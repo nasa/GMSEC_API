@@ -1,0 +1,42 @@
+# Copyright 2007-2015 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
+# Linux x86 build configuration for GMSEC_API
+
+# load the default macros
+include $(GMSEC_HOME)/config/default
+
+BINDIR    = $(GMSEC_HOME)/bin
+
+# platform location of Java headers for JNI
+JAVA_INCS = -I$(JDK_HOME)/include -I$(JDK_HOME)/include/linux
+JAVA_LIBS = -L$(JDK_HOME)/jre/lib/i386/client -ljvm
+
+CXX       = g++
+CC        = gcc
+
+LINK      = $(CXX)
+DLINK     = $(CXX) -shared
+SHLIB_EXT = so
+
+INCS      = -I$(GMSEC_HOME)/include \
+            -I$(GMSEC_HOME)/framework/include \
+            -I$(GMSEC_HOME)/framework/support/include
+
+# add COVERAGE for code coverage
+ifeq ($(COVERAGE),1)
+	COVERAGE = --coverage
+endif
+
+# define C/C++ compiler flags
+CXXFLAGS = $(DEBUG_FLAGS) $(COVERAGE) -march=i486 -Wall -D_REENTRANT $(INCS) 
+CFLAGS   = $(CXXFLAGS)
+
+# define api/example/test applications LDFLAGS
+LDFLAGS  = $(COVERAGE) -L$(BINDIR) -lGMSECAPI -ldl -lpthread
+
+# define API API_CXXFLAGS and API_LDFLAGS
+API_CXXFLAGS = -fPIC $(CXXFLAGS)
+API_LDFLAGS  = $(COVERAGE) -ldl -lpthread

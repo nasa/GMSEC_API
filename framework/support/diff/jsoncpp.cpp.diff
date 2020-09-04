@@ -1,0 +1,276 @@
+diff -u -w -r jsoncpp-0.y.z/dist/jsoncpp.cpp GMSEC_API/framework/support/src/jsoncpp.cpp > jsoncpp.cpp.diff
+--- jsoncpp-0.y.z/dist/jsoncpp.cpp	2015-09-22 15:46:27.202708960 -0400
++++ GMSEC_API/framework/support/src/jsoncpp.cpp	2015-09-23 09:49:30.353155016 -0400
+@@ -62,6 +62,11 @@
+ Public Domain "license" you can re-license your copy using whatever
+ license you like.
+ 
++-------------------------------------------------------------
++GMSEC API has a copy of JsonCpp in the gmsec namespace to
++avoid conflicts
++-------------------------------------------------------------
++
+ */
+ 
+ // //////////////////////////////////////////////////////////////////////
+@@ -73,7 +78,7 @@
+ 
+ 
+ 
+-#include "json/json.h"
++#include <json.h>
+ 
+ #ifndef JSON_IS_AMALGAMATION
+ #error "Compile with -I PATH_TO_JSON_DIRECTORY"
+@@ -197,7 +202,11 @@
+ #include "json_tool.h"
+ #endif // if !defined(JSON_IS_AMALGAMATION)
+ #include <utility>
++#ifdef __SUNPRO_CC
++#include <stdio.h>
++#else
+ #include <cstdio>
++#endif
+ #include <cassert>
+ #include <cstring>
+ #include <istream>
+@@ -1674,7 +1683,7 @@
+   }
+ 
+   // Avoid using a string constant for the format control string given to
+-  // sscanf, as this can cause hard to debug crashes on OS X. See here for more
++  // std::sscanf, as this can cause hard to debug crashes on OS X. See here for more
+   // info:
+   //
+   //     http://developer.apple.com/library/mac/#DOCUMENTATION/DeveloperTools/gcc-4.0.1/gcc/Incompatibilities.html
+@@ -1682,12 +1691,12 @@
+ 
+   if (length <= bufferSize) {
+     Char buffer[bufferSize + 1];
+-    memcpy(buffer, token.start_, length);
++    std::memcpy(buffer, token.start_, length);
+     buffer[length] = 0;
+-    count = sscanf(buffer, format, &value);
++    count = std::sscanf(buffer, format, &value);
+   } else {
+     std::string buffer(token.start_, token.end_);
+-    count = sscanf(buffer.c_str(), format, &value);
++    count = std::sscanf(buffer.c_str(), format, &value);
+   }
+ 
+   if (count != 1)
+@@ -2033,7 +2042,7 @@
+   std::string errs;
+   bool ok = parseFromStream(b, sin, &root, &errs);
+   if (!ok) {
+-    fprintf(stderr,
++    std::fprintf(stderr,
+             "Error from reader: %s",
+             errs.c_str());
+ 
+@@ -2312,7 +2321,7 @@
+  * @param value Pointer to the string to duplicate. Must be zero-terminated if
+  *              length is "unknown".
+  * @param length Length of the value. if equals to unknown, then it will be
+- *               computed using strlen(value).
++ *               computed using std::strlen(value).
+  * @return Pointer on the duplicate instance of string.
+  */
+ static inline char* duplicateStringValue(const char* value,
+@@ -2328,7 +2337,7 @@
+         "in Json::Value::duplicateStringValue(): "
+         "Failed to allocate string value buffer");
+   }
+-  memcpy(newString, value, length);
++  std::memcpy(newString, value, length);
+   newString[length] = 0;
+   return newString;
+ }
+@@ -2352,7 +2361,7 @@
+         "Failed to allocate string value buffer");
+   }
+   *reinterpret_cast<unsigned*>(newString) = length;
+-  memcpy(newString + sizeof(unsigned), value, length);
++  std::memcpy(newString + sizeof(unsigned), value, length);
+   newString[actualLength - 1U] = 0; // to avoid buffer over-run accidents by users later
+   return newString;
+ }
+@@ -2361,7 +2370,7 @@
+     unsigned* length, char const** value)
+ {
+   if (!isPrefixed) {
+-    *length = static_cast<unsigned>(strlen(prefixed));
++    *length = static_cast<unsigned>(std::strlen(prefixed));
+     *value = prefixed;
+   } else {
+     *length = *reinterpret_cast<unsigned const*>(prefixed);
+@@ -2495,7 +2504,7 @@
+   unsigned this_len = this->storage_.length_;
+   unsigned other_len = other.storage_.length_;
+   unsigned min_len = std::min(this_len, other_len);
+-  int comp = memcmp(this->cstr_, other.cstr_, min_len);
++  int comp = std::memcmp(this->cstr_, other.cstr_, min_len);
+   if (comp < 0) return true;
+   if (comp > 0) return false;
+   return (this_len < other_len);
+@@ -2508,7 +2517,7 @@
+   unsigned this_len = this->storage_.length_;
+   unsigned other_len = other.storage_.length_;
+   if (this_len != other_len) return false;
+-  int comp = memcmp(this->cstr_, other.cstr_, this_len);
++  int comp = std::memcmp(this->cstr_, other.cstr_, this_len);
+   return comp == 0;
+ }
+ 
+@@ -2585,7 +2594,7 @@
+ 
+ Value::Value(const char* value) {
+   initBasic(stringValue, true);
+-  value_.string_ = duplicateAndPrefixStringValue(value, static_cast<unsigned>(strlen(value)));
++  value_.string_ = duplicateAndPrefixStringValue(value, static_cast<unsigned>(std::strlen(value)));
+ }
+ 
+ Value::Value(const char* beginValue, const char* endValue) {
+@@ -2656,7 +2665,7 @@
+       const CommentInfo& otherComment = other.comments_[comment];
+       if (otherComment.comment_)
+         comments_[comment].setComment(
+-            otherComment.comment_, strlen(otherComment.comment_));
++            otherComment.comment_, std::strlen(otherComment.comment_));
+     }
+   }
+ }
+@@ -2744,7 +2753,7 @@
+     decodePrefixedString(this->allocated_, this->value_.string_, &this_len, &this_str);
+     decodePrefixedString(other.allocated_, other.value_.string_, &other_len, &other_str);
+     unsigned min_len = std::min(this_len, other_len);
+-    int comp = memcmp(this_str, other_str, min_len);
++    int comp = std::memcmp(this_str, other_str, min_len);
+     if (comp < 0) return true;
+     if (comp > 0) return false;
+     return (this_len < other_len);
+@@ -2799,7 +2808,7 @@
+     decodePrefixedString(this->allocated_, this->value_.string_, &this_len, &this_str);
+     decodePrefixedString(other.allocated_, other.value_.string_, &other_len, &other_str);
+     if (this_len != other_len) return false;
+-    int comp = memcmp(this_str, other_str, this_len);
++    int comp = std::memcmp(this_str, other_str, this_len);
+     return comp == 0;
+   }
+   case arrayValue:
+@@ -3193,7 +3202,7 @@
+   if (type_ == nullValue)
+     *this = Value(objectValue);
+   CZString actualKey(
+-      key, static_cast<unsigned>(strlen(key)), CZString::noDuplication); // NOTE!
++      key, static_cast<unsigned>(std::strlen(key)), CZString::noDuplication); // NOTE!
+   ObjectValues::iterator it = value_.map_->lower_bound(actualKey);
+   if (it != value_.map_->end() && (*it).first == actualKey)
+     return (*it).second;
+@@ -3244,7 +3253,7 @@
+ }
+ const Value& Value::operator[](const char* key) const
+ {
+-  Value const* found = find(key, key + strlen(key));
++  Value const* found = find(key, key + std::strlen(key));
+   if (!found) return nullRef;
+   return *found;
+ }
+@@ -3256,7 +3265,7 @@
+ }
+ 
+ Value& Value::operator[](const char* key) {
+-  return resolveReference(key, key + strlen(key));
++  return resolveReference(key, key + std::strlen(key));
+ }
+ 
+ Value& Value::operator[](const std::string& key) {
+@@ -3288,7 +3297,7 @@
+ }
+ Value Value::get(char const* key, Value const& defaultValue) const
+ {
+-  return get(key, key + strlen(key), defaultValue);
++  return get(key, key + std::strlen(key), defaultValue);
+ }
+ Value Value::get(std::string const& key, Value const& defaultValue) const
+ {
+@@ -3311,7 +3320,7 @@
+ }
+ bool Value::removeMember(const char* key, Value* removed)
+ {
+-  return removeMember(key, key + strlen(key), removed);
++  return removeMember(key, key + std::strlen(key), removed);
+ }
+ bool Value::removeMember(std::string const& key, Value* removed)
+ {
+@@ -3325,7 +3334,7 @@
+     return nullRef;
+ 
+   Value removed;  // null
+-  removeMember(key, key + strlen(key), &removed);
++  removeMember(key, key + std::strlen(key), &removed);
+   return removed; // still null if removeMember() did nothing
+ }
+ Value Value::removeMember(const std::string& key)
+@@ -3370,7 +3379,7 @@
+ }
+ bool Value::isMember(char const* key) const
+ {
+-  return isMember(key, key + strlen(key));
++  return isMember(key, key + std::strlen(key));
+ }
+ bool Value::isMember(std::string const& key) const
+ {
+@@ -3533,7 +3542,7 @@
+ }
+ 
+ void Value::setComment(const char* comment, CommentPlacement placement) {
+-  setComment(comment, strlen(comment), placement);
++  setComment(comment, std::strlen(comment), placement);
+ }
+ 
+ void Value::setComment(const std::string& comment, CommentPlacement placement) {
+@@ -3663,7 +3672,7 @@
+       ++current;
+     } else {
+       const char* beginName = current;
+-      while (current != end && !strchr("[.", *current))
++      while (current != end && !std::strchr("[.", *current))
+         ++current;
+       args_.push_back(std::string(beginName, current));
+     }
+@@ -3910,14 +3919,14 @@
+   if (value == NULL)
+     return "";
+   // Not sure how to handle unicode...
+-  if (strpbrk(value, "\"\\\b\f\n\r\t") == NULL &&
++  if (std::strpbrk(value, "\"\\\b\f\n\r\t") == NULL &&
+       !containsControlCharacter(value))
+     return std::string("\"") + value + "\"";
+   // We have to walk value and escape any special characters.
+   // Appending to std::string is not efficient, but this should be rare.
+   // (Note: forward slashes are *not* rare, but I am not escaping them.)
+   std::string::size_type maxsize =
+-      strlen(value) * 2 + 3; // allescaped+quotes+NULL
++      std::strlen(value) * 2 + 3; // allescaped+quotes+NULL
+   std::string result;
+   result.reserve(maxsize); // to avoid lots of mallocs
+   result += "\"";
+@@ -4122,7 +4131,7 @@
+ // //////////////////////////////////////////////////////////////////
+ 
+ StyledWriter::StyledWriter()
+-    : rightMargin_(74), indentSize_(3), addChildValues_() {}
++    : rightMargin_(74), indentSize_(3), addChildValues_(false) {}
+ 
+ std::string StyledWriter::write(const Value& root) {
+   document_ = "";
+@@ -4337,7 +4346,7 @@
+ 
+ StyledStreamWriter::StyledStreamWriter(std::string indentation)
+     : document_(NULL), rightMargin_(74), indentation_(indentation),
+-      addChildValues_() {}
++      addChildValues_(false) {}
+ 
+ void StyledStreamWriter::write(std::ostream& out, const Value& root) {
+   document_ = &out;

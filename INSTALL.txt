@@ -1,0 +1,378 @@
+ 
+# Copyright 2007-2015 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+ 
+ 
+=========================================================================
+             GMSEC API Open Source Build Instructions
+=========================================================================
+
+This file describes how to build the GMSEC API from the open source
+distribution. The steps in this file assume you have:
+
+* the source code for the API, located in a directory named GMSEC_API
+* for Windows systems: Visual Studio 2008 (or 2010)
+* for Solaris 10 systems: Sun One Compiler CC, make and gmake
+* for all other systems: make and the GNU Compiler Collection
+        * Red Hat Enterprise Linux 3: gcc 3.2.3, GNU make 3.79.1 [1]
+        * Red Hat Enterprise Linux 4: gcc 3.4.6, GNU make 3.80 [1]
+        * Red Hat Enterprise Linux 5: gcc 4.1.2, GNU make 3.81 [1]
+        * Red Hat Enterprise Linux 6: gcc 4.4.6, GNU make 3.81 [1]
+        * Mac OS X (PowerPC): gcc 4.0.1, GNU make 3.81
+        * Mac OS X (Intel): gcc 4.0.1, GNU make 3.80
+        * Mac OS X (Intel): gcc LLVM 5.1 (clang-503.0.40), GNU make 3.81
+        * HP-UX 11.11: gcc 4.1.2, gmake
+* for Java: JDK and JRE version 1.5 or higher
+* for Perl (non-Windows): (threaded) Perl 5.8.8 or later
+* for Perl (Windows): ActivePerl 5.14.2 (build 1402) and the manifest tool
+  (mt.exe) from the Windows SDK
+
+Please note that this is intended as a "getting started" document. After
+you are familiar with the build process, you will probably want to tailor
+it to your system.
+
+
+Comments on dependencies
+-----------------------------------------
+The tools and versions identified are those used by the GMSEC team to build
+binaries for distribution. Many alternative tools and versions will work.
+
+The tools tagged [1] are the defaults shipped on those systems.
+
+Past open source GMSEC API distributions had dependencies on libxml2,
+zlib, and Xerces. GMSEC API 3.6 has removed those external dependencies.
+GMSEC API 3.6 no longer depends on the GMSEC_API_SUPPORT.tgz tar-ball.
+
+
+Building GMSEC API extensions
+-----------------------------------------
+In order to build GMSEC API extensions, for example middleware adapters,
+the directory layout assumed by the build files is:
+
+        + GMSEC_API/
+            + ...
+
+        + SUPPORT/
+            + ...
+
+For example, if building the middleware adapter for the (fictional) mwx
+middleware, the SUPPORT directory would have
+
+        + SUPPORT/
+            + mwx/
+                + include/
+                + lib/
+                + ...
+
+where the mwx/include/ and mwx/lib/ directories contain the middleware
+client interface and libraries for mwx.  Symbolic links are useful when
+populating the SUPPORT directory since those links can refer to standard
+installation locations on the system.
+
+
+==========================================================================
+                              Windows systems:
+==========================================================================
+
+Environment Variable Settings:
+-----------------------------------------
+PATH:
+Define an environment variable JDK_HOME
+* Set to your Java SDK installation directory (not the bin directory)
+
+Add all of the following to your PATH:
+* GMSEC_API\bin (the full path to this directory)
+* the path to perl.exe (to build the Perl binding)
+* the path to javac (to build the Java binding)
+* the .NET Framework 3.5 directory
+* the path to mt.exe (in the Windows SDK)
+* Visual Studio 9.0's Common7/IDE, VC, and VC/bin directories
+
+For example:
+set JDK_HOME=C:\Program Files\Java\jdk1.5.0_22
+set PATH=%PATH%;C:\GMSEC_API\bin;C:\Perl\bin;C:\Program Files\Java\jdk1.5.0_22\bin;
+set PATH=%PATH%;C:\Windows\Microsoft.NET\Framework\v3.5
+set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE
+set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC;
+    C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin
+
+Please note that when setting environment variables in this fashion, they will
+only be available for any processes that are run within the same command line
+window.
+
+To set environment variables so that they affect all processes, open up the 
+Environment Variables settings in Windows (search for "environment" in the start
+menu and add/modify variables as needed*.
+
+* If you already have a process open when modifying the variables, the new
+settings will not take place until you restart the process.
+
+Building the C++ and Java APIs:
+---------------------------------------
+Next, open GMSEC_API\gmsecapi_opensource.sln in Visual Studio 2008.  If using
+a later version of Visual Studio (e.g., VS 2010 or VS 2012), Visual Studio
+will prompt to upgrade the project files.
+
+Choose the "Release" Solution Configuration (located in the toolbar). In the
+Solution Explorer, right-click the solution and select "Rebuild Solution".
+
+The GMSEC API jar file
+	GMSEC_API\bin\gmsecapi.jar
+needs to be in the Java classpath to make use of the GMSEC API Java binding.
+
+
+Building the GMSEC API Perl binding:
+---------------------------------------
+At the Windows command prompt, from the GMSEC_API\perl directory, execute:
+        perl -Iextra Makefile.PL PREFIX=..\bin
+        vcvarsall.bat
+        nmake
+        nmake install
+
+
+C++ Examples:
+---------------------
+Open GMSEC_API\examples\cpp\cpp.sln in Visual Studio. Choose the Release
+configuration. In the Solution Explorer, right-click the solution and
+select "Rebuild Solution". (Requires that the C++ API be built.) The
+executables will be placed in the GMSEC_API/bin directory.
+
+C Examples:
+---------------------
+Open GMSEC_API\examples\c\c.sln in Visual Studio 2008 Express. Choose the
+Release configuration. In the Solution Explorer, right-click the solution
+and select "Rebuild Solution". (Requires that the C++ API be built.)  The
+executables will be placed in the GMSEC_API/bin directory.
+
+Java Examples:
+---------------------
+Run GMSEC_API\examples\java\compileAll.cmd
+
+If the builds are successful you will have built the GMSEC API, the Bolt
+message delivery server as well as the C and C++ example code.  These software
+entities will reside in the GMSEC_API\bin directory.
+
+Proceed to the section "Testing the Build" below.
+
+
+
+=========================================================================
+                        Unix/Linux systems:
+=========================================================================
+
+Environment Variable Settings:
+-----------------------------------------
+GMSEC_PLATFORM
+--------------
+Set the GMSEC_PLATFORM environment variable based on the platform to one
+of the following:
+
+ Platform                 Setting
+-------------            ------------
+Linux x86 (gcc)          linux.x86
+Linux x86_64 (gcc)       linux.x86_64
+
+Mac OS X x86 (gcc)       macosx.x86
+Mac OS X x86_64 (gcc)    macosx.x86_64
+Mac OS X PPC 32 (gcc)    macosx.ppc
+
+Solaris 10 x86 (CC)      solaris.x86.CC
+Solaris 10 SPARC (CC)    solaris.sparc.CC
+Solaris 10 SPARC (gcc)   solaris.sparc.gcc
+
+HP-UX PA-RISC2 (gcc)     hpux.pa
+HP-UX IA64 (aCC)         hpux.ia64.aCC
+HP-UX IA64 (gcc)         hpux.ia64.gcc
+
+
+The configuration files associated with these platforms are in
+        + GMSEC_API/
+            + config/
+                + ...
+
+For platforms that have Mac OS X 10.8 (Mountain Lion) or later, edit both the
+macosx.x86_64 and basic.macosx.x86_64 configuration files to uncomment appro-
+priate definitions that are required to support the Clang compiler.  Refer to
+the variables for OPT_STDCPP, JAVA_BIN and JAVA_INCS.
+
+For other UNIX/Linux-like platforms, adding a config file here (based on the
+existing options) can address platform specifics (e.g., OS, architecture,
+compiler, other tools).
+
+
+JDK PATH:
+---------
+Set the JDK_HOME environment variable to your JDK installation
+e.g.  export JDK_HOME=/usr/java/jdk1.5.0_22
+
+For Mac users, here's an example of your JDK_HOME
+e.g.  export JDK_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_71.jdk/Contents/Home/
+
+PATH :
+------
+If not already set, the appropriate version of Perl needs
+to be in your PATH.
+
+CLASSPATH :
+-----------
+Add the GMSEC API jar file to the CLASSPATH.  It will reside
+in the GMSEC_API/bin directory after a successful builld.
+
+        GMSEC_API/bin/gmsecapi.jar
+
+
+For running the GMSEC API examples:
+-----------------------------------
+The GMSEC_API/bin directory holds shared libraries needed by GMSEC.
+The environment variable that specifies the directories to search for
+shared libraries depends on the operating system:
+
+ Platform              Environment Variable
+-------------         ----------------------
+Linux                 LD_LIBRARY_PATH
+Mac OS X              DYLD_LIBRARY_PATH
+Solaris               LD_LIBRARY_PATH
+HP-UX old             SHLIB_PATH
+HP-UX modern          LD_LIBRARY_PATH
+
+
+Update the environment variable corresponding to the platform to include
+the fully qualified GMSEC_API/bin directory.
+
+MW_WRAPPERS :
+-----------
+This environment variable can be used to specify which middleware wrappers, in
+addition to Message Bus and Bolt wrappers, that should be created.  A listing
+of the various middleware wrappers that can be built are listed in the
+GMSEC_API/wrapper directory.
+
+For example, in Bash, the following statement would indicate that the ActiveMQ
+C++ 3.8.1, the C2, and the C2-NSS wrappers should be built:
+
+    export MW_WRAPPERS="activemq381 c2 c2_nss"
+
+NOTE:
+-----
+If you've added these environment settings to a file such as ".profile",
+".cshrc", or "bashrc", etc., you will need to source these files in order to
+incorporate these settings into your environment.
+
+
+Building the API :
+-----------------------
+
+To begin building the GMSEC API, execute the following commands:
+
+    $ cd GMSEC_API
+    $ make              # for RHEL, Mac
+or
+    $ gmake             # for HP-UX, Solaris
+
+When the make-process has completed, the GMSEC API will have been built, along
+with related software, such as the C and C++ example applications, and the
+Java GMSEC API binding (JAR file).  These software entities will reside in the
+GMSEC_API/bin directory.
+
+The (make) install target can be used to copy a runnable version of the
+GMSEC API to the GMSEC_API/../release/ directory.  The given install target
+is dependent on GNU tar.
+
+Proceed to the section "Testing the Build" below.
+
+
+=========================================================================
+                          All systems:
+=========================================================================
+
+Perl Examples:
+--------------------
+The examples are Perl scripts and therefore do not need to be compiled.
+They are located in the directory :
+
+	GMSEC_API/examples/perl
+
+
+Java Examples:
+---------------------
+The Java example code residing in GMSEC_API/examples/java is not compiled
+as part of the top level API build process, therefore each Java example
+code snippet is left to be built as a user exercise.
+
+=========================================================================
+                       Testing the Build:
+=========================================================================
+
+1.) Go to the binary directory
+* GMSEC_API/bin
+
+2.) Start the Bolt server as such:
+* java -jar bolt.jar
+
+You should see Bolt listening for a connection, something like this:
+
+2013/347/06:01:10.351 INFO bolt.Server
+	waiting for connections on /0.0.0.0:9100
+
+3.) Start a GMSEC subscriber as such:
+* For Unix Systems type: ./gmsub connectiontype=gmsec_bolt
+* For Window Systems type: gmsub.exe connectiontype=gmsec_bolt
+
+You should see the subscriber estabish a connection and listening for a
+message for which it has subscribed, something like this:
+
+2013/347/06:02:07.282 INFO bolt.Server
+	creating IOManager
+
+2013/347/06:02:07.323 MONITOR bolt.Client[id=1]
+	created
+
+2013/347/06:02:07.342 INFO bolt.IOManager
+	welcome: added WELCOME to Client[id=1]
+
+
+4.) Execute a GMSEC publisher as such:
+* For Unix Systems type: ./gmpub connectiontype=gmsec_bolt
+* For Window Systems type: gmpub.exe connectiontype=gmsec_bolt
+
+You should see the publisher connect to Bolt and publish a series
+of messages, something like this:
+
+2013-347-11:03:46.395 [INFO] [gmpub.cpp:79] GMSEC API v3.5.4 [12/12/2013]
+
+2013-347-11:03:46.400 [INFO] [gmpub.cpp:95] Middleware version = 1.0
+
+2013-347-11:03:46.400 [INFO] [gmpub.cpp:98] Using subject 'GMSEC.TEST.PUBLISH'
+
+2013-347-11:03:46.400 [INFO] [gmpub.cpp:99] Publishing 1 message(s)
+
+2013-347-11:03:46.400 [INFO] [gmpub.cpp:128] working
+
+2013-347-11:03:46.400 [INFO] [gmpub.cpp:205] Sending:
+<MESSAGE SUBJECT="GMSEC.TEST.PUBLISH" KIND="PUBLISH">
+	<FIELD TYPE="CHAR" NAME="C">c</FIELD>
+	<FIELD TYPE="I32" NAME="COUNT">0</FIELD>
+	<FIELD TYPE="F64" NAME="D" BITS="4000000000000000">2</FIELD>
+	<FIELD TYPE="F32" NAME="E" BITS="40000000">2</FIELD>
+	<FIELD TYPE="BOOL" NAME="F">FALSE</FIELD>
+	<FIELD TYPE="I32" NAME="I">1</FIELD>
+	<FIELD TYPE="I16" NAME="J">1</FIELD>
+	<FIELD TYPE="U16" NAME="K">1</FIELD>
+	<FIELD TYPE="STRING" NAME="S">This is a test</FIELD>
+	<FIELD TYPE="BOOL" NAME="T">TRUE</FIELD>
+	<FIELD TYPE="U32" NAME="U">1</FIELD>
+	<FIELD TYPE="BIN" NAME="X">4A4C4D4E4F5051</FIELD>
+</MESSAGE>
+
+
+=========================================================================
+                         Contact Information:
+=========================================================================
+
+Questions, comments and concerns regarding the GMSEC API Open Source
+distribution should be forwarded to:
+
+gmsec-support@lists.nasa.gov
+
+=========================================================================

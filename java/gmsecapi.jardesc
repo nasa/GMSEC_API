@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jardesc>
+    <jar path="gmsecapi.jar"/>
+    <options overwrite="false" compress="true" exportErrors="true" exportWarnings="true" saveDescription="true" descriptionLocation="/gmsecapi/gmsecapi.jardesc" useSourceFolders="false" buildIfNeeded="true"/>
+    <manifest manifestVersion="1.0" usesManifest="true" reuseManifest="false" saveManifest="false" generateManifest="true" manifestLocation="">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportOutputFolder="false" exportJavaFiles="false">
+        <javaElement handleIdentifier="=gmsecapi/&lt;gov.nasa.gsfc.gmsecapi.base"/>
+        <javaElement handleIdentifier="=gmsecapi/&lt;gov.nasa.gsfc.gmsecapi.jni"/>
+        <javaElement handleIdentifier="=gmsecapi/&lt;gov.nasa.gsfc.gmsecapi.mist"/>
+        <javaElement handleIdentifier="=gmsecapi/&lt;gov.nasa.gsfc.gmsecapi.gmsec_ss"/>
+        <javaElement handleIdentifier="=gmsecapi/&lt;gov.nasa.gsfc.gmsecapi.gmsec_soap"/>
+        <javaElement handleIdentifier="=gmsecapi/&lt;gov.nasa.gsfc.gmsecapi"/>
+    </selectedElements>
+</jardesc>
