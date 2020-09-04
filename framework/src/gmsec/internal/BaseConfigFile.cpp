@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -838,6 +838,8 @@ Status BaseConfigFile::AddSubscription(const char *name, const char* subscriptio
 
 		if (tmpRootElement == NULL)
 		{
+			delete tmpDoc;
+
 			result.Set(GMSEC_STATUS_CONFIGFILE_ERROR,
 			           GMSEC_OTHER_ERROR,
 			           "Root Element of XML Document is NULL");
@@ -863,6 +865,8 @@ Status BaseConfigFile::AddSubscription(const char *name, const char* subscriptio
 	}
 	else
 	{
+		delete tmpDoc;
+
 		result.Set(GMSEC_STATUS_CONFIGFILE_ERROR,
 			GMSEC_XML_PARSE_ERROR,
 			"Invalid xml format - parse failed");
@@ -908,6 +912,8 @@ Status BaseConfigFile::AddConfig(const char *name, gmsec::Config& config)
 
 		if (tmpRootElement == NULL)
 		{
+			delete tmpDoc;
+
 			result.Set(GMSEC_STATUS_CONFIGFILE_ERROR,
 			           GMSEC_OTHER_ERROR,
 			           "Root Element of XML Document is NULL");
@@ -933,6 +939,8 @@ Status BaseConfigFile::AddConfig(const char *name, gmsec::Config& config)
 	}
 	else
 	{
+		delete tmpDoc;
+
 		result.Set(GMSEC_STATUS_CONFIGFILE_ERROR,
 			GMSEC_XML_PARSE_ERROR,
 			"Invalid xml format - parse failed");
@@ -978,6 +986,8 @@ Status BaseConfigFile::AddMessage(const char *name, gmsec::Message& message)
 
 		if (tmpRootElement == NULL)
 		{
+			delete tmpDoc;
+
 			result.Set(GMSEC_STATUS_CONFIGFILE_ERROR,
 			           GMSEC_OTHER_ERROR,
 			           "Root Element of XML Document is NULL");
@@ -1003,6 +1013,8 @@ Status BaseConfigFile::AddMessage(const char *name, gmsec::Message& message)
 	}
 	else
 	{
+		delete tmpDoc;
+
 		result.Set(GMSEC_STATUS_CONFIGFILE_ERROR,
 			GMSEC_XML_PARSE_ERROR,
 			"Invalid xml format - parse failed");
@@ -1080,6 +1092,8 @@ Status BaseConfigFile::AddCustomXML(const char* xml)
 	}
 	else
 	{
+		delete tmpDoc;
+
 		result.Set(GMSEC_STATUS_CONFIGFILE_ERROR,
 			GMSEC_XML_PARSE_ERROR,
 			"Invalid xml format - parse failed");
@@ -1378,8 +1392,17 @@ tinyxml2::XMLElement* BaseConfigFile::GetCustomXMLElement(const char* xml)
 	}
 
 	tinyxml2::XMLDocument* tmpDoc = new tinyxml2::XMLDocument();
+
+	if (tmpDoc == NULL)
+	{
+		const char* errorString = "Failed to allocate XMLDocument";
+		LOG_WARNING << "BaseConfigFile::GetCustomXMLElement : " << errorString;
+		return NULL;
+	}
+
 	if (tmpDoc->Parse(xmlStr.c_str()) != tinyxml2::XML_NO_ERROR)
 	{
+		delete tmpDoc;
 		const char* errorString = "Unparseable XML string given";
 		LOG_WARNING << "BaseConfigFile::GetCustomXMLElement : " << errorString;
 		return NULL;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -47,55 +47,84 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Config
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Config_1String
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Config_1Args
   (JNIEnv *jenv, jclass jcls, jobjectArray jargs)
 {
-	Config* created = 0;
+	jlong jConfig = 0;
 
 	try
 	{
 		jint size = jenv->GetArrayLength(jargs);
+
 		if (size < 1)
 		{
-			return Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Config(jenv, jcls);
+			jConfig = Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Config(jenv, jcls);
 		}
-
-		std::vector<char*> args;
-		int i;
-		for (i = 0; jvmOk(jenv, "new Config(String[])") && i < size; ++i)
+		else
 		{
-			jstring s = (jstring) jenv->GetObjectArrayElement(jargs, i);
-			JStringManager manager(jenv, s);
-			if (manager.c_str())
+			std::vector<char*> args;
+
+			for (int i = 0; jvmOk(jenv, "new Config(String[])") && i < size; ++i)
 			{
-				args.push_back(StringUtil::stringNew(manager.c_str()));
+				jstring s = (jstring) jenv->GetObjectArrayElement(jargs, i);
+
+				JStringManager manager(jenv, s);
+
+				if (manager.c_str())
+				{
+					args.push_back(StringUtil::stringNew(manager.c_str()));
+				}
 			}
-		}
 
-		if (jvmOk(jenv, "new Config(String[])"))
-		{
-			created = new Config((int) args.size(), &args[0]);
-		}
+			if (jvmOk(jenv, "new Config(String[])"))
+			{
+				Config* created = new Config((int) args.size(), &args[0]);
 
-		for (size_t j = 0; j < args.size(); ++j)
-		{
-			StringUtil::stringDestroy(args[j]);
+				jConfig = JNI_POINTER_TO_JLONG(created);
+			}
+
+			for (size_t j = 0; j < args.size(); ++j)
+			{
+				StringUtil::stringDestroy(args[j]);
+			}
 		}
 	}
 	JNI_CATCH
 
-	return JNI_POINTER_TO_JLONG(created);
+	return jConfig;
+}
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Config_1Data
+  (JNIEnv *jenv, jclass jcls, jstring jData)
+{
+	jlong jConfig = 0;
+
+	try
+	{
+		JStringManager data(jenv, jData);
+
+		if (jvmOk(jenv, "new Config(const char*)") && data.c_str())
+		{
+			Config* created = new Config(data.c_str());
+
+			jConfig = JNI_POINTER_TO_JLONG(created);
+		}
+	}
+	JNI_CATCH
+
+	return jConfig;
 }
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Config_1Copy
-  (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig)
+  (JNIEnv *jenv, jclass jcls, jlong jOtherPtr, jobject jOther)
 {
-	Config* created = 0;
+	jlong jConfig = 0;
 
 	try
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		Config* config = JNI_JLONG_TO_CONFIG(jOtherPtr);
 
 		if (!config)
 		{
@@ -103,12 +132,14 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Config_1C
 		}
 		else
 		{
-			created = new Config(*config);
+			Config* created = new Config(*config);
+
+			jConfig = JNI_POINTER_TO_JLONG(created);
 		}
 	}
 	JNI_CATCH
 
-	return JNI_POINTER_TO_JLONG(created);
+	return jConfig;
 }
 
 
@@ -245,7 +276,7 @@ JNIEXPORT jobjectArray JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_
 			{
 				key = it->c_str();
 
-				jstring jKey = jenv->NewStringUTF(key);
+				jstring jKey = makeJavaString(jenv, key);
 
 				jenv->SetObjectArrayElement(jKeys, i++, jKey);
 			}
@@ -295,7 +326,7 @@ JNIEXPORT jobjectArray JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_
 			{
 				value = it->c_str();
 
-				jstring jValue = jenv->NewStringUTF(value);
+				jstring jValue = makeJavaString(jenv, value);
 
 				jenv->SetObjectArrayElement(jValues, i++, jValue);
 			}
@@ -331,7 +362,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_1GetV
 
 				if (value)
 				{
-					result = jenv->NewStringUTF(value);
+					result = makeJavaString(jenv, value);
 
 					jvmOk(jenv, "Config.GetValue");
 				}
@@ -369,7 +400,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_1GetV
 
 				if (value)
 				{
-					result = jenv->NewStringUTF(value);
+					result = makeJavaString(jenv, value);
 
 					jvmOk(jenv, "Config.GetValue");
 				}
@@ -643,7 +674,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_1ToXM
 		{
 			const char* xml = config->toXML();
 
-			result = jenv->NewStringUTF(xml);
+			result = makeJavaString(jenv, xml);
 		}
 	}
 	JNI_CATCH
@@ -681,6 +712,32 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_1FromXML
 		}
 	}
 	JNI_CATCH
+}
+
+
+JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_1ToJSON
+  (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig)
+{
+	jstring result;
+
+	try
+	{
+		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+		if (!config)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+		}
+		else
+		{
+			const char* json = config->toJSON();
+
+			result = makeJavaString(jenv, json);
+		}
+	}
+	JNI_CATCH
+
+	return result;
 }
 
 

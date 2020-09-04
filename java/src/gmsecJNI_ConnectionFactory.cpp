@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -110,7 +110,7 @@ extern "C"
 		jstring s = 0;
 		try
 		{
-			s = jenv->NewStringUTF(ConnectionFactory::GetAPIVersion());
+			s = makeJavaString(jenv, ConnectionFactory::GetAPIVersion());
 			jvmOk(jenv, "ConnectionFactory.GetAPIVersion");
 		}
 		JNI_CATCH

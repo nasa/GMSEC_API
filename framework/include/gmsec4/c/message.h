@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -137,24 +137,24 @@ extern "C"
      *
      * GMSEC_Message msgXML = messageCreateUsingData(XML, status);
      * 
-     * // Create a Message object with JOSN text 	 * 
+     * // Create a Message object with JSON text 
      * const char* JSON = "{\"MESSAGE\":{ \
-     *                    \"KIND\":\"PUBLISH\", \
-     *                    \"SUBJECT\":\"GMSEC.TEST.JSON.SUBJECT\", \
-     *                    \"FIELD\":[ \
-     *                       { \
-     *                           \"NAME\":\"CHAR-FIELD\", \
-     *                           \"TYPE\":\"CHAR\", \
-     *                           \"VALUE\":\"c\" \
-     *                       }, \
-     *                       { \
-     *                           \"NAME\":\"BOOL-FIELD\", \
-     *                           \"TYPE\":\"BOOL\", \
-     *                           \"VALUE\":\"TRUE\" \
+     *                       \"KIND\":\"PUBLISH\", \
+     *                       \"SUBJECT\":\"GMSEC.TEST.JSON.SUBJECT\", \
+     *                       \"FIELD\":[ \
+     *                         { \
+     *                            \"NAME\":\"CHAR-FIELD\", \
+     *                            \"TYPE\":\"CHAR\", \
+     *                            \"VALUE\":\"c\" \
+     *                         }, \
+     *                         { \
+     *                            \"NAME\":\"BOOL-FIELD\", \
+     *                            \"TYPE\":\"BOOL\", \
+     *                            \"VALUE\":\"TRUE\" \
+     *                         } \
+     *                         ] \
      *                       } \
-     *                   ] \
-     *               } \
-     *              }";
+     *                     }";
      *
      * GMSEC_Message msgJSON = messageCreateUsingData(JSON, status);
      *
@@ -243,6 +243,18 @@ extern "C"
 	 * @return The message subject/topic.
 	 */
 	GMSEC_API const char* messageGetSubject(const GMSEC_Message msg, GMSEC_Status status);
+
+
+	/**
+	 * @fn void messageSetSubject(GMSEC_Message msg, const char* subject, GMSEC_Status status)
+	 *
+	 * @brief Allows for the setting/changing of the message subject.
+	 *
+	 * @param[in]  msg     - handle to the Message
+	 * @param[in]  subject - the subject/topic to associate with the message
+	 * @param[out] status  - status of the operation
+	 */
+	GMSEC_API void messageSetSubject(GMSEC_Message msg, const char* subject, GMSEC_Status status);
 
 
 	/**

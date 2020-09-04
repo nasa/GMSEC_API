@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -159,7 +159,7 @@ public class ConnectionManager
 	 * successfully returns, the ConnectionManager is ready for message operations.
 	 *
 	 * @throws A GMSEC_Exception is thrown if the configuration information cannot be used to deduce
-	 * a Connection type, or if there is a failure to connect to the middleware server.
+	 * a Connection type, or if an anomaly occurs while connecting to the middleware server.
 	 */
 	public void initialize() throws GMSEC_Exception
 	{
@@ -172,8 +172,10 @@ public class ConnectionManager
 	 *
 	 * @desc Cleanup - This function disconnects and destroys the underlying Connection object,
 	 * returning an error status if this operation is not successful.
+	 *
+	 * @throws GMSEC_Exception if an anomaly occurs while connecting
 	 */
-	public void cleanup()
+	public void cleanup() throws GMSEC_Exception
 	{
 		m_jniConnMgr.cleanup();
 	}
@@ -194,9 +196,11 @@ public class ConnectionManager
 	/**
 	 * @fn Specification getSpecification()
 	 *
-	 * @desc Returns the Specification object associated with the Connection Manager.
+	 * @brief Returns the Specification object associated with the Connection Manager.
+	 *
+	 * @return A Specification object.
 	 */
-	public Specification getSpecification() throws GMSEC_Exception
+	public Specification getSpecification()
 	{
 		return m_jniConnMgr.getSpecification();
 	}
@@ -872,23 +876,20 @@ public class ConnectionManager
 	 * @brief This method updates the field which is included within the Heartbeat Message being
 	 * published by the Heartbeat Service.  If validatiion is enabled, the message will then be
 	 * re-validated with the modified field set. Should the validation pass, the change will be
-	 * persisted to the heartbeat service, otherwise an Exception is thrown.
+	 * persisted to the heartbeat service, otherwise an error is returned.
 	 *
 	 * @param componentStatus - Field containing updated information for the Heartbeat Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given Field is null.
 	 * @throws A GMSEC_Exception is thrown if the given Field is not already present in the Heartbeat
 	 * Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
+	 *
+	 * @note This method has been deprecated; use setHeartbeatServiceField() instead.
 	 */
 	public Status changeComponentStatus(Field componentStatus)
 		throws IllegalArgumentException, GMSEC_Exception
 	{
-		if (componentStatus == null)
-		{
-			throw new IllegalArgumentException("Field is null");
-		}
-
-		return m_jniConnMgr.changeComponentStatus(componentStatus);
+		return setHeartbeatServiceField(componentStatus);
 	}
 
 
@@ -898,23 +899,20 @@ public class ConnectionManager
 	 * @brief This method updates the field which is included within the Heartbeat Message being
 	 * published by the Heartbeat Service.  If validatiion is enabled, the message will then be
 	 * re-validated with the modified field set. Should the validation pass, the change will be
-	 * persisted to the heartbeat service, otherwise an Exception is thrown.
+	 * persisted to the heartbeat service, otherwise an error is returned.
 	 *
 	 * @param componentInfo - Field containing updated information for the Heartbeat Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given Field is null.
 	 * @throws A GMSEC_Exception is thrown if the given Field is not already present in the Heartbeat
 	 * Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
+	 *
+	 * @note This method has been deprecated; use setHeartbeatServiceField() instead.
 	 */
 	public Status changeComponentInfo(Field componentInfo)
 		throws IllegalArgumentException, GMSEC_Exception
 	{
-		if (componentInfo == null)
-		{
-			throw new IllegalArgumentException("Field is null");
-		}
-
-		return m_jniConnMgr.changeComponentInfo(componentInfo);
+		return setHeartbeatServiceField(componentInfo);
 	}
 
 
@@ -924,23 +922,20 @@ public class ConnectionManager
 	 * @brief This method updates the field which is included within the Heartbeat Message being
 	 * published by the Heartbeat Service.  If validatiion is enabled, the message will then be
 	 * re-validated with the modified field set. Should the validation pass, the change will be
-	 * persisted to the heartbeat service, otherwise an Exception is thrown.
+	 * persisted to the heartbeat service, otherwise an error is returned.
 	 *
 	 * @param cpuMemory - Field containing updated information for the Heartbeat Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given Field is null.
 	 * @throws A GMSEC_Exception is thrown if the given Field is not already present in the Heartbeat
 	 * Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
+	 *
+	 * @note This method has been deprecated; use setHeartbeatServiceField() instead.
 	 */
 	public Status changeCPUMemory(Field cpuMemory)
 		throws IllegalArgumentException, GMSEC_Exception
 	{
-		if (cpuMemory == null)
-		{
-			throw new IllegalArgumentException("Field is null");
-		}
-
-		return m_jniConnMgr.changeCPUMemory(cpuMemory);
+		return setHeartbeatServiceField(cpuMemory);
 	}
 
 
@@ -950,23 +945,47 @@ public class ConnectionManager
 	 * @brief This method updates the field which is included within the Heartbeat Message being
 	 * published by the Heartbeat Service.  If validatiion is enabled, the message will then be
 	 * re-validated with the modified field set. Should the validation pass, the change will be
-	 * persisted to the heartbeat service, otherwise an Exception is thrown.
+	 * persisted to the heartbeat service, otherwise an error is returned.
 	 *
 	 * @param cpuUtil- Field containing updated information for the Heartbeat Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given Field is null.
 	 * @throws A GMSEC_Exception is thrown if the given Field is not already present in the Heartbeat
 	 * Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
+	 *
+	 * @note This method has been deprecated; use setHeartbeatServiceField() instead.
 	 */
 	public Status changeCPUUtil(Field cpuUtil)
 		throws IllegalArgumentException, GMSEC_Exception
 	{
-		if (cpuUtil == null)
+		return setHeartbeatServiceField(cpuUtil);
+	}
+
+
+	/**
+	 * @fn Status setHeartbeatServiceField(Field field)
+	 *
+	 * @brief This method can be used to set or update the given field within the Heartbeat Message
+	 * being published by the Heartbeat Service.  If validatiion is enabled, the message will then be
+	 * re-validated with the modified field set. Should the validation pass, the change will be
+	 * persisted to the heartbeat service, otherwise an error is returned.
+	 *
+	 * @param field - the field to add or set within the heartbeat message
+	 *
+	 * @return The status of the operation.
+	 *
+	 * @throws An IllegalArgumentException is thrown if the given Field is null.
+	 * @throws A GMSEC_Exception is thrown is thrown if an unexpected error occurs.
+	 */
+	public Status setHeartbeatServiceField(Field field)
+		throws IllegalArgumentException, GMSEC_Exception
+	{
+		if (field == null)
 		{
 			throw new IllegalArgumentException("Field is null");
 		}
 
-		return m_jniConnMgr.changeCPUUtil(cpuUtil);
+		return m_jniConnMgr.setHeartbeatServiceField(field);
 	}
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -198,7 +198,7 @@ public class Connection
 	 *
 	 * @brief This function establishes this connection to the middleware
 	 *
-	 * @throws GMSEC_Exception on severe connection error
+	 * @throws GMSEC_Exception if an anomaly occurs while connecting
 	 */
 	public void connect() throws GMSEC_Exception
 	{
@@ -210,8 +210,10 @@ public class Connection
 	 * @fn void disconnect()
 	 *
 	 * @brief This function terminates this connection to the middleware.
+	 *
+	 * @throws GMSEC_Exception if an anomaly occurs while disconnecting
 	 */
-	public void disconnect()
+	public void disconnect() throws GMSEC_Exception
 	{
 		m_jniConnection.disconnect();
 	}

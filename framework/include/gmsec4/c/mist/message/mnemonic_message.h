@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -194,6 +194,31 @@ extern "C"
 	 * @sa mnemonicMessageGetNumMnemonics
 	 */
 	GMSEC_API const GMSEC_Mnemonic mnemonicMessageGetMnemonic(const GMSEC_Message msg, size_t index, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_MnemonicIterator mnemonicMessageGetIterator(GMSEC_Message msg, GMSEC_Status status)
+	 *
+	 * @desc Function that allows the callee to get the Mnemonic Iterator associated with the %MnemonicMessage.
+	 * This iterator will allow for applications to iterate over the Mnemonics stored within the
+	 * %MnemonicMessage.
+	 * The iterator is reset each time mnemonicMessageGetIterator() is called.  The iterator itself is
+	 * destroyed when the %MnemonicMessage object is destroyed.
+	 *
+	 * @note Only one Mnemonic Iterator is associated with a %MnemonicMessage; multiple calls to
+	 * mnemonicMessageGetIterator() will return a handle to the same Mnemonic Iterator.  Each call will reset
+	 * the iterator.
+	 *
+	 * @param[in]  msg    - the handle to the MnemonicMessage
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return A handle to a MnemonicIterator.
+	 *
+	 * @sa mnemonicMessageGetIterator()
+	 * @sa mnemonicIteratorHasNext()
+	 * @sa mnemonicIteratorNext()
+	 */
+	GMSEC_API GMSEC_MnemonicIterator mnemonicMessageGetIterator(GMSEC_Message msg, GMSEC_Status status);
 
 
 	/**

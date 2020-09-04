@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,6 +17,14 @@ using namespace gmsec::api;
 %ignore gmsec::api::Connection::unsubscribe(SubscriptionInfo*&);
 %ignore gmsec::api::Connection::release(Message*&);
 %ignore gmsec::api::Connection::destroy(Connection*&);
+
+// Excluding these due to issues with threading in Perl with SWIG-based objects
+%ignore request(const Message& request, GMSEC_I32 timeout, ReplyCallback* cb, GMSEC_I32 republish_ms = 0);
+%ignore gmsec::api::Connection::cancelRequest;
+%ignore gmsec::api::Connection::dispatch;
+%ignore gmsec::api::Connection::startAutoDispatch;
+%ignore gmsec::api::Connection::stopAutoDispatch;
+%ignore gmsec::api::Connection::registerEventCallback;
 
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/Connection.h>
@@ -172,13 +180,17 @@ C<libgmsec_perl::Connection-E<gt>connect()>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-        Exception on severe connection error.
+    Exception if an anomaly occurs while connecting
 
 =head3 disconnect
 
 C<libgmsec_perl::Connection-E<gt>disconnect()>
 
     This function terminates this connection to the middleware.  It is automatically called by the destructor if necessary.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    Exception if an anomaly occurs while disconnecting
 
 =head3 getState
 
@@ -210,30 +222,11 @@ C<libgmsec_perl::Connection-E<gt>getLibraryVersion()>
 
     library version
 
-=head3 registerEventCallback
-
-C<libgmsec_perl::Connection-E<gt>registerEventCallback($connectionEvent, $callback)>
-
-    This function allows the registration of a callback for a particular error event.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
-
-        $connectionEvent - type of event to register
-        $callback - object derived from EventCallback to register for this error event
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-
-        Exception if the EventCallback is NULL
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="EventCallback.html">EventCallback</a>
-
 =head3 subscribe
 
 C<libgmsec_perl::Connection-E<gt>subscribe($subject, $callback = NULL)>
 
-    This function subscribes to a particular subject or pattern and associates a callback to be called when messages matching the subject or pattern are received. If all subscriptions are performed using this function then the auto-dispatcher can be used to asynchronously receive messages. If receive() is used to pull messages then dispatch() will need to be called to ensure registered Callbacks are called.
+    This function subscribes to a particular subject or pattern.
 
     Example subscription patterns:
 
@@ -281,15 +274,9 @@ C<libgmsec_perl::Connection-E<gt>subscribe($subject, $callback = NULL)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#receive">receive()</a><br>
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#dispatch">dispatch()</a><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#startautodispatch">startAutoDispatch()</a><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#stopautodispatch">stopAutoDispatch()</a><br>
-
 C<libgmsec_perl::Connection-E<gt>subscribe($subject, $config, $callback = NULL)>
 
-    This function subscribes to a particular subject or pattern and uses the provided config object to enable or disable middleware-level subscription functionalities (e.g. ActiveMQ Durable Consumer). If a callback is specified, then the auto-dispatcher can be used to deliver messages to the callback. If receive() is used to pull messages, then dispatch() will need to be called to ensure registered Callbacks are called.
+    This function subscribes to a particular subject or pattern and uses the provided config object to enable or disable middleware-level subscription functionalities (e.g. ActiveMQ Durable Consumer).
 
     See libgmsec_perl::Connection::subscribe($subject, $callback) for an explanation of subscription patterns
 
@@ -329,44 +316,6 @@ C<libgmsec_perl::Connection-E<gt>unsubscribe($subscriptionInfo)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#receive">receive()</a><br>
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#dispatch">dispatch()</a><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#startautodispatch">startAutoDispatch()</a><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#stopautodispatch">stopAutoDispatch()</a><br>
-
-=head3 startAutoDispatch
-
-C<libgmsec_perl::Connection-E<gt>startAutoDispatch()>
-
-    This function will start a thread that will dispatch messages asynchronously when they are received. If this is used, all subscriptions must be made with callbacks or the messages with be dropped. If receive() is called while the auto-dispatcher is used, the behavior will be undesireable and undefined.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
-
-         A value of 1 (true) is returned if the auto-dispatcher has been started; false otherwise.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#stopautodispatch">stopAutoDispatch()</a><br>
-
-=head3 stopAutoDispatch
-
-C<libgmsec_perl::Connection-E<gt>stopAutoDispatch($waitForCompletion)>
-
-        This function will stop the auto dispatch thread.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
-
-        [optional] $waitForCompletion - This function will stop the auto dispatch thread.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
-
-         A value of 1 (true) will be returned if the auto-dispatcher was running and has been stopped; false otherwise.  If the waitForCompletion flag is set to 0 (false), then users can expect a return value of false. 
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#startautodispatch">startAutoDispatch()</a><br>
-
 =head3 publish
 
 C<libgmsec_perl::Connection-E<gt>publish($message)>
@@ -391,10 +340,6 @@ C<libgmsec_perl::Connection-E<gt>publish($message)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#receive">receive()</a><br>
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#startautodispatch">startAutoDispatch()</a><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#stopautodispatch">stopAutoDispatch()</a><br>
-
 C<libgmsec_perl::Connection-E<gt>publish($message, $config)>
 
         This function will publish a message to the middleware using the config object provided to toggle between special middleware-level publish functionalities (e.g. ActiveMQ - Durable Producer).
@@ -417,10 +362,6 @@ C<libgmsec_perl::Connection-E<gt>publish($message, $config)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#subscribe">subscribe()</a><br>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#receive">receive()</a><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#startautodispatch">startAutoDispatch()</a><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#stopautodispatch">stopAutoDispatch()</a><br>
 
 =head3 request
 
@@ -506,20 +447,6 @@ C<libgmsec_perl::Connection-E<gt>reply($request, $reply)>
 
         Exception on error transmitting message
 
-=head3 dispatch
-
-C<libgmsec_perl::Connection-E<gt>dispatch($message)>
-
-        This function will cause any callbacks that are registered with matching message subject patterns to be called.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
-
-        $message - message to be dispatched
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-
-        Exception on error dispatching message
-
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#subscribe">subscribe()</a><br>
@@ -547,8 +474,6 @@ C<libgmsec_perl::Connection-E<gt>receive($timeout = -1)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#subscribe">subscribe()</a><br>
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#dispatch">dispatch()</a><br>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#release">release()</a><br>
 

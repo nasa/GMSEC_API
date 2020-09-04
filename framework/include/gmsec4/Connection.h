@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -159,7 +159,7 @@ public:
 	 * @fn void connect()
 	 * @brief This function establishes this connection to the middleware
 	 *
-	 * @throws Exception on severe connection error
+	 * @throws Exception if an anomaly occurs while connecting
 	 */
 	void CALL_TYPE connect();
 
@@ -168,6 +168,8 @@ public:
 	 * @fn void disconnect()
 	 * @desc This function terminates this connection to the middleware.
 	 * It is automatically called by the destructor if necessary
+	 *
+	 * @throws Exception if an anomaly occurs while disconnecting
 	 */
 	void CALL_TYPE disconnect(); 
 

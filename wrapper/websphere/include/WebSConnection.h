@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -177,15 +177,11 @@ private:
 
 	gmsec::api::internal::RequestSpecs     requestSpecs;
 
-	std::string username;
-	std::string password;
 	std::string hostname;
 	std::string channel;
 	std::string qmanager;
 	std::string pKeyReposStem;
 	std::string pCipherSpec;
-	bool        persistent;
-	bool        threadSafe;
 	bool        useFilter;
 	bool        connAsyncPublish;
 	bool        connCheckAsyncStatus;

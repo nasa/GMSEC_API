@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -138,16 +138,9 @@ Specification^ ConnectionManager::GetSpecification()
 {
 	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
 
-	try
-	{
-		gmsec::api::mist::Specification& nativeSpec = m_impl->getSpecification();
+	gmsec::api::mist::Specification& nativeSpec = m_impl->getSpecification();
 
-		return gcnew Specification(&nativeSpec, false);
-	}
-	catch (gmsec::api::Exception& e)
-	{
-		throw gcnew GMSEC_Exception(e);
-	}
+	return gcnew Specification(&nativeSpec, false);
 }
 
 
@@ -738,79 +731,43 @@ void ConnectionManager::StopHeartbeatService()
 }
 
 
+// deprecated
 Status^ ConnectionManager::ChangeComponentStatus(Field^ componentStatus)
 {
-	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
-	THROW_EXCEPTION_IF_NULLPTR(componentStatus, StatusClass::MIST_ERROR, StatusCode::INVALID_FIELD, "Field is null");
-
-	try
-	{
-		gmsec::api::Field* nativeField  = ((Field^) componentStatus)->GetChild();
-		gmsec::api::Status nativeStatus = m_impl->changeComponentStatus(*nativeField);
-
-		return gcnew Status(new gmsec::api::Status(nativeStatus));
-	}
-	catch (gmsec::api::Exception& e)
-	{
-		throw gcnew GMSEC_Exception(e);
-	}
+	return SetHeartbeatServiceField(componentStatus);
 }
 
 
+// deprecated
 Status^ ConnectionManager::ChangeComponentInfo(Field^ componentInfo)
 {
-	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
-	THROW_EXCEPTION_IF_NULLPTR(componentInfo, StatusClass::MIST_ERROR, StatusCode::INVALID_FIELD, "Field is null");
-
-	try
-	{
-		gmsec::api::Field* nativeField  = ((Field^) componentInfo)->GetChild();
-		gmsec::api::Status nativeStatus = m_impl->changeComponentInfo(*nativeField);
-
-		return gcnew Status(new gmsec::api::Status(nativeStatus));
-	}
-	catch (gmsec::api::Exception& e)
-	{
-		throw gcnew GMSEC_Exception(e);
-	}
+	return SetHeartbeatServiceField(componentInfo);
 }
 
 
+// deprecated
 Status^ ConnectionManager::ChangeCPUMemory(Field^ cpuMemory)
 {
-	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
-	THROW_EXCEPTION_IF_NULLPTR(cpuMemory, StatusClass::MIST_ERROR, StatusCode::INVALID_FIELD, "Field is null");
-
-	try
-	{
-		gmsec::api::Field* nativeField  = ((Field^) cpuMemory)->GetChild();
-		gmsec::api::Status nativeStatus = m_impl->changeCPUMemory(*nativeField);
-
-		return gcnew Status(new gmsec::api::Status(nativeStatus));
-	}
-	catch (gmsec::api::Exception& e)
-	{
-		throw gcnew GMSEC_Exception(e);
-	}
+	return SetHeartbeatServiceField(cpuMemory);
 }
 
 
+// deprecated
 Status^ ConnectionManager::ChangeCPUUtil(Field^ cpuUtil)
 {
+	return SetHeartbeatServiceField(cpuUtil);
+}
+
+
+Status^ ConnectionManager::SetHeartbeatServiceField(Field^ field)
+{
 	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
-	THROW_EXCEPTION_IF_NULLPTR(cpuUtil, StatusClass::MIST_ERROR, StatusCode::INVALID_FIELD, "Field is null");
+	THROW_EXCEPTION_IF_NULLPTR(field, StatusClass::MIST_ERROR, StatusCode::INVALID_FIELD, "Field is null");
 
-	try
-	{
-		gmsec::api::Field* nativeField  = ((Field^) cpuUtil)->GetChild();
-		gmsec::api::Status nativeStatus = m_impl->changeCPUUtil(*nativeField);
+	gmsec::api::Field* nativeField  = ((Field^) field)->GetChild();
+	gmsec::api::Status nativeStatus = m_impl->setHeartbeatServiceField(*nativeField);
 
-		return gcnew Status(new gmsec::api::Status(nativeStatus));
-	}
-	catch (gmsec::api::Exception& e)
-	{
-		throw gcnew GMSEC_Exception(e);
-	}
+	return gcnew Status(new gmsec::api::Status(nativeStatus));
 }
 
 

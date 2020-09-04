@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -1084,114 +1084,40 @@ void CALL_TYPE connectionManagerStopHeartbeatService(GMSEC_ConnectionMgr connMgr
 }
 
 
+// deprecated
 void CALL_TYPE connectionManagerChangeComponentStatus(GMSEC_ConnectionMgr connMgr, const GMSEC_Field componentStatus, GMSEC_Status status)
 {
-	Status result;
-
-	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
-	const Field*       fld = reinterpret_cast<const Field*>(componentStatus);
-
-	if (!mgr)
-	{
-		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
-	}
-	else if (!fld)
-	{
-		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Field handle is NULL");
-	}
-	else
-	{
-		try
-		{
-			result = mgr->changeComponentStatus(*fld);
-		}
-		catch (Exception& e)
-		{
-			result = Status(e);
-		}
-	}
-
-	if (status)
-	{
-		*((Status*) status) = result;
-	}
+	connectionManagerSetHeartbeatServiceField(connMgr, componentStatus, status);
 }
 
 
+// deprecated
 void CALL_TYPE connectionManagerChangeComponentInfo(GMSEC_ConnectionMgr connMgr, const GMSEC_Field componentInfo, GMSEC_Status status)
 {
-	Status result;
-
-	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
-	const Field*       fld = reinterpret_cast<const Field*>(componentInfo);
-
-	if (!mgr)
-	{
-		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
-	}
-	else if (!fld)
-	{
-		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Field handle is NULL");
-	}
-	else
-	{
-		try
-		{
-			result = mgr->changeComponentInfo(*fld);
-		}
-		catch (Exception& e)
-		{
-			result = Status(e);
-		}
-	}
-
-	if (status)
-	{
-		*((Status*) status) = result;
-	}
+	connectionManagerSetHeartbeatServiceField(connMgr, componentInfo, status);
 }
 
 
+// deprecated
 void CALL_TYPE connectionManagerChangeCPUMemory(GMSEC_ConnectionMgr connMgr, const GMSEC_Field cpuMemory, GMSEC_Status status)
 {
-	Status result;
-
-	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
-	const Field*       fld = reinterpret_cast<const Field*>(cpuMemory);
-
-	if (!mgr)
-	{
-		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
-	}
-	else if (!fld)
-	{
-		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Field handle is NULL");
-	}
-	else
-	{
-		try
-		{
-			result = mgr->changeCPUMemory(*fld);
-		}
-		catch (Exception& e)
-		{
-			result = Status(e);
-		}
-	}
-
-	if (status)
-	{
-		*((Status*) status) = result;
-	}
+	connectionManagerSetHeartbeatServiceField(connMgr, cpuMemory, status);
 }
 
 
+// deprecated
 void CALL_TYPE connectionManagerChangeCPUUtil(GMSEC_ConnectionMgr connMgr, const GMSEC_Field cpuUtil, GMSEC_Status status)
+{
+	connectionManagerSetHeartbeatServiceField(connMgr, cpuUtil, status);
+}
+
+
+void CALL_TYPE connectionManagerSetHeartbeatServiceField(GMSEC_ConnectionMgr connMgr, const GMSEC_Field field, GMSEC_Status status)
 {
 	Status result;
 
 	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
-	const Field*       fld = reinterpret_cast<const Field*>(cpuUtil);
+	const Field*       fld = reinterpret_cast<const Field*>(field);
 
 	if (!mgr)
 	{
@@ -1203,14 +1129,7 @@ void CALL_TYPE connectionManagerChangeCPUUtil(GMSEC_ConnectionMgr connMgr, const
 	}
 	else
 	{
-		try
-		{
-			result = mgr->changeCPUUtil(*fld);
-		}
-		catch (Exception& e)
-		{
-			result = Status(e);
-		}
+		result = mgr->setHeartbeatServiceField(*fld);
 	}
 
 	if (status)

@@ -5,6 +5,9 @@
 using namespace gmsec::api;
 %}
 
+// Excluding these due to issues with threading in Perl with SWIG-based objects
+%ignore registerHandler;
+
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/util/Log.h>
 
@@ -41,6 +44,7 @@ using namespace gmsec::api;
 %}
 
 %perlcode %{
+=pod
 # Define the default LogHandler for Perl
 {
         package DefaultLogHandler;
@@ -76,6 +80,7 @@ $defaultHandler->DISOWN();
 # Register the Default Handler for all logging levels
 libgmsec_perl::Log::setReportingLevel($libgmsec_perl::logNONE);
 libgmsec_perl::Log::registerHandler($defaultHandler);
+=cut
 
 =pod
 
@@ -108,25 +113,6 @@ C<libgmsec_perl::Log-E<gt>getReportingLevel()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         $logLevel - logging level with possible values of $libgmsec_perl::logNONE, $libgmsec_perl::logERROR, $libgmsec_perl::logSECURE, $libgmsec_perl::logWARNING, $libgmsec_perl::logINFO, $libgmsec_perl::logVERBOSE, $libgmsec_perl::logDEBUG
-
-=head3 registerHandler
-
-C<libgmsec_perl::Log-E<gt>registerHandler($logHandler)>
-
-        This function registers a LogHandler that will be called for all logging levels.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
-
-        $logHandler - Pointer to an instance of a package whose base package is LogHandler
-
-C<libgmsec_perl::Log-E<gt>registerHandler($logLevel, $logHandler)>
-
-        This function registers a LogHandler that will be called for a specific logging level.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
-
-        $logLevel - logging level with possible values of $libgmsec_perl::logNONE, $libgmsec_perl::logERROR, $libgmsec_perl::logSECURE, $libgmsec_perl::logWARNING, $libgmsec_perl::logINFO, $libgmsec_perl::logVERBOSE, $libgmsec_perl::logDEBUG
-        $logHandler - Pointer to an instance of a package whose base package is LogHandler
 
 =head3 toString
 

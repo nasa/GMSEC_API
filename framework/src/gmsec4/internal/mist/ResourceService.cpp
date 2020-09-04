@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -176,7 +176,7 @@ void ResourceService::run()
 				try
 				{
 					m_connMann->publishResourceMessage(m_subject.c_str(), m_sampleInterval, m_averageInterval);
-					GMSEC_INFO << "ResourceService published C2CX-RSRC message.";
+					GMSEC_VERBOSE << "ResourceService published C2CX-RSRC message.";
 				}
 				catch (Exception& e)
 				{

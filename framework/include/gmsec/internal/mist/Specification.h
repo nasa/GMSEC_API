@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -137,7 +137,7 @@ public:
 	 */
 	Status Validate(Message *message, Context &context) const;
 
-	/** @fn Register(const char * id, MessageTemplate &newTemplate)
+	/** @fn Register(const char* id, MessageTemplate* newTemplate)
 	 * @brief Adds the MessageTemplate and id to BaseSpecification's map, passing ownership
 	 * of newTemplate to BaseSpecification
 	 *
@@ -146,7 +146,7 @@ public:
 	 *
 	 * @return status - result of operation
 	 */
-	Status Register(const char * id, MessageTemplate &newTemplate);
+	Status Register(const char* id, MessageTemplate* newTemplate);
 
 	/** @fn GetTemplateIds(gmsec::util::List<gmsec::util::String>& idList);
 	 * @brief Fetches list of template IDs.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,19 +32,19 @@ extern "C" {
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Message__Ljava_lang_String_2I
-  (JNIEnv *jenv, jclass jcls, jstring jName, jint jKind)
+  (JNIEnv *jenv, jclass jcls, jstring jSubject, jint jKind)
 {
 	Message* created = 0;
 
 	try
 	{
-		JStringManager name(jenv, jName);
+		JStringManager subject(jenv, jSubject);
 
-		if (jvmOk(jenv, "Message.Message(name, kind)"))
+		if (jvmOk(jenv, "Message.Message(subject, kind)"))
 		{
 			Message::MessageKind kind = messageKindToNative(jenv, jKind);
 
-			created = new Message(name.c_str(), kind);
+			created = new Message(subject.c_str(), kind);
 		}
 	}
 	JNI_CATCH
@@ -54,20 +54,20 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Message__
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Message__Ljava_lang_String_2IJLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2
-  (JNIEnv *jenv, jclass jcls, jstring jName, jint jKind, jlong jCfgPtr, jobject jCfg)
+  (JNIEnv *jenv, jclass jcls, jstring jSubject, jint jKind, jlong jCfgPtr, jobject jCfg)
 {
 	Message* created = 0;
 
 	try
 	{
-		JStringManager name(jenv, jName);
+		JStringManager subject(jenv, jSubject);
 
-		if (jvmOk(jenv, "Message.Message(name, kind, config)"))
+		if (jvmOk(jenv, "Message.Message(subject, kind, config)"))
 		{
 			Message::MessageKind kind = messageKindToNative(jenv, jKind);
 			Config* config = JNI_JLONG_TO_CONFIG(jCfgPtr);
 
-			created = new Message(name.c_str(), kind, *config);
+			created = new Message(subject.c_str(), kind, *config);
 		}
 	}
 	JNI_CATCH
@@ -207,13 +207,38 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1Get
 		else
 		{
 			const char* tmp = msg->getSubject();
-			s = jenv->NewStringUTF(tmp);
+			s = makeJavaString(jenv, tmp);
 			jvmOk(jenv, "Message.getSubject");
 		}
 	}
 	JNI_CATCH
 
 	return s;
+}
+
+
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1SetSubject
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jSubject)
+{
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager subject(jenv, jSubject);
+
+			if (jvmOk(jenv, "Message.setSubject"))
+			{
+				msg->setSubject(subject.c_str());
+			}
+		}
+	}
+	JNI_CATCH
 }
 
 
@@ -372,7 +397,7 @@ JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1Get
 				std::ostringstream oss;
 				oss << value;
 
-				jstring valueAsString = jenv->NewStringUTF(oss.str().c_str());
+				jstring valueAsString = makeJavaString(jenv, oss.str().c_str());
 
 				result = jenv->NewObject(Cache::getCache().classU64, Cache::getCache().methodU64Init, valueAsString);
 
@@ -438,7 +463,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1Get
 
 			if (jvmOk(jenv, "Message.getStringValue"))
 			{
-				result = jenv->NewStringUTF(msg->getStringValue(fieldName.c_str()));
+				result = makeJavaString(jenv, msg->getStringValue(fieldName.c_str()));
 			}
 		}
 	}
@@ -1105,7 +1130,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1ToX
 		else
 		{
 			const char* xml = msg->toXML();
-			s = jenv->NewStringUTF(xml);
+			s = makeJavaString(jenv, xml);
 			jvmOk(jenv, "Message.toXML");
 		}
 	}
@@ -1131,7 +1156,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1ToJ
 		else
 		{
 			const char* json = msg->toJSON();
-			s = jenv->NewStringUTF(json);
+			s = makeJavaString(jenv, json);
 			jvmOk(jenv, "Message.toJSON");
 		}
 	}

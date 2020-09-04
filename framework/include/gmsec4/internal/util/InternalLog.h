@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,6 +21,7 @@
 #include <gmsec4/util/wdllexp.h>
 
 #include <iostream>
+#include <string>
 
 
 namespace gmsec
@@ -135,6 +136,18 @@ public:
 	/* @cond For C API support ONLY */
 	static void registerHandler(GMSEC_LogLevel level, GMSEC_LogHandler* handler);
 	/* @endcond */
+
+
+	/**
+	 * @fn static std::string prepareLogMessage(const LogEntry& entry)
+	 *
+	 * @brief Convenience method for generating the output string for a logged message entry.
+	 *
+	 * @param entry - the LogEntry to use when generating the output string
+	 *
+	 * @returns A log message string.
+	 */
+	static std::string prepareLogMessage(const gmsec::api::util::LogEntry& entry);
 
 private:
 	friend class gmsec::util::Log;

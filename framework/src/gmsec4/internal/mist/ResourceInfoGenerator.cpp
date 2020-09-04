@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -53,6 +53,8 @@
 #include <fstream>
 #include <sys/statvfs.h>
 #include <sys/utsname.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #elif defined(__linux__)
 #include <iostream>
@@ -75,6 +77,7 @@
 #include <unistd.h>
 #include <strings.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
@@ -187,7 +190,26 @@ void ResourceInfoGenerator::addMainMemoryStats(Message &msg, unsigned int versio
 
 #elif defined(__hpux)
 
-	system("top -f /tmp/tmpout.top");
+	bool haveStats = false;
+	int  tries     = 40;
+
+	while (!haveStats && tries-- > 0)
+	{
+		system("top -f /tmp/tmpout.top");
+
+		TimeUtil::millisleep(100);
+
+		struct stat top_stats;
+		stat("/tmp/tmpout.top", &top_stats);
+
+		haveStats = (top_stats.st_size > 0);
+	}
+
+	if (!haveStats)
+	{
+		GMSEC_ERROR << "Failed to acquire MEMORY stats";
+		return;
+	}
 
 	bool              done     = false;
 	int               num_args = 0;
@@ -278,7 +300,27 @@ void ResourceInfoGenerator::addMainMemoryStats(Message &msg, unsigned int versio
 
 #elif defined(__APPLE__)
 
-	system("top -l 1 > /tmp/tmpout.top");
+	bool haveStats = false;
+	int  tries     = 40;
+
+	while (!haveStats && tries-- > 0)
+	{
+		system("/usr/bin/top -l 1 > /tmp/tmpout.top");
+
+		TimeUtil::millisleep(100);
+
+		struct stat top_stats;
+		stat("/tmp/tmpout.top", &top_stats);
+
+		haveStats = (top_stats.st_size > 0);
+	}
+
+	if (!haveStats)
+	{
+		GMSEC_ERROR << "Failed to acquire MEMORY stats";
+		return;
+	}
+
 
 	char              buffer[CHAR_BUF_LEN];
 	bool              phys_done             = false;
@@ -1237,7 +1279,26 @@ void ResourceInfoGenerator::addCPUStats(Message &msg, unsigned int version, size
 
 #elif defined(__hpux)
 
-	system("top -w -f /tmp/tmpout.top");
+	bool haveStats = false;
+	int  tries     = 40;
+
+	while (!haveStats && tries-- > 0)
+	{
+		system("top -w -f /tmp/tmpout.top");
+
+		TimeUtil::millisleep(100);
+
+		struct stat top_stats;
+		stat("/tmp/tmpout.top", &top_stats);
+
+		haveStats = (top_stats.st_size > 0);
+	}
+
+	if (!haveStats)
+	{
+		GMSEC_ERROR << "Failed to acquire CPU stats";
+		return;
+	}
 
 	char              buffer[CHAR_BUF_LEN];
 	bool              done                     = false;
@@ -1400,7 +1461,7 @@ void ResourceInfoGenerator::addCPUStats(Message &msg, unsigned int version, size
 	bool               ready_to_fetch_cpu_loads = false;
 	CPUTickStruct      cpu_tick_struct;
 
-	FILE* pipe_output_fp = popen("top -l 1", "r");
+	FILE* pipe_output_fp = popen("/usr/bin/top -l 1", "r");
 
 	std::istringstream iss;
 

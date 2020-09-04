@@ -4,25 +4,37 @@ for the current release and historical releases.
 See the associated Version Description Document (VDD) for further details
 of each release.
 
+For technical support regarding this release, or any previous version, please
+contact the API Team at gmsec-support@lists.nasa.gov.
+
+
+
+==============================================================================
+= ADVISEMENT ALERT (for users of API 4.2.1 and later versions)
+==============================================================================
+Starting with API 4.2.1, support for RHEL 5 (both x86 and x86-64) has been
+dropped.  It is recommended that users of RHEL 5 upgrade their systems to
+RHEL 7 (or RHEL 6) if they wish to adopt the latest version of the GMSEC API.
+
 
 
 ==============================================================================
 = ADVISEMENT ALERT (for users of API 4.1 and later versions)
 ==============================================================================
 Version 4.1 of the GMSEC API introduces a new external interface binding for
-Java, C, C++, and C#. This new interface provides new functionality, including
+Java, C, C++, and C#.  This new interface provides new functionality, including
 an expanded range of capabilities for the Messaging Interface Standardization
-Toolkit (MIST - please see the GMSEC API User's Guide). This new interface 
-has been optimized to require less code and result in safer operations. While
+Toolkit (MIST - please see the GMSEC API User's Guide).  This new interface 
+has been optimized to require less code and result in safer operations.  While
 the interface from version 3.7 and earlier is maintained, the GMSEC team 
 recommends that new software make use of this new interface. 
 
 It is also necessary for software products that use the 3.7 and earlier 
-interface to upgrade the linked version of the GMSEC API shared object library
-to 4.0, if those software products will be used on the same GMSEC bus as 
-clients which are using the new interface. Since the new interface allows for
+interface to upgrade to a 4.X series of the GMSEC API shared object
+library, if those software products will be used on the same GMSEC bus as
+clients which are using the new interface.  Since the new interface allows for
 a broader range of data types, the library for the old interface has been
-updated to handle the new data types. If this library upgrade is not 
+updated to handle the new data types.  If this library upgrade is not 
 performed, existing software written with the GMSEC API will be unable to 
 interpret messages with new data types. 
 
@@ -62,8 +74,148 @@ specific UNIQUE-ID that presents a higher probability of collision.
 For users that employ the same release of the API across all their systems,
 the message loss issue is highly unlikely to occur.
 
-For additional information regarding this issue, please contact the API Team
-at gmsec-support@lists.nasa.gov.
+
+
+==============================================================================
+= GMSEC API 4.3 release notes (2017 May 1)
+==============================================================================
+o For Mac OS X users, this release may break binary compatibility with previous
+    API 4.x releases.  This is due to a change in how the API is built on OS X.
+    Previously, libstdc++ was being used; now libc++ is used.  (See item 4462
+    below).  This change was made to prevent a sporadic crash from occurring
+    when using various API functions.
+
+o Beginning with API 4.3, strict validation of subjects used within Messages
+    and for subscriptions will be performed to ensure that they are GMSEC-
+    compliant, as defined by the GMSEC Interface Specification Document.
+    Users wishing to continue using non-strict validation may employ the use
+    of the "SEC-POLICY" configuration option and set it equal to the value
+    "API3".
+
+o Beginning with API 4.3, support for Solaris 10 x86 and HP-UX has been dropped.
+
+o Users of the Java language binding should be aware that the
+    Connection.disconnect() and ConnectionManager.cleanup() functions now
+    throw a GMSEC_Exception.  This means that any code which calls these
+    functions must be encapsulated by a try..catch statement which handles
+    a GMSEC_Exception, or else the application will not be able to compile.
+    Previously compiled software will still be able to run, just as it did
+    prior to this change.  This change was made in response to DR #4788 
+    (See below) so that exceptional states can be handled more gracefully.
+    
+o The Perl language binding of the API is being pared down to only include
+    support for synchronous operations.  Features involving asynchronous
+    operations (e.g. registration of callbacks, auto-dispatcher, etc.) have
+    been removed from the binding.  Additionally, LogHandler subclassing has
+    been removed.  The removal of these features is due to an instability
+    discovered when executing subclass implementations in a multithreaded
+    process, such as when using the AutoDispatcher or invoking a custom LogHandler
+    from a non-main thread.
+	
+o Configurable message bins (aggregated messages) now support subscription-type
+    wildcards (e.g. '>', '*', and '+')
+
+o The ConnectionManager, MISTMessage, DeviceMessage, ProductFileMessage,
+    MnemonicMessage, and various iterator classes (Collectively referred to
+    as the Messaging Interface Standardization Toolkit (MIST)) have been
+    added to the 4.X Perl interface.
+
+o The Config class can now ingest and output JSON data, as well as ingest
+    strings of whitespace-delimited "key=value" pairs, much like command-line
+    arguments used when running example programs such as gmpub and gmsub.
+
+--- Change summary -----------------------------------------------------------
+4147    Refactor implementation of the ActiveMQ Transport Listener
+4462    Build API on Mac OS X using libc++ (not libstdc++)
+4509    Add ability to exclude messages, using subject, from being added to
+        Configurable Message Bins
+4512    Improve efficiency of InternalSpecification
+4513    Move InternalField::getValue() to StringUtil
+4514    Add setSubject function to Message class
+4515    Add support for custom Message validation
+4516    Expand 4.X Perl Unit Testing Coverage
+4517    Add support for MIST into the 4.X Perl interface
+4518    Add Device, Mnemonic and Product File Iterator support in C binding
+4559    Config class should be able to ingest alternative types of String data
+4561    Update gmhelp to provide bind/connect connection examples for ZeroMQ
+4567    Expand OS support for 4.X Perl interface
+4572    Embellish error information included with exceptions thrown from Bolt
+4596    Prevent MagicBus middleware wrapper from attempting to communicate with
+        MB server once it is known that the connection has been lost
+4597    Cannot create a BinaryField object with the Perl interface
+4598    Comparison made against configuration string value should be case
+        insensitive
+4600    In the C++ and C example programs, unsubscribe should only be called on
+        active subscriptions
+4601    Error checking should by default be performed on subscription subjects
+        with wildcard operators
+4616    Incorrect cast types are used in Java binding when constructing C++
+        fields
+4618    Users should be able to add or change Heartbeat Service fields
+4619    Message template files do not use correct XML encoding syntax
+4655    Fix bug related to how message tracking field options are processed by
+        the Connection class
+4657    Field should be able to ingest JSON with numeric type syntax
+4662    Implement a public toJSON() method for Config
+4669    Config functions getFirst and getNext in Perl interface do not work
+4685    Resolve dead-lock issue when call to publish() is made within a callback
+4694    Republish period for asynchronous request is not being properly handled
+4699    Configurable Message Bin fails to handle message subject using wildcard
+        element
+4707    Replace use of deprecated OSAtomicAdd with alternative function for Mac
+        OS X
+4717    Remove references of API 3.x header files from API 4.x modules
+4721    Address issues reported by HP Fortify
+4729    Field.getString() should be Field.getStringValue() in the Java 4.X API
+4743    Re-order field type and name when displaying Field XML information
+4744    Issue Request-kind message when Connection Manager requestDirective()
+        is called
+4751    Make the decoding of a message packet more efficient
+4768    Remove Field descriptions from validation error messages
+4788    Update documentation and example programs to indicate that
+        Connection::disconnect() can throw an exception in rare cases
+4803    Non-ASCII Unicode characters cause String truncation when retrieving data
+        from the Java language binding
+4804    Improve error messages related to MnemonicMessage's dependent field
+        RAW-VALUE
+4807    The getField functions should report the name of the requested field when
+        unable to retrieve it from a message
+4809    GMSEC_Exception does not initialize base class (Exception)
+4840    Fix MistMessage to allow a value of 0 (zero) for F32 fields
+4853    Client applications crash when using a Magic Bus fail-over configuration
+        and yet only one broker is running
+
+
+
+==============================================================================
+= GMSEC API 4.2.2 release notes (2016 December 16)
+==============================================================================
+o This is a patch release that includes a couple of bug fixes.
+
+o (Fastpath) Improvements to Configurable Message Binning that allow users to
+    configure which messages, if any, should be excluded from being binned.
+    Users can also employ the use of wild-cards when indicating which messages
+    to bin or exclude from binning.
+
+--- Change summary -----------------------------------------------------------
+4509    Add ability to exclude messages, using subject, from being added to
+        Configurable Message Bins
+4655    Fixed bug related to how message tracking field options are processed
+        by the Connection class
+4685    Resolve dead-lock issue when call to publish() is made within a callback
+        that was summoned by dispatch()
+
+
+
+==============================================================================
+= GMSEC API 4.2.1 release notes (2016 November 9)
+==============================================================================
+o This is a patch release to correct a bug in a method that is used by the
+	Time Utility functions.
+
+--- Change summary -----------------------------------------------------------
+4609	Fix StringUtil::getTimeFromString() so that it can process time stamps
+		that do not include fractional time
 
 
 

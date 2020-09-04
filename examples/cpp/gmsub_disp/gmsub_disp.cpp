@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,19 +42,21 @@ public:
 	bool run();
 
 private:
-	typedef std::vector<std::string> Subjects;
+	typedef std::vector<std::string>       Subjects;
+	typedef std::vector<SubscriptionInfo*> Subscriptions;
 
-	Config&     config;
-	Connection* connection;
-	Subjects    subjects;
-	SubscriptionInfo** info;
+	Config&       config;
+	Connection*   connection;
+	Subjects      subjects;
+	Subscriptions subscriptions;
 };
 
 
 gmsub_disp::gmsub_disp(Config& c)
 	: config(c),
 	  connection(0),
-	  subjects()
+	  subjects(),
+	  subscriptions()
 {
 	/* Initialize config */
 	example::initialize(c);
@@ -65,13 +67,22 @@ gmsub_disp::~gmsub_disp()
 {
 	if (connection)
 	{
-		for (size_t i = 0; i < subjects.size(); ++i)
+		for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
 		{
-			GMSEC_INFO << "Unsubscribing from " << subjects[i].c_str();
-			connection->unsubscribe(info[i]);
+			SubscriptionInfo* info = *it;
+
+			GMSEC_INFO << "Unsubscribing from " << info->getSubject();
+
+			connection->unsubscribe(info);
 		}
-		delete[] info;
-		connection->disconnect();
+		try
+		{
+			connection->disconnect();
+		}
+		catch (Exception& e)
+		{
+			GMSEC_ERROR << e.what();
+		}
 		Connection::destroy(connection);
 	}
 
@@ -103,11 +114,13 @@ bool gmsub_disp::run()
 		//o Subscribe using Callback
 		PublishCallback cb;
 
-		info = new SubscriptionInfo*[subjects.size()];
 		for (size_t i = 0; i < subjects.size(); ++i)
 		{
 			GMSEC_INFO << "Subscribing to " << subjects[i].c_str();
-			info[i] = connection->subscribe(subjects[i].c_str(), &cb);
+
+			SubscriptionInfo* info = connection->subscribe(subjects[i].c_str(), &cb);
+
+			subscriptions.push_back(info);
 		}
 
 		GMSEC_INFO << "Starting AutoDispatch";

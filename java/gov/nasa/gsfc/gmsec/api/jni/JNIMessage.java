@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -98,6 +98,12 @@ public class JNIMessage
 	public String getSubject()
 	{
 		return gmsecJNI.Message_GetSubject(swigCPtr, this);
+	}
+
+
+	public void setSubject(String subject)
+	{
+		gmsecJNI.Message_SetSubject(swigCPtr, this, subject);
 	}
 
 

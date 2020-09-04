@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,12 +9,18 @@
 #include "gmsecJNI_Jenv.h"
 #include "gmsecJNI_Cache.h"
 
+#include <gmsec4/internal/util/InternalLog.h>
+
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/TimeUtil.h>
 
 #include <iostream>
+#include <sstream>
 
 
 using namespace gmsec::api::jni;
+using namespace gmsec::api::util;
+using namespace gmsec::api::internal;
 
 
 JNIException::JNIException(const std::string& s)
@@ -101,6 +107,31 @@ bool gmsec::api::jni::jvmOk(JNIEnv* jenv, const char* context)
 }
 
 
+/** @fn makeJavaString
+ * @brief Helper function to convert a const char* to a Java String
+ * while properly handling String encoding issues.
+ */
+jstring gmsec::api::jni::makeJavaString(JNIEnv *jenv, const char* cStr)
+{
+	if (cStr == NULL)
+	{
+		throw std::invalid_argument("cannot construct a Java String with a NULL C-style string");
+	}
+
+	// Convert the C-style string into a Java binary array
+	std::string str(cStr);
+	int byteCount = str.length();
+	const jbyte* pNativeMessage = reinterpret_cast<const jbyte*>(str.c_str());
+	jbyteArray bytes = jenv->NewByteArray(byteCount);
+	jenv->SetByteArrayRegion(bytes, 0, byteCount, pNativeMessage);
+	jclass stringClass = jenv->FindClass("java/lang/String");
+	jmethodID ctor = jenv->GetMethodID(stringClass, "<init>", "([B)V");
+
+	// Convert the Java binary array into the platform default Charset
+	return reinterpret_cast<jstring>(jenv->NewObject(stringClass, ctor, bytes));
+}
+
+
 
 /**
    @brief JStringManager assists in conversions from jstring to char *.
@@ -172,7 +203,12 @@ AutoJEnv::AutoJEnv()
 	int x = JNI_GetCreatedJavaVMs(&jvm, 1, &count);
 	if (x)
 	{
-		std::cerr << "AutoJEnv: JNI_GetJavaVMs failed: " << x << '\n';
+		std::stringstream ss;
+		ss << "AutoJEnv: JNI_GetJavaVMs failed: " << x;
+
+		LogEntry warning = { __FILE__, __LINE__, logWARNING, TimeUtil::getCurrentTime(), ss.str().c_str() };
+
+		std::cerr << InternalLog::prepareLogMessage(warning) << std::endl;
 	}
 	else 
 	{
@@ -190,13 +226,22 @@ AutoJEnv::AutoJEnv()
 			}
 			else
 			{
-				std::cerr << "AutoJEnv: AttachCurrentThread failed: " << x << '\n';
+				std::stringstream ss;
+				ss << "AutoJEnv: AttachCurrentThread failed: " << x;
+
+				LogEntry warning = { __FILE__, __LINE__, logWARNING, TimeUtil::getCurrentTime(), ss.str().c_str() };
+
+				std::cerr << InternalLog::prepareLogMessage(warning) << std::endl;
 			}
 		}
 		else
 		{
-			// already attached
-			std::cerr << "AutoJEnv: GetEnv failed: " << x << '\n';
+			std::stringstream ss;
+			ss << "AutoJEnv: GetEnv failed: " << x;
+
+			LogEntry warning = { __FILE__, __LINE__, logWARNING, TimeUtil::getCurrentTime(), ss.str().c_str() };
+
+			std::cerr << InternalLog::prepareLogMessage(warning) << std::endl;
 		}
 	}
 }
@@ -209,7 +254,12 @@ AutoJEnv::~AutoJEnv()
 		int x = jvm->DetachCurrentThread();
 		if (x)
 		{
-			std::cerr << "AutoJEnv: unable to DetachCurrentThread: " << x << '\n';
+			std::stringstream ss;
+			ss << "AutoJEnv: Unable to DetachCurrentThread: " << x;
+
+			LogEntry warning = { __FILE__, __LINE__, logWARNING, TimeUtil::getCurrentTime(), ss.str().c_str() };
+
+			std::cerr << InternalLog::prepareLogMessage(warning) << std::endl;
 		}
 	}
 	jenv = 0;

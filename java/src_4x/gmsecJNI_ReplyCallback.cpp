@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -49,9 +49,9 @@ void CxxReplyCallbackProxy::onEvent(Connection& conn, const Status& status, Conn
 		return;
 	}
 
-	jstring statusString = jenv->NewStringUTF(status.getReason());
+	jstring statusString = makeJavaString(jenv, status.getReason());
 
-	if (!jvmOk(jenv, "CxxReplyCallbackProxy.onEvent: NewStringUTF(status)") || !statusString)
+	if (!jvmOk(jenv, "CxxReplyCallbackProxy.onEvent: makeJavaString(jenv, status)") || !statusString)
 	{
 		GMSEC_WARNING << "CxxReplyCallbackProxy::onEvent() -- Unable to create status jstring.";
 		return;

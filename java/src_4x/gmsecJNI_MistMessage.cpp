@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -171,7 +171,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MistMessageG
 		}
 		else
 		{
-			jSchemaID = jenv->NewStringUTF(msg->getSchemaID());
+			jSchemaID = makeJavaString(jenv, msg->getSchemaID());
 
 			jvmOk(jenv, "MistMessage.getSchemaID");
 		}

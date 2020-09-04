@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -380,7 +380,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ProductFileM
 		{
 			const char* type = prodMsg->getProductType();
 
-			jType = jenv->NewStringUTF(type);
+			jType = makeJavaString(jenv, type);
 
 			jvmOk(jenv, "ProductFileMessage::getProductType");
 		}
@@ -408,7 +408,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ProductFileM
 		{
 			const char* subtype = prodMsg->getProductSubtype();
 
-			jSubtype = jenv->NewStringUTF(subtype);
+			jSubtype = makeJavaString(jenv, subtype);
 
 			jvmOk(jenv, "ProductFileMessage::getProductSubtype");
 		}

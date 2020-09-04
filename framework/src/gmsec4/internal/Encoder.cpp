@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,6 +10,7 @@
 
 #include <gmsec4/internal/Encoder.h>
 
+#include <gmsec4/internal/MessageBuddy.h>
 #include <gmsec4/internal/StringUtil.h>
 
 #include <gmsec4/Errors.h>
@@ -1533,9 +1534,10 @@ void MessageDecoder::decode(Message &message, const DataBuffer &in)
 
 				if (field)
 				{
-					message.addField(*field);
+					MessageBuddy::getInternal(message).addField(*field, false);
 
-					delete field;
+					// Note: We do NOT delete field object here; ownership is held
+					// by the Message object.
 				}
 			}
 		}

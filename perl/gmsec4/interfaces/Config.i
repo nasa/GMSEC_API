@@ -1,27 +1,73 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 %module Config
+
+/*
+struct ConfigPair
+{
+  char* name;
+  char* value;
+};
+*/
+
 %{
 #include <gmsec4/Config.h>
 using namespace gmsec::api;
 %}
 
+%ignore gmsec::api::Config::getFirst(const char*&, const char*&) const;
+%ignore gmsec::api::Config::getNext(const char*&, const char*&) const;
+
+
+%inline %{
+class ConfigPair
+{
+public:
+    inline const char* getName() const
+    {
+        return name;
+    }
+    inline const char* getValue() const
+    {
+        return value;
+    }
+
+    const char* name;
+    const char* value;
+};
+%}
+
+
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/Config.h>
+
+
+%extend gmsec::api::Config {
+
+    bool CALL_TYPE getFirst(ConfigPair* cp) const
+    {
+        return self->getFirst(cp->name, cp->value);
+    }
+
+    bool CALL_TYPE getNext(ConfigPair* cp) const
+    {
+        return self->getNext(cp->name, cp->value);
+    }
+}
+
+
+
+
 
 %perlcode%{
 =pod
 
-=head1 NAME
-
-libgmsec_perl::Config
-
-=head1 DESCRIPTION
+=head1 libgmsec_perl::Config
 
 This class is a collection for managing connection configuration items.
 
@@ -29,7 +75,7 @@ Encapsulates the parameters necessary for initialization Connections and setting
 
 =head2 Public Member Subroutines
 
-=head3 new
+=head3 new()
 
 C<libgmsec_perl::Config-E<gt>new()>
 
@@ -67,13 +113,13 @@ C<libgmsec_perl::Config-E<gt>new($config)>
 
         An copy of the Config object provided
 
-=head3 DESTROY
+=head3 DESTROY()
 
 C<libgmsec_perl::Config-E<gt>DESTROY()>
 
         destructor
 
-=head3 addValue
+=head3 addValue()
 
 C<libgmsec_perl::Config-E<gt>addValue($name, $value)>
 
@@ -88,7 +134,7 @@ C<libgmsec_perl::Config-E<gt>addValue($name, $value)>
 
         Exception if either name or value are NULL, or are empty strings
 
-=head3 clearValue
+=head3 clearValue()
 
 C<libgmsec_perl::Config-E<gt>clearValue($name)>
 
@@ -106,7 +152,7 @@ C<libgmsec_perl::Config-E<gt>clearValue($name)>
 
         Exception if name is NULL
 
-=head3 getValue
+=head3 getValue()
 
 C<libgmsec_perl::Config-E<gt>getValue($name)>
 
@@ -139,7 +185,7 @@ C<libgmsec_perl::Config-E<gt>getValue($name, $defaultValue)>
 
         Exception if name is NULL
 
-=head3 getBooleanValue
+=head3 getBooleanValue()
 
 C<libgmsec_perl::Config-E<gt>getBooleanValue($name)>
 
@@ -174,7 +220,7 @@ C<libgmsec_perl::Config-E<gt>getBooleanValue($name, $defaultValue)>
 
         Exception if name is NULL
 
-=head3 getIntegerValue
+=head3 getIntegerValue()
 
 C<libgmsec_perl::Config-E<gt>getIntegerValue($name)>
 
@@ -209,7 +255,7 @@ C<libgmsec_perl::Config-E<gt>getIntegerValue($name, $defaultValue)>
 
         Exception if name is NULL
 
-=head3 getDoubleValue
+=head3 getDoubleValue()
 
 C<libgmsec_perl::Config-E<gt>getDoubleValue($name)>
 
@@ -244,43 +290,49 @@ C<libgmsec_perl::Config-E<gt>getDoubleValue($name, $defaultValue)>
 
         Exception if name is NULL
 
-=head3 clear
+=head3 clear()
 
 C<libgmsec_perl::Config-E<gt>clear()>
 
         This function clears all values from the Config object
 
-=head3 getFirst
+=head3 getFirst()
 
-C<libgmsec_perl::Config-E<gt>getFirst($name, $value)>
+C<libgmsec_perl::Config-E<gt>getFirst($configPair)>
 
-        This function gets the first name and value for iteration. The scope of the name and value are the life of the Config object, or until the next getFirst() call.
+        This function gets the first name and value pair for iteration. The scope of the name and value are the life of the Config object, or until the next getFirst() call.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
-        $name - output parameter name of value
-        $value - output parameter value
+        $configPair - structure containing name/value pair
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         boolean status as to whether name/value pair are available
 
-=head3 getNext
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
 
-C<libgmsec_perl::Config-E<gt>getNext($name, $value)>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Config.html#libgmsec_perl::ConfigPair">ConfigPair</a>
 
-        This function gets the next name & value for iteration. The scope of the name and value are the life of the Config object, or until the next getNext() call.
+=head3 getNext()
+
+C<libgmsec_perl::Config-E<gt>getNext($configPair)>
+
+        This function gets the next name & value pair for iteration. The scope of the name and value are the life of the Config object, or until the next getNext() call.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
-        $name - output parameter name of value
-        $value - output parameter value
+        $configPair - structure containing name/value pair
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         boolean status as to whether name/value pair are available
 
-=head3 merge
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Config.html#libgmsec_perl::ConfigPair">ConfigPair</a>
+
+=head3 merge()
 
 C<libgmsec_perl::Config-E<gt>merge($config, $overwriteExisting = true)>
 
@@ -291,7 +343,7 @@ C<libgmsec_perl::Config-E<gt>merge($config, $overwriteExisting = true)>
         $config - the Config object from which to read name/value pairs.
         [optional] $overwriteExisting - indicates whether to overwrite any existing name/value pairs within the working Config object. If flag is omitted, then the default is to overwrite existing name/value pairs.
 
-=head3 toXML
+=head3 toXML()
 
 C<libgmsec_perl::Config-E<gt>toXML()>
 
@@ -312,6 +364,64 @@ C<libgmsec_perl::Config-E<gt>toXML()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Config.html#new">new($xml)</a>
+
+
+
+=head1 libgmsec_perl::ConfigPair
+
+This structure is used to reference a single name/value pair that is returned when calling Config-E<gt>getFirst() and Config-E<gt>getNext().
+
+Example usage:
+
+    my $config = libgmsec_perl::Config->new();
+
+    ...
+
+    my $pair = libgmsec_perl::ConfigPair->new();
+
+    my $hasPair = $config>getFirst($pair);
+
+    while ($hasPair)
+    {
+        print("Name: " . $pair>getName() . ", Value: " . $pair>getValue() . "\n");
+
+        $hasPair = $config>getNext($pair);
+    }
+
+=head2 Public Member Subroutines
+
+=head3 new()
+
+C<libgmsec_perl::ConfigPair-E<gt>new()>
+
+        Default Constructor
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        An empty ConfigPair object
+
+
+
+=head3 getName()
+
+C<libgmsec_perl::ConfigPair-E<gt>getName()>
+
+        Returns the name associated with the object
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        A string identifying the name of the configuration pair.
+
+
+=head3 getValue()
+
+C<libgmsec_perl::ConfigPair-E<gt>getValue()>
+
+        Returns the value associated with the object
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        A string identifying the value of the configuration pair.
 
 =cut
 %}

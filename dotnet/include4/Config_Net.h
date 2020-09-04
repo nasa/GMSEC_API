@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,16 +41,19 @@ public:
 	Config(array<System::String^>^ argv);
 
 
-	/// <summary>This constructor will create a config and parse values from the passed in XML string.
-	/// The XML format is the same as used by the FromXML() and ToXML() functions.</summary>
+	/// <summary>
+	/// This constructor will create a Config object by parsing key/value pairs from
+	/// the given data string.  The data string can contain either XML or JSON formatted
+	/// configuration data, or contain raw data consisting of white-space separated key=value
+	/// pairs.
+	/// </summary>
 	///
-	/// <seealso cref="FromXML()" />
+	/// <param name="data">data string containing configuration information</param>
+	///
+	/// <exception cref="GMSEC_Exception">Exception is thrown if the data string is not parsable.</exception>
+	///
 	/// <seealso cref="ToXML()" />
-	///
-	/// <param name="xml">string in XML format</param>
-	///
-	/// <exception cref="GMSEC_Exception">Invalid XML input is given.</exception>
-	Config(System::String^ xml);
+	Config(System::String^ data);
 
 
 	/// <summary>Basic (and safe) deep copy constructor</summary>
@@ -247,6 +250,12 @@ public:
 	///
 	/// <exception cref="GMSEC_Exception">If a malformed XML, or null, string is given.</exception>
 	void FromXML(System::String^ xml);
+
+
+	/// <summary>This function will dump this config to JSON.
+	///
+	/// <returns>A JSON string representation of the config object.</returns>
+	System::String^ ToJSON();
 
 
 protected:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -108,8 +108,29 @@ extern "C"
 	 * check the Status object.
 	 *
 	 * @sa configDestroy()
+	 *
+	 * @note This function has been deprecated; use configCreateUsingData() instead.
 	 */
 	GMSEC_API GMSEC_Config configCreateUsingXML(const char* xml, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_Config configCreateUsingData(const char* data, GMSEC_Status status)
+	 *
+	 * @brief This constructor will create a config object by parsing key/value pairs from the
+	 * given data string.  The data string can contain either XML or JSON formatted configuration
+	 * data, or contain raw data consisting of white-space separated key=value pairs.
+	 *
+	 * @param[in]  data   - the data string containing configuration information
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return A handle to the created config object, or NULL if an error occurs.  If the latter,
+	 * check the Status object.
+	 *
+	 * @sa configToXML()
+	 * @sa configDestroy()
+	 */
+	GMSEC_API GMSEC_Config configCreateUsingData(const char* data, GMSEC_Status status);
 
 
 	/**
@@ -364,7 +385,7 @@ extern "C"
 	GMSEC_API void configMerge(GMSEC_Config config, const GMSEC_Config other, GMSEC_BOOL overwriteExisting, GMSEC_Status status);
 
 
-	/** @fn void configToXML(const GMSEC_Config cfg, const char** xml, GMSEC_Status status)
+	/** @fn const char* configToXML(const GMSEC_Config cfg, GMSEC_Status status)
 	 *
 	 * @brief This function dumps a config to an XML string.
 	 * The format is the same as that which is parsed by configFromXML().
@@ -407,6 +428,23 @@ extern "C"
 	 * @sa configToXML
 	 */
 	GMSEC_API void configFromXML(GMSEC_Config cfg, const char* xml, GMSEC_Status status);
+
+
+	/** @fn const char* configToJSON(const GMSEC_Config cfg, GMSEC_Status status)
+	 *
+	 * @brief This function dumps a config to an JSON string.
+	 *
+	 * @note As with all C API functions, a status MUST BE CREATED with CreateStatus() and
+	 * passed in as the status parameter in order to receive any resulting status.
+	 *
+	 * @param[in]  cfg    - handle to config
+	 * @param[out] status - out parameter operation status
+	 *
+	 * @return An JSON string that represents the current Config object.
+	 *
+	 * @sa configFromXML
+	 */
+	GMSEC_API const char* configToJSON(const GMSEC_Config cfg, GMSEC_Status status);
 
 
 #ifdef __cplusplus

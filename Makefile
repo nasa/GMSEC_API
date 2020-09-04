@@ -1,5 +1,5 @@
  
-# Copyright 2007-2016 United States Government as represented by the
+# Copyright 2007-2017 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -53,8 +53,11 @@ perl_api:
 	cd ./perl/gmsec; \
 		PERL_CC=$(PERL_CC) perl -Iextra Makefile.PL PREFIX=../../bin ; \
 		$(MAKE) ; $(MAKE) install
-# Note: Perl binding for API 4.X is currently only supported on Windows and Linux platforms.
+# Note: Perl binding for API 4.X is currently only supported on Linux and Mac platforms.
 ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
+	$(MAKE) -C perl/gmsec4
+endif
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
 	$(MAKE) -C perl/gmsec4
 endif
 

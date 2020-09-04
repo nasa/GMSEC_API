@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -37,6 +37,7 @@
 		#include <hash_map>
 		typedef stdext::hash_map<std::string, gmsec::internal::BaseField*> HashMap;
 	#endif
+
 #elif defined(__sun)
 	#if defined (__sparc)
 		typedef std::map<std::string, gmsec::internal::BaseField*> HashMap;
@@ -44,10 +45,16 @@
 		#include <hash_map>
 		typedef std::hash_map<std::string, gmsec::internal::BaseField*> HashMap;
 	#endif
+
+#elif defined(__APPLE__)
+        #include <unordered_map>
+	typedef std::unordered_map<std::string, gmsec::internal::BaseField*> HashMap;
+
 #else 
         #include <tr1/unordered_map>
         typedef std::tr1::unordered_map<std::string, gmsec::internal::BaseField*> HashMap;
 #endif
+
 typedef std::map<std::string, gmsec::internal::BaseField*> BinaryTreeMap;
 
 

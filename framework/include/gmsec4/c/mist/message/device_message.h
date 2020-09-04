@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -187,6 +187,29 @@ extern "C"
 	 * @sa deviceMessageGetNumDevices
 	 */
 	GMSEC_API const GMSEC_Device deviceMessageGetDevice(const GMSEC_Message msg, size_t index, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_DeviceIterator deviceMessageGetIterator(GMSEC_Message msg, GMSEC_Status status)
+	 *
+	 * @desc Function that allows the callee to get the Device Iterator associated with the %DeviceMessage.
+	 * This iterator will allow for applications to iterate over the Devices stored within the %DeviceMessage.
+	 * The iterator is reset each time deviceMessageGetIterator() is called.  The iterator itself is destroyed when the
+	 * %DeviceMessage object is destroyed.
+	 *
+	 * @note Only one Device Iterator is associated with a %DeviceMessage; multiple calls to
+	 * deviceMessageGetIterator() will return a handle to the same Device Iterator.  Each call will reset the iterator.
+	 *
+	 * @param[in]  msg    - the handle to the Device Message
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return A handle to a Device Iterator.
+	 *
+	 * @sa deviceMessageGetIterator()
+	 * @sa deviceIteratorHasNext()
+	 * @sa deviceIteratorNext()
+	 */
+	GMSEC_API GMSEC_DeviceIterator deviceMessageGetIterator(GMSEC_Message msg, GMSEC_Status status);
 
 
 	/**

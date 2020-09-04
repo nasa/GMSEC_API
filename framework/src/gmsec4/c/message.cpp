@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -222,6 +222,35 @@ const char* CALL_TYPE messageGetSubject(const GMSEC_Message msg, GMSEC_Status st
 	}
 
 	return subject;
+}
+
+
+void CALL_TYPE messageSetSubject(GMSEC_Message msg, const char* subject, GMSEC_Status status)
+{
+	Status result;
+
+	Message* m = reinterpret_cast<Message*>(msg);
+
+	if (!m)
+	{
+		result = Status(MSG_ERROR, UNINITIALIZED_OBJECT, "Message handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			m->setSubject(subject);
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
 }
 
 

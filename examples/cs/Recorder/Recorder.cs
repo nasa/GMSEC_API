@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -56,15 +56,22 @@ namespace Recorder
 		{
 			if (conn != null)
 			{
-                for (int i = info.Count - 1; i >= 0; i--)
-                {
-                    Log.Info("Unsubscribing from " + info[i].GetSubject());
-                    var temp = info[i];
-                    conn.Unsubscribe(ref temp);
-                    info.RemoveAt(i);
-                }
-                
-                conn.Disconnect();
+				for (int i = info.Count - 1; i >= 0; i--)
+				{
+				    Log.Info("Unsubscribing from " + info[i].GetSubject());
+				    var temp = info[i];
+				    conn.Unsubscribe(ref temp);
+				    info.RemoveAt(i);
+				}
+
+				try
+				{
+					conn.Disconnect();
+				}
+				catch (GMSEC_Exception e)
+				{
+					Log.Error(e.ToString());
+				}
 
 				Connection.Destroy(ref conn);
 			}

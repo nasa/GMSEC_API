@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -110,39 +110,10 @@ HeartbeatService::~HeartbeatService()
 }
 
 
-Status HeartbeatService::changeComponentStatus(const Field& componentStatus)
+void HeartbeatService::setField(const Field& field)
 {
-	Status status;
 	gmsec::api::util::AutoMutex lock(m_msgMutex);
-	m_msg.addField(componentStatus);
-	return status;
-}
-
-
-Status HeartbeatService::changeComponentInfo(const Field& componentInfo)
-{
-	Status status;
-	gmsec::api::util::AutoMutex lock(m_msgMutex);
-	m_msg.addField(componentInfo);
-	return status;
-}
-
-
-Status HeartbeatService::changeCPUUtil(const Field& cpuUtil)
-{
-	Status status;
-	gmsec::api::util::AutoMutex lock(m_msgMutex);
-	m_msg.addField(cpuUtil);
-	return status;
-}
-
-
-Status HeartbeatService::changeCPUMemory(const Field& cpuMemory)
-{	
-	Status status;
-	gmsec::api::util::AutoMutex lock(m_msgMutex);
-	m_msg.addField(cpuMemory);
-	return status;
+	m_msg.addField(field);
 }
 
 
@@ -235,7 +206,7 @@ void HeartbeatService::run()
 
 					m_connection->publish(m_msg);
 
-					GMSEC_INFO << "HeartbeatService published C2CX-HB message.";
+					GMSEC_VERBOSE << "HeartbeatService published C2CX-HB message.";
 				}
 				catch (Exception& e)
 				{

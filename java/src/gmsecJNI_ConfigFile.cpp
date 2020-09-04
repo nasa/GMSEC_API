@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -308,7 +308,7 @@ extern "C"
 
 				if (!status.isError())
 				{
-					jstring s = jenv->NewStringUTF(tmp);
+					jstring s = makeJavaString(jenv, tmp);
 					if (jvmOk(jenv, "ConfigFile.ToXML"))
 					{
 						jenv->SetObjectField(outxml, Cache::getCache().fieldString_value, s);
@@ -347,7 +347,7 @@ extern "C"
 				jstring s = 0;
 
 				if (jvmOk(jenv, "ConfigFile.LookupSubscription"))
-					s = jenv->NewStringUTF(value);
+					s = makeJavaString(jenv, value);
 
 				if (jvmOk(jenv, "ConfigFile.LookupSubscription"))
 					jenv->SetObjectField(pattern, Cache::getCache().fieldString_value, s);

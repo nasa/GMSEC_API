@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -103,6 +103,14 @@ public:
 
 	/// <summary>Returns message subject</summary>
 	System::String^ GetSubject();
+
+
+	/// <summary>Allows for the setting/changing of the message subject</summary>
+	///
+	/// <param name="subject">The subject/topic to associate with the message</param>
+	///
+	/// <exception cref="GMSEC_Exception">If the subject is null or contains an empty-string</exception>
+	void SetSubject(System::String^ subject);
 
 
 	/// <summary>Returns configuration associcated with the message</summary>

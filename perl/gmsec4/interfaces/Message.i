@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -323,6 +323,20 @@ C<libgmsec_perl::Message-E<gt>getSubject()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         The subject assigned to the Message.
+
+=head3 setSubject
+
+C<libgmsec_perl::Message-E<gt>setSubject($subject)>
+
+        Allows for the setting/changing of the message subject.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+        $subject - the subject/topic to assign to the message
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+        Exception is thrown if the subject is NULL or contains an empty-string
 
 =head3 getKind
 

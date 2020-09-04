@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -120,10 +120,12 @@ public class Config
 
 
 	/**
-	 * @fn Config(String xml)
+	 * @fn Config(String data)
 	 *
-	 * @brief Creates an configuration object using the XML string representation
-	 * of a Config object.
+	 * @brief Creates an configuration object by parsing the key/value pairs from the
+	 * given data string.  The data string can contain either XML or JSON formatted
+	 * configuration data, or contain raw data consisting of white-space separated
+	 * key=value pairs.
 	 *
 	 * Example XML string:
 	 * @code
@@ -135,21 +137,26 @@ public class Config
 	 * </CONFIG>
 	 * @endcode
 	 *
-	 * @param xml - an XML string that represents a Config object.
+	 * Example raw-data string:
+	 * @code
+	 * connectionType=gmsec_bolt server=10.1.2.159 tracking=true loglevel=info
+	 * @endcode
 	 *
-	 * @throws An IllegalArgumentException is thrown if the XML string is null, or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the given XML string is not parsable.
+	 * @param data - data string containing configuration information
+	 *
+	 * @throws An IllegalArgumentException is thrown if the data string is null, or contains an empty string.
+	 * @throws A GMSEC_Exception is thrown if the given data string is not parsable.
 	 *
 	 * @sa toXML()
 	 */
-	public Config(String xml) throws IllegalArgumentException, GMSEC_Exception
+	public Config(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
-		if (xml == null || xml.isEmpty())
+		if (data == null || data.isEmpty())
 		{
-			throw new IllegalArgumentException("XML string is null or contains an empty string");
+			throw new IllegalArgumentException("Data string is null or contains an empty string");
 		}
 
-		m_jniConfig = new JNIConfig(xml);
+		m_jniConfig = new JNIConfig(data);
 	}
 
 
@@ -451,21 +458,6 @@ public class Config
 
 
 	/**
-	 * @fn String toXML()
-	 *
-	 * @brief Convenience method for converting the Config object into XML representation.
-	 *
-	 * @return XML string
-	 *
-	 * @sa fromXML()
-	 */
-	public String toXML()
-	{
-		return m_jniConfig.toXML();
-	}
-
-
-	/**
 	 * @fn merge(Config other, boolean overwriteExisting)
 	 *
 	 * @brief Merge the given %Config object with the current %Config object.
@@ -477,6 +469,21 @@ public class Config
 	public void merge(Config other, boolean overwriteExisting)
 	{
 		m_jniConfig.merge(other, overwriteExisting);
+	}
+
+
+	/**
+	 * @fn String toXML()
+	 *
+	 * @brief Convenience method for converting the Config object into XML representation.
+	 *
+	 * @return XML string
+	 *
+	 * @sa fromXML()
+	 */
+	public String toXML()
+	{
+		return m_jniConfig.toXML();
 	}
 
 
@@ -511,5 +518,21 @@ public class Config
 		}
 
 		m_jniConfig.fromXML(xml);
+	}
+
+
+	/**
+	 * @fn String toJSON()
+	 *
+	 * @brief This function will dump the Config into JSON format.
+	 * The format is the same as that which is accepted by Config(String data).
+	 *
+	 * @return JSON formatted string
+	 *
+	 * @sa Config(String data)
+	 */
+	public String toJSON()
+	{
+		return m_jniConfig.toJSON();
 	}
 }

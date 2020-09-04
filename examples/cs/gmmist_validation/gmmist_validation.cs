@@ -247,7 +247,14 @@
             }
             finally
             {
-                connManager.Cleanup();
+		try
+		{
+			connManager.Cleanup();
+		}
+		catch (GMSEC_Exception e)
+		{
+			Log.Error(e.ToString());
+		}
             }
 
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -37,8 +37,8 @@ Config::Config(int argc, char* argv[])
 }
 
 
-Config::Config(const char* xml)
-	: m_iConfig(new internal::InternalConfig(xml))
+Config::Config(const char* data)
+	: m_iConfig(new internal::InternalConfig(data))
 {
 }
 
@@ -159,6 +159,12 @@ const char* Config::toXML() const
 void Config::fromXML(const char* xml)
 {
 	m_iConfig->fromXML(xml);
+}
+
+
+const char* Config::toJSON() const
+{
+	return m_iConfig->toJSON();
 }
 
 } // namespace api

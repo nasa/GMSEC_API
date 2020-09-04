@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -176,7 +176,14 @@ private:
 			GMSEC_INFO << "Unsubscribing from " << info->getSubject();
 			m_conn->unsubscribe(info);
 			// Disconnect from middleware server.
-			m_conn->disconnect();
+			try
+			{
+				m_conn->disconnect();
+			}
+			catch (Exception& e)
+			{
+				GMSEC_ERROR << e.what();
+			}
 
 			// Destroy connection object.
 			Connection::destroy(m_conn);

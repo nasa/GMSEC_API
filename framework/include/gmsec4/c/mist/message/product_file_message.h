@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -256,6 +256,32 @@ extern "C"
 	 * @sa productFileMessageGetNumProductFiles
 	 */
 	GMSEC_API const GMSEC_ProductFile productFileMessageGetProductFile(const GMSEC_Message msg, size_t index, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_ProductFileIterator productFileMessageGetIterator(GMSEC_Message msg, GMSEC_Status status)
+	 *
+	 * @desc Function that allows the callee to get the Product File Iterator associated with the
+	 * %ProductFileMessage.
+	 * This iterator will allow for applications to iterate over the Product Files stored within the
+	 * %ProductFileMessage.
+	 * The iterator is reset each time productFileMessageGetIterator() is called.  The iterator itself is
+	 * destroyed when the %ProductFileMessage object is destroyed.
+	 *
+	 * @note Only one Product File Iterator is associated with a %ProductFileMessage; multiple calls to
+	 * productFileMessageGetIterator() will return a handle to the same Product File Iterator.  Each call will
+	 * reset the iterator.
+	 *
+	 * @param[in]  msg    - the handle to the ProductFileMessage
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return A handle to a ProductFileIterator.
+	 *
+	 * @sa productFileMessageGetIterator()
+	 * @sa productFileIteratorHasNext()
+	 * @sa productFileIteratorNext()
+	 */
+	GMSEC_API GMSEC_ProductFileIterator productFileMessageGetIterator(GMSEC_Message msg, GMSEC_Status status);
 
 
 	/**

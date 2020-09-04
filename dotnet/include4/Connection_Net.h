@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -91,11 +91,13 @@ public:
 
 
 	/// <summary>Establishes a connection to the middleware.</summary>
+	/// <exception cref="GMSEC_Exception">If an anomaly occurs while connecting</exception>
 	void Connect();
 
 
 	/// <summary>Terminates the connection to the middleware.</summary>
-	void Disconnect();
+	/// <exception cref="GMSEC_Exception">If an anomaly occurs while disconnecting</exception>
+ 	void Disconnect();
 
 
 	/// <summary>Returns the current state of the connection to the middleware.</summary>

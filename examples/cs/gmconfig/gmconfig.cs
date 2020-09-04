@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,7 +20,7 @@ namespace gmconfig
 	using GMSEC.API.UTIL;
 	using GMSEC.API.Example.Common;
 	using System;
-    using System.Collections.Generic;
+	using System.Collections.Generic;
 
 	class gmconfig : GmsecExample
 	{
@@ -78,10 +78,10 @@ namespace gmconfig
 				string pattern2 = cfgFile.LookupSubscription("custom1");
 
 				Log.Info("Subscribing to " + pattern1);
-                info.Add(conn.Subscribe(pattern1));
+				info.Add(conn.Subscribe(pattern1));
 
 				Log.Info("Subscribing to " + pattern2);
-                info.Add(conn.Subscribe(pattern2));
+				info.Add(conn.Subscribe(pattern2));
 
 				// Lookup Message from config file
 				Message msg = cfgFile.LookupMessage("msg1");
@@ -108,8 +108,15 @@ namespace gmconfig
                         info.RemoveAt(i);
                     }
                     
-                    // Disconnect connection
-					conn.Disconnect();
+                    			// Disconnect
+					try
+					{
+						conn.Disconnect();
+					}
+					catch (GMSEC_Exception e)
+					{
+						Log.Error(e.ToString());
+					}
 
 					// Destroy connection
 					Connection.Destroy(ref conn);

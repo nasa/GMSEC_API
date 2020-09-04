@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -190,15 +190,16 @@ Field* InternalField::fromXML(tinyxml2::XMLElement* element)
 
 Field* InternalField::fromJSON(const Json::Value& root)
 {
-	Status result;
-
 	// Required attributes
-	const char* name = NULL;
-	const char* type = NULL;
-	const char* value = NULL;
+	std::string name;
+	std::string type;
+	std::string value;
+
 	// Non-required attributes
-	const char* head = NULL;
-	const char* bits = NULL;
+	std::string head;
+	std::string bits;
+
+	std::ostringstream oss;
 
 	if (root.isMember(std::string("NAME")))
 	{
@@ -222,15 +223,21 @@ Field* InternalField::fromJSON(const Json::Value& root)
 
 	if (root.isMember(std::string("VALUE")))
 	{
-		value = root["VALUE"].asCString();
+		try
+		{
+			value = root["VALUE"].asCString();
+		}
+		catch (...)
+		{
+			double tmpValue = root["VALUE"].asDouble();
+			oss.str("");
+			oss << tmpValue;
+			value = oss.str();
+		}
 	}
 	else
 	{
-		if (lookupType(type) == Field::STRING_TYPE)
-		{
-			value = "";
-		}
-		else
+		if (lookupType(type.c_str()) != Field::STRING_TYPE)
 		{
 			throw Exception(FIELD_ERROR, JSON_PARSE_ERROR,
 				"Invalid JSON Field format - no VALUE provided");
@@ -247,7 +254,7 @@ Field* InternalField::fromJSON(const Json::Value& root)
 		bits = root["BITS"].asCString();
 	}
 
-	return createField(name, type, value, bits, head);
+	return createField(name.c_str(), type.c_str(), value.c_str(), bits.c_str(), head.c_str());
 }
 
 
@@ -434,11 +441,11 @@ const char* InternalField::getStringValue() const
 
 Field* InternalField::createField(const char* name, const char* type, const char* value, const char* bits, const char* head)
 {
-	if (!name)
+	if (!name || std::string(name).empty())
 	{
 		throw Exception(FIELD_ERROR, INVALID_FIELD_NAME, "Field name was not specified");
 	}
-	if (!type)
+	if (!type || std::string(type).empty())
 	{
 		throw Exception(FIELD_ERROR, UNKNOWN_FIELD_TYPE, "Field type was not specified");
 	}
@@ -480,7 +487,7 @@ Field* InternalField::createField(const char* name, const char* type, const char
 				break;
 
 			case Field::CHAR_TYPE:
-				field = new CharField(name, getValue<char>(value));
+				field = new CharField(name, StringUtil::getValue<char>(value));
 				break;
 
 			case Field::I8_TYPE:
@@ -488,40 +495,40 @@ Field* InternalField::createField(const char* name, const char* type, const char
 				// pretend we are dealing with an I16 value.  Otherwise
 				// if we were to specify I8, the value would be converted
 				// to the ASCII equivalent of the character in value.
-				field = new I8Field(name, (GMSEC_I8) getValue<GMSEC_I16>(value));
+				field = new I8Field(name, (GMSEC_I8) StringUtil::getValue<GMSEC_I16>(value));
 				break;
 
 			case Field::I16_TYPE:
-				field = new I16Field(name, getValue<GMSEC_I16>(value));
+				field = new I16Field(name, StringUtil::getValue<GMSEC_I16>(value));
 				break;
 
 			case Field::I32_TYPE:
-				field = new I32Field(name, getValue<GMSEC_I32>(value));
+				field = new I32Field(name, StringUtil::getValue<GMSEC_I32>(value));
 				break;
 
 			case Field::I64_TYPE:
-				field = new I64Field(name, getValue<GMSEC_I64>(value));
+				field = new I64Field(name, StringUtil::getValue<GMSEC_I64>(value));
 				break;
 
 			case Field::F32_TYPE:
-				if (bits)
+				if (bits && !std::string(bits).empty())
 				{
 					field = new F32Field(name, MathUtil::extractF32(bits));
 				}
 				else
 				{
-					field = new F32Field(name, getValue<GMSEC_F32>(value));
+					field = new F32Field(name, StringUtil::getValue<GMSEC_F32>(value));
 				}
 				break;
 
 			case Field::F64_TYPE:
-				if (bits)
+				if (bits && !std::string(bits).empty())
 				{
 					field = new F64Field(name, MathUtil::extractF64(bits));
 				}
 				else
 				{
-					field = new F64Field(name, getValue<GMSEC_F64>(value));
+					field = new F64Field(name, StringUtil::getValue<GMSEC_F64>(value));
 				}
 				break;
 
@@ -534,19 +541,19 @@ Field* InternalField::createField(const char* name, const char* type, const char
 				// pretend we are dealing with an U16 value.  Otherwise
 				// if we were to specify U8, the value would be converted
 				// to the ASCII equivalent of the character in value.
-				field = new U8Field(name, (GMSEC_U8) getValue<GMSEC_U16>(value));
+				field = new U8Field(name, (GMSEC_U8) StringUtil::getValue<GMSEC_U16>(value));
 				break;
 
 			case Field::U16_TYPE:
-				field = new U16Field(name, getValue<GMSEC_U16>(value));
+				field = new U16Field(name, StringUtil::getValue<GMSEC_U16>(value));
 				break;
 
 			case Field::U32_TYPE:
-				field = new U32Field(name, getValue<GMSEC_U32>(value));
+				field = new U32Field(name, StringUtil::getValue<GMSEC_U32>(value));
 				break;
 
 			case Field::U64_TYPE:
-				field = new U64Field(name, getValue<GMSEC_U64>(value));
+				field = new U64Field(name, StringUtil::getValue<GMSEC_U64>(value));
 				break;
 
 			default:
