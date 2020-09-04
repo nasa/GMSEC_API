@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -38,13 +38,13 @@
 #include <sstream>
 
 
-static const char* HEADER_VERSION_STRING    = "HEADER-VERSION";
-static const char* MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
-static const char* MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
-static const char* CONTENT_VERSION_STRING   = "CONTENT-VERSION";
-static const char* MSG_STRING               = "MSG";
-static const char* MVAL_STRING              = "MVAL";
-static const char* NUM_OF_MNEMONICS_STRING  = "NUM-OF-MNEMONICS";
+static const char* const HEADER_VERSION_STRING    = "HEADER-VERSION";
+static const char* const MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
+static const char* const MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
+static const char* const CONTENT_VERSION_STRING   = "CONTENT-VERSION";
+static const char* const MSG_STRING               = "MSG";
+static const char* const MVAL_STRING              = "MVAL";
+static const char* const NUM_OF_MNEMONICS_STRING  = "NUM-OF-MNEMONICS";
 
 
 using namespace gmsec::api::mist::internal;
@@ -99,44 +99,57 @@ InternalMnemonicMessage::InternalMnemonicMessage(const char* data)
 	  m_list(),
 	  m_mnemonicIterator(*this)
 {
-
 	MessageSubclassHelper::checkStringField(MESSAGE_TYPE_STRING, "InternalMnemonicMessage", MSG_STRING, *this);
 	MessageSubclassHelper::checkStringField(MESSAGE_SUBTYPE_STRING, "InternalMnemonicMessage", MVAL_STRING, *this);
-	MessageSubclassHelper::checkFloatField(HEADER_VERSION_STRING, "InternalMnemonicMessage", 2010.0, *this);
 
 	try
 	{
-		const F32Field& f32_field = getF32Field(CONTENT_VERSION_STRING);
-		if(f32_field.getValue() == 2016.0)
+		const F32Field& content = getF32Field(CONTENT_VERSION_STRING);
+
+		unsigned int version = (unsigned int)(content.getValue() * 100);
+
+		if (version <= GMSEC_ISD_2014_00)
 		{
-			m_specVersion = GMSEC_ISD_2016_00;
-		}else{
-			//If message is not from the 2016 (or other known revision), message version shall be oldest supported
 			m_specVersion = GMSEC_ISD_2014_00;
 		}
+		else if (version <= GMSEC_ISD_2016_00)
+		{
+			m_specVersion = GMSEC_ISD_2016_00;
+		}
+		else if (version <= GMSEC_ISD_2018_00)
+		{
+			m_specVersion = GMSEC_ISD_2018_00;
+		}
+		else
+		{
+			m_specVersion = GMSEC_ISD_CURRENT;
+		}
 	}
-	catch (const Exception& excep)
+	catch (const Exception& e)
 	{
 		std::ostringstream oss;
 
 		oss << "InternalMnemonicMessage:  Error while fetching "
 		    << CONTENT_VERSION_STRING << " from message; field not fetched."
-			<< excep.what();
+			<< e.what();
 
 		throw Exception(MIST_ERROR, MISSING_REQUIRED_FIELD, oss.str().c_str());
 	}
 
-	GMSEC_U16 num_of_mnemonics;
-	if(m_specVersion == GMSEC_ISD_2016_00){
-		num_of_mnemonics = MessageSubclassHelper::extractU16Field(NUM_OF_MNEMONICS_STRING, 
-						"InternalMnemonicMessage::InternalDeviceMessage()", *this);
-	}else{
-		num_of_mnemonics = MessageSubclassHelper::extractI16Field(NUM_OF_MNEMONICS_STRING, 
+	GMSEC_U32 numOfMnemonics = 0;
+
+	if (m_specVersion >= GMSEC_ISD_2016_00)
+	{
+		numOfMnemonics = MessageSubclassHelper::extractU16Field(NUM_OF_MNEMONICS_STRING, 
 						"InternalMnemonicMessage::InternalDeviceMessage()", *this);
 	}
-	
-	
-	for (GMSEC_I16 count = 0; count < num_of_mnemonics; count++)
+	else
+	{
+		numOfMnemonics = MessageSubclassHelper::extractI16Field(NUM_OF_MNEMONICS_STRING, 
+						"InternalMnemonicMessage::InternalDeviceMessage()", *this);
+	}
+
+	for (GMSEC_U32 count = 0; count < numOfMnemonics; ++count)
 	{
 		m_list.push_back(extractMessageMnemonic(count+1));
 	}
@@ -152,14 +165,7 @@ void InternalMnemonicMessage::addMnemonic(const Mnemonic& mnemonic)
 {
 	m_list.push_back(mnemonic);
 
-	if(m_specVersion == GMSEC_ISD_2014_00){
-		addField(NUM_OF_MNEMONICS_STRING, (GMSEC_I16)m_list.size());
-	}else if(m_specVersion == GMSEC_ISD_2016_00){
-		addField(NUM_OF_MNEMONICS_STRING, (GMSEC_U16)m_list.size());
-	}else{
-		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate "
-			<< NUM_OF_MNEMONICS_STRING << " in Mnemonic message";
-	}
+	setValue(NUM_OF_MNEMONICS_STRING, (GMSEC_I64) m_list.size());
 
 	std::ostringstream s;
 	s << "MNEMONIC." << m_list.size();
@@ -167,7 +173,7 @@ void InternalMnemonicMessage::addMnemonic(const Mnemonic& mnemonic)
 
 	std::string nameStr = strCount;
 	nameStr.append(".NAME");
-	addField(nameStr.c_str(), mnemonic.getName());
+	setValue(nameStr.c_str(), mnemonic.getName());
 
 	if (mnemonic.statusAvailable())
 	{
@@ -186,27 +192,21 @@ void InternalMnemonicMessage::addMnemonic(const Mnemonic& mnemonic)
 			                INCORRECT_FIELD_TYPE,
 			                "InternalMnemonicMessage::addMnemonic():  Expected I16Field and got something different in a dynamic_cast, for .STATUS.");
 		}
-		addField(statusStrName.c_str(), i16_value);
+
+		setValue(statusStrName.c_str(), (GMSEC_I64) i16_value);
 	}
 
 	if (mnemonic.unitsAvailable())
 	{
 		std::string unitsName = strCount;
 		unitsName.append(".UNITS");
-		addField(unitsName.c_str(), mnemonic.getUnits());
+		setValue(unitsName.c_str(), mnemonic.getUnits());
 	}
 
 	std::string numSamplesName = strCount;
 	numSamplesName.append(".NUM-OF-SAMPLES");
-	if(m_specVersion == GMSEC_ISD_2014_00){
-		addField(numSamplesName.c_str(), (GMSEC_I16) mnemonic.getSampleCount());
-	}else if(m_specVersion == GMSEC_ISD_2016_00){
-		addField(numSamplesName.c_str(), (GMSEC_U16) mnemonic.getSampleCount());
-	}else{
-		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate"
-			<< " NUM-OF-SAMPLES in Mnemonic message";
-	}
-	
+
+	setValue(numSamplesName.c_str(), (GMSEC_I64) mnemonic.getSampleCount());
 
 	for (size_t s_idx = 0; s_idx < mnemonic.getSampleCount(); s_idx++)
 	{
@@ -218,7 +218,7 @@ void InternalMnemonicMessage::addMnemonic(const Mnemonic& mnemonic)
 		
 		std::string tsCount = sampleCountStr;
 		tsCount.append(".TIME-STAMP");
-		addField(tsCount.c_str(), current->getTimestamp());
+		setValue(tsCount.c_str(), current->getTimestamp());
 
 		std::string rawValCount = sampleCountStr;
 		rawValCount.append(".RAW-VALUE");
@@ -235,7 +235,7 @@ void InternalMnemonicMessage::addMnemonic(const Mnemonic& mnemonic)
 			                INCORRECT_FIELD_TYPE,
 			                "InternalMnemonicMessage::addMnemonic():  Expected I32Field and got something different in a dynamic_cast, for .RAW-VALUE.");
 		}
-		addField(rawValCount.c_str(), i32_value);
+		setValue(rawValCount.c_str(), (GMSEC_I64) i32_value);
 
 		if (current->hasEUValue())
 		{
@@ -244,15 +244,13 @@ void InternalMnemonicMessage::addMnemonic(const Mnemonic& mnemonic)
 
 			try
 			{
-				GMSEC_F32 f32_value = dynamic_cast<const F32Field&>(current->getEUValue()).getValue();
-
-				addField(euValCount.c_str(), f32_value);
+				setValue(euValCount.c_str(), current->getEUValue().getDoubleValue());
 			}
 			catch (...)
 			{
 				throw Exception(MIST_ERROR,
 				                INCORRECT_FIELD_TYPE,
-				                "InternalMnemonicMessage::addMnemonic():  Expected F32Field and got something different in a dynamic_cast, for .EU-VALUE.");
+				                "InternalMnemonicMessage::addMnemonic():  Unable to convert EU-VALUE to double value.");
 			}
 		}
 
@@ -260,7 +258,7 @@ void InternalMnemonicMessage::addMnemonic(const Mnemonic& mnemonic)
 		{
 			std::string textValCount = sampleCountStr;
 			textValCount.append(".TEXT-VALUE");
-			addField(textValCount.c_str(), current->getTextValue());
+			setValue(textValCount.c_str(), current->getTextValue());
 		}
 
 		if (current->hasFlags())
@@ -374,7 +372,7 @@ const Mnemonic& InternalMnemonicMessage::nextMnemonic()
 
 Mnemonic InternalMnemonicMessage::extractMessageMnemonic(size_t index) const
 {
-	char   tmp_name[256];
+	char tmp_name[256];
 
 	GMSEC_I16   mnemonic_status;
 	std::string mnemonic_units;
@@ -392,7 +390,8 @@ Mnemonic InternalMnemonicMessage::extractMessageMnemonic(size_t index) const
 
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "MNEMONIC.%u.NUM-OF-SAMPLES", index);
 	size_t mnemonic_num_of_samples;
-	if(m_specVersion == GMSEC_ISD_2016_00)
+
+	if(m_specVersion >= GMSEC_ISD_2016_00)
 	{
 		mnemonic_num_of_samples = MessageSubclassHelper::extractU16Field(tmp_name, 
 			"InternalMnemonicMessage::extractMessageMnemonic()", *this);
@@ -610,25 +609,10 @@ void InternalMnemonicMessage::init(unsigned int version)
 {
 	m_specVersion = version;
 
-	addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010);
 	addField(MESSAGE_TYPE_STRING, MSG_STRING);
 	addField(MESSAGE_SUBTYPE_STRING, MVAL_STRING);
 
-	if (m_specVersion == GMSEC_ISD_2014_00)
-	{
-		addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2010);
-		addField(NUM_OF_MNEMONICS_STRING, (GMSEC_I16) m_list.size());
-	}
-	else if (m_specVersion == GMSEC_ISD_2016_00)
-	{
-		addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
-		addField(NUM_OF_MNEMONICS_STRING, (GMSEC_U16) m_list.size());
-	}
-	else
-	{
-		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate"
-			<< " Mnemonic Message header information";
-	}
+	setValue(NUM_OF_MNEMONICS_STRING, (GMSEC_I64) m_list.size());
 }
 
 }  // end namespace internal

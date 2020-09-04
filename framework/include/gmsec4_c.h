@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,14 +30,12 @@
 
 #include <gmsec4/c/mist/connection_manager.h>
 #include <gmsec4/c/mist/device.h>
-#include <gmsec4/c/mist/device_message.h>                  // DEPRECATED
 #include <gmsec4/c/mist/device_param.h>
+#include <gmsec4/c/mist/message_specification.h>
 #include <gmsec4/c/mist/mist_defs.h>
 #include <gmsec4/c/mist/mnemonic.h>
-#include <gmsec4/c/mist/mnemonic_message.h>                // DEPRECATED
 #include <gmsec4/c/mist/mnemonic_sample.h>
 #include <gmsec4/c/mist/product_file.h>
-#include <gmsec4/c/mist/product_file_message.h>            // DEPRECATED
 #include <gmsec4/c/mist/schema_id_iterator.h>
 #include <gmsec4/c/mist/service_param.h>
 #include <gmsec4/c/mist/specification.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -198,7 +198,7 @@ bool MBWire::deserialize(const char* data, int size, gmsec::api::Message*& messa
 	index += subSpace + 1;
 
 	// get the message's kind
-	unsigned char msgKind = data[index];
+	char msgKind = data[index];
 	index += 1;
 
 	// create the GMSEC message; first construct the subject

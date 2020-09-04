@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file DeviceIterator.java
- *
- * @brief A class that can be used to iterate over the Fields contained within a Message.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist;
@@ -19,12 +17,10 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIDeviceIterator;
 
 
 /**
- * @class DeviceIterator
- *
- * @brief A class that can be used to iterate over the Device object(s) contained within a DeviceMessage.
- *
+ * A class that can be used to iterate over the Device object(s) contained within a DeviceMessage.
+ * <p>
  * An example usage is:
- * @code
+ * <pre>{@code
  * DeviceIterator iter = devMessage.getDeviceIterator()
  *
  * while (iter.hasNext())
@@ -33,7 +29,7 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIDeviceIterator;
  *
  *     ...
  * }
- * @endcode
+ * }</pre>
  */
 public class DeviceIterator
 {
@@ -45,12 +41,21 @@ public class DeviceIterator
 	}
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param iter Object to reference for acquiring internal JNIDeviceIterator.
+	 * @return Internal JNIDeviceIterator object.
+	 */
 	public static JNIDeviceIterator getInternal(DeviceIterator iter)
 	{
 		return (iter == null ? null : iter.m_jniIter);
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param jIter Internal JNIDeviceIterator object.
+	 */
 	public DeviceIterator(JNIDeviceIterator jIter)
 	{
 		m_jniIter = jIter;
@@ -58,9 +63,7 @@ public class DeviceIterator
 
 
 	/**
-	 * @fn boolean hasNext()
-	 *
-	 * @brief Indicates whether there are additional Device objects that can be accessed
+	 * Indicates whether there are additional Device objects that can be accessed
 	 * using this iterator.
 	 *
 	 * @return Returns true if more devices are accessible; otherwise returns false.
@@ -72,11 +75,11 @@ public class DeviceIterator
 
 
 	/**
-	 * @fn Device next()
+	 * Returns the next Device accessible using this iterator.
 	 *
-	 * @brief Returns the next Device accessible using this iterator.
+	 * @return The next available Device object.
 	 *
-	 * @throw A GMSEC_Exception is thrown if this method is called and there are no
+	 * @throws GMSEC_Exception Thrown if this method is called and there are no
 	 * more Devices accessible using this iterator.
 	 */
 	public Device next() throws GMSEC_Exception
@@ -86,10 +89,7 @@ public class DeviceIterator
 
 
 	/**
-	 * @fn void reset()
-	 *
-	 * @desc Resets this iterator so that it can be used again to iterate over the
-	 * devices.
+	 * Resets this iterator so that it can be used again to iterate over the devices.
 	 */
 	public void reset()
 	{

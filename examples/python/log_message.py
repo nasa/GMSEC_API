@@ -34,8 +34,9 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " + sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
-    
-    
+        return -1
+
+
     # Load the command-line input into a GMSEC Config object
     # A Config object is basically a key-value pair map which is used to
     # pass configuration options into objects such as Connections,
@@ -56,12 +57,9 @@ def main():
     # interface
     # This is useful for determining which version of the API is
     # configured within the environment
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create a ConnectionManager object
         connManager = libgmsec_python.ConnectionManager(config)
 
@@ -120,10 +118,14 @@ def main():
         # Note: Since these Fields contain variable values which are
         # based on the context in which they are used, they cannot be
         # automatically populated using MistMessage.
+        eventTime = "YYYY-DDD-HH:MM:SS.sss"
+        libgmsec_python.TimeUtil.formatTime(libgmsec_python.TimeUtil.getCurrentTime(), eventTime);
+
         logMsg.addField(libgmsec_python.I16Field("SEVERITY",1))
         logMsg.setValue("MSG-TEXT", "Creating an example GMSEC LOG Message")
         logMsg.setValue("OCCURRENCE-TYPE", "SYS")
         logMsg.setValue("SUBCLASS", "AST")
+        logMsg.setValue("EVENT-TIME", eventTime)
 
         # Add the standard fields to the LOG message
         connManager.addStandardFields(logMsg)
@@ -132,11 +134,9 @@ def main():
         connManager.publish(logMsg)
         
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
         
-
     return 0
 
 

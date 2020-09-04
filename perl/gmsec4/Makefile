@@ -1,4 +1,4 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -11,15 +11,11 @@ TARGET	        = libgmsec_perl.$(SHLIB_EXT)
 SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_SWG        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/perl5 -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
-SWIG_OPTS       = -c++ -perl5 $(SWIG_SWG)
-
-ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
-SWIG_OPTS      += -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
-endif
+SWIG_OPTS       = -c++ -perl5 $(SWIG_SWG) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
 
 FRAMEWORK_DIR   = ../../framework
 
-GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include
+GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include/c++/$(shell $(CXX) -dumpversion)
 PERL_INCS       = -I$(PERL5_LIB)/CORE
 API_CXXFLAGS   += $(PERL_INCS)
 
@@ -38,7 +34,32 @@ WRAPPED_OBJ     = $(INTERFACEDIR)/libgmsec_perl_wrap.o
 OBJECTS        += $(WRAPPED_OBJ)
 
 
-default: $(WRAPPED_SRC) $(WRAPPED_OBJ) $(BINDIR)/$(TARGET) install
+default: check_swig message $(WRAPPED_SRC) $(WRAPPED_OBJ) $(BINDIR)/$(TARGET) install
+
+
+check_swig:
+	@if [ -z $(SWIG_HOME) ]; then \
+		echo; \
+		echo; \
+		echo "###########################################################"; \
+		echo "#"; \
+		echo "# SWIG_HOME is not defined"; \
+		echo "#"; \
+		echo "# Skipping build of Perl binding for API 4.x"; \
+		echo "#"; \
+		echo "###########################################################"; \
+		exit 1; \
+	fi
+
+
+message:
+	@echo
+	@echo
+	@echo "###########################################################"
+	@echo "#"
+	@echo "#  Building Perl binding of the GMSEC API"
+	@echo "#"
+	@echo "###########################################################"
 
 
 $(INTERFACEDIR)/%_wrap.cxx: $(INTERFACEDIR)/%.i

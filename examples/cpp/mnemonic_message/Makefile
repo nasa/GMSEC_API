@@ -1,31 +1,10 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
 
 
-GMSEC_HOME=../../..
-
-include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
-
 SRCS   = mnemonic_message.cpp
-TARGET = mnemonic_message
+TARGET = $(SRCS:.cpp=)
 
-
-default: checkDefs $(TARGET)
-
-
-clean: checkDefs
-	$(RM) $(TARGET)
-	$(RM) *.gcno *.gcda
-
-
-checkDefs:
-	@ if [ -z $(TARGET) ]; then \
-		echo "TARGET is not defined"; \
-		exit 1; \
-	fi
-
-
-$(TARGET): $(SRCS)
-	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+include ../AppMake.mf

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 	initializeLogging(config, status);
 
 	//o Enable Message validation.  This parameter is "false" by default.
-	configAddValue(config, "GMSEC-MSG-CONTENT-VALIDATE", "true", status);
+	configAddValue(config, "GMSEC-MSG-CONTENT-VALIDATE", "true", NULL);
 
 	//o Tell the API that there is an additional layer of message schema to
 	// validate (The 'EXAMPLE' message definitions).  This value is set to
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 	// message specification at 'layer 1' which builds upon the message
 	// specification outlined in the GMSEC ISD.  This would be followed by
 	// a mission-level message specification at 'layer 2' and so on.
-	configAddValue(config, "GMSEC-SCHEMA-LEVEL", "1", status);
+	configAddValue(config, "GMSEC-SCHEMA-LEVEL", "1", NULL);
 
 	//o Tell the API where to find all of the schema files.
 	//
@@ -86,11 +86,13 @@ int main(int argc, char* argv[])
 	// template files must be contained in the same directory.
 	// e.g. GMSEC_API/templates/2016.00 (Or the location defined in
 	// GMSEC-SCHEMA-PATH)
-	configAddValue(config, "GMSEC-SCHEMA-PATH", "templates", status);
+	configAddValue(config, "GMSEC-SCHEMA-PATH", "templates", NULL);
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	//o Since this example relies on the 2016.00 version of the templates,
+	//  we indicate such within the configuration object.
+	configAddValue(config, "GMSEC-SPECIFICATION-VERSION", "201600", NULL);
+
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	connMgr = connectionManagerCreate(config, status);
 	checkStatus(status);
@@ -150,7 +152,7 @@ int main(int argc, char* argv[])
 
 	if(statusIsError(status))
 	{
-		GMSEC_ERROR(statusGet(status));
+		GMSEC_ERROR("This error is expected:\n%s", statusGet(status));
 	}
 
 	connectionManagerCleanup(connMgr, status);

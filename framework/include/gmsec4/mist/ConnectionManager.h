@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -88,6 +88,16 @@ class GMSEC_API ConnectionManager
 {
 public:
 	/**
+	 * @fn const char* getAPIVersion()
+	 *
+	 * @brief This function identifies the version of the API.
+	 *
+	 * @return String containing API version information.
+	 */
+	static const char* CALL_TYPE getAPIVersion();
+
+
+	/**
 	 * @fn ConnectionManager(const Config &cfg, bool validate = false, unsigned int version = GMSEC_ISD_CURRENT)
 	 *
 	 * @brief Constructor - Initializes the ConnectionManager instance without
@@ -104,6 +114,9 @@ public:
 	 * should validate messages (default is false)
 	 * @param version - the version of the GMSEC message specification to be used
 	 * in validating messages (default is GMSEC_ISD_CURRENT)
+	 *
+	 * @throw An Exception is thrown if the configuration information cannot be used to deduce
+	 * a Connection type, or if an anomaly occurs while loading schemas for the specified ISD.
 	 */
 	ConnectionManager(const Config& cfg, bool validate = false, unsigned int version = GMSEC_ISD_CURRENT);
 
@@ -122,14 +135,10 @@ public:
 	/**
 	 * @fn void initialize()
 	 *
-	 * @desc Uses the config object supplied in the 
-	 * constructor to establish a connection with the defined GMSEC middleware server.
-	 * The underlying connection object is created and connected in one operation, 
-	 * returning an error status if either operation is a failure. Once this call
-	 * successfully returns, the ConnectionManager is ready for message operations.
+	 * @desc Establishes a connection with the GMSEC middleware server.
+	 * Once this call successfully returns, the ConnectionManager is ready for message operations.
 	 *
-	 * @throw An Exception is thrown if the configuration information cannot be used to deduce
-	 * a Connection type, or if an anomaly occurs while connecting to the middleware server.
+	 * @throw An Exception is thrown if an anomaly occurs while attempting to connect to the middleware server.
 	 */
 	void CALL_TYPE initialize();
 
@@ -146,6 +155,27 @@ public:
 	 * @sa Connection:disconnect()
 	 */
 	void CALL_TYPE cleanup();
+
+
+	/**
+	 * @fn ConnectionState getState() const
+	 *
+	 * @brief This function returns the current state of the connection to the middleware.
+	 *
+	 * @return Enumerated ConnectionState value.
+	 */
+	Connection::ConnectionState CALL_TYPE getState() const;
+
+
+	/**
+	 * @fn const char* getLibraryRootName() const
+	 *
+	 * @brief This function identifies the root library name and therefore the
+	 * connection type that this connection is associated with.
+	 *
+	 * @return root library name
+	 */
+	const char* CALL_TYPE getLibraryRootName() const;
 
 
 	/**
@@ -214,7 +244,6 @@ public:
 	 *
 	 * @sa Connection::registerEventCallback(Connection::ConnectionEvent event, EventCallback* cb) @n
 	 *
-	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the callback is NULL.
 	 */
 	void CALL_TYPE registerEventCallback(Connection::ConnectionEvent event, ConnectionManagerEventCallback* cb);
@@ -231,6 +260,10 @@ public:
 	 *
 	 * @param subject - subject pattern to match received messages
 	 * @param cb - callback to be called when message is received (optional)
+	 *
+	 * @return SubscriptionInfo handle used to cancel or modify subscription.
+	 * ConnectionManager maintains ownership of SubscriptionInfo; user should not delete but instead call unsubscribe()
+	 * to free resource.
 	 *
 	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the subject string is NULL.
@@ -252,6 +285,10 @@ public:
 	 * @param config  - config object to be used for subscription operation
 	 * @param cb      - callback to be called when message is received (optional)
 	 *
+	 * @return SubscriptionInfo handle used to cancel or modify subscription.
+	 * ConnectionManager maintains ownership of SubscriptionInfo; user should not delete but instead call unsubscribe()
+	 * to free resource.
+	 *
 	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the subject string is NULL.
 	 */
@@ -265,12 +302,11 @@ public:
 	 * or messages that match this pattern.  It will also remove the registration of any callbacks
 	 * with this subject pattern.
 	 *
-	 * @param subject - subject pattern to deregister
-	 * @param cb - callback to deregister (optional)
+	 * @param info - SubscriptionInfo handle from subscription.
 	 *
-	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
-	 * @throw An Exception is thrown if the subject string is NULL, or if the callback that
-	 * is given is not registered.
+	 * @throw Exception is thrown if the %ConnectionManager has not been initialized.
+	 * @throw Exception is thrown if SubscriptionInfo object is null or originated from a different ConnectionManager object.
+	 * @throw Exception is thrown if error occurs at the middleware level.
 	 */
 	void CALL_TYPE unsubscribe(SubscriptionInfo*& info);
 
@@ -310,7 +346,7 @@ public:
 
 
 	/**
-	 * @fn void request(const Message& request, GMSEC_I32 timeout, ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = 0)
+	 * @fn void request(const Message& request, GMSEC_I32 timeout, ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 *
 	 * @brief If this connection manager has been created with "validate"
 	 * option disabled, this is a pass-through function to the underlying connection.
@@ -319,11 +355,10 @@ public:
 	 * @param request - message to be sent
 	 * @param timeout - maximum time to wait for reply (in milliseconds)
 	 * @param cb - callback to call when reply is received
-	 * @param republish_ms - request message resubmission interval (in milliseconds). If set
-	 * to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-	 * period will default to 60000ms, unless the user has provided an alternate time period via
-	 * the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-	 * is 100ms.
+	 * @param republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 * value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 * the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 * Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the request message fails validation, or if any other severe
@@ -331,11 +366,11 @@ public:
 	 *
 	 * @sa cancelRequest()
 	 */
-	void CALL_TYPE request(const Message& request, GMSEC_I32 timeout, ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = 0);
+	void CALL_TYPE request(const Message& request, GMSEC_I32 timeout, ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 
 	/**
-	 * @fn Message* request(const Message& request, GMSEC_I32 timeout, GMSEC_I32 republish_ms = 0)
+	 * @fn Message* request(const Message& request, GMSEC_I32 timeout, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 *
 	 * @brief If this connection manager has been created with "validate"
 	 * option disabled, this is a pass-through function to the underlying connection.
@@ -343,11 +378,10 @@ public:
 	 *
 	 * @param request - message to be sent
 	 * @param timeout - maximum time to wait for reply (in milliseconds)
-	 * @param republish_ms - request message resubmission interval (in milliseconds). If set
-	 * to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-	 * period will default to 60000ms, unless the user has provided an alternate time period via
-	 * the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-	 * is 100ms.
+	 * @param republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 * value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 * the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 * Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @return reply - reply message (if received)
 	 *
@@ -355,7 +389,7 @@ public:
 	 *
 	 * @sa ConnectionManager::release
 	 */
-	Message* CALL_TYPE request(const Message& request, GMSEC_I32 timeout, GMSEC_I32 republish_ms = 0);
+	Message* CALL_TYPE request(const Message& request, GMSEC_I32 timeout, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 
 	/**
@@ -366,7 +400,7 @@ public:
 	 *
 	 * @param cb - The ConnectionManagerReplyCallback to disassociate from a pending request.
 	 *
-	 * @sa void request(const Message& request, GMSEC_I32 timeout, ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = 0)
+	 * @sa void request(const Message& request, GMSEC_I32 timeout, ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 */
 	void CALL_TYPE cancelRequest(ConnectionManagerReplyCallback* cb);
 
@@ -504,6 +538,54 @@ public:
 
 
 	/**
+	 * @fn const char* getName() const
+	 *
+	 * @brief Returns the name of the connection, automatically generated or user specified.
+	 *
+	 * @return A string
+	 */
+	const char* CALL_TYPE getName() const;
+
+
+	/**
+	 * @fn void setName(const char* name)
+	 *
+	 * @brief Set the logical name of this connection. This can be used for
+	 * Identifying connections withing a client program. If a name is not given,
+	 * one will be automatically generated.
+	 *
+	 * @param name - name of this connection
+	 */
+	void CALL_TYPE setName(const char* name);
+
+
+	/**
+	 * @fn const char* getID() const
+	 *
+	 * @desc Get the string ID for this connection.
+	 */
+	const char* CALL_TYPE getID() const;
+
+
+	/**
+	 * @fn const char* getMWInfo() const
+	 *
+	 * @desc Returns a string containing middleware information.
+	 */
+	const char* CALL_TYPE getMWInfo() const;
+
+
+	/**
+	 * @fn getPublishQueueMessageCount() const
+	 *
+	 * @brief Retrieves the number of messages queued for asynchronous publish operations
+	 *
+	 * @return The number of messages in the publish queue
+	 */
+	GMSEC_U64 CALL_TYPE getPublishQueueMessageCount() const;
+
+
+	/**
 	 * @fn Message createHeartbeatMessage(const char* subject, const gmsec::api::util::DataList<Field*>& heartbeatFields)
 	 *
 	 * @brief This method creates a message and passes ownership to the user. This message is populated with
@@ -536,6 +618,9 @@ public:
 	 * the message will be published at an interval supplied by the "PUB-RATE" field regardless of validation
 	 * results. If no "PUB-RATE" has been defined, the service will default to the GMSEC standard 30 second
 	 * heartbeat interval.
+	 *
+	 * If users would like to have a COUNTER field added to the published heartbeat message, then the Heartbeat
+	 * Service should be provided with this field within the list of fields provided to this method.
 	 *
 	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard
@@ -734,7 +819,7 @@ public:
 	 *                           const gmsec::api::util::DataList<Field*>& fields,
 	 *                           GMSEC_I32 timeout, 
 	 *                           ConnectionManagerReplyCallback* cb,
-	 *                           GMSEC_I32 republish_ms = 0)
+	 *                           GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 *
 	 * @brief This function creates a Directive message, per the description in the GMSEC
 	 * interface specification document. The message is populated with the standard
@@ -742,9 +827,9 @@ public:
 	 * information as described in the GMSEC interface specification document.
 	 *
 	 * This function then invokes request(const Message& request, GMSEC_I32 timeout, 
-	 * ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = 0) to place that message
-	 * on the GMSEC bus. This implicitly sets the message's response flag to true, so that
-	 * receivers of the message will know a response is necessary
+	 * ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
+	 * to place that message on the GMSEC bus. This implicitly sets the message's response flag to true,
+	 * so that receivers of the message will know a response is necessary.
 	 *
 	 * @param subject - subject on which to publish the message
 	 * @param directiveString - a field containing the string directive that this
@@ -754,11 +839,10 @@ public:
 	 * @param timeout - The time to wait before a response to the message will no longer
 	 * be routed to the supplied callback
 	 * @param cb - the callback to be invoked upon reception of a response message
-	 * @param republish_ms - request message resubmission interval (in milliseconds). If set
-	 * to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-	 * period will default to 60000ms, unless the user has provided an alternate time period via
-	 * the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-	 * is 100ms.
+	 * @param republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 * value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 * the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 * Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the message cannot be validated, or if other severe error
@@ -769,7 +853,7 @@ public:
 	                                const gmsec::api::util::DataList<Field*>& fields,
 	                                GMSEC_I32 timeout, 
 	                                ConnectionManagerReplyCallback* cb,
-	                                GMSEC_I32 republish_ms = 0);
+	                                GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 
 	/**
@@ -777,7 +861,7 @@ public:
      *                               const Field& directiveString, 
 	 *                               const gmsec::api::util::DataList<Field*>& fields,
 	 *                               GMSEC_I32 timeout, 
-	 *                               GMSEC_I32 republish_ms = 0)
+	 *                               GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 *
 	 * @brief This function creates a Directive message, per the description in the GMSEC
 	 * interface specification document. The message is populated with the standard
@@ -785,9 +869,9 @@ public:
 	 * information as described in the GMSEC interface specification document.
 	 *
 	 * This function then invokes request(const Message& request, GMSEC_I32 timeout, 
-	 * GMSEC_I32 republish_ms = 0) to place that message on the GMSEC bus. This implicitly
-	 * sets the message's response flag to true, so that receivers of the message will 
-	 * know a response is necessary
+	 * GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER) to place that message on the GMSEC bus.
+	 * This implicitly sets the message's response flag to true, so that receivers of the message will 
+	 * know a response is necessary.
 	 *
 	 * @param subject - subject on which to publish the message
 	 * @param directiveString - a field containing the string directive that this
@@ -796,11 +880,10 @@ public:
 	 * with the directive message.
 	 * @param timeout - The time to wait before a response to the message will no longer
 	 * be routed to the supplied callback
-	 * @param republish_ms - request message resubmission interval (in milliseconds). If set
-	 * to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-	 * period will default to 60000ms, unless the user has provided an alternate time period via
-	 * the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-	 * is 100ms.
+	 * @param republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 * value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 * the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 * Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the message cannot be validated, or if other severe error
@@ -815,7 +898,7 @@ public:
 	                                    const Field& directiveString, 
 	                                    const gmsec::api::util::DataList<Field*>& fields,
 	                                    GMSEC_I32 timeout, 
-	                                    GMSEC_I32 republish_ms = 0);
+	                                    GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 
 	/**
@@ -980,7 +1063,7 @@ public:
 	 *                               const gmsec::api::util::DataList<ServiceParam*>& sParams,
 	 *                               GMSEC_I32 timeout, 
 	 *                               ConnectionManagerReplyCallback* cb,
-	 *                               GMSEC_I32 republish_ms = 0)
+	 *                               GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 *
 	 * @brief This function creates a Simple Service message, per the description in the GMSEC
 	 * interface specification document. The message is populated with the standard
@@ -988,9 +1071,9 @@ public:
 	 * information as described in the GMSEC interface specification document.
 	 *
 	 * This function then invokes request(const Message& request, GMSEC_I32 timeout, 
-	 * ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = 0) to place that message
-	 * on the GMSEC bus. This implicitly sets the message's response flag to true, so that
-	 * receivers of the message will know a response is necessary
+	 * ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
+	 * to place that message on the GMSEC bus. This implicitly sets the message's response flag to true,
+	 * so that receivers of the message will know a response is necessary
 	 *
 	 * @param subject - subject on which to publish the message
 	 * @param opName - the name of the operation of the service
@@ -1003,11 +1086,10 @@ public:
 	 * @param timeout - The time to wait before a response to the message will no longer
 	 * be routed to the supplied callback
 	 * @param cb - the callback to be invoked upon reception of a response message
-	 * @param republish_ms - request message resubmission interval (in milliseconds). If set
-	 * to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-	 * period will default to 60000ms, unless the user has provided an alternate time period via
-	 * the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-	 * is 100ms.
+	 * @param republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 * value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 * the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 * Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the message cannot be validated, or if other severe error
@@ -1020,7 +1102,7 @@ public:
 	                                    const gmsec::api::util::DataList<ServiceParam*>& sParams,
 	                                    GMSEC_I32 timeout, 
 	                                    ConnectionManagerReplyCallback* cb,
-	                                    GMSEC_I32 republish_ms = 0);
+	                                    GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 
 	/**
@@ -1030,7 +1112,7 @@ public:
 	 *                                   const gmsec::api::util::DataList<Field*>& fields, 
 	 *                                   const gmsec::api::util::DataList<ServiceParam*>& sParams,
 	 *                                   GMSEC_I32 timeout, 
-	 *                                   GMSEC_I32 republish_ms = 0)
+	 *                                   GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 *
 	 * @brief This function creates a Simple Service message, per the description in the GMSEC
 	 * interface specification document. The message is populated with the standard
@@ -1038,7 +1120,7 @@ public:
 	 * information as described in the GMSEC interface specification document.
 	 *
 	 * This function then invokes request(const Message& request, GMSEC_I32 timeout, 
-	 * GMSEC_I32 republish_ms = 0) to place that message on the GMSEC bus. This implicitly
+	 * GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER) to place that message on the GMSEC bus. This implicitly
 	 * sets the message's response flag to true, so that receivers of the message will 
 	 * know a response is necessary
 	 *
@@ -1052,11 +1134,10 @@ public:
 	 * invocation
 	 * @param timeout - The time to wait before a response to the message will no longer
 	 * be routed to the supplied callback
-	 * @param republish_ms - request message resubmission interval (in milliseconds). If set
-	 * to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-	 * period will default to 60000ms, unless the user has provided an alternate time period via
-	 * the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-	 * is 100ms.
+	 * @param republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 * value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 * the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 * Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the message cannot be validated, or if other severe error
@@ -1072,7 +1153,15 @@ public:
 	                                        const gmsec::api::util::DataList<Field*>& fields, 
 	                                        const gmsec::api::util::DataList<ServiceParam*>& sParams,
 	                                        GMSEC_I32 timeout, 
-	                                        GMSEC_I32 republish_ms = 0);
+	                                        GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
+
+
+	/**
+	 * @fn void shutdownAllMiddlewares()
+	 *
+	 * @desc Calls shutdown routines for each middleware that has a shutdown routine registered.
+	 */
+	static void shutdownAllMiddlewares();
 
 
 	/* @cond For C API support ONLY! */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,16 +17,21 @@
 
 #include <gmsec4/c/mist/schema_id_iterator.h>
 
+#include <gmsec4/internal/StringUtil.h>
+
+#include <gmsec4/mist/FieldSpecification.h>
+#include <gmsec4/mist/MessageSpecification.h>
+#include <gmsec4/mist/SchemaIDIterator.h>
+#include <gmsec4/mist/Specification.h>
+
 #include <gmsec4/Config.h>
 #include <gmsec4/Exception.h>
 #include <gmsec4/Message.h>
 
-#include <gmsec4/mist/SchemaIDIterator.h>
-#include <gmsec4/mist/Specification.h>
-
 
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
+using namespace gmsec::api::util;
 
 
 GMSEC_Specification CALL_TYPE specificationCreate(const GMSEC_Config config, GMSEC_Status status)
@@ -193,6 +198,92 @@ unsigned int CALL_TYPE specificationGetVersion(GMSEC_Specification spec, GMSEC_S
 	}
 
 	return version;
+}
+
+
+void CALL_TYPE specificationGetMessageSpecifications(GMSEC_Specification spec, GMSEC_MessageSpecification** msgSpecs, int* numMsgSpecs, GMSEC_Status status)
+{
+	Specification* s = reinterpret_cast<Specification*>(spec);
+	Status         result;
+
+	if (!s)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Specification handle is NULL");
+	}
+	else
+	{
+		const DataList<MessageSpecification*>& cppMsgSpecs = s->getMessageSpecifications();
+
+		*msgSpecs    = new GMSEC_MessageSpecification[cppMsgSpecs.size()];
+		*numMsgSpecs = (int) cppMsgSpecs.size();
+
+		int spec = 0;
+		for (DataList<MessageSpecification*>::const_iterator it = cppMsgSpecs.begin(); it != cppMsgSpecs.end(); ++it)
+		{
+			const DataList<FieldSpecification*>& cppFldSpecs = (*it)->getFieldSpecifications();
+
+			(*msgSpecs)[spec].schemaID      = StringUtil::stringNew((*it)->getSchemaID());
+			(*msgSpecs)[spec].fieldSpecs    = new GMSEC_FieldSpecification[cppFldSpecs.size()];
+			(*msgSpecs)[spec].numFieldSpecs = (int) cppFldSpecs.size();
+
+			int fld = 0;
+			for (DataList<FieldSpecification*>::const_iterator it2 = cppFldSpecs.begin(); it2 != cppFldSpecs.end(); ++it2)
+			{
+				(*msgSpecs)[spec].fieldSpecs[fld].name           = StringUtil::stringNew((*it2)->getName());
+				(*msgSpecs)[spec].fieldSpecs[fld].type           = StringUtil::stringNew((*it2)->getType());
+				(*msgSpecs)[spec].fieldSpecs[fld].mode           = StringUtil::stringNew((*it2)->getMode());
+				(*msgSpecs)[spec].fieldSpecs[fld].classification = StringUtil::stringNew((*it2)->getClassification());
+				(*msgSpecs)[spec].fieldSpecs[fld].value          = StringUtil::stringNew((*it2)->getValue());
+				(*msgSpecs)[spec].fieldSpecs[fld].description    = StringUtil::stringNew((*it2)->getDescription());
+
+				++fld;
+			}
+
+			++spec;
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+}
+
+
+void CALL_TYPE specificationDestroyMessageSpecifications(GMSEC_MessageSpecification* msgSpecs, int numMsgSpecs, GMSEC_Status status)
+{
+	Status result;
+
+	if (!msgSpecs)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "GMSEC_MessageSpecification is NULL");
+	}
+	else
+	{
+		for (int i = 0; i < numMsgSpecs; ++i)
+		{
+			StringUtil::stringDestroy(msgSpecs[i].schemaID);
+
+			for (int j = 0; j < msgSpecs[i].numFieldSpecs; ++j)
+			{
+				StringUtil::stringDestroy(msgSpecs[i].fieldSpecs[j].name);
+				StringUtil::stringDestroy(msgSpecs[i].fieldSpecs[j].type);
+				StringUtil::stringDestroy(msgSpecs[i].fieldSpecs[j].mode);
+				StringUtil::stringDestroy(msgSpecs[i].fieldSpecs[j].classification);
+				StringUtil::stringDestroy(msgSpecs[i].fieldSpecs[j].value);
+				StringUtil::stringDestroy(msgSpecs[i].fieldSpecs[j].description);
+			}
+
+			delete [] msgSpecs[i].fieldSpecs;
+		}
+
+		delete [] msgSpecs;
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
 }
 
 

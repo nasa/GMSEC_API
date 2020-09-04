@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -37,9 +37,12 @@ public:
 	FieldTemplate(const std::string& fieldName, 
 				  const std::string& fieldMode, 
 				  const std::string& fieldClass, 
-				  const std::string& fieldValue, 
+				  const std::list<std::string>& fieldValues, 
 				  const std::list<std::string>& fieldTypes, 
 				  const std::string& fieldDescription);
+
+
+	FieldTemplate(const FieldTemplate& other);
 
 
 	~FieldTemplate();
@@ -47,28 +50,41 @@ public:
 
 	//accessors to member data
 	std::string CALL_TYPE getName() const;
+	std::string CALL_TYPE getModifiedName() const;
 	std::string CALL_TYPE getMode() const;
 	std::string CALL_TYPE getClass() const;//use with isHeader()
 										   //true if m_class is "header"
 										   //false if m_class is "standard"
-	std::string CALL_TYPE getValue() const;
 	std::list<std::string> CALL_TYPE getTypeStrings() const;
 	std::list<gmsec::api::Field::FieldType> getTypes() const;
+	std::list<std::string> getValues() const;
 	std::string CALL_TYPE getDescription() const;
 	std::string CALL_TYPE getSize() const;
 
-	//For use if the type is explicitly set, gets the first type in the list
+	//For use if the type or value is explicitly set, gets the first in the list
 	//(an explicitly defined type will only have one item in the list)
 	std::string getType() const;
+	std::string getValue() const;
+
+	//Returns the lists as concatenated strings
+	std::string getConcatenatedTypes() const;
+	std::string getConcatenatedValues() const;
+
+	//If an array control, returns the placeholder value for the index number
+	std::string getArrayControlValue() const;
 
 	//mutators
 	void CALL_TYPE setName(const std::string& name);
+	void CALL_TYPE setModifiedName(const std::string& name);
 	void CALL_TYPE setMode(const std::string& mode);
 	void CALL_TYPE setClass(const std::string& value);
-	void CALL_TYPE setValue(const std::string& value);
+	void CALL_TYPE setValues(const std::list<std::string>& values);
 	void CALL_TYPE setTypes(const std::list<std::string>& types);
 	void CALL_TYPE setDescription(const std::string& description);
 	void CALL_TYPE setSize(const std::string& size);
+
+	//used to set an explicit value for the field template
+	void setValue(const std::string& value);
 
 	//additional information
 	bool hasExplicitType() const;
@@ -84,6 +100,7 @@ public:
 	
 
 	//creates a new field based off of the template
+	//note: caller is responsible for deleting the returned field object
 	Field* CALL_TYPE toField(const std::string& type) const;
 
 
@@ -92,13 +109,16 @@ protected:
 
 
 private:
+	// Defined, but not implemented
+	FieldTemplate& operator=(const FieldTemplate&);
+
+
 	std::string m_name;
+	std::string m_modifiedName;
 	std::string m_mode;
 	std::string m_class; //corresponds to bool header in standard fields
 
-	//TODO MAV
-	//std::list<std::string> m_values (also add accessor/mutators)
-	std::string m_value;
+	std::list<std::string> m_values;
 	
 	
 	std::list<std::string> m_types;

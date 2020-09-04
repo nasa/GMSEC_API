@@ -15,6 +15,8 @@ using namespace gmsec::api::mist;
 // Turn on director mapping for the Specification package
 %feature("director") Specification;
 
+%ignore gmsec::api::mist::Specification::getMessageSpecifications() const;
+
 /*
 %feature("director:except") {
     if ($error != NULL) {
@@ -33,3 +35,29 @@ using namespace gmsec::api::mist;
 %include "dox/Specification_dox.i"
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/Specification.h>
+
+%include <std_list.i>
+
+namespace std
+{
+    %template(MessageSpecificationList) list<gmsec::api::mist::MessageSpecification*>;
+}
+
+
+%extend gmsec::api::mist::Specification {
+
+    const std::list<gmsec::api::mist::MessageSpecification*> CALL_TYPE getMessageSpecifications()
+    {
+        const gmsec::api::util::DataList<gmsec::api::mist::MessageSpecification*>& msgSpecs = self->getMessageSpecifications();
+
+        std::list<gmsec::api::mist::MessageSpecification*> newMsgSpecs;
+
+        for (gmsec::api::util::DataList<gmsec::api::mist::MessageSpecification*>::const_iterator it = msgSpecs.begin(); it != msgSpecs.end(); ++it)
+        {
+            newMsgSpecs.push_back(*it);
+        }
+
+        return newMsgSpecs;
+    }
+}
+

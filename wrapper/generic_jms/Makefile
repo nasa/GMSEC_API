@@ -1,5 +1,5 @@
  
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -35,7 +35,12 @@ OBJECTS      = $(OBJDIR)/gmsec_generic_jms.o \
                $(OBJDIR)/JNI.o
 
 
-default: clean library
+default: check-env clean library
+
+check-env:
+ifndef JDK_HOME
+	$(error JDK_HOME is not defined; GMSEC API Generic JMS wrapper will not be built)
+endif
 
 library: $(BINDIR)/$(TARGET)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,17 +8,13 @@
 
 /**
  * @file U16.java
- *
- * @brief This is a container class for the GMSEC unsigned 16-bit integer field type.
  */
 
 package gov.nasa.gsfc.gmsec.api;
 
 
 /**
- * @class U16
- *
- * @brief This is a container class for the GMSEC unsigned 16-bit integer field type.
+ * This is a container class for the GMSEC unsigned 16-bit integer field type.
  */
 public class U16
 {
@@ -26,19 +22,19 @@ public class U16
 
 
 	/**
-	 * @desc Minimum value (0) allowed for U16 type.
+	 * Minimum value (0) allowed for U16 type.
 	 */
 	public static final int MIN_VALUE = 0;
 
 
 	/**
-	 * @desc Maximum value (2^16 - 1) allowed for U16 type.
+	 * Maximum value (2^16 - 1) allowed for U16 type.
 	 */
 	public static final int MAX_VALUE = 65535;
 
 
 	/**
-	 * @desc Enforce allowable range for U16 values.
+	 * Enforce allowable range for U16 values.
 	 */
 	private int checkRange(int arg) throws IllegalArgumentException
 	{
@@ -55,9 +51,7 @@ public class U16
 
 
 	/**
-	 * @fn U16()
-	 *
-	 * @brief construct with value equal to MIN_VALUE
+	 * Construct U16 object with value equal to MIN_VALUE
 	 */
 	public U16()
 	{
@@ -66,13 +60,11 @@ public class U16
 
 
 	/**
-	 * @fn U16(int value)
+	 * Construct U16 object with the given value
 	 *
-	 * @brief construct with given value
+	 * @param value The value to assign to the U16 object.
 	 *
-	 * @param value - the value to assign to the U16 object.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
+	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
 	public U16(int value)
 	{
@@ -81,11 +73,9 @@ public class U16
 
 
 	/**
-	 * @fn U16(U16 other)
+	 * Copy constructor
 	 *
-	 * @brief Copy constructor
-	 *
-	 * @param other - the U16 object to copy
+	 * @param other The U16 object to copy
 	 */
 	public U16(U16 other)
 	{
@@ -94,13 +84,11 @@ public class U16
 
 
 	/**
-	 * @fn set(int value)
+	 * Set U16 object with given value.
 	 *
-	 * @brief Set U16 object with given value.
+	 * @param value The value to assign to the U16 object.
 	 *
-	 * @param value - the value to assign to the U16 object.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
+	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
 	public void set(int value)
 	{
@@ -109,9 +97,7 @@ public class U16
 
 
 	/*
-	 * @fn int get()
-	 *
-	 * @desc Returns the underlying value within the U16 object.
+	 * Returns the underlying value within the U16 object.
 	 */
 	public int get()
 	{
@@ -120,9 +106,7 @@ public class U16
 
 
 	/**
-	 * @fn String toString()
-	 *
-	 * @desc Returns the U16 value as a printable string.
+	 * Returns the U16 value as a printable string.
 	 */
 	public String toString()
 	{

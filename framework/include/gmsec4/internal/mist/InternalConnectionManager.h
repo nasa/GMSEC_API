@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -68,6 +68,9 @@ namespace internal
 class GMSEC_API InternalConnectionManager
 {
 public:
+	static const char* CALL_TYPE getAPIVersion();
+
+
 	InternalConnectionManager(gmsec::api::mist::ConnectionManager* parent, const Config& cfg, bool validate, unsigned int version);
 
 
@@ -78,6 +81,12 @@ public:
 
 
 	void CALL_TYPE cleanup();
+
+
+	Connection::ConnectionState CALL_TYPE getState() const;
+
+
+	const char* CALL_TYPE getLibraryRootName() const;
 
 
 	const char* CALL_TYPE getLibraryVersion() const;
@@ -147,6 +156,21 @@ public:
 
 
 	void CALL_TYPE removeExcludedSubject(const char* subject);
+
+
+	const char* CALL_TYPE getName() const;
+
+
+	void CALL_TYPE setName(const char* name);
+
+
+	const char* CALL_TYPE getID() const;
+
+
+	const char* CALL_TYPE getMWInfo() const;
+
+
+	GMSEC_U64 CALL_TYPE getPublishQueueMessageCount() const;
 
 
 	Message CALL_TYPE createHeartbeatMessage(const char* subject, const gmsec::api::util::DataList<Field*>& heartbeatFields);
@@ -237,6 +261,10 @@ public:
 	                                           ResponseStatus::Response ssResponse,
 	                                           const gmsec::api::util::DataList<Field*>& fields);
 
+
+	static void shutdownAllMiddlewares();
+
+
     /* For C-binding only! */
 	void CALL_TYPE setSpecification(Specification* spec, GMSEC_SpecificationValidateMessage* validateMsg);
 
@@ -293,7 +321,11 @@ private:
 
 
 	// helper functions
-	void setHeartbeatDefaults(const char* subject, const gmsec::api::util::DataList<Field*>& heartbeatFields);
+	inline bool validateOnSend() { return m_validate == VALIDATE_ALL || m_validate == VALIDATE_SEND; }
+
+	inline bool validateOnRecv() { return m_validate == VALIDATE_ALL || m_validate == VALIDATE_RECV; }
+
+	void storeHeartbeatServiceDetails(const char* subject, const gmsec::api::util::DataList<Field*>& heartbeatFields);
 
 	Message createMessage(const char* subject, Message::MessageKind kind, const FieldList& fields);
 
@@ -302,16 +334,27 @@ private:
 
 	typedef std::list<SubscriptionInfo*> SubscriptionList;
 
+	enum ValidateLevel
+	{
+		VALIDATE_NONE,
+		VALIDATE_RECV,
+		VALIDATE_SEND,
+		VALIDATE_ALL
+	};
+
 	// member data
 	Config                               m_config;
 	Connection*                          m_connection;
-	bool                                 m_validate;
+	ValidateLevel                        m_validate;
 	Specification*                       m_specification;
 	Specification*                       m_customSpecification;
-	FieldList                            m_standardHeartbeatFields;
-	FieldList                            m_standardLogFields;
-	std::string                          m_heartbeatSubject;
+
+	std::string                          m_heartbeatServiceSubject;
+	FieldList                            m_heartbeatServiceFields;
+
 	std::string                          m_logSubject;
+	FieldList                            m_standardLogFields;
+
 	size_t                               m_resourceMessageCounter;
 	SubscriptionList                     m_subscriptions;
 	MessagePopulator*                    m_messagePopulator;

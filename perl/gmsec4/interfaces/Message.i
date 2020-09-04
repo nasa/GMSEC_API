@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,11 +8,33 @@
 %module Message
 %{
 #include <gmsec4/Message.h>
+#include <list>
 using namespace gmsec::api;
 %}
 
+// Functions containing lists that will be redefined
+%ignore gmsec::api::Message::addFields(const gmsec::api::util::DataList<Field*>&);
+
+%ignore gmsec::api::Message::operator=(const Message&);
+
+
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/Message.h>
+
+
+%extend gmsec::api::Message {
+
+    bool CALL_TYPE addFields(const std::list<gmsec::api::Field*>& fields) {
+        gmsec::api::util::DataList<gmsec::api::Field*> dl_fields;
+
+        for (std::list<gmsec::api::Field*>::const_iterator it = fields.begin(); it != fields.end(); ++it) {
+            dl_fields.push_back(*it);
+        }
+
+        return self->addFields(dl_fields);
+    }
+}
+
 
 %perlcode%{
 =pod
@@ -379,6 +401,21 @@ C<libgmsec_perl::Message-E<gt>addField($field)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         Returns 1 (true) if the Field is replacing one with the same name; 0 (false) otherwise.
+
+=head3 addFields
+
+C<libgmsec_perl::Message-E<gt>addFields($fields)>
+
+        This function will add the fields in the provided list to the message.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+        $fields - the list of Field objects
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+        Returns true if any existing field in the Message has been replaced; false otherwise.
+";
+
 
 =head3 clearFields
 

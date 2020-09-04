@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,6 +18,7 @@
 
 #include <gmsec4/mist/SchemaIDIterator.h>
 
+#include <gmsec4/util/DataList.h>
 #include <gmsec4/util/Deprecated.h>
 
 namespace gmsec
@@ -29,10 +30,11 @@ namespace api
 
 namespace mist
 {
+	// Forward declaration(s)
+	class MessageSpecification;
 
 	namespace internal
 	{
-		// Forward declaration(s)
 		class MessageTemplate;
 		class InternalSpecification;
 		class SpecificationBuddy;
@@ -110,9 +112,17 @@ public:
    /**
     * @fn getVersion()
 	*
-	* @brief returns the version of the ISD being used as an unsigned integer.
+	* @brief Returns the version of the ISD being used as an unsigned integer.
     */
 	unsigned int CALL_TYPE getVersion() const;
+
+
+	/**
+	 * @fn
+	 *
+	 * @brief Returns the list of MessageSpecification objects, each of which represents a message template.
+	 */
+	const util::DataList<MessageSpecification*>& getMessageSpecifications() const;
 
 
    /**

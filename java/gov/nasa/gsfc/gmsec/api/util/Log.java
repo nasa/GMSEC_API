@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,31 +8,25 @@
 
 /**
  * @file Log.java
- *
- * @brief Basic logging class.
  */
 
 package gov.nasa.gsfc.gmsec.api.util;
 
-import gov.nasa.gsfc.gmsec.api.jni.*;
+import gov.nasa.gsfc.gmsec.api.jni.util.JNILog;
 
 
 /**
- * @class Log
- *
- * @brief Basic logging class. This class supports basic logging to any output
- *        stream. This class is thread-safe.
+ * Basic logging class. This class supports basic logging to any output
+ * stream. This class is thread-safe.
  */
 public class Log
 {
 	/**
-	 * @fn void setReportingLevel(LogLevel level)
+	 * Sets maximum logging level.
 	 *
-	 * @brief Sets maximum logging level.
-	 *
-	 * @param level - Possible values LogLevel.NONE, LogLevel.ERROR,
-	 *                LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
-	 *                LogLevel.VERBOSE, and LogLevel.DEBUG.
+	 * @param level Possible values LogLevel.NONE, LogLevel.ERROR,
+	 *              LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
+	 *              LogLevel.VERBOSE, and LogLevel.DEBUG.
 	 */
 	public static void setReportingLevel(LogLevel level)
 	{
@@ -41,9 +35,7 @@ public class Log
 
 
 	/**
-	 * @fn LogLevel getReportingLevel()
-	 *
-	 * @brief Returns the maximum logging level.
+	 * Returns the maximum logging level.
 	 *
 	 * @return Possible values LogLevel.NONE, LogLevel.ERROR,
 	 *         LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
@@ -56,11 +48,9 @@ public class Log
 
 
 	/**
-	 * @fn void registerHandler(LogHandler handler)
+	 * Registers a LogHandler that will be called for all logging levels.
 	 *
-	 * @brief Registers a LogHandler that will be called for all logging levels.
-	 *
-	 * @param handler - An instance of a class which extends LogHandler, or null to
+	 * @param handler An instance of a class which extends LogHandler, or null to
 	 * restore the default log handler.
 	 */
 	public static void registerHandler(LogHandler handler)
@@ -70,16 +60,12 @@ public class Log
 
 
 	/**
-	 * @fn registerHandler(LogLevel level, LogHandler handler)
+	 * Registers a LogHandler that will be called for a specific logging level.
 	 *
-	 * @brief Registers a LogHandler that will be called for a specific
-	 *        logging level.
-	 *
-	 * @param level - Possible values LogLevel.NONE, LogLevel.ERROR,
-	 *                LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
-	 *                LogLevel.VERBOSE, and LogLevel.DEBUG.
-	 *
-	 * @param handler - An instance of a class which extends LogHandler, or null to
+	 * @param level Possible values LogLevel.NONE, LogLevel.ERROR,
+	 *              LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
+	 *              LogLevel.VERBOSE, and LogLevel.DEBUG.
+	 * @param handler An instance of a class which extends LogHandler, or null to
 	 * restore the default log handler.
 	 */
 	public static void registerHandler(LogLevel level, LogHandler handler)
@@ -89,13 +75,11 @@ public class Log
 
 
 	/**
-	 * @fn String levelToString(LogLevel level)
+	 * Converts the log level number to a string value.
 	 *
-	 * @brief Converts the log level number to a string value.
-	 *
-	 * @param level - Possible values LogLevel.NONE, LogLevel.ERROR,
-	 *                LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
-	 *                LogLevel.VERBOSE, and LogLevel.DEBUG
+	 * @param level Possible values LogLevel.NONE, LogLevel.ERROR,
+	 *              LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
+	 *              LogLevel.VERBOSE, and LogLevel.DEBUG
 	 *
 	 * @return String with possible contents of "NONE," "ERROR,"
 	 *         "SECURE," "WARNING," "INFO," "VERBOSE," "DEBUG," or
@@ -108,17 +92,15 @@ public class Log
 
 
 	/**
-	 * @fn LogLevel levelFromString(String level)
+	 * Converts the string value to a log level number.
 	 *
-	 * @brief Converts the string value to a log level number.
-	 *
-	 * @param level - String with possible contents of "NONE," "ERROR,"
-	 *                "SECURE," "WARNING," "INFO," "VERBOSE," "DEBUG," or
-	 *                "INVALID."
+	 * @param level String with possible contents of "NONE," "ERROR,"
+	 *              "SECURE," "WARNING," "INFO," "VERBOSE," "DEBUG," or
+	 *              "INVALID."
 	 *
 	 * @return Possible values LogLevel.NONE, LogLevel.ERROR,
-	 *          LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
-	 *          LogLevel.VERBOSE, and LogLevel.DEBUG
+	 *         LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
+	 *         LogLevel.VERBOSE, and LogLevel.DEBUG
 	 */
 	public static LogLevel levelFromString(String level)
 	{
@@ -131,11 +113,9 @@ public class Log
 
 
 	/**
-	 * @fn void error(String message)
+	 * Logs an error message.
 	 *
-	 * @brief Logs an error message.
-	 *
-	 * @param message - String to log.
+	 * @param message String to log.
 	 */
 	public static void error(String message)
 	{
@@ -147,11 +127,9 @@ public class Log
 
 
 	/**
-	 * @fn void secure(String message)
+	 * Logs a secure message.
 	 *
-	 * @brief Logs a secure message.
-	 *
-	 * @param message - String to log.
+	 * @param message String to log.
 	 */
 	public static void secure(String message)
 	{
@@ -163,11 +141,9 @@ public class Log
 
 
 	/**
-	 * @fn void warning(String message)
+	 * Logs a warning message.
 	 *
-	 * @brief Logs a warning message.
-	 *
-	 * @param message - String to log.
+	 * @param message String to log.
 	 */
 	public static void warning(String message)
 	{
@@ -179,11 +155,9 @@ public class Log
 
 
 	/**
-	 * @fn void info(String message)
+	 * Logs an info message.
 	 *
-	 * @brief Logs an info message.
-	 *
-	 * @param message - String to log.
+	 * @param message String to log.
 	 */
 	public static void info(String message)
 	{
@@ -195,11 +169,9 @@ public class Log
 
 
 	/**
-	 * @fn void verbose(String message)
+	 * Logs a verbose message.
 	 *
-	 * @brief Logs a verbose message.
-	 *
-	 * @param message - String to log.
+	 * @param message String to log.
 	 */
 	public static void verbose(String message)
 	{
@@ -211,11 +183,9 @@ public class Log
 
 
 	/**
-	 * @fn void debug(String message)
+	 * Logs a debug message.
 	 *
-	 * @brief Logs a debug message.
-	 *
-	 * @param message - String to log.
+	 * @param message String to log.
 	 */
 	public static void debug(String message)
 	{

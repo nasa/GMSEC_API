@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,22 +8,22 @@
 
 /**
  * @file BooleanField.java
- *
- * @brief Specialized Field class that can be used to retain a boolean value.
  */
 
 package gov.nasa.gsfc.gmsec.api.field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIBooleanField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIBooleanField;
 
 
 /**
- * @class BooleanField
- *
- * @brief Specialized Field class that can be used to retain a boolean value.
+ * Specialized Field class that can be used to retain a boolean value.
  */
 public class BooleanField extends Field
 {
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A JNIBooleanField object.
+	 */
 	public BooleanField(JNIBooleanField field)
 	{
 		setInternal(field);
@@ -31,14 +31,12 @@ public class BooleanField extends Field
 
 
 	/**
-	 * @fn BooleanField(String name, boolean data)
+	 * Default constructor.
 	 *
-	 * @brief Default constructor.
+	 * @param name Name of the field.
+	 * @param data Boolean data to associate with the field.
 	 *
-	 * @param name - name of the field.
-	 * @param data - boolean data to associate with the field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
 	 */
 	public BooleanField(String name, boolean data) throws IllegalArgumentException
 	{
@@ -49,13 +47,11 @@ public class BooleanField extends Field
 
 
 	/**
-	 * @fn BooleanField(BooleanField other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other BooleanField object to copy.
 	 *
-	 * @param other - the other BooleanField object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given BooleanField is null.
+	 * @throws IllegalArgumentException Thrown if the given BooleanField is null.
 	 */
 	public BooleanField(BooleanField other) throws IllegalArgumentException
 	{
@@ -69,9 +65,9 @@ public class BooleanField extends Field
 
 
 	/**
-	 * @fn boolean getValue()
+	 * Returns the data stored within the BooleanField.
 	 *
-	 * @return Returns the data stored within the BooleanField.
+	 * @return A boolean value.
 	 */
 	public boolean getValue()
 	{

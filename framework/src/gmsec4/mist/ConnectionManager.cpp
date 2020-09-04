@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -52,6 +52,12 @@ namespace mist
 {
 
 
+const char* ConnectionManager::getAPIVersion()
+{
+	return internal::InternalConnectionManager::getAPIVersion();
+}
+
+
 ConnectionManager::ConnectionManager(const Config& cfg, bool validate, unsigned int version)
 	: m_internal(new internal::InternalConnectionManager(this, cfg, validate, version))
 {
@@ -73,6 +79,18 @@ void ConnectionManager::initialize()
 void ConnectionManager::cleanup()
 {
 	m_internal->cleanup();
+}
+
+
+Connection::ConnectionState ConnectionManager::getState() const
+{
+	return m_internal->getState();
+}
+
+
+const char* ConnectionManager::getLibraryRootName() const
+{
+	return m_internal->getLibraryRootName();
 }
 
 
@@ -205,6 +223,36 @@ void ConnectionManager::excludeSubject(const char* subject)
 void ConnectionManager::removeExcludedSubject(const char* subject)
 {
 	return m_internal->removeExcludedSubject(subject);
+}
+
+
+const char* ConnectionManager::getName() const
+{
+	return m_internal->getName();
+}
+
+
+void ConnectionManager::setName(const char* name)
+{
+	m_internal->setName(name);
+}
+
+
+const char* ConnectionManager::getID() const
+{
+	return m_internal->getID();
+}
+
+
+const char* ConnectionManager::getMWInfo() const
+{
+	return m_internal->getMWInfo();
+}
+
+
+GMSEC_U64 ConnectionManager::getPublishQueueMessageCount() const
+{
+	return m_internal->getPublishQueueMessageCount();
 }
 
 
@@ -390,6 +438,12 @@ void ConnectionManager::requestSimpleService(const char* subject, const char* op
 		GMSEC_I32 republish_ms)
 {
 	m_internal->requestSimpleService(subject, opName, opNumber, fields, params, timeout, rcb, ecb, republish_ms);
+}
+
+
+void ConnectionManager::shutdownAllMiddlewares()
+{
+	internal::InternalConnectionManager::shutdownAllMiddlewares();
 }
 
 }  //namespace mist

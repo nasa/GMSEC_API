@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -755,6 +755,41 @@ GMSEC_BOOL CALL_TYPE messageAddU64Field(GMSEC_Message msg, const char* name, GMS
 	}
 
 	return overwrite;
+}
+
+
+GMSEC_BOOL CALL_TYPE messageAddFields(GMSEC_Message msg, const GMSEC_Field fields[], size_t numFields, GMSEC_Status status)
+{
+	bool   fieldsReplaced = false;
+	Status result;
+
+	Message* m = reinterpret_cast<Message*>(msg);
+
+	if (!m)
+	{
+		result = Status(MSG_ERROR, UNINITIALIZED_OBJECT, "Message handle is NULL");
+	}
+	else if (!fields || numFields == 0)
+	{
+		result = Status(MSG_ERROR, UNINITIALIZED_OBJECT, "Array of Fields is NULL or field count is zero");
+	}
+	else
+	{
+		for (size_t i = 0; i < numFields; ++i)
+		{
+			if (fields[i] != NULL)
+			{
+				fieldsReplaced |= (messageAddField(msg, fields[i], NULL) == GMSEC_TRUE);
+			}
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return (fieldsReplaced ? GMSEC_TRUE : GMSEC_FALSE);
 }
 
 

@@ -1,0 +1,49 @@
+# Copyright 2007-2018 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
+
+GMSEC_HOME=../../..
+
+include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
+
+MCS         = /usr/bin/mcs
+MONO        = /usr/bin/mono
+
+CS_ASSEMBLY = $(GMSEC_HOME)/bin/gmsec_csharp.dll
+
+.PHONY: checkDefs clean run
+
+
+default all: checkDefs $(TARGET)
+
+
+clean: checkDefs
+	$(RM) $(TARGET)
+
+
+checkDefs:
+	@ if [ -z $(TARGET) ]; then \
+		echo "TARGET is not defined"; \
+		exit 1; \
+	fi
+
+
+$(TARGET): $(SRCS)
+	$(MCS) -r:$(CS_ASSEMBLY) -out:$@ $<
+
+
+run: checkARGS $(TARGET)
+	$(MONO) $(TARGET) $(ARGS)
+
+
+checkARGS:
+	@ if [[ -z "$(ARGS)" ]]; then \
+		echo "Error: ARGS are missing; try something like:"; \
+		echo; \
+		echo "    make run ARGS=\"mw-id=bolt server=localhost\""; \
+		echo; \
+		exit 1; \
+	fi
+

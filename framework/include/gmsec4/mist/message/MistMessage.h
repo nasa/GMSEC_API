@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,17 +17,19 @@
 
 #include <gmsec4/Message.h>
 
+#include <gmsec4/util/DataList.h>
+
 namespace gmsec
 {
 namespace api
 {
+	// Forward declaration(s)
+	class Message;
+
 namespace mist
 {
+	// Forward declaration(s)
 	class Specification;
-	namespace internal
-	{
-		class MessageTemplate;
-	}
 
 namespace message
 {
@@ -71,6 +73,7 @@ public:
 	*/
 	MistMessage(const char* subject, const char* schemaID, const Specification& spec);
 
+
    /**
 	* @fn MistMessage(const char* subject, const char* schemaID, const Config& config, const Specification& spec)
 	*
@@ -88,6 +91,7 @@ public:
 	*/
 	MistMessage(const char* subject, const char* schemaID, const Config& config, const Specification& spec);
 
+
    /**
 	* @fn MistMessage(const MistMessage& other)
 	*
@@ -98,6 +102,32 @@ public:
 	* @throw An exception is thrown if Specification fails to load the template directory or if schemaID is not a valid ID.
 	*/
 	MistMessage(const MistMessage& other);
+
+
+	/**
+	 * @fn MistMessage(const Message& msg)
+	 *
+	 * @brief Special constructor that constructs a MistMessage using a simple Message.
+	 *
+	 * @param msg - The simple Message to reference while building the MistMessage
+	 *
+	 * @throw An exception is thrown if the given Message does not house sufficient information to construct a MistMessage.
+	 */
+	MistMessage(const Message& msg);
+
+
+	/**
+	 * @fn MistMessage(const Message& msg, const Config& specConfig)
+	 *
+	 * @brief Special constructor that builds a MistMessage using a simple Message.
+	 *
+	 * @param msg - The simple Message to reference while building the MistMessage
+	 * @param specConfig - The specification configuration to apply when constructing the MistMessage
+	 *
+	 * @throw An exception is thrown if the given Message does not house sufficient information to construct a MistMessage.
+	 */
+	MistMessage(const Message& msg, const Config& specConfig);
+
 
    /**
 	* @fn MistMessage(const char* data)
@@ -110,6 +140,7 @@ public:
 	*/
 	MistMessage(const char* data);
 
+
    /**
     * @fn ~MistMessage()
 	*
@@ -117,12 +148,39 @@ public:
 	*/
 	virtual ~MistMessage();
 
-   /**
-    * @fn getSchemaID()
-	*
-	* @brief Returns a string that identifies the schema that the Message is based off of.
-	*/
+
+	/**
+	 * @fn void setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields)
+	 *
+	 * @brief Sets the internal list of fields which are to be automatically placed in all
+	 * MistMessage objects that are created.  Internal copies of the Fields are made, and
+	 * thus ownership of the fields that are provided are not retained by MistMessage.
+	 *
+	 * @param standardFields - A list of fields to be copied to the internal set of fields,
+	 * which will in turn be included with all MistMessage objects that are created.
+	 *
+	 * @sa clearStandardFields()
+	 */
+	static void CALL_TYPE setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields);
+
+
+	/**
+	 * @fn void clearStandardFields()
+	 *
+	 * @brief Destroys the lists of standard fields that are included with MistMessage objects.
+	 *
+	 * @sa setStandardFields()
+	 */
+	static void clearStandardFields();
+
+
+	/**
+	 * @fn getSchemaID()
+	 *
+	 * @brief Returns a string that identifies the schema that the Message is based off of.
+	 */
 	const char* CALL_TYPE getSchemaID() const;
+
 
    /**
     * @fn setValue(const char* fieldName, const char* value)
@@ -142,6 +200,7 @@ public:
 	*/
 	void CALL_TYPE setValue(const char* fieldName, const char* value);
 
+
    /**
     * @fn setValue(const char* fieldName, GMSEC_I64 value)
 	*
@@ -159,7 +218,8 @@ public:
 	* by the field, or if the string is too big when converting to char.
 	*/
 	void CALL_TYPE setValue(const char* fieldName, GMSEC_I64 value);
-	
+
+
    /**
     * @fn setValue(const char* fieldName, GMSEC_F64 value)
 	*
@@ -181,6 +241,11 @@ public:
 
 protected:
 	MistMessage(gmsec::api::mist::message::internal::InternalMistMessage* internalMsg);
+
+
+private:
+	// Defined, but not implemented
+	MistMessage& operator=(const MistMessage&);
 };
 
 } // namespace message

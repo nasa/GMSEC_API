@@ -1,6 +1,6 @@
 rem @echo OFF
 
-rem Copyright 2007-2017 United States Government as represented by the
+rem Copyright 2007-2018 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -10,7 +10,7 @@ rem This batch file builds everything for Microsoft Windows
 
 rem Build the main part of the API
 
-set BUILD=gmsecapi gmsec_java gmsec_jni generic_jms bolt mb MBServer dotnet libgmsec_python libgmsec_perl gmhelp
+set BUILD=gmsecapi gmsec_java gmsec_jni generic_jms bolt mb MBServer dotnet libgmsec_python libgmsec_python3 libgmsec_perl libgmsec_csharp gmhelp
 
 IF DEFINED WRAPPERS (
 	set BUILD=%BUILD% %WRAPPERS%
@@ -29,58 +29,84 @@ IF DEFINED GMSEC_x64 (
 set TMP=
 set TEMP=
 
-IF DEFINED GMSEC_VC6 (
-	call "C:\tools\VC98\Bin\VCVARS32.BAT"
-	MSBuild.exe gmsecapi_allvendors.sln /t:Rebuild /p:Configuration=Release;Platform=Win32 /p:"VCBuildAdditionalOptions= /useenv"
-	GOTO Perl
-)
+REM IF DEFINED GMSEC_VC6 (
+REM	call "C:\tools\VC98\Bin\VCVARS32.BAT"
+REM	MSBuild.exe gmsecapi_allvendors.sln /t:Rebuild /p:Configuration=Release;Platform=Win32 /p:"VCBuildAdditionalOptions= /useenv"
+REM	GOTO Perl
+REM )
 
-echo GMSEC_VS2010 is defined as %GMSEC_VS2010%
-echo GMSEC_VS2013 is defined as %GMSEC_VS2013%
-echo GMSEC_VS2017 is defined as %GMSEC_VS2017%
+REM echo GMSEC_VS2010 is defined as %GMSEC_VS2010%
+REM echo GMSEC_VS2013 is defined as %GMSEC_VS2013%
+REM echo GMSEC_VS2017 is defined as %GMSEC_VS2017%
 
+set _startPath=%~dp0
 IF DEFINED GMSEC_VS2017 (
-	echo Calling Microsoft Visual Studio 17.0 vcvarsall script for x64 architecture
-	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+	echo Calling Microsoft Visual Studio 17.0 vcvarsall script for %MCD% architecture
+	IF "%MCD%" == "Win32" (
+		call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x86
+	) ELSE (
+		call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" %MCD%
+	)
 )
+REM echo "Current Directory  : %cd%"
+REM echo "Change Directory to: %_startPath%"
+cd %_startPath%
 
-IF DEFINED GMSEC_VS2013 (
-	rmdir C:\Users\nightrun\AppData\Local\Microsoft\VisualStudio\12.0 /s /q
-	rmdir C:\Users\nightrun\AppData\Roaming\Microsoft\VisualStudio\12.0 /s /q
-	echo Calling Microsoft Visual Studio 12.0 vcvarsall script for x64 architecture
-	call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
-)
 
-IF DEFINED GMSEC_VS2010 (
-	echo Upgrading project files
-	devenv "gmsecapi_allvendors.sln" /upgrade
-	cd tools/utilities
-	devenv "utilities.sln" /upgrade
-	cd ../..
-)
+REM IF DEFINED GMSEC_VS2013 (
+REM	rmdir C:\Users\%USERNAME%\AppData\Local\Microsoft\VisualStudio\12.0 /s /q
+REM	rmdir C:\Users\%USERNAME%\AppData\Roaming\Microsoft\VisualStudio\12.0 /s /q
+REM	echo Calling Microsoft Visual Studio 12.0 vcvarsall script for %MCD% architecture
+REM	call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %MCD%
+REM )
+
+REM IF DEFINED GMSEC_VS2010 (
+REM	echo Upgrading project files
+REM	devenv "gmsecapi_allvendors.sln" /upgrade
+REM	cd tools/utilities
+REM	devenv "utilities.sln" /upgrade
+REM	cd ../..
+REM )
+
 
 rem Always start off with a clean slate
 MSBuild.exe gmsecapi_allvendors.sln /t:Clean /p:Configuration=Release;Platform=%MCD%
 MSBuild.exe gmsecapi_allvendors.sln /t:Clean /p:Configuration=Release-SNK;Platform=%MCD%
 
 rem Build each portion of the solution, in the desired order.
+echo OFF
 FOR %%i IN (%BUILD%) DO (
-   IF '%%i'=='dotnet' (
-	MSBuild.exe gmsecapi_allvendors.sln /t:%%i /p:Configuration=Release-SNK;Platform=%MCD%
-   ) ELSE (
-   	MSBuild.exe gmsecapi_allvendors.sln /t:%%i /p:Configuration=Release;Platform=%MCD%
-   )
+	echo.
+	echo.
+	echo ###########################################################
+	echo #
+	echo #  Building %%i
+	echo #
+	echo ###########################################################
+	IF '%%i'=='dotnet' (
+		MSBuild.exe gmsecapi_allvendors.sln /t:%%i /p:Configuration=Release-SNK;Platform=%MCD%
+	) ELSE (
+		MSBuild.exe gmsecapi_allvendors.sln /t:%%i /p:Configuration=Release;Platform=%MCD%
+	)
 )
 
+
 :Perl
+rem Build the Perl binding of API 3.x
+echo.
+echo.
+echo ###########################################################
+echo #
+echo #  Building Perl binding for API 3.x
+echo #
+echo ###########################################################
 cd perl\gmsec
-rem Build the Perl part of the API
 perl -Iextra Makefile.PL PREFIX=../../bin
-rem perl -Iextra Makefile.PL PREFIX=../../bin MAKE=dmake
 nmake
 nmake install
 cd ..\..
 
+echo ON
 
 rem Build the utilities
 
@@ -92,6 +118,11 @@ IF DEFINED GMSEC_VC6 (
 	MSBuild.exe utilities.sln /t:Rebuild /p:Configuration=Release;Platform=%MCD%
 )
 cd ..\..
+
+rem Copy XSLT-related runtime libraries
+copy ..\SUPPORT\libxml2\bin\libxml2.dll bin
+copy ..\SUPPORT\libxslt\bin\libxslt.dll bin
+copy ..\SUPPORT\libxslt\bin\libexslt.dll bin
 
 rem Copy validator scripts
 mkdir bin\validator

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -67,17 +67,17 @@ GMSEC_TimeSpec CALL_TYPE timeUtilDiffTime(const GMSEC_TimeSpec time1, const GMSE
 
 GMSEC_BOOL CALL_TYPE timeUtilEqualTo(const GMSEC_TimeSpec time1, const GMSEC_TimeSpec time0)
 {
-	return (gmsec::api::util::operator==(time1, time0) == true ? GMSEC_TRUE : GMSEC_FALSE);
+	return (time1 == time0 ? GMSEC_TRUE : GMSEC_FALSE);
 }
 
 
 GMSEC_BOOL CALL_TYPE timeUtilGreaterThan(const GMSEC_TimeSpec time1, const GMSEC_TimeSpec time0)
 {
-	return (gmsec::api::util::operator>(time1, time0) == true ? GMSEC_TRUE : GMSEC_FALSE);
+	return (time1 > time0 ? GMSEC_TRUE : GMSEC_FALSE);
 }
 
 
 GMSEC_BOOL CALL_TYPE timeUtilLesserThan(const GMSEC_TimeSpec time1, const GMSEC_TimeSpec time0)
 {
-	return (gmsec::api::util::operator<(time1, time0) == true ? GMSEC_TRUE : GMSEC_FALSE);
+	return (time1 < time0 ? GMSEC_TRUE : GMSEC_FALSE);
 }

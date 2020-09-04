@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,11 +20,15 @@
 
 #include <sstream>
 #include <algorithm>
+#include <iomanip>
 #include <cmath>
 #include <ctime>
 #include <cerrno>
 #include <iterator>
-#include <string.h>
+#include <functional> 
+#include <cctype>
+#include <locale>
+#include <cstring>
 
 
 #ifdef __sun
@@ -39,7 +43,7 @@
 #define strtoll _strtoi64
 #endif
 
-#if defined(__GNUC__) && !defined(__hpux)
+#if defined(__GLIBC__) && !defined(__hpux)
 #define HAVE_EXECINFO_H 1
 #endif
 
@@ -62,6 +66,8 @@ extern "C" void __cxa_pure_virtual()
 #endif /* HAVE_EXECINFO_H */
 
 
+#include <json.h>
+#include <tinyxml2.h>
 #include <miniz.h>
 #define COMPRESS_HDR_SZB (sizeof(GMSEC_U32))
 
@@ -234,6 +240,46 @@ std::vector<std::string> StringUtil::split(const std::string& str, const char de
 
 	ret.push_back(current);
 	return ret;
+}
+
+std::vector<std::string> StringUtil::split(const std::string& str, const std::string& delimiter)
+{
+	std::vector<std::string> ret;
+
+	std::string current = str;
+
+	while (current.find(delimiter) != std::string::npos)
+	{
+		ret.push_back(current.substr(0, current.find(delimiter)));
+
+		current.erase(0, current.find(delimiter) + delimiter.size());
+	}
+
+	ret.push_back(current);
+
+	return ret;
+}
+
+
+std::string StringUtil::ltrim(const std::string& str)
+{
+	std::string tmp = str;
+    tmp.erase(tmp.begin(), std::find_if(tmp.begin(), tmp.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+    return tmp;
+}
+
+
+std::string StringUtil::rtrim(const std::string& str)
+{
+	std::string tmp = str;
+    tmp.erase(std::find_if(tmp.rbegin(), tmp.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), tmp.end());
+    return tmp;
+}
+
+
+std::string StringUtil::trim(const std::string& str)
+{
+	return ltrim(rtrim(str));
 }
 
 std::string StringUtil::trim(const std::string& str, const char chop)
@@ -766,6 +812,84 @@ Status StringUtil::gmsec_uncompress(const DataBuffer& in, DataBuffer& out)
 	}
 
 	return status;
+}
+
+
+bool StringUtil::getBoolean(const char* value)
+{
+	if (value == NULL)
+	{
+		throw Exception(OTHER_ERROR, PARSE_ERROR, "Value cannot be NULL");
+	}
+
+	std::string tmpValue = StringUtil::trim(value);
+
+	if (tmpValue.empty())
+	{
+		throw Exception(OTHER_ERROR, PARSE_ERROR, "Unable to convert value");
+	}
+
+	return StringUtil::stringIsTrue(tmpValue.c_str());
+}
+
+
+std::string StringUtil::toXML(const char* data)
+{
+	if (data == NULL)
+	{
+		throw Exception(OTHER_ERROR, PARSE_ERROR, "Cannot convert data value to XML; data is NULL");
+	}
+
+	std::ostringstream oss;
+
+	for (const char* c = data; *c; ++c)
+	{
+		// Convert the data value if necessary to its XML equivalent;
+		// otherwise leave it as is.
+		//
+		switch (*c)
+		{
+#if 0
+		case 0x0a:  // newline
+			oss << "&#10;";
+			break;
+		case 0x0d:  // carriage return
+			oss << "&#13;";
+			break;
+#endif
+		case 0x22:  // double quote
+			oss << "&quot;";
+			break;
+		case 0x26:  // ampersand
+			oss << "&amp;";
+			break;
+		case 0x27:  // single quote
+			oss << "&apos;";
+			break;
+		case 0x3C:  // less than
+			oss << "&lt;";
+			break;
+		case 0x3E:  // greater than
+			oss << "&gt;";
+			break;
+		default:
+			oss << *c;
+			break;
+		}
+	}
+
+	return oss.str();
+}
+
+
+std::string StringUtil::toJSON(const char* data)
+{
+	if (data == NULL)
+	{
+		throw Exception(OTHER_ERROR, PARSE_ERROR, "Cannot convert data value to JSON; data is NULL");
+	}
+
+	return Json::valueToQuotedString(data);
 }
 
 

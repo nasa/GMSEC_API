@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -68,12 +68,25 @@ class GMSEC_API MsgFieldMap
 public:
 	/*
 	 * @enum StorageType
-	 * @bried The storage type that the MsgFieldMap should employ.
+	 * @brief The storage type that the MsgFieldMap should employ.
 	 */
 	enum StorageType
 	{
 		BINARY_TREE_MAP,   ///< Binary Tree Map (e.g. std::map)
 		HASH_MAP           ///< Hash Map (e.g. unordered map)
+	};
+
+
+	/*
+	 * @enum FieldDisplay
+	 * @brief Indicator for how message fields ought to be displayed
+	 * when toXML() or toJSON() is called.
+	 */
+	enum FieldDisplay
+	{
+		DEFAULT,
+		SORTED,
+		UNSORTED
 	};
 
 
@@ -137,6 +150,13 @@ public:
 	 * @return an integer value.
 	 */
 	size_t CALL_TYPE getRolloverLimit() const;
+
+
+	/**
+	 * @fn void setFieldDisplay(FieldDisplay display)
+	 * @brief Set how fields will be displayed when toXML() or toJSON() is called.
+	 */
+	void CALL_TYPE setFieldDisplay(FieldDisplay display);
 
 
 	/*
@@ -266,6 +286,7 @@ private:
 	// Member data
 	StorageType   m_type;
 	size_t        m_rolloverLimit;
+	FieldDisplay  m_fieldDisplay;
 	BinaryTreeMap m_binTreeMap;
 	HashMap       m_hashMap;
 

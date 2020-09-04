@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -45,7 +45,7 @@ public class message_bins
 		Config config = new Config(args);
 
 		//o Enable Message Binning
-		config.addValue("GMSEC-USE-MESSAGE-BINS", "true");
+		config.addValue("GMSEC-USE-MSG-BINS", "true");
 
 		//o Specify the number of messages to be aggregated prior to publishing
 		// the aggregate message to the middleware server (This applies to all
@@ -54,7 +54,7 @@ public class message_bins
 		// Note: The aggregate message will be sent to the middleware server
 		// immediately upon this many messages being published, regardless of
 		// the value supplied for GMSEC-MSG-BIN-TIMEOUT.
-		config.addValue("GMSEC-MSG-BIN-SIZE", "5");
+		config.addValue("GMSEC-MSG-BIN-SIZE", "10");
 
 		//o Specify a timeout (in milliseconds) for the aggregate message to be
 		// sent to the middleware server
@@ -73,11 +73,13 @@ public class message_bins
 		// GMSEC-MSG-BIN-SUBJECT-N parameters.
 		config.addValue("GMSEC-MSG-BIN-EXCLUDE-SUBJECT-1", EXAMPLE_BIN_EXCLUDE_SUBJECT);
 
+		//o Since this example program uses an invalid message, we ensure the
+		//  validation check is disabled.
+		config.addValue("gmsec-msg-content-validate-all", "false");
+
 		initializeLogging(config);
 
-		// TODO: Once available, replace this statement with usage of
-		// ConnectionManager::getAPIVersion (See RTC 4798)
-		Log.info(Connection.getAPIVersion());
+		Log.info(ConnectionManager.getAPIVersion());
 
 		try
 		{

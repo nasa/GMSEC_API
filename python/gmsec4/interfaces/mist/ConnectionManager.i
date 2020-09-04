@@ -58,7 +58,6 @@ namespace std
     }
     const std::list<gmsec::api::Field*> CALL_TYPE getStandardFields()
     {
-        GMSEC_INFO << "CALLING NEW PYTHON getStandardFields()";
         gmsec::api::util::DataList<gmsec::api::Field*> standardFields = self->getStandardFields();
         std::list<gmsec::api::Field*> newFields;
 

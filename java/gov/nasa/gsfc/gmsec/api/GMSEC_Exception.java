@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,12 +8,6 @@
 
 /**
  * @file GMSEC_Exception.java
- *
- * @brief This file contains the standard class for GMSEC exceptions. It holds
- * the information previously used by Status objects to convey error states. 
- * This is not a total replacement of the Status object, the Status object
- * will still have a purpose for more elaborate error definitions, such as that
- * pertaining to validation.
  */
 
 
@@ -21,8 +15,7 @@ package gov.nasa.gsfc.gmsec.api;
 
 
 /**
- * @class GMSEC_Exception
- * @brief This class defines the standard GMSEC exception.
+ * This class defines the standard GMSEC exception.
  */
 public class GMSEC_Exception extends Exception
 {
@@ -32,6 +25,10 @@ public class GMSEC_Exception extends Exception
 	private String               m_errorMsg;
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only
+	 * @param errorMsg Error message string.
+	 */
 	public GMSEC_Exception(String errorMsg)
 	{
 		super(errorMsg);
@@ -72,16 +69,14 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
-	 * @fn GMSEC_Exception(StatusClassification errorClass, StatusCode errorCode, String errorMsg)
+	 * Constructor.
 	 *
-	 * @brief Default Constructor.
+	 * @param errorClass Value indicating source of the error
+	 * @param errorCode  Value indicating reason for the error
+	 * @param errorMsg   Explanation for the error
 	 *
-	 * @param errorClass - value indicating source of the error
-	 * @param errorCode  - value indicating reason for the error
-	 * @param errorMsg   - explanation for the error
-	 *
-	 * @sa StatusClassification.java
-	 * @sa StatusCode.java
+	 * @see StatusClassification
+	 * @see StatusCode
 	 */
 	public GMSEC_Exception(StatusClassification errorClass, StatusCode errorCode, String errorMsg)
 	{
@@ -95,17 +90,15 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
-	 * @fn GMSEC_Exception(StatusClassification errorClass, StatusCode errorCode, int customCode, String errorMsg)
+	 * Constructor.
 	 *
-	 * @brief Default Constructor.
+	 * @param errorClass Value indicating source of the error
+	 * @param errorCode  Value indicating reason for the error
+	 * @param customCode Custom error code (typically middleware specific) regarding the root cause of the error
+	 * @param errorMsg   Explanation for the error
 	 *
-	 * @param errorClass - value indicating source of the error
-	 * @param errorCode  - value indicating reason for the error
-	 * @param customCode - custom error code (typically middleware specific) regarding the root cause of the error
-	 * @param errorMsg   - explanation for the error
-	 *
-	 * @sa StatusClassification.java
-	 * @sa StatusCode.java
+	 * @see StatusClassification
+	 * @see StatusCode
 	 */
 	public GMSEC_Exception(StatusClassification errorClass, StatusCode errorCode, int customCode, String errorMsg)
 	{
@@ -119,13 +112,11 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
-	 * @fn StatusClassification getErrorClassification()
-	 *
-	 * @brief Returns the error class associated with the exception.
+	 * Returns the error class associated with the exception.
 	 *
 	 * @return An StatusClassification value.
 	 *
-	 * @sa StatusClassification.java
+	 * @see StatusClassification
 	 */
 	public StatusClassification getErrorClassification()
 	{
@@ -134,13 +125,11 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
-	 * @fn StatusCode getErrorCode()
-	 *
-	 * @brief Returns the error code associated with the exception.
+	 * Returns the error code associated with the exception.
 	 *
 	 * @return An StatusCode value.
 	 *
-	 * @sa StatusCode.java
+	 * @see StatusCode
 	 */
 	public StatusCode getErrorCode()
 	{
@@ -149,11 +138,9 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
-	 * @fn int getCustomCode()
+	 * Returns the custom code associated with the exception.
 	 *
-	 * @brief Returns the custom code associated with the exception.
-	 *
-	 * @return A integer value.
+	 * @return An integer value.
 	 */
 	public int getCustomCode()
 	{
@@ -162,9 +149,7 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
-	 * @fn String getErrorMessage()
-	 *
-	 * @brief Returns the error message associated with the exception.
+	 * Returns the error message associated with the exception.
 	 *
 	 * @return A string containing the error message.
 	 */
@@ -175,9 +160,7 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
-	 * @fn String toString()
-	 *
-	 * @brief Returns string with the format of [errorClass,errorCode,customCode] : errorMessage
+	 * Returns string with the format of [errorClass,errorCode,customCode] : errorMessage
 	 *
 	 * @return A string containing the error class, code, custom code and message.
 	 */

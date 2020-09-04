@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -55,6 +55,7 @@
 #include <cctype>   // for toupper
 #include <sstream>  // for ostringstream
 #include <cstdio>   // for sscanf
+#include <cstdlib>   // for sscanf
 
 
 using namespace gmsec::api::util;
@@ -462,8 +463,22 @@ Field* InternalField::createField(const char* name, const char* type, const char
 
 	if (type != NULL && name != NULL)
 	{
-		switch (lookupType(type))
+		Field::FieldType ftype;
+
+		try {
+			ftype = lookupType(type);
+		}
+		catch (...) {
+			std::ostringstream oss;
+			oss << "Field " << name << " has illegal type ['" << type << "']";
+			throw Exception(FIELD_ERROR, UNKNOWN_FIELD_TYPE, oss.str().c_str());
+		}
+
+		try
 		{
+			// If here, then ftype has been initialized.
+			switch (ftype)
+			{
 			case Field::BIN_TYPE:
 				{
 					std::basic_string<unsigned char> blob;
@@ -476,7 +491,7 @@ Field* InternalField::createField(const char* name, const char* type, const char
 #ifndef WIN32
 						std::sscanf(hex, "%02X", &ch);
 #else
-						sscanf_s(hex, "%02X", &ch, sizeof(ch));
+						sscanf_s(hex, "%02X", &ch);
 #endif
 
 						blob.push_back((unsigned char) ch);
@@ -487,11 +502,11 @@ Field* InternalField::createField(const char* name, const char* type, const char
 				break;
 
 			case Field::BOOL_TYPE:
-				field = new BooleanField(name, StringUtil::stringEqualsIgnoreCase(value, "TRUE"));
+				field = new BooleanField(name, StringUtil::getBoolean(value));
 				break;
 
 			case Field::CHAR_TYPE:
-				field = new CharField(name, StringUtil::getValue<char>(value));
+				field = new CharField(name, StringUtil::getValue<GMSEC_CHAR>(value));
 				break;
 
 			case Field::I8_TYPE:
@@ -503,15 +518,15 @@ Field* InternalField::createField(const char* name, const char* type, const char
 				break;
 
 			case Field::I16_TYPE:
-				field = new I16Field(name, StringUtil::getValue<GMSEC_I16>(value));
+				field = new I16Field(name, (GMSEC_I16) StringUtil::getValue<GMSEC_I16>(value));
 				break;
 
 			case Field::I32_TYPE:
-				field = new I32Field(name, StringUtil::getValue<GMSEC_I32>(value));
+				field = new I32Field(name, (GMSEC_I32) StringUtil::getValue<GMSEC_I32>(value));
 				break;
 
 			case Field::I64_TYPE:
-				field = new I64Field(name, StringUtil::getValue<GMSEC_I64>(value));
+				field = new I64Field(name, (GMSEC_I64) StringUtil::getValue<GMSEC_I64>(value));
 				break;
 
 			case Field::F32_TYPE:
@@ -549,24 +564,28 @@ Field* InternalField::createField(const char* name, const char* type, const char
 				break;
 
 			case Field::U16_TYPE:
-				field = new U16Field(name, StringUtil::getValue<GMSEC_U16>(value));
+				field = new U16Field(name, (GMSEC_U16) StringUtil::getValue<GMSEC_U16>(value));
 				break;
 
 			case Field::U32_TYPE:
-				field = new U32Field(name, StringUtil::getValue<GMSEC_U32>(value));
+				field = new U32Field(name, (GMSEC_U32) StringUtil::getValue<GMSEC_U32>(value));
 				break;
 
 			case Field::U64_TYPE:
 				field = new U64Field(name, StringUtil::getValue<GMSEC_U64>(value));
 				break;
+			}
 
-			default:
-				throw Exception(FIELD_ERROR, UNKNOWN_FIELD_TYPE, "Unknown Field type was specified");
+			if (field && head && head[0] == 'T')
+			{
+				field->isHeader(true);
+			}
 		}
-
-		if (field && head && head[0] == 'T')
+		catch (...)
 		{
-			field->isHeader(true);
+			std::ostringstream oss;
+			oss << "Field " << name << " has illegal value ['" << StringUtil::trim(value) << "']";
+			throw Exception(FIELD_ERROR, INVALID_FIELD_VALUE, oss.str().c_str());
 		}
 	}
 
@@ -699,10 +718,11 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 	if (first.getType() != second.getType())
 	{
 		std::ostringstream oss;
-		oss << "InternalField::testEquals:  field type mistmatch " << lookupTypeStr(first.getType()) << " and " << lookupTypeStr(second.getType());
-		throw Exception(MSG_ERROR,
-		                FIELD_TYPE_MISMATCH,
-		                oss.str().c_str());
+		oss << "InternalField::testEquals() -- Field type mismatch between "
+		    << first.getName()  << " [" << lookupTypeStr(first.getType()) << "] and "
+		    << second.getName() << " [" << lookupTypeStr(second.getType()) << "]";
+
+		throw Exception(MSG_ERROR, FIELD_TYPE_MISMATCH, oss.str().c_str());
 	}
 
 	switch (first.getType())
@@ -711,10 +731,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const BinaryField& tmp1 = dynamic_cast<const BinaryField&>(first);
 			const BinaryField& tmp2 = dynamic_cast<const BinaryField&>(second);
-			if (std::memcmp(tmp1.getValue(), tmp2.getValue(), tmp1.getLength()) == 0)
-			{
-				ret_val = true;
-			}
+			ret_val = (std::memcmp(tmp1.getValue(), tmp2.getValue(), tmp1.getLength()) == 0);
 		}
 		break;
 
@@ -722,10 +739,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const BooleanField& tmp1 = dynamic_cast<const BooleanField&>(first);
 			const BooleanField& tmp2 = dynamic_cast<const BooleanField&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -733,10 +747,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const CharField& tmp1 = dynamic_cast<const CharField&>(first);
 			const CharField& tmp2 = dynamic_cast<const CharField&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -744,10 +755,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const I8Field& tmp1 = dynamic_cast<const I8Field&>(first);
 			const I8Field& tmp2 = dynamic_cast<const I8Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -755,10 +763,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const I16Field& tmp1 = dynamic_cast<const I16Field&>(first);
 			const I16Field& tmp2 = dynamic_cast<const I16Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -766,10 +771,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const I32Field& tmp1 = dynamic_cast<const I32Field&>(first);
 			const I32Field& tmp2 = dynamic_cast<const I32Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -777,10 +779,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const I64Field& tmp1 = dynamic_cast<const I64Field&>(first);
 			const I64Field& tmp2 = dynamic_cast<const I64Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -788,10 +787,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const F32Field& tmp1 = dynamic_cast<const F32Field&>(first);
 			const F32Field& tmp2 = dynamic_cast<const F32Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -799,10 +795,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const F64Field& tmp1 = dynamic_cast<const F64Field&>(first);
 			const F64Field& tmp2 = dynamic_cast<const F64Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -810,10 +803,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const StringField& tmp1 = dynamic_cast<const StringField&>(first);
 			const StringField& tmp2 = dynamic_cast<const StringField&>(second);
-			if (StringUtil::stringEquals(tmp1.getValue(), tmp2.getValue()))
-			{
-				ret_val = true;
-			}
+			ret_val = StringUtil::stringEquals(tmp1.getValue(), tmp2.getValue());
 		}
 		break;
 
@@ -821,10 +811,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const U8Field& tmp1 = dynamic_cast<const U8Field&>(first);
 			const U8Field& tmp2 = dynamic_cast<const U8Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -832,10 +819,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const U16Field& tmp1 = dynamic_cast<const U16Field&>(first);
 			const U16Field& tmp2 = dynamic_cast<const U16Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -843,10 +827,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const U32Field& tmp1 = dynamic_cast<const U32Field&>(first);
 			const U32Field& tmp2 = dynamic_cast<const U32Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 
@@ -854,10 +835,7 @@ bool InternalField::testEquals(const Field& first, const Field& second)
 		{
 			const U64Field& tmp1 = dynamic_cast<const U64Field&>(first);
 			const U64Field& tmp2 = dynamic_cast<const U64Field&>(second);
-			if (tmp1.getValue() == tmp2.getValue())
-			{
-				ret_val = true;
-			}
+			ret_val = (tmp1.getValue() == tmp2.getValue());
 		}
 		break;
 

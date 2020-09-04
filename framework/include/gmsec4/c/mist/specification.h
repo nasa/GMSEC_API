@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -37,6 +37,8 @@
 
 #ifndef GMSEC_API_C_SPECIFICATION_H
 #define GMSEC_API_C_SPECIFICATION_H
+
+#include <gmsec4/c/mist/message_specification.h>
 
 #include <gmsec4_defs.h>
 
@@ -130,6 +132,34 @@ extern "C"
 	 * @return The ISD version (e.g. 201600).
 	 */
 	GMSEC_API unsigned int specificationGetVersion(GMSEC_Specification spec, GMSEC_Status status);
+
+
+	/**
+	 * @fn void specificationGetMessageSpecifications(GMSEC_Specification spec, GMSEC_MessageSpecification* msgSpecs, int* numMsgSpecs, GMSEC_Status status)
+	 *
+	 * @brief Returns the list of Message Specifications, each of which includes a schema ID and a list of Field Specifications. The user is responsible for
+	 * destroying the return list using specificationDestroyMessageSpecifications().
+	 *
+	 * @param[in]     spec        - the handle to the Specification object.
+	 * @param[in/out] msgSpecs    - the handle from which to return the Message Specification(s)
+	 * @param[in/out] numMsgSpecs - the handle from which to return the number of Message Specification(s)
+	 * @param[out]    status      - out parameter operation result status.
+	 *
+	 * @sa specificationDestroyMessageSpecifications
+	 */
+	GMSEC_API void specificationGetMessageSpecifications(GMSEC_Specification spec, GMSEC_MessageSpecification** msgSpecs, int* numMsgSpecs, GMSEC_Status status);
+
+
+	/**
+	 * @fn void specificationDestroyMessageSpecifications(GMSEC_MessageSpecification* msgSpecs, int numMsgSpecs, GMSEC_Status status)
+	 *
+	 * @brief Convenience function for destroying (deallocating) memory associated with a list of Message Specifications.
+	 *
+	 * @param[in]  msgSpecs    - the handle from which to return the Message Specification(s)
+	 * @param[in]  numMsgSpecs - the handle from which to return the number of Message Specification(s)
+	 * @param[out] status      - out parameter operation result status.
+	 */
+	GMSEC_API void specificationDestroyMessageSpecifications(GMSEC_MessageSpecification* msgSpecs, int numMsgSpecs, GMSEC_Status status);
 
 
 	/**

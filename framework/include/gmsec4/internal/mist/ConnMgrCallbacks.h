@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -35,16 +35,18 @@ namespace internal
 class GMSEC_API CMCallback : public gmsec::api::Callback
 {
 public:
-	CMCallback(ConnectionManager* manager, ConnectionManagerCallback* cb);
+	CMCallback(ConnectionManager* manager, ConnectionManagerCallback* cb, bool doValidate);
 
-	ConnectionManager* getManager() const;
-	ConnectionManagerCallback* getCallback() const;
+	inline ConnectionManager* getManager() const { return m_mgr; }
+	inline ConnectionManagerCallback* getCallback() const { return m_cb; }
+	inline bool doValidate() const { return m_doValidate; }
 
 	virtual void CALL_TYPE onMessage(gmsec::api::Connection& conn, const gmsec::api::Message& msg);
 
 private:
 	ConnectionManager* m_mgr;
 	ConnectionManagerCallback* m_cb;
+	bool m_doValidate;
 };
 
 
@@ -53,8 +55,8 @@ class GMSEC_API CMEventCallback : public gmsec::api::EventCallback
 public:
 	CMEventCallback(ConnectionManager* manager, ConnectionManagerEventCallback* cb);
 
-	ConnectionManager* getManager() const;
-	ConnectionManagerEventCallback* getCallback() const;
+	inline ConnectionManager* getManager() const { return m_mgr; }
+	inline ConnectionManagerEventCallback* getCallback() const { return m_cb; }
 
 	virtual void CALL_TYPE onEvent(gmsec::api::Connection& conn, const gmsec::api::Status& status, Connection::ConnectionEvent event);
 
@@ -67,10 +69,11 @@ private:
 class GMSEC_API CMReplyCallback : public gmsec::api::ReplyCallback
 {
 public:
-	CMReplyCallback(ConnectionManager* manager, ConnectionManagerReplyCallback* cb);
+	CMReplyCallback(ConnectionManager* manager, ConnectionManagerReplyCallback* cb, bool doValidate);
 
-	ConnectionManager* getManager() const;
-	ConnectionManagerReplyCallback* getCallback() const;
+	inline ConnectionManager* getManager() const { return m_mgr; }
+	inline ConnectionManagerReplyCallback* getCallback() const { return m_cb; }
+	inline bool doValidate() const { return m_doValidate; }
 
 	virtual void CALL_TYPE onReply(gmsec::api::Connection& conn, const gmsec::api::Message& req, const gmsec::api::Message& rep);
 	virtual void CALL_TYPE onEvent(gmsec::api::Connection& conn, const gmsec::api::Status& status, Connection::ConnectionEvent event);
@@ -78,6 +81,7 @@ public:
 private:
 	ConnectionManager* m_mgr;
 	ConnectionManagerReplyCallback* m_cb;
+	bool m_doValidate;
 };
 
 }  //namespace internal

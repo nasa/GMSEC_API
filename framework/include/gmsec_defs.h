@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -508,6 +508,12 @@ typedef GMSEC_U16 GMSEC_MSG_KIND;
  *     GetNextMsg()
  */
 #define GMSEC_WAIT_FOREVER	-1
+
+/** @def GMSEC_REQUEST_REPUBLISH_NEVER
+ * @brief Value to indicate that a request message should only be issued once
+ * should a response message not be received.
+ */
+#define GMSEC_REQUEST_REPUBLISH_NEVER	-1
 /**@}*/
 
 /** @name Message kind identifiers

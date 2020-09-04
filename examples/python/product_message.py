@@ -35,6 +35,7 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " +  sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
+        return -1
 
 
     # Load the command-line input into a GMSEC Config object
@@ -58,12 +59,9 @@ def main():
     # interface
     # This is useful for determining which version of the API is
     # configured within the environment
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create a ConnectionManager object
         connManager = libgmsec_python.ConnectionManager(config)
 
@@ -106,16 +104,14 @@ def main():
         # description, version, file format, and the URI
         externalFile = libgmsec_python.ProductFile("External File", "External File Description", "1.0.0", "TXT", "//hostname/dir/filename")
 
-        fSize = 8
-        filePayload = ''   
+        filePayload = bytearray()
     
-        for idx in range(0, fSize):
-            filePayload+=(chr(idx))
-                
+        for i in range(0, 256):
+            filePayload.append(i)
 
         # Create a ProductFile object with the product name,
         # description, version, format, binary array, and file size
-        binaryFile = libgmsec_python.ProductFile("File as Binary", "Binary File Description", "1.0.0", "BIN", filePayload, fSize)
+        binaryFile = libgmsec_python.ProductFile("File as Binary", "Binary File Description", "1.0.0", "BIN", filePayload, len(filePayload))
 
         # Create a Product File Message with the subject,
         # RESPONSE-STATUS Field value, Message type (publish, request,
@@ -132,10 +128,9 @@ def main():
         connManager.publish(productMessage)
         
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
-        
+
     return 0
 
 

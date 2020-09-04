@@ -1,10 +1,9 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
 
 
 /** 
@@ -16,24 +15,22 @@
  * 
  */
 
-#include "../example.h"
 #include "throughput_pub.h"
 #include "status_reporter.h"
 
-#include <string>
 
 using namespace gmsec::api;
 using namespace gmsec::api::util;
 
 
-throughput_pub::throughput_pub(Config &c)
-	: config(c),
+throughput_pub::throughput_pub(const Config& config)
+	: Utility(config),
 	  connection(0),
 	  reportingThread(0),
 	  iteration(0)
 {
-	/* Initialize config */
-	example::initialize(c);
+	/* Initialize utility */
+	initialize();
 }
 
 
@@ -57,6 +54,20 @@ throughput_pub::~throughput_pub()
 }
 
 
+void throughput_pub::usage(const std::string& programName)
+{
+	Utility::usage(programName);
+
+	std::cerr << "\n\t\t* subject=<message subject>"
+	          << "\n"
+	          << "\n\t\t* data-size=<number of bytes to package into messages>"
+	          << "\n"
+	          << "\n\t\t* monitor-rate=<period of time (milliseconds) to report monitored throughput>"
+	          << "\n"
+	          << std::endl;
+}
+
+
 bool throughput_pub::run()
 {
 	bool success = true;
@@ -67,15 +78,15 @@ bool throughput_pub::run()
 	try
 	{
 		//o Create the Connection
-		connection = Connection::create(config);
+		connection = Connection::create(getConfig());
 
 		//o Connect
 		connection->connect();
 
 		//o Get information from the command line
-		std::string subject = example::get(config, "SUBJECT", "GMSEC.TEST.PUBLISH");
-		int dataSize        = example::get(config, "DATA-SIZE", 0);          // Size of the binary packet to add to the GMSEC Message
-		int monitorRate  = example::get(config, "MONITOR-RATE", 1000); // Time to wait between reporting the achieved throughput
+		std::string subject = get("SUBJECT", "GMSEC.TEST.PUBLISH");
+		int dataSize        = get("DATA-SIZE", 0);          // Size of the binary packet to add to the GMSEC Message
+		int monitorRate     = get("MONITOR-RATE", 1000); // Time to wait between reporting the achieved throughput
 
 		//o Output middleware version
 		GMSEC_INFO << "Middleware version = " << connection->getLibraryVersion();
@@ -99,7 +110,7 @@ bool throughput_pub::run()
 		message.addField("COUNT", (GMSEC_I32) iteration);
 		message.addField("DATA", (GMSEC_BIN) data, dataSize);
 
-		if (config.getBooleanValue("ENCRYPT", false))
+		if (getConfig().getBooleanValue("ENCRYPT", false))
 		{
 			message.addField("SEC-ENCRYPT", true);
 		}
@@ -133,15 +144,17 @@ int main(int argc, char* argv[])
 {
 	Config config(argc, argv);
 
-	example::addToConfigFromFile(config);
+	throughput_pub tpp(config);
 
-	if (example::isOptionInvalid(config, argc))
+	tpp.addToConfigFromFile();
+
+	if (tpp.isOptionInvalid(argc))
 	{
-		example::printUsage("throughput_pub");
-		return -1;
+		tpp.usage("throughput_pub");
+		return 1;
 	}
 
-	throughput_pub(config).run();
+	return tpp.run() ? 0 : 1;
 }
 
 

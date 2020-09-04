@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -43,6 +43,12 @@ public:
 	/// <param name="name">Mnemonic name</param>
 	/// <param name="samples">List of MnemonicSample objects</param>
 	Mnemonic(System::String^ name, System::Collections::Generic::List<MnemonicSample^>^ samples);
+
+
+	/// <summary>Constructor</summary>
+	///
+	/// <param name="name">Mnemonic name</param>
+	Mnemonic(System::String^ name);
 
 
 	/// <summary>Copy-constructor for making deep-copy of other Mnemonic object.</summary>
@@ -144,6 +150,9 @@ internal:
 
 
 private:
+        void ConstructorImplementation(System::String^ name, 
+                                       System::Collections::Generic::List<MnemonicSample^>^ samples);
+
 	gmsec::api::mist::Mnemonic* m_impl;
 	bool                        m_owned;
 };

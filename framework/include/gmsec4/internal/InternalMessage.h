@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,8 +20,8 @@
 #include <gmsec4/internal/TrackingDetails.h>
 #include <gmsec4/internal/Value.h>
 
+#include <gmsec4/util/DataList.h>
 #include <gmsec4/util/wdllexp.h>
-
 
 #include <memory>
 #include <string>
@@ -78,6 +78,8 @@ public:
 	bool CALL_TYPE addField(const char* name, GMSEC_U16 value);
 	bool CALL_TYPE addField(const char* name, GMSEC_U32 value);
 	bool CALL_TYPE addField(const char* name, GMSEC_U64 value);
+
+	bool CALL_TYPE addFields(const gmsec::api::util::DataList<Field*>& fields);
 
 	void CALL_TYPE clearFields();
 

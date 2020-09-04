@@ -40,7 +40,7 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="I16"
+	        TYPE="U16"
 	        DESCRIPTION="Number of data samples for the nth mnemonic"/>
 	<FIELD 	NAME="ARRAY-START"
 			MODE="CONTROL"

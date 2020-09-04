@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,8 +17,10 @@
  *
  */
 
-#include "../example.h"
+#include <gmsec4_cpp.h>
+
 #include <iostream>
+#include <sstream>
 #include <string>
 
 using namespace gmsec::api;
@@ -46,7 +48,9 @@ class gm_msg_config
 {
 public:
 	gm_msg_config(const char* filename);
+
 	~gm_msg_config();
+
 	bool run();
 
 private:
@@ -62,7 +66,8 @@ gm_msg_config::gm_msg_config(const char* filename)
 	  connection(0)
 {
 	Config tmp;
-	example::initialize(tmp);
+	tmp.addValue("loglevel", "info");
+	tmp.addValue("logfile", "stdout");
 }
 
 
@@ -140,7 +145,7 @@ bool gm_msg_config::run()
 			{
 				Config tmp;
 				tmp.addValue("X", input.c_str());
-				msg_type = example::get(tmp, "X", -1);
+				msg_type = tmp.getIntegerValue("X", -1);
 			}
 
 			if ((msg_type >= 1) && (msg_type <= msgnum))
@@ -163,12 +168,16 @@ bool gm_msg_config::run()
 				}
 				else if (message.getKind() == Message::REQUEST)
 				{
-					Message* reply = connection->request(message, 1000);
+					Message* reply = connection->request(message, 3000, -1);
 
 					if (reply)
 					{
 						GMSEC_INFO << "Received reply:\n" << reply->toXML();
 						connection->release(reply);
+					}
+					else
+					{
+						GMSEC_WARNING << "Timeout; reply not received";
 					}
 				}
 				else if (message.getKind() == Message::REPLY)

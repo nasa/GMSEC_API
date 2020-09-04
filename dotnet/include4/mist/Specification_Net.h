@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -26,6 +26,7 @@ namespace MIST
 {
 	// Forward declaration(s)
 	ref class SchemaIDIterator;
+	ref class MessageSpecification;
 
 
 /// <summary>
@@ -100,6 +101,12 @@ public:
 	/// Returns the version of the ISD being used as an unsigned integer.
 	/// </summary>
 	unsigned int GetVersion();
+
+
+	/// <summary>
+	/// Accessor for acquiring the list of MessageSpecification objects associated with the Specification.
+	/// </summary>
+	System::Collections::Generic::List<MessageSpecification^>^ GetMessageSpecifications();
 
 
 	/// <summary>

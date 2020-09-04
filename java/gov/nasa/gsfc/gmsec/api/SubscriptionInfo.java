@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,9 +8,6 @@
 
 /**
  * @file SubscriptionInfo.java
- *
- * @brief A class that contains the information the user has supplied when
- * setting up a subscription.
  */
 
 package gov.nasa.gsfc.gmsec.api;
@@ -19,13 +16,11 @@ import gov.nasa.gsfc.gmsec.api.jni.JNISubscriptionInfo;
 
 
 /**
- * @class SubscriptionInfo
- *
- * @brief A class that contains the information the user has supplied when
+ * A class that contains the information the user has supplied when
  * setting up a subscription.
  *
- * @sa Connection.subscribe() @n
- *     Connection.unsubscribe()
+ * @see Connection#subscribe(String)
+ * @see Connection#unsubscribe(SubscriptionInfo)
  */
 public class SubscriptionInfo
 {
@@ -33,18 +28,26 @@ public class SubscriptionInfo
 
 
 	// Prevent users from instantiating their own objects.
-	//
 	private SubscriptionInfo()
 	{
 	}
 
 
+	/**
+	 * This constructor for internal GMSEC API use only.
+	 * @param jSubInfo A JNISubscriptionInfo object.
+	 */
 	public SubscriptionInfo(JNISubscriptionInfo jSubInfo)
 	{
 		m_jniSubInfo = jSubInfo;
 	}
 
 
+	/**
+	 * This method for internal GMSEC API use only.
+	 * @param obj A SubscriptionInfo object.
+	 * @return A JNISubscriptionInfo object.
+	 */
 	public static JNISubscriptionInfo getInternal(SubscriptionInfo obj)
 	{
 		return (obj == null ? null : obj.m_jniSubInfo);
@@ -52,10 +55,10 @@ public class SubscriptionInfo
 
 
 	/**
-	 * @fn String getSubject()
-	 *
-	 * @brief Returns the subject/topic string the user has supplied when setting
+	 * Returns the subject/topic string the user has supplied when setting
 	 * up a subscription.
+	 *
+	 * @return The subject string.
 	 */
 	public String getSubject()
 	{
@@ -64,9 +67,9 @@ public class SubscriptionInfo
 
 
 	/**
-	 * @fn Callback getCallback()
+	 * Returns the Callback object, if any, used when setting up the subscription.
 	 *
-	 * @brief Returns the Callback object, if any, used when setting up the subscription.
+	 * @return A handle to a Callback.
 	 */
 	public Callback getCallback()
 	{

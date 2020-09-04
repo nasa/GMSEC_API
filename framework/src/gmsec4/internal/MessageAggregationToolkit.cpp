@@ -64,6 +64,11 @@ bool MessageAggregationToolkit::addMessage(const Message& msg, const Config& con
 	const char* subject = msg.getSubject();
 	MessageBin* bin     = NULL;
 
+	if (m_messageFilter.isSubjectExcluded(subject))
+	{
+		return false;
+	}
+
 	if (m_aggregateAllMsgs)
 	{
 		MessageBins::iterator it = m_messageBins.find(subject);

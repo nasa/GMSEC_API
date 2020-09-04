@@ -133,11 +133,10 @@
     request: request message to be sent
     timeout: maximum time to wait for reply (in milliseconds)
     cb: Callback to call when reply is received
-    republish_ms: request message resubmission interval (in milliseconds). If set
-        to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-        period will default to 60000ms, unless the user has provided an alternate time period via
-        the Config object used to create the Connection object.  The minimum republish period allowed
-        is 100ms.
+    republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+        value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+        the period will default to 60000ms, unless the user has provided an alternate time period via the
+        Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
     Exceptions
     ----------
@@ -162,11 +161,10 @@
     ----------
     request: request message to be sent
     timeout:  maximum time to wait for reply (in milliseconds)
-    republish_ms: request message resubmission interval (in milliseconds). If set
-        to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-        period will default to 60000ms, unless the user has provided an alternate time period via
-        the Config object used to create the Connection object.  The minimum republish period allowed
-        is 100ms.
+    republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+        value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+        the period will default to 60000ms, unless the user has provided an alternate time period via the
+        Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
     Returns
     -------

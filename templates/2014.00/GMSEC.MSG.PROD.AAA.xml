@@ -81,7 +81,7 @@
 	<FIELD  NAME="PROD-SUBTYPE"
 	        MODE="REQUIRED"
 	        FIELD_CLASS="STANDARD"
-	        VALUE="DATA"
+	        VALUE="DATA~~MSG~~PLOT~~RPT~~STAT"
 	        TYPE="STRING"
 	        DESCRIPTION="Subcategory of the product.  Could be echo of the PROD-SUBTYPE field of the Product Request Message."/>
 	<FIELD  NAME="NUM-OF-PROD-SUBTYPES"

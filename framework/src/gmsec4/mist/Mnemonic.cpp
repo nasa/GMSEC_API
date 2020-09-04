@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,10 +31,17 @@ Mnemonic::Mnemonic(const char* name, const DataList<MnemonicSample*>& samples)
 }
 
 
+Mnemonic::Mnemonic(const char* name)
+	: m_iMnemonic(new InternalMnemonic(name, DataList<MnemonicSample*>()))
+{
+}
+
+
 Mnemonic::Mnemonic(const Mnemonic& other)
 	: m_iMnemonic(new InternalMnemonic(*(other.m_iMnemonic)))
 {
 }
+
 
 Mnemonic& Mnemonic::operator=(const Mnemonic& other)
 {

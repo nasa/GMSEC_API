@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -101,6 +101,7 @@
 #include <gmsec4_defs.h>
 
 #include <gmsec4/util/wdllexp.h>
+#include <gmsec4/util/Deprecated.h>
 
 #include <stddef.h>
 
@@ -109,6 +110,16 @@
 extern "C"
 {
 #endif
+
+
+	/**
+	 * @fn const char* connectionManagerGetAPIVersion()
+	 *
+	 * @brief This function identifies the version of the API.
+	 *
+	 * @return String containing API version information.
+	 */
+	GMSEC_API const char* connectionManagerGetAPIVersion();
 
 
 	/**
@@ -186,10 +197,8 @@ extern "C"
 	/**
 	 * @fn void connectionManagerInitialize(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
 	 *
-	 * @brief Uses the config object supplied in the constructor to establish a connection with the defined
-	 * GMSEC middleware server. The underlying connection object is created and connected in one operation,
-	 * returning an error status if either operation is a failure. Once this call successfully returns, the
-	 * ConnectionManager is ready for message operations.
+	 * @brief Establishes a connection with the GMSEC middleware server.
+	 * Upon success, the ConnectionManager is ready for message operations.
 	 *
 	 * @param[in]  connMgr - the handle to the ConnectionManager object
 	 * @param[out] status  - the result of the operation
@@ -208,6 +217,33 @@ extern "C"
 	 * @param[out] status  - the result of the operation
 	 */
 	GMSEC_API void connectionManagerCleanup(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_ConnectionState connectionManagerGetState(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+	 *
+	 * @brief This function returns the current state of the connection to the middleware.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[out] status  - out parameter operation result status
+	 *
+	 * @return Enumerated GMSEC_ConnectionState value.
+	 */
+	 GMSEC_API GMSEC_ConnectionState connectionManagerGetState(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+
+
+	/**
+	 * @fn const char* connectionManagerGetLibraryRootName(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+	 *
+	 * @brief This function identifies the root library name and therefore the
+	 * connection type that this connection is associated with.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[out] status  - out parameter operation result status
+	 *
+	 * @return root library name
+	 */
+	GMSEC_API const char* connectionManagerGetLibraryRootName(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
 
 
 	/**
@@ -457,9 +493,10 @@ extern "C"
 	 * @param[in]  timeout      - the maximum time to wait for reply (in milliseconds)
 	 * @param[in]  rcb          - the address of the reply callback function to call when a reply is received.
 	 * @param[in]  ecb          - the address of the event callback function to call if/when an event is issued.
-	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1) it will never republish a request message.
-	 *                            If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create
-	 *                            the ConnectionManager object.  The minimum republish period allowed is 100ms.
+	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 *                            value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 *                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 *                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 * @param[out] status       - out parameter operation result status
 	 */
 GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr, const GMSEC_Message request, GMSEC_I32 timeout, GMSEC_ConnectionMgrReplyCallback* rcb, GMSEC_ConnectionMgrEventCallback* ecb, GMSEC_I32 republish_ms, GMSEC_Status status);
@@ -477,9 +514,10 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  connMgr      - the handle to the ConnectionManager object
 	 * @param[in]  request      - the handle to a request Message object
 	 * @param[in]  timeout      - the maximum time to wait for reply (in milliseconds)
-	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1) it will never republish a request message.
-	 *                            If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create
-	 *                            the ConnectionManager object.  The minimum republish period allowed is 100ms.
+	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 *                            value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 *                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 *                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 * @param[out] status       - out parameter operation result status
 	 *
 	 * @return A handle to a reply Message, or NULL if a timeout or an error occurs.  If the return value is NULL and the status indicates no error, then it is
@@ -487,7 +525,7 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 *
 	 * Example code:
 	 * @code
-	 * GMSEC_Message reply = connectionManagerRequest(connMgr, request, timeout, -1, status);
+	 * GMSEC_Message reply = connectionManagerRequest(connMgr, request, timeout, GMSEC_REQUEST_REPUBLISH_NEVER, status);
 	 *
 	 * if (statusIsError(status) == GMSEC_TRUE)
 	 * {
@@ -631,6 +669,68 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 
 
 	/**
+	 * @fn const char* connectionManagerGetName(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+	 *
+	 * @brief Returns the name of the connection manager, automatically generated or user specified.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[out] status  - out parameter operation result status
+	 *
+	 * @return A string
+	 */
+	GMSEC_API const char* connectionManagerGetName(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+
+
+	/**
+	 * @fn void connectionManagerSetName(GMSEC_ConnectionMgr connMgr, const char* name, GMSEC_Status status)
+	 *
+	 * @brief Set the logical name of this connection. This can be used for
+	 * Identifying connections withing a client program. If a name is not given,
+	 * one will be automatically generated.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[in]  name    - name of this connection manager
+	 * @param[out] status  - out parameter operation result status
+	 */
+	GMSEC_API void connectionManagerSetName(GMSEC_ConnectionMgr connMgr, const char* name, GMSEC_Status status);
+
+
+	/**
+	 * @fn const char* connectionManagerGetID(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+	 *
+	 * @brief Get the string ID for this connection.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[out] status  - out parameter operation result status
+	 */
+	GMSEC_API const char* connectionManagerGetID(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+
+
+	/**
+	 * @fn const char* connectionManagerGetMWInfo(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+	 *
+	 * @brief Returns a string containing middleware information.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[out] status  - out parameter operation result status
+	 */
+	GMSEC_API const char* connectionManagerGetMWInfo(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_U64 connectionManagerGetPublishQueueMessageCount(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+	 *
+	 * @brief Retrieves the number of messages queued for asynchronous publish operations
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[out] status  - out parameter operation result status
+	 *
+	 * @return The number of messages in the publish queue
+	 */
+	GMSEC_API GMSEC_U64 connectionManagerGetPublishQueueMessageCount(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+
+
+	/**
 	 * @fn GMSEC_Message connectionManagerCreateHeartbeatMessage(GMSEC_ConnectionMgr connMgr, const char* subject, const GMSEC_Field fields[], size_t numFields, GMSEC_Status status)
 	 *
 	 * @brief Creates a message and passes ownership to the user. This message is populated with
@@ -668,6 +768,9 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * has not been set, the message will be published at an interval supplied by the "PUB-RATE" field
 	 * regardless of validation results. If no "PUB-RATE" has been defined, the service will default to the
 	 * GMSEC standard 30 second heartbeat interval.
+	 *
+	 * If users would like to have a COUNTER field added to the published heartbeat message, then the Heartbeat
+	 * Service should be provided with this field within the array of fields provided to this function.
 	 *
 	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard
@@ -708,7 +811,7 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 *
 	 * @note This function has been deprecated; use connectionManagerSetHeartbeatField() instead.
 	 */
-	GMSEC_API void connectionManagerChangeComponentStatus(GMSEC_ConnectionMgr connMgr, const GMSEC_Field componentStatus, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API void connectionManagerChangeComponentStatus(GMSEC_ConnectionMgr connMgr, const GMSEC_Field componentStatus, GMSEC_Status status);
 
 
 	/**
@@ -725,7 +828,7 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 *
 	 * @note This function has been deprecated; use connectionManagerSetHeartbeatField() instead.
 	 */
-	GMSEC_API void connectionManagerChangeComponentInfo(GMSEC_ConnectionMgr connMgr, const GMSEC_Field componentInfo, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API void connectionManagerChangeComponentInfo(GMSEC_ConnectionMgr connMgr, const GMSEC_Field componentInfo, GMSEC_Status status);
 
 
 	/**
@@ -742,7 +845,7 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 *
 	 * @note This function has been deprecated; use connectionManagerSetHeartbeatField() instead.
 	 */
-	GMSEC_API void connectionManagerChangeCPUMemory(GMSEC_ConnectionMgr connMgr, const GMSEC_Field cpuMemory, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API void connectionManagerChangeCPUMemory(GMSEC_ConnectionMgr connMgr, const GMSEC_Field cpuMemory, GMSEC_Status status);
 
 
 	/**
@@ -759,7 +862,7 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 *
 	 * @note This function has been deprecated; use connectionManagerSetHeartbeatField() instead.
 	 */
-	GMSEC_API void connectionManagerChangeCPUUtil(GMSEC_ConnectionMgr connMgr, const GMSEC_Field cpuUtil, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API void connectionManagerChangeCPUUtil(GMSEC_ConnectionMgr connMgr, const GMSEC_Field cpuUtil, GMSEC_Status status);
 
 
 	/**
@@ -881,9 +984,10 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  timeout      - the time period (in milliseconds) to wait for a reply
 	 * @param[in]  rcb          - address to a ConnectionManager Reply Callback function
 	 * @param[in]  ecb          - address to a ConnectionManager Event Callback function
-	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1) it will never republish a request message.
-	 *                            If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create
-	 *                            the ConnectionManager object.  The minimum republish period allowed is 100ms.
+	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 *                            value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 *                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 *                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 * @param[out] status       - out parameter operation result status
 	 */
 	GMSEC_API void connectionManagerRequestDirectiveWithCallback(GMSEC_ConnectionMgr connMgr, const char* subject, const GMSEC_Field dirString, const GMSEC_Field fields[], size_t numFields, GMSEC_I32 timeout, GMSEC_ConnectionMgrReplyCallback* rcb, GMSEC_ConnectionMgrEventCallback* ecb, GMSEC_I32 republish_ms, GMSEC_Status status);
@@ -905,9 +1009,10 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  fields       - array of fields to include with the request directive
 	 * @param[in]  numFields    - number of fields in the array
 	 * @param[in]  timeout      - the time period (in milliseconds) to wait for a reply
-	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1) it will never republish a request message.
-	 *                            If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create
-	 *                            the ConnectionManager object.  The minimum republish period allowed is 100ms.
+	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 *                            value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 *                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 *                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 * @param[out] status       - out parameter operation result status
 	 *
 	 * @return A handle to a reply Message, or NULL if a timeout or an error occurs.  If the return value is NULL and the status indicates no error, then it is
@@ -1057,9 +1162,10 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  timeout      - the period (in milliseconds) to wait for a reply
 	 * @param[in]  rcb          - the address to the ConnectionManager Reply Callback function
 	 * @param[in]  ecb          - the address to the ConnectionManager Event Callback function
-	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1) it will never republish a request message.
-	 *                            If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create
-	 *                            the ConnectionManager object.  The minimum republish period allowed is 100ms.
+	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 *                            value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 *                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 *                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 * @param[out] status       - out parameter operation result status
 	 */
 	GMSEC_API void connectionManagerRequestSimpleServiceWithCallback(GMSEC_ConnectionMgr connMgr, const char* subject, const char* opName, const GMSEC_Field opNumber, const GMSEC_Field fields[], size_t numFields, const GMSEC_ServiceParam params[], size_t numParams, GMSEC_I32 timeout, GMSEC_ConnectionMgrReplyCallback* rcb, GMSEC_ConnectionMgrEventCallback* ecb, GMSEC_I32 republish_ms, GMSEC_Status status);
@@ -1084,15 +1190,24 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  params       - the array of ServiceParam object providing meta data for this service invocation
 	 * @param[in]  numParams    - the number of ServiceParam objects
 	 * @param[in]  timeout      - the period (in milliseconds) to wait for a reply
-	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1) it will never republish a request message.
-	 *                            If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create
-	 *                            the ConnectionManager object.  The minimum republish period allowed is 100ms.
+	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 *                            value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 *                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 *                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 * @param[out] status       - out parameter operation result status
 	 *
 	 * @return A handle to a reply Message, or NULL if a timeout or an error occurs.  If the return value is NULL and the status indicates no error, then it is
 	 * safe to assume that a timeout occurred.
 	 */
 	GMSEC_API GMSEC_Message connectionManagerRequestSimpleService(GMSEC_ConnectionMgr connMgr, const char* subject, const char* opName, const GMSEC_Field opNumber, const GMSEC_Field fields[], size_t numFields, const GMSEC_ServiceParam params[], size_t numParams, GMSEC_I32 timeout, GMSEC_I32 republish_ms, GMSEC_Status status);
+
+
+	/**
+	 * @fn void connectionManagerShutdownAllMiddlewares(void)
+	 *
+	 * @desc Calls shutdown routines for each middleware that has a shutdown routine registered.
+	 */
+	GMSEC_API void connectionManagerShutdownAllMiddlewares(void);
 
 
 	/**

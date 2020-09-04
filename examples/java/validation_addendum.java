@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -71,9 +71,11 @@ public class validation_addendum
 		// GMSEC-SCHEMA-PATH)
 		config.addValue("GMSEC-SCHEMA-PATH", "templates");
 
-		// TODO: Once available, replace this statement with usage of
-		// ConnectionManager::getAPIVersion (See RTC 4798)
-		Log.info(Connection.getAPIVersion());
+		//o Since this example relies on the 2016.00 version of the templates,
+		//  we indicate such within the configuration object.
+		config.addValue("GMSEC-SPECIFICATION-VERSION", "201600");
+
+		Log.info(ConnectionManager.getAPIVersion());
 
 		try
 		{
@@ -126,7 +128,7 @@ public class validation_addendum
 			}
 			catch (Exception e)
 			{
-				Log.error(e.getMessage());
+				Log.error("This error is expected:\n" + e.getMessage());
 			}
 
 			//o Disconnect from the middleware and clean up the Connection

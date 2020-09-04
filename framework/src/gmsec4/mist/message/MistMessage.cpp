@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,6 +15,7 @@
 #include <gmsec4/mist/message/MistMessage.h>
 
 #include <gmsec4/internal/mist/message/InternalMistMessage.h>
+#include <gmsec4/internal/InternalMessage.h>
 
 #include <gmsec4/mist/Specification.h>
 
@@ -24,6 +25,7 @@ using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
 using namespace gmsec::api::mist::message;
 using namespace gmsec::api::mist::message::internal;
+using namespace gmsec::api::util;
 
 
 MistMessage::MistMessage(const char* subject, const char* schemaID, const Specification& spec)
@@ -33,13 +35,25 @@ MistMessage::MistMessage(const char* subject, const char* schemaID, const Specif
 
 
 MistMessage::MistMessage(const char* subject, const char* schemaID, const gmsec::api::Config& config, const Specification& spec)
-	: Message(new InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, spec))
+	: Message(new InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, config, spec))
 {
 }
 
 
 MistMessage::MistMessage(const MistMessage& other)
 	: Message(new InternalMistMessage(dynamic_cast<const InternalMistMessage&>(other.getInternal())))
+{
+}
+
+
+MistMessage::MistMessage(const Message& msg)
+	: Message(new InternalMistMessage(msg))
+{
+}
+
+
+MistMessage::MistMessage(const Message& msg, const Config& specConfig)
+	: Message(new InternalMistMessage(msg, specConfig))
 {
 }
 
@@ -58,6 +72,18 @@ MistMessage::MistMessage(gmsec::api::mist::message::internal::InternalMistMessag
 
 MistMessage::~MistMessage()
 {
+}
+
+
+void MistMessage::setStandardFields(const DataList<Field*>& standardFields)
+{
+	InternalMistMessage::setStandardFields(standardFields);
+}
+
+
+void MistMessage::clearStandardFields()
+{
+	InternalMistMessage::clearStandardFields();
 }
 
 

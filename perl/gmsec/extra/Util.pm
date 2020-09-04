@@ -1,13 +1,7 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
-
-
-
-
-
-
 
 
 use strict;
@@ -39,12 +33,10 @@ sub args
 
 	if ($osname =~ /Win32/) {
 
-		my $vc6 = $ENV{VC6_HOME};
-		my $vshome = $ENV{VS_HOME}
-			|| "c:/Program Files/Microsoft Visual Studio 9.0";
-		my $msvc = $vc6 || "$vshome/VC";
-		my $msdk = $ENV{MSDK_HOME}
-			|| "c:/Program Files/Microsoft SDKs/Windows/v6.0a";
+		my $vc6    = $ENV{VC6_HOME};
+		my $vshome = $ENV{VS_HOME} || "c:/Program Files/Microsoft Visual Studio 9.0";
+		my $msvc   = $vc6 || "$vshome/VC";
+		my $msdk   = $ENV{MSDK_HOME} || "c:/Program Files/Microsoft SDKs/Windows/v6.0a";
 
 		my @libdir;
 		my $win64 = $ENV{GMSEC_x64};
@@ -72,7 +64,21 @@ sub args
 		if (defined($module) and $module ne 'GMSECAPI') {
 			$ldfrom .= ' ..\\GMSECAPI\\gmsec_perl$(OBJ_EXT)';
 		}
+
+		# Starting with VS2015, M$ broke up MSVCRT and MSVCPRT into three libraries.
+		# Users now need to link against not only MSVCRT (or MSVCPRT), but also against
+		# VCRUNTIME and UCRT.
+		#
+		# Thanks M$!
+		#
+		# Note: We need a better way to extract the VS version number
+		#
+		if ($msdk =~ /2015/ || $msdk =~ /2017/) {
+			$ldfrom .= ' vcruntime.lib ucrt.lib';
+		}
+
 		$ldfrom .= ' msvcprt.lib gmsecapi.lib';
+
 		$inc .= qq( -I"$msvc/include" -I"$msdk/include");
 		$define = '-DWIN32';
 

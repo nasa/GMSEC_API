@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,22 +8,22 @@
 
 /**
  * @file StringField.java
- *
- * @brief Specialized Field class that can be used to retain a string value.
  */
 
 package gov.nasa.gsfc.gmsec.api.field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIStringField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIStringField;
 
 
 /**
- * @class StringField
- *
- * @brief Specialized Field class that can be used to retain a string value.
+ * Specialized Field class that can be used to retain a string value.
  */
 public class StringField extends Field
 {
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A JNIStringField object.
+	 */
 	public StringField(JNIStringField field)
 	{
 		setInternal(field);
@@ -31,15 +31,13 @@ public class StringField extends Field
 
 
 	/**
-	 * @fn StringField(String name, String data)
+	 * Default constructor.
 	 *
-	 * @brief Default constructor.
+	 * @param name Name of the field.
+	 * @param data Data to associate with the field.
 	 *
-	 * @param name - name of the field.
-	 * @param data - data to associate with the field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null, or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the data string is null.
+	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the data string is null.
 	 */
 	public StringField(String name, String data) throws IllegalArgumentException
 	{
@@ -55,13 +53,11 @@ public class StringField extends Field
 
 
 	/**
-	 * @fn StringField(StringField other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other StringField object to copy.
 	 *
-	 * @param other - the other StringField object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given StringField object is null.
+	 * @throws IllegalArgumentException Thrown if the given StringField object is null.
 	 */
 	public StringField(StringField other) throws IllegalArgumentException
 	{
@@ -75,9 +71,9 @@ public class StringField extends Field
 
 
 	/**
-	 * @fn String getValue()
+	 * Returns the data stored within the StringField.
 	 *
-	 * @return Returns the data stored within the StringField.
+	 * @return A string value.
 	 */
 	public String getValue()
 	{

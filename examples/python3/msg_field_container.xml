@@ -1,0 +1,61 @@
+opyright 2007-2017 United States Government as represented by the
+   Administrator of The National Aeronautics and Space Administration.
+   No copyright is claimed in the United States under Title 17, U.S. Code.
+   All Rights Reserved.
+-->
+
+<DEFINITIONS>
+        <CONFIG NAME="config">
+                <PARAMETER NAME="connectiontype">gmsec_bolt</PARAMETER>
+                <PARAMETER NAME="server">localhost:9100</PARAMETER>
+        </CONFIG>
+
+    <MESSAGE NAME="msg1" SUBJECT="GMSEC.MISSION.CONST.SAT.EVT.MSG" KIND="publish">
+                <CONFIG NAME="msg_config">
+                        <PARAMETER NAME="KIND">GMSEC_MSG_PUBLISH</PARAMETER>
+                        <PARAMETER NAME="GMSEC-MSGFLD-STORE-TYPE">TREE</PARAMETER>
+                        <PARAMETER NAME="GMSEC-MSGFLD-STORE-SIZE">8</PARAMETER>
+                </CONFIG>
+                <FIELD TYPE="I32" NAME="FIELD-000">1111</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-001">2222</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-002">3333</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-003">4444</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-004">5555</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-005">6666</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-006">7777</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-007">8888</FIELD>
+        </MESSAGE>
+
+    <MESSAGE NAME="msg2" SUBJECT="GMSEC.MISSION.CONST.SAT.EVT.MSG" KIND="publish">
+                <CONFIG NAME="msg_config">
+                        <PARAMETER NAME="KIND">GMSEC_MSG_PUBLISH</PARAMETER>
+                        <PARAMETER NAME="GMSEC-MSGFLD-STORE-TYPE">TREE</PARAMETER>
+                        <PARAMETER NAME="GMSEC-MSGFLD-STORE-SIZE">8</PARAMETER>
+                </CONFIG>
+                <FIELD TYPE="I32" NAME="FIELD-000">1111</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-001">2222</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-002">3333</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-003">4444</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-004">5555</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-005">6666</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-006">7777</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-007">8888</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-008">8888</FIELD>
+        </MESSAGE>
+
+    <MESSAGE NAME="msg3" SUBJECT="GMSEC.MISSION.CONST.SAT.EVT.MSG" KIND="publish">
+                <CONFIG NAME="msg_config">
+                        <PARAMETER NAME="KIND">GMSEC_MSG_PUBLISH</PARAMETER>
+                        <PARAMETER NAME="GMSEC-MSGFLD-STORE-TYPE">HASH</PARAMETER>
+                </CONFIG>
+                <FIELD TYPE="I32" NAME="FIELD-000">1111</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-001">2222</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-002">3333</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-003">4444</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-004">5555</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-005">6666</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-006">7777</FIELD>
+                <FIELD TYPE="I32" NAME="FIELD-007">8888</FIELD>
+        </MESSAGE>
+</DEFINITIONS>
+

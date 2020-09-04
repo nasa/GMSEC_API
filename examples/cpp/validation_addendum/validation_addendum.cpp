@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -76,9 +76,11 @@ int main (int argc, char* argv[])
 	// GMSEC-SCHEMA-PATH)
 	config.addValue("GMSEC-SCHEMA-PATH", "templates");
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO << Connection::getAPIVersion();
+	//o Since this example relies on the 2016.00 version of the templates,
+	//  we indicate such within the configuration object.
+	config.addValue("GMSEC-SPECIFICATION-VERSION", "201600");
+
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
@@ -131,7 +133,7 @@ int main (int argc, char* argv[])
 		}
 		catch (Exception e)
 		{
-			GMSEC_ERROR << e.what();
+			GMSEC_ERROR << "This error is expected:\n" << e.what();
 		}
 
 		//o Disconnect from the middleware and clean up the Connection

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,6 +19,7 @@
 #define GMSEC_API_UTIL_TIMEUTIL_H
 
 #include <gmsec4_defs.h>
+
 #include <gmsec4/util/wdllexp.h>
 
 #include <stddef.h>  // for size_t
@@ -78,7 +79,7 @@ public:
 
 
 	/**
-	 * @fn void CALL_TYPE formatTime_s(const GMSEC_TimeSpec& time_s, char* buffer)
+	 * @fn void CALL_TYPE formatTime(const GMSEC_TimeSpec& time_s, char* buffer)
 	 *
 	 * @brief Formats the given TimeSpec into a GMSEC time string with the format of YYYY-DDD-HH-MM-SS.sss
 	 *
@@ -131,6 +132,46 @@ private:
  * @brief Compares the two given GMSEC_TimeSpec values for equality.
  *
  * @return Returns true of the time values are equal; false otherwise.
+ *
+ * @note This method has been deprecated.
+ */
+GMSEC_API bool CALL_TYPE operator==(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0);
+
+
+/**
+ * @fn bool operator>(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
+ *
+ * @brief Reports back as to whether the first time value is chronologically greater than the second time value.
+ *
+ * @return Returns true if the first time value is greater; false otherwise.
+ *
+ * @note This method has been deprecated.
+ */
+GMSEC_API bool CALL_TYPE operator>(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0);
+
+
+/**
+ * @fn bool operator<(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
+ *
+ * @brief Reports back as to whether the first time value is chronologically less than the second time value.
+ *
+ * @return Returns true if the first time value is less; false otherwise.
+ *
+ * @note This method has been deprecated.
+ */
+GMSEC_API bool CALL_TYPE operator<(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0);
+
+} // namespace util
+} // namespace api
+} // namespace gmsec
+
+
+/**
+ * @fn bool operator==(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
+ *
+ * @brief Compares the two given GMSEC_TimeSpec values for equality.
+ *
+ * @return Returns true of the time values are equal; false otherwise.
  */
 GMSEC_API bool CALL_TYPE operator==(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0);
 
@@ -153,10 +194,6 @@ GMSEC_API bool CALL_TYPE operator>(const GMSEC_TimeSpec& time1, const GMSEC_Time
  * @return Returns true if the first time value is less; false otherwise.
  */
 GMSEC_API bool CALL_TYPE operator<(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0);
-
-} // namespace util
-} // namespace api
-} // namespace gmsec
 
 
 #endif

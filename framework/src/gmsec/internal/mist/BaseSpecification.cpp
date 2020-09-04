@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -848,7 +848,7 @@ Status BaseSpecification::parser(tinyxml2::XMLElement* xmlSchema, std::string& i
 #ifndef WIN32
 							sscanf(hex_str, "%02X", &mem_value);
 #else
-							sscanf_s(hex_str, "%02X", &mem_value, sizeof(mem_value));
+							sscanf_s(hex_str, "%02X", &mem_value);
 #endif
 
 							tmp_mem[mem_char_count]= (unsigned char) mem_value;

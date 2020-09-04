@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -184,7 +184,7 @@ ConfigOption jms_wl_client_opt8 =
 };
 
 
-// JMS WebSphere Client Options
+// JMS IBMMQ and WebSphere Client Options
 //
 ConfigOption jms_ws_client_opt1 =
 {
@@ -203,7 +203,7 @@ ConfigOption jms_ws_client_opt2 =
 {
 " *  mw-initial-context-factory=<string>",
 
-"        WebSphere initial context factory. [required]",
+"        Initial context factory. [required]",
 
 "        No additional details available.",
 
@@ -230,7 +230,7 @@ ConfigOption jms_ws_client_opt4 =
 {
 " *  mw-lookup-connection-factory=<string>",
 
-"        The name of the WebSphere connection factory. [required]",
+"        The name of the connection factory. [required]",
 
 "        The name of the connection factory as defined in the JNDI definition.",
 

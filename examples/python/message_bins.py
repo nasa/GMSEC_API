@@ -38,6 +38,8 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " + sys.argv[0] + " mw-id=<middleware ID>" 
         print usageMessage
+        return -1
+
 
     # Load the command-line input into a GMSEC Config object
     # A Config object is basically a key-value pair map which is used to
@@ -51,7 +53,7 @@ def main():
         config.addValue(value[0], value[1])
 
     # Enable Message Binning
-    config.addValue("GMSEC-USE-MESSAGE-BINS", "true")
+    config.addValue("GMSEC-USE-MSG-BINS", "true")
 
     # Specify the number of messages to be aggregated prior to publishing
     # the aggregate message to the middleware server (This applies to all
@@ -60,7 +62,7 @@ def main():
     # Note: The aggregate message will be sent to the middleware server
     # immediately upon this many messages being published, regardless of
     # the value supplied for GMSEC-MSG-BIN-TIMEOUT.
-    config.addValue("GMSEC-MSG-BIN-SIZE", "5")
+    config.addValue("GMSEC-MSG-BIN-SIZE", "10")
 
     # Specify a timeout (in milliseconds) for the aggregate message to be
     # sent to the middleware server
@@ -79,6 +81,10 @@ def main():
     # GMSEC-MSG-BIN-SUBJECT-N parameters.
     config.addValue("GMSEC-MSG-BIN-EXCLUDE-SUBJECT-1", EXAMPLE_BIN_EXCLUDE_SUBJECT)
 
+    # Since this example program uses an invalid message, we ensure the
+    # validation check is disabled.
+    config.addValue("gmsec-msg-content-validate-all", "false")
+
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
     # on the terminal/command line
@@ -87,12 +93,9 @@ def main():
     # interface
     # This is useful for determining which version of the API is
     # configured within the environment
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create a ConnectionManager object
         # This is the linchpin for all communications between the
         # GMSEC API and the middleware server
@@ -110,7 +113,6 @@ def main():
         message = libgmsec_python.Message(EXAMPLE_MESSAGE_SUBJECT, libgmsec_python.Message.PUBLISH)
 
         for i in range(0,5):
-            
             populateMessage(message, i+1)
 
             # Publish the message to the middleware bus
@@ -119,10 +121,8 @@ def main():
             # Display the XML string representation of the Message for
             # the sake of review
             libgmsec_python.logInfo("Published message: " + message.toXML())
-            
-            
-             
-        # Create a message
+
+        # Create another message
         message = libgmsec_python.Message(EXAMPLE_BIN_EXCLUDE_SUBJECT, libgmsec_python.Message.PUBLISH)
 
         populateMessage(message, 1)
@@ -142,10 +142,8 @@ def main():
         connMgr.cleanup()
         
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
-        
 
     return 0
 

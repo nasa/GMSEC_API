@@ -14,6 +14,15 @@ BINDIR    = $(GMSEC_HOME)/bin
 JAVA_INCS = -I$(JDK_HOME)/include -I$(JDK_HOME)/include/linux
 JAVA_LIBS = -L$(JDK_HOME)/jre/lib/i386/client -ljvm
 
+ifndef PERL5_LIB
+PERL5_LIB = /usr/lib/perl5
+endif
+
+ifndef PYTHON_INC
+PYTHON_INC = /usr/include/python
+endif
+
+
 CXX       = g++
 CC        = gcc
 
@@ -21,9 +30,10 @@ LINK      = $(CXX)
 DLINK     = $(CXX) -shared
 SHLIB_EXT = so
 
-INCS      = -I$(GMSEC_HOME)/include \
-            -I$(GMSEC_HOME)/framework/include \
-            -I$(GMSEC_HOME)/framework/support/include
+INCS      = -I$(GMSEC_HOME)/framework/include \
+            -I$(GMSEC_HOME)/framework/support/include \
+            -I$(LIBXML2_HOME)/include/libxml2 \
+            -I$(LIBXSLT_HOME)/include
 
 # add COVERAGE for code coverage
 ifeq ($(COVERAGE),1)
@@ -34,9 +44,13 @@ endif
 CXXFLAGS = $(DEBUG_FLAGS) $(COVERAGE) -march=i486 -Wall -D_REENTRANT $(INCS) 
 CFLAGS   = $(CXXFLAGS)
 
+LIBXML2_LIB = $(LIBXML2_HOME)/lib
+LIBXSLT_LIB = $(LIBXSLT_HOME)/lib
+
 # define api/example/test applications LDFLAGS
-LDFLAGS  = $(COVERAGE) -L$(BINDIR) -lGMSECAPI -ldl -lpthread
+RPATH    = -Wl,-rpath,'$$ORIGIN' -Wl,-z,origin
+LDFLAGS  = $(COVERAGE) -L$(BINDIR) -lGMSECAPI -ldl -lpthread -L$(LIBXML2_LIB) -lxml2 -L$(LIBXSLT_LIB) -lxslt $(RPATH)
 
 # define API API_CXXFLAGS and API_LDFLAGS
 API_CXXFLAGS = -fPIC $(CXXFLAGS)
-API_LDFLAGS  = $(COVERAGE) -ldl -lpthread
+API_LDFLAGS  = $(COVERAGE) -ldl -lpthread -L$(LIBXML2_LIB) -lxml2 -L$(LIBXSLT_LIB) -lxslt $(RPATH)

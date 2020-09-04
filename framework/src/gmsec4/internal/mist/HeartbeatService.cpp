@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,6 +32,13 @@
 #include <gmsec4/internal/SystemUtil.h>
 
 #include <string>
+#include <limits>
+
+#ifdef WIN32
+	#ifdef max
+	#undef max
+	#endif
+#endif
 
 
 namespace gmsec
@@ -83,7 +90,7 @@ void HeartbeatService::setField(const Field& field)
 	{
 		GMSEC_I64 rate = field.getIntegerValue();
 
-		if (rate > 0)
+		if (rate >= 0)
 		{
 			m_msg.addField(field);
 
@@ -93,7 +100,7 @@ void HeartbeatService::setField(const Field& field)
 		}
 		else
 		{
-			throw Exception(MIST_ERROR, VALUE_OUT_OF_RANGE, "Setting HeartbeatService PUB-RATE to zero or less is not permitted");
+			throw Exception(MIST_ERROR, VALUE_OUT_OF_RANGE, "Setting HeartbeatService PUB-RATE to less than zero is not permitted");
 		}
 	}
 	else
@@ -180,13 +187,21 @@ void HeartbeatService::run()
 
 					if (field != NULL)
 					{
+						++m_counter;
+
 						if (field->getType() == Field::I16_TYPE)
 						{
-							m_msg.addField("COUNTER", GMSEC_I16(++m_counter));
+							m_counter %= GMSEC_U32(std::numeric_limits<GMSEC_I16>::max() + 1);
+
+							if (m_counter == 0) ++m_counter;
+
+							m_msg.addField("COUNTER", GMSEC_I16(m_counter));
 						}
 						else if (field->getType() == Field::U16_TYPE)
 						{
-							m_msg.addField("COUNTER", ++m_counter);
+							if (m_counter == 0) ++m_counter;
+
+							m_msg.addField("COUNTER", m_counter);
 						}
 					}
 
@@ -199,7 +214,18 @@ void HeartbeatService::run()
 					GMSEC_ERROR << "HeartbeatService: Error publishing message -- " << e.what();
 				}
 			}
-			gmsec::api::util::TimeUtil::millisleep(200);
+
+			// Delay a bit (less than a second) so that in case the PUB-RATE is
+			// zero, we do not hammer the CPU.
+			gmsec::api::util::TimeUtil::millisleep(500);
+
+#if 0
+			// Only publish one heartbeat message if the PUB-RATE is zero.
+			if (m_pubInterval == 0)
+			{
+				m_alive.set(false);
+			}
+#endif
 		}
 	}
 
@@ -256,7 +282,8 @@ Status HeartbeatService::teardownService()
 
 HeartbeatService::ActionInfo::ActionInfo(double interval)
 	: last_s(gmsec::api::util::TimeUtil::getCurrentTime_s(0)),
-	  interval_s(interval)
+	  interval_s(interval),
+	  actNow(false)
 {
 }
 
@@ -264,12 +291,23 @@ HeartbeatService::ActionInfo::ActionInfo(double interval)
 bool HeartbeatService::ActionInfo::tryNow()
 {
 	bool flag = false;
-	double now_s = gmsec::api::util::TimeUtil::getCurrentTime_s(0);
-	if (now_s - last_s >= interval_s)
+
+	if (interval_s > 0)
 	{
-		flag = true;
-		last_s = now_s;
+		double now_s = gmsec::api::util::TimeUtil::getCurrentTime_s(0);
+		if (now_s - last_s >= interval_s)
+		{
+			flag = true;
+			last_s = now_s;
+		}
 	}
+
+	if (flag == false)
+	{
+		flag   = actNow;
+		actNow = false;
+	}
+
 	return flag;
 }
 
@@ -277,6 +315,11 @@ bool HeartbeatService::ActionInfo::tryNow()
 void HeartbeatService::ActionInfo::setInterval(double interval)
 {
 	interval_s = interval;
+
+	if (interval == 0)
+	{
+		actNow = true;
+	}
 }
 
 

@@ -40,16 +40,12 @@ class ExampleReplyCallback(libgmsec_python.ConnectionManagerReplyCallback):
         self.receivedReply = False
                                                                   
     def onReply(self, connection, request, reply):
-        
         # Display XML representation of reply message
         libgmsec_python.logInfo("[ExampleReplyCallback::onReply]\n" + reply.toXML())
-
         self.receivedReply = True
         
     def onEvent(self, connection, status, event):
-        
         if (status.isError()):
-                
             libgmsec_python.logError("[ExampleReplyCallback::onError] " + status.get() + ", event=" + event)
 
 
@@ -58,6 +54,8 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " +  sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
+        return -1
+
 
     # Load the command-line input into a GMSEC Config object
     # A Config object is basically a key-value pair map which is used to
@@ -70,6 +68,10 @@ def main():
         value = arg.split('=')
         config.addValue(value[0], value[1])
 
+    # Since this example program uses an invalid message, we ensure the
+    # validation check is disabled.
+    config.addValue("gmsec-msg-content-validate-all", "false")
+
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
     # on the terminal/command line
@@ -79,7 +81,6 @@ def main():
     libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
 
     try:
-        
         # Create the Connection
         connMgr = libgmsec_python.ConnectionManager(config)
 
@@ -106,24 +107,21 @@ def main():
 
         # Loop while waiting for the asynchronous response until done
         while (cb.receivedReply == 0):
-                
             libgmsec_python.TimeUtil.millisleep(100)
                 
-
         if (cb.receivedReply):
-                
             libgmsec_python.logInfo("Response Received!")
-                
         else:
-                
             libgmsec_python.logWarning("No response received")
+
+        connMgr.cleanup()
             
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
         
     return 0
+
 
 def initializeLogging(config):
 
