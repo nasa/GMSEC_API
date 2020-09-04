@@ -237,6 +237,8 @@ void ConnectionMgr::run()
 	{
 		m_connWriterShared->shutdown();
 		m_connWriterShared.reset();
+		m_connWriterThread->join();
+		m_connWriterThread.reset();
 	}
 
 	delete m_sock;

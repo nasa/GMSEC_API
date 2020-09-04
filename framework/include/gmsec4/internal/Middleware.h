@@ -9,8 +9,6 @@
 #ifndef GMSEC_API_INTERNAL_MIDDLEWARE_H
 #define GMSEC_API_INTERNAL_MIDDLEWARE_H
 
-#include <gmsec4/Status.h>
-
 #include <gmsec4/util/wdllexp.h>
 
 
@@ -28,13 +26,13 @@ public:
 	virtual ~Middleware();
 
 	// The default implementation of this method is trivial.
-	virtual Status shutdown();
+	virtual void shutdown();
 
-	static Status shutdown(const char* name);
+	static void shutdown(const char* name);
 
-	static Status shutdownAll();
+	static void shutdownAll();
 
-	static Status addMiddleware(const char* name, Middleware* middleware);
+	static void addMiddleware(const char* name, Middleware* middleware);
 
 private:
 	// Declared, but not implemented.

@@ -24,6 +24,7 @@ typedef struct
 	GMSEC_Config     config;
 	GMSEC_Connection connection;
 	GMSEC_Message    message;
+	GMSEC_SubscriptionInfo *info;
 } gmrpl_cb_t;
 
 
@@ -192,12 +193,13 @@ GMSEC_BOOL gmrpl_cb_Run(gmrpl_cb_t* this)
 	GMSEC_INFO("Middleware version = %s", connectionGetLibraryVersion(this->connection, NULL));
 
 	/* Subscribe using subject and callback */
+	this->info = (GMSEC_SubscriptionInfo*)malloc(2 * sizeof(GMSEC_SubscriptionInfo));
 	GMSEC_INFO("Subscribing to %s (using callback)", subject);
-	connectionSubscribeWithCallback(this->connection, subject, onMessageCallback, this->status);
+	this->info[0] = connectionSubscribeWithCallback(this->connection, subject, onMessageCallback, this->status);
 	if (!example_check("connectionSubscribeWithCallback", this->status)) return GMSEC_FALSE;
 
 	GMSEC_INFO("Subscribing to GMSEC.TERMINATE (using callback)");
-	connectionSubscribeWithCallback(this->connection, "GMSEC.TERMINATE", onMessageCallback, this->status);
+	this->info[1] = connectionSubscribeWithCallback(this->connection, "GMSEC.TERMINATE", onMessageCallback, this->status);
 	if (!example_check("connectionSubscribeWithCallback", this->status)) return GMSEC_FALSE;
 
 
@@ -251,11 +253,24 @@ GMSEC_BOOL gmrpl_cb_Run(gmrpl_cb_t* this)
 
 void gmrpl_cb_Cleanup(gmrpl_cb_t* this)
 {
+	int i;
+
 	/* Destroy Message */
 	if (this->message != NULL)
 	{
 		messageDestroy(&this->message);
 	}
+
+	for(i = 1; i >= 0; i--)
+	{
+		GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info[i]));
+		connectionUnsubscribe(this->connection, &(this->info[i]), this->status);
+		if (!example_check("Unsubscribing...", this->status))
+		{
+			GMSEC_ERROR("Problem with Unsubscribing...");
+		}
+	}
+	free(this->info);
 
 	/* Destroy connection */
 	if (this->connection != NULL)

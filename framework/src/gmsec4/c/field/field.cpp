@@ -117,6 +117,130 @@ const char* CALL_TYPE fieldToJSON(const GMSEC_Field field, GMSEC_Status status)
 }
 
 
+GMSEC_I64 CALL_TYPE fieldGetIntegerValue(const GMSEC_Field field, GMSEC_Status status)
+{
+	const Field* fld   = reinterpret_cast<const Field*>(field);
+	GMSEC_I64    value = 0;
+	Status       result;
+
+	if (fld)
+	{
+		try
+		{
+			value = fld->getIntegerValue();
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+	else
+	{
+		result = Status(FIELD_ERROR, UNINITIALIZED_OBJECT, "Field object is NULL");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return value;
+}
+
+
+GMSEC_U64 CALL_TYPE fieldGetUnsignedIntegerValue(const GMSEC_Field field, GMSEC_Status status)
+{
+	const Field* fld   = reinterpret_cast<const Field*>(field);
+	GMSEC_U64    value = 0;
+	Status       result;
+
+	if (fld)
+	{
+		try
+		{
+			value = fld->getUnsignedIntegerValue();
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+	else
+	{
+		result = Status(FIELD_ERROR, UNINITIALIZED_OBJECT, "Field object is NULL");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return value;
+}
+
+
+GMSEC_F64 CALL_TYPE fieldGetDoubleValue(const GMSEC_Field field, GMSEC_Status status)
+{
+	const Field* fld   = reinterpret_cast<const Field*>(field);
+	GMSEC_F64    value = 0;
+	Status       result;
+
+	if (fld)
+	{
+		try
+		{
+			value = fld->getDoubleValue();
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+	else
+	{
+		result = Status(FIELD_ERROR, UNINITIALIZED_OBJECT, "Field object is NULL");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return value;
+}
+
+
+const char* CALL_TYPE fieldGetStringValue(const GMSEC_Field field, GMSEC_Status status)
+{
+	const Field* fld   = reinterpret_cast<const Field*>(field);
+	const char*  value = 0;
+	Status       result;
+
+	if (fld)
+	{
+		try
+		{
+			value = fld->getStringValue();
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+	else
+	{
+		result = Status(FIELD_ERROR, UNINITIALIZED_OBJECT, "Field object is NULL");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return value;
+}
+
+
 void CALL_TYPE fieldDestroy(GMSEC_Field* field)
 {
 	if (field)

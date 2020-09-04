@@ -25,11 +25,17 @@ namespace api
 namespace mist
 {
 	class ProductFile;
+	namespace internal
+	{
+		class InternalProductFileIterator;
+	}
 
-namespace internal
+namespace message
 {
-	class InternalProductFileMessage;
-	class InternalProductFileIterator;
+	namespace internal
+	{
+		class InternalProductFileMessage;
+	}
 }
 
 
@@ -83,7 +89,7 @@ public:
 
 
 private:
-	friend class gmsec::api::mist::internal::InternalProductFileMessage;
+	friend class gmsec::api::mist::message::internal::InternalProductFileMessage;
 
 	/**
 	 * @fn ProductFileIterator(const ProductFileMessage& msg)
@@ -92,7 +98,7 @@ private:
 	 *
 	 * @param msg - the ProductFileMessage object to use when iterating over the ProductFile objects.
 	 */
-    ProductFileIterator(mist::internal::InternalProductFileMessage& msg);
+	ProductFileIterator(gmsec::api::mist::message::internal::InternalProductFileMessage& msg);
 
 
 	// Declared, but not implemented
@@ -103,7 +109,7 @@ private:
 	//ProductFileIterator& operator=(const ProductFileIterator&);
 
 
-    gmsec::api::mist::internal::InternalProductFileIterator* m_iter;
+	gmsec::api::mist::internal::InternalProductFileIterator* m_iter;
 };
 
 } // namespace mist

@@ -189,9 +189,10 @@ void CALL_TYPE connectionManagerCleanup(GMSEC_ConnectionMgr connMgr, GMSEC_Statu
 
 const char* CALL_TYPE connectionManagerGetLibraryVersion(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
 {
-	Status result;
-	const char * libver = NULL;
-	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
+	Status             result;
+
+	const char*        libver  = NULL;
+	ConnectionManager* mgr     = reinterpret_cast<ConnectionManager*>(connMgr);
 
 	if (!mgr)
 	{
@@ -208,13 +209,47 @@ const char* CALL_TYPE connectionManagerGetLibraryVersion(GMSEC_ConnectionMgr con
 			result = Status(e);
 		}
 	}    
-   
+
 	if (status)
 	{
 		*((Status*) status) = result;
 	}
 
-	return libver;    
+	return libver;
+}
+
+
+GMSEC_Specification CALL_TYPE connectionManagerGetSpecification(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+{
+	GMSEC_Specification spec = NULL;
+	Status              result;
+
+	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			Specification& s = mgr->getSpecification();
+
+			spec = reinterpret_cast<GMSEC_Specification>(&s);
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return spec;
 }
 
 

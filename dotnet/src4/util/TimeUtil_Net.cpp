@@ -58,7 +58,7 @@ String^ TimeUtil::FormatTime(TimeSpec^ spec, int subseconds)
 	ts.seconds     = spec->seconds;
 	ts.nanoseconds = spec->nanoseconds;
 
-	gmsec::api::util::TimeUtil::formatTime(ts, buffer, subseconds);
+	gmsec::api::util::TimeUtil::formatTime(ts, subseconds, buffer);
 
 	String^ timestr = gcnew String(buffer);
 

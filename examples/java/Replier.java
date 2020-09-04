@@ -41,6 +41,7 @@ import gov.nasa.gsfc.gmsec.api.field.I16Field;
 import gov.nasa.gsfc.gmsec.api.util.Log;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -145,6 +146,7 @@ public class Replier implements Example
 	Config     config;
 	ConfigFile configFile;
 	Connection conn;
+	ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 
 	Replier(Config config, ConfigFile configFile)
@@ -181,7 +183,7 @@ public class Replier implements Example
 			String subject = configFile.lookupSubscription("DIRECTIVE-REQUEST");
 
 			// Subscribe
-			conn.subscribe(subject, new RequestReplyCallback(configFile));
+			info.add(conn.subscribe(subject, new RequestReplyCallback(configFile)));
 
 			// Find and load the config file heartbeat message definition
 			Message heartbeatMessage = configFile.lookupMessage("C2CX-HEARTBEAT-REP");
@@ -255,17 +257,31 @@ public class Replier implements Example
 		}
 		finally
 		{
-			cleanup();
+			try
+			{
+				cleanup();
+			}
+			catch (GMSEC_Exception e)
+			{
+				Log.error("GMSEC_Exception: " + e.toString());
+				result = false;
+			}
 		}
   
 		return result;
  	}
 
 
-	public boolean cleanup()
+	public boolean cleanup() throws GMSEC_Exception
 	{
 		if (conn != null)
 		{
+			for(int i = info.size()-1; i >= 0; i-- )
+			{
+				Log.info("Unsubscribing from " + info.get(i).getSubject());
+				conn.unsubscribe(info.get(i));
+				info.remove(i);
+			}
 			Util.closeConnection(conn);
 		}
 

@@ -11,6 +11,9 @@ package gov.nasa.gsfc.gmsec.api.jni;
 import gov.nasa.gsfc.gmsec.api.Config;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 
+import gov.nasa.gsfc.gmsec.api.util.Log;
+import gov.nasa.gsfc.gmsec.api.jni.JNILog;
+
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -30,6 +33,8 @@ public class JNIConfig
 	{
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;
+
+		initLogging(gmsecJNI.Config_GetValue(swigCPtr, this, "logfile"));
 	}
 
 
@@ -56,7 +61,7 @@ public class JNIConfig
 	}
 
 
-	protected static long getCPtr(JNIConfig obj)
+	public static long getCPtr(JNIConfig obj)
 	{
 		return (obj == null) ? 0 : obj.swigCPtr;
 	}
@@ -97,6 +102,11 @@ public class JNIConfig
 	public void addValue(String name, String value)
 	{
 		gmsecJNI.Config_AddValue(swigCPtr, this, name, value);
+
+		if (name.equalsIgnoreCase("logfile"))
+		{
+			initLogging(value);
+		}
 	}
 
 
@@ -215,5 +225,14 @@ public class JNIConfig
 	public void fromXML(String xml)
 	{
 		gmsecJNI.Config_FromXML(swigCPtr, this, xml);
+	}
+
+
+	private void initLogging(String stream)
+	{
+		if (stream != null)
+		{
+			JNILog.getDefaultLogHandler().setStream(stream);
+		}
 	}
 }

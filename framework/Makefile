@@ -124,8 +124,14 @@ CORE4_OBJ	= \
 	$(OBJDIR4)/mist/ProductFile.o \
 	$(OBJDIR4)/mist/ProductFileIterator.o \
 	$(OBJDIR4)/mist/ProductFileMessage.o \
+	$(OBJDIR4)/mist/SchemaIDIterator.o \
 	$(OBJDIR4)/mist/ServiceParam.o \
-	$(OBJDIR4)/mist/SubscriptionInfo.o
+	$(OBJDIR4)/mist/Specification.o \
+	$(OBJDIR4)/mist/SubscriptionInfo.o \
+	$(OBJDIR4)/mist/message/DeviceMessage.o \
+	$(OBJDIR4)/mist/message/MistMessage.o \
+	$(OBJDIR4)/mist/message/MnemonicMessage.o \
+	$(OBJDIR4)/mist/message/ProductFileMessage.o 
 
 
 INTERNAL4_OBJ	= \
@@ -150,6 +156,7 @@ INTERNAL4_OBJ	= \
 	$(OBJDIR4)/internal/InternalStatus.o \
 	$(OBJDIR4)/internal/InternalSubscriptionInfo.o \
 	$(OBJDIR4)/internal/MathUtil.o \
+	$(OBJDIR4)/internal/MessageAggregationToolkit.o \
 	$(OBJDIR4)/internal/Middleware.o \
 	$(OBJDIR4)/internal/MsgFieldMap.o \
 	$(OBJDIR4)/internal/RequestThread.o \
@@ -176,29 +183,20 @@ INTERNAL4_OBJ	= \
 	$(OBJDIR4)/internal/field/InternalU16Field.o \
 	$(OBJDIR4)/internal/field/InternalU32Field.o \
 	$(OBJDIR4)/internal/field/InternalU64Field.o \
-	$(OBJDIR4)/internal/mist/AbstractBaseFieldDescriptor.o \
-	$(OBJDIR4)/internal/mist/AbstractFieldDescriptor.o \
-	$(OBJDIR4)/internal/mist/CompoundFieldDescriptor.o \
-	$(OBJDIR4)/internal/mist/Context.o \
 	$(OBJDIR4)/internal/mist/ConnMgrCallbacks.o \
 	$(OBJDIR4)/internal/mist/ConnMgrCallbackCache.o \
-	$(OBJDIR4)/internal/mist/DescriptorList.o \
+	$(OBJDIR4)/internal/mist/FieldTemplate.o \
 	$(OBJDIR4)/internal/mist/HeartbeatService.o \
-	$(OBJDIR4)/internal/mist/InternalContext.o \
-	$(OBJDIR4)/internal/mist/InternalCompoundFieldDescriptor.o \
 	$(OBJDIR4)/internal/mist/InternalConnectionManager.o \
 	$(OBJDIR4)/internal/mist/InternalDevice.o \
 	$(OBJDIR4)/internal/mist/InternalDeviceIterator.o \
-	$(OBJDIR4)/internal/mist/InternalDeviceMessage.o \
 	$(OBJDIR4)/internal/mist/InternalDeviceParam.o \
 	$(OBJDIR4)/internal/mist/InternalMnemonic.o \
 	$(OBJDIR4)/internal/mist/InternalMnemonicIterator.o \
-	$(OBJDIR4)/internal/mist/InternalMnemonicMessage.o \
 	$(OBJDIR4)/internal/mist/InternalMnemonicSample.o \
-	$(OBJDIR4)/internal/mist/InternalMessageTemplate.o \
 	$(OBJDIR4)/internal/mist/InternalProductFile.o \
 	$(OBJDIR4)/internal/mist/InternalProductFileIterator.o \
-	$(OBJDIR4)/internal/mist/InternalProductFileMessage.o \
+	$(OBJDIR4)/internal/mist/InternalSchemaIDIterator.o \
 	$(OBJDIR4)/internal/mist/InternalServiceParam.o \
 	$(OBJDIR4)/internal/mist/InternalSpecification.o \
 	$(OBJDIR4)/internal/mist/InternalSubscriptionInfo.o \
@@ -208,7 +206,11 @@ INTERNAL4_OBJ	= \
 	$(OBJDIR4)/internal/mist/MistCallbackAdapter.o \
 	$(OBJDIR4)/internal/mist/ResourceInfoGenerator.o \
 	$(OBJDIR4)/internal/mist/ResourceService.o \
-	$(OBJDIR4)/internal/mist/Specification.o \
+	$(OBJDIR4)/internal/mist/SchemaTemplate.o \
+	$(OBJDIR4)/internal/mist/message/InternalDeviceMessage.o \
+	$(OBJDIR4)/internal/mist/message/InternalMistMessage.o \
+	$(OBJDIR4)/internal/mist/message/InternalMnemonicMessage.o \
+	$(OBJDIR4)/internal/mist/message/InternalProductFileMessage.o \
 	$(OBJDIR4)/internal/performance/PerformanceLogger.o \
 	$(OBJDIR4)/internal/util/InternalLog.o \
 	$(OBJDIR4)/internal/util/InternalLoggerStream.o \
@@ -242,14 +244,17 @@ CAPI4_OBJ	= \
 	$(COBJDIR4)/field/u8_field.o \
 	$(COBJDIR4)/mist/connection_manager.o \
 	$(COBJDIR4)/mist/device.o \
-	$(COBJDIR4)/mist/device_message.o \
 	$(COBJDIR4)/mist/device_param.o \
 	$(COBJDIR4)/mist/mnemonic.o \
-	$(COBJDIR4)/mist/mnemonic_message.o \
 	$(COBJDIR4)/mist/mnemonic_sample.o \
 	$(COBJDIR4)/mist/product_file.o \
-	$(COBJDIR4)/mist/product_file_message.o \
+	$(COBJDIR4)/mist/schema_id_iterator.o \
 	$(COBJDIR4)/mist/service_param.o \
+	$(COBJDIR4)/mist/specification.o \
+	$(COBJDIR4)/mist/message/device_message.o \
+	$(COBJDIR4)/mist/message/mist_message.o \
+	$(COBJDIR4)/mist/message/mnemonic_message.o \
+	$(COBJDIR4)/mist/message/product_file_message.o \
 	$(COBJDIR4)/util/log.o \
 	$(COBJDIR4)/util/timeutil.o \
 

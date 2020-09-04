@@ -31,15 +31,23 @@ namespace mist
 	class Mnemonic;
 	class MnemonicIterator;
 
-namespace internal
+namespace message
 {
-	class InternalMnemonicMessage;
+	namespace internal
+	{
+		class InternalMnemonicMessage;
+	}
 }
 
 /**
  * @class MnemonicMessage
  *
  * @brief The Message object contains a GMSEC MSG MVAL message.
+ * The following message schema IDs and their templates are supported: @n
+ * 2014.00.GMSEC.MSG.MVAL
+ * 2016.00.GMSEC.MSG.MVAL
+ *
+ * @note gmsec::api::mist::MnemonicMessage has been deprecated.  It is recommended to use gmsec::api::mist::message::MnemonicMessage
  *
  * @sa Message @n
  *     Config @n
@@ -156,7 +164,7 @@ public:
 	 *
 	 * @return A reference to a MnemonicIterator object.
 	 */
-	MnemonicIterator& CALL_TYPE getMnemonicIterator() const;
+	gmsec::api::mist::MnemonicIterator& CALL_TYPE getMnemonicIterator() const;
 
 
 	/**
@@ -168,7 +176,8 @@ public:
 
 
 private:
-	internal::InternalMnemonicMessage* m_internal;
+	// Defined so as to preserve binary compatibility with API 4.1
+	void* filler;
 };
 
 } // namespace mist

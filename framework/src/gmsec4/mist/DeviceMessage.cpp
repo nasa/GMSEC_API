@@ -15,60 +15,65 @@
 
 #include <gmsec4/mist/DeviceMessage.h>
 
-#include <gmsec4/internal/mist/InternalDeviceMessage.h>
+#include <gmsec4/internal/mist/message/InternalDeviceMessage.h>
 
 #include <gmsec4/mist/Device.h>
 #include <gmsec4/mist/DeviceIterator.h>
 
+#include <gmsec4/mist/Specification.h>
+
 #include <gmsec4/Config.h>
+
+#include <gmsec4/util/Log.h>
 
 
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::mist::message;
+using namespace gmsec::api::mist::message::internal;
 
 
 DeviceMessage::DeviceMessage(const char* subject, unsigned int version)
-	: Message(subject, Message::PUBLISH),
-	  m_internal(new InternalDeviceMessage(subject, version))
+	: Message(new InternalDeviceMessage(subject,
+	                                    InternalMistMessage::buildSchemaID(PUBLISH, "C2CX", "DEV", version).c_str(),
+	                                    InternalMistMessage::buildSpecification(version)))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::DeviceMessage instead.";
 }
 
 
 DeviceMessage::DeviceMessage(const char* subject, const Config& config, unsigned int version)
-	: Message(subject, Message::PUBLISH, config),
-	  m_internal(new InternalDeviceMessage(subject, config, version))
+	: Message(new InternalDeviceMessage(subject,
+	                                    InternalMistMessage::buildSchemaID(PUBLISH, "C2CX", "DEV", version).c_str(),
+	                                    config,
+	                                    InternalMistMessage::buildSpecification(version)))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::DeviceMessage instead.";
 }
 
 
 DeviceMessage::DeviceMessage(const DeviceMessage& other)
-	: Message(other),
-	  m_internal(new InternalDeviceMessage(*(other.m_internal)))
+	: Message(new InternalDeviceMessage(dynamic_cast<InternalDeviceMessage&>(other.getInternal())))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::DeviceMessage instead.";
 }
 
 
 DeviceMessage::DeviceMessage(const char* data)
-	: Message(data),
-	  m_internal(new InternalDeviceMessage(data))
+	: Message(new InternalDeviceMessage(data))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::DeviceMessage instead.";
 }
 
 
 DeviceMessage& DeviceMessage::operator=(const DeviceMessage& other)
 {
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::DeviceMessage instead.";
+
 	if (this != &other)
 	{
-		delete m_internal;
-
-		m_internal = new InternalDeviceMessage(*(other.m_internal));
-
-		registerChild(m_internal);
+		this->registerInternal(new InternalDeviceMessage(dynamic_cast<InternalDeviceMessage&>(other.getInternal())));
 	}
 
 	return *this;
@@ -77,37 +82,34 @@ DeviceMessage& DeviceMessage::operator=(const DeviceMessage& other)
 
 DeviceMessage::~DeviceMessage()
 {
-	// Message parent class deletes m_internal (if it's been registered).
 }
 
 
 void DeviceMessage::addDevice(const Device& device)
 {
-	m_internal->addDevice(device);
+	dynamic_cast<InternalDeviceMessage&>(getInternal()).addDevice(device);
 }
 
 
 size_t DeviceMessage::getNumDevices() const
 {
-	return m_internal->getNumDevices();
+	return dynamic_cast<InternalDeviceMessage&>(getInternal()).getNumDevices();
 }
 
 
 const Device& DeviceMessage::getDevice(size_t index) const
 {
-	return m_internal->getDevice(index);
+	return dynamic_cast<InternalDeviceMessage&>(getInternal()).getDevice(index);
 }
 
 
 DeviceIterator& DeviceMessage::getDeviceIterator() const
 {
-	return m_internal->getDeviceIterator();
+	return dynamic_cast<InternalDeviceMessage&>(getInternal()).getDeviceIterator();
 }
 
 
 DeviceMessage DeviceMessage::convertMessage(const Message& message)
 {
-	DeviceMessage device_message(message.toXML());
-
-	return device_message;
+	return DeviceMessage(message.toXML());
 }

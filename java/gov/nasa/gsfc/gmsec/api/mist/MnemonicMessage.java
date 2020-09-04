@@ -11,6 +11,8 @@
  *
  * @brief The MnemonicMessage object is an extension of Message, and serves as
  * a container for a GMSEC MSG MVAL %Message.
+ *
+ * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist;
@@ -21,7 +23,10 @@ import gov.nasa.gsfc.gmsec.api.StatusCode;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 import gov.nasa.gsfc.gmsec.api.Message;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIMnemonicMessage;
+import gov.nasa.gsfc.gmsec.api.util.Log;
+
+import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMistMessage;
+import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMnemonicMessage;
 
 
 /**
@@ -32,23 +37,6 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIMnemonicMessage;
  */
 public class MnemonicMessage extends Message
 {
-	private JNIMnemonicMessage m_jniMnemonicMessage = null;
-
-
-	public static JNIMnemonicMessage getInternal(MnemonicMessage msg)
-	{
-		return (msg == null ? null : msg.m_jniMnemonicMessage);
-	}
-
-
-	public MnemonicMessage(JNIMnemonicMessage jMnemMsg)
-	{
-		super(jMnemMsg);
-
-		m_jniMnemonicMessage = jMnemMsg;
-	}
-
-
 	/**
 	 * @fn MnemonicMessage(String subject, int version)
 	 *
@@ -58,14 +46,23 @@ public class MnemonicMessage extends Message
 	 * @param version - the version of the GMSEC ISD to be used.
 	 *
 	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty string.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.
 	 */
 	public MnemonicMessage(String subject, int version) throws IllegalArgumentException
 	{
-		super(subject, Message.MessageKind.PUBLISH);
+		super((JNIMnemonicMessage) null);
 
-		m_jniMnemonicMessage = new JNIMnemonicMessage(subject, version);
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.");
 
-		registerChild(m_jniMnemonicMessage);
+		if (subject == null || subject.isEmpty())
+		{
+			throw new IllegalArgumentException("Subject cannot be null, nor contain an empty string");
+		}
+
+		registerChild(new JNIMnemonicMessage(subject,
+		                                     JNIMistMessage.buildSchemaID(Message.MessageKind.PUBLISH, "MVAL", null, null, version),
+		                                     JNIMistMessage.buildSpecification(version)));
 	}
 
 
@@ -81,19 +78,28 @@ public class MnemonicMessage extends Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty string.
 	 * @throws An IllegalArgumentException is thrown if the config object is null.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.
 	 */
 	public MnemonicMessage(String subject, Config config, int version) throws IllegalArgumentException
 	{
-		super(subject, Message.MessageKind.PUBLISH);
+		super((JNIMnemonicMessage) null);
 
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.");
+
+		if (subject == null || subject.isEmpty())
+		{
+			throw new IllegalArgumentException("Subject cannot be null, nor contain an empty string");
+		}
 		if (config == null)
 		{
-			throw new IllegalArgumentException("Config is null");
+			throw new IllegalArgumentException("Config cannot be null");
 		}
 
-		m_jniMnemonicMessage = new JNIMnemonicMessage(subject, Config.getInternal(config), version);
-
-		registerChild(m_jniMnemonicMessage);
+		registerChild(new JNIMnemonicMessage(subject,
+		                                     JNIMistMessage.buildSchemaID(Message.MessageKind.PUBLISH, "MVAL", null, null, version),
+		                                     config,
+		                                     JNIMistMessage.buildSpecification(version)));
 	}
 
 
@@ -106,14 +112,21 @@ public class MnemonicMessage extends Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the data string is null or contains an empty string.
 	 * @throws A GMSEC_Exception is thrown if the data string cannot be parsed.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.
 	 */
 	public MnemonicMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
-		super(data);
+		super((JNIMnemonicMessage) null);
 
-		m_jniMnemonicMessage = new JNIMnemonicMessage(data);
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.");
 
-		registerChild(m_jniMnemonicMessage);
+		if (data == null || data.isEmpty())
+		{
+			throw new IllegalArgumentException("Data cannot be null, nor contain an empty string");
+		}
+
+		registerChild(new JNIMnemonicMessage(data));
 	}
 
 
@@ -125,14 +138,21 @@ public class MnemonicMessage extends Message
 	 * @param other - the other MnemonicMessage object to copy.
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given MnemonicMessage object is null.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.
 	 */
 	public MnemonicMessage(MnemonicMessage other) throws IllegalArgumentException
 	{
-		super(other);
+		super((JNIMnemonicMessage) null);
 
-		m_jniMnemonicMessage = new JNIMnemonicMessage(MnemonicMessage.getInternal(other));
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.");
 
-		registerChild(m_jniMnemonicMessage);
+		if (other == null)
+		{
+			throw new IllegalArgumentException("MnemonicMessage cannot be null");
+		}
+
+		registerChild(new JNIMnemonicMessage((JNIMnemonicMessage) getInternal(other)));
 	}
 
 
@@ -152,7 +172,7 @@ public class MnemonicMessage extends Message
 			throw new IllegalArgumentException("Mnemonic is null");
 		}
 
-		m_jniMnemonicMessage.addMnemonic(Mnemonic.getInternal(mnemonic));
+		((JNIMnemonicMessage) getInternal(this)).addMnemonic(Mnemonic.getInternal(mnemonic));
 	}
 
 
@@ -167,7 +187,7 @@ public class MnemonicMessage extends Message
 	 */
 	public int getNumMnemonics()
 	{
-		return m_jniMnemonicMessage.getNumMnemonics();
+		return ((JNIMnemonicMessage) getInternal(this)).getNumMnemonics();
 	}
 
 
@@ -184,7 +204,7 @@ public class MnemonicMessage extends Message
 	 */
 	public Mnemonic getMnemonic(int index) throws GMSEC_Exception
 	{
-		return m_jniMnemonicMessage.getMnemonic(index);
+		return ((JNIMnemonicMessage) getInternal(this)).getMnemonic(index);
 	}
 
 
@@ -203,7 +223,7 @@ public class MnemonicMessage extends Message
 	 */
 	public MnemonicIterator getMnemonicIterator()
 	{
-		return m_jniMnemonicMessage.getMnemonicIterator();
+		return ((JNIMnemonicMessage) getInternal(this)).getMnemonicIterator();
 	}
 
 
@@ -223,6 +243,17 @@ public class MnemonicMessage extends Message
 			throw new IllegalArgumentException("Message is null");
 		}
 
-		return JNIMnemonicMessage.convertMessage(Message.getInternal(msg));
+		MnemonicMessage mnemMsg = null;
+
+		try
+		{
+			mnemMsg = new MnemonicMessage(msg.toXML());
+		}
+		catch (GMSEC_Exception e)
+		{
+				throw new IllegalArgumentException(e.toString());
+		}
+
+		return mnemMsg;
 	}
 }

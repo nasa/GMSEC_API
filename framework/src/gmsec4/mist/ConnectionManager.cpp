@@ -41,6 +41,7 @@
 #include <gmsec4/util/DataList.h>
 
 #include <gmsec4/internal/mist/InternalConnectionManager.h>
+#include <gmsec4/mist/Specification.h>
 
 
 namespace gmsec
@@ -55,7 +56,6 @@ ConnectionManager::ConnectionManager(const Config& cfg, bool validate, unsigned 
 	: m_internal(new internal::InternalConnectionManager(this, cfg, validate, version))
 {
 }
-
 
 ConnectionManager::~ConnectionManager()
 {
@@ -79,6 +79,12 @@ void ConnectionManager::cleanup()
 const char* ConnectionManager::getLibraryVersion() const
 {
 	return m_internal->getLibraryVersion();
+}
+
+
+Specification& ConnectionManager::getSpecification() const
+{
+	return m_internal->getSpecification();
 }
 
 
@@ -369,7 +375,6 @@ void ConnectionManager::requestSimpleService(const char* subject, const char* op
 {
 	m_internal->requestSimpleService(subject, opName, opNumber, fields, params, timeout, rcb, ecb, republish_ms);
 }
-
 
 }  //namespace mist
 }  //namespace api

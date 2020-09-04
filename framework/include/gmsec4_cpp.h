@@ -36,15 +36,22 @@
 #include <gmsec4/mist/ConnectionManager.h>
 #include <gmsec4/mist/ConnectionManagerReplyCallback.h>
 #include <gmsec4/mist/Device.h>
-#include <gmsec4/mist/DeviceMessage.h>
+#include <gmsec4/mist/DeviceMessage.h>                          // DEPRECATED
 #include <gmsec4/mist/DeviceParam.h>
 #include <gmsec4/mist/mist_defs.h>
 #include <gmsec4/mist/Mnemonic.h>
-#include <gmsec4/mist/MnemonicMessage.h>
+#include <gmsec4/mist/MnemonicMessage.h>                        // DEPRECATED
 #include <gmsec4/mist/MnemonicSample.h>
 #include <gmsec4/mist/ProductFile.h>
-#include <gmsec4/mist/ProductFileMessage.h>
+#include <gmsec4/mist/ProductFileMessage.h>                     // DEPRECATED
+#include <gmsec4/mist/SchemaIDIterator.h>
 #include <gmsec4/mist/ServiceParam.h>
+#include <gmsec4/mist/Specification.h>
+
+#include <gmsec4/mist/message/DeviceMessage.h>
+#include <gmsec4/mist/message/MistMessage.h>
+#include <gmsec4/mist/message/MnemonicMessage.h>
+#include <gmsec4/mist/message/ProductFileMessage.h>
 
 #include <gmsec4/util/Atomics.h>
 #include <gmsec4/util/BoundedQueue.h>

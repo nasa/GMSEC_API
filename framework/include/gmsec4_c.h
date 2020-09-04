@@ -30,15 +30,22 @@
 
 #include <gmsec4/c/mist/connection_manager.h>
 #include <gmsec4/c/mist/device.h>
-#include <gmsec4/c/mist/device_message.h>
+#include <gmsec4/c/mist/device_message.h>                  // DEPRECATED
 #include <gmsec4/c/mist/device_param.h>
 #include <gmsec4/c/mist/mist_defs.h>
 #include <gmsec4/c/mist/mnemonic.h>
-#include <gmsec4/c/mist/mnemonic_message.h>
+#include <gmsec4/c/mist/mnemonic_message.h>                // DEPRECATED
 #include <gmsec4/c/mist/mnemonic_sample.h>
 #include <gmsec4/c/mist/product_file.h>
-#include <gmsec4/c/mist/product_file_message.h>
+#include <gmsec4/c/mist/product_file_message.h>            // DEPRECATED
+#include <gmsec4/c/mist/schema_id_iterator.h>
 #include <gmsec4/c/mist/service_param.h>
+#include <gmsec4/c/mist/specification.h>
+
+#include <gmsec4/c/mist/message/device_message.h>
+#include <gmsec4/c/mist/message/mist_message.h>
+#include <gmsec4/c/mist/message/mnemonic_message.h>
+#include <gmsec4/c/mist/message/product_file_message.h>
 
 #include <gmsec4/c/util/log.h>
 #include <gmsec4/c/util/timeutil.h>

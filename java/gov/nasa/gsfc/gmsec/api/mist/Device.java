@@ -22,7 +22,7 @@ import gov.nasa.gsfc.gmsec.api.field.Field;
 
 import gov.nasa.gsfc.gmsec.api.mist.DeviceParam;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIDevice;
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIDevice;
 
 
 

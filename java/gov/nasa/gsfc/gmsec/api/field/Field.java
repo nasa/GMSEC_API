@@ -14,6 +14,7 @@
 
 package gov.nasa.gsfc.gmsec.api.field;
 
+import gov.nasa.gsfc.gmsec.api.U64;
 import gov.nasa.gsfc.gmsec.api.jni.JNIField;
 
 
@@ -125,6 +126,66 @@ public class Field
 	public String toJSON()
 	{
 		return m_jniField.toJSON();
+	}
+
+
+	/**
+	 * @fn long getIntegerValue() const
+	 *
+	 * @brief Attempts to convert the field value into long integer number representation.
+	 *
+	 * @return Returns the field value as an integer.
+	 *
+	 * @throws An Exception is thrown if the field cannot be successfully converted to a long integer.
+	 */
+	public long getIntegerValue()
+	{
+		return m_jniField.getIntegerValue();
+	}
+
+
+	/**
+	 * @fn U64 getUnsignedIntegerValue() const
+	 *
+	 * @brief Attempts to convert the field value into U64 representation.
+	 *
+	 * @return Returns the field value as an integer.
+	 *
+	 * @throws An Exception is thrown if the field cannot be successfully converted to U64.
+	 */
+	public U64 getUnsignedIntegerValue()
+	{
+		return m_jniField.getUnsignedIntegerValue();
+	}
+
+
+	/**
+	 * @fn double getDoubleValue() const
+	 *
+	 * @brief Attempts to convert the field value into a 64-bit floating point number representation.
+	 *
+	 * @return Returns the field value as a floating point number.
+	 *
+	 * @throws An Exception is thrown if the field cannot be successfully converted to a double.
+	 */
+	public double getDoubleValue()
+	{
+		return m_jniField.getDoubleValue();
+	}
+
+
+	/**
+	 * @fn String getStringValue()
+	 *
+	 * @brief Attempts to convert the field value into string representation.
+	 *
+	 * @return Returns the field value as a string.
+	 *
+	 * @throws An Exception is thrown if the field cannot be successfully converted to a string.
+	 */
+	public String getString()
+	{
+		return m_jniField.getStringValue();
 	}
 
 

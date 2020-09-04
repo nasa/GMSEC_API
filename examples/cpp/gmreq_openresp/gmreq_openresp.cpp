@@ -155,7 +155,7 @@ private:
 		const char* subject = "GMSEC.SYSTEST.TEST1.RESP.>";
 
 		// Subscribe to (anticipated) response/reply subject.
-		m_conn->subscribe(subject);
+		info = m_conn->subscribe(subject);
 
 		GMSEC_INFO << "Subscribing to " << subject;
 
@@ -173,6 +173,8 @@ private:
 
 		if (m_conn)
 		{
+			GMSEC_INFO << "Unsubscribing from " << info->getSubject();
+			m_conn->unsubscribe(info);
 			// Disconnect from middleware server.
 			m_conn->disconnect();
 
@@ -196,6 +198,7 @@ private:
 	Config      m_config;
 	Connection* m_conn;
 	Message*    m_request;
+	SubscriptionInfo* info;
 };
 
 

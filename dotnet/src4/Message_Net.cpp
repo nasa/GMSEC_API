@@ -157,6 +157,8 @@ void Message::AddConfig(Config^ config)
 
 bool Message::AddField(Field^ field)
 {
+	THROW_EXCEPTION_IF_NULLPTR(field, StatusClass::MSG_ERROR, StatusCode::INVALID_FIELD, "Field is null");
+
 	gmsec::api::Field* nativeField = ((Field^) field)->GetChild();
 
 	return m_impl->addField(*nativeField);
@@ -190,6 +192,106 @@ bool Message::ClearField(String^ name)
 	finally
 	{
 		FREE_HGLOBAL_IF_NOT_NULLPTR(nameStr);
+	}
+}
+
+
+Int64 Message::GetIntegerValue(String^ fieldName)
+{
+	char* fieldNameStr = nullptr;
+
+	try
+	{
+		fieldNameStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(fieldName).ToPointer());
+
+		return m_impl->getIntegerValue(fieldNameStr);
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+	catch (...)
+	{
+		throw gcnew GMSEC_Exception(StatusClass::MSG_ERROR, StatusCode::OUT_OF_MEMORY, "Unable to process field name string");
+	}
+	finally
+	{
+		FREE_HGLOBAL_IF_NOT_NULLPTR(fieldNameStr);
+	}
+}
+
+
+UInt64 Message::GetUnsignedIntegerValue(String^ fieldName)
+{
+	char* fieldNameStr = nullptr;
+
+	try
+	{
+		fieldNameStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(fieldName).ToPointer());
+
+		return m_impl->getUnsignedIntegerValue(fieldNameStr);
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+	catch (...)
+	{
+		throw gcnew GMSEC_Exception(StatusClass::MSG_ERROR, StatusCode::OUT_OF_MEMORY, "Unable to process field name string");
+	}
+	finally
+	{
+		FREE_HGLOBAL_IF_NOT_NULLPTR(fieldNameStr);
+	}
+}
+
+
+double Message::GetDoubleValue(String^ fieldName)
+{
+	char* fieldNameStr = nullptr;
+
+	try
+	{
+		fieldNameStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(fieldName).ToPointer());
+
+		return m_impl->getDoubleValue(fieldNameStr);
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+	catch (...)
+	{
+		throw gcnew GMSEC_Exception(StatusClass::MSG_ERROR, StatusCode::OUT_OF_MEMORY, "Unable to process field name string");
+	}
+	finally
+	{
+		FREE_HGLOBAL_IF_NOT_NULLPTR(fieldNameStr);
+	}
+}
+
+
+String^ Message::GetStringValue(String^ fieldName)
+{
+	char* fieldNameStr = nullptr;
+
+	try
+	{
+		fieldNameStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(fieldName).ToPointer());
+
+		return gcnew String(m_impl->getStringValue(fieldNameStr));
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+	catch (...)
+	{
+		throw gcnew GMSEC_Exception(StatusClass::MSG_ERROR, StatusCode::OUT_OF_MEMORY, "Unable to process field name string");
+	}
+	finally
+	{
+		FREE_HGLOBAL_IF_NOT_NULLPTR(fieldNameStr);
 	}
 }
 

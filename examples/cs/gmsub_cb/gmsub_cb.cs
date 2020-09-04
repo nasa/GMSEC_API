@@ -39,7 +39,7 @@ namespace gmsub_cb
 	class gmsub_cb : GmsecExample
 	{
 		private Connection conn;
-
+        private List<SubscriptionInfo> info = new List<SubscriptionInfo>(); 
 
 		public gmsub_cb()
 		{
@@ -70,7 +70,15 @@ namespace gmsub_cb
 		{
 			if (conn != null)
 			{
-				conn.Disconnect();
+                for (int i = info.Count - 1; i >= 0; i--)
+                {
+                    Log.Info("Unsubscribing to " + info[i].GetSubject());
+                    var temp = info[i];
+                    conn.Unsubscribe(ref temp);
+                    info.RemoveAt(i);
+                }
+
+                conn.Disconnect();
 
 				Connection.Destroy(ref conn);
 			}
@@ -122,7 +130,7 @@ namespace gmsub_cb
 				for (int i = 0; i < subjects.Count; i++)
 				{
 					Log.Info("Subscribing to "+subjects[i]);
-					conn.Subscribe(subjects[i], cb);
+					info.Add(conn.Subscribe(subjects[i], cb));
 				}
 
 				// Wait & Print Out Messages

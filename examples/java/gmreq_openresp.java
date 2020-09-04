@@ -26,12 +26,14 @@
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.*;
 
+import java.util.ArrayList;
 
 public class gmreq_openresp extends ReplyCallback implements Example
 {
 	private Config     m_config;
 	private Connection m_conn;
 	private Message    m_request;
+	private ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 
 	public gmreq_openresp(Config config) throws ExampleException
@@ -126,7 +128,7 @@ public class gmreq_openresp extends ReplyCallback implements Example
 		m_conn.connect();
 
 		// Subscribe to (anticipated) response/reply subject.
-		m_conn.subscribe("GMSEC.SYSTEST.TEST1.RESP.>");
+		info.add(m_conn.subscribe("GMSEC.SYSTEST.TEST1.RESP.>"));
 
 		// Create request directive message.
 		m_request = new Message("GMSEC.SYSTEST.TEST1.REQ.DIR.MY-REQUEST", Message.MessageKind.REQUEST);
@@ -149,10 +151,16 @@ public class gmreq_openresp extends ReplyCallback implements Example
 	}
 
 
-	public boolean cleanup()
+	public boolean cleanup() throws GMSEC_Exception
 	{
 		if (m_conn != null)
 		{
+			for(int i = info.size()-1; i >= 0; i--)
+			{
+				Log.info("Unsubscribing from " + info.get(i).getSubject());
+				m_conn.unsubscribe(info.get(i));
+				info.remove(i);
+			}
 			Util.closeConnection(m_conn);
 		}
 

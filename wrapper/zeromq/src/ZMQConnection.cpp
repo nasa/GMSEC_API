@@ -149,10 +149,8 @@ const char* ZMQConnection::getMWInfo()
 
 
 
-Status ZMQConnection::mwConnect()
+void ZMQConnection::mwConnect()
 {
-	Status result;
-
 	// Retrieve the RequestSpecs
 	m_requestSpecs = getExternal().getRequestSpecs();
 
@@ -167,17 +165,13 @@ Status ZMQConnection::mwConnect()
 	{
 		std::ostringstream ss;
 		ss << "Unable to create a ZeroMQ Context, errorno code: " << zmq_errno();
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, ss.str().c_str(), zmq_errno());
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, zmq_errno(), ss.str().c_str());
 	}
-
-	return result;
 }
 
 
-Status ZMQConnection::mwDisconnect()
+void ZMQConnection::mwDisconnect()
 {
-	Status result;
-
 	if (m_msgListener.get())
 	{
 		stopMsgListener(m_msgListenerObj);
@@ -224,23 +218,14 @@ Status ZMQConnection::mwDisconnect()
 		zmq_term(m_context);
 		m_context = 0;
 	}
-
-	return result;
 }
 
 
-Status ZMQConnection::mwSubscribe(const char* subject, const Config& config)
+void ZMQConnection::mwSubscribe(const char* subject, const Config& config)
 {
-	Status result;
-
 	if (m_subSocket == NULL)
 	{
-		result = setupSocket(&m_subSocket, ZMQ_SUB, m_subEndpoint);
-
-		if (result.isError())
-		{
-			return result;
-		}
+		setupSocket(&m_subSocket, ZMQ_SUB, m_subEndpoint);
 
 		zmq_setsockopt(m_subSocket, ZMQ_SUBSCRIBE, "", 0); // Use this to set filters on the subscription
 	}
@@ -261,34 +246,23 @@ Status ZMQConnection::mwSubscribe(const char* subject, const Config& config)
 	}
 
 	m_msgListenerObj->subscribe(subject);
-
-	return result;
 }
 
 
-Status ZMQConnection::mwUnsubscribe(const char* subject)
+void ZMQConnection::mwUnsubscribe(const char* subject)
 {
-	Status result;
-
 	m_msgListenerObj->unsubscribe(subject);
-
-	return result;
 }
 
 
-Status ZMQConnection::mwPublish(const Message& message, const Config& config)
+void ZMQConnection::mwPublish(const Message& message, const Config& config)
 {
 	if (m_pubSocket == NULL)
 	{
-		Status result = setupSocket(&m_pubSocket, ZMQ_PUB, m_pubEndpoint);
-
-		if (result.isError())
-		{
-			return result;
-		}
+		setupSocket(&m_pubSocket, ZMQ_PUB, m_pubEndpoint);
 	}
 
-	return mwPublishAux(message, config, m_pubSocket);
+	mwPublishAux(message, config, m_pubSocket);
 }
 
 
@@ -300,20 +274,19 @@ static void my_free(void* data, void* hint)
 }
 
 
-Status ZMQConnection::mwPublishAux(const Message& message, const Config& config, void* socket)
+void ZMQConnection::mwPublishAux(const Message& message, const Config& config, void* socket)
 {
-	Status result;
-	int    zmqResult;
+	int zmqResult;
 
 	// Prepare the message
 	DataBuffer gmsecBuffer;
 	ValueMap   meta;
 
-	result = getExternal().getPolicy().package(const_cast<Message&>(message), gmsecBuffer, meta);
+	Status result = getExternal().getPolicy().package(const_cast<Message&>(message), gmsecBuffer, meta);
 
 	if (result.isError())
 	{
-		return result;
+		throw Exception(result);
 	}
 
 	// Add the Message Kind to the message meta data
@@ -353,7 +326,7 @@ Status ZMQConnection::mwPublishAux(const Message& message, const Config& config,
 		zmqResult = zmq_msg_send(&subject_frame, socket, ZMQ_SNDMORE);
 		if (zmqResult == -1 && (zmq_errno() != EINTR || zmq_errno() != EAGAIN))
 		{
-			result = zmqErrorToStatus("ZeroMQ publish operation failed, POSIX errno code: ", zmq_errno());
+			zmqErrorToException("ZeroMQ publish operation failed, POSIX errno code: ", zmq_errno());
 		}
 	}
 	while ((zmqResult == -1 && (zmq_errno() == EINTR || zmq_errno() == EAGAIN)) && retryCounter < 3);
@@ -367,7 +340,7 @@ Status ZMQConnection::mwPublishAux(const Message& message, const Config& config,
 			zmqResult = zmq_msg_send(&meta_frame, socket, ZMQ_SNDMORE);
 			if (zmqResult == -1 && (zmq_errno() != EINTR || zmq_errno() != EAGAIN))
 			{
-				result = zmqErrorToStatus("ZeroMQ publish operation failed, POSIX errno code: ", zmq_errno());
+				zmqErrorToException("ZeroMQ publish operation failed, POSIX errno code: ", zmq_errno());
 			}
 		}
 		while ((zmqResult == -1 && (zmq_errno() == EINTR || zmq_errno() == EAGAIN)) && retryCounter < 3);
@@ -382,7 +355,7 @@ Status ZMQConnection::mwPublishAux(const Message& message, const Config& config,
 			zmqResult = zmq_msg_send(&message_frame, socket, 0);
 			if (zmqResult == -1 && (zmq_errno() != EINTR || zmq_errno() != EAGAIN))
 			{
-				result = zmqErrorToStatus("ZeroMQ publish operation failed, POSIX errno code: ", zmq_errno());
+				zmqErrorToException("ZeroMQ publish operation failed, POSIX errno code: ", zmq_errno());
 			}
 		}
 		while ((zmqResult == -1 && (zmq_errno() == EINTR || zmq_errno() == EAGAIN)) && retryCounter < 3);
@@ -391,8 +364,6 @@ Status ZMQConnection::mwPublishAux(const Message& message, const Config& config,
 	// Note: According to the ZeroMQ documentation for zmq_msg_send,
 	// zmq_msg_close() does not need to be called after a successful zmq_msg_send().
 	// This implies that ZeroMQ will handle deallocation of the messages.
-
-	return result;
 }
 
 
@@ -402,12 +373,8 @@ Status ZMQConnection::storeProperties(const ValueMap& meta, DataBuffer& out)
 
 	// Determine the length of the buffer and resize it accordingly
 	size_t length = 0;
-	result = findLength(meta, length);
 
-	if (result.isError())
-	{
-		return result;
-	}
+	findLength(meta, length);
 
 	out.resize(length);
 
@@ -433,10 +400,8 @@ Status ZMQConnection::storeProperties(const ValueMap& meta, DataBuffer& out)
 }
 
 
-Status ZMQConnection::findLength(const ValueMap& meta, size_t& length)
+void ZMQConnection::findLength(const ValueMap& meta, size_t& length)
 {
-	Status result;
-
 	// Account for the I32 which contains the number of Values in the meta object
 	length = 4;
 
@@ -456,25 +421,28 @@ Status ZMQConnection::findLength(const ValueMap& meta, size_t& length)
 		{
 			length += 1;
 		}
-		if (value->isInteger())
+		else if (value->isInteger())
 		{
 			length += 4;
 		}
-		if (value->isReal())
+		else if (value->isReal())
 		{
 			length += 8;
 		}
-		if (value->isString())
+		else if (value->isString())
 		{
 			std::string valueString;
 			value->getString(valueString);
-			size_t count = StringUtil::stringLength(valueString.c_str());
+
+			size_t count = valueString.length();
+
 			if (count > size_t(gmsec::api::internal::GMSEC_STRING_LIMIT))
 			{
+				length = 0;
+
 				std::ostringstream statusError;
 				statusError << "Excessive string length for meta value: " << itr.getID();
-				result.set(CONNECTION_ERROR, ENCODING_ERROR, statusError.str().c_str());
-				return result;
+				throw Exception(CONNECTION_ERROR, ENCODING_ERROR, statusError.str().c_str());
 			}
 			else
 			{
@@ -484,8 +452,6 @@ Status ZMQConnection::findLength(const ValueMap& meta, size_t& length)
 
 		value = itr.next();
 	}
-
-	return result;
 }
 
 
@@ -661,19 +627,12 @@ std::string ZMQConnection::generateUniqueId(long id)
 }
 
 
-Status ZMQConnection::mwRequest(const Message& request, std::string& id)
+void ZMQConnection::mwRequest(const Message& request, std::string& id)
 {
-	Status result;
-
 	// Only turn on the ReplyListener if Request-Reply is enabled
 	if (m_requestSpecs.requestReplyEnabled)
 	{
-		result = initReplyListener();
-
-		if (result.isError())
-		{
-			return result;
-		}
+		initReplyListener();
 	}
 
 	id = generateUniqueId(++m_requestCounter);
@@ -698,74 +657,62 @@ Status ZMQConnection::mwRequest(const Message& request, std::string& id)
 	}
 
 	// Send request for reply
-	result = mwPublish(request, getExternal().getConfig());
+	mwPublish(request, getExternal().getConfig());
 	
-	if (!result.isError())
-	{
-		GMSEC_DEBUG << "[Request sent successfully: " << request.getSubject() << "]";
-	}
-	else
-	{
-		GMSEC_DEBUG << "[Problem sending request]";
-	}
-
-	return result;
+	GMSEC_DEBUG << "[Request sent successfully: " << request.getSubject() << "]";
 }
 
 
-Status ZMQConnection::mwReply(const Message& request, const Message& reply)
+void ZMQConnection::mwReply(const Message& request, const Message& reply)
 {
-	Status result;
-
 	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
 	const StringField* replySubj = dynamic_cast<const StringField*>(request.getField(OPT_REPLY_STRING));
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(ZEROMQ_REPLY_ADDRESS));
 
 	if (!uniqueID)
 	{
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain UNIQUE-ID field");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain UNIQUE-ID field");
 	}
 	if (!replySubj)
 	{
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain MW-REPLY-SUBJECT field");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain MW-REPLY-SUBJECT field");
 	}
 	if (!replyAddr)
 	{
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain REPLY-ADDRESS field");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain REPLY-ADDRESS field");
 	}
+
+	// Set up the reply socket
+	const char* rAddr = replyAddr->getValue();
+
+	void* repSocket = NULL;
+	setupSocket(&repSocket, ZMQ_PUB, rAddr);
 
 	MessageBuddy::getInternal(reply).addField(*uniqueID);
 	MessageBuddy::getInternal(reply).setSubject(replySubj->getValue());
 
-	const char* rAddr = replyAddr->getValue();
-
-	// Set up the reply socket
-	void* repSocket = NULL;
-	result = setupSocket(&repSocket, ZMQ_PUB, rAddr);
-
-	if (result.isError())
-	{
-		return result;
-	}
-	
 	// Publish the reply
-	result = mwPublishAux(reply, getExternal().getConfig(), repSocket);
+	try
+	{
+		mwPublishAux(reply, getExternal().getConfig(), repSocket);
 	
-	GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() << "]";
+		GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() << "]";
 
-	// Clean up the reply socket
-	zmq_close(repSocket);
+		// Clean up the reply socket
+		zmq_close(repSocket);
+	}
+	catch (const Exception& e)
+	{
+		// Clean up the reply socket
+		zmq_close(repSocket);
 
-	return result;
+		throw e;
+	}
 }
 
 
-Status ZMQConnection::mwReceive(Message*& message, GMSEC_I32 timeout)
+void ZMQConnection::mwReceive(Message*& message, GMSEC_I32 timeout)
 {
-	Status result;
 	double start_s;
 	bool done = false, first = true;
 
@@ -825,7 +772,7 @@ Status ZMQConnection::mwReceive(Message*& message, GMSEC_I32 timeout)
 
 		if (m_sigMismatchFlag)
 		{
-			result.set(POLICY_ERROR, INVALID_SIGNATURE, "Signature mismatch");
+			GMSEC_DEBUG << "Signature mismatch";
 			m_sigMismatchFlag = false;
 			continue;
 		}
@@ -838,12 +785,20 @@ Status ZMQConnection::mwReceive(Message*& message, GMSEC_I32 timeout)
 				// Read it off of the queue and check the result for errors
 				MessageSubscriptionResult* messageResult = m_msgQueue.front();
 
-				result = messageResult->status;
+				message = messageResult->message;
+				Status result = messageResult->status;
 
-				if (!result.isError())
+				// Remove from queue
+				m_msgQueue.pop();
+				delete messageResult;
+
+				if (result.isError())
 				{
-					message = messageResult->message;
+					throw Exception(result);
+				}
 
+				if (message != NULL)
+				{
 					const StringField* uniqueID = dynamic_cast<const StringField*>(message->getField("UNIQUE-ID"));
 
 					if (m_useUniqueFilter && uniqueID)
@@ -899,26 +854,16 @@ Status ZMQConnection::mwReceive(Message*& message, GMSEC_I32 timeout)
 					// Will exit loop, remove item from queue and return the error message
 					done = true;
 				}
-				
-				// Remove from queue
-				m_msgQueue.pop();
-				delete messageResult;
 			}
 		}
 
 		first = false;
 	}
 	
-	if (result.isError())
-	{
-		// error already assigned
-	}
-	else if (message != NULL)
+	if (message != NULL)
 	{
 		GMSEC_DEBUG << "[Received published message: " << message->getSubject() << "]";
 	}
-
-	return result;
 }
 
 
@@ -975,18 +920,15 @@ std::string ZMQConnection::getEndpointKey(const std::string& endpoint)
 }
 
 
-Status ZMQConnection::setupSocket(void** socket, int type, const std::string& endpoint, bool replyListener)
+void ZMQConnection::setupSocket(void** socket, int type, const std::string& endpoint, bool replyListener)
 {
-	Status result;
-
 	// Ensure that the type provided is a valid type
 	// Note: See ZeroMQ docs or zmq.h for valid types
 	if (type < ZMQ_PAIR || type > ZMQ_STREAM)
 	{
 		std::ostringstream errorStr;
 		errorStr << "Unknown ZeroMQ Socket type: " << type << ".";
-		result.set(MIDDLEWARE_ERROR, INVALID_CONNECTION, errorStr.str().c_str());
-		return result;
+		throw Exception(MIDDLEWARE_ERROR, INVALID_CONNECTION, errorStr.str().c_str());
 	}
 
 	// Construct the socket
@@ -1012,25 +954,21 @@ Status ZMQConnection::setupSocket(void** socket, int type, const std::string& en
 	// replier where to send its reply).
 	if (socketOp == ZMQConnection::BIND || (type == ZMQ_PUB && socketOp != ZMQConnection::CONNECT) || replyListener)
 	{
-		result = bindSocket(socket, endpoint);
+		bindSocket(socket, endpoint);
 	}
 	else
 	{
-		result = connectSocket(socket, endpoint);
+		connectSocket(socket, endpoint);
 	}
 
 	// Wait for m_settleTime to give the socket enough time to settle
 	// before performing any network-related activities
 	TimeUtil::millisleep(m_settleTime);
-
-	return result;
 }
 
 
-Status ZMQConnection::bindSocket(void** socket, const std::string& endpointList)
+void ZMQConnection::bindSocket(void** socket, const std::string& endpointList)
 {
-	Status result;
-
 	std::istringstream urlSplitter(getUrl(endpointList));
 	std::string endpoint;
 
@@ -1040,20 +978,14 @@ Status ZMQConnection::bindSocket(void** socket, const std::string& endpointList)
 
 		if (zmqResult == -1)
 		{	
-			result = zmqErrorToStatus("ZeroMQ socket bind operation failed for endpoint " + endpoint + ", POSIX errno code: ", zmq_errno());
-			// Immediately return if any of the URLs had an issue binding
-			return result;
+			zmqErrorToException("ZeroMQ socket bind operation failed for endpoint " + endpoint + ", POSIX errno code: ", zmq_errno());
 		}
 	}
-
-	return result;
 }
 
 
-Status ZMQConnection::connectSocket(void** socket, const std::string& endpointList)
+void ZMQConnection::connectSocket(void** socket, const std::string& endpointList)
 {
-	Status result;
-
 	std::istringstream urlSplitter(getUrl(endpointList));
 	std::string endpoint;
 
@@ -1063,13 +995,9 @@ Status ZMQConnection::connectSocket(void** socket, const std::string& endpointLi
 
 		if (zmqResult == -1)
 		{	
-			result = zmqErrorToStatus("ZeroMQ socket bind operation failed for endpoint " + endpoint + ", POSIX errno code: ", zmq_errno());
-			// Immediately return if any of the URLs had an issue binding
-			return result;
+			zmqErrorToException("ZeroMQ socket bind operation failed for endpoint " + endpoint + ", POSIX errno code: ", zmq_errno());
 		}
 	}
-
-	return result;
 }
 
 
@@ -1091,19 +1019,21 @@ void ZMQConnection::handleMessage(zmq_msg_t* zmqMessage, int zmqMsgSize, zmq_msg
 
 	Status result = getExternal().getPolicy().unpackage(*message.get(), gmsecBuffer, meta);
 
-	if (result.getCode() == INVALID_SIGNATURE)
-	{
-		m_sigMismatchFlag = true;
-
-		AutoMutex hold(m_queueCondition.getMutex());
-
-		m_queueCondition.signal(GOT_MESSAGE);
-	}
-
 	if (result.isError())
 	{
+		if (result.getCode() == INVALID_SIGNATURE)
+		{
+			m_sigMismatchFlag = true;
+
+			AutoMutex hold(m_queueCondition.getMutex());
+
+			m_queueCondition.signal(GOT_MESSAGE);
+		}
+
 		GMSEC_WARNING << "Unable to unpackage message";
-		enqueueResult(result, (result.isError() ? 0 : message.release()));
+
+		enqueueResult(result);
+
 		return;
 	}
 
@@ -1143,71 +1073,70 @@ void ZMQConnection::handleMessage(zmq_msg_t* zmqMessage, int zmqMsgSize, zmq_msg
 	
 	if (enqueue)
 	{
-		enqueueResult(result, (result.isError() ? 0 : message.release()));
+		enqueueResult(Status(), message.release());
 	}
-
-	return;
 }
 
 
-Status ZMQConnection::initReplyListener()
+void ZMQConnection::initReplyListener()
 {
-	Status result;
-
 	// If subject mapping is turned on and the reply listener has not been started yet,
 	// start the reply listening thread
 	if (m_requestSpecs.useSubjectMapping && m_repListenSocket == NULL)
 	{
 		// Determine if the user supplied an endpoint for the Reply Listener
 		bool userSuppliedEndpoint = m_repListenEndpoint.length() > 0;
+		char ipv4[16]             = {0};
+		bool socketIsGood         = false;
 
-		// If not, use the default listen port
-		std::string hostname;
-		char ipv4[16] = {0};
+		GMSEC_INFO << "Scanning for a port to set up the ReplyListener on because an endpoint"
+		              " was not provided in the " << ZEROMQ_REPLYLISTEN_ENDPOINT << " parameter";
+
 		if (!userSuppliedEndpoint)
 		{
+			std::string hostname;
 			SystemUtil::getHostName(hostname);
 			hostnameToIpv4(hostname.c_str(), ipv4);
-
-			std::ostringstream endpoint;
-			endpoint << "tcp://" << ipv4 << ":" << m_repListenPort;
-			m_repListenEndpoint = endpoint.str();
 		}
 
-		result = setupSocket(&m_repListenSocket, ZMQ_SUB, m_repListenEndpoint, true);
-
-		// If the user supplied an endpoint and it failed, immediately return the error
-		if (result.isError())
+		while (!socketIsGood)
 		{
-			if (userSuppliedEndpoint || result.getCustomCode() != EADDRINUSE)
+			GMSEC_DEBUG << "Reply Listener was unable to bind to endpoint: " << m_repListenEndpoint.c_str();
+
+			// Attempt to set up a Reply Listener endpoint with either the user-provided endpoint (if any),
+			// or with using an ephemeral port (range is 1024-49151).
+
+			if (!userSuppliedEndpoint)
 			{
-				return result;
+				std::ostringstream endpoint;
+				endpoint << "tcp://" << ipv4 << ":" << m_repListenPort;
+				m_repListenEndpoint = endpoint.str();
 			}
-			// If the user did not supply an endpoint and the error indicated that the port is in use,
-			// try until a usable port is found or it hits port 49151 as that is the highest non-ephemeral
-			// port number available on Linux systems (Google it)
-			else
+
+			GMSEC_DEBUG << "Reply Listener attempting to bind to endpoint: " << m_repListenEndpoint.c_str();
+
+			try
 			{
-				GMSEC_INFO << "Scanning for a port to set up the ReplyListener on because an endpoint"
-					" was not provided in the " << ZEROMQ_REPLYLISTEN_ENDPOINT << " parameter";
+				setupSocket(&m_repListenSocket, ZMQ_SUB, m_repListenEndpoint, true);
 
-				while (result.isError() && m_repListenPort <= 49151)
+				socketIsGood = true;
+			}
+			catch (const Exception& e)
+			{
+				// If we reach here, and the user provided the Reply Listener endpoint, then we
+				// are done; that is, return an error.
+				//
+				// If the user did NOT provide an endpoint, then try the next ephemeral port
+				// available.  On Linux systems, the maximum ephemeral port is 49151, thus if
+				// we fail to set up a socket somewhere within the range of ports 1024-49151,
+				// then report an error.
+
+				GMSEC_VERBOSE << e.what();
+
+				if (userSuppliedEndpoint || ++m_repListenPort > 49151)
 				{
-					GMSEC_DEBUG << "Reply Listener was unable to bind to endpoint: " << m_repListenEndpoint.c_str();
-
-					std::ostringstream endpoint;
-					endpoint << "tcp://" << ipv4 << ":" << ++m_repListenPort;
-					m_repListenEndpoint = endpoint.str();
-
-					GMSEC_DEBUG << "Reply Listener attempting to bind to endpoint: " << m_repListenEndpoint.c_str();
-
-					result = setupSocket(&m_repListenSocket, ZMQ_SUB, m_repListenEndpoint, true);
-				}
-
-				// If the loop ended and there is still an error, port 49151 was reached
-				if (result.isError())
-				{
-					return result;
+					// We're done attempting to set up a socket; just report the error.
+					throw e;
 				}
 			}
 		}
@@ -1239,21 +1168,15 @@ Status ZMQConnection::initReplyListener()
 		repAddrStream << "connect:" << m_repListenEndpoint;
 		m_replyAddress = repAddrStream.str();
 	}
-
-	return result;
 }
 
 
-Status ZMQConnection::zmqErrorToStatus(const std::string& errorMsg, const int& errnoCode)
+void ZMQConnection::zmqErrorToException(const std::string& errorMsg, const int errnoCode)
 {
-	Status status;
-
 	// Package up the ZeroMQ error into a Status object
 	std::ostringstream errorString;
 	errorString << errorMsg << errnoCode;
-	status.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, errorString.str().c_str(), zmq_errno());
-
-	return status;
+	throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, zmq_errno(), errorString.str().c_str());
 }
 
 

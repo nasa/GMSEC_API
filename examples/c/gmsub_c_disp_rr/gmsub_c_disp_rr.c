@@ -30,6 +30,7 @@ typedef struct
 	GMSEC_Config     config;
 	GMSEC_Connection connection;
 	GMSEC_Message    request;
+	GMSEC_SubscriptionInfo info;
 } gmsub_c_disp_rr_t;
 
 
@@ -121,7 +122,7 @@ GMSEC_BOOL gmsub_c_disp_rr_Run(gmsub_c_disp_rr_t *this)
 	/* Register the callback for Publish and Subscribe */
 	GMSEC_INFO("Subscribing to Publisher");
 
-	connectionSubscribeWithCallback(this->connection, subject, onMessageCallback, this->status);
+	this->info = connectionSubscribeWithCallback(this->connection, subject, onMessageCallback, this->status);
 	if (!example_check("connectionSubscribeWithCallback", this->status)) return GMSEC_FALSE; 
 
 	/* Launch the auto dispatcher in a seperate thread */
@@ -168,6 +169,13 @@ void gmsub_c_disp_rr_Cleanup(gmsub_c_disp_rr_t* this)
 	if (this->request != NULL)
 	{
 		messageDestroy(&this->request);
+	}
+
+	GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info));
+	connectionUnsubscribe(this->connection, &(this->info), this->status);
+	if (!example_check("Unsubscribing...", this->status))
+	{
+		GMSEC_ERROR("Problem with Unsubscribing...");
 	}
 
 	/* Destroy the connection */

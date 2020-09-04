@@ -148,10 +148,10 @@ double TimeUtil::getCurrentTime_s(GMSEC_TimeSpec* ts)
 
 GMSEC_TimeSpec TimeUtil::getCharTime(const char* timeString)
 {
-	double theTime = StringUtil::getTimeFromString(timeString);
-	double seconds = (long) theTime / 1;
-	double millis  = (theTime - seconds) * 1000.0;
-	long   nanos   = (long) millis * 1000000L;
+	double theTime    = StringUtil::getTimeFromString(timeString);
+	double seconds    = (long) theTime / 1;
+	double fractional = (theTime - seconds) * 1000000;
+	long   nanos      = (long)((fractional * 10 + 5) / 10) * 1000;
 
 	GMSEC_TimeSpec ts = { (long) seconds, nanos };
 
@@ -177,7 +177,7 @@ void TimeUtil::formatTime(const GMSEC_TimeSpec& ts, char* buffer)
 }
 
 
-void TimeUtil::formatTime(const GMSEC_TimeSpec& ts, char* buffer, int subs)
+void TimeUtil::formatTime(const GMSEC_TimeSpec& ts, int subs, char* buffer)
 {
 	if (subs == 0)
 	{
@@ -197,6 +197,13 @@ void TimeUtil::formatTime(const GMSEC_TimeSpec& ts, char* buffer, int subs)
 
 		formatTimeAux(ts, buffer, timeFormat.str().c_str(), subs);
 	}
+}
+
+
+// Deprecated since v4.2 - nevertheless we keep for binary compatibility reasons
+void TimeUtil::formatTime(const GMSEC_TimeSpec& ts, char* buffer, int subs)
+{
+	formatTime(ts, subs, buffer);
 }
 
 

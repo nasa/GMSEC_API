@@ -53,6 +53,18 @@ InternalConnection::InternalConnection(gmsec::api::Connection* p)
 
 InternalConnection::~InternalConnection()
 {
+	gmsec::api::util::AutoMutex lock(m_subscribeMutex);
+
+	for (Subscriptions::iterator it = m_subscriptions.begin(); it != m_subscriptions.end(); ++it)
+	{
+		delete it->second;
+	}
+
+	if (IsConnected())
+	{
+		Disconnect();
+	}
+
 	gmsec::api::Connection::destroy(m_adapter);
 
 	delete m_collector;
@@ -1076,7 +1088,14 @@ InternalConnection::SubscriptionDetails::~SubscriptionDetails()
 {
 	for (std::list<Details*>::iterator it = infoDetails.begin(); it != infoDetails.end(); ++it)
 	{
-		delete *it;
+		Details* details = *it;
+
+		if (details->info)
+		{
+			delete details->info->getCallback();
+		}
+
+		delete details;
 	}
 	infoDetails.clear();
 }

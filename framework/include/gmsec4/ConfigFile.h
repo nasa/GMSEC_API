@@ -270,7 +270,7 @@ public:
 
 
 	/** @fn lookupConfig(const char* name) const
-	 * @brief This function will attempt to find a named connection in the
+	 * @brief This function will attempt to find a named Config in the
 	 * config file and set the passed in config object with
 	 * the loaded values.
 	 *
@@ -341,7 +341,7 @@ public:
 
 	/** @fn lookupSubscription(const char* name) const
 	 * @brief This function will look up a subscription pattern defined in
-	 * the config file. This is usefull to allow easy modification of subject
+	 * the config file. This is useful to allow easy modification of subject
 	 * names without code changes.
 	 *
 	 * Example

@@ -30,16 +30,29 @@ namespace mist
 	class Device;
 	class DeviceIterator;
 
-namespace internal
-{
-	class InternalDeviceMessage;
-	class InternalDeviceIterator;
-}
+	namespace internal
+	{
+		class InternalDeviceIterator;
+	}
+
+	namespace message
+	{
+		namespace internal
+		{
+			class InternalDeviceMessage;
+		}
+	}
+
 
 /**
  * @class DeviceMessage
  *
  * @brief The Message object contains a GMSEC MSG C2CX DEV message.
+ * The following message schema IDs and their templates are supported: @n
+ * 2014.00.GMSEC.MSG.C2CX.DEV
+ * 2016.00.GMSEC.MSG.C2CX.DEV
+ *
+ * @note gmsec::api::mist::DeviceMessage has been deprecated.  It is recommended to use gmsec::api::mist::message::DeviceMessage
  *
  * @sa Message @n
  *     Config @n
@@ -158,7 +171,7 @@ class GMSEC_API DeviceMessage : public Message
 	 *
 	 * @return A reference to a DeviceIterator object.
 	 */
-	DeviceIterator& CALL_TYPE getDeviceIterator() const;
+	gmsec::api::mist::DeviceIterator& CALL_TYPE getDeviceIterator() const;
 
 
 	/**
@@ -169,10 +182,11 @@ class GMSEC_API DeviceMessage : public Message
 	static DeviceMessage CALL_TYPE convertMessage(const Message& message);
 
 
-  private:
+private:
 	friend class gmsec::api::mist::internal::InternalDeviceIterator;
 
-	internal::InternalDeviceMessage* m_internal;
+	// Defined so as to preserve binary compatibility with API 4.1
+	void* filler;
 };
 
 } // namespace mist

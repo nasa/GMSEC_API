@@ -39,6 +39,8 @@ ref class MnemonicIterator;
 /// <summary>
 /// The class defines a GMSEC MSG MVAL (Mnemonic value) message.
 /// </summary>
+///
+/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.MnemonicMessage instead.
 
 
 public ref class MnemonicMessage : public Message
@@ -50,6 +52,8 @@ public:
 	/// <param name="version">The GMSEC Interface Specification Document (ISD) version to be used</param>
 	///
 	/// <seealso cref="MIST_Defs_Net.h"/>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.MnemonicMessage instead.
 	MnemonicMessage(System::String^ subject, unsigned int version);
 
 
@@ -60,6 +64,8 @@ public:
 	/// <param name="version">The GMSEC Interface Specification Document (ISD) version to be used</param>
 	///
 	/// <seealso cref="MIST_Defs_Net.h"/>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.MnemonicMessage instead.
 	MnemonicMessage(System::String^ subject, Config^ config, unsigned int version);
 
 
@@ -68,12 +74,16 @@ public:
 	/// <param name="data">XML or JSON string used to initialize the contents of the message</param>
 	///
 	/// <exception cref="GMSEC_Exception">An exception is thrown if the data cannot be parsed</exception>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.MnemonicMessage instead.
 	MnemonicMessage(System::String^ data);
 
 
 	/// <summary>Copy-constructor</summary>
 	///
 	/// <param name="other">The MnemonicMessage object to copy</param>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.MnemonicMessage instead.
 	MnemonicMessage(MnemonicMessage^ other);
 
 

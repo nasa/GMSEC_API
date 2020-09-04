@@ -231,15 +231,75 @@ JavaVM* AutoJEnv::getVM()
 
 jobject gmsec::api::jni::createJavaMessage(JNIEnv* jenv, const gmsec::api::Message& message)
 {
-	jobject jniMessage = jenv->NewObject(Cache::getCache().classJNIMessage, Cache::getCache().methodMessageInitJZ, JNI_POINTER_TO_JLONG(&message), JNI_FALSE);
+	jobject jniMessage = jenv->NewObject(Cache::getCache().classJNIMessage, Cache::getCache().methodMessageInitJZ, JNI_POINTER_TO_JLONG((&message)), JNI_FALSE);
+	jobject jMessage = jenv->NewObject(Cache::getCache().classMessage, Cache::getCache().methodMessageInit, jniMessage);
 
-	if (!gmsec::api::jni::jvmOk(jenv, "createJavaMessage: new JNIMessage") || !jniMessage)
+	if (!gmsec::api::jni::jvmOk(jenv, "createJavaMessage: new Message") || !jMessage)
 	{
-		GMSEC_DEBUG << "Unable to create JNIMessage";
+		GMSEC_DEBUG << "Unable to create Java Message";
 		return 0;
 	}
 
-	return jniMessage;
+	return jMessage;
+}
+
+
+int gmsec::api::jni::messageKindToJava(JNIEnv* jenv, gmsec::api::Message::MessageKind msgKind)
+{
+    switch (msgKind)
+    {
+	case gmsec::api::Message::PUBLISH: return 0;
+	case gmsec::api::Message::REQUEST: return 1;
+	case gmsec::api::Message::REPLY:   return 2;
+	}
+
+	ThrowGmsecException(jenv, "Unknown message kind");
+
+	// We will never reach here, but the compiler will be happy nonetheless.
+	return 0;
+}
+
+
+gmsec::api::Message::MessageKind gmsec::api::jni::messageKindToNative(JNIEnv* jenv, jint msgKind)
+{
+	switch ((int) msgKind)
+	{
+	case 0: return gmsec::api::Message::PUBLISH;
+	case 1: return gmsec::api::Message::REQUEST;
+	case 2: return gmsec::api::Message::REPLY;
+	}
+
+	ThrowGmsecException(jenv, "Unknown message kind");
+
+	// We will never reach here, but the compiler will be happy nonetheless.
+	return gmsec::api::Message::PUBLISH;
+}
+
+
+int gmsec::api::jni::fieldTypeToJava(JNIEnv* jenv, gmsec::api::Field::FieldType fieldType)
+{
+    switch (fieldType)
+    {
+	case gmsec::api::Field::BIN_TYPE   : return 0;
+	case gmsec::api::Field::BOOL_TYPE  : return 1;
+	case gmsec::api::Field::CHAR_TYPE  : return 2;
+	case gmsec::api::Field::I8_TYPE    : return 3;
+	case gmsec::api::Field::I16_TYPE   : return 4;
+	case gmsec::api::Field::I32_TYPE   : return 5;
+	case gmsec::api::Field::I64_TYPE   : return 6;
+	case gmsec::api::Field::F32_TYPE   : return 7;
+	case gmsec::api::Field::F64_TYPE   : return 8;
+	case gmsec::api::Field::STRING_TYPE: return 9;
+	case gmsec::api::Field::U8_TYPE    : return 10;
+	case gmsec::api::Field::U16_TYPE   : return 11;
+	case gmsec::api::Field::U32_TYPE   : return 12;
+	case gmsec::api::Field::U64_TYPE   : return 13;
+	}
+
+	ThrowGmsecException(jenv, "Unknown field type");
+
+	// We will never reach here, but the compiler will be happy nonetheless.
+	return 0;
 }
 
 

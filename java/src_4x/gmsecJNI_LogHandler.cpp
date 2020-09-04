@@ -58,6 +58,8 @@ void CxxLogHandlerProxy::onMessage(const LogEntry& entry)
 	jmethodID callbackMethod = Cache::getCache().methodLogHandlerOnMessage;
 	jobject   levelObj       = jenv->GetStaticObjectField(Cache::getCache().classLogLevel, levelField);
 	jobject   timeSpecObj    = jenv->NewObject(Cache::getCache().classTimeSpec, Cache::getCache().methodTimeSpecInitJZ);
+	jstring   fileStr        = jenv->NewStringUTF(entry.file);
+	jint      lineNumber     = (jint) entry.line;
 	jstring   msgStr         = jenv->NewStringUTF(entry.message);
 	jobject   logEntryObj    = jenv->NewObject(Cache::getCache().classLogEntry, Cache::getCache().methodLogEntryInitJZ);
 
@@ -66,6 +68,8 @@ void CxxLogHandlerProxy::onMessage(const LogEntry& entry)
 
 	jenv->SetObjectField(logEntryObj, Cache::getCache().fieldLogLevel_value,   levelObj);
 	jenv->SetObjectField(logEntryObj, Cache::getCache().fieldLogTime_value,    timeSpecObj);
+	jenv->SetObjectField(logEntryObj, Cache::getCache().fieldLogFile_value,    fileStr);
+	jenv->SetIntField(logEntryObj, Cache::getCache().fieldLogLine_value,       lineNumber);
 	jenv->SetObjectField(logEntryObj, Cache::getCache().fieldLogMessage_value, msgStr);
 
 	jenv->CallVoidMethod(jLogHandler, callbackMethod, logEntryObj);

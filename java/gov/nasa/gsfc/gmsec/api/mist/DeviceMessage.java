@@ -11,6 +11,8 @@
  *
  * @brief The DeviceMessage object is an extension of Message, and serves as a container
  * for a GMSEC C2CX %Device %Message.
+ *
+ * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist;
@@ -21,7 +23,10 @@ import gov.nasa.gsfc.gmsec.api.StatusCode;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 import gov.nasa.gsfc.gmsec.api.Message;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIDeviceMessage;
+import gov.nasa.gsfc.gmsec.api.util.Log;
+
+import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIDeviceMessage;
+import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMistMessage;
 
 
 /**
@@ -29,26 +34,11 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIDeviceMessage;
  *
  * @brief The DeviceMessage object is an extension of Message, and serves as a container for a GMSEC C2CX %Device %Message.
  * The methods of this class allow for the construction and manipulation of the data within the message.
+ *
+ * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
  */
 public class DeviceMessage extends Message
 {
-	private JNIDeviceMessage m_jniDeviceMessage = null;
-
-
-	public static JNIDeviceMessage getInternal(DeviceMessage msg)
-	{
-		return (msg == null ? null : msg.m_jniDeviceMessage);
-	}
-
-
-	public DeviceMessage(JNIDeviceMessage jDevMsg)
-	{
-		super(jDevMsg);
-
-		m_jniDeviceMessage = jDevMsg;
-	}
-
-
 	/**
 	 * @fn DeviceMessage(String subject, int version)
 	 *
@@ -58,14 +48,21 @@ public class DeviceMessage extends Message
 	 * @param version - the version of the GMSEC ISD to be used.
 	 *
 	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
 	 */
 	public DeviceMessage(String subject, int version) throws IllegalArgumentException
 	{
-		super(subject, Message.MessageKind.PUBLISH);
+		super((JNIDeviceMessage) null);
 
-		m_jniDeviceMessage = new JNIDeviceMessage(subject, version);
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.");
 
-		registerChild(m_jniDeviceMessage);
+		if (subject == null || subject.isEmpty())
+		{
+			throw new IllegalArgumentException("Subject cannot be null, nor contain an empty string");
+		}
+
+		registerChild(new JNIDeviceMessage(subject, JNIMistMessage.buildSpecification(version)));
 	}
 
 
@@ -81,19 +78,25 @@ public class DeviceMessage extends Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
 	 * @throws An IllegalArgumentException is thrown if the config object is null.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
 	 */
 	public DeviceMessage(String subject, Config config, int version) throws IllegalArgumentException
 	{
-		super(subject, Message.MessageKind.PUBLISH);
+		super((JNIDeviceMessage) null);
 
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.");
+
+		if (subject == null || subject.isEmpty())
+		{
+			throw new IllegalArgumentException("Subject cannot be null, nor contain an empty string");
+		}
 		if (config == null)
 		{
-			throw new IllegalArgumentException("Config is null");
+			throw new IllegalArgumentException("Config cannot be null");
 		}
 
-		m_jniDeviceMessage = new JNIDeviceMessage(subject, Config.getInternal(config), version);
-
-		registerChild(m_jniDeviceMessage);
+		registerChild(new JNIDeviceMessage(subject, config, JNIMistMessage.buildSpecification(version)));
 	}
 
 
@@ -106,14 +109,21 @@ public class DeviceMessage extends Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the data string is null or contains an empty string.
 	 * @throws A GMSEC_Exception is thrown if the data string cannot be parsed.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
 	 */
 	public DeviceMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
-		super(data);
+		super((JNIDeviceMessage) null);
 
-		m_jniDeviceMessage = new JNIDeviceMessage(data);
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.");
 
-		registerChild(m_jniDeviceMessage);
+		if (data == null || data.isEmpty())
+		{
+			throw new IllegalArgumentException("Data cannot be null, nor contain an empty string");
+		}
+
+		registerChild(new JNIDeviceMessage(data));
 	}
 
 
@@ -125,14 +135,21 @@ public class DeviceMessage extends Message
 	 * @param other - the other DeviceMessage object to copy.
 	 *
 	 * @throws An IllegalArgumentException is thrown if the device message object is null.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
 	 */
 	public DeviceMessage(DeviceMessage other) throws IllegalArgumentException
 	{
-		super(other);
+		super((JNIDeviceMessage) null);
 
-		m_jniDeviceMessage = new JNIDeviceMessage(DeviceMessage.getInternal(other));
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.");
 
-		registerChild(m_jniDeviceMessage);
+		if (other == null)
+		{
+			throw new IllegalArgumentException("DeviceMessage cannot be null");
+		}
+
+		registerChild(new JNIDeviceMessage((JNIDeviceMessage) getInternal(other)));
 	}
 
 
@@ -152,7 +169,7 @@ public class DeviceMessage extends Message
 			throw new IllegalArgumentException("Device is null");
 		}
 
-		m_jniDeviceMessage.addDevice(Device.getInternal(device));
+		((JNIDeviceMessage) getInternal(this)).addDevice(Device.getInternal(device));
 	}
 
 
@@ -167,7 +184,7 @@ public class DeviceMessage extends Message
 	 */
 	public int getNumDevices()
 	{
-		return m_jniDeviceMessage.getNumDevices();
+		return ((JNIDeviceMessage) getInternal(this)).getNumDevices();
 	}
 
 
@@ -184,7 +201,7 @@ public class DeviceMessage extends Message
 	 */
 	public Device getDevice(int index) throws GMSEC_Exception
 	{
-		return m_jniDeviceMessage.getDevice(index);
+		return ((JNIDeviceMessage) getInternal(this)).getDevice(index);
 	}
 
 
@@ -203,7 +220,7 @@ public class DeviceMessage extends Message
 	 */
 	public DeviceIterator getDeviceIterator()
 	{
-		return m_jniDeviceMessage.getDeviceIterator();
+		return ((JNIDeviceMessage) getInternal(this)).getDeviceIterator();
 	}
 
 
@@ -223,6 +240,17 @@ public class DeviceMessage extends Message
 			throw new IllegalArgumentException("Message is null");
 		}
 
-		return JNIDeviceMessage.convertMessage(Message.getInternal(msg));
+		DeviceMessage devMsg = null;
+
+		try
+		{
+			devMsg = new DeviceMessage(msg.toXML());
+		}
+		catch (GMSEC_Exception e)
+		{
+			throw new IllegalArgumentException(e.toString());
+		}
+
+		return devMsg;
 	}
 }

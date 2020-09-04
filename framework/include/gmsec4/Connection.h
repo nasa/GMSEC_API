@@ -95,9 +95,9 @@ public:
 	 */
 	enum ConnectionState
 	{
-		NOT_CONNECTED,      ///< Not connected to middleware server.
-		CONNECTED,          ///< Connected to middleware server.
-		RECONNECTING        ///< Connection to middleware server is broken; reattempting to connect.
+		NOT_CONNECTED = 0,      ///< Not connected to middleware server.
+		CONNECTED = 1,          ///< Connected to middleware server.
+		RECONNECTING = 2        ///< Connection to middleware server is broken; reattempting to connect.
 	};
 
 	/**
@@ -106,15 +106,16 @@ public:
 	 */
 	enum ConnectionEvent
 	{
-		DISPATCHER_ERROR_EVENT,           ///< Error occurred while attempting to dispatch message.
-		REQUEST_TIMEOUT_EVENT,            ///< A timeout occurred while attempting to receive a reply for a pending request.
-		CONNECTION_SUCCESSFUL_EVENT,      ///< Successfully connected to the middleware server.
-		CONNECTION_BROKEN_EVENT,          ///< Connection to middleware server has been broken
-		CONNECTION_RECONNECT_EVENT,       ///< An attempt is being made to reconnect to the middleware server.
-		CONNECTION_EXCEPTION_EVENT,       ///< An error, possibly fatal, has occurred with the connection to the middleware.
-		GMD_ERROR_EVENT,                  ///< SmartSockets Guaranteed Message Delivery (GMD) error.
-		WSMQ_ASYNC_STATUS_CHECK_EVENT,    ///< WebSphere MQ Asynchronous Put status check.
-		ALL_EVENTS                        ///< Monitor all events.
+		DISPATCHER_ERROR_EVENT = 0,           ///< Error occurred while attempting to dispatch message.
+		REQUEST_TIMEOUT_EVENT = 1,            ///< A timeout occurred while attempting to receive a reply for a pending request.
+		CONNECTION_SUCCESSFUL_EVENT = 2,      ///< Successfully connected to the middleware server.
+		CONNECTION_BROKEN_EVENT = 3,          ///< Connection to middleware server has been broken
+		CONNECTION_RECONNECT_EVENT = 4,       ///< An attempt is being made to reconnect to the middleware server.
+		CONNECTION_EXCEPTION_EVENT = 5,       ///< An error, possibly fatal, has occurred with the connection to the middleware.
+		GMD_ERROR_EVENT = 6,                  ///< SmartSockets Guaranteed Message Delivery (GMD) error.
+		WSMQ_ASYNC_STATUS_CHECK_EVENT = 7,    ///< WebSphere MQ Asynchronous Put status check.
+		ALL_EVENTS = 8,                       ///< Monitor all events.
+		MSG_PUBLISH_FAILURE_EVENT = 9                   ///< Failure occured while attempting to publish aggregated message.
 	};
 
 

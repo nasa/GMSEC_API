@@ -1,134 +1,206 @@
- 
+#
 # Copyright 2007-2016 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
+#
 
-
-
-
-
-
-
- 
+# 
 # gmsub_disp.pl
-#
-#
-# A Perl example demonstration of GMSEC subscriber with auto-dispatching
-# using dispatcher functionality.
+# 
+# A perl example demonstrating the subscription abilities of 
+# GMSEC.  This example involves the use of Callback functionality,
+# in combination with the AutoDispatcher for receipt of messages.
+# 
 
 
-
-use lib '../../bin/lib';
 use strict;
-use GMSECAPI;
-use PublishCallback;
 use Util;
+
+use libgmsec_perl;
+
+*isa = \&UNIVERSAL::isa;
+
+# Define the PublishCallback Callback Package
+{
+	package PublishCallback;
+	use base 'libgmsec_perl::Callback';
+
+	sub new
+	{
+		# Initialize the base Package (libgmsec_perl::Callback)
+		my $class = shift;
+		my $self = $class->SUPER::new();
+
+		# Set the iteration limit and the shared Condition object to coordinate
+		# with the main thread's (caller of startAutoDispatch) logic
+		($self->{ITERATIONS}, $self->{CONDITION}) = @_;
+
+		# Initialize the count to 0
+		$self->{COUNT} = 0;
+
+		return $self;
+	}
+
+	sub onMessage
+	{
+		my ($self, $conn, $message) = @_;
+
+		libgmsec_perl::LogInfo("[PublishCallback::onMessage] Received:\n" . $message->toXML());
+
+		my $iterations = $self->{ITERATIONS};
+		my $done = ($iterations > 0 ? 1 : 0) && ++$self->{COUNT} >= $iterations;
+		$done = $done || ($message->getSubject() eq "GMSEC.TERMINATE" ? 1 : 0);
+
+		# If done, signal the main thread to exit its loop and shut down the auto-dispatcher
+		if ($done)
+		{
+			$self->{CONDITION}->signal($libgmsec_perl::Condition::USER);
+		}
+	}
+} # end PublishCallback definition
 
 
 {
-   my $task = bless({});
-   Util::driver($task, @ARGV);
+	my $task = bless({});
+	Util::driver($task, @ARGV);
 }
 
 
 sub printUsage
 {
-   my ($self, $config) = @_;
-   my $hasConnectionType = Util::hasConnectionType($config);
+	my ($self, $config) = @_;
+	my $hasConnectionType = Util::hasConnectionType($config);
+	return 0 if ($hasConnectionType);
 
-   return 0 if ($hasConnectionType);
+	print "\nusage: perl gmsub_disp.pl connectiontype=<middleware> [ <parameter>=<value> ]" .
 
-   print "\n\nusage: perl gmsub_disp.pl connectiontype=<middleware> ";
-   print "[ <parameter>=<value> ]";
-   print "\n\n\tNote that the parameter 'connectiontype' is required.";
-   print "\n\tThe rest of other parameters are optional.";
-   print "\n\n\tserver=<server name>";
-   print " (required if middleware is not bolt/MB locally)";
-   print "\n\tsubject=<subject name>";
-   print "\n\tsubject.<N>=<sub-subject name>";
-   print "\n\t\tNote: N must be 1 or greater";
-   print "\n\t\tFor example, subject.1=GMSEC.A subject.2=GMSEC.B";
-   print "\n\tcfgfile=<config_filename.xml>";
-   print "\n\nFor more information, see API User's Guide\n\n";
+	"\n\n\tNote that the parameter 'connectiontype' is required." .
+	"\n\tThe rest of other parameters are optional." .
 
-   return 1;
+	"\n\n\tserver=<server name> (required if middleware is not bolt/MB locally)" .
+	"\n\tsubject=<subject name>" .
+	"\n\tsubject.N=<sub-subject name>" .
+	"\n\t\tNote: N must be 1 or greater" .
+	"\n\t\tFor example, subject.1=GMSEC.A subject.2=GMSEC.B"  .
+	"\n\titerations=<iterations>" .
+	"\n\tloglevel=<log level>" .
+	"\n\tcfgfile=<config_filename.xml>" .
+	"\n\nFor more information, see API User's Guide\n";
+
+	return 1;
 }
 
 
 sub run
 {
-   my ($self, $config) = @_;
+	my ($self, $config) = @_;
 
-   my @subjects = Util::getSubjects($config);
+	# Determine run-time settings
+	my @subjects = Util::determineSubjects($config);
+	my $iterations = Util::getInteger($config, "ITERATIONS", 0);
 
-   # Output GMSEC API version
-   Util::report(GMSECAPI::ConnectionFactory::GetAPIVersion());
+	if ($iterations > 0)
+	{
+		libgmsec_perl::LogInfo("Waiting for up to " . $iterations . " messages");
+	}
 
-   # Create the Connection
-   my $connection = GMSECAPI::ConnectionFactory::Create($config);
-   Util::check('ConnectionFactory.Create',
-       GMSECAPI::ConnectionFactory::Status());
+	# Output GMSEC API version
+	libgmsec_perl::LogInfo(libgmsec_perl::Connection::getAPIVersion());
 
-   $self->{CONNECTION} = $connection;
+	my $connection;
 
-   # Connect
-   unless ($connection->Connect) {
-     Util::check('Connect', $connection->Status);
-   }
+	eval
+	{
+		# Create the Connection
+		$connection = libgmsec_perl::Connection::create($config);
+		$self->{CONNECTION} = $connection;
 
-   # Output middleware version
-   Util::report("Middleware version = " . $connection->GetLibraryVersion());
+		# Connect
+		$connection->connect();
 
-   # Subscribe 
-   for my $subject (@subjects) {
-     Util::report("Subscribing to Publisher (" . $subject . ")\n");
-     my $cb = PublishCallback->new;
-     unless ($connection->Subscribe($subject, $cb, 'PublishCallback') ) {
-       Util::check('Subscribe', $connection->Status);
-     }
-   }
-   # Auto Dispatch
-   Util::report("Starting AutoDispatch");
-   unless ($connection->StartAutoDispatch) {
-     Util::check('StartAutoDispatch', $connection->Status);
-   }
+		# Output middleware version
+		libgmsec_perl::LogInfo("Middleware version = " . $connection->getLibraryVersion());
 
-   Util::report("Press the enter key to exit\n");
+		# Output example program-specific information
+		libgmsec_perl::LogInfo("Using subjects: " . join(", ", @subjects));
+		if ($iterations > 0)
+		{
+			libgmsec_perl::LogInfo("Receiving " . $iterations . " message(s)");
+		}
 
-   my ($kbhit);
-   read(STDIN, $kbhit, 1);
-   Util::report("Stopping AutoDispatch\n");
-   unless ( $connection->StopAutoDispatch ) {
-     Util::check('StopAutoDispatch', $connection->Status);
-   }
+		# Subscribe using a PublishCallback
+		my $condition = libgmsec_perl::Condition->new();
+		my $publishCallback = PublishCallback->new($iterations, $condition);
+		$publishCallback->DISOWN();
 
+		# Subscribe
+		for my $subject (@subjects)
+		{
+			libgmsec_perl::LogInfo("Subscribing to " . $subject);
+			push(@{$self->{SUBINFO}}, $connection->subscribe($subject, $publishCallback));
+		}
+
+		my $autoMutex = libgmsec_perl::AutoMutex->new($condition->getMutex());
+		libgmsec_perl::LogInfo("Starting AutoDispatcher");
+		if ($connection->startAutoDispatch())
+		{
+			my $conditionCode = -1; # Set the condition code to a value that the Condition enum could never be
+			while ($conditionCode != $libgmsec_perl::Condition::USER)
+			{
+				$conditionCode = $condition->wait();
+			}
+		}
+		else
+		{
+			libgmsec_perl::LogError("Failed to start AutoDispatcher");
+		}
+	};
+	if (isa($@, 'libgmsec_perl::Exception'))
+	{
+		libgmsec_perl::LogError($@->what());
+	}
+	elsif($@)
+	{
+		libgmsec_perl::LogError($@);
+	}
+
+	$connection->stopAutoDispatch();
+
+	$self->cleanup();
 }
+
 
 sub cleanup
 {
-   my ($self) = @_;
+	my ($self) = @_;
 
-   my $connection = $self->{CONNECTION};
+	my $connection = $self->{CONNECTION};
 
-   if ($connection)
-   {
-      # Disconnect if necessary
-      if ($connection->IsConnected)
-      {
-         Util::report("disconnecting\n");
-         unless ($connection->Disconnect) {
-            Util::check('Disconnect', $connection->Status);
-         }
-      }
+	if ($connection)
+	{
+		for my $subInfo (@{$self->{SUBINFO}})
+		{
+			eval
+			{
+				libgmsec_perl::LogInfo("Unsubscribing from " . $subInfo->getSubject());
+				$connection->unsubscribe($subInfo);
+			};
+			if (isa($@, 'libgmsec_perl::Exception'))
+			{
+				libgmsec_perl::LogError($@->what());
+			}
+			elsif($@)
+			{
+				libgmsec_perl::LogError($@);
+			}
+		}
 
-      # Destroy the Connection
-      Util::report("destroying connection\n");
-      unless (GMSECAPI::ConnectionFactory::Destroy($connection)) {
-          Util::check('ConnectionFactory.Destroy',
-                      GMSECAPI::ConnectionFactory::Status());
-      }
-   }
+		libgmsec_perl::Connection::destroy($connection);
+
+	}
+
+	libgmsec_perl::Connection::shutdownAllMiddlewares();
 }
 
 

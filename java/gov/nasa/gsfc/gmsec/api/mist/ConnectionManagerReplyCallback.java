@@ -15,8 +15,8 @@ package gov.nasa.gsfc.gmsec.api.mist;
 
 import gov.nasa.gsfc.gmsec.api.Message;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIConnectionManager;
-import gov.nasa.gsfc.gmsec.api.jni.JNIConnMgrReplyCallback;
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIConnectionManager;
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIConnMgrReplyCallback;
 
 
 /**

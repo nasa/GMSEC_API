@@ -7,11 +7,13 @@
 
 
 #include <gmsec4/internal/mist/InternalMnemonicIterator.h>
-#include <gmsec4/internal/mist/InternalMnemonicMessage.h>
+
+#include <gmsec4/internal/mist/message/InternalMnemonicMessage.h>
 
 
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::mist::message::internal;
 
 
 InternalMnemonicIterator::InternalMnemonicIterator(InternalMnemonicMessage& msg)

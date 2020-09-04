@@ -70,8 +70,12 @@ extern "C"
 	/**
 	 * @fn GMSEC_ConnectionMgr connectionManagerCreate(const GMSEC_Config config, GMSEC_Status status)
 	 *
-	 * @brief Creates a new ConnectionManager object with the given configuration.  Note that message validation
-	 * against the default version of the GMSEC Interface Specification Document (ISD) will be enabled.
+	 * @brief Creates a new ConnectionManager object with the given configuration.
+	 *
+	 * @note Message validation will be disabled, unless the configuration option GMSEC-MSG-CONTENT-VALIDATE
+	 * is set to true.  If GMSEC-MSG-CONTENT-VALIDATE is set to true, then messages will be validated against
+	 * the default version of the GMSEC Interface Specification Document (ISD).  The version of the ISD can
+	 * be changed by specifying the configuration option GMSEC-SPECIFICATION-VERSION to a valid value (e.g. 201400).
 	 *
 	 * @param[in]  config - the configuration object that specifies the type of connection object to create.
 	 * @param[out] status - the result of the operation.
@@ -89,6 +93,10 @@ extern "C"
 	 *
 	 * @brief Creates a new ConnectionMnaager object with the given configuration, and allows user to indicate whether the ConnectionManager
 	 * will validate produced messages using the default version of the GMSEC Interface Specification Document (ISD).
+	 *
+	 * @note If message validation is enabled, then messages will be validated against the default version of the GMSEC Interface Specification
+	 * Document (ISD).  The version of the ISD can be changed by specifying the configuration option GMSEC-SPECIFICATION-VERSION to a valid
+	 * value (e.g. 201400).
 	 *
 	 * @param[in]  config   - the configuration object that specifies the type of connection object to create.
 	 * @param[in]  validate - used to indicate whether the ConnectionManager should validate messages that are produced.
@@ -169,6 +177,19 @@ extern "C"
 	 * @return library version
 	 */
 	GMSEC_API const char* connectionManagerGetLibraryVersion(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_Specification connectionManagerGetSpecification(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+	 *
+	 * @brief Returns the Specification object associated with the Connection Manager.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[out] status  - the result of the operation
+	 *
+	 * @return A handle to a Specification object.
+	 */
+	GMSEC_API GMSEC_Specification connectionManagerGetSpecification(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
 
 
 	/**

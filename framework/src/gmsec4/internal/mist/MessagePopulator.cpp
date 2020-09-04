@@ -484,14 +484,19 @@ void MessagePopulator::populateLogMessage(Message &msg, const DataList<Field*>& 
 		}
 	}
 
-	char eventTime[GMSEC_TIME_BUFSIZE] = {0};
-	GMSEC_TimeSpec theTime = TimeUtil::getCurrentTime();
-	TimeUtil::formatTime(theTime, eventTime);
-
 	msg.addField(StringField(MESSAGE_TYPE_STRING, MSG_STRING));
 	msg.addField(StringField(MESSAGE_SUBTYPE_STRING, "LOG"));
-	msg.addField(StringField(EVENT_TIME_STRING, const_cast<const char*>(eventTime)));
 	msg.addField(F32Field(HEADER_VERSION_STRING, (GMSEC_F32) 2010.0));
+
+	// If the message already contains the EVENT-TIME field, then do NOT overwrite it.
+	if (msg.getField(EVENT_TIME_STRING) == NULL)
+	{
+		char eventTime[GMSEC_TIME_BUFSIZE] = {0};
+		GMSEC_TimeSpec theTime = TimeUtil::getCurrentTime();
+		TimeUtil::formatTime(theTime, eventTime);
+
+		msg.addField(StringField(EVENT_TIME_STRING, const_cast<const char*>(eventTime)));
+	}
 
 	if (m_specVersion == GMSEC_ISD_2014_00)
 	{
@@ -628,4 +633,9 @@ void MessagePopulator::populateResourceStaticMembers(Message &msg, size_t counte
 	}
 
 	
+}
+
+const gmsec::api::util::DataList<Field*>& MessagePopulator::getStandardFields() const
+{
+	return m_standardFieldsAllMsgs;
 }

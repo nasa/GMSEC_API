@@ -104,6 +104,7 @@ private:
 	std::string cfgFilename;
 	ConfigFile  cfgFile;
 	Connection* connection;
+	SubscriptionInfo* info;
 };
 
 
@@ -121,6 +122,8 @@ Replier::~Replier()
 {
 	if (connection)
 	{
+		GMSEC_INFO << "Unsubscribing from " << info->getSubject();
+		connection->unsubscribe(info);
 		connection->disconnect();
 		Connection::destroy(connection);
 	}
@@ -162,7 +165,7 @@ bool Replier::run()
 		RequestReplyCallback cb(cfgFile);
 		const char* topic = cfgFile.lookupSubscription("DIRECTIVE-REQUEST");
 
-		connection->subscribe(topic, &cb);
+		info = connection->subscribe(topic, &cb);
 
 		/* Output some general program information */
 		GMSEC_INFO << "Publishing for " << loopCountdown << " seconds.";
@@ -207,6 +210,7 @@ bool Replier::run()
 		//o End time
 		TimeUtil::formatTime(TimeUtil::getCurrentTime(), theTime);
 		GMSEC_INFO << "End Time: " << theTime;
+
 
 		connection->stopAutoDispatch();
 	}

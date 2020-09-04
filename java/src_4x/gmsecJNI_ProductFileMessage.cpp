@@ -12,15 +12,20 @@
 #include "gmsecJNI.h"
 #include "gmsecJNI_Jenv.h"
 
-#include <gmsec4/Exception.h>
+#include <gmsec4/Config.h>
+#include <gmsec4/Message.h>
+
 #include <gmsec4/mist/ProductFile.h>
 #include <gmsec4/mist/ProductFileIterator.h>
-#include <gmsec4/mist/ProductFileMessage.h>
+#include <gmsec4/mist/Specification.h>
+
+#include <gmsec4/mist/message/ProductFileMessage.h>
 
 
 using namespace gmsec::api;
 using namespace gmsec::api::jni;
 using namespace gmsec::api::mist;
+using namespace gmsec::api::mist::message;
 
 
 #ifdef __cplusplus
@@ -28,51 +33,18 @@ extern "C" {
 #endif
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage__Ljava_lang_String_2ILjava_lang_String_2Ljava_lang_String_2I
-  (JNIEnv *jenv, jclass jcls, jstring jSubject, jint jStatus, jstring jProductType, jstring jProductSubtype, jint jVersion)
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage__Ljava_lang_String_2IILjava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2
+  (JNIEnv *jenv, jclass jcls, jstring jSubject, jint jResponseStatus, jint jKind, jstring jProductType, jstring jProductSubtype, jlong jSpecPtr, jobject jSpec)
 {
 	jlong jCreated = 0;
 
 	try
 	{
-		JStringManager subject(jenv, jSubject);
-		JStringManager productType(jenv, jProductType);
-		JStringManager productSubtype(jenv, jProductSubtype);
+		Specification* spec = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
 
-		if (jvmOk(jenv, "ProductTypeMessage"))
+		if (!spec)
 		{
-			try
-			{
-				ResponseStatus::Response status = static_cast<ResponseStatus::Response>((int) jStatus);
-
-				ProductFileMessage* prodMsg = new ProductFileMessage(subject.c_str(), status, productType.c_str(), productSubtype.c_str(), (unsigned int) jVersion);
-
-				jCreated = JNI_POINTER_TO_JLONG(prodMsg);
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
-		}
-	}
-	JNI_CATCH
-
-	return jCreated;
-}
-
-
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage__Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2ILjava_lang_String_2Ljava_lang_String_2I
-  (JNIEnv *jenv, jclass jcls, jstring jSubject, jlong jConfigPtr, jobject jConfig, jint jStatus, jstring jProductType, jstring jProductSubtype, jint jVersion)
-{
-	jlong jCreated = 0;
-
-	try
-	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
 		}
 		else
 		{
@@ -82,18 +54,126 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFi
 
 			if (jvmOk(jenv, "ProductTypeMessage"))
 			{
-				try
-				{
-					ResponseStatus::Response status = static_cast<ResponseStatus::Response>((int) jStatus);
+				ResponseStatus::Response status = static_cast<ResponseStatus::Response>((int) jResponseStatus);
+				Message::MessageKind     kind   = messageKindToNative(jenv, jKind);
 
-					ProductFileMessage* prodMsg = new ProductFileMessage(subject.c_str(), *config, status, productType.c_str(), productSubtype.c_str(), (unsigned int) jVersion);
+				ProductFileMessage* prodMsg = new ProductFileMessage(subject.c_str(), status, kind, productType.c_str(), productSubtype.c_str(), *spec);
 
-					jCreated = JNI_POINTER_TO_JLONG(prodMsg);
-				}
-				catch (Exception& e)
-				{
-					ThrowGmsecException(jenv, e.what());
-				}
+				jCreated = JNI_POINTER_TO_JLONG(prodMsg);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return jCreated;
+}
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage__Ljava_lang_String_2IILjava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2
+  (JNIEnv *jenv, jclass jcls, jstring jSubject, jint jResponseStatus, jint jKind, jstring jProductType, jstring jProductSubtype, jlong jConfigPtr, jobject jConfig, jlong jSpecPtr, jobject jSpec)
+{
+	jlong jCreated = 0;
+
+	try
+	{
+		Config*        config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		Specification* spec   = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+
+		if (!config)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+		}
+		else if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else
+		{
+			JStringManager subject(jenv, jSubject);
+			JStringManager productType(jenv, jProductType);
+			JStringManager productSubtype(jenv, jProductSubtype);
+
+			if (jvmOk(jenv, "ProductTypeMessage"))
+			{
+				ResponseStatus::Response status = static_cast<ResponseStatus::Response>((int) jResponseStatus);
+				Message::MessageKind     kind   = messageKindToNative(jenv, jKind);
+
+				ProductFileMessage* prodMsg = new ProductFileMessage(subject.c_str(), status, kind, productType.c_str(), productSubtype.c_str(), *config, *spec);
+
+				jCreated = JNI_POINTER_TO_JLONG(prodMsg);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return jCreated;
+}
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage__Ljava_lang_String_2ILjava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2
+  (JNIEnv *jenv, jclass jcls, jstring jSubject, jint jResponseStatus, jstring jSchemaID, jlong jSpecPtr, jobject jSpec)
+{
+	jlong jCreated = 0;
+
+	try
+	{
+		Specification* spec = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+
+		if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else
+		{
+			JStringManager subject(jenv, jSubject);
+			JStringManager schemaID(jenv, jSchemaID);
+
+			if (jvmOk(jenv, "ProductTypeMessage"))
+			{
+				ResponseStatus::Response status = static_cast<ResponseStatus::Response>((int) jResponseStatus);
+
+				ProductFileMessage* prodMsg = new ProductFileMessage(subject.c_str(), status, schemaID.c_str(), *spec);
+
+				jCreated = JNI_POINTER_TO_JLONG(prodMsg);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return jCreated;
+}
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage__Ljava_lang_String_2ILjava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2
+  (JNIEnv *jenv, jclass jcls, jstring jSubject, jint jResponseStatus, jstring jSchemaID, jlong jConfigPtr, jobject jConfig, jlong jSpecPtr, jobject jSpec)
+{
+	jlong jCreated = 0;
+
+	try
+	{
+		Config*        config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		Specification* spec   = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+
+		if (!config)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+		}
+		else if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else
+		{
+			JStringManager subject(jenv, jSubject);
+			JStringManager schemaID(jenv, jSchemaID);
+
+			if (jvmOk(jenv, "ProductTypeMessage"))
+			{
+				ResponseStatus::Response status = static_cast<ResponseStatus::Response>((int) jResponseStatus);
+
+				ProductFileMessage* prodMsg = new ProductFileMessage(subject.c_str(), status, schemaID.c_str(), *config, *spec);
+
+				jCreated = JNI_POINTER_TO_JLONG(prodMsg);
 			}
 		}
 	}
@@ -114,16 +194,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFi
 
 		if (jvmOk(jenv, "ProductTypeMessage"))
 		{
-			try
-			{
-				ProductFileMessage* prodMsg = new ProductFileMessage(data.c_str());
+			ProductFileMessage* prodMsg = new ProductFileMessage(data.c_str());
 
-				jCreated = JNI_POINTER_TO_JLONG(prodMsg);
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
+			jCreated = JNI_POINTER_TO_JLONG(prodMsg);
 		}
 	}
 	JNI_CATCH
@@ -133,13 +206,13 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFi
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage_1Copy
-  (JNIEnv *jenv, jclass jcls, jlong jProdFileMsgPtr, jobject jProdFileMsg)
+  (JNIEnv *jenv, jclass jcls, jlong jOtherPtr, jobject jOther)
 {
 	jlong jCreated = 0;
 
 	try
 	{
-		ProductFileMessage* other = JNI_JLONG_TO_PRODUCT_FILE_MSG(jProdFileMsgPtr);
+		ProductFileMessage* other = JNI_JLONG_TO_PRODUCT_FILE_MSG(jOtherPtr);
 
 		if (!other)
 		{
@@ -147,41 +220,14 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFi
 		}
 		else
 		{
-			try
-			{
-				ProductFileMessage* prodMsg = new ProductFileMessage(*other);
+			ProductFileMessage* prodMsg = new ProductFileMessage(*other);
 
-				jCreated = JNI_POINTER_TO_JLONG(prodMsg);
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
+			jCreated = JNI_POINTER_TO_JLONG(prodMsg);
 		}
 	}
 	JNI_CATCH
 
 	return jCreated;
-}
-
-
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_delete_1ProductFileMessage
-  (JNIEnv *jenv, jclass jcls, jlong jProdFileMsgPtr, jobject jProdFileMsg)
-{
-	try
-	{
-		ProductFileMessage* prodMsg = JNI_JLONG_TO_PRODUCT_FILE_MSG(jProdFileMsgPtr);
-
-		if (!prodMsg)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ProductFileMessage reference is null");
-		}
-		else
-		{
-			delete prodMsg;
-		}
-	}
-	JNI_CATCH
 }
 
 
@@ -364,7 +410,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ProductFileM
 
 			jSubtype = jenv->NewStringUTF(subtype);
 
-			jvmOk(jenv, "ProductFileMessage::getProductSubType");
+			jvmOk(jenv, "ProductFileMessage::getProductSubtype");
 		}
 	}
 	JNI_CATCH
@@ -388,16 +434,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ProductFileMes
 		}
 		else
 		{
-			try
-			{
-				ProductFileMessage prodMsg = ProductFileMessage::convertMessage(*msg);
+			ProductFileMessage prodMsg = ProductFileMessage::convertMessage(*msg);
 
-				jCreated = JNI_POINTER_TO_JLONG(new ProductFileMessage(prodMsg));
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
+			jCreated = JNI_POINTER_TO_JLONG(new ProductFileMessage(prodMsg));
 		}
 	}
 	JNI_CATCH

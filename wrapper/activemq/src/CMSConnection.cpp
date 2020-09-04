@@ -207,6 +207,7 @@ static Field::FieldType lookupFieldType(const char* fieldTypeStr)
 	{
 		std::ostringstream oss;
 		oss << "Unknown Field Type: " << fieldTypeStr;
+		GMSEC_VERBOSE << oss.str().c_str();
 		throw Exception(FIELD_ERROR, UNKNOWN_FIELD_TYPE, oss.str().c_str());
 	}
 
@@ -234,6 +235,7 @@ static Message::MessageKind lookupMessageKind(const char* msgTypeStr)
 	{
 		std::ostringstream oss;
 		oss << "Unknown message kind: " << msgTypeStr;
+		GMSEC_VERBOSE << oss.str().c_str();
 		throw Exception(MSG_ERROR, UNKNOWN_MSG_TYPE, oss.str().c_str());
 	}
 
@@ -394,6 +396,7 @@ enum PrefixConfig
 	PREFIX_NONE
 };
 
+
 static void mwConfig(const Config& config, const char* key, std::string& out, PrefixConfig prefix = PREFIX_OPTIONAL)
 {
 	const char* value = 0;
@@ -416,22 +419,6 @@ static void mwConfig(const Config& config, const char* key, std::string& out, Pr
 			out = value;
 		}
 	}
-}
-
-
-
-/**
-* @fn cmsException (Status &result, cms::CMSException &e, int klass, int code)
-* @param result The Status object to update.
-* @param e The exception to process.
-* @param klass The GMSEC error class.
-* @param code The GMSEC error code.
-* @brief Process a CMS exception converting it to a GMSEC Status.
-*/
-static void cmsException(Status &result, cms::CMSException &e, int klass, int code)
-{
-	result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, e.getMessage().c_str(), code);
-	GMSEC_WARNING << "ActiveMQ CMS exception : " << e.getMessage().c_str();
 }
 
 
@@ -799,10 +786,8 @@ const char* CMSConnection::getMWInfo()
 }
 
 
-Status CMSConnection::mwConnect()
+void CMSConnection::mwConnect()
 {
-	Status result;
-
 	// Initialize the request specs
 	m_requestSpecs = getExternal().getRequestSpecs();
 
@@ -870,12 +855,11 @@ Status CMSConnection::mwConnect()
 	}
 	catch (cms::CMSException &e)
 	{
-		cmsException(result, e, MIDDLEWARE_ERROR, INVALID_CONNECTION);
-
 		// check if this is an invalid access exception
 		std::string message = e.getMessage();
+
 		size_t p = message.find("Message: User name or password is invalid.");
-		if (p != std::string::npos)
+		if (p != std::string::npos) 
 		{
 			// skip the "Message: "
 			size_t from = p + 9;
@@ -887,30 +871,30 @@ Status CMSConnection::mwConnect()
 				to = message.length();
 			}
 
-			result.set(POLICY_ERROR, USER_ACCESS_INVALID, message.substr(from, to - from).c_str());
+			message = message.substr(from, to - from);
+			GMSEC_VERBOSE << message.c_str();
+			throw Exception(POLICY_ERROR, USER_ACCESS_INVALID, message.c_str());
+		}
+		else
+		{
+			const char* errmsg = "Error connecting to middleware broker";
+			GMSEC_VERBOSE << errmsg;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, INVALID_CONNECTION, errmsg);
 		}
 	}
-
-	return result;
 }
 
 
-Status CMSConnection::mwDisconnect()
+void CMSConnection::mwDisconnect()
 {
-	Status result;
-
 	try
 	{
-		std::string localMWInfo = getMWInfo();
 		cleanup();
-		GMSEC_DEBUG << "Disconnected from server " << localMWInfo.c_str();
 	}
 	catch (cms::CMSException &e)
 	{
-		cmsException(result, e, MIDDLEWARE_ERROR, INVALID_CONNECTION);
+		GMSEC_ERROR << "Error disconnecting";
 	}
-	
-	return result;
 }
 
 
@@ -952,16 +936,14 @@ gmsec_amqcms::SubscriptionInfo* CMSConnection::makeSubscriptionInfo(const std::s
 }
 
 
-Status CMSConnection::mwSubscribe(const char *subject0, const Config &config)
+void CMSConnection::mwSubscribe(const char *subject0, const Config &config)
 {
-	Status result;
-
 	std::string subject(subject0);
 	std::map<std::string, gmsec_amqcms::SubscriptionInfo*>::const_iterator i = m_subscriptions.find(subject);
 	if (i != m_subscriptions.end())
 	{
-		result.set(MIDDLEWARE_ERROR, INVALID_SUBJECT_NAME, "Duplicate subscription");
-		return result;
+		GMSEC_VERBOSE << "Duplicate subscription";
+		throw Exception(MIDDLEWARE_ERROR, INVALID_SUBJECT_NAME, "Duplicate subscription");
 	}
 
 	try
@@ -986,8 +968,8 @@ Status CMSConnection::mwSubscribe(const char *subject0, const Config &config)
 		}
 		else
 		{
-			result.set(MIDDLEWARE_ERROR, INVALID_CONFIG_VALUE, "Invalid Subscription configuration arguments");
-			return result;
+			GMSEC_VERBOSE << "Invalid subscription configuration arguments";
+			throw Exception(MIDDLEWARE_ERROR, INVALID_CONFIG_VALUE, "Invalid subscription configuration arguments");
 		}
 
 		// if (cmsExtra.length() > 0)
@@ -997,8 +979,6 @@ Status CMSConnection::mwSubscribe(const char *subject0, const Config &config)
 	}
 	catch (cms::CMSException &e)
 	{
-		cmsException(result, e, MIDDLEWARE_ERROR, INVALID_CONNECTION);
-
 		std::string message(e.getMessage());
 		// check if this is an authorization exception
 		// check if this is an unauthorized exception
@@ -1022,24 +1002,27 @@ Status CMSConnection::mwSubscribe(const char *subject0, const Config &config)
 				to = message.length();
 			}
 
-			result.set(POLICY_ERROR, SUBSCRIBE_NOT_AUTHORIZED, message.substr(from, to - from).c_str());
+			message = message.substr(from, to - from);
+			GMSEC_VERBOSE << message.c_str();
+			throw Exception(POLICY_ERROR, SUBSCRIBE_NOT_AUTHORIZED, message.c_str());
+		}
+		else
+		{
+			GMSEC_VERBOSE << message.c_str();
+			throw Exception(MIDDLEWARE_ERROR, INVALID_CONNECTION, message.c_str());
 		}
 	}
-
-	return result;
 }
 
 
-Status CMSConnection::mwUnsubscribe(const char* subject)
+void CMSConnection::mwUnsubscribe(const char* subject)
 {
-	Status result;
-
 	std::map<std::string, SubscriptionInfo*>::iterator it = m_subscriptions.find(subject);
 
 	if (it == m_subscriptions.end())
 	{
-		result.set(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject");
-		return result;
+		GMSEC_VERBOSE << "Not subscribed to subject";
+		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject");
 	}
 
 	try
@@ -1051,17 +1034,14 @@ Status CMSConnection::mwUnsubscribe(const char* subject)
 	}
 	catch (cms::CMSException &e)
 	{
-		cmsException(result, e, MIDDLEWARE_ERROR, INVALID_CONNECTION);
+		GMSEC_VERBOSE << e.what();
+		throw Exception(MIDDLEWARE_ERROR, INVALID_CONNECTION, e.what());
 	}
-
-	return result;
 }
 
 
-Status CMSConnection::mwPublish(const Message& msg, const Config& config)
+void CMSConnection::mwPublish(const Message& msg, const Config& config)
 {
-	Status result;
-
 	std::string subject(msg.getSubject());
 
 	try
@@ -1071,7 +1051,7 @@ Status CMSConnection::mwPublish(const Message& msg, const Config& config)
 		std::auto_ptr<cms::MessageProducer> producer(m_publishSession->createProducer(destination.get()));
 		std::auto_ptr<cms::Message>         cmsMsg;
 
-		result = prepare(msg, cmsMsg);
+		prepare(msg, cmsMsg);
 
 		if (config.getBooleanValue("durable-publish", false))
 		{
@@ -1085,9 +1065,7 @@ Status CMSConnection::mwPublish(const Message& msg, const Config& config)
 			{
 				if (StringUtil::str2int(priority, priorityStr) != StringUtil::STR2NUM_SUCCESS)
 				{
-					result.set(CONFIG_ERROR, INVALID_CONFIG_VALUE,
-						"Invalid 'durable-priority' value provided for publish operation. Defaulting to a priority of 4.");
-					GMSEC_WARNING << "CMSConnection::mwPublish : " << result.get();
+					GMSEC_WARNING << "Invalid 'durable-priority' value provided for publish operation. Defaulting to a priority of 4";
 				}
 			}
 			else
@@ -1099,9 +1077,7 @@ Status CMSConnection::mwPublish(const Message& msg, const Config& config)
 			{
 				if (StringUtil::str2longlong(timeToLive, timeToLiveStr) != StringUtil::STR2NUM_SUCCESS)
 				{
-					result.set(CONFIG_ERROR, INVALID_CONFIG_VALUE,
-						"Invalid 'durable-time-to-live' value provided for publish operation. Defaulting to 30000ms.");
-					GMSEC_WARNING << "CMSConnection::mwPublish : " << result.get();
+					GMSEC_WARNING << "Invalid 'durable-time-to-live' value provided for publish operation. Defaulting to 30000ms";
 				}
 			}
 			else
@@ -1118,8 +1094,6 @@ Status CMSConnection::mwPublish(const Message& msg, const Config& config)
 	}
 	catch (cms::CMSException &e)
 	{
-		cmsException(result, e, MIDDLEWARE_ERROR, INVALID_MSG);
-
 		std::string message = e.getMessage();
 
 		// check if this is an unauthorized exception
@@ -1143,12 +1117,16 @@ Status CMSConnection::mwPublish(const Message& msg, const Config& config)
 				to = message.length();
 			}
 
-			result.set(POLICY_ERROR, PUBLISH_NOT_AUTHORIZED, message.substr(from, to - from).c_str());
+			message = message.substr(from, to - from);
+			GMSEC_VERBOSE << message.c_str();
+			throw Exception(POLICY_ERROR, PUBLISH_NOT_AUTHORIZED, message.c_str());
+		}
+		else
+		{
+			GMSEC_VERBOSE << e.what();
+			throw Exception(MIDDLEWARE_ERROR, INVALID_MSG, e.what());
 		}
 	}
-
-	return result;
-
 }
 
 
@@ -1162,10 +1140,8 @@ static std::string generateID()
 }
 
 
-Status CMSConnection::mwRequest(const Message& request, std::string& id)
+void CMSConnection::mwRequest(const Message& request, std::string& id)
 {
-	Status result;
-
 	std::string subject(request.getSubject());
 
 	id = generateID();
@@ -1181,12 +1157,7 @@ Status CMSConnection::mwRequest(const Message& request, std::string& id)
 			MessageBuddy::getInternal(request).getDetails().setBoolean(OPT_REQ_RESP, true);
 		}
 
-		result = prepare(request, cmsRequest);
-
-		if (result.isError())
-		{
-			return result;
-		}
+		prepare(request, cmsRequest);
 
 		if (m_requestSpecs.useSubjectMapping)
 		{
@@ -1203,25 +1174,21 @@ Status CMSConnection::mwRequest(const Message& request, std::string& id)
 	}
 	catch (cms::CMSException &e)
 	{
-		cmsException(result, e, MIDDLEWARE_ERROR, INVALID_MSG);
-		return result;
+		GMSEC_VERBOSE << e.what();
+		throw Exception(MIDDLEWARE_ERROR, INVALID_MSG, e.what());
 	}
-
-	return result;
 }
 
 
-Status CMSConnection::mwReply(const Message& request, const Message& reply)
+void CMSConnection::mwReply(const Message& request, const Message& reply)
 {
-	Status result;
-
 	// Get the Request's Unique ID, and put it into a field in the Reply
 	const StringField* uniqueID = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
 
 	if (!uniqueID)
 	{
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
-		return result;
+		GMSEC_VERBOSE << "Request does not contain unique ID field";
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
 
 	// Add the REPLY_UNIQUE_ID_FIELD to the reply message
@@ -1231,12 +1198,7 @@ Status CMSConnection::mwReply(const Message& request, const Message& reply)
 	{
 		std::auto_ptr<cms::Message> cmsReply;
 
-		result = prepare(reply, cmsReply);
-
-		if (result.isError())
-		{
-			return result;
-		}
+		prepare(reply, cmsReply);
 
 		cmsReply->setCMSType(CMS_TYPE_REPLY);
 		cmsReply->setCMSCorrelationID(uniqueID->getValue());
@@ -1251,19 +1213,16 @@ Status CMSConnection::mwReply(const Message& request, const Message& reply)
 	}
 	catch (cms::CMSException &e)
 	{
-		cmsException(result, e, MIDDLEWARE_ERROR, INVALID_CONNECTION);
+		GMSEC_VERBOSE << e.what();
+		throw Exception(MIDDLEWARE_ERROR, INVALID_CONNECTION, e.what());
 	}
 
 	GMSEC_DEBUG << "Reply sent with subject " << reply.getSubject();
-
-	return result;
 }
 
 
-Status CMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
+void CMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 {
-	Status result;
-
 	bool done = false;
 
 	// initialize msg
@@ -1277,9 +1236,9 @@ Status CMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 			delete msg;
 		}			
 
-		result = mwReceiveAux(msg, timeout);
+		mwReceiveAux(msg, timeout);
 
-		if (result.isError() || !msg)
+		if (!msg)
 		{
 			// error already noted
 			break;
@@ -1310,15 +1269,11 @@ Status CMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 			done = true;
 		}
 	}
-
-	return result;
 }
 
 
-Status CMSConnection::mwReceiveAux(Message*& msg, GMSEC_I32 timeout)
+void CMSConnection::mwReceiveAux(Message*& msg, GMSEC_I32 timeout)
 {
-	Status result;
-
 	double start_s;
 
 	// initialize message to NULL
@@ -1330,7 +1285,7 @@ Status CMSConnection::mwReceiveAux(Message*& msg, GMSEC_I32 timeout)
 	}
 
 	bool done = false;
-	while (!result.isError() && !done)
+	while (!done)
 	{
 		try
 		{
@@ -1363,16 +1318,15 @@ Status CMSConnection::mwReceiveAux(Message*& msg, GMSEC_I32 timeout)
 			if (popped.get())
 			{
 				done = true;
-				result = unload(popped.get(), msg);
+				unload(popped.get(), msg);
 			}
 		}
 		catch (decaf::lang::Exception &e)
 		{
-			result.set(MIDDLEWARE_ERROR, INVALID_MSG, e.what());
+			GMSEC_VERBOSE << e.what();
+			throw Exception(MIDDLEWARE_ERROR, INVALID_MSG, e.what());
 		}
 	}
-
-	return result;
 }
 
 
@@ -1537,6 +1491,7 @@ static Message* parseProperties(const cms::Message& cmsMessage, Message::Message
 	}
 	catch (cms::CMSException& e)
 	{
+		GMSEC_VERBOSE << e.what();
 		throw Exception(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, e.what());
 	}
 
@@ -1556,38 +1511,16 @@ static Message* parseProperties(const cms::Message& cmsMessage, Message::Message
 }
 
 
-Status CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMessage)
+void CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMessage)
 {
-	Status result;
-
 	gmsecMessage = 0;
 
 	std::auto_ptr<Message> msgManager;
-	Message::MessageKind   msgKind;
-
-	try
-	{
-		msgKind = lookupMessageKind(cmsMessage->getCMSType().c_str());
-	}
-	catch (Exception& e)
-	{
-		result.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), e.getCustomCode());
-		GMSEC_WARNING << e.what();
-		return result;
-	}
+	Message::MessageKind   msgKind = lookupMessageKind(cmsMessage->getCMSType().c_str());
 
 	ValueMap meta;
 
-	try
-	{
-		msgManager.reset(parseProperties(*cmsMessage, msgKind, meta));
-	}
-	catch (Exception& e)
-	{
-		result.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), e.getCustomCode());
-		GMSEC_WARNING << e.what();
-		return result;
-	}
+	msgManager.reset(parseProperties(*cmsMessage, msgKind, meta));
 
 	// need to copy destination for reply
 	if (msgKind == Message::REQUEST)
@@ -1629,7 +1562,13 @@ Status CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMess
 		int bytes = bytesMessage->getBodyLength();
 		GMSEC_U8* p = (GMSEC_U8 *) bytesMessage->getBodyBytes();
 		DataBuffer buffer(p, bytes, true);
-		result = getExternal().getPolicy().unpackage(*msgManager.get(), buffer, meta);
+
+		Status result = getExternal().getPolicy().unpackage(*msgManager.get(), buffer, meta);
+
+		if (result.isError())
+		{
+			throw Exception(result);
+		}
 
 		if (msgKind == Message::REPLY)
 		{
@@ -1641,15 +1580,8 @@ Status CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMess
 	else
 	{
 		// we could add support for other CMS message types...
-		result.set(MIDDLEWARE_ERROR, INVALID_MSG, "Received cms::Message is not a BytesMessage");
-		return result;
-	}
-
-	// if we get here without an error, we pass ownership of the created
-	// CMSMessage back to the caller
-	if (result.isError())
-	{
-		return result;
+		GMSEC_VERBOSE << "Received cms::Message is not a BytesMessage";
+		throw Exception(MIDDLEWARE_ERROR, INVALID_MSG, "Received cms::Message is not a BytesMessage");
 	}
 
 	gmsecMessage = msgManager.release();
@@ -1660,32 +1592,21 @@ Status CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMess
 
 		msgMeta.setBoolean(OPT_REQ_RESP, true);
 
-		try
-		{
-			const StringField& field    = gmsecMessage->getStringField(REPLY_UNIQUE_ID_FIELD);
-			const char*        uniqueID = field.getValue();
+		const StringField& field    = gmsecMessage->getStringField(REPLY_UNIQUE_ID_FIELD);
+		const char*        uniqueID = field.getValue();
 
-			msgMeta.setString(REPLY_UNIQUE_ID_FIELD, uniqueID);
+		msgMeta.setString(REPLY_UNIQUE_ID_FIELD, uniqueID);
 
-			gmsecMessage->clearField(REPLY_UNIQUE_ID_FIELD);
-		}
-		catch (Exception& e)
-		{
-			result.set(MIDDLEWARE_ERROR, e.getErrorCode(), e.getErrorMessage(), e.getCustomCode());
-		}
+		gmsecMessage->clearField(REPLY_UNIQUE_ID_FIELD);
 	}
-
-	return result;
 }
 
 
-bool CMSConnection::handleCmsReply(const cms::Message* cmsReply, bool logStackTrace)
+void CMSConnection::handleCmsReply(const cms::Message* cmsReply, bool logStackTrace)
 {
-	bool success = true;
-
 	try
 	{
-		success = handleReply(cmsReply);
+		handleReply(cmsReply);
 	}
 	catch (cms::CMSException &e)
 	{
@@ -1705,23 +1626,16 @@ bool CMSConnection::handleCmsReply(const cms::Message* cmsReply, bool logStackTr
 		}
 		GMSEC_WARNING << "ActiveMQ handleCmsReply: " << e.what() << extra.c_str();
 	}
-
-	return success;
 }
 
 
-bool CMSConnection::handleReply(const cms::Message* cmsMessage)
+void CMSConnection::handleReply(const cms::Message* cmsMessage)
 {
 	Message* gmsecMessage = 0;
 
-	Status result = unload(cmsMessage, gmsecMessage);
+	unload(cmsMessage, gmsecMessage);
 
-	if (!result.isError())
-	{
-		getExternal().onReply(gmsecMessage);
-	}
-
-	return !result.isError();
+	getExternal().onReply(gmsecMessage);
 }
 
 
@@ -1819,22 +1733,20 @@ static Status storeProperties(ValueMap& header, cms::Message& cmsMessage)
 }
 
 
-Status CMSConnection::prepare(const Message& msg, std::auto_ptr<cms::Message>& cmsMessage)
+void CMSConnection::prepare(const Message& msg, std::auto_ptr<cms::Message>& cmsMessage)
 {
-	Status result;
-
 	DataBuffer buffer;
 	ValueMap header;
 
-	result = getExternal().getPolicy().package(const_cast<Message&>(msg), buffer, header);
+	Status result = getExternal().getPolicy().package(const_cast<Message&>(msg), buffer, header);
 
 	if (result.isError())
 	{
-		return result;
+		throw Exception(result);
 	}
 
-	std::string          subject = msg.getSubject();
-	Message::MessageKind kind    = msg.getKind();
+	std::string subject = msg.getSubject();
+	Message::MessageKind kind = msg.getKind();
 
 	header.setString(GMSEC_SUBJECT_PROPERTY, subject.c_str());
 
@@ -1844,20 +1756,13 @@ Status CMSConnection::prepare(const Message& msg, std::auto_ptr<cms::Message>& c
 		bytesMessage->setCMSType(kindToCMSType(kind));
 		bytesMessage->setBodyBytes(buffer.get(), buffer.size());
 
-		result = storeProperties(header, *bytesMessage);
-
-		if (result.isError())
-		{
-			return result;
-		}
+		storeProperties(header, *bytesMessage);
 
 		cmsMessage.reset(bytesMessage.release());
 	}
 	catch (cms::CMSException &e)
 	{
-		cmsException(result, e, MSG_ERROR, INVALID_MSG);
-		return result;
+		GMSEC_VERBOSE << e.what();
+		throw Exception(MSG_ERROR, INVALID_MSG, e.what());
 	}
-
-	return result;
 }

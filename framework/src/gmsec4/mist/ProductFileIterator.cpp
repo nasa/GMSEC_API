@@ -10,12 +10,13 @@
 
 #include <gmsec4/mist/ProductFile.h>
 
-#include <gmsec4/internal/mist/InternalProductFileMessage.h>
-#include <gmsec4/internal/mist/InternalProductFileIterator.h>
+#include <gmsec4/internal/mist/message/InternalProductFileMessage.h>
 
+#include <gmsec4/internal/mist/InternalProductFileIterator.h>
 
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::mist::message::internal;
 
 
 ProductFileIterator::ProductFileIterator(InternalProductFileMessage& msg)

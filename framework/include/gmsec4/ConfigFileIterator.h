@@ -153,7 +153,7 @@ public:
 	 *     cfgFile.load("someFile.xml");
 	 *
 	 *     ConfigFileIterator iter;
-	 *     cfgFile.reset(iter);
+	 *     iter = cfgFile.getIterator();
 	 *
 	 *     std::string customElement;
 	 *

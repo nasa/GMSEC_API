@@ -1,4 +1,12 @@
-package gov.nasa.gsfc.gmsec.api.jni;
+/*
+ * Copyright 2007-2016 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
+ * No copyright is claimed in the United States under Title 17, U.S. Code.
+ * All Rights Reserved.
+ */
+
+
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.field.Field;
 
@@ -8,6 +16,8 @@ import gov.nasa.gsfc.gmsec.api.mist.Mnemonic;
 import gov.nasa.gsfc.gmsec.api.mist.MnemonicSample;
 import gov.nasa.gsfc.gmsec.api.mist.ProductFile;
 import gov.nasa.gsfc.gmsec.api.mist.ServiceParam;
+
+import gov.nasa.gsfc.gmsec.api.jni.JNIField;
 
 
 class ArrayListConverter

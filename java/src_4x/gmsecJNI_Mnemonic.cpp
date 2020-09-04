@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Mnemonic__Ljava_lang_String_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIMnemonicSample_2I
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Mnemonic__Ljava_lang_String_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_mist_JNIMnemonicSample_2I
   (JNIEnv *jenv, jclass jcls, jstring jName, jlongArray jMnemonicSamplePtrs, jobjectArray jMnemonicSamples, jint jNumSamples)
 {
 	jlong created = 0;
@@ -352,7 +352,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Mnemonic_1GetS
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Mnemonic_1SetSample
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Mnemonic_1AddSample
   (JNIEnv *jenv, jclass jcls, jlong jMnemonicPtr, jobject jMnemonic, jlong jMnemonicSamplePtr, jobject jMnemonicSample)
 {
 	try
@@ -364,7 +364,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Mnemonic_1SetSa
 		{
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Mnemonic reference is null");
 		}
-		if (!sample)
+		else if (!sample)
 		{
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MnemonicSample reference is null");
 		}

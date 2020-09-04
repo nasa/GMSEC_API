@@ -10,6 +10,7 @@
 //
 
 #include "gmsecJNI.h"
+#include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 
 #include <gmsec4/Config.h>
@@ -18,6 +19,7 @@
 #include <gmsec4/Message.h>
 
 #include <iostream>
+#include <sstream>
 
 
 using namespace gmsec::api;
@@ -27,39 +29,6 @@ using namespace gmsec::api::jni;
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-static int messageKindToJava(JNIEnv* jenv, Message::MessageKind msgKind)
-{
-    switch (msgKind)
-    {
-	case Message::PUBLISH: return 0;
-	case Message::REQUEST: return 1;
-	case Message::REPLY:   return 2;
-	}
-
-	ThrowGmsecException(jenv, "Unknown message kind");
-
-	// We will never reach here, but the compiler will be happy nonetheless.
-	return -1;
-}
-
-
-static Message::MessageKind messageKindToNative(JNIEnv* jenv, jint msgKind)
-{
-	switch ((int) msgKind)
-	{
-	case 0: return Message::PUBLISH;
-	case 1: return Message::REQUEST;
-	case 2: return Message::REPLY;
-	}
-
-	ThrowGmsecException(jenv, "Unknown message kind");
-
-	// We will never reach here, but the compiler will be happy nonetheless.
-	return Message::PUBLISH;
-}
-
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Message__Ljava_lang_String_2I
@@ -108,17 +77,17 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Message__
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Message__Ljava_lang_String_2
-  (JNIEnv *jenv, jclass jcls, jstring jXML)
+  (JNIEnv *jenv, jclass jcls, jstring jData)
 {
 	Message* created = 0;
 
 	try
 	{
-		JStringManager xml(jenv, jXML);
+		JStringManager data(jenv, jData);
 
-		if (jvmOk(jenv, "Message.Message(xml)"))
+		if (jvmOk(jenv, "Message.Message(data)"))
 		{
-			created = new Message(xml.c_str());
+			created = new Message(data.c_str());
 		}
 	}
 	JNI_CATCH
@@ -350,6 +319,135 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1Cl
 }
 
 
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetIntegerValue
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName)
+{
+	jlong result = 0;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (!msg)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.getIntegerValue"))
+			{
+				result = msg->getIntegerValue(fieldName.c_str());
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetUnsignedIntegerValue
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName)
+{
+	jobject result = 0;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (!msg)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.getUnsignedIntegerValue"))
+			{
+				GMSEC_U64 value = msg->getUnsignedIntegerValue(fieldName.c_str());
+
+				std::ostringstream oss;
+				oss << value;
+
+				jstring valueAsString = jenv->NewStringUTF(oss.str().c_str());
+
+				result = jenv->NewObject(Cache::getCache().classU64, Cache::getCache().methodU64Init, valueAsString);
+
+				if (!gmsec::api::jni::jvmOk(jenv, "Message::getUnsignedIntegerValue: new U64") || !result)
+				{
+					GMSEC_WARNING << "Unable to create U64 object";
+					result = 0;
+				}
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jdouble JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetDoubleValue
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName)
+{
+	jdouble result = 0;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (!msg)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.getDoubleValue"))
+			{
+				result = msg->getDoubleValue(fieldName.c_str());
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetStringValue
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName)
+{
+	jstring result = 0;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (!msg)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.getStringValue"))
+			{
+				result = jenv->NewStringUTF(msg->getStringValue(fieldName.c_str()));
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetField
   (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jName)
 {
@@ -384,7 +482,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetFi
 JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetFieldType
   (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jName)
 {
-	jint result = 0;
+	jint type = 0;
 
 	try
 	{
@@ -400,13 +498,13 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetFie
 
 			if (jvmOk(jenv, "Message.getFieldType"))
 			{
-				result = (jint) msg->getFieldType(name.c_str());
+				type = (jint) fieldTypeToJava(jenv, msg->getFieldType(name.c_str()));
 			}
 		}
 	}
 	JNI_CATCH
 
-	return result;
+	return type;
 }
 
 

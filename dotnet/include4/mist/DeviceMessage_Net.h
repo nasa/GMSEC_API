@@ -40,6 +40,8 @@ ref class DeviceIterator;
 /// This class is a lightweight container for holding information on a Device, and
 /// used to generate GMSEC Device messages by the ConnectionManager class.
 /// </summary>
+///
+/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.DeviceMessage instead.
 
 
 public ref class DeviceMessage : public Message
@@ -51,6 +53,8 @@ public:
 	/// <param name="version">The GMSEC Interface Specification Document (ISD) version to be used</param>
 	///
 	/// <seealso cref="MIST_Defs_Net.h"/>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.DeviceMessage instead.
 	DeviceMessage(System::String^ subject, unsigned int version);
 
 
@@ -61,6 +65,8 @@ public:
 	/// <param name="version">The GMSEC Interface Specification Document (ISD) version to be used</param>
 	///
 	/// <seealso cref="MIST_Defs_Net.h"/>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.DeviceMessage instead.
 	DeviceMessage(System::String^ subject, Config^ config, unsigned int version);
 
 
@@ -69,12 +75,16 @@ public:
 	/// <param name="data">XML or JSON string used to initialize the contents of the message</param>
 	///
 	/// <exception cref="GMSEC_Exception">An exception is thrown if the data cannot be parsed</exception>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.DeviceMessage instead.
 	DeviceMessage(System::String^ data);
 
 
 	/// <summary>Copy-constructor</summary>
 	///
 	/// <param name="other">The DeviceMessage object to copy</param>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.DeviceMessage instead.
 	DeviceMessage(DeviceMessage^ other);
 
 

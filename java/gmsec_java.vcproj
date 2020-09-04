@@ -613,10 +613,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\JNIDeviceMessage.java"
-						>
-					</File>
-					<File
 						RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\JNIDeviceParam.java"
 						>
 					</File>
@@ -626,10 +622,6 @@
 					</File>
 					<File
 						RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\JNIMnemonicIterator.java"
-						>
-					</File>
-					<File
-						RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\JNIMnemonicMessage.java"
 						>
 					</File>
 					<File
@@ -645,13 +637,37 @@
 						>
 					</File>
 					<File
-						RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\JNIProductFileMessage.java"
+						RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\JNISchemaIDIterator.java"
 						>
 					</File>
 					<File
 						RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\JNIServiceParam.java"
 						>
 					</File>
+					<File
+						RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\JNISpecification.java"
+						>
+					</File>
+					<Filter
+						Name="message"
+						>
+						<File
+							RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\message\JNIDeviceMessage.java"
+							>
+						</File>
+						<File
+							RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\message\JNIMistMessage.java"
+							>
+						</File>
+						<File
+							RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\message\JNIMnemonicMessage.java"
+							>
+						</File>
+						<File
+							RelativePath=".\gov\nasa\gsfc\gmsec\api\jni\mist\message\JNIProductFileMessage.java"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="util"
@@ -730,13 +746,41 @@
 					>
 				</File>
 				<File
+					RelativePath=".\gov\nasa\gsfc\gmsec\api\mist\SchemaIDIterator.java"
+					>
+				</File>
+				<File
 					RelativePath=".\gov\nasa\gsfc\gmsec\api\mist\ServiceParam.java"
+					>
+				</File>
+				<File
+					RelativePath=".\gov\nasa\gsfc\gmsec\api\mist\Specification.java"
 					>
 				</File>
 				<File
 					RelativePath=".\gov\nasa\gsfc\gmsec\api\mist\SubscriptionInfo.java"
 					>
 				</File>
+				<Filter
+					Name="message"
+					>
+					<File
+						RelativePath=".\gov\nasa\gsfc\gmsec\api\mist\message\DeviceMessage.java"
+						>
+					</File>
+					<File
+						RelativePath=".\gov\nasa\gsfc\gmsec\api\mist\message\MistMessage.java"
+						>
+					</File>
+					<File
+						RelativePath=".\gov\nasa\gsfc\gmsec\api\mist\message\MnemonicMessage.java"
+						>
+					</File>
+					<File
+						RelativePath=".\gov\nasa\gsfc\gmsec\api\mist\message\ProductFileMessage.java"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="field"
