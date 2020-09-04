@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -25,29 +25,31 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIConnMgrEventCallback;
  * {@link ConnectionManager#registerEventCallback(Connection.ConnectionEvent, ConnectionManagerEventCallback)}
  * to have user code executed asynchronously when an event occurs in the connection object.
  * <p>
- * Please note that because users are able to create their own ConnectionManagerEventCallback class, reentrancy
- * is not guaranteed unless if they implement their own reentrancy rules.
- * Also note that because a ConnectionManagerEventCallback can be registered to multiple connections,
- * it can be run concurrently among those connections.
+ * Note that because users are able to create their own EventCallback class, reentrancy is not
+ * guaranteed unless if they implement their own reentrancy rules.
+ * <p>
+ * In addition, if a ConnectionManagerEventCallback is registered to multiple connections,
+ * onEvent() can be invoked concurrently from different connection manager threads.
+ * Users are encouraged to employ the use of synchronization to enforce thread safety.
  * <p>
  * Example callback class:
- * <pre>{@code
- * public class MyEventCallback extends ConnectionManagerEventCallback
- * {
- *     public void onEvent(ConnectionManager connMgr, Status status, Connection.ConnectionEvent event)
- *     {
- *         System.out.println(status.get());
- *     }
- * }
- * }</pre>
+   <pre>{@code
+   public class MyEventCallback extends ConnectionManagerEventCallback
+   {
+       public void onEvent(ConnectionManager connMgr, Status status, Connection.ConnectionEvent event)
+       {
+           System.out.println(status.get());
+       }
+   }
+   }</pre>
  * <p>
  * Example callback registration:
- * <pre>{@code
- * connMgr.registerEventCallback(Connection.ConnectionEvent.ALL_EVENTS, new MyEventCallback());
- * }</pre>
+   <pre>{@code
+   connMgr.registerEventCallback(Connection.ConnectionEvent.ALL_EVENTS, new MyEventCallback());
+   }</pre>
  *
  * @see ConnectionManager#registerEventCallback(Connection.ConnectionEvent, ConnectionManagerEventCallback)
-*/
+ */
 public abstract class ConnectionManagerEventCallback
 {
 	private JNIConnMgrEventCallback m_jniConnMgrEventCallback = null;
@@ -98,15 +100,18 @@ public abstract class ConnectionManagerEventCallback
 	 * This method is called in response to a event after a call to
 	 * {@link ConnectionManager#registerEventCallback(Connection.ConnectionEvent, ConnectionManagerEventCallback)}.
 	 * <p>
-	 * Please note that if a callback is registered to multiple connections, onEvent() can be invoked 
+	 * If a callback is registered to multiple connections, onEvent() can be invoked 
 	 * concurrently from the different connection threads.
+	 * <p>
+	 * <b>DO NOT STORE or CHANGE STATE</b> of the ConnectionManager object; it should only be used within
+	 * the scope of the callback method.
+	 * <p>
+	 * <b>DO NOT STORE</b> the Status object for use beyond the scope of the callback. Otherwise, make a
+	 * copy of the Status object.
 	 *
 	 * @param connMgr A reference to the ConnectionManager object that is reporting the event.
 	 * @param status  A reference to a status object that contains information regarding the event.
 	 * @param event   the event that led the callback to be summoned.
-	 * <p>
-	 * Note: <b>DO NOT DESTROY</b> the ConnectionManager that is passed into this function
-	 * by the API. It is owned by the API and does not need to be managed by the client program.
 	 */
 	public abstract void onEvent(ConnectionManager connMgr, Status status, Connection.ConnectionEvent event);
 }

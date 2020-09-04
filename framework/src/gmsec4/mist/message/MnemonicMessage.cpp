@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -54,6 +54,12 @@ MnemonicMessage::MnemonicMessage(const char* data)
 }
 
 
+MnemonicMessage::MnemonicMessage(const Specification& spec, const char* data)
+	: MistMessage(new InternalMnemonicMessage(spec, data))
+{
+}
+
+
 MnemonicMessage& MnemonicMessage::operator=(const MnemonicMessage& other)
 {
 	if (this != &other)
@@ -96,5 +102,7 @@ MnemonicIterator& MnemonicMessage::getMnemonicIterator() const
 
 MnemonicMessage MnemonicMessage::convertMessage(const Message& message)
 {
+	GMSEC_DISABLE_DEPRECATED_WARNINGS
 	return MnemonicMessage(message.toXML());
+	GMSEC_ENABLE_DEPRECATED_WARNINGS
 }

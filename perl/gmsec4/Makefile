@@ -1,4 +1,4 @@
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -17,7 +17,7 @@ FRAMEWORK_DIR   = ../../framework
 
 GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include/c++/$(shell $(CXX) -dumpversion)
 PERL_INCS       = -I$(PERL5_LIB)/CORE
-API_CXXFLAGS   += $(PERL_INCS)
+API_CXXFLAGS   += -Wno-literal-suffix $(PERL_INCS)
 
 LDFLAGS        += -L$(PERL5_LIB)/CORE -lperl
 

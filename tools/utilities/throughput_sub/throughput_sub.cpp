@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,12 +19,13 @@
 #include "status_reporter.h"
 
 using namespace gmsec::api;
+using namespace gmsec::api::mist;
 using namespace gmsec::api::util;
 
 
 throughput_sub::throughput_sub(const Config& config)
 	: Utility(config),
-	  connection(0),
+	  connMgr(0),
 	  reportingThread(0),
 	  bytesReceived(0),
 	  droppedMsgCount(0),
@@ -37,21 +38,21 @@ throughput_sub::throughput_sub(const Config& config)
 
 throughput_sub::~throughput_sub()
 {
-	if (connection)
+	if (connMgr)
 	{
 		try
 		{
-			connection->disconnect();
+			connMgr->cleanup();
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			GMSEC_ERROR << e.what();
 		}
 
-		Connection::destroy(connection);
+		delete connMgr;
 	}
 
-	Connection::shutdownAllMiddlewares();
+	ConnectionManager::shutdownAllMiddlewares();
 }
 
 
@@ -72,27 +73,27 @@ bool throughput_sub::run()
 	bool success = true;
 
 	/* output GMSEC API version */
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
-		//o Create the Connection
-		connection = Connection::create(getConfig());
+		//o Create the ConnectionManager
+		connMgr = new ConnectionManager(getConfig());
 
 		//o Connect
-		connection->connect();
+		connMgr->initialize();
 
 		//o Get information from the command line
 		std::string subject     = get("SUBJECT", "GMSEC.TEST.PUBLISH");
 		int         monitorRate = get("MONITOR-RATE", 1000); // Time to wait between reporting the achieved throughput
 
 		//o Output middleware version
-		GMSEC_INFO << "Middleware version = " << connection->getLibraryVersion();
+		GMSEC_INFO << "Middleware version = " << connMgr->getLibraryVersion();
 
 		//o Output information
 		GMSEC_INFO << "Subscribing to subject '" << subject.c_str() << "'";
 
-		connection->subscribe(subject.c_str());
+		(void) connMgr->subscribe(subject.c_str());
 
 		GMSEC_INFO << "Reporting throughput status every " << monitorRate << " milliseconds";
 
@@ -105,20 +106,24 @@ bool throughput_sub::run()
 		reportingThread->start();
 		while (!done)
 		{
-			Message* message = connection->receive();
+			Message* message = connMgr->receive(GMSEC_WAIT_FOREVER);
 
-			AutoMutex lock(mutex);
-			bytesReceived += message->getBinaryField("DATA").getLength();
-			lock.leave();
+			{
+				AutoMutex lock(mutex);
+
+				bytesReceived += message->getBinaryField("DATA").getLength();
+			}
 
 			// Check to see if any messages have been dropped based on the COUNT field
 			if (iteration++ != message->getIntegerValue("COUNT"))
 			{
 				droppedMsgCount += 1;
 			}
+
+			connMgr->release(message);
 		}
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
 		GMSEC_ERROR << e.what();
 		success = false;
@@ -138,9 +143,9 @@ size_t throughput_sub::getNumBitsReceived()
 {
 	// Need to reset the number of bytes received every so often so that it does not grow in an unbounded fashion and cause an overflow
 	AutoMutex lock(mutex);
+
 	size_t rcvd = bytesReceived;
 	bytesReceived = 0;
-	lock.leave();
 
 	return rcvd;
 }
@@ -170,7 +175,7 @@ void runReporter(StdSharedPtr<status_reporter> reporter)
 	{
 		reporter.get()->run();
 	}
-	catch (std::exception& e)
+	catch (const std::exception& e)
 	{
 		GMSEC_ERROR << "Reporting thread terminated with error: " << e.what();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -28,7 +28,7 @@ libgmsec_perl::Callback
 
 =head1 DESCRIPTION
 
-This package is the abstract base package for received message callbacks. A user created package, derived from this package, can be passed into Subscribe() and Request() to have user code executed asynchronously when a message is received. Please note that because users are able to create their own Callback package, reentrancy is not guarunteed unless if reentrancy rules are specified. Also note that because a Callback can be registered to multiple connections, it can be run concurrently amongst those connections. Because of this, the use of a libgmsec_perl::AutoMutex is suggested to enforce thread safety.
+This package is the abstract base package for received message callbacks. A user created package, derived from this package, can be passed into Subscribe() and Request() to have user code executed asynchronously when a message is received. Please note that because users are able to create their own Callback package, reentrancy is not guarunteed unless if reentrancy rules are specified. Also note that because a Callback can be registered to multiple connections, it can be run concurrently amongst those connections. Because of this, the use of a libgmsec_perl::Mutex is suggested to enforce thread safety.
 
 Example Callback package:
 

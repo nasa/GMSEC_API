@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,16 +12,17 @@
 #include "ConnectionWriter.h"
 #include "TCPSocketServer.h"
 
+
 #include <gmsec4/Message.h>
 
 #include <gmsec4/util/Atomics.h>
 #include <gmsec4/util/Mutex.h>
 #include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/StdThread.h>
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <list>
-#include <memory>
 #include <string>
 #include <queue>
 
@@ -142,9 +143,9 @@ private:
 	void doPublish(const MBFastMessage& msg);
 
 
-	typedef std::queue<MBFastMessage*>                       MessageQueue;
-	typedef std::auto_ptr<gmsec::api::util::StdThread>       ConnWriterThread;
-	typedef gmsec::api::util::StdSharedPtr<ConnectionWriter> ConnWriterShared;
+	typedef std::queue<MBFastMessage*>                                  MessageQueue;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> ConnWriterThread;
+	typedef gmsec::api::util::StdSharedPtr<ConnectionWriter>            ConnWriterShared;
 
 
 	// Member data

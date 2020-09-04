@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,8 +15,10 @@
 
 #include <gmsec4/internal/mist/HeartbeatService.h>
 
+#include <gmsec4/mist/ConnectionManager.h>
+#include <gmsec4/mist/Specification.h>
+
 #include <gmsec4/Config.h>
-#include <gmsec4/Connection.h>
 #include <gmsec4/Errors.h>
 #include <gmsec4/Exception.h>
 #include <gmsec4/Fields.h>
@@ -52,19 +54,24 @@ namespace internal
 
 HeartbeatService::HeartbeatService(const Config& config, const Message& msgTemplate)
 	: m_config(config),
-	  m_connection(0),
+	  m_connMgr(0),
 	  m_msg(msgTemplate),
 	  m_pubInterval(30),
-	  m_counter(0),
+	  m_counter(1),
 	  m_publishAction(0),
 	  m_startupLatch(1),
 	  m_shutdownLatch(1)
 {
 	const Field* pubRate = m_msg.getField("PUB-RATE");
-
 	if (pubRate)
 	{
 		m_pubInterval = (GMSEC_U16) pubRate->getUnsignedIntegerValue();
+	}
+
+	const Field* counter = m_msg.getField("COUNTER");
+	if (counter)
+	{
+		m_counter = (GMSEC_U16) counter->getUnsignedIntegerValue();
 	}
 
 	m_alive.set(false);
@@ -75,9 +82,10 @@ HeartbeatService::~HeartbeatService()
 {
 	m_alive.set(false);
 
-	if (m_connection)
+	if (m_connMgr)
 	{
 		teardownService();
+		delete m_connMgr;
 	}
 }
 
@@ -165,16 +173,12 @@ void HeartbeatService::run()
 
 		while (m_alive.get())
 		{
-			bool publishMsg = false;
+			bool publishMsg = m_publishAction->tryNow();
 
 			if (firstTime)
 			{
 				publishMsg = true;
 				firstTime  = false;
-			}
-			else
-			{
-				publishMsg = m_publishAction->tryNow();
 			}
 
 			if (publishMsg)
@@ -187,8 +191,6 @@ void HeartbeatService::run()
 
 					if (field != NULL)
 					{
-						++m_counter;
-
 						if (field->getType() == Field::I16_TYPE)
 						{
 							m_counter %= GMSEC_U32(std::numeric_limits<GMSEC_I16>::max() + 1);
@@ -205,9 +207,18 @@ void HeartbeatService::run()
 						}
 					}
 
-					m_connection->publish(m_msg);
+					if (m_connMgr->getSpecification().getVersion() == GMSEC_ISD_2014_00)
+					{
+						std::ostringstream oss;
+						oss << "GMSEC-C2CX-HB-" << m_counter;
+						m_msg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
+					}
+
+					m_connMgr->publish(m_msg);
 
 					GMSEC_VERBOSE << "HeartbeatService published C2CX-HB message.";
+
+					++m_counter;
 				}
 				catch (Exception& e)
 				{
@@ -218,14 +229,6 @@ void HeartbeatService::run()
 			// Delay a bit (less than a second) so that in case the PUB-RATE is
 			// zero, we do not hammer the CPU.
 			gmsec::api::util::TimeUtil::millisleep(500);
-
-#if 0
-			// Only publish one heartbeat message if the PUB-RATE is zero.
-			if (m_pubInterval == 0)
-			{
-				m_alive.set(false);
-			}
-#endif
 		}
 	}
 
@@ -246,12 +249,12 @@ Status HeartbeatService::setupService()
 
 	try
 	{
-		m_connection = Connection::create(m_config);
-		m_connection->connect();
+		m_connMgr = new ConnectionManager(m_config);
+		m_connMgr->initialize();
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
-		GMSEC_ERROR << "HeartbeatService is unable to create a connection: " << e.what();
+		GMSEC_ERROR << "HeartbeatService is unable to create a ConnectionManager: " << e.what();
 		status.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage());
 	}
 
@@ -263,14 +266,13 @@ Status HeartbeatService::teardownService()
 {
 	Status status;
 
-	if (m_connection)
+	if (m_connMgr)
 	{
 		try
 		{
-			m_connection->disconnect();
-			Connection::destroy(m_connection);
+			m_connMgr->cleanup();
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			status.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage());
 		}

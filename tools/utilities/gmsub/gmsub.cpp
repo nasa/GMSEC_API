@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -23,14 +23,11 @@
 #include <string>
 #include <vector>
 
-using namespace gmsec::api;
-using namespace gmsec::api::util;
 
-
-class GMSEC_Subscriber : public Utility
+class GMSEC_Subscriber : public gmsec::api::util::Utility
 {
 public:
-	GMSEC_Subscriber(const Config& config);
+	GMSEC_Subscriber(const gmsec::api::Config& config);
 
 	~GMSEC_Subscriber();
 
@@ -39,19 +36,19 @@ public:
 	bool run();
 
 private:
-	typedef std::vector<std::string>       Subjects;
-	typedef std::vector<SubscriptionInfo*> Subscriptions;
+	typedef std::vector<std::string> Subjects;
+	typedef std::vector<gmsec::api::mist::SubscriptionInfo*> Subscriptions;
 
 
-	Connection*   connection;
-	Subjects      subjects;
-	Subscriptions subscriptions;
+	gmsec::api::mist::ConnectionManager* connMgr;
+	Subjects                             subjects;
+	Subscriptions                        subscriptions;
 };
 
 
-GMSEC_Subscriber::GMSEC_Subscriber(const Config& c)
+GMSEC_Subscriber::GMSEC_Subscriber(const gmsec::api::Config& c)
 	: Utility(c),
-	  connection(0),
+	  connMgr(0),
 	  subjects(),
 	  subscriptions()
 {
@@ -64,27 +61,30 @@ GMSEC_Subscriber::~GMSEC_Subscriber()
 {
 	try
 	{
-		if (connection)
+		if (connMgr)
 		{
+			//o Normally, applications should not have to unsubscribe(). When not performed,
+			//  the ConnectionManager will take care of this automatically when cleanup() is called.
 			for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
 			{
-				SubscriptionInfo* info = *it;
+				gmsec::api::mist::SubscriptionInfo* info = *it;
 
 				GMSEC_INFO << "Unsubscribing from " << info->getSubject();
-				connection->unsubscribe(info);
+
+				connMgr->unsubscribe(info);
 			}
 
-			connection->disconnect();
+			connMgr->cleanup();
 
-			Connection::destroy(connection);
+			delete connMgr;
 		}
 	}
-	catch (const Exception& e)
+	catch (const gmsec::api::Exception& e)
 	{
 		GMSEC_ERROR << e.what();
 	}
 
-	Connection::shutdownAllMiddlewares();
+	gmsec::api::mist::ConnectionManager::shutdownAllMiddlewares();
 }
 
 
@@ -114,15 +114,15 @@ bool GMSEC_Subscriber::run()
 	bool success = true;
 
 	//o output GMSEC API version
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << gmsec::api::mist::ConnectionManager::getAPIVersion();
 
 	try
 	{
 		//o Create the Connection
-		connection = Connection::create(getConfig());
+		connMgr = new gmsec::api::mist::ConnectionManager(getConfig());
 
 		//o Connect
-		connection->connect();
+		connMgr->initialize();
 
 		//o Determine the subjects to listen to
 		determineSubjects(subjects);
@@ -138,14 +138,14 @@ bool GMSEC_Subscriber::run()
 		}
 
 		//o Output the middleware information
-		GMSEC_INFO << "Middleware version = " << connection->getLibraryVersion();
+		GMSEC_INFO << "Middleware version = " << connMgr->getLibraryVersion();
 
 		//o Subscribe
 		for (size_t i = 0; i < subjects.size(); ++i)
 		{
 			GMSEC_INFO << "Subscribing to " << subjects[i].c_str();
 
-			SubscriptionInfo* info = connection->subscribe(subjects[i].c_str());
+			gmsec::api::mist::SubscriptionInfo* info = connMgr->subscribe(subjects[i].c_str());
 
 			subscriptions.push_back(info);
 		}
@@ -157,7 +157,7 @@ bool GMSEC_Subscriber::run()
 		double nextTime;
 		double elapsedTime = 0;
 
-		prevTime = TimeUtil::getCurrentTime_s();
+		prevTime = gmsec::api::util::TimeUtil::getCurrentTime_s();
 
 		while (!done)
 		{
@@ -168,11 +168,11 @@ bool GMSEC_Subscriber::run()
 				continue;
 			}
 
-			Message* message = connection->receive(msg_timeout_ms);
+			gmsec::api::Message* message = connMgr->receive(msg_timeout_ms);
 
 			if (prog_timeout_s != GMSEC_WAIT_FOREVER)
 			{
-				nextTime = TimeUtil::getCurrentTime_s();
+				nextTime = gmsec::api::util::TimeUtil::getCurrentTime_s();
 				elapsedTime += (nextTime - prevTime);
 				prevTime = nextTime;
 			}
@@ -190,11 +190,11 @@ bool GMSEC_Subscriber::run()
 				done = (iterations > 0 && count >= iterations);
 				done = done || (std::string(message->getSubject()) == "GMSEC.TERMINATE");
 
-				connection->release(message);
+				connMgr->release(message);
 			}
 		}
 	}
-	catch (Exception& e)
+	catch (const gmsec::api::Exception& e)
 	{
 		GMSEC_ERROR << e.what();
 		success = false;
@@ -206,7 +206,7 @@ bool GMSEC_Subscriber::run()
 
 int main(int argc, char* argv[])
 {
-	Config config(argc, argv);
+	gmsec::api::Config config(argc, argv);
 
 	GMSEC_Subscriber gmsub(config);
 

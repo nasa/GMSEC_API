@@ -2,7 +2,7 @@
 
 
 """
- Copyright 2007-2017 United States Government as represented by the
+ Copyright 2007-2019 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -50,7 +50,7 @@ class ValidationCallback(libgmsec_python.ConnectionManagerCallback):
 
             # Start by checking to ensure that this is a PROD message
             if (isProdMsg(message)):
-                prodMessage = libgmsec_python.ProductFileMessage(message.toXML())
+                prodMessage = libgmsec_python.ProductFileMessage(connMgr.getSpecification(), message.toXML())
 
                 # Get the iterator so that we can analyze each Product File within the message
                 prodFileIter = prodMessage.getProductFileIterator()

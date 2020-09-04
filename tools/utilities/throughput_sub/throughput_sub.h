@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,25 +21,14 @@
 
 #include <string>
 
-namespace gmsec
-{
-namespace api
-{
-	// Forward Declarations
-	class Config;
-	class Connection;
-}
-}
-
+// Forward declaration(s)
 class status_reporter;
 
-using namespace gmsec::api;
-using namespace gmsec::api::util;
 
-class throughput_sub : public Utility
+class throughput_sub : public gmsec::api::util::Utility
 {
 public:
-	throughput_sub(const Config& config);
+	throughput_sub(const gmsec::api::Config& config);
 
 	~throughput_sub();
 
@@ -52,13 +41,13 @@ public:
 	bool run();
 
 private:
-	Connection* connection;
-	StdThread*  reportingThread;
-	size_t      bytesReceived;
-	int         droppedMsgCount;
-	mutable     gmsec::api::util::Mutex mutex;
+	gmsec::api::mist::ConnectionManager* connMgr;
+	gmsec::api::util::StdThread*         reportingThread;
+	size_t                               bytesReceived;
+	int                                  droppedMsgCount;
+	mutable gmsec::api::util::Mutex      mutex;
 };
 
-void runReporter(StdSharedPtr<status_reporter> reporter);
+void runReporter(gmsec::api::util::StdSharedPtr<status_reporter> reporter);
 
 #endif

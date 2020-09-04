@@ -1,12 +1,12 @@
 
 %feature("docstring") gmsec::api::mist::message::MnemonicMessage "
 
-    A MistMessage object that is capable of storing Mnemonic objects
-    The following message schema IDs and their templates are supported:
+    A MistMessage that is capable of storing Mnemonics.
 
-        MSG.MVAL
-        REQ.MVAL
-        RESP.MVAL
+    The following message schema IDs and their templates are supported:
+    MSG.MVAL
+    REQ.MVAL
+    RESP.MVAL
 
     See Also
     --------
@@ -15,118 +15,126 @@
     Config
     Specification
     Field
-    MsgFieldIterator
+    MessageFieldIterator
 
     CONSTRUCTORS:
 
-    MnemonicMessage(self, subject, version)
+    MnemonicMessage(subject: str, schemaID: str, spec: Specification)
 
     Initializes the message instance.
 
     Parameters
     ----------
-    subject: The subject string for the message.
-    version: The version of the GMSEC message specification to be used.
+    subject  : The subject string for the message.
+    schemaID : The string used to identify the message schema in the GMSEC ISD.
+               The schema ID has the format of: MessageKind.MessageType (e.g. MSG.MVAL).
+    spec     : The Specification this message's schema will adhere to.
 
-    MnemonicMessage(self, subject, config, version)
+
+
+    MnemonicMessage(subject: str, schemaID: str, config: Config, spec: Specification)
 
     Initializes the message instance.
 
     Parameters
     ----------
-    subject: The subject string for the message.
-    config: A configuration to associate with the message.
-    version: The version of the GMSEC message specification to be used.
+    subject  : The subject string for the message.
+    schemaID : The string used to identify the message schema in the GMSEC ISD.
+               The schema ID has the format of: messageKind.messageType (e.g. MSG.MVAL).
+    config   : A Config to associate with the message.
+    spec     : The Specification this message's schema will adhere to.
 
-    MnemonicMessage(self, other)
 
-    Copy constructor - initializes the message instance using the other
-    given MnemonicMessage.
+
+    MnemonicMessage(other: MnemonicMessage)
+
+    Copy constructor - initializes the message instance using the other given MnemonicMessage.
 
     Parameters
     ----------
-    other: The other MnemonicMessage object to copy.
+    other : The MnemonicMessage to copy.
 
-    MnemonicMessage(self, data)
+
+
+    MnemonicMessage(data: str)
 
     Initializes a MnemonicMessage from an XML or JSON string.
 
     Parameters
     ----------
-    data: XML or JSON string used to initialize MnemonicMessage.
-";
-
-
-%feature("docstring") gmsec::api::mist::message::MnemonicMessage::getMnemonic "
-
-    getMnemonic(self, index) -> Mnemonic
-
-    Get mnemonic numbered at index. Note that the index which will be
-    retrieved does not correspond to the GMSEC ISD and starts from 0
-    instead of 1. For example, getMnemonic(0) would return the Mnemonic
-    corresponding to MNEMONIC.1.
-
-    Returns
-    -------
-    Mnemonic at specified index inside of MnemonicMessage.
+    data : XML or JSON string used to initialize MnemonicMessage.
 
     Exceptions
     ----------
-    A GmsecError is thrown if the index specified is not in the range
-    of Mnemonics in this message.
+    A GmsecError is thrown if the given data does not represent a valid XML or JSON statement.
 
-    Note: This function has been deprecated, use MnemonicIterator
-    instead.
+    Note
+    ----------
+    This constructor has been deprecated. Use MnemonicMessage(self, spec, data) instead.
+
+
+
+    MnemonicMessage(spec: Specification, data: str)
+
+    Initializes a MnemonicMessage using the given XML or JSON data representation of the message, and ensures the message adheres to the provided specification.
+
+    Parameters
+    ----------
+    spec : The Specification this message's schema will adhere to.
+    data : XML of JSON string used to initialize the message.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the given data does not represent a valid XML or JSON statement.
+    A GmsecError is thrown if the given data does not represent a Mnemonic Message.
 ";
 
 
 %feature("docstring") gmsec::api::mist::message::MnemonicMessage::getMnemonicIterator "
 
-    getMnemonicIterator(self) -> MnemonicIterator
+    get_mnemonic_iterator(self) -> MnemonicIterator
 
     Method that allows the callee to get the MnemonicIterator associated
     with the MnemonicMessage.
     This iterator will allow for applications to iterate over the
-    Mnemonic objects stored within the MnemonicMessage.
+    Mnemonics stored within the MnemonicMessage.
     The iterator is reset each time getMnemonicIterator() is called.
-    The iterator itself is destroyed when the MnemonicMessage object
+    The iterator itself is destroyed when the MnemonicMessage
     is destroyed.
 
-    Note: Only one MnemonicIterator object is associated with a
-    MnemonicMessage object; multiple calls to getMnemonicIterator()
-    will return a reference to the same MnemonicIterator object. Each
+    Note: Only one MnemonicIterator is associated with a
+    MnemonicMessage; multiple calls to getMnemonicIterator()
+    will return a reference to the same MnemonicIterator. Each
     call will reset the iterator.
 
     Returns
     -------
-    A reference to a MnemonicIterator object.
+    A reference to a MnemonicIterator.
 ";
 
 %feature("docstring") gmsec::api::mist::message::MnemonicMessage::addMnemonic "
 
-    addMnemonic(self, mnemonic)
+    add_mnemonic(self, mnemonic: Mnemonic)
 
     Add a mnemonic to the message.
+
+    Parameters
+    ----------
+    mnemonic : The Mnemonic to add to the message.
 ";
 
 
 %feature("docstring") gmsec::api::mist::message::MnemonicMessage::convertMessage "
 
-    convertMessage(message) -> MnemonicMessage
+    convert_message(message: Message) -> MnemonicMessage
 
-    Constructs and returns a MnemonicMessage from an an ordinary
-    message.
+    Constructs and returns a MnemonicMessage from an an ordinary message.
+
+    Parameters
+    ----------
+    message - The Message to convert, if possible, into a MnemonicMessage.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the given Message cannot be converted to a MnemonicMessage.
 ";
-
-
-%feature("docstring") gmsec::api::mist::message::MnemonicMessage::getNumMnemonics "
-
-    getNumMnemonics(self) -> size_t
-
-    Get the number of mnemonics in this message.
-
-    Returns
-    -------
-    Return the number of mnemonics in the message.
-";
-

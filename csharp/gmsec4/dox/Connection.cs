@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -26,7 +26,7 @@ public class Connection : global::System.IDisposable {
   }
 
   /// <summary>Creates an instance of a Connection object based on the given configuration.</summary>
-  /// <param name="config">The configuration object that specifies the type of Connection object to create.</param>
+  /// <param name="cfg">The configuration object that specifies the type of Connection object to create.</param>
   /// <exception cref="GmsecException">The configuration information cannot be used to deduce the connection object type.</exception>
   public static Connection Create(Config cfg) {
   }
@@ -127,15 +127,15 @@ public class Connection : global::System.IDisposable {
   }
 
   /// <summary>Publishes a message to the middleware</summary>
-  /// <param name="msg">The message to publish.</summary>
+  /// <param name="msg">The message to publish.</param>
   /// <exception cref="GmsecException">If an error occurs while attempting to publish the message.</exception>
   public void Publish(Message msg) {
   }
 
   /// <summary>Publishes a message to the middleware using the config object provided to toggle between special
   /// middleware-level publish methodalities. (eg. ActiveMQ - Durable Producer)</summary>
-  /// <param name="msg">The message to publish.</summary>
-  /// <param name="config">The configuration object to be used by the publish operation.</summary>
+  /// <param name="msg">The message to publish.</param>
+  /// <param name="config">The configuration object to be used by the publish operation.</param>
   /// <exception cref="GmsecException">If an error occurs while attempting to publish the message.</exception>
   public void Publish(Message msg, Config config) {
   }
@@ -188,10 +188,12 @@ public class Connection : global::System.IDisposable {
   public Message Request(Message request, int timeout) {
   }
 
+/*
   /// <summary>Cancels a pending request that may be associated with the given ReplyCallback.</summary>
   /// <param name="rcb">The reply callback that is currently being used to receive a reply message</param>
-  public void CancelRequest(ReplyCallback cb) {
+  public void CancelRequest(ReplyCallback rcb) {
   }
+*/
 
   /// <summary>Sends a reply in response to a given request.</summary>
   /// <param name="request">The request message that was received, and to which we are responding to.</param>

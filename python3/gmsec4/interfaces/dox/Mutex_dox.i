@@ -5,12 +5,12 @@
 
     CONSTRUCTOR:
 
-    Mutex(self)
+    Mutex()
 ";
 
 %feature("docstring") gmsec::api::util::Mutex::enterMutex "
 
-    enterMutex(self)
+    enter_mutex(self)
 
     Waits until the Mutex is aquired and locks. This is a reentrant
     function.
@@ -18,7 +18,7 @@
 
 %feature("docstring") gmsec::api::util::Mutex::leaveMutex "
 
-    leaveMutex(self)
+    leave_mutex(self)
 
     Releases the mutex. If the mutex has been \"entered\" multiple
     times, only one release is required.

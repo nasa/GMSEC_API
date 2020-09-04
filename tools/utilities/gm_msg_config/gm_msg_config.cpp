@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,27 +22,11 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 using namespace gmsec::api;
+using namespace gmsec::api::mist;
 
-
-static std::string msgtypes[] =
-{
-	"LOG", "ARCHIVE-MESSAGE-RETRIEVAL-REQUEST",
-	"ARCHIVE-MESSAGE-RETRIEVAL-RESPONSE", "DIRECTIVE-REQUEST",
-	"DIRECTIVE-RESPONSE", "C2CX-CONFIGURATION", "C2CX-CONTROL",
-	"C2CX-DEVICE", "C2CX-HEARTBEAT", "C2CX-RESOURCE",
-	"TELEMETRY-CCSDS-PACKET", "TELEMETRY-CCSDS-FRAME",
-	"REPLAY-TELEMETRY-REQUEST", "REPLAY-TELEMETRY-RESPONSE",
-	"MNEMONIC-VALUE-REQUEST", "MNEMONIC-VALUE-RESPONSE",
-	"MNEMONIC-VALUE-DATA-MESSAGE", "ARCHIVE-MNEMONIC-VALUE-REQUEST",
-	"ARCHIVE-MNEMONIC-VALUE-RESPONSE", "ARCHIVE-MNEMONIC-VALUE-DATA",
-	"DATABASE-ATTRIBUTES-REQUEST", "DB-RESPONSE-LIMIT-SET",
-	"DB-RESPONSE-TEXT-CONVERSION", "DB-RESPONSE-CAL-CURVE",
-	"DB-RESPONSE-SHORT-DESCRIPTION", "DB-RESPONSE-LONG-DESCRIPTION",
-	"DB-RESPONSE-LIST-OF-MNEMONICS", "COMMAND-REQUEST", "COMMAND-RESPONSE",
-	"PRODUCT-REQUEST", "PRODUCT-RESPONSE", "PRODUCT-MSG"
-};
 
 class gm_msg_config
 {
@@ -55,39 +39,17 @@ public:
 
 private:
 	std::string cfgFilename;
-	ConfigFile  cfgFile;
-	Connection* connection;
 };
 
 
 gm_msg_config::gm_msg_config(const char* filename)
-	: cfgFilename(filename),
-	  cfgFile(),
-	  connection(0)
+	: cfgFilename(filename)
 {
-	Config tmp;
-	tmp.addValue("loglevel", "info");
-	tmp.addValue("logfile", "stdout");
 }
 
 
 gm_msg_config::~gm_msg_config()
 {
-	if (connection)
-	{
-		try
-		{
-			connection->disconnect();
-		}
-		catch (Exception& e)
-		{
-			GMSEC_ERROR << e.what();
-		}
-
-		Connection::destroy(connection);
-	}
-
-	Connection::shutdownAllMiddlewares();
 }
 
 
@@ -98,21 +60,30 @@ bool gm_msg_config::run()
 	try
 	{
 		//o Load and parse configuration file
+		ConfigFile cfgFile;
 		cfgFile.load(cfgFilename.c_str());
 
 		//o Retrieve config from file
-		Config c1 = cfgFile.lookupConfig("GMSEC-MESSAGE-BUS");
+		Config cfg = cfgFile.lookupConfig("Bolt Configuration");
 
 		//o Display details of config file
-		GMSEC_INFO << "Config:\n" << c1.toXML();
+		GMSEC_INFO << "Config:\n" << cfg.toXML();
 
-		//o Create connection from loaded config
-		connection = Connection::create(c1);
+		//o Create manifest of message(s) available from ConfigFile
+		std::vector<ConfigFile::MessageEntry> availableMessages;
 
-		//o Connect to GMSEC bus
-		connection->connect();
+		const ConfigFileIterator& iter = cfgFile.getIterator();
 
-		size_t msgnum = sizeof(msgtypes) / sizeof(msgtypes[0]);
+		while (iter.hasNextMessage())
+		{
+			const ConfigFile::MessageEntry& entry = iter.nextMessage();
+
+			availableMessages.push_back(entry);
+		}
+
+		//o Create ConnectionManager (and underlying Specification) from previously loaded config
+		ConnectionManager connMgr(cfg);
+
 		const char *separator = "\n========================================================================\n";
 
 		while (true)
@@ -121,12 +92,12 @@ bool gm_msg_config::run()
 			std::string msg_string;
 
 			std::stringstream display_types;
-			display_types << separator << "GMSEC Message format to displayed/publish:" << separator;
+			display_types << separator << "GMSEC Message to validate:" << separator;
 
-			for (size_t i = 0; i < msgnum; ++i)
+			for (size_t i = 0; i < availableMessages.size(); ++i)
 			{
 				display_types.width(2);
-				display_types << i+1 << ") " << msgtypes[i] << "\n";
+				display_types << i+1 << ") " << availableMessages[i].getName() << "\n";
 			}
 
 			display_types << " x) Exit\n\n" << "Enter value: ";
@@ -148,41 +119,28 @@ bool gm_msg_config::run()
 				msg_type = tmp.getIntegerValue("X", -1);
 			}
 
-			if ((msg_type >= 1) && (msg_type <= msgnum))
+			if ((msg_type >= 1) && (msg_type <= availableMessages.size()))
 			{
-				msg_string = msgtypes[msg_type - 1];
+				const char*    msgName = availableMessages[ msg_type - 1 ].getName();
+				const Message& msg     = availableMessages[ msg_type - 1 ].getMessage();
 
-				Message message = cfgFile.lookupMessage(msg_string.c_str());
-
-				//o Dump Message
+				//o Display XML representation of the Message
 				GMSEC_INFO << separator
-			             << " -- Displaying Format for Message Type : "
-			             << msg_string.c_str()
-			             << separator
-			             << message.toXML();
+				           << " -- Displaying Format for Message Type : "
+				           << msgName
+				           << separator
+				           << msg.toXML();
 
-				//o Attempt to publish message through the GMSEC bus
-				if (message.getKind() == Message::PUBLISH)
+				//o Validate the message
+				try
 				{
-					connection->publish(message);
-				}
-				else if (message.getKind() == Message::REQUEST)
-				{
-					Message* reply = connection->request(message, 3000, -1);
+					connMgr.getSpecification().validateMessage( msg );
 
-					if (reply)
-					{
-						GMSEC_INFO << "Received reply:\n" << reply->toXML();
-						connection->release(reply);
-					}
-					else
-					{
-						GMSEC_WARNING << "Timeout; reply not received";
-					}
+					GMSEC_INFO << "Message is valid!";
 				}
-				else if (message.getKind() == Message::REPLY)
+				catch (const Exception& e)
 				{
-					//TODO: demonstrate example
+					GMSEC_ERROR << "Message is not valid!\n" << e.what();
 				}
 			}
 			else
@@ -191,7 +149,7 @@ bool gm_msg_config::run()
 			}
 		}
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
 		GMSEC_ERROR << e.what();
 		success = false;
@@ -208,6 +166,11 @@ int main(int argc, char* argv[])
 		std::cout << "Usage: gm_msg_config <filename>" << std::endl;
 		return -1;
 	}
+
+	// Enable logging
+	Config config(argc, argv);
+	config.addValue("loglevel", config.getValue("loglevel", "info"));
+	config.addValue("logfile",  config.getValue("logfile", "stderr"));
 
 	gm_msg_config msg_config(argv[1]);
 

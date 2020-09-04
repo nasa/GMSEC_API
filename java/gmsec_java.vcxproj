@@ -184,6 +184,7 @@
     <None Include="gov\nasa\gsfc\gmsec\api\field\U8Field.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\gmsecAPI.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\GMSEC_Exception.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\HeartbeatGenerator.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIBinaryField.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIBooleanField.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNICharField.java" />
@@ -208,6 +209,7 @@
     <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIConfigFileIterator.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIConnection.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIEventCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIHeartbeatGenerator.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIMessage.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIMessageEntry.java" />
     <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIMessageFieldIterator.java" />

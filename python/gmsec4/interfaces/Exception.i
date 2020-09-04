@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,6 +10,8 @@
 #include <gmsec4/Exception.h>
 using namespace gmsec::api;
 %}
+
+%ignore gmsec::api::Exception::operator=(const Exception&);
 
 
 %include "dox/Exception_dox.i"

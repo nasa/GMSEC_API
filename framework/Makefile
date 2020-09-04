@@ -1,4 +1,4 @@
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -93,6 +93,7 @@ CORE4_OBJ	= \
 	$(OBJDIR4)/ConfigFileIterator.o \
 	$(OBJDIR4)/Connection.o \
 	$(OBJDIR4)/Exception.o \
+	$(OBJDIR4)/HeartbeatGenerator.o \
 	$(OBJDIR4)/Message.o \
 	$(OBJDIR4)/MessageFieldIterator.o \
 	$(OBJDIR4)/Status.o \
@@ -154,6 +155,7 @@ INTERNAL4_OBJ	= \
 	$(OBJDIR4)/internal/InternalConfigFileIterator.o \
 	$(OBJDIR4)/internal/InternalConnection.o \
 	$(OBJDIR4)/internal/InternalException.o \
+	$(OBJDIR4)/internal/InternalHeartbeatGenerator.o \
 	$(OBJDIR4)/internal/InternalMessage.o \
 	$(OBJDIR4)/internal/InternalMessageFieldIterator.o \
 	$(OBJDIR4)/internal/InternalStatus.o \
@@ -229,6 +231,7 @@ CAPI4_OBJ	= \
 	$(COBJDIR4)/config_file.o \
 	$(COBJDIR4)/config_file_iterator.o \
 	$(COBJDIR4)/connection.o \
+	$(COBJDIR4)/heartbeat_generator.o \
 	$(COBJDIR4)/message.o \
 	$(COBJDIR4)/message_field_iterator.o \
 	$(COBJDIR4)/status.o \

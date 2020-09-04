@@ -7,54 +7,28 @@
 
     CONSTRUCTOR:
 
-    I16Field(self, name, value)
+    I16Field(self, name: str, value: short)
 
-    Constructor for creating a specialized Field object containing a
+    Constructor for creating a specialized Field containing a
     signed 16-bit value
 
     Parameters
     ----------
-    name: the name of the Field
-    value: the value to store
+    name  : The name of the Field
+    value : The value to store
 
     Exceptions
     ----------
-    A GmsecError is thrown if the name is NULL, or is an empty string.
+    A GmsecError is thrown if the name is None, or is an empty string.
 ";
 
 %feature("docstring") gmsec::api::I16Field::getValue "
 
-    getValue(self) -> GMSEC_I16
+    get_value(self) -> short
 
-    Exposes the underlying value held by the object.
-
-    Returns
-    -------
-    Returns the value associated with the object.
-";
-
-
-%feature("docstring") gmsec::api::I16Field::toJSON "
-
-    toJSON(self) -> char const *
-
-    Convenience method that returns the JSON string representation of
-    this object.
+    Exposes the underlying value held by the field.
 
     Returns
     -------
-    A JSON string.
-";
-
-
-%feature("docstring") gmsec::api::I16Field::toXML "
-
-    toXML(self) -> char const *
-
-    Convenience method that returns the XML string representation of
-    this object.
-
-    Returns
-    -------
-    An XML string.
+    Returns the value associated with the field.
 ";

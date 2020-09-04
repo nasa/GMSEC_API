@@ -78,7 +78,7 @@ C<libgmsec_perl::LogHandler-E<gt>onMessage($entry)>
 
         This function is called by the API in response to a log message. A class derrived from libgmsec_perl::LogHandler needs to be registered with Log::registerHandler() in order to be called for a particular logging level.
 
-        Because this class is user defined, it is not considered thread-safe unless made so by the user. The use of a libgmsec_perl::AutoMutex is suggested to encapsulate any sensitive code blocks.
+        Because this class is user defined, it is not considered thread-safe unless made so by the user. The use of a libgmsec_perl::Mutex is suggested to encapsulate any sensitive code blocks.
 
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>

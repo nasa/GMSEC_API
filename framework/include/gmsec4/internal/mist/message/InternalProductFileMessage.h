@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -60,6 +60,9 @@ public:
 	InternalProductFileMessage(const char* data);
 
 
+	InternalProductFileMessage(const Specification& spec, const char* data);
+
+
 	virtual ~InternalProductFileMessage();
 
 
@@ -99,16 +102,11 @@ public:
 private:
 	ProductFile extractMessageProductFile(size_t index);
 
-	void init(ResponseStatus::Response responseStatus, 
-			  const char* schemaID);
+	void init(ResponseStatus::Response responseStatus, const char* schemaID);
 
 	std::vector<ProductFile>              m_list;
 	std::vector<ProductFile>::iterator    m_listIter;
 	gmsec::api::mist::ProductFileIterator m_productFileIterator;
-
-	ResponseStatus::Response              m_responseStatus;
-	std::string                           m_productType;
-	std::string                           m_productSubtype;
 };
 
 } // namespace internal

@@ -311,10 +311,6 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\GMSEC_API\framework\src\gmsec4\internal\mist\InternalFieldSpecification.cpp" />
-    <ClCompile Include="..\GMSEC_API\framework\src\gmsec4\internal\mist\InternalMessageSpecification.cpp" />
-    <ClCompile Include="..\GMSEC_API\framework\src\gmsec4\mist\FieldSpecification.cpp" />
-    <ClCompile Include="..\GMSEC_API\framework\src\gmsec4\mist\MessageSpecification.cpp" />
     <ClCompile Include="framework\src\gmsec4\Config.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ObjectFileName>
@@ -637,6 +633,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects\Release\api4\c\</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects\Release\api4\c\</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\heartbeat_generator.cpp" />
     <ClCompile Include="framework\src\gmsec4\c\message.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects\Debug\api4\c\</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects\Debug\api4\c\</ObjectFileName>
@@ -1169,6 +1166,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\HeartbeatGenerator.cpp" />
     <ClCompile Include="framework\src\gmsec4\internal\ActiveSubscriptions.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ObjectFileName>
@@ -1617,6 +1615,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalHeartbeatGenerator.cpp" />
     <ClCompile Include="framework\src\gmsec4\internal\InternalMessage.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ObjectFileName>
@@ -1841,6 +1840,8 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalFieldSpecification.cpp" />
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalMessageSpecification.cpp" />
     <ClCompile Include="framework\src\gmsec4\internal\mist\InternalMnemonic.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</ObjectFileName>
@@ -2415,6 +2416,8 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\FieldSpecification.cpp" />
+    <ClCompile Include="framework\src\gmsec4\mist\MessageSpecification.cpp" />
     <ClCompile Include="framework\src\gmsec4\mist\message\DeviceMessage.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/message/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/message/</ObjectFileName>
@@ -3158,6 +3161,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClInclude Include="framework\include\gmsec4\c\field\u32_field.h" />
     <ClInclude Include="framework\include\gmsec4\c\field\u64_field.h" />
     <ClInclude Include="framework\include\gmsec4\c\field\u8_field.h" />
+    <ClInclude Include="framework\include\gmsec4\c\heartbeat_generator.h" />
     <ClInclude Include="framework\include\gmsec4\c\message.h" />
     <ClInclude Include="framework\include\gmsec4\c\message_field_iterator.h" />
     <ClInclude Include="framework\include\gmsec4\c\mist\connection_manager.h" />
@@ -3203,6 +3207,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClInclude Include="framework\include\gmsec4\field\U32Field.h" />
     <ClInclude Include="framework\include\gmsec4\field\U64Field.h" />
     <ClInclude Include="framework\include\gmsec4\field\U8Field.h" />
+    <ClInclude Include="framework\include\gmsec4\HeartbeatGenerator.h" />
     <ClInclude Include="framework\include\gmsec4\internal\ActiveSubscriptions.h" />
     <ClInclude Include="framework\include\gmsec4\internal\AsyncPublisher.h" />
     <ClInclude Include="framework\include\gmsec4\internal\CallbackAdapter.h" />
@@ -3238,6 +3243,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClInclude Include="framework\include\gmsec4\internal\InternalConfigFileIterator.h" />
     <ClInclude Include="framework\include\gmsec4\internal\InternalConnection.h" />
     <ClInclude Include="framework\include\gmsec4\internal\InternalException.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalHeartbeatGenerator.h" />
     <ClInclude Include="framework\include\gmsec4\internal\InternalMessage.h" />
     <ClInclude Include="framework\include\gmsec4\internal\InternalMessageFieldIterator.h" />
     <ClInclude Include="framework\include\gmsec4\internal\InternalStatus.h" />
@@ -3339,6 +3345,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClInclude Include="framework\include\gmsec4\util\Buffer.h" />
     <ClInclude Include="framework\include\gmsec4\util\Condition.h" />
     <ClInclude Include="framework\include\gmsec4\util\CountDownLatch.h" />
+    <ClInclude Include="framework\include\gmsec4\util\cxx.h" />
     <ClInclude Include="framework\include\gmsec4\util\DataList.h" />
     <ClInclude Include="framework\include\gmsec4\util\Deprecated.h" />
     <ClInclude Include="framework\include\gmsec4\util\List.h" />
@@ -3349,6 +3356,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClInclude Include="framework\include\gmsec4\util\Mutex.h" />
     <ClInclude Include="framework\include\gmsec4\util\StdSharedPtr.h" />
     <ClInclude Include="framework\include\gmsec4\util\StdThread.h" />
+    <ClInclude Include="framework\include\gmsec4\util\StdUniquePtr.h" />
     <ClInclude Include="framework\include\gmsec4\util\TimeUtil.h" />
     <ClInclude Include="framework\include\gmsec4\util\wdllexp.h" />
     <ClInclude Include="framework\include\gmsec\Callback.h" />

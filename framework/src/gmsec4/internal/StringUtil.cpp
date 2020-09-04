@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -224,38 +224,29 @@ void StringUtil::copyBytes(void * dest, const void *src, size_t count)
 
 std::vector<std::string> StringUtil::split(const std::string& str, const char delimiter)
 {
-	std::vector<std::string> ret;
+	std::string delimiterStr;
 
-	std::string current = "";
-	for (size_t i = 0; i < str.length(); i++)
-	{
-		if (str[i] != delimiter)
-			current += str[i];
-		else
-		{
-			ret.push_back(current);
-			current = "";
-		}
-	}
+	delimiterStr += delimiter;
 
-	ret.push_back(current);
-	return ret;
+	return split(str, delimiterStr);
 }
 
 std::vector<std::string> StringUtil::split(const std::string& str, const std::string& delimiter)
 {
 	std::vector<std::string> ret;
 
-	std::string current = str;
+	size_t begin = 0;
+	size_t end = str.find(delimiter);
 
-	while (current.find(delimiter) != std::string::npos)
+	while (end != std::string::npos)
 	{
-		ret.push_back(current.substr(0, current.find(delimiter)));
+		ret.push_back(str.substr(begin, end - begin));
 
-		current.erase(0, current.find(delimiter) + delimiter.size());
+		begin = end + delimiter.length();
+		end = str.find(delimiter, begin);
 	}
 
-	ret.push_back(current);
+	ret.push_back(str.substr(begin));
 
 	return ret;
 }
@@ -437,7 +428,7 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 
 bool StringUtil::stringIsTrue(const char * s)
 {
-	return (s ? stringEqualsIgnoreCase(s, "TRUE") || stringEqualsIgnoreCase(s, "YES") : false);
+	return (s ? stringEquals(s, "1") || stringEqualsIgnoreCase(s, "TRUE") || stringEqualsIgnoreCase(s, "YES") : false);
 }
 
 

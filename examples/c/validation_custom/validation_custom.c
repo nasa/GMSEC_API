@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,8 +42,10 @@ GMSEC_BOOL isProdMsg(GMSEC_Message message, GMSEC_Status status);
 void validationCallback(GMSEC_ConnectionMgr connMgr, const GMSEC_Message message)
 {
 	GMSEC_Status status = statusCreate();
+	GMSEC_Specification spec = connectionManagerGetSpecification(connMgr, NULL);
+
 	//o Run the message through the GMSEC API-supplied validation
-	specificationValidateMessage(connectionManagerGetSpecification(connMgr, status), message, status);
+	specificationValidateMessage(spec, message, status);
 	checkStatus(status);
 
 	//o In this example scenario, we are expecting to receive a
@@ -61,7 +63,7 @@ void validationCallback(GMSEC_ConnectionMgr connMgr, const GMSEC_Message message
 	if(isProdMsg(message, status))
 	{
 		GMSEC_ProductFileIterator prodIter;
-		GMSEC_Message prodMessage = productFileMessageCreateUsingData(messageToXML(message, NULL), status);
+		GMSEC_Message prodMessage = productFileMessageCreateUsingSpecAndData(spec, messageToXML(message, NULL), status);
 		checkStatus(status);
 
 		//o Extract the Product File URI location(s) from the

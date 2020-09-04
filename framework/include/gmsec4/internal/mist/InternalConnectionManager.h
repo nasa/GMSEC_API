@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,6 +14,10 @@
 #ifndef GMSEC_INTERNAL_CONNECTIONMANAGER_H
 #define GMSEC_INTERNAL_CONNECTIONMANAGER_H
 
+#include <gmsec4/mist/ConnectionManager.h>
+
+#include <gmsec4/mist/message/MistMessage.h>
+
 #include <gmsec4/Config.h>
 #include <gmsec4/Connection.h>
 #include <gmsec4/Message.h>
@@ -26,17 +30,15 @@
 #include <gmsec4/internal/mist/MessagePopulator.h>
 
 #include <gmsec4/util/DataList.h>
-
-#include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/Mutex.h>
+#include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/StdThread.h>
-
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4_defs.h>
 
 #include <list>
-#include <memory>
 #include <string>
 
 
@@ -50,7 +52,6 @@ namespace api
 namespace mist
 {
 	// Forward declarations(s)
-	class ConnectionManager;
 	class ConnectionManagerCallback;
 	class ConnectionManagerEventCallback;
 	class ConnectionManagerReplyCallback;
@@ -226,10 +227,11 @@ public:
 	                                        GMSEC_I32 republish_ms = 0);
 
 
-	void publishResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval);
+	void publishResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval); // deprecated
+	void publishResourceMessage(const char* subject, size_t pubRate, size_t sampleInterval, size_t averageInterval);
 
 
-	Message createResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval);
+	message::MistMessage createResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval);
 
 
 	void startResourceMessageService(const char* subject, size_t intervalSeconds, size_t sampleInterval, size_t averageInterval);
@@ -355,7 +357,7 @@ private:
 	std::string                          m_logSubject;
 	FieldList                            m_standardLogFields;
 
-	size_t                               m_resourceMessageCounter;
+	GMSEC_U16                            m_resourceMessageCounter;
 	SubscriptionList                     m_subscriptions;
 	MessagePopulator*                    m_messagePopulator;
 	mutable gmsec::api::util::Mutex      m_cmLock;
@@ -364,14 +366,24 @@ private:
 	gmsec::api::mist::ConnectionManager* m_parent;
 	MistCallbackAdapter*                 m_callbackAdapter;
 
-	std::auto_ptr<gmsec::api::util::StdThread>       m_hbThread;
-	gmsec::api::util::StdSharedPtr<HeartbeatService> m_hbService;
+	gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> m_hbThread;
+	gmsec::api::util::StdSharedPtr<HeartbeatService>            m_hbService;
 
-	std::auto_ptr<gmsec::api::util::StdThread>       m_rsrcThread;
-	gmsec::api::util::StdSharedPtr<ResourceService>  m_rsrcService;
+	gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> m_rsrcThread;
+	gmsec::api::util::StdSharedPtr<ResourceService>             m_rsrcService;
 
 	// will be used for support of C binding
 	CustomSpecification* m_ceeCustomSpec;
+};
+
+
+class ConnectionManagerBuddy
+{
+public:
+	static InternalConnectionManager& getInternal(const ConnectionManager& connMgr)
+	{
+		return *(connMgr.m_internal);
+	}
 };
 
 }  //namespace internal

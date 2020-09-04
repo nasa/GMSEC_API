@@ -2,7 +2,7 @@
 
 
 """
- Copyright 2007-2017 United States Government as represented by the
+ Copyright 2007-2019 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -25,52 +25,50 @@ import sys
 # determines how messages will be logged to output
 
 class BaseHandler(libgmsec_python.LogHandler):
-
     def __init__(self, wai):
         # Use a mutex so messages from different threads don't get mixed up
         libgmsec_python.LogHandler.__init__(self)
         self.mutex = libgmsec_python.Mutex()
-        self.whoAmI = wai
+        self.whoami = wai
 
     def onMessage(self, entry):
-        
-        autoMutex = libgmsec_python.AutoMutex(mutex)
+        self.mutex.enterMutex()
 
-        tempBuffer = []
+        tempBuffer = "YYYY-DDD-HH:MM:SS.sss"   # Lame, but we need temp space for holding return time buffer
         libgmsec_python.TimeUtil.formatTime(entry.time, tempBuffer)
 
-        string = "[BaseHandler::onMessage] for: " + whoAmI + " : " + tempBuffer + " [" + libgmsec_python.Log.toString(entry.level) + "]" + " [" + entry.file + ":" + entry.line + "] " + entry.message + "\n" 
-        print string
+        msg = "[BaseHandler for " + self.whoami + "]" \
+            + " : " + tempBuffer + " [" + libgmsec_python.Log.toString(entry.level) + "]" \
+            + " [" + entry.file + ":" + str(entry.line) + "] " \
+            + entry.message + "\n"
+
+        print msg.replace("\n", "\n\t")
+
+        self.mutex.leaveMutex()
 
 
 # Different Handlers can be implemented for each logging level, if so desired
 class ErrorHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"GMSEC_ERROR")
 
 class WarningHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"GMSEC_WARNING")
 
 class InfoHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"GMSEC_INFO")
 
 class VerboseHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"GMSEC_VERBOSE")
 
 class DebugHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"GMSEC_DEBUG")
 
 class AnyHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"ANY_HANDLER") 
 
@@ -88,20 +86,22 @@ def main(agrv=None):
         value = arg.split('=')
         config.addValue(value[0], value[1])
 
+    libgmsec_python.Log.registerHandler(None)
+    libgmsec_python.Log.setReportingLevel(libgmsec_python.logINFO)
 
     # Create and register log handlers
-    errorHandler = ErrorHandler()
-    warningHandler =  WarningHandler()
-    infoHandler = InfoHandler()
+    errorHandler   = ErrorHandler()
+    warningHandler = WarningHandler()
+    infoHandler    = InfoHandler()
     verboseHandler = VerboseHandler()
-    debugHandler = DebugHandler()
-    anyHandler = AnyHandler()
+    debugHandler   = DebugHandler()
+    anyHandler     = AnyHandler()
 
-    libgmsec_python.Log.registerHandler(libgmsec_python.logERROR, errorHandler)
+    libgmsec_python.Log.registerHandler(libgmsec_python.logERROR,   errorHandler)
     libgmsec_python.Log.registerHandler(libgmsec_python.logWARNING, warningHandler)
-    libgmsec_python.Log.registerHandler(libgmsec_python.logINFO, infoHandler)
+    libgmsec_python.Log.registerHandler(libgmsec_python.logINFO,    infoHandler)
     libgmsec_python.Log.registerHandler(libgmsec_python.logVERBOSE, verboseHandler)
-    libgmsec_python.Log.registerHandler(libgmsec_python.logDEBUG, debugHandler)
+    libgmsec_python.Log.registerHandler(libgmsec_python.logDEBUG,   debugHandler)
 
     # Set logging reporting level
     libgmsec_python.Log.setReportingLevel(libgmsec_python.logVERBOSE)
@@ -156,9 +156,9 @@ def main(agrv=None):
 
     # Set logging reporting level to now allow DEBUG messages to be shown
     libgmsec_python.Log.setReportingLevel(libgmsec_python.logDEBUG)
+
     if (libgmsec_python.Log.getReportingLevel() == libgmsec_python.logDEBUG):
         libgmsec_python.logInfo("Changed reporting level to logDEBUG")
-        
     else:
         libgmsec_python.logError("Failed to change reporting level to logDEBUG")
         

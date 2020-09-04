@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -109,15 +109,17 @@ public class MistMessage extends Message
 
 	/**
 	 * Initializes a MistMessage using an XML or JSON string
+	 * <p>
+	 * Note: This constructor has been deprecated; use {@link #MistMessage(Specification, String)} instead.
 	 *
 	 * @param data XML or JSON string used to initialize the message
 	 *
-	 * @throws IllegalArgumentException Thrown if any of the data string is invalid.
-	 * @throws GMSEC_Exception Thrown if data string contains invalid XML or JSON statement(s).
+	 * @throws IllegalArgumentException Thrown if the data string is null.
+	 * @throws GMSEC_Exception Thrown if data string contains invalid an XML or JSON statement.
 	 *
-	 * @see Message#toXML()
-	 * @see Message#toJSON()
+	 * @deprecated This constructor has been deprecated; use MistMessage(Specification, String) instead.
 	 */
+	@Deprecated
 	public MistMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
 		super((JNIMistMessage) null);
@@ -128,6 +130,37 @@ public class MistMessage extends Message
 		}
 
 		registerChild(new JNIMistMessage(data));
+	}
+
+
+	/**
+	 * Initializes a MistMessage using an XML or JSON string, and ensures the message adheres
+	 * to the provided specification.
+	 *
+	 * @param spec The specification this message's schema will adhere to.
+	 * @param data XML or JSON string used to initialize the message
+	 *
+	 * @throws IllegalArgumentException Thrown if the data string is null.
+	 * @throws IllegalArgumentException Thrown if the Specification is null.
+	 * @throws GMSEC_Exception Thrown if data string contains invalid an XML or JSON statement.
+	 *
+	 * @see Message#toXML()
+	 * @see Message#toJSON()
+	 */
+	public MistMessage(Specification spec, String data) throws IllegalArgumentException, GMSEC_Exception
+	{
+		super((JNIMistMessage) null);
+
+		if (spec == null)
+		{
+			throw new IllegalArgumentException("Specification cannot be null");
+		}
+		if (data == null || data.isEmpty())
+		{
+			throw new IllegalArgumentException("Data cannot be null, nor contain an empty string");
+		}
+
+		registerChild(new JNIMistMessage(Specification.getInternal(spec), data));
 	}
 
 

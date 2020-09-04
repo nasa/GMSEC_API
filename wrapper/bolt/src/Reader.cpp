@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -11,6 +11,7 @@
 #include <bolt/Log.h>
 #include <bolt/util.h>
 
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/TimeUtil.h>
 
 
@@ -84,7 +85,7 @@ if (DEBUG_READER)
 					if (isHeader)
 					{
 						// got header, set up for body
-						auto_ptr<Header> header(Header::parse(buffer));
+						gmsec::api::util::StdUniquePtr<Header> header(Header::parse(buffer));
 						if (!header.get())
 						{
 							problem = "unable to parse packet header";

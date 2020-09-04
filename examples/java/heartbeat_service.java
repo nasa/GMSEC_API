@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,7 +31,8 @@ import java.util.ArrayList;
 
 public class heartbeat_service
 {
-	public static final String HB_MESSAGE_SUBJECT = "GMSEC.MISSION.SPACECRAFT.MSG.C2CX.HB";
+	public static final String HB_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.HEARTBEAT-SERVICE.HB";
+	public static final int    HB_PUBLISH_RATE    = 5; // in seconds
 
 	public static void main(String[] args)
 	{
@@ -60,13 +61,28 @@ public class heartbeat_service
 			// be used by all GMSEC Messages
 			ArrayList<Field> headerFields = new ArrayList<>();
 
-			StringField missionField = new StringField("MISSION-ID", "GMSEC");
-			StringField facilityField = new StringField("FACILITY", "GMSEC Lab");
-			StringField componentField = new StringField("COMPONENT", "heartbeat_service");
+			int version = connManager.getSpecification().getVersion();
+
+			StringField missionField = new StringField("MISSION-ID", "MY-MISSION");
+			StringField facilityField = new StringField("FACILITY", "MY-FACILITY");
+			StringField componentField = new StringField("COMPONENT", "HEARTBEAT-SERVICE");
+			StringField domain1Field = new StringField("DOMAIN1", "MY-DOMAIN-1");
+			StringField domain2Field = new StringField("DOMAIN2", "MY-DOMAIN-2");
+			StringField msgID = new StringField("MSG-ID", "MY-MSG-ID");
 
 			headerFields.add(missionField);
 			headerFields.add(facilityField);
 			headerFields.add(componentField);
+
+			if (version == 201400)
+			{
+				headerFields.add(msgID);
+			}
+			else if (version >= 201800)
+			{
+				headerFields.add(domain1Field);
+				headerFields.add(domain2Field);
+			}
 
 			//o Use setStandardFields to define a set of header fields for
 			// all messages which are created or published on the
@@ -84,16 +100,15 @@ public class heartbeat_service
 				//o Determine which version of the GMSEC message specification
 				// the ConnectionManager was initialized with and add
 				// the correctly typed Fields to the Message
-				int version = connManager.getSpecification().getVersion();
-				if(version == 201600)
+				if(version >= 201600)
 				{
-					hbStandardFields.add(new U16Field("PUB-RATE", new U16(30)));
+					hbStandardFields.add(new U16Field("PUB-RATE", new U16(HB_PUBLISH_RATE)));
 					hbStandardFields.add(new U16Field("COUNTER", new U16(1)));
 				}
 				else if (version == 201400)
 				{
-					hbStandardFields.add(new I16Field("PUB-RATE",(short)30));
-					hbStandardFields.add(new I16Field("COUNTER", (short)1));
+					hbStandardFields.add(new I16Field("PUB-RATE",(short) HB_PUBLISH_RATE));
+					hbStandardFields.add(new I16Field("COUNTER", (short) 1));
 				}
 
 				//o Note: COMPONENT-STATUS is an optional field used to
@@ -104,7 +119,7 @@ public class heartbeat_service
 				// 2 - Warning / Yellow
 				// 3 - Orange
 				// 4 - Error / Red
-				I16Field componentStatusField = new I16Field("COMPONENT-STATUS", (short)0);
+				I16Field componentStatusField = new I16Field("COMPONENT-STATUS", (short) 0);
 
 				hbStandardFields.add(componentStatusField);
 
@@ -135,7 +150,7 @@ public class heartbeat_service
 				// COMPONENT-STATUS Field to indicate that the component has
 				// transitioned from a startup/debug state to a running/green
 				// state.
-				I16Field componentStatusField = new I16Field("COMPONENT-STATUS", (short)1);
+				I16Field componentStatusField = new I16Field("COMPONENT-STATUS", (short) 1);
 				connManager.setHeartbeatServiceField(componentStatusField);
 			}
 

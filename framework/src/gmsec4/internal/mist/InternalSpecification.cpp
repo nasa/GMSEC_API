@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,7 +8,6 @@
 
 // Disable the Visual Studio warning C4355
 //   ('this' : used in base member initializer list)
-//   Found in the Connection(Server s, const Options &o) constructor
 #ifdef WIN32
 #pragma warning(disable: 4355)
 #endif
@@ -33,9 +32,6 @@
 #include <gmsec4/mist/MessageSpecification.h>
 #include <gmsec4/mist/mist_defs.h>
 
-#include <gmsec4/util/Log.h>
-#include <gmsec4/util/Mutex.h>
-
 #include <gmsec4/ConfigOptions.h>
 #include <gmsec4/Errors.h>
 #include <gmsec4/Exception.h>
@@ -43,14 +39,22 @@
 #include <gmsec4/Message.h>
 #include <gmsec4/Config.h>
 
+#include <gmsec4/util/cxx.h>
+#include <gmsec4/util/Log.h>
+#include <gmsec4/util/Mutex.h>
+#include <gmsec4/util/StdUniquePtr.h>
+
 #include <tinyxml2.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 
 #include <limits>
-#include <memory>
 #include <set>
 #include <sstream>
+
+#if GMSEC_CXX_11_AVAILABLE == 1
+#include <regex>
+#endif
 
 
 using namespace gmsec::api;
@@ -66,6 +70,7 @@ static Mutex g_mutex;
 
 static const char* const NEWLINE_INDENT1 = "\n   ";
 static const char* const NEWLINE_INDENT2 = "\n      ";
+static const char* const INDENT1 = "   ";
 
 
 static bool isXMLFile(const std::string& filename)
@@ -102,6 +107,7 @@ static bool isXSDFile(const std::string& filename)
 InternalSpecification::InternalSpecification(const Config& config)
 	: m_config(config),
 	  m_iterator(*this),
+	  m_configTracking(),
 	  m_msgSpecs()
 {
 	const char* path = m_config.getValue(GMSEC_SCHEMA_PATH);
@@ -237,6 +243,9 @@ InternalSpecification::InternalSpecification(const Config& config)
 	}
 
 
+	m_configTracking = TrackingDetails::initialize(m_config);
+
+
 	// Load the schemas
 	try {
 		load();
@@ -302,146 +311,141 @@ Status InternalSpecification::loadTemplate(const char* source, const char* fileN
 		xmlError = xml.Parse(source);
 	}
 
-	if(xmlError == tinyxml2::XML_NO_ERROR)
-	{
-		tinyxml2::XMLElement* schema = xml.RootElement();
-		
-		if(schema != NULL)
-		{
-			std::string id;
-			std::string specID = m_specificationId;
-			specID.insert(4, ".");
-
-			FieldTemplateList fields;
-			status = parser(schema, id, fields);
-
-			if (!m_legacyTemplates && !StringUtil::stringEqualsIgnoreCase(fileName, DIRECTORY_FILE))
-			{
-				//XSD files only have shorthand schema ID, append revisions and addendum
-
-				if (id == "HEADER")
-				{
-					//appending addendum to header id
-					std::string fullID;
-					fullID.append(StringUtil::split(fileName, '_').front()).append(".").append(id);
-
-					id = fullID;
-				}
-				else
-				{
-					//appending version and addendum to schema id
-					std::string fullID = m_specificationId;
-					fullID.insert(4, ".");
-					fullID.append(".").append(StringUtil::split(fileName, '_').front()).append(".").append(id);
-
-					id = fullID;
-				}
-			}
-			
-			if(!status.isError())
-			{
-				if (id.find(".HEADER") != std::string::npos)
-				{
-					m_headers[id] = cloneFieldTemplates(fields);
-
-					if (id == m_lastHeaderName)
-					{
-						m_headers["DEFAULT"] = cloneFieldTemplates(fields);
-					}
-				}
-				else if (id != specID && id != "C2MS.HEADER")
-				{
-					// The types of Schema IDs that the API (currently) supports.
-					//
-					// Schema ID Type 1: major.minor.schemaLevel.messagekind.messagetype.<optionalmessagesubtype>
-					// Schema ID Type 2: messagekind.messagetype.<optionalmessagesubtype>
-
-					// We store the Message Template using a Type 1 Schema ID (if not already stored)
-					if (m_templates.find(id) == m_templates.end())
-					{
-						m_templates[id] = new MessageTemplate(id.c_str(), fields);
-					}
-					else
-					{
-						std::ostringstream errmsg;
-						errmsg <<  "Duplicate Schema Name of " << id << " found";
-
-						return Status(MIST_ERROR, TEMPLATE_DIR_ERROR, errmsg.str().c_str());
-					}
-
-					// We then store another copy of the Message Template using a Type 2 Schema ID (if not already stored)
-					std::vector<std::string> elements = StringUtil::split(id, '.');
-					if (elements.size() >= 5)
-					{
-						// Have Major and Minor number, and presumably, addendum name (e.g. GMSEC or COMPATC2)
-						std::string short_id;
-						for (size_t i = 3; i < elements.size(); ++i)
-						{
-							short_id.append(elements.at(i)).append(".");
-						}
-						short_id.erase(short_id.length() - 1);  // erase trailing period
-
-
-						// Check if Message Templates map has an entry for the short ID
-						// If not:
-						//     Add new Message Template to the map
-						//
-						// Else
-						//     Iterate through Schema List; for each entry:
-						//         Check each of the following:
-						//             a) The schema level matches our desired level AND
-						//             b) The schema ID is or part of our short ID AND
-						//             c) The level name is the same as the addendum name
-						//
-						//         If the above conditions are all true, then:
-						//             Delete existing Message Template
-						//             Add new Message Template to the map
-						//
-						if (m_templates.find(short_id) == m_templates.end())
-						{
-							m_templates[short_id] = new MessageTemplate(id.c_str(), fields);
-						}
-						else
-						{
-							for (SchemaTemplateList::iterator it = m_directory.begin(); it != m_directory.end(); ++it)
-							{
-								if ((it->getLevel() == m_schemaLevel) &&
-								    (short_id.find(it->getID()) != std::string::npos) &&
-								    (it->getLevelName() == elements.at(2)))
-								{
-									delete m_templates[short_id];
-
-									m_templates[short_id] = new MessageTemplate(id.c_str(), fields);
-
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			xml.Clear();
-
-			for (FieldTemplateList::iterator it = fields.begin(); it != fields.end(); ++it)
-			{
-				delete *it;
-			}
-			fields.clear();
-		}
-		else
-		{
-			std::string msg = "Loaded XML schema is NULL";
-			GMSEC_WARNING << "InternalSpecification::LoadTemplate() : " << msg.c_str();
-			status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, msg.c_str());
-		}
-	}
-	else
+	if(xmlError != tinyxml2::XML_NO_ERROR)
 	{
 		std::string msg = "Unparseable XML string given from file name: ";
 		msg += fileName;
-		GMSEC_WARNING << "InternalSpecification::LoadTemplate() : " << msg.c_str();
-		status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, msg.c_str());
+		return Status(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, msg.c_str());
 	}
+
+	tinyxml2::XMLElement* schema = xml.RootElement();
+
+	if (schema == NULL)
+	{
+		std::string msg = "Loaded XML schema is NULL";
+		return Status(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, "Loaded XML Schema is NULL");
+	}
+
+	std::string id;
+	std::string specID = m_specificationId;
+	specID.insert(4, ".");
+
+	FieldTemplateList fields;
+	status = parser(schema, id, fields);
+
+	if (!m_legacyTemplates && !StringUtil::stringEqualsIgnoreCase(fileName, DIRECTORY_FILE))
+	{
+		//XSD files only have shorthand schema ID, append revisions and addendum
+
+		if (id == "HEADER")
+		{
+			//appending addendum to header id
+			std::string fullID;
+			fullID.append(StringUtil::split(fileName, '_').front()).append(".").append(id);
+
+			id = fullID;
+		}
+		else
+		{
+			//appending version and addendum to schema id
+			std::string fullID = m_specificationId;
+			fullID.insert(4, ".");
+			fullID.append(".").append(StringUtil::split(fileName, '_').front()).append(".").append(id);
+
+			id = fullID;
+		}
+	}
+
+	if (!status.isError())
+	{
+		if (id.find(".HEADER") != std::string::npos)
+		{
+			m_headers[id] = cloneFieldTemplates(fields);
+
+			if (id == m_lastHeaderName)
+			{
+				m_headers["DEFAULT"] = cloneFieldTemplates(fields);
+			}
+		}
+		else if (id != specID && id != "C2MS.HEADER")
+		{
+			// The types of Schema IDs that the API (currently) supports.
+			//
+			// Schema ID Type 1: major.minor.schemaLevel.messagekind.messagetype.<optionalmessagesubtype>
+			// Schema ID Type 2: messagekind.messagetype.<optionalmessagesubtype>
+
+			// We store the Message Template using a Type 1 Schema ID (if not already stored)
+			if (m_templates.find(id) == m_templates.end())
+			{
+				m_templates[id] = new MessageTemplate(id.c_str(), fields);
+			}
+			else
+			{
+				std::ostringstream errmsg;
+				errmsg << "Duplicate Schema Name of " << id << " found";
+
+				return Status(MIST_ERROR, TEMPLATE_DIR_ERROR, errmsg.str().c_str());
+			}
+
+			// We then store another copy of the Message Template using a Type 2 Schema ID (if not already stored)
+			std::vector<std::string> elements = StringUtil::split(id, '.');
+			if (elements.size() >= 5)
+			{
+				// Have Major and Minor number, and presumably, addendum name (e.g. GMSEC or COMPATC2)
+				std::string short_id;
+				for (size_t i = 3; i < elements.size(); ++i)
+				{
+					short_id.append(elements.at(i)).append(".");
+				}
+				short_id.erase(short_id.length() - 1);  // erase trailing period
+
+
+				// Check if Message Templates map has an entry for the short ID
+				// If not:
+				//     Add new Message Template to the map
+				//
+				// Else
+				//     Iterate through Schema List; for each entry:
+				//         Check each of the following:
+				//             a) The schema level matches our desired level AND
+				//             b) The schema ID is or part of our short ID AND
+				//             c) The level name is the same as the addendum name
+				//
+				//         If the above conditions are all true, then:
+				//             Delete existing Message Template
+				//             Add new Message Template to the map
+				//
+				if (m_templates.find(short_id) == m_templates.end())
+				{
+					m_templates[short_id] = new MessageTemplate(id.c_str(), fields);
+				}
+				else
+				{
+					for (SchemaTemplateList::iterator it = m_directory.begin(); it != m_directory.end(); ++it)
+					{
+						if ((it->getLevel() == m_schemaLevel) &&
+							(short_id.find(it->getID()) != std::string::npos) &&
+							(it->getLevelName() == elements.at(2)))
+						{
+							delete m_templates[short_id];
+
+							m_templates[short_id] = new MessageTemplate(id.c_str(), fields);
+
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	xml.Clear();
+
+	for (FieldTemplateList::iterator it = fields.begin(); it != fields.end(); ++it)
+	{
+		delete *it;
+	}
+	fields.clear();
+	
 
 	return status;
 }
@@ -750,7 +754,7 @@ Status InternalSpecification::compare(const Message& msg, const FieldTemplateLis
 		}
 
 		//modify the name of the field template as necessary
-		if (arrayLevel > 0)
+		if (arrayLevel > 0 && (arraySizeList.size() > 0 && arraySizeList.front() > 0))
 		{
 			std::string name = prepFieldName(temp->getName().c_str(), arrayCharList, arrayIndexList);
 
@@ -768,7 +772,7 @@ Status InternalSpecification::compare(const Message& msg, const FieldTemplateLis
 
 			if (valStatus.isError())
 			{
-				errorList.append(valStatus.get()).append(NEWLINE_INDENT1);
+				errorList.append(valStatus.getReason()).append(NEWLINE_INDENT1);
 			}
 		}
 		else if (temp->getMode() == "OPTIONAL" && m_validationLevel > 1)
@@ -778,33 +782,45 @@ Status InternalSpecification::compare(const Message& msg, const FieldTemplateLis
 
 			if (valStatus.isError())
 			{
-				errorList.append(valStatus.get()).append(NEWLINE_INDENT1);
+				errorList.append(valStatus.getReason()).append(NEWLINE_INDENT1);
 			}
 		}
 	}//loop until we're done running through all the field templates
 
-	if (m_validationLevel > 2)
-	{
-		//No junk (i.e. non-expected) fields if validation is set to strict
-		MessageFieldIterator& iter = msg.getFieldIterator();
+	// Check if tracking fields need to be validated.
+	bool msgBeingSent = false;
+	MessageBuddy::getInternal(msg).getDetails().getBoolean(GMSEC_MSG_BEING_SENT, msgBeingSent);
 
-		//iterating through all the fields in the message
-		while (iter.hasNext())
+	const TrackingDetails& msgTracking = MessageBuddy::getInternal(msg).getTracking();
+	const MessageFieldIterator& iter = msg.getFieldIterator();
+
+	//Iterate through all the fields in the message, check for API reserved and, if necessary, extraneous fields
+	while (iter.hasNext())
+	{
+		const Field& field = iter.next();
+
+		//When message is being sent, disallow tracking fields (these are reserved for use by the API).
+		if (msgBeingSent && isReservedField(field.getName()))
 		{
-			const Field& field = iter.next();
-			
-			//now check to ensure the fields is valid
-			if (validFieldNames.find(field.getName()) == validFieldNames.end())
+			Status status = checkTrackingField(field.getName(), m_configTracking, msgTracking);
+
+			if (status.isError())
 			{
-				std::ostringstream err;
-				err << "Message contains user-defined field " << field.getName() 
-					<< ", which is disallowed under the current validation settings";
-				GMSEC_VERBOSE << err.str().c_str();
-				Status error(MIST_ERROR, NON_ALLOWED_FIELD, err.str().c_str());
-				errorList.append(error.get()).append(NEWLINE_INDENT1);
+				errorList.append(status.getReason()).append(NEWLINE_INDENT1);
 			}
 		}
+
+		//Disallow extraneous fields (test is only applicable if validation level is 3 or more)
+		if (m_validationLevel > 2 && validFieldNames.find(field.getName()) == validFieldNames.end())
+		{
+			std::ostringstream err;
+			err << "Message contains user-defined field " << field.getName() 
+				<< ", which is disallowed under the current validation settings";
+			Status error(MIST_ERROR, NON_ALLOWED_FIELD, err.str().c_str());
+			errorList.append(error.getReason()).append(NEWLINE_INDENT1);
+		}
 	}
+
 
 	if (errorList.empty())
 	{
@@ -893,9 +909,8 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 						Field::FieldType type = *it;
 						err << getTypeStr(type) << " ";
 					}
-					//GMSEC_ERROR << err.str().c_str();
 					status.set(MIST_ERROR, INCORRECT_FIELD_TYPE, err.str().c_str());
-					cumulativeError.append(status.get()).append(NEWLINE_INDENT1);
+					cumulativeError.append(err.str().c_str()).append(NEWLINE_INDENT1);
 				}
 			}
 			
@@ -1168,9 +1183,8 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 					err << msgField->getName()
 				 		<< " has incorrect value of " << msgField->getStringValue()
 				 		<< ", acceptable values: " << ftmp.getConcatenatedValues();
-					//GMSEC_ERROR << err.str().c_str();
 					status.set(MIST_ERROR, FIELD_NOT_SET, err.str().c_str());
-					cumulativeError.append(status.get()).append(NEWLINE_INDENT1);
+					cumulativeError.append(err.str().c_str()).append(NEWLINE_INDENT1);
 				}
 			}
 		}
@@ -1181,9 +1195,8 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 				std::stringstream err;
 				err << ftmp.getName() 
 					<< " is a required field, but is missing from message.  ";
-				//GMSEC_ERROR << err.str().c_str();
 				status.set(MIST_ERROR, MISSING_REQUIRED_FIELD, err.str().c_str());
-				cumulativeError.append(status.get()).append(NEWLINE_INDENT1);
+				cumulativeError.append(err.str().c_str()).append(NEWLINE_INDENT1);
 			}
 		}
 	}
@@ -1194,9 +1207,8 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 			std::stringstream err;
 			err << ftmp.getName() 
 				<< " is a required field, but is missing from message.  ";
-			//GMSEC_ERROR << err.str().c_str();
 			status.set(MIST_ERROR, MISSING_REQUIRED_FIELD, err.str().c_str());
-			cumulativeError.append(status.get()).append(NEWLINE_INDENT1);
+			cumulativeError.append(err.str().c_str()).append(NEWLINE_INDENT1);
 		}
 	}
 
@@ -1209,10 +1221,7 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 		size_t pos = cumulativeError.rfind("\n");
 		cumulativeError = cumulativeError.substr(0, pos);
 
-		std::string err = "Field Validation Error: ";
-		err.append(NEWLINE_INDENT2).append(cumulativeError);
-
-		status = Status(MIST_ERROR, FIELD_FAILED_VALIDATION, err.c_str());
+		status = Status(MIST_ERROR, FIELD_FAILED_VALIDATION, cumulativeError.c_str());
 	}
 
 	return status;
@@ -1366,10 +1375,9 @@ void InternalSpecification::cleanup()
 
 void InternalSpecification::load()
 {
-	Status status;    //This var will get overridden by the current status, error or non-error
-	Status lastError; //This is the last error found by InternalSpecification::Load
-	                  //This is to avoid potential scenarios where an error status 
-	                  //is overridden by a non-error status
+	Status status;    
+	std::string errorList;
+	std::ostringstream oss;
 
 	std::string template_dir;
 
@@ -1380,30 +1388,18 @@ void InternalSpecification::load()
 
 		if (FileUtil::getCurrentSharedObjectPath(shared_object_path) == false)
 		{
-			std::string err_msg = "Could not get system-specified base path.";
-
-			status.set(MIST_ERROR, TEMPLATE_DIR_NOT_FOUND, err_msg.c_str());
-
-			GMSEC_WARNING << err_msg.c_str();
+			throw Exception(MIST_ERROR, TEMPLATE_DIR_NOT_FOUND, "Could not get the system-specified base path.");
 		}
-		else
+		size_t dirMarker = shared_object_path.rfind(FileUtil::PATH_SEPARATOR);
+
+		if (dirMarker == std::string::npos)
 		{
-			size_t dirMarker = shared_object_path.rfind(FileUtil::PATH_SEPARATOR);
-	
-			if (dirMarker != std::string::npos)
-			{
-				template_dir = shared_object_path.substr(0, dirMarker) + FileUtil::PATH_SEPARATOR + ".." + FileUtil::PATH_SEPARATOR + "templates";
-			}
-			else
-			{
-				std::string err_msg = "Could not list files in template directory ";
-				err_msg += template_dir;
-
-				status.set(MIST_ERROR, TEMPLATE_DIR_NOT_FOUND, err_msg.c_str());
-	
-				GMSEC_WARNING << err_msg.c_str();
-			}
+			std::string err_msg = "Could not list files in template directory ";
+			err_msg += template_dir;
+			throw Exception(MIST_ERROR, TEMPLATE_DIR_NOT_FOUND, err_msg.c_str());
 		}
+
+		template_dir = shared_object_path.substr(0, dirMarker) + FileUtil::PATH_SEPARATOR + ".." + FileUtil::PATH_SEPARATOR + "templates";
 	}
 	else
 	{
@@ -1440,168 +1436,128 @@ void InternalSpecification::load()
 		{
 			std::string err_msg = "Could not list files in template directory ";
 			err_msg += template_dir;
-
-			status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err_msg.c_str());
-
-			GMSEC_ERROR << err_msg.c_str();
+			throw Exception(MIST_ERROR, TEMPLATE_DIR_ERROR, err_msg.c_str());
 		}
-		else
+
+		// Always load the DIRECTORY file first...
+		std::string path = template_dir;
+		path += FileUtil::PATH_SEPARATOR;
+		path += DIRECTORY_FILE;
+
+		Status result = loadTemplate(path.c_str(), DIRECTORY_FILE);
+
+		if (m_directory.empty() || result.isError())
 		{
-			// Always load the DIRECTORY file first...
-			std::string path = template_dir;
-			path += FileUtil::PATH_SEPARATOR;
-			path += DIRECTORY_FILE;
-
-			status = loadTemplate(path.c_str(), DIRECTORY_FILE);
-
-			if (m_directory.empty() || status.isError())
-			{
-				std::string err = "Template Directory information failed to load: ";
-				err += status.get();
-				status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
-				throw Exception(status);
-			}
+			std::string err = "Template Directory information failed to load: ";
+			err += result.get();
+			status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
+			throw Exception(status);
+		}
 			
-			// Then other files...
-			for (std::list<std::string>::iterator it = schema_files.begin(); it != schema_files.end(); ++it)
-			{
-				std::string filename = *it;
+		// Then other files...
+		for (std::list<std::string>::iterator it = schema_files.begin(); it != schema_files.end(); ++it)
+		{
+			std::string filename = *it;
 
-				if (m_legacyTemplates)
-				{//Specification is configured to take in legacy XML message templates
+			if (m_legacyTemplates)
+			{//Specification is configured to take in legacy XML message templates
 
-					// We do not care about directories (current or above), or the DIRECTORY file (which has
-					// already been processed)
-					if (filename != ".." && 
-						filename != "." && 
-						!StringUtil::stringEquals(filename.c_str(), DIRECTORY_FILE) && 
-						isXMLFile(filename))
+				// We do not care about directories (current or above), or the DIRECTORY file (which has
+				// already been processed)
+				if (filename != ".." && 
+					filename != "." && 
+					!StringUtil::stringEquals(filename.c_str(), DIRECTORY_FILE) && 
+					isXMLFile(filename))
+				{
+					path = template_dir;
+					path += FileUtil::PATH_SEPARATOR;
+					path += filename;
+
+					//passing a path to an XML file to loadTemplate()
+					result = loadTemplate(path.c_str(), filename.c_str());
+
+					if (result.isError())
 					{
-						path = template_dir;
-						path += FileUtil::PATH_SEPARATOR;
-						path += filename;
-
-						//passing a path to an XML file to loadTemplate()
-						status = loadTemplate(path.c_str(), filename.c_str());
-
-						if (status.isError())
-						{
-							std::string err = "Error loading template file ";
-							err.append(filename.c_str());
-							status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
-
-							GMSEC_ERROR << status.get();
-
-							lastError = status;
-						}
+						if (!errorList.empty()) errorList.append("\n");
+						oss.clear();
+						oss.str("");
+						oss << "Failed to parse " << filename.c_str() << "\n" << result.getReason() << "\n" << (status.isError() ? status.get() : "");
+						status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 					}
 				}
-				else
-				{//Specification is configured to take in XSD message templates
-					if (filename != ".." && 
-						filename != "." && 
-						!StringUtil::stringEquals(filename.c_str(), DIRECTORY_FILE) && 
-						!StringUtil::stringEquals(filename.c_str(), FIELDS_FILE) && 
-						!StringUtil::stringEquals(filename.c_str(), DEFAULTS_FILE) && 
-						isXSDFile(filename))
+			}
+			else
+			{//Specification is configured to take in XSD message templates
+				if (filename != ".." && 
+					filename != "." && 
+					!StringUtil::stringEquals(filename.c_str(), DIRECTORY_FILE) && 
+					!StringUtil::stringEquals(filename.c_str(), FIELDS_FILE) && 
+					!StringUtil::stringEquals(filename.c_str(), DEFAULTS_FILE) && 
+					isXSDFile(filename))
+				{
+					AutoMutex lock(g_mutex);
+
+					xsltStylesheetPtr stylesheet = NULL;
+					xmlDocPtr xsd = NULL;
+					xmlDocPtr xml;
+					xmlSubstituteEntitiesDefault(1);
+					xmlLoadExtDtdDefaultValue = 1;
+
+					path = template_dir;
+					path += FileUtil::PATH_SEPARATOR;
+					path += TRANSFORM_FILE;
+
+					stylesheet = xsltParseStylesheetFile((const xmlChar *)path.c_str());
+
+					if (stylesheet == NULL)
 					{
-						AutoMutex lock(g_mutex);
+						std::string err = "Error loading stylesheet";
+						status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
 
-						xsltStylesheetPtr stylesheet = NULL;
-						xmlDocPtr xsd = NULL;
-						xmlDocPtr xml;
-						xmlSubstituteEntitiesDefault(1);
-						xmlLoadExtDtdDefaultValue = 1;
+						xsltCleanupGlobals();
+						xmlCleanupParser();
 
-						path = template_dir;
-						path += FileUtil::PATH_SEPARATOR;
-						path += TRANSFORM_FILE;
+						throw Exception(status);
+					}
 
-						stylesheet = xsltParseStylesheetFile((const xmlChar *)path.c_str());
+					path = template_dir;
+					path += FileUtil::PATH_SEPARATOR;
+					path += filename;
 
-						if (stylesheet == NULL)
-						{
-							std::string err = "Error loading stylesheet";
-							status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
-							GMSEC_ERROR << status.get();
-							lastError = status;
+					xsd = xmlParseFile(path.c_str());
 
-							xsltCleanupGlobals();
-							xmlCleanupParser();
+					if (xsd == NULL)
+					{
+						if (!errorList.empty()) errorList.append("\n");
+						oss.clear();
+						oss.str("");
+						oss << "Failed to parse " << filename.c_str() << ": malformed XSD" << "\n" << (status.isError() ? status.get() : "");
+						status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 
-							continue;
-						}
+						xsltFreeStylesheet(stylesheet);
 
-						path = template_dir;
-						path += FileUtil::PATH_SEPARATOR;
-						path += filename;
+						xsltCleanupGlobals();
+						xmlCleanupParser();
 
-						xsd = xmlParseFile(path.c_str());
+						continue;
+					}
 
-						if (xsd == NULL)
-						{
-							std::string err = "Error loading template file ";
-							err.append(filename.c_str());
-							status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
-							GMSEC_ERROR << status.get();
-							lastError = status;
+					const char *params[] = { NULL };
+					xml = xsltApplyStylesheet(stylesheet, xsd, params);
 
-							xsltFreeStylesheet(stylesheet);
+					xmlChar *xmlCharString;
+					std::string xmlOutputString;
+					int size;
 
-							xsltCleanupGlobals();
-							xmlCleanupParser();
+					xmlDocDumpMemory(xml, &xmlCharString, &size);
 
-							continue;
-						}
-
-						const char *params[] = { NULL };
-						xml = xsltApplyStylesheet(stylesheet, xsd, params);
-
-						xmlChar *xmlCharString;
-						std::string xmlOutputString;
-						int size;
-
-						xmlDocDumpMemory(xml, &xmlCharString, &size);
-
-						if (xmlCharString == NULL)
-						{
-							std::string err = "Error loading template file ";
-							err.append(filename.c_str());
-							status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
-							GMSEC_ERROR << status.get();
-							lastError = status;
-
-							xsltFreeStylesheet(stylesheet);
-							xmlFreeDoc(xml);
-							xmlFreeDoc(xsd);
-
-							xsltCleanupGlobals();
-							xmlCleanupParser();
-
-							continue;
-						}
-						try
-						{
-							xmlOutputString = (char *) xmlCharString;
-						}
-						catch (...)
-						{
-							std::string err = "Error loading template file ";
-							err.append(filename.c_str());
-							status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
-							GMSEC_ERROR << status.get();
-							lastError = status;
-
-							xsltFreeStylesheet(stylesheet);
-							xmlFreeDoc(xml);
-							xmlFreeDoc(xsd);
-
-							xsltCleanupGlobals();
-							xmlCleanupParser();
-
-							continue;
-						}
-						xmlFree(xmlCharString);
+					if (xmlCharString == NULL)
+					{
+						if (!errorList.empty()) errorList.append("\n");
+						oss.clear();
+						oss.str("");
+						oss << "Failed to parse " << filename.c_str() << "\n" << (status.isError() ? status.get() : "");
+						status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 
 						xsltFreeStylesheet(stylesheet);
 						xmlFreeDoc(xml);
@@ -1610,30 +1566,57 @@ void InternalSpecification::load()
 						xsltCleanupGlobals();
 						xmlCleanupParser();
 
-						//passing an xml-formatted string to loadTemplate()
-						status = loadTemplate(xmlOutputString.c_str(), filename.c_str());
+						continue;
+					}
+					try
+					{
+						xmlOutputString = (char *) xmlCharString;
+					}
+					catch (const Exception& e)
+					{
+						if (!errorList.empty()) errorList.append("\n");
+						oss.clear();
+						oss.str("");
+						oss << "Failed to parse " << filename.c_str() << "\n" << e.what() << "\n" << (status.isError() ? status.get() : "");
+						status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 
-						if (status.isError())
-						{
-							std::string err = "Error loading template file ";
-							err.append(filename.c_str());
-							status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err.c_str());
+						xsltFreeStylesheet(stylesheet);
+						xmlFreeDoc(xml);
+						xmlFreeDoc(xsd);
 
-							GMSEC_ERROR << status.get();
+						xsltCleanupGlobals();
+						xmlCleanupParser();
 
-							lastError = status;
-						}
+						continue;
+					}
+					xmlFree(xmlCharString);
+
+					xsltFreeStylesheet(stylesheet);
+					xmlFreeDoc(xml);
+					xmlFreeDoc(xsd);
+
+					xsltCleanupGlobals();
+					xmlCleanupParser();
+
+					//passing an xml-formatted string to loadTemplate()
+					result = loadTemplate(xmlOutputString.c_str(), filename.c_str());
+
+					if (result.isError())
+					{
+						std::string err = "Error loading template file ";
+						if (!errorList.empty()) errorList.append("\n");
+						oss.clear();
+						oss.str("");
+						oss << "Failed to parse " << filename.c_str() << "\n" << result.getReason() << "\n" << (status.isError() ? status.get() : "");
+						status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 					}
 				}
 			}
 		}
+		
 	}
 
-	if (lastError.isError())
-	{
-		throw Exception(lastError);
-	}
-	else if (status.isError())
+	if (status.isError())
 	{
 		throw Exception(status);
 	}
@@ -1705,6 +1688,9 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 	//the number goes up as more array controls are opened, down as array controls are closed
 	int arrayControlActive = 0;
 
+	//The accumulated error messages as a string
+	std::string errorList;
+
 	if(xmlSchema->FirstAttribute() != NULL)
 	{
 		std::string name = xmlSchema->FirstAttribute()->Name();
@@ -1722,7 +1708,6 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 	{//We failed to set schemaID, which likely means it failed to parse
 		status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, 
 				   "The schema read did not have a template id NAME specified.");
-		GMSEC_ERROR << status.get();
 		return status;
 	}
 	else if(schemaID == id)
@@ -1750,15 +1735,14 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 
 					for(std::vector<std::string>::const_iterator it = definitions.begin(); it != definitions.end(); ++it)
 					{
-						schema.addDefinition(std::string(*it).c_str());
+						schema.addDefinition(it->c_str());
 					}
 				}
 				else if(std::string(attribute->Name()).find("LEVEL-") == 0)
 				{
 					std::string level = std::string(attribute->Name()).substr(6, std::string(attribute->Name()).length()-6);
 					int value;
-					StringUtil::STR2NUM_ERROR result = util::StringUtil::str2int(value, level.c_str());
-					if(result == StringUtil::STR2NUM_SUCCESS)
+					if(StringUtil::STR2NUM_SUCCESS == StringUtil::str2int(value, level.c_str()))
 					{
 						schema.setLevel(value);
 						schema.setLevelName(attribute->Value());
@@ -1769,7 +1753,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 						oss.str("");
 						oss << schema.getID() << " is referenced in directory but schema level LEVEL-" << level.c_str() << " can't be parsed";
 						status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-						GMSEC_ERROR << status.get();
+						errorList.append(INDENT1).append(status.get()).append("\n");
 					}
 				}
 				else if(StringUtil::stringEqualsIgnoreCase(attribute->Name(), "DESCRIPTION"))
@@ -1782,7 +1766,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			if(StringUtil::stringEquals(schema.getID(), ""))
 			{
 				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, "Directory references a schema with no name");
-				GMSEC_ERROR << status.get();
+				errorList.append(INDENT1).append(status.get()).append("\n");
 			}
 
 			if(schema.isDefinitionEmpty())
@@ -1791,7 +1775,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 				oss.str("");
 				oss << schema.getID() << " is referenced in directory but contains no definition";
 				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-				GMSEC_ERROR << status.get();
+				errorList.append(INDENT1).append(status.get()).append("\n");
 			}
 
 			if(StringUtil::stringEquals(schema.getLevelName(), ""))
@@ -1800,10 +1784,10 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 				oss.str("");
 				oss << schema.getID() << " is referenced in directory but contains an unnamed level";
 				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-				GMSEC_ERROR << status.get();
+				errorList.append(INDENT1).append(status.get()).append("\n");
 			}
 
-			if ((std::string(schema.getID()) == "HEADER") && (schema.getLevel() == m_schemaLevel))
+			if ((schema.getLevel() == m_schemaLevel) && StringUtil::stringEqualsIgnoreCase(schema.getID(), "HEADER"))
 			{
 				m_lastHeaderName = std::string(schema.getLevelName()) + ".HEADER";
 			}
@@ -1833,6 +1817,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 				oss.str("");
 				oss << "DIRECTORY is missing definition for LEVEL-" << i << " HEADER";
 				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
+				errorList.append(INDENT1).append(status.get()).append("\n");
 				break;
 			}
 		}
@@ -1843,10 +1828,10 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 	//Now we'll run through all of the child elements
 	//and set them up as FieldTemplates
 	for (tinyxml2::XMLElement* field = xmlSchema->FirstChildElement();
-	     field != NULL && !status.isError();
+	     field != NULL;
 	     field = field->NextSiblingElement())
 	{
-		std::auto_ptr<FieldTemplate> fieldTemplate(new FieldTemplate());
+		StdUniquePtr<FieldTemplate> fieldTemplate(new FieldTemplate());
 
 		//Now that we have an element, we'll run through all of the attributes
 		//and save them in their appropriate strings
@@ -1863,12 +1848,14 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			{
 				fieldTemplate->setMode(attribute->Value());
 
-				if (fieldTemplate->getMode() == "CONTROL" && fieldTemplate->getName() == "ARRAY-START")
+				if (StringUtil::stringEqualsIgnoreCase(fieldTemplate->getMode().c_str(), "CONTROL") && 
+					StringUtil::stringEqualsIgnoreCase(fieldTemplate->getName().c_str(), "ARRAY-START"))
 				{
 					//encountered ARRAY-START, set array control flag
 					arrayControlActive++;
 				}
-				else if (fieldTemplate->getMode() == "CONTROL" && fieldTemplate->getName() == "ARRAY-END")
+				else if (StringUtil::stringEqualsIgnoreCase(fieldTemplate->getMode().c_str(), "CONTROL") &&
+						 StringUtil::stringEqualsIgnoreCase(fieldTemplate->getName().c_str(), "ARRAY-END"))
 				{
 					//encountered ARRAY-END, clear array control flag if it is set or throw error
 					if (arrayControlActive > 0)
@@ -1879,9 +1866,8 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 					else
 					{
 						//error, we found an ARRAY-END control before we found an ARRAY-START
-						status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE,
-								   "Unexpected ARRAY-END control before ARRAY-START control.");
-						GMSEC_ERROR << status.get();
+						status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, "Unexpected ARRAY-END control before ARRAY-START control.");
+						errorList.append(INDENT1).append(status.get()).append("\n");
 					}
 				}
 			}
@@ -1891,32 +1877,24 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			}
 			else if (StringUtil::stringEqualsIgnoreCase(attribute->Name(), "TYPE"))
 			{
-				std::string value = attribute->Value();
-				std::list<std::string> types;
-
-				std::vector<std::string> list = StringUtil::split(value,',');
+				std::vector<std::string> list = StringUtil::split(attribute->Value(),',');
+				std::list<std::string>   types;
 
 				for (std::vector<std::string>::const_iterator it = list.begin(); it != list.end(); ++it)
 				{
-					std::string type = StringUtil::trim(*it);
-					types.push_back(type);
+					types.push_back(StringUtil::trim(*it));
 				}
 
 				fieldTemplate->setTypes(types);
 			}
 			else if (StringUtil::stringEqualsIgnoreCase(attribute->Name(), "VALUE"))
 			{
-				//take attribute->value into temp variable
-				std::string temp = attribute->Value();
+				const std::string& temp = attribute->Value();
 
 				//list of values to be added to the field template
 				std::list<std::string> formattedValues;
 
-				//list of valid types from the field template
-				//all values must be valid for the given types
-				std::list<Field::FieldType> types = fieldTemplate->getTypes();
-
-				if (!temp.empty() && fieldTemplate->getMode() == "CONTROL")
+				if (!temp.empty() && StringUtil::stringEqualsIgnoreCase(fieldTemplate->getMode().c_str(), "CONTROL"))
 				{
 					//Control field value
 					formattedValues.push_back(temp);
@@ -1933,99 +1911,26 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 						//trim each value, then check to make sure it is properly formatted
 						std::string value = StringUtil::stripWhiteSpace(*it);
 
-						//TODO MAV: Consider processing an inverse operator here? (Not supported by XSD)
-
-						if (!fieldTemplate->isTypeVariable())
+						if (value.find("..") != std::string::npos)
 						{
-							//type is not variable, so check to make sure the values are valid for the given types(s)
+							//finite range
 
-							//TODO MAV: consider finite range with .. delimiter? (e.g. 1..10) (Not supported by XSD)
-							if (value.find("..") != std::string::npos)
+							//split the range into its upper and lower bounds, then check the bounds
+							if (StringUtil::split(value, "..").size() == 2)
 							{
-								//finite range
-
-								//split the range into its upper and lower bounds, then check the bounds
-								std::vector<std::string> range = StringUtil::split(value, "..");
-
-								//range should have exactly 2 elements, an upper and lower bound
-								if (range.size() != 2)
-								{
-									oss.clear();
-									oss.str("");
-									oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid range \"" << value << "\"";
-									status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-									GMSEC_ERROR << status.get();
-								}
-								else if (checkValue(types, range.at(0)) && checkValue(types, range.at(1)))
-								{
-									formattedValues.push_back(value);
-								}
-								else
-								{
-									oss.clear();
-									oss.str("");
-									oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid range \"" << value << "\"";
-									status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-									GMSEC_ERROR << status.get();
-								}
-
-							}
-							else if (StringUtil::stringEquals(&value.at(value.length()-1), "+"))
-							{
-								//lower bound
-
-								if (checkValue(types, value.substr(0, value.length() - 1)))
-								{
-									formattedValues.push_back(value);
-								}
-								else
-								{
-									oss.clear();
-									oss.str("");
-									oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid value \"" << value << "\"";
-									status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-									GMSEC_ERROR << status.get();
-								}
-							}
-							else if (StringUtil::stringEquals(&value.at(value.length()-1), "-"))
-							{
-								//Upper bound
-
-								if (checkValue(types, value.substr(0, value.length() - 1)))
-								{
-									formattedValues.push_back(value);
-								}
-								else
-								{
-									oss.clear();
-									oss.str("");
-									oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid value \"" << value << "\"";
-									status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-									GMSEC_ERROR << status.get();
-								}
+								formattedValues.push_back(value);
 							}
 							else
 							{
-								//absolute value
-
-								if (checkValue(types, value))
-								{
-									formattedValues.push_back(value);
-								}
-								else
-								{
-									oss.clear();
-									oss.str("");
-									oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid value \"" << value << "\"";
-									status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-									GMSEC_ERROR << status.get();
-								}
+								oss.clear();
+								oss.str("");
+								oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid range \"" << value << "\"";
+								errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+								status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
 							}
 						}
 						else
 						{
-							//type can be anything, so value can reasonably be anything, just add it
-
 							formattedValues.push_back(value);
 						}
 					}
@@ -2047,9 +1952,9 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			{
 				oss.clear();
 				oss.str("");
-				oss << schemaID << ": The field template " << fieldTemplate->getName() << "contains an unrecognized attribute " << attribute->Name();
-				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-				GMSEC_ERROR << status.get();
+				oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an unrecognized attribute " << attribute->Name();
+				errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
 			}
 		}//done parsing the attributes
 
@@ -2058,86 +1963,174 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			//throw an error if f_name wasn't parsed
 			oss.clear();
 			oss.str("");
-			oss << schemaID << ":  field template is missing NAME attribute";
-			status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-			GMSEC_ERROR << status.get();
+			oss << schemaID << ": field template is missing NAME attribute";
+			errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+			status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
 		}
-
-		if (fieldTemplate->getMode().empty())
+		
+		if (fieldTemplate->getMode().empty() || 
+			!(StringUtil::stringEqualsIgnoreCase(fieldTemplate->getMode().c_str(), "OPTIONAL") ||
+			StringUtil::stringEqualsIgnoreCase(fieldTemplate->getMode().c_str(), "REQUIRED") ||
+			StringUtil::stringEqualsIgnoreCase(fieldTemplate->getMode().c_str(), "CONTROL")))
 		{
 			//throw an error if f_mode wasn't parsed
 			oss.clear();
 			oss.str("");
-			oss << schemaID << ": the field template " << fieldTemplate->getName() << " is missing MODE attribute";
-			status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-			GMSEC_ERROR << status.get();
+			oss << schemaID << ": the field template " << fieldTemplate->getName() << " has invalid MODE attribute";
+			errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+			status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
 		}
 
 		//check to make sure all attributes are accounted for
-		if (fieldTemplate->getMode() == "REQUIRED" || fieldTemplate->getMode() == "OPTIONAL")
+		if (!StringUtil::stringEqualsIgnoreCase(fieldTemplate->getMode().c_str(), "CONTROL"))
 		{
 			//checking attributes for regular field templates
-			if (fieldTemplate->getClass().empty())
+			if (fieldTemplate->getClass().empty() ||
+				!(StringUtil::stringEqualsIgnoreCase(fieldTemplate->getClass().c_str(), "HEADER") ||
+				  StringUtil::stringEqualsIgnoreCase(fieldTemplate->getClass().c_str(), "STANDARD")))
 			{
 				oss.clear();
 				oss.str("");
-				oss << schemaID << ": the field template " << fieldTemplate->getName() << " is missing FIELD_CLASS attribute";
-				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-				GMSEC_ERROR << status.get();
+				oss << schemaID << ": the field template " << fieldTemplate->getName() << " has invalid FIELD_CLASS attribute";
+				errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
+			}
+			
+			//check to make sure all types are valid
+			const std::list<std::string>& types = fieldTemplate->getTypeStrings();
+
+			if (!types.empty() && !(types.size() == 1 && types.front().empty()))
+			{
+				for (std::list<std::string>::const_iterator it = types.begin(); it != types.end(); ++it)
+				{
+					if (!(StringUtil::stringEqualsIgnoreCase(it->c_str(), "VARIABLE") ||
+						  StringUtil::stringEqualsIgnoreCase(it->c_str(), "UNSET") || 
+						  StringUtil::stringEqualsIgnoreCase(it->c_str(), "HEADER_STRING") || 
+						  StringUtil::stringEqualsIgnoreCase(it->c_str(), "TIME")))
+					{
+						try 
+						{
+							gmsec::api::internal::InternalField::lookupType((*it).c_str());
+						}
+						catch (...) 
+						{
+							oss.clear();
+							oss.str("");
+							oss << schemaID << ": the field template " << fieldTemplate->getName() << " contains unrecognized TYPE \"" << (*it).c_str() << "\"";
+							errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+							status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
+						}
+					}
+				}
+			}
+			else
+			{
+				oss.clear();
+				oss.str("");
+				oss << schemaID << ": the field template " << fieldTemplate->getName() << " is missing TYPE";
+				errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
 			}
 
-			std::list<std::string> types = fieldTemplate->getTypeStrings();
+			//check types against the values to make sure they work
+			const std::list<std::string>& values = fieldTemplate->getValues();
 
-			for(std::list<std::string>::const_iterator it = types.begin(); it != types.end(); ++it)
+			for (std::list<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
 			{
-				bool validType = false;
+				if (!fieldTemplate->isTypeVariable())
+				{
+					const std::string& value = *it;
 
-				if (*it == "VARIABLE" || *it == "UNSET")
-				{
-					validType = true;
-				}
-				else
-				{
-					try {
-						gmsec::api::internal::InternalField::lookupType((*it).c_str());
-						validType = true;
-					}
-					catch (...) {
-						// validType already set to false
-					}
-				}
+					//type is not variable, so check to make sure the values are valid for the given types(s)
 
-				if (!validType)
-				{
-					oss.clear();
-					oss.str("");
-					oss << schemaID << ": the field template " << fieldTemplate->getName() << " contains unrecognized type \"" << fieldTemplate->getType() << "\"";
-					status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-					GMSEC_ERROR << status.get();
+					if (StringUtil::stringEquals(&value.at(value.length() - 1), "+"))
+					{
+						//lower bound
+
+						if (!checkValue(fieldTemplate->getTypes(), value.substr(0, value.length() - 1)))
+						{
+							oss.clear();
+							oss.str("");
+							oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid value \"" << value << "\"";
+							errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+							status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
+						}
+					}
+					else if (StringUtil::stringEquals(&value.at(value.length() - 1), "-"))
+					{
+						//Upper bound
+
+						if (!checkValue(fieldTemplate->getTypes(), value.substr(0, value.length() - 1)))
+						{
+							oss.clear();
+							oss.str("");
+							oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid value \"" << value << "\"";
+							errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+							status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
+						}
+					}
+					else if (value.find("..") != std::string::npos)
+					{
+						//finite range
+
+						//split the range into its upper and lower bounds, then check the bounds
+						std::vector<std::string> range = StringUtil::split(value, "..");
+
+						//range should have exactly 2 elements, an upper and lower bound
+						if (range.size() != 2)
+						{
+							oss.clear();
+							oss.str("");
+							oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid range \"" << value << "\"";
+							errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+							status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
+						}
+						else if (!(checkValue(fieldTemplate->getTypes(), range.at(0)) && checkValue(fieldTemplate->getTypes(), range.at(1))))
+						{
+							oss.clear();
+							oss.str("");
+							oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid range \"" << value << "\"";
+							errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+							status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
+						}
+					}
+					else
+					{
+						//absolute value
+
+						if (!checkValue(fieldTemplate->getTypes(), value))
+						{
+							oss.clear();
+							oss.str("");
+							oss << schemaID << ": The field template " << fieldTemplate->getName() << " contains an invalid value \"" << value << "\"";
+							errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+							status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
+						}
+					}
 				}
 			}
 		}//done checking attributes for regular fields
 
-		if (fieldTemplate->getMode() == "CONTROL")
+		if (StringUtil::stringEqualsIgnoreCase(fieldTemplate->getMode().c_str(), "CONTROL"))
 		{
 			//checking control fields to make sure all attributes are present
-			if (fieldTemplate->getName() == "ARRAY-START")
+			if (StringUtil::stringEqualsIgnoreCase(fieldTemplate->getName().c_str(), "ARRAY-START"))
 			{
 				if (fieldTemplate->getArrayControlValue().empty())
 				{
 					oss.clear();
 					oss.str("");
 					oss << schemaID << ": the control field " << fieldTemplate->getName() << " is missing VALUE attribute";
-					status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-					GMSEC_ERROR << status.get();
+					errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+					status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
 				}
 				if (fieldTemplate->getSize().empty())
 				{
 					oss.clear();
 					oss.str("");
 					oss << schemaID << ": the control field " << fieldTemplate->getName() << " is missing SIZE attribute";
-					status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-					GMSEC_ERROR << status.get();
+					errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+					status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
 				}
 			}
 		}//done checking CONTROL fields
@@ -2153,15 +2146,22 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 		oss.clear();
 		oss.str("");
 		oss << schemaID << ":  Expected ARRAY-END control not found";
-		status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-		GMSEC_ERROR << status.get();
+		errorList.append(INDENT1).append(oss.str().c_str()).append("\n");
+		status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
+	}
+
+
+	if (!errorList.empty() && errorList[errorList.length()-1] == '\n')
+	{
+		errorList.erase(errorList.length() - 1);
+		status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, errorList.c_str());
 	}
 
 	return status;
 }
 
 
-bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::string value)
+bool InternalSpecification::checkValue(const std::list<Field::FieldType>& types, const std::string& value) const
 {
 	bool valid = true;
 
@@ -2179,7 +2179,7 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 			}
 			catch (...)
 			{
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_CHAR";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_CHAR";
 				valid = false;
 			}
 
@@ -2195,13 +2195,13 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 					  StringUtil::stringEqualsIgnoreCase(value.c_str(), "true") || 
 					  StringUtil::stringEqualsIgnoreCase(value.c_str(), "false")))
 				{
-					GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_BOOL";
+					//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_BOOL";
 					valid = false;
 				}
 			}
 			catch (...)
 			{
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_BOOL";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_BOOL";
 				valid = false;
 			}
 
@@ -2216,13 +2216,13 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 				if (!(testValue >= GMSEC_I64((std::numeric_limits<GMSEC_I16>::min)()) &&
 					  testValue <= GMSEC_I64((std::numeric_limits<GMSEC_I16>::max)())))
 				{
-					GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " is outside limits of GMSEC_I16";
+					//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " is outside limits of GMSEC_I16";
 					valid = false;
 				}
 			}
 			catch (...)
 			{
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_I16";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_I16";
 				valid = false;
 			}
 
@@ -2232,7 +2232,7 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 		{
 			if (std::string(value).find("-") != std::string::npos)
 			{//no negative numbers allowed
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_U16";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_U16";
 				valid = false;
 			}
 
@@ -2243,13 +2243,13 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 				if (!(testValue >= GMSEC_I64((std::numeric_limits<GMSEC_U16>::min)()) &&
 					  testValue <= GMSEC_I64((std::numeric_limits<GMSEC_U16>::max)())))
 				{
-					GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " is outside limits of GMSEC_U16";
+					//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " is outside limits of GMSEC_U16";
 					valid = false;
 				}
 			}
 			catch (...)
 			{
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_U16";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_U16";
 				valid = false;
 			}
 
@@ -2264,14 +2264,14 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 				if (!(testValue >= GMSEC_I64((std::numeric_limits<GMSEC_I32>::min)()) &&
 					  testValue <= GMSEC_I64((std::numeric_limits<GMSEC_I32>::max)())))
 				{
-					GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " is outside limits of GMSEC_I32";
+					//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " is outside limits of GMSEC_I32";
 					valid = false;
 				}
 
 			}
 			catch (...)
 			{
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_I32";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_I32";
 				valid = false;
 			}
 
@@ -2281,7 +2281,7 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 		{
 			if (std::string(value).find("-") != std::string::npos)
 			{//no negative numbers allowed
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_U32";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_U32";
 				valid = false;
 			}
 
@@ -2292,13 +2292,13 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 				if (!(testValue >= GMSEC_I64((std::numeric_limits<GMSEC_U32>::min)()) &&
 					  testValue <= GMSEC_I64((std::numeric_limits<GMSEC_U32>::max)())))
 				{
-					GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " is outside limits of GMSEC_U32";
+					//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " is outside limits of GMSEC_U32";
 					valid = false;
 				}
 			}
 			catch (...)
 			{
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_U32";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_U32";
 				valid = false;
 			}
 
@@ -2312,7 +2312,7 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 			}
 			catch (...)
 			{
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_F32";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_F32";
 				valid = false;
 			}
 
@@ -2326,7 +2326,7 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 			}
 			catch (...)
 			{
-				GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_F64";
+				//GMSEC_ERROR << "XML Parse Error: " << value.c_str() << " cannot be converted to GMSEC_F64";
 				valid = false;
 			}
 
@@ -2337,7 +2337,7 @@ bool InternalSpecification::checkValue(std::list<Field::FieldType> types, std::s
 			break;
 		case 10: //BIN_TYPE
 		{//BIN_TYPE field is used for data, and should not be predefining values
-			GMSEC_ERROR << "XML Parse Error: unable to evaluate BIN_TYPE values";
+			//GMSEC_ERROR << "XML Parse Error: unable to evaluate BIN_TYPE values";
 			valid = false;
 			break;
 		}
@@ -2805,4 +2805,173 @@ InternalSpecification::FieldTemplateList InternalSpecification::cloneFieldTempla
 	}
 
 	return fieldTemps;
+}
+
+
+bool InternalSpecification::isReservedField(const char* fieldName)
+{
+	bool reserved = false;
+
+#if GMSEC_CXX_11_AVAILABLE == 1
+
+	static const char* reservedFields[] =
+	{
+		"CONNECTION-ID",
+		"MW-INFO",
+		"NODE",
+		"PROCESS-ID",
+		"PUBLISH-TIME",
+		"UNIQUE-ID",
+		"USER-NAME",
+		"NUM-OF-SUBSCRIPTIONS",
+		"SUBSCRIPTION.(.*).SUBJECT-PATTERN",
+		"CONNECTION-ENDPOINT",
+		"MW-CONNECTION-ENDPOINT",
+		NULL
+	};
+
+	for (size_t i = 0; !reserved && reservedFields[i]; ++i)
+	{
+		reserved = std::regex_match(fieldName, std::regex(reservedFields[i]));
+	}
+
+#else
+
+	static const char* reservedFields[] =
+	{
+		"CONNECTION-ID",
+		"MW-INFO",
+		"NODE",
+		"PROCESS-ID",
+		"PUBLISH-TIME",
+		"UNIQUE-ID",
+		"USER-NAME",
+		"NUM-OF-SUBSCRIPTIONS",
+		"SUBSCRIPTION.%d.SUBJECT-PATTERN",
+		"CONNECTION-ENDPOINT",
+		"MW-CONNECTION-ENDPOINT",
+		NULL
+	};
+
+	for (size_t i = 0; !reserved && reservedFields[i]; ++i)
+	{
+		if ((std::string(fieldName).find("SUBSCRIPTION") != std::string::npos) && (std::string(fieldName).find("SUBJECT-PATTERN") != std::string::npos))
+		{
+			reserved = true;
+		}
+		else
+		{
+			reserved = (std::string(fieldName) == reservedFields[i]);
+		}
+	}
+
+#endif
+
+	return reserved;
+}
+
+
+Status InternalSpecification::checkTrackingField(const char* fieldName, const TrackingDetails& configTracking, const TrackingDetails& msgTracking)
+{
+	Status status;
+
+	const int ON    = MESSAGE_TRACKINGFIELDS_ON;
+	const int OFF   = MESSAGE_TRACKINGFIELDS_OFF;
+	const int UNSET = MESSAGE_TRACKINGFIELDS_UNSET;
+
+	bool addTracking = (configTracking.get() == ON && (msgTracking.get() == ON || msgTracking.get() == UNSET));
+	bool haveError   = false;
+
+	if (StringUtil::stringEquals(fieldName, "CONNECTION-ID"))
+	{
+		if ((addTracking || configTracking.getConnectionId() == ON || msgTracking.getConnectionId() == ON) &&
+		    (configTracking.getConnectionId() != OFF && msgTracking.getConnectionId() != OFF))
+		{
+			haveError = true;
+		}
+	}
+	else if (StringUtil::stringEquals(fieldName, "MW-INFO"))
+	{
+		if ((addTracking || configTracking.getMwInfo() == ON || msgTracking.getMwInfo() == ON) &&
+		    (configTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
+		{
+			haveError = true;
+		}
+	}
+	else if (StringUtil::stringEquals(fieldName, "NODE"))
+	{
+		if ((addTracking || configTracking.getNode() == ON || msgTracking.getNode() == ON) &&
+		    (configTracking.getNode() != OFF && msgTracking.getNode() != OFF))
+		{
+			haveError = true;
+		}
+	}
+	else if (StringUtil::stringEquals(fieldName, "PROCESS-ID"))
+	{
+		if ((addTracking || configTracking.getProcessId() == ON || msgTracking.getProcessId() == ON) &&
+		    (configTracking.getProcessId() != OFF && msgTracking.getProcessId() != OFF))
+		{
+			haveError = true;
+		}
+	}
+	else if (StringUtil::stringEquals(fieldName, "PUBLISH-TIME"))
+	{
+		if ((addTracking || configTracking.getPublishTime() == ON || msgTracking.getPublishTime() == ON) &&
+		    (configTracking.getPublishTime() != OFF && msgTracking.getPublishTime() != OFF))
+		{
+			haveError = true;
+		}
+	}
+	else if (StringUtil::stringEquals(fieldName, "UNIQUE-ID"))
+	{
+		if ((addTracking || configTracking.getUniqueId() == ON || msgTracking.getUniqueId() == ON) &&
+		    (configTracking.getUniqueId() != OFF && msgTracking.getUniqueId() != OFF))
+		{
+			haveError = true;
+		}
+	}
+	else if (StringUtil::stringEquals(fieldName, "USER-NAME"))
+	{
+		if ((addTracking || configTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
+		    (configTracking.getUserName() != OFF && msgTracking.getUserName() != OFF))
+		{
+			haveError = true;
+		}
+	}
+	else if (StringUtil::stringEquals(fieldName, "NUM-OF-SUBSCRIPTIONS"))
+	{
+		if ((addTracking || configTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
+		    (configTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+		{
+			haveError = true;
+		}
+	}
+	else if (std::string(fieldName).find("SUBSCRIPTION.") != std::string::npos && std::string(fieldName).find(".SUBJECT-PATTERN") != std::string::npos)
+	{
+		if ((addTracking || configTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
+		    (configTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+		{
+			int val;
+			int tmp = sscanf(fieldName, "SUBSCRIPTION.%d.SUBJECT-PATTERN", &val);
+
+			haveError = (tmp == 1);
+		}
+	}
+	else if (StringUtil::stringEquals(fieldName, "CONNECTION-ENDPOINT") || StringUtil::stringEquals(fieldName, "MW-CONNECTION-ENDPOINT"))
+	{
+		if ((addTracking || configTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
+		    (configTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
+		{
+			haveError = true;
+		}
+	}
+
+	if (haveError)
+	{
+		std::stringstream err;
+		err << fieldName << " is a reserved tracking field for the GMSEC API";
+		status.set(MIST_ERROR, NON_ALLOWED_FIELD, err.str().c_str());
+	}
+
+	return status;
 }

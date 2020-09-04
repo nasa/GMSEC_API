@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -320,14 +320,14 @@ void FieldTemplate::setDescription(const std::string& description)
 
 bool FieldTemplate::hasExplicitType() const
 {
-	return m_types.size() == 1;
+	return m_types.size() == 1 && !(StringUtil::stringEqualsIgnoreCase(m_types.front().c_str(), "VARIABLE")) && !(StringUtil::stringEqualsIgnoreCase(m_types.front().c_str(), "UNSET"));
 }
 
 bool FieldTemplate::hasExplicitValue() const
 {//to have an explicitly defined value, there can only be one value present that is not a range and the type must be explicitly defined
 	if (m_values.size() == 1 && hasExplicitType())
 	{
-		std::string value = *m_values.begin();
+		const std::string& value = *m_values.begin();
 		if (value.find("..") != std::string::npos && !StringUtil::stringEqualsIgnoreCase(getType().c_str(), "STRING"))
 			return false;
 		else if ((StringUtil::stringEquals(&value.at(value.length() - 1), "+") ||
@@ -345,8 +345,7 @@ bool FieldTemplate::isTypeVariable() const
 	bool variable = false;
 	for(std::list<std::string>::const_iterator it = m_types.begin(); it != m_types.end(); ++it)
 	{
-		std::string type = *it;
-		if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "UNSET") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "VARIABLE"))
+		if(StringUtil::stringEqualsIgnoreCase(it->c_str(), "UNSET") || StringUtil::stringEqualsIgnoreCase(it->c_str(), "VARIABLE"))
 		{
 			variable = true;
 		}
@@ -384,10 +383,9 @@ std::string FieldTemplate::toXML(const std::string& type) const
 Field* FieldTemplate::toField(const std::string& type) const
 {
 	tinyxml2::XMLDocument doc;
+
 	doc.Parse(toXML(type).c_str());
 
-	tinyxml2::XMLElement* element = doc.RootElement();
-
 	//parsing the root element into a field
-	return InternalField::fromXML(element);
+	return InternalField::fromXML(doc.RootElement());
 }

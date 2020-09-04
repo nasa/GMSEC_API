@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -242,6 +242,37 @@ ProductFileMessage::ProductFileMessage(System::String^ data)
 		dataStr  = static_cast<char*>(Marshal::StringToHGlobalAnsi(data).ToPointer());
 
 		m_impl  = new gmsec::api::mist::message::ProductFileMessage(dataStr);
+		m_owned = true;
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+	catch (...)
+	{
+		throw gcnew GMSEC_Exception(StatusClass::MIST_ERROR, StatusCode::OUT_OF_MEMORY, "Unable to process data string");
+	}
+	finally
+	{
+		FREE_HGLOBAL_IF_NOT_NULLPTR(dataStr);
+	}
+}
+
+
+ProductFileMessage::ProductFileMessage(Specification^ spec, System::String^ data)
+    : MistMessage((gmsec::api::mist::message::MistMessage*) nullptr, false)
+{
+	THROW_EXCEPTION_IF_NULLPTR(spec, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "Specification is null");
+
+	char* dataStr = nullptr;
+
+	try
+	{
+		dataStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(data).ToPointer());
+
+		gmsec::api::mist::Specification* specNative = spec->GetUnmanagedImplementation();
+
+		m_impl  = new gmsec::api::mist::message::ProductFileMessage(*specNative, dataStr);
 		m_owned = true;
 	}
 	catch (gmsec::api::Exception& e)

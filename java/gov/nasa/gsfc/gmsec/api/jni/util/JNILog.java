@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,6 +16,7 @@ import gov.nasa.gsfc.gmsec.api.util.LogLevel;
 import gov.nasa.gsfc.gmsec.api.util.LogHandler;
 import gov.nasa.gsfc.gmsec.api.util.TimeUtil;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -47,6 +48,8 @@ public class JNILog
 		public void onMessage(LogEntry entry)
 		{
 			StringBuilder sb = new StringBuilder();
+
+			entry.fileName = entry.fileName.substring(entry.fileName.lastIndexOf(File.pathSeparator) + 1);
 
 			sb.append(TimeUtil.formatTime(entry.time)).append(" [").append(entry.level.toString()).append("] ");
 			sb.append("[").append(entry.fileName).append(":").append(entry.lineNumber).append("] ");

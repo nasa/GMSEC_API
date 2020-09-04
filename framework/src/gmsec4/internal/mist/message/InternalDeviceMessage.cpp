@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -71,7 +71,7 @@ InternalDeviceMessage::InternalDeviceMessage(const char* subject, const char* id
 	  m_list(),
 	  m_deviceIterator(*this)
 {
-	init(spec.getVersion());
+	init();
 }
 
 
@@ -80,7 +80,7 @@ InternalDeviceMessage::InternalDeviceMessage(const char* subject, const char* id
 	  m_list(),
 	  m_deviceIterator(*this)
 {
-	init(spec.getVersion());
+	init();
 }
 
 
@@ -89,7 +89,7 @@ InternalDeviceMessage::InternalDeviceMessage(const InternalDeviceMessage& other)
 	  m_list(other.m_list),
 	  m_deviceIterator(*this)
 {
-	init(other.m_specVersion);
+	init();
 }
 
 
@@ -104,56 +104,31 @@ InternalDeviceMessage::InternalDeviceMessage(const char* data)
 
 	MessageSubclassHelper::checkStringField(C2CX_SUBTYPE_STRING, "InternalDeviceMessage()", DEV_STRING, *this);
 
-	try
+	GMSEC_U32 numOfDevices = (GMSEC_U32) this->getUnsignedIntegerValue(NUM_OF_DEVICES_STRING);
+
+	for (GMSEC_U32 index = 1; index <= numOfDevices; ++index)
 	{
-		const F32Field& content = getF32Field(CONTENT_VERSION_STRING);
-
-		unsigned int version = (unsigned int)(content.getValue() * 100);
-
-		if (version <= GMSEC_ISD_2014_00)
-		{
-			m_specVersion = GMSEC_ISD_2014_00;
-		}
-		else if (version <= GMSEC_ISD_2016_00)
-		{
-			m_specVersion = GMSEC_ISD_2016_00;
-		}
-		else if (version <= GMSEC_ISD_2018_00)
-		{
-			m_specVersion = GMSEC_ISD_2018_00;
-		}
-		else
-		{
-			m_specVersion = GMSEC_ISD_CURRENT;
-		}
+		m_list.push_back(extractMessageDevice(index));
 	}
-	catch (const Exception& e)
+}
+
+
+InternalDeviceMessage::InternalDeviceMessage(const Specification& spec, const char* data)
+	: InternalMistMessage(spec, data),
+	  m_list(),
+	  m_deviceIterator(*this)
+{
+	MessageSubclassHelper::checkStringField(MESSAGE_TYPE_STRING, "InternalDeviceMessage()", MSG_STRING, *this);
+
+	MessageSubclassHelper::checkStringField(MESSAGE_SUBTYPE_STRING, "InternalDeviceMessage()", C2CX_STRING, *this);
+
+	MessageSubclassHelper::checkStringField(C2CX_SUBTYPE_STRING, "InternalDeviceMessage()", DEV_STRING, *this);
+
+	GMSEC_U32 numOfDevices = (GMSEC_U32) this->getUnsignedIntegerValue(NUM_OF_DEVICES_STRING);
+
+	for (GMSEC_U32 index = 1; index <= numOfDevices; ++index)
 	{
-		std::ostringstream oss;
-
-		oss << "InternalDeviceMessage:  Error while fetching "
-		    << CONTENT_VERSION_STRING << " from message; field not fetched."
-			<< e.what();
-
-		throw Exception(MIST_ERROR, MISSING_REQUIRED_FIELD, oss.str().c_str());
-	}
-
-	GMSEC_U32 numOfDevices = 0;
-
-	if (m_specVersion >= GMSEC_ISD_2016_00)
-	{
-		numOfDevices = MessageSubclassHelper::extractU16Field(NUM_OF_DEVICES_STRING, 
-							"InternalDeviceMessage::InternalDeviceMessage()", *this);
-	}
-	else
-	{
-		numOfDevices = MessageSubclassHelper::extractI16Field(NUM_OF_DEVICES_STRING, 
-							"InternalDeviceMessage::InternalDeviceMessage()", *this);
-	}
-
-	for (GMSEC_U32 count = 0; count < numOfDevices; ++count)
-	{
-		m_list.push_back(extractMessageDevice(count+1));
+		m_list.push_back(extractMessageDevice(index));
 	}
 }
 
@@ -167,53 +142,27 @@ void InternalDeviceMessage::addDevice(const Device& device)
 {
 	m_list.push_back(device);
 
-	if (m_specVersion == GMSEC_ISD_2014_00)
-	{
-		addField(NUM_OF_DEVICES_STRING, (GMSEC_I16)m_list.size());
-	}
-	else if (m_specVersion >= GMSEC_ISD_2016_00)
-	{
-		addField(NUM_OF_DEVICES_STRING, (GMSEC_U16)m_list.size());
-	}
-	else
-	{
-		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate"
-			<< " Device Message number of devices";
-	}
-	
+	this->setValue(NUM_OF_DEVICES_STRING, (GMSEC_I64) m_list.size());
 
 	std::ostringstream s;
 	s << "DEVICE." << m_list.size();
-	std::string strCount = s.str();
 
-	std::string nameStr = strCount;
+	std::string nameStr = s.str();
 	nameStr.append(".NAME");
 	addField(nameStr.c_str(), device.getName());
 
-	std::string statusStrName = strCount;
+	std::string statusStrName = s.str();
 	statusStrName.append(".STATUS");
 	addField(statusStrName.c_str(), (GMSEC_I16) device.getStatus());
 
-	std::string numParamsName = strCount;
+	std::string numParamsName = s.str();
 	numParamsName.append(".NUM-OF-PARAMS");
 	
-	if (m_specVersion == GMSEC_ISD_2014_00)
-	{
-		addField(numParamsName.c_str(), (GMSEC_I16) device.getParamCount());
-	}
-	else if (m_specVersion >= GMSEC_ISD_2016_00)
-	{
-		addField(numParamsName.c_str(), (GMSEC_U16) device.getParamCount());
-	}
-	else
-	{
-		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate"
-			<< " Device Message number of params";
-	}
+	this->setValue(numParamsName.c_str(), (GMSEC_I64) device.getParamCount());
 	
 	if (device.infoAvailable())
 	{
-		std::string infoCount = strCount;
+		std::string infoCount = s.str();
 		infoCount.append(".INFO");
 
 		const Field &iField = device.getInfo();
@@ -223,12 +172,13 @@ void InternalDeviceMessage::addDevice(const Device& device)
 			                INCORRECT_FIELD_TYPE,
 			                "InternalDeviceMessage::addDevice():  Expected I16Field and got something different, for .INFO.");
 		}
+
 		MessageSubclassHelper::addRenamedFieldToMessage(iField, *this, infoCount.c_str());
 	}
 
 	if (device.numberAvailable())
 	{
-		std::string numberCount = strCount;
+		std::string numberCount = s.str();
 		numberCount.append(".NUMBER");
 
 		GMSEC_I16 i16_value = 0;
@@ -248,43 +198,43 @@ void InternalDeviceMessage::addDevice(const Device& device)
 	
 	if (device.modelAvailable())
 	{
-		std::string modelCount = strCount;
+		std::string modelCount = s.str();
 		modelCount.append(".MODEL");
 		addField(modelCount.c_str(), device.getModel());
 	}
 
 	if (device.serialAvailable())
 	{
-		std::string serialCount = strCount;
+		std::string serialCount = s.str();
 		serialCount.append(".SERIAL");
 		addField(serialCount.c_str(), device.getSerial());
 	}
 
 	if (device.versionAvailable())
 	{
-		std::string versionCount = strCount;
+		std::string versionCount = s.str();
 		versionCount.append(".VERSION");
 		addField(versionCount.c_str(), device.getVersion());
 	}
 
 	if (device.groupAvailable())
 	{
-		std::string groupCount = strCount;
+		std::string groupCount = s.str();
 		groupCount.append(".GROUP");
 		addField(groupCount.c_str(), device.getGroup());
 	}
 
 	if (device.roleAvailable())
 	{
-		std::string roleCount = strCount;
+		std::string roleCount = s.str();
 		roleCount.append(".ROLE");
 		addField(roleCount.c_str(), device.getRole());
 	}
 
-	for (size_t s_idx = 0; s_idx < device.getParamCount(); s_idx++)
+	for (size_t s_idx = 0; s_idx < device.getParamCount(); ++s_idx)
 	{
 		std::ostringstream ss;
-		ss << strCount << ".PARAM." << (s_idx + 1);
+		ss << s.str() << ".PARAM." << (s_idx+1);
 		std::string sampleCountStr = ss.str();
 
 		DeviceParam current = device.getParam(s_idx);
@@ -308,17 +258,19 @@ void InternalDeviceMessage::addDevice(const Device& device)
 
 const Device& InternalDeviceMessage::getDevice(size_t index) const
 {
-	if (index < m_list.size())
+	//Note: Index is zero-based
+
+	if (index >= m_list.size())
 	{
-		return m_list[index];
+		std::ostringstream oss;
+
+		oss << "InternalDeviceMessage::getDevice():  index "
+		    << index << "specified is out-of-range";
+
+		throw Exception(MIST_ERROR, INDEX_OUT_OF_RANGE, oss.str().c_str());
 	}
 
-	std::ostringstream oss;
-
-	oss << "InternalDeviceMessage::getDevice():  index "
-	    << index << "specified is out-of-range";
-
-	throw Exception(MIST_ERROR, INDEX_OUT_OF_RANGE, oss.str().c_str());
+	return m_list[index];
 }
 
 
@@ -362,25 +314,16 @@ const Device& InternalDeviceMessage::nextDevice()
 }
 
 
-std::string InternalDeviceMessage::buildSchemaID(unsigned int version)
+std::string InternalDeviceMessage::buildSchemaID()
 {
-	//schema ID starts with version number, then add major.minor delimiter
-	//std::ostringstream oss;
-	//oss << version;
-	//std::string id = oss.str();
-
-	//delimiter is inserted after major revision (a four digit number)
-	//id.insert(4, ".");
-
-	//id.append(".GMSEC.MSG.C2CX.DEV");
-
-	//return id;
 	return "MSG.C2CX.DEV";
 }
 
 
 Device InternalDeviceMessage::extractMessageDevice(size_t index) const
 {
+	//Note: Index is one-based
+
 	char tmp_name[256];
 	
 	GMSEC_I16   device_info;
@@ -403,46 +346,29 @@ Device InternalDeviceMessage::extractMessageDevice(size_t index) const
 							"InternalDeviceMessage::extractMessageDevice()", *this));
 	
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.NUM-OF-PARAMS", index);
-	size_t device_num_of_params;
+	size_t device_num_of_params = (size_t) this->getUnsignedIntegerValue(tmp_name);
 
-	if (m_specVersion >= GMSEC_ISD_2016_00)
-	{
-		device_num_of_params = MessageSubclassHelper::extractU16Field(tmp_name, 
-							"InternalDeviceMessage::extractMessageDevice()", *this);
-	}
-	else
-	{
-		device_num_of_params = MessageSubclassHelper::extractI16Field(tmp_name, 
-							"InternalDeviceMessage::extractMessageDevice()", *this);
-	}
-	
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.INFO", index);
-	
+
 	bool device_info_exists = MessageSubclassHelper::getOptionalI16(tmp_name, *this, device_info);
-	
 
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.NUMBER", index);
 	bool device_number_exists = MessageSubclassHelper::getOptionalI16(tmp_name, *this, device_number);
-
 
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.MODEL", index);
 	bool device_model_exists = MessageSubclassHelper::getOptionalString(tmp_name, *this, device_model);
 
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.SERIAL", index);
 	bool device_serial_exists = MessageSubclassHelper::getOptionalString(tmp_name, *this, device_serial);
-	
 
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.VERSION", index);
 	bool device_version_exists = MessageSubclassHelper::getOptionalString(tmp_name, *this, device_version);
-	
 
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.GROUP", index);
 	bool device_group_exists = MessageSubclassHelper::getOptionalString(tmp_name, *this, device_group);
-	
-	
+
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.ROLE", index);
 	bool device_role_exists = MessageSubclassHelper::getOptionalString(tmp_name, *this, device_role);
-	
 
 	Device device(device_name.c_str(), device_status);
 
@@ -483,47 +409,35 @@ Device InternalDeviceMessage::extractMessageDevice(size_t index) const
 		device.setInfo(device_info_field);
 	}
 
-	size_t      param_idx = 1;
-	std::string param_name;
-	std::string param_timestamp;
-	const Field* param_value_ptr = NULL;
+	std::string  param_name;
+	std::string  param_timestamp;
+	const Field* param_value = NULL;
 
-	while (param_idx <= device_num_of_params)
+	for (size_t param_idx = 1; param_idx <= device_num_of_params; ++param_idx)
 	{
 		StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.PARAM.%u.NAME", index, param_idx);
-		param_name = MessageSubclassHelper::extractStringField(tmp_name, 
-													  "InternalDeviceMessage::extractMessageDevice()",
-													  *this);
-		
+		param_name = getStringValue(tmp_name);
 
 		StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.PARAM.%u.TIME", index, param_idx);
-		param_timestamp = MessageSubclassHelper::extractStringField(tmp_name, 
-													  "InternalDeviceMessage::extractMessageDevice()",
-													  *this);
+		param_timestamp = getStringValue(tmp_name);
 
 		StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "DEVICE.%u.PARAM.%u.VALUE", index, param_idx);
+		param_value = getField(tmp_name);
 
-		param_value_ptr = MessageSubclassHelper::extractField(tmp_name, 
-						   "InternalDeviceMessage::extractMessageDevice()", *this);
-		
-		DeviceParam device_param(param_name.c_str(), param_timestamp.c_str(), *param_value_ptr);
+		DeviceParam device_param(param_name.c_str(), param_timestamp.c_str(), *param_value);
 
 		device.addParam(device_param);
-
-		param_idx++;
 	}
 
 	return device;
 }
 
 
-void InternalDeviceMessage::init(unsigned int version)
+void InternalDeviceMessage::init()
 {
-	m_specVersion = version;
-
 	setValue(NUM_OF_DEVICES_STRING, (GMSEC_I64) m_list.size());
 
-	if (m_specVersion <= GMSEC_ISD_2014_00)
+	if (getSpecVersion() <= GMSEC_ISD_2014_00 && getField(MSG_ID_STRING) == NULL)
 	{
 		addField(MSG_ID_STRING, getSubject()); //MSG-ID only needed pre-2016
 	}
@@ -534,4 +448,3 @@ void InternalDeviceMessage::init(unsigned int version)
 } // end namespace mist
 } // end namespace api
 } // end namespace gmsec
-

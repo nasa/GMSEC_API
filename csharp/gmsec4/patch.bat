@@ -1,14 +1,12 @@
 @ECHO OFF
 
-REM Copyright 2007-2018 United States Government as represented by the
-REM Administrator of The National Aeronautics and Space Administration.
-REM No copyright is claimed in the United States under Title 17, U.S. Code.
-REM All Rights Reserved.
+rem Copyright 2007-2019 United States Government as represented by the
+rem Administrator of The National Aeronautics and Space Administration.
+rem No copyright is claimed in the United States under Title 17, U.S. Code.
+rem All Rights Reserved.
 
 
 CALL fixField
-CALL fixConfig
-CALL fixLogHandler
 CALL fixOther
 
 @ECHO ON

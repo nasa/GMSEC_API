@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -52,7 +52,7 @@ class ValidationCallback extends ConnectionManagerCallback
 			//o Start by checking to ensure that this is a PROD message
 			if (isProdMsg(message))
 			{
-				ProductFileMessage prodMessage = new ProductFileMessage(message.toXML());
+				ProductFileMessage prodMessage = new ProductFileMessage(connMgr.getSpecification(), message.toXML());
 
 				//o Extract the Product File URI location(s) from the
 				// message using a ProductFileIterator

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -80,6 +80,15 @@ public:
 
 
 	/**
+	 * @fn void getName(const char* name)
+	 * @brief Sets the Field name attribute to the given name string.
+	 * @param name - the name of the Field
+	 * @throw An Exception is thrown if the name is NULL, or is an empty string.
+	 */
+	void CALL_TYPE setName(const char* name);
+
+
+	/**
 	 * @fn FieldType getType() const
 	 * @brief Returns the type of the Field object.
 	 * @return FieldType enumerated value.
@@ -152,6 +161,30 @@ public:
 	 * @throws An Exception is thrown if the field cannot be successfully converted to a string.
 	 */
 	const char* CALL_TYPE getStringValue() const;
+
+
+	/**
+	 * @fn Field* clone() const
+	 *
+	 * @brief Creates/returns a clone of the Field object.
+	 *
+	 * @return A cloned Field object.
+	 *
+	 * @sa Field::destroyClone()
+	 */
+	Field* CALL_TYPE clone() const;
+
+
+	/**
+	 * @fn void destroyClone(Field*& clone)
+	 *
+	 * @brief Destroys the (cloned) Field object.
+	 *
+	 * @param clone - the cloned field to destroy.
+	 *
+	 * @sa clone()
+	 */
+	static void CALL_TYPE destroyClone(Field*& clone);
 
 
 protected:

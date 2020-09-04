@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -29,9 +29,6 @@ class connection_state
 			Console.WriteLine("\nPlease see the GMSEC_API/example/cs/message_field_container directory for an example xml configuration file.");
 			return -1;
 		}
-
-		// Initialize default log handler
-		DefaultLogHandler.Initialize();
 
 		//o If it was not specified in the command-line arguments, set LOGLEVEL
 		// to 'INFO' and LOGFILE to 'stdout' to allow the program report output

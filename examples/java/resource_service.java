@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,6 +31,8 @@ import java.util.ArrayList;
 public class resource_service
 {
 	static String RSRC_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.RESOURCE_SERVICE.RSRC";
+	static int    RSRC_PUBLISH_RATE    = 5; // in seconds
+
 	public static void main(String[] args)
 	{
 		if (args.length < 1)
@@ -58,15 +60,28 @@ public class resource_service
 			// be used by all GMSEC Messages
 			ArrayList<Field> headerFields = new ArrayList<Field>();
 
-			F32Field versionField = new F32Field("HEADER-VERSION", 2010.0f);
-			StringField missionField = new StringField("MISSION-ID", "GMSEC");
-			StringField facilityField = new StringField("FACILITY", "GMSEC Lab");
-			StringField componentField = new StringField("COMPONENT", "heartbeat_service");
+			int version = connManager.getSpecification().getVersion();
 
-			headerFields.add(versionField);
+			StringField missionField = new StringField("MISSION-ID", "MY-MISSION");
+			StringField facilityField = new StringField("FACILITY", "MY-FACILITY");
+			StringField componentField = new StringField("COMPONENT", "RESOURCE-SERVICE");
+			StringField domain1Field = new StringField("DOMAIN1", "MY-DOMAIN-1");
+			StringField domain2Field = new StringField("DOMAIN2", "MY-DOMAIN-2");
+			StringField msgID = new StringField("MSG-ID", "MY-MSG-ID");
+
 			headerFields.add(missionField);
 			headerFields.add(facilityField);
 			headerFields.add(componentField);
+
+			if (version == 201400)
+			{
+				headerFields.add(msgID);
+			}
+			else if (version >=201800)
+			{
+				headerFields.add(domain1Field);
+				headerFields.add(domain2Field);
+			}
 
 			//o Use setStandardFields to define a set of header fields for
 			// all messages which are created or published on the
@@ -91,9 +106,8 @@ public class resource_service
 			// parameter provided to the startResourceMessageService() function.
 			// If an interval is not provided, the service will default to
 			// publishing a message every 60 seconds.
-			int interval_s = 30;
-			Log.info("Starting the Resource Message service, a message will be published every " + interval_s + " seconds");
-			connManager.startResourceMessageService(RSRC_MESSAGE_SUBJECT, interval_s, 1, 10);
+			Log.info("Starting the Resource Message service, a message will be published every " + RSRC_PUBLISH_RATE + " seconds");
+			connManager.startResourceMessageService(RSRC_MESSAGE_SUBJECT, RSRC_PUBLISH_RATE, 1, 10);
 
 			//o Wait for user input to end the program
 			Log.info("Publishing C2CX Resource Messages indefinitely, press <enter> to exit the program");

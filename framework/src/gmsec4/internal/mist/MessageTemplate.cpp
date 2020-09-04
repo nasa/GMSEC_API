@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,16 +16,16 @@
 
 #include <gmsec4/internal/mist/FieldTemplate.h>
 
+#include <gmsec4/internal/StringUtil.h>
+
 #include <gmsec4/Config.h>
 #include <gmsec4/Errors.h>
 #include <gmsec4/Fields.h>
 #include <gmsec4/MessageFieldIterator.h>
 
-#include <gmsec4/internal/StringUtil.h>
-
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
-#include <memory>
 #include <string>
 #include <sstream>
 
@@ -217,7 +217,7 @@ const char* MessageTemplate::toXML(const char* subject)
 		{
 			try
 			{
-				std::auto_ptr<Field> field(fieldTemplate->toField(fieldTemplate->getType()));
+				StdUniquePtr<Field> field(fieldTemplate->toField(fieldTemplate->getType()));
 
 				msg.addField(*(field.get()));
 			}

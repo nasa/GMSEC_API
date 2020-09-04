@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,6 +20,7 @@
 #include <gmsec4/ConfigOptions.h>
 
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/TimeUtil.h>
 
 #include <netdb.h>     // For getaddrinfo() in hostnameToIpv4()
@@ -1009,7 +1010,7 @@ void ZMQConnection::handleMessage(zmq_msg_t* zmqMessage, int zmqMsgSize, zmq_msg
 	// Extract the contents of the encoded meta object from the ZeroMQ message
 	DataBuffer metaBuffer((GMSEC_U8*) zmq_msg_data(metaMessage), metaSize, false);
 
-	std::auto_ptr<Message> message(new Message(subject, Message::PUBLISH, getExternal().getMessageConfig()));
+	StdUniquePtr<Message> message(new Message(subject, Message::PUBLISH, getExternal().getMessageConfig()));
 
 	// Decode the meta object
 	ValueMap meta;

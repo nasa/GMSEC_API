@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,6 +42,12 @@ const char* Field::getName() const
 }
 
 
+void Field::setName(const char* name)
+{
+	m_internal->setName(name);
+}
+
+
 Field::FieldType Field::getType() const
 {
 	return m_internal->getType();
@@ -81,6 +87,19 @@ GMSEC_F64 Field::getDoubleValue() const
 const char* Field::getStringValue() const
 {
 	return m_internal->getStringValue();
+}
+
+
+Field* Field::clone() const
+{
+	return InternalField::makeFieldCopy(*this);
+}
+
+
+void Field::destroyClone(Field*& clone)
+{
+	delete clone;
+	clone = NULL;
 }
 
 

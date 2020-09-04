@@ -1,6 +1,6 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
- * Administrator of the National Aeronautics and Space Administration.
+ * Copyright 2007-2019 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
@@ -12,6 +12,8 @@
 #include <gmsec4/mist/message/DeviceMessage.h>
 using namespace gmsec::api::mist::message;
 %}
+
+%ignore gmsec::api::mist::message::DeviceMessage::operator=(const DeviceMessage&);
 
 %include "dox/DeviceMessage_dox.i"
 %include <gmsec4/util/wdllexp.h>

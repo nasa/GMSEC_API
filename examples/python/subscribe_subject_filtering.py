@@ -2,7 +2,7 @@
 
 
 """
- Copyright 2007-2017 United States Government as represented by the
+ Copyright 2007-2019 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -101,12 +101,18 @@ def main():
         # Example error handling for calling receive() with a timeout
         if (message != None):
             libgmsec_python.logInfo("Received message:\n" + message.toXML())
-                
+
+            # Dispose of the received message
+            connMgr.release(message)
+
         libgmsec_python.logInfo("Waiting 5 seconds to demonstrate that a second message will not be received")
         message = connMgr.receive(5000)
 
         if (message != None):
             libgmsec_python.logError("Unexpectedly received a filtered message:\n" + message.toXML())
+
+            # Dispose of the received message
+            connMgr.release(message)
 
         # Disconnect from the middleware and clean up the Connection
         connMgr.cleanup()

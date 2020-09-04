@@ -9,83 +9,106 @@
 
 %feature("docstring") gmsec::api::util::TimeUtil::diffTime "
 
-    diffTime(time1, time0) -> GMSEC_TimeSpec
+    diff_time(time1: GMSEC_TimeSpec, time0: GMSEC_TimeSpec) -> GMSEC_TimeSpec
 
     Computes the time-delta between the two given times.
 
+    Parameters
+    ----------
+    time1 : Time taken at the second measurement
+    time0 : Time taken at the first measurement
+
     Returns
     -------
-    A GMSEC_TimeSpec that contains the time-delta.
+    A GMSEC_TimeSpec that contains the time-delta (i.e. time1 - time0).
 
 ";
 
 %feature("docstring") gmsec::api::util::TimeUtil::millisleep "
 
-    millisleep(milliseconds)
+    millisleep(milliseconds: int)
 
     Sleeps for the specified number of milliseconds (at least 1).
+
+    Parameters:
+    -----------
+    milliseconds : The number of milliseconds to sleep
 ";
 
 %feature("docstring") gmsec::api::util::TimeUtil::getCharTime "
 
-    getCharTime(timeString) -> GMSEC_TimeSpec
+    get_char_time(timeString: str) -> GMSEC_TimeSpec
 
-    Returns the current time in seconds since Jan 1, 1970 as
-    represented by the string
+    Returns the current time in seconds since Jan 1, 1970 as represented by the string
+
+    Parameters
+    ----------
+    timestring : Time string with the format of \"YYYY-DDD-HH:MM:SS.sss\".
+
+    Returns
+    -------
+    The current time in seconds since Jan 1, 1970 as represented by the string
 ";
 
 %feature("docstring") gmsec::api::util::TimeUtil::getCurrentTime_s "
 
-    getCurrentTime_s(ts=None) -> double
+    get_current_time_s() -> double
 
-    Returns the current time in seconds since Jan 1, 1970 as
-    represented by the string
+    Returns the current time in seconds since Jan 1, 1970.
+
+    Returns
+    -------
+    The current time represented as a floating point value.
 ";
 
 %feature("docstring") gmsec::api::util::TimeUtil::formatTime "
 
-    formatTime(ts, buffer)
+    format_time(ts: GMSEC_TimeSpec) -> str
 
-    Formats the given TimeSpec into a GMSEC time string with the
-    format of YYYY-DDD-HH-MM-SS.sss
-
-    Parameters
-    ----------
-    ts: a GMSEC_TimeSpec containing time information
-    buffer: the array where to store the formatted time string.
-
-    Note: buffer must be at least GMSEC_TIME_BUFSIZE characters
-
-    formatTime(ts, subs, buffer)
-
-    Stores a GMSEC time string with the format of
-    YYYY-DDD-HH-MM-SS[.s*] into the given buffer.
+    Formats the given TimeSpec into a GMSEC time string with the format of YYYY-DDD-HH-MM-SS.sss
 
     Parameters
     ----------
-    ts: a GMSEC_TimeSpec containing time information
-    subs: the number of digits to allow for subseconds [0 .. 9].
-    buffer: the array where to store the formatted time string.
+    ts : The GMSEC_TimeSpec containing time information
 
-    Note: buffer must be at least GMSEC_TIME_BUFSIZE characters
+    Returns
+    -------
+    A time string with the format of YYYY-DDD-HH-MM-SS.sss
 
-    formatTime(ts, buffer, subs)
 
-    Deprecated since v4.2 - nevertheless we keep for binary
-    compatibility reasons
+
+    format_time(ts: GMSEC_TimeSpec, subs: int) -> str
+
+    Stores a GMSEC time string with the format of YYYY-DDD-HH-MM-SS[.s*] into the given buffer.
+
+    Parameters
+    ----------
+    ts   : The GMSEC_TimeSpec containing time information
+    subs : the number of digits to allow for subseconds [0 .. 9].
+
+    Returns
+    -------
+    A time string with the format of YYYY-DDD-HH-MM-SS[.s*]
 ";
 
 %feature("docstring") gmsec::api::util::TimeUtil::getCharTime_s "
 
-    getCharTime_s(timeString) -> double
+    get_char_time_s(timeString: str) -> double
 
-    Returns the current time in seconds since Jan 1, 1970 as
-    represented by the string
+    Returns the current time in seconds since Jan 1, 1970 as represented by the string
+
+    Returns
+    -------
+    The current time as the number of seconds since the 01/01/1970 epoch.
 ";
 
 %feature("docstring") gmsec::api::util::TimeUtil::getCurrentTime "
 
-    getCurrentTime() -> GMSEC_TimeSpec
+    get_current_time() -> GMSEC_TimeSpec
     
     Returns the current time in seconds since Jan 1, 1970.
+
+    Returns
+    -------
+    A GMSEC_TimeSpec with the current time
 ";

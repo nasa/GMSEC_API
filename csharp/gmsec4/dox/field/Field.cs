@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,6 +21,12 @@ public class Field : global::System.IDisposable {
   /// <summary>Returns the name of the field object</summary>
   /// <returns>A string containing the field name</returns>
   public string GetName() {
+  }
+
+  /// <summary>Sets the name of the Field object</summary>
+  /// <param name="name">The name of the Field object.</param>
+  /// <exception cref="GmsecException">An exception is thrown if the name is null or contains an empty string.</exception>
+  public void SetName(string name) {
   }
 
   /// <summary>Returns the type of the field object</summary>
@@ -70,6 +76,16 @@ public class Field : global::System.IDisposable {
   /// <returns>Returns the field value as a string.</returns>
   /// <exception cref="GmsecException">An exception is thrown if the field cannot be successfully converted to a string.</exception>
   public string GetStringValue() {
+  }
+
+  /// <summary>Creates/returns a clone of the Field object.</summary>
+  /// <returns>A clone of the Field object.</returns>
+  public Field Clone() {
+  }
+
+  /// <summary>Destroys the cloned Field object.</summary>
+  /// <param name="clone">The cloned Field object to destroy.</param>
+  public void DestroyClone(Field clone) {
   }
 
   /// <summary>Enumeration of possible field types.</summary>

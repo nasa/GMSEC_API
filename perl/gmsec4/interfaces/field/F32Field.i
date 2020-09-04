@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,6 +13,26 @@ using namespace gmsec::api;
 
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/field/F32Field.h>
+
+%extend gmsec::api::F32Field {
+    F32Field* CALL_TYPE clone() const
+    {
+        return dynamic_cast<F32Field*>(self->clone());
+    }
+
+    static F32Field* CALL_TYPE castField(Field* field)
+    {
+        F32Field* casted = dynamic_cast<F32Field*>(field);
+
+        if (casted == NULL)
+        {
+            throw Exception(FIELD_ERROR, FIELD_TYPE_MISMATCH, "Field cannot be casted to an F32Field");
+        }
+
+        return casted;
+    }
+};
+
 
 %perlcode%{
 =pod
@@ -95,6 +115,7 @@ Field containing an unsigned 64-bit value.
 
 =back
 
+
 =head2 Public Member Subroutines
 
 =head3 new
@@ -120,11 +141,15 @@ C<libgmsec_perl::F32Field-E<gt>new($field)>
 
         $field - the F32Field to copy
 
+
+
 =head3 DESTROY
 
 C<libgmsec_perl::F32Field-E<gt>DESTROY()>
 
         Destructor.
+
+
 
 =head3 getValue
 
@@ -135,6 +160,40 @@ C<libgmsec_perl::F32Field-E<gt>getValue()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         Returns a pointer to the underlying data held by this object.
+
+
+
+=head3 clone
+
+C<libgmsec_perl::F32Field-E<gt>clone()>
+
+        Creates and returns an exact clone of the field object.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        Returns a clone of the field object.
+
+
+
+=head3 castField
+
+C<libgmsec_perl::F32Field-E<gt>castField()>
+
+        Converts the given Field object to an F32Field object.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+        Field object that represents an F32Field.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+        An exception is thrown if the field object cannot be converted to an F32Field.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        Returns the F32Field representation of the given field object.
+
+
 
 =head3 toXML 
 
@@ -148,6 +207,8 @@ C<libgmsec_perl::Field-E<gt>toXML()>
 
         Returns an XML string.
 
+
+
 =head3 toJSON
 
 C<libgmsec_perl::Field-E<gt>toJSON()>
@@ -160,6 +221,8 @@ C<libgmsec_perl::Field-E<gt>toJSON()>
 
         Returns an JSON string.
 
+
+
 =head3 getName
 
 C<libgmsec_perl::Field-E<gt>getName()>
@@ -169,6 +232,24 @@ C<libgmsec_perl::Field-E<gt>getName()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
         String containing Field name.
+
+
+
+=head3 setName
+
+C<libgmsec_perl::Field-E<gt>setName()>
+
+        Sets the field name to the given string.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+        Field name string.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+        An exception is thrown if the field name is null or is an empty string.
+
+
 
 =head3 getType
 
@@ -184,6 +265,8 @@ C<libgmsec_perl::Field-E<gt>getType()>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Field.html#fieldtype">FieldType</a>
 
+
+
 =head3 isHeader
 
 C<libgmsec_perl::Field-E<gt>isHeader()>
@@ -193,6 +276,8 @@ C<libgmsec_perl::Field-E<gt>isHeader()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         Returns 1 (true) if a header field, 0 (false) otherwise.
+
+
 
 =head3 getIntegerValue
 
@@ -208,6 +293,8 @@ C<libgmsec_perl::Field-E<gt>getIntegerValue()>
 
         An Exception is thrown if the field cannot be successfully converted into an integer.
 
+
+
 =head3 getUnsignedIntegerValue
 
 C<libgmsec_perl::Field-E<gt>getUnsignedIntegerValue()>
@@ -222,6 +309,8 @@ C<libgmsec_perl::Field-E<gt>getUnsignedIntegerValue()>
 
         An Exception is thrown if the field cannot be successfully converted into an unsigned integer.
 
+
+
 =head3 getDoubleValue
 
 C<libgmsec_perl::Field-E<gt>getDoubleValue()>
@@ -235,6 +324,8 @@ C<libgmsec_perl::Field-E<gt>getDoubleValue()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An Exception is thrown if the field cannot be successfully converted into a double.
+
+
 
 =head3 getStringValue
 

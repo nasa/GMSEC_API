@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,12 +17,14 @@ namespace GMSEC.API {
 /// messages. A user created class, derived from this class, can be passed into Request()
 /// to have user code executed asynchronously when a reply is received or when an error
 /// occurs.
-/// <p>
-/// Please note that because users are able to create their own ReplyCallback class,
-/// reentrancy is not guarunteed unless if they implement their own reentrancy rules. Also
-/// note that because a ReplyCallback can be registered to multiple connections, it can be
-/// run concurrently amongst those connections.
 /// </summary>
+/// <p>
+/// Note that because users are able to create their own ConnectionManagerReplyCallback class,
+/// reentrancy is not guaranteed unless they implement their own reentrancy rules.
+/// <p>
+/// In addition, if a ConnectionManagerReplyCallback is registered to multiple Connection Manager objects,
+/// OnReply() can be invoked concurrently from different threads. Use of an AutoMutex is suggested to
+/// enforce thread safety.
 ///
 /// <seealso cref="ConnectionManager.Request(Message, int, ConnectionManagerReplyCallback)"/>
 /// <seealso cref="ConnectionManager.Request(Message, int, ConnectionManagerReplyCallback, int)"/>
@@ -32,14 +34,16 @@ public class ConnectionManagerReplyCallback : ConnectionManagerEventCallback {
   /// <summary>
   /// This method is called in response to an asynchronous reply message being received. 
   /// <p>
-  /// Please note that if a ReplyCallback is registered to multiple connections, OnReply() can
+  /// Note that if a ReplyCallback is registered to multiple connections, OnReply() can
   /// be invoked concurrently from the different connection threads.
   /// </summary>
   ///
   /// <remarks>
-  /// <b>DO NOT DESTROY</b> the Connection or Message objects that are passed into this function by the API.
-  /// They are owned by the API and do not need to be managed by the client program. Also, they should not
-  /// be stored by the client program beyond the scope of this callback function.
+  /// <b>DO NOT STORE or CHANGE STATE</b> of the ConnectionManager object that is passed to the callback
+  /// method.
+  ///
+  /// <b>DO NOT STORE</b> the Message objects for use beyond the scope of the callback. Otherwise,
+  /// make a copy of the Message object(s).
   /// </remarks>
   ///
   /// <param name="connMgr">ConnectionManager on which the message was received</param>

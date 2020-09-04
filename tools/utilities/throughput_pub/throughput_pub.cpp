@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,12 +20,13 @@
 
 
 using namespace gmsec::api;
+using namespace gmsec::api::mist;
 using namespace gmsec::api::util;
 
 
 throughput_pub::throughput_pub(const Config& config)
 	: Utility(config),
-	  connection(0),
+	  connMgr(0),
 	  reportingThread(0),
 	  iteration(0)
 {
@@ -36,21 +37,21 @@ throughput_pub::throughput_pub(const Config& config)
 
 throughput_pub::~throughput_pub()
 {
-	if (connection)
+	if (connMgr)
 	{
 		try
 		{
-			connection->disconnect();
+			connMgr->cleanup();
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			GMSEC_ERROR << e.what();
 		}
 
-		Connection::destroy(connection);
+		delete connMgr;
 	}
 
-	Connection::shutdownAllMiddlewares();
+	ConnectionManager::shutdownAllMiddlewares();
 }
 
 
@@ -73,23 +74,23 @@ bool throughput_pub::run()
 	bool success = true;
 
 	/* output GMSEC API version */
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
-		//o Create the Connection
-		connection = Connection::create(getConfig());
+		//o Create the ConnectionManager
+		connMgr = new ConnectionManager(getConfig());
 
 		//o Connect
-		connection->connect();
+		connMgr->initialize();
 
 		//o Get information from the command line
 		std::string subject = get("SUBJECT", "GMSEC.TEST.PUBLISH");
-		int dataSize        = get("DATA-SIZE", 0);          // Size of the binary packet to add to the GMSEC Message
+		int dataSize        = get("DATA-SIZE", 1000);    // Size of the binary packet to add to the GMSEC Message
 		int monitorRate     = get("MONITOR-RATE", 1000); // Time to wait between reporting the achieved throughput
 
 		//o Output middleware version
-		GMSEC_INFO << "Middleware version = " << connection->getLibraryVersion();
+		GMSEC_INFO << "Middleware version = " << connMgr->getLibraryVersion();
 
 		//o Output information
 		GMSEC_INFO << "Using subject '" << subject.c_str() << "'";
@@ -121,10 +122,10 @@ bool throughput_pub::run()
 			message.addField("COUNT", (GMSEC_I32) iteration++);
 
 			//o Publish Message
-			connection->publish(message);
+			connMgr->publish(message);
 		}
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
 		GMSEC_ERROR << e.what();
 		success = false;
@@ -164,7 +165,7 @@ void runReporter(StdSharedPtr<status_reporter> reporter)
 	{
 		reporter.get()->run();
 	}
-	catch (std::exception& e)
+	catch (const std::exception& e)
 	{
 		GMSEC_ERROR << "Reporting thread terminated with error: " << e.what();
 	}

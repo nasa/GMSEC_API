@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -60,7 +60,7 @@ This is the public interface for middleware connections. Each middleware connect
 
 The connection class provides services available on an implemented GMSEC connection. An application can create multiple connection objects with different parameters and different middleware. Creating multiple connections to the same middleware is not prevented but may not be supported by all middleware implementations.
 
-Connection objects make use of a gmsec::util::AutoMutex by default and are therefore considered thread-safe.
+Connection objects make use of a gmsec::util::Mutex by default and are therefore considered thread-safe.
 
 =head2 Public Types and Constants
 

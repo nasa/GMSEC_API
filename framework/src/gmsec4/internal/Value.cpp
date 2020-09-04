@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -425,6 +425,18 @@ void ValueMap::setOpaqueValue(const char* key, Value* value)
 }
 
 
+void ValueMap::clearValue(const char* key)
+{
+	MapType::iterator it = values.find(key);
+
+	if (it != values.end())
+	{
+		delete it->second;
+		values.erase(it);
+	}
+}
+
+
 void ValueMap::reset(ValueMap::Iterator& i) const
 {
 	i.pmap = &values;
@@ -540,6 +552,14 @@ void transferHeaderFields(const Message& from, ValueMap& to)
 			case Field::I32_TYPE: {
 				GMSEC_I32 value = dynamic_cast<const I32Field&>(field).getValue();
 				to.setI32(name, value);
+				break;
+			}
+			case Field::U32_TYPE: {
+				GMSEC_U32 value = dynamic_cast<const U32Field&>(field).getValue();
+				if (value > 2147483647) {
+					GMSEC_WARNING << "Underflow while attempting to store GMSEC_U32 as a GMSEC_I32";
+				}
+				to.setI32(name, (GMSEC_I32) value);
 				break;
 			}
 			case Field::STRING_TYPE: {

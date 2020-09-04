@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,21 +9,21 @@
 #ifndef GMSEC_API_INTERNAL_MESSAGE_H
 #define GMSEC_API_INTERNAL_MESSAGE_H
 
-#include <gmsec4/Config.h>
-#include <gmsec4/Fields.h>
-#include <gmsec4/Message.h>
-#include <gmsec4/MessageFieldIterator.h>
-
 #include <gmsec4/internal/MsgFieldMap.h>
 #include <gmsec4/internal/json-forwards.h>
 #include <gmsec4/internal/tinyxml2.h>
 #include <gmsec4/internal/TrackingDetails.h>
 #include <gmsec4/internal/Value.h>
 
+#include <gmsec4/Config.h>
+#include <gmsec4/Fields.h>
+#include <gmsec4/Message.h>
+#include <gmsec4/MessageFieldIterator.h>
+
 #include <gmsec4/util/DataList.h>
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/wdllexp.h>
 
-#include <memory>
 #include <string>
 
 
@@ -160,7 +160,7 @@ private:
 
 	void CALL_TYPE fromJSON(const Json::Value& root);
 
-	typedef std::auto_ptr<ValueMap> Details;
+	typedef gmsec::api::util::StdUniquePtr<ValueMap> Details;
 
 	std::string          m_subject;
 	Message::MessageKind m_kind;

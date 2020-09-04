@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -34,7 +34,6 @@ using namespace gmsec::api;
 %extend gmsec::api::BinaryField {
     GMSEC_BinaryData CALL_TYPE getValue()
     {
-        GMSEC_BinaryData bd = { self->getValue(), (int) self->getLength() };
-        return bd;
+        return GMSEC_BinaryData(self->getValue(), (int) self->getLength());
     }
 };

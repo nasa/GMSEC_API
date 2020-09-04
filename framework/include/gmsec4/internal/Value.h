@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,6 +17,7 @@
 
 #include <gmsec4/util/wdllexp.h>
 
+#include <iostream>
 #include <map>
 #include <string>
 
@@ -88,6 +89,8 @@ public:
 	void setString(const char* key, const std::string& value);
 	void setOpaqueValue(const char* key, Value* value);
 
+	void clearValue(const char* key);
+
 	typedef std::map<std::string, Value *> MapType;
 
 
@@ -115,6 +118,21 @@ public:
 	void reset(Iterator& i) const;
 
 	void cloneValues(const ValueMap& from);
+
+	friend std::ostream& operator<<(std::ostream& os, const ValueMap& vmap)
+	{
+		ValueMap::Iterator iter;
+		vmap.reset(iter);
+		const Value* val = NULL;
+		while ((val = iter.next()) != NULL)
+		{
+			const std::string& id = iter.getID();
+			std::string  v;
+			val->getString(v);
+			os << "\t" << id << " <--> " << v << "\n";
+		}
+		return os;
+	}
 
 private:
 	// Declared, but not implemented.

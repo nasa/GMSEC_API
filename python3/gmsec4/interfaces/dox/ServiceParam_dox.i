@@ -11,48 +11,49 @@
 
     CONSTRUCTORS:
 
-    ServiceParam(self, dName, dValue)
+    ServiceParam(name: str, value: Field)
 
-    Initializes the ServiceParam object with a name and value.
-
-    Parameters
-    ----------
-    dName: The name of the ServiceParam
-    dValue: The value of the parameter
-
-    ServiceParam(self, other)
-
-    Copy constructor - Initializes the ServiceParam object from another
-    ServiceParam.
+    Initializes the ServiceParam with a name and value.
 
     Parameters
     ----------
-    other: The other ServiceParam to inherit avalues from
+    name  : The name of the ServiceParam
+    value : The Field containing the value of the parameter
+
+
+
+    ServiceParam(other: ServiceParam)
+
+    Copy constructor - Initializes the ServiceParam from another ServiceParam.
+
+    Parameters
+    ----------
+    other : The ServiceParam to copy
 ";
 
 %feature("docstring") gmsec::api::mist::ServiceParam::getValue "
 
-    getValue(self) -> Field
+    get_value(self) -> Field
 
     Retrieves the value of the ServiceParam
 
     Returns
     -------
-    The value of the ServiceParam
+    The value Field of the ServiceParam
 ";
 
 %feature("docstring") gmsec::api::mist::ServiceParam::__eq__ "
 
-    __eq__(self, serviceParam) -> bool
+    __eq__(self, serviceParam: ServiceParam) -> bool
 
     Parameters
     ----------
-    serviceParam: gmsec::api::mist::mist::ServiceParam const &
+    serviceParam : The ServiceParam to compare against
 ";
 
 %feature("docstring") gmsec::api::mist::ServiceParam::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
     Retrieves the name of the ServiceParam
 
@@ -63,9 +64,9 @@
 
 %feature("docstring") gmsec::api::mist::ServiceParam::__ne__ "
 
-    __ne__(self, serviceParam) -> bool
+    __ne__(self, serviceParam: ServiceParam) -> bool
 
     Parameters
     ----------
-    serviceParam: gmsec::api::mist::mist::ServiceParam const &
+    serviceParam : The ServiceParam to compare against
 ";

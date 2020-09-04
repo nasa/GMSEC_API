@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,6 +42,7 @@ enum StatusClass
 	POLICY_ERROR = 11,           ///< Error with policy
 	DISPATCHER_ERROR = 12,       ///< Error with AutoDispatcher
 	MIST_ERROR = 13,             ///< MIST error
+	HEARTBEAT_GENERATOR_ERROR = 14, ///< HeartbeatGenerator error
 	CUSTOM_ERROR = 49,           ///< Custom error
 	OTHER_ERROR = 50             ///< Other error
 };

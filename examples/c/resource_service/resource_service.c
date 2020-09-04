@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -23,7 +23,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const char* RSRC_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.RESOURCE_SERVICE.RSRC";
+const char* RSRC_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.RESOURCE-SERVICE.RSRC";
+const int   RSRC_PUBLISH_RATE    = 5; // in seconds
 
 //o Helper functions
 void initializeLogging(GMSEC_Config config, GMSEC_Status status);
@@ -31,13 +32,13 @@ void checkStatus(GMSEC_Status status);
 
 int main(int argc, char* argv[])
 {
-	GMSEC_Status status = statusCreate();
-	GMSEC_Config config;
+	GMSEC_Status        status = statusCreate();
+	GMSEC_Config        config;
 	GMSEC_ConnectionMgr connManager;
-	GMSEC_Field* headerFields;
-	size_t numFields = 4;
-	GMSEC_Message rsrcMsg;
-	size_t interval_s;
+	unsigned int        version;
+	size_t              numFields;
+	GMSEC_Field*        headerFields;
+	GMSEC_Message       rsrcMsg;
 
 	if (argc <= 1)
 	{
@@ -62,16 +63,29 @@ int main(int argc, char* argv[])
 
 	//o Create all of the GMSEC Message header Fields which will
 	// be used by all GMSEC Messages
+	version = specificationGetVersion(connectionManagerGetSpecification(connManager, NULL), NULL);
+
+	switch (version)
+	{
+	case 201400: numFields = 4; break;
+	case 201600: numFields = 3; break;
+	default:     numFields = 5; break;
+	}
 	headerFields = malloc(sizeof(GMSEC_Field) * numFields);
 
-	headerFields[0] = f32FieldCreate("HEADER-VERSION", (GMSEC_F32) 2010.0, status);
-	checkStatus(status);
-	headerFields[1] = stringFieldCreate("MISSION-ID", "GMSEC", status);
-	checkStatus(status);
-	headerFields[2] = stringFieldCreate("FACILITY", "GMSEC Lab", status);
-	checkStatus(status);
-	headerFields[3] = stringFieldCreate("COMPONENT", "heartbeat_service", status);
-	checkStatus(status);
+	headerFields[0] = stringFieldCreate("MISSION-ID", "MY-MISSION", NULL);
+	headerFields[1] = stringFieldCreate("FACILITY", "MY-FACILITY", NULL);
+	headerFields[2] = stringFieldCreate("COMPONENT", "RESOURCE-SERVICE", NULL);
+
+	if (version == 201400)
+	{
+		headerFields[3] = stringFieldCreate("MSG-ID", "MY-MSG-ID", NULL);
+	}
+	else if (version >= 201800)
+	{
+		headerFields[3] = stringFieldCreate("DOMAIN1", "MY-DOMAIN-1", NULL);
+		headerFields[4] = stringFieldCreate("DOMAIN2", "MY-DOMAIN-2", NULL);
+	}
 
 	//o Use setStandardFields to define a set of header fields for
 	// all messages which are created or published on the
@@ -101,9 +115,8 @@ int main(int argc, char* argv[])
 	// parameter provided to the startResourceMessageService() function.
 	// If an interval is not provided, the service will default to
 	// publishing a message every 60 seconds.
-	interval_s = 30;
-	GMSEC_INFO("Starting the Resource Message service, a message will be published every %d seconds", interval_s);
-	connectionManagerStartResourceMessageService(connManager, RSRC_MESSAGE_SUBJECT, interval_s, 1, 10, status);
+	GMSEC_INFO("Starting the Resource Message service, a message will be published every %d seconds", RSRC_PUBLISH_RATE);
+	connectionManagerStartResourceMessageService(connManager, RSRC_MESSAGE_SUBJECT, RSRC_PUBLISH_RATE, 1, 10, status);
 	checkStatus(status);
 
 	//o Wait for user input to end the program

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -165,7 +165,24 @@ extern "C"
 	 *
 	 * @return A handle to a ProductFileMessage object, or NULL if an error occurs.  In case of the latter, check the status.
 	 */
-	GMSEC_API GMSEC_Message productFileMessageCreateUsingData(const char* data, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_Message productFileMessageCreateUsingData(const char* data, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_Message productFileMessageCreateUsingSpecAndData(GMSEC_Specification spec, const char* data, GMSEC_Status status)
+	 *
+	 * @brief Creates a Product File Message instance using the given XML or JSON data representation of the message, and ensures
+	 * the message adheres to the provided specification.
+	 *
+	 * @param[in]  spec   - A reference to the specification this message's schema will adhere to.
+	 * @param[in]  data   - the XML or JSON string representation of a message.
+	 * @param[out] status - the result of the operation.
+	 *
+	 * @return A handle to a Message object, or NULL if an error occurs. If the latter occurs, check the status.
+	 *
+	 * @sa messageDestroy
+	 */
+	GMSEC_API GMSEC_Message productFileMessageCreateUsingSpecAndData(GMSEC_Specification spec, const char* data, GMSEC_Status status);
 
 
 	/**
@@ -301,7 +318,7 @@ extern "C"
 	 *
 	 * @sa messageDestroy()
 	 */
-	GMSEC_API GMSEC_Message productFileMessageConvert(const GMSEC_Message msg, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_Message productFileMessageConvert(const GMSEC_Message msg, GMSEC_Status status);
 
 
 #ifdef __cplusplus
