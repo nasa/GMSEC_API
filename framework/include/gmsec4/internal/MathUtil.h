@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,6 +22,10 @@ namespace internal
 class MathUtil
 {
 public:
+	static bool floatEquals(GMSEC_F32 f1, GMSEC_F32 f2);
+
+	static bool doubleEquals(GMSEC_F64 d1, GMSEC_F64 d2);
+
 	static GMSEC_F32 extractF32(const char* hexstr);
 
 	static GMSEC_F64 extractF64(const char* hexstr);

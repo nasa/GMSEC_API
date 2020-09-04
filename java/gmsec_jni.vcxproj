@@ -737,6 +737,20 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="src_4x\gmsecJNI_MessageValidator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\objects\Debug/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\objects\Debug/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\objects\Debug/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\..\objects\Debug/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\..\objects\Debug/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\..\objects\Debug/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
+    </ClCompile>
     <ClCompile Include="src_4x\gmsecJNI_MistMessage.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\objects\Debug/api4/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\objects\Debug/api4/</ObjectFileName>
@@ -1033,6 +1047,7 @@
     <ClInclude Include="src_4x\gmsecJNI_EventCallback.h" />
     <ClInclude Include="src_4x\gmsecJNI_Jenv.h" />
     <ClInclude Include="src_4x\gmsecJNI_LogHandler.h" />
+    <ClInclude Include="src_4x\gmsecJNI_MessageValidator.h" />
     <ClInclude Include="src_4x\gmsecJNI_ReplyCallback.h" />
   </ItemGroup>
   <ItemGroup>

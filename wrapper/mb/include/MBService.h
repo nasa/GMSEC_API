@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -86,10 +86,10 @@ public:
 
 
 	/**
-	 * @fn dispatchMsg(const char* subject, const gmsec::api::Message& msg)
+	 * @fn dispatchMsg(const gmsec::api::Message& msg)
 	 * dispatch a message through the message dispatcher
 	 */
-	void dispatchMsg(const char* subject, const gmsec::api::Message& msg);
+	void dispatchMsg(const gmsec::api::Message& msg);
 
 
 	/**

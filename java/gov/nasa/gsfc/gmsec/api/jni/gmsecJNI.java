@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -442,10 +442,10 @@ public class gmsecJNI
 	public final static native String ConnectionManager_GetLibraryRootName(long jarg1, JNIConnectionManager connMgr);
 	public final static native String ConnectionManager_GetLibraryVersion(long jarg1, JNIConnectionManager connMgr);
 	public final static native long ConnectionManager_GetSpecification(long jarg1, JNIConnectionManager connMgr);
-	public final static native void ConnectionManager_SetSpecification(long jarg1, JNIConnectionManager connMgr, long jarg2, JNISpecification jspec, Specification spec);
 	public final static native void ConnectionManager_SetStandardFields(long jarg1, JNIConnectionManager connMgr, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native long[] ConnectionManager_GetStandardFields(long jarg1, JNIConnectionManager connMgr);
 	public final static native void ConnectionManager_AddStandardFields(long jarg1, JNIConnectionManager connMgr, long msgPtr, JNIMessage msg);
+	public final static native void ConnectionManager_RegisterMessageValidator(long jarg1, JNIConnectionManager connMgr, long valPtr);
 	public final static native void ConnectionManager_RegisterEventCallback(long jarg1, JNIConnectionManager connMgr, int event, long cbPtr);
 	public final static native long ConnectionManager_Subscribe(long jarg1, JNIConnectionManager connMgr, String subject);
 	public final static native long ConnectionManager_Subscribe(long jarg1, JNIConnectionManager connMgr, String subject, long cbPtr);
@@ -572,6 +572,12 @@ public class gmsecJNI
 	public final static native String DeviceParam_GetName(long jarg1, JNIDeviceParam jParam);
 	public final static native String DeviceParam_GetTimestamp(long jarg1, JNIDeviceParam jParam);
 	public final static native long DeviceParam_GetValue(long jarg1, JNIDeviceParam jParam);
+
+
+	// MIST MessageValidator native class functions
+	//
+	public final static native long new_MessageValidator(Object validator);
+	public final static native void delete_MessageValidator(long jarg1, JNIMessageValidator jValidator);
 
 
 	// MIST MistMessage native class functions
@@ -725,6 +731,8 @@ public class gmsecJNI
 	public final static native void Specification_ValidateMessage(long jarg1, JNISpecification jSpec, long jarg2, JNIMessage msg);
 	public final static native long Specification_GetSchemaIDIterator(long jarg1, JNISpecification jSpec);
 	public final static native int Specification_GetVersion(long jarg1, JNISpecification jSpec);
+	public final static native int Specification_GetSchemaLevel(long jarg1, JNISpecification jSpec);
 	public final static native List<MessageSpecification> Specification_GetMessageSpecifications(long jarg1, JNISpecification jSpec);
+	public final static native void Specification_RegisterMessageValidator(long jarg1, JNISpecification jSpec, long valPtr);
 	public final static native String Specification_GetTemplateXML(long jarg1, JNISpecification jSpec, String subject, String schemaID);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,6 +22,7 @@
 
 #include <gmsec4/util/Log.h>
 
+#include <proton/error.h>
 #include <proton/message.h>
 #include <proton/session.h>
 #include <proton/connection.h>
@@ -78,15 +79,14 @@ SubscriptionInfo::~SubscriptionInfo()
 
 bool SubscriptionInfo::initSubscriptionWithConn()
 {
-	int amqpResult;
-
 	// Initialize messenger and incoming window
 	threadMessenger = pn_messenger(NULL);
 
-	amqpResult = pn_messenger_set_incoming_window(threadMessenger, -1);
+	int amqpResult = pn_messenger_set_incoming_window(threadMessenger, -1);
 
-	if (amqpResult)
+	if (amqpResult != 0)
 	{
+		GMSEC_WARNING << "Unable to set incoming window";
 		return false;
 	}
 
@@ -95,40 +95,52 @@ bool SubscriptionInfo::initSubscriptionWithConn()
 	pn_messenger_set_private_key(threadMessenger, ssl.pKey.c_str());
 	pn_messenger_set_password(threadMessenger, ssl.kPass.c_str());
 
-	pn_messenger_set_timeout(threadMessenger, 100);
+	pn_messenger_set_timeout(threadMessenger, 500);
 
 	// Set messenger's subscription (does not connect to server at this point)
 	pn_messenger_subscribe(threadMessenger, amqpSub.addr.c_str());
 
-	//pn_sasl_allowed_mechs(pn_sasl(pn_connection_transport(pn_session_connection(pn_link_session(pn_messenger_get_link(threadMessenger, amqpSub.addr.c_str(), false))))), "PLAIN");
-	//cout << "mechs: " << pn_sasl_get_mech(pn_sasl(pn_connection_transport(pn_session_connection(pn_link_session(pn_messenger_get_link(threadMessenger, amqpSub.addr.c_str(), false)))))) << endl;
-	// Connect to server and initiate creation of a server-side queue
+	bool subscribed = false;
+	int  tries = 3;
 
-	amqpResult = pn_messenger_recv(threadMessenger, -1);
+	for (int i = 0; i < tries && !subscribed; ++i)
+	{
+		pn_messenger_recv(threadMessenger, -1);
 
-	if (amqpSub.subject == "GMSEC.TERMINATE")
-	{
-		return true;
-	}
-	
-	while (true)
-	{
 		amqpSub.conn->publishTestMessage(amqpSub.subject.c_str());
-		amqpResult = pn_messenger_work(threadMessenger, 100);
 
-		if (pn_messenger_incoming(threadMessenger))
+		amqpResult = pn_messenger_work(threadMessenger, 1000);
+
+		if (amqpResult == 0)
 		{
-			return true;
+			GMSEC_WARNING << "Subscription test message not received" << (i < tries ? "; will try again..." : "");
+		}
+		else if (amqpResult < 0)
+		{
+			GMSEC_ERROR << "Error receiving subscription test message [" << amqpResult << "]" << (i < tries ? "; will try again..." : "");
+		}
+		else if (pn_messenger_incoming(threadMessenger) > 0)
+		{
+			GMSEC_VERBOSE << "Subscribed to: " << amqpSub.subject.c_str();
+			subscribed = true;
+		}
+		else
+		{
+			GMSEC_WARNING << "No incoming message in queue" << (i < tries ? "; will try again..." : "");
 		}
 	}
+
+	if (!subscribed)
+	{
+		GMSEC_WARNING << "Failed to subscribe to: " << amqpSub.subject.c_str();
+	}
 	
-	return false;
+	return subscribed;
 }
 
 
 void SubscriptionInfo::run()
 {
-	int amqpResult;
 	pn_tracker_t tracker;
 
 	// Initialize subscription
@@ -151,7 +163,7 @@ void SubscriptionInfo::run()
 		StdThread::yield();
 		
 		// Receive any messages from threadMessenger's queue
-		amqpResult = pn_messenger_work(threadMessenger, -1);
+		int amqpResult = pn_messenger_work(threadMessenger, -1);
 
 		if (amqpResult < 0 && amqpResult != PN_INTR)
 		{
@@ -165,7 +177,9 @@ void SubscriptionInfo::run()
 		while (pn_messenger_incoming(threadMessenger))
 		{
 			pn_message_t *message = pn_message();
+
 			amqpResult = pn_messenger_get(threadMessenger, message);
+
 			if (amqpResult && amqpResult != PN_INTR)
 			{
 				AutoMutex hold(amqpSub.conn->queueCondition.getMutex());
@@ -414,14 +428,11 @@ AMQPConnection::AMQPConnection(const Config& cfg)
 	uniquecounter(0),
 	requestCounter(0),
 	sigMismatchFlag(false),
-	sslConfig("uninit", "uninit", "uninit", "uninit")
+	sslConfig("", "", "", "")
 {
-	std::string persist;
-	std::string threadSafeToggle;
 	std::string filterToggle;
 	
 	// Try to get the needed values out of the config object.
-	mwConfig(cfg, "threadSafe", threadSafeToggle);
 	mwConfig(cfg, "username", username);
 	mwConfig(cfg, "password", password);
 	mwConfig(cfg, "server", hostname);
@@ -434,7 +445,6 @@ AMQPConnection::AMQPConnection(const Config& cfg)
 
 	mwConfig(cfg, "filter-dups", filterToggle, true);
 	
-	threadSafe = StringUtil::stringEqualsIgnoreCase(threadSafeToggle.c_str(), "yes");
 	useFilter = filterToggle.empty() || StringUtil::stringEqualsIgnoreCase(filterToggle.c_str(), "yes");
 }
 
@@ -455,12 +465,12 @@ AMQPConnection::~AMQPConnection()
 	{
 		MsgSubscriptionResult* msgResult = queue.front();
 
+		queue.pop();
+
 		if (msgResult->message)
 		{
 			delete msgResult->message;
 		}
-
-		queue.pop();
 
 		delete msgResult;
 	}
@@ -489,11 +499,6 @@ void AMQPConnection::mwConnect()
 	// Initialize request specs
 	specs = getExternal().getRequestSpecs();
 
-	int         amqpResult;
-	int         conTestTOUT = 0;
-	int         confTries;
-	std::string testSubject;
-
 	isApollo = false;
 
 	if (!getAMQPURIConfig())
@@ -505,7 +510,6 @@ void AMQPConnection::mwConnect()
 
 	// Test the ability to connect to the given address
 	pn_messenger_t* testSubMessenger = pn_messenger(NULL);
-	std::string fullAddress;
 
 	// Set the SSL options
 	pn_messenger_set_trusted_certificates(testSubMessenger, sslConfig.tStore.c_str());
@@ -519,18 +523,20 @@ void AMQPConnection::mwConnect()
 	pn_messenger_set_password(pubMessenger, sslConfig.kPass.c_str());
 
 	pn_messenger_set_blocking(testSubMessenger, false);
-	fullAddress = assembleAddress(address, "");
+	std::string fullAddress = assembleAddress(address, "");
 	pn_messenger_subscribe(testSubMessenger, fullAddress.c_str());
-	//pn_sasl_allowed_mechs(pn_sasl(pn_connection_transport(pn_session_connection(pn_link_session(pn_messenger_get_link(testSubMessenger, fullAddress.c_str(), false))))), "PLAIN AMQPLAIN");
 	pn_messenger_recv(testSubMessenger, -1);
 	pn_messenger_set_blocking(testSubMessenger, true);
 
 	bool confirmed = false;
-	for (confTries = 0; confTries < 10 && !confirmed; ++confTries)
+	int  connTestTimeout = 0;
+	for (int confTries = 0; confTries < 10 && !confirmed; ++confTries)
 	{
-		conTestTOUT += 50;
-		pn_messenger_set_timeout(testSubMessenger, conTestTOUT);
-		amqpResult = pn_messenger_work(testSubMessenger, conTestTOUT);
+		connTestTimeout += 50;
+
+		pn_messenger_set_timeout(testSubMessenger, connTestTimeout);
+
+		int amqpResult = pn_messenger_work(testSubMessenger, connTestTimeout);
 
 		if (amqpResult != PN_TIMEOUT)
 		{
@@ -567,8 +573,9 @@ void AMQPConnection::mwConnect()
 
 			requestThread->start();
 
-			int reason = subscribeCondition.wait(3000);
-			if (reason != AMQPConnection::LISTENING && reason != AMQPConnection::GOT_MESSAGE)
+			int reason = subscribeCondition.wait(10 * 1000);
+
+			if (reason != AMQPConnection::LISTENING)
 			{
 				throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, AMQPConnection::UNABLE_TO_SUBSCRIBE, "Unable to start reply listener");
 			}
@@ -1248,7 +1255,6 @@ void AMQPConnection::enqueueResult(const Status& status, Message* message)
 	AutoMutex hold(queueCondition.getMutex());
 	queue.push(new MsgSubscriptionResult(status, message));
 	queueCondition.signal(GOT_MESSAGE);
-	return;
 }
 
 

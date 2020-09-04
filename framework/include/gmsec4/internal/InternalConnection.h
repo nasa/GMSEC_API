@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -144,7 +144,7 @@ public:
 	virtual void CALL_TYPE publish(const Message& msg); 
 
 
-	virtual void CALL_TYPE publish(const Message& msg, const Config& config);
+	virtual void CALL_TYPE publish(const Message& msg, const Config& mwConfig);
 
 
 	virtual void CALL_TYPE request(const Message& request, GMSEC_I32 timeout, ReplyCallback* cb, GMSEC_I32 republish_ms = 0);

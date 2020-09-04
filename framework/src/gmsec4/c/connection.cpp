@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -551,13 +551,13 @@ void CALL_TYPE connectionPublish(GMSEC_Connection conn, GMSEC_Message msg, GMSEC
 }
 
 
-void CALL_TYPE connectionPublishWithConfig(GMSEC_Connection conn, GMSEC_Message msg, GMSEC_Config config, GMSEC_Status status)
+void CALL_TYPE connectionPublishWithConfig(GMSEC_Connection conn, GMSEC_Message msg, GMSEC_Config mwConfig, GMSEC_Status status)
 {
 	Status result;
 
 	Connection* c   = reinterpret_cast<Connection*>(conn);
 	Message*    m   = reinterpret_cast<Message*>(msg);
-	Config*     cfg = reinterpret_cast<Config*>(config);
+	Config*     cfg = reinterpret_cast<Config*>(mwConfig);
 
 	if (!c)
 	{

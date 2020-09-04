@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -11,17 +11,19 @@ GMSEC_HOME	 = ../..
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
-LIBROOTNAME  = gmsec_activemq39
+LIBROOTNAME  = gmsec_activemq
+MAJOR_VER    = 3
+MINOR_VER    = 9
+PATCH_VER    = 4
 
-TARGET       = lib$(LIBROOTNAME).$(SHLIB_EXT)
-
-ALT_TARGET   = lib$(LIBROOTNAME)4.$(SHLIB_EXT)
+TARGET       = lib$(LIBROOTNAME)$(MAJOR_VER)$(MINOR_VER)$(PATCH_VER).$(SHLIB_EXT)
+LINK_TARGET  = lib$(LIBROOTNAME)$(MAJOR_VER)$(MINOR_VER).$(SHLIB_EXT)
 
 OBJDIR       = ../activemq/src
 
-SUPDIR       = $(SUPPORT)/activemq394
+SUPDIR       = $(SUPPORT)/activemq$(MAJOR_VER)$(MINOR_VER)$(PATCH_VER)
 
-LOCAL_DEFS   = -DACTIVEMQ_CMS_V3=1 -DACTIVEMQ_USE_MSG_RESET=1 -DGMSEC_LIBROOTNAME=$(LIBROOTNAME)
+LOCAL_DEFS   = -DACTIVEMQ_CMS_V3=1 -DACTIVEMQ_USE_MSG_RESET=1 -DGMSEC_LIBROOTNAME=$(LIBROOTNAME)$(MAJOR_VER)$(MINOR_VER)$(PATCH_VER)
 
 LOCAL_INCS   = -I$(SUPDIR)/include \
                -I$(SUPDIR)/include/apr-1 \
@@ -50,12 +52,12 @@ clean:
 	$(RM) $(OBJECTS)
 	$(RM) $(OBJDIR)/*.gcda $(OBJDIR)/*.gcno
 	$(RM) $(BINDIR)/$(TARGET)
-	$(RM) $(BINDIR)/$(ALT_TARGET)
+	$(RM) $(BINDIR)/$(LINK_TARGET)
 
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
 	$(DLINK) $(OBJECTS) $(LDFLAGS) -o $@
-	@ln -s $(TARGET) $(BINDIR)/$(ALT_TARGET)
+	@ln -s $(TARGET) $(BINDIR)/$(LINK_TARGET)
 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp

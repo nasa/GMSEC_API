@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,6 +30,7 @@ namespace api
 	namespace mist
 	{
 		class ConnectionManager;
+		class MessageValidator;
 	}
 }
 }
@@ -88,6 +89,9 @@ public:
 	jmethodID methodReplyCallbackOnReply;
 	jfieldID  fieldReplyCallbackJNIConnection;
 
+	// MessageValidator method references
+	jmethodID methodMessageValidatorValidateMessage;
+
 	// JNIConnection references
 	jclass classJNIConnection;
 	jfieldID fieldConnection_extconn;
@@ -97,7 +101,21 @@ public:
 	// JNIStatus references
 	jclass classJNIStatus;
 	jmethodID methodStatusInitIJString;
-	jmethodID methodStatusSetCustomCode;
+
+	// Status references
+	jclass classStatus;
+	jmethodID methodStatusGetClass;
+	jmethodID methodStatusGetCode;
+	jmethodID methodStatusGetReason;
+	jmethodID methodStatusGetCustomCode;
+
+	// StatusClassification references
+	jclass classStatusClass;
+	jmethodID methodStatusClassGetValue;
+
+	// StatusCode references
+	jclass classStatusCode;
+	jmethodID methodStatusCodeGetValue;
 
 	// JNIMessage references
 	jclass classJNIMessage;

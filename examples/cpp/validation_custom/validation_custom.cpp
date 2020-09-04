@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,85 +10,82 @@
  * 
  * This file contains an example demonstrating how to implement additional
  * Message validation logic in addition to that which the GMSEC API provides.
- *
- * Note: This example focuses on adding additional validation upon the receipt
- * of a message.  It almost goes without saying that additional logic can be
- * added to a program prior to invoking the publish() function without having
- * to do anything special.
  */
 
 #include <gmsec4_cpp.h>
 
 #include <string>
 #include <iostream>
-#include <sstream>
 
 using namespace gmsec::api;
-using namespace gmsec::api::util;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::message;
+using namespace gmsec::api::util;
 
-const char* PROD_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.PROD.PRODUCT_MESSAGE";
+
+const char* HB_MSG_SUBJECT     = "GMSEC.MISSION.SATELLITE.MSG.HB.VALIDATION-CUSTOM";
+const char* ALT_HB_MSG_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.VALIDATION-CUSTOM.HB";
+
 
 //o Helper functions
 void initializeLogging(Config& config);
-void setupStandardFields(ConnectionManager& connMgr);
-mist::message::ProductFileMessage* createProductFileMessage(const ConnectionManager& connMgr, const char* filePath);
-bool isProdMsg(Message message);
+void setupStandardFields(unsigned int specVersion);
+void clearStandardFields();
 
-//o Create a callback and define message content validation logic which will
-// be used in combination with the GMSEC API validation.
-class ValidationCallback: public ConnectionManagerCallback
+
+//o Define custom message validator that can be used in combination with
+//  the GMSEC API validation.
+//
+//  Note: This is an arbitrary exercise to demonstrate the functionality
+//  of a custom message validator.
+class CustomMessageValidator : public MessageValidator
 {
 public:
-	virtual void CALL_TYPE onMessage(ConnectionManager& connMgr, const Message& message)
+	Status validateMessage(const Message& msg)
 	{
+		Status status;
+
 		try
 		{
-			//o Run the message through the GMSEC API-supplied validation
-			connMgr.getSpecification().validateMessage(message);
+			//o Get message type and subtype
+			std::string type;
+			std::string subtype;
 
-			//o In this example scenario, we are expecting to receive a
-			// GMSEC PROD message containing a URI to a location on the disk
-			// where a product file has been placed for retrieval.  In this
-			// case, we want to validate that the location on the disk is
-			// in an area which we would expect (i.e. Something that the
-			// team has agreed upon prior to operational deployment).
-			//
-			// By validating this URI, we ensure that no malicious users
-			// have infiltrated the system and somehow modified the messages
-			// to cause us to retrieve a file from an unknown location.
-
-			//o Start by checking to ensure that this is a PROD message
-			if (isProdMsg(message))
+			if (msg.hasField("MESSAGE-TYPE"))
 			{
-				mist::message::ProductFileMessage prodMessage(connMgr.getSpecification(), message.toXML());
+				type = msg.getStringValue("MESSAGE-TYPE");
+			}
+			if (msg.hasField("C2CX-SUBTYPE"))
+			{
+				subtype = msg.getStringValue("C2CX-SUBTYPE");
+			}
+			else if (msg.hasField("MESSAGE-SUBTYPE"))
+			{
+				subtype = msg.getStringValue("MESSAGE-SUBTYPE");
+			}
 
-				//o Extract the Product File URI location(s) from the
-				// message using a ProductFileIterator
-				ProductFileIterator& prodIter = prodMessage.getProductFileIterator();
+			//o Ensure we have a Heartbeat message and it contains the PUB-RATE field
+			if (type == "MSG" && subtype == "HB" && msg.hasField("PUB-RATE"))
+			{
+				GMSEC_I64 pubRate = msg.getIntegerValue("PUB-RATE");
 
-				while(prodIter.hasNext())
+				//o Ensure PUB-RATE field value is between 10 and 60 (inclusive)
+				if (pubRate < 10 || pubRate > 60)
 				{
-					ProductFile prodFile = prodIter.next();
-
-					//o Check to ensure that the URI contains "//hostname/dir"
-					std::string prodUri = prodFile.getURI();
-					if (prodUri.find("//hostname/dir") == std::string::npos)
-					{
-						std::stringstream errorMsg;
-						errorMsg << "Received an invalid PROD Message (bad URI):\n" << message.toXML();
-						throw Exception(MIST_ERROR, MESSAGE_FAILED_VALIDATION, errorMsg.str().c_str());
-					}
+					status.set(MSG_ERROR, VALUE_OUT_OF_RANGE, "PUB-RATE field does not have a valid value");
 				}
-
-				GMSEC_INFO << "Received a valid message:\n" << message.toXML();
+			}
+			else
+			{
+				status.set(MSG_ERROR, INVALID_MSG, "Non-Heartbeat message received");
 			}
 		}
-		catch (Exception e)
+		catch (const Exception& e)
 		{
-			GMSEC_ERROR << e.what();
+			status = Status(e);
 		}
+
+		return status;
 	}
 };
 
@@ -105,51 +102,79 @@ int main (int argc, char* argv[])
 
 	initializeLogging(config);
 
-	//o Enable Message validation.  This parameter is "false" by default.
-	config.addValue("GMSEC-MSG-CONTENT-VALIDATE", "true");
+	//o Enable Message validation via connection configuration
+	config.addValue("gmsec-msg-content-validate-send", "true");
 	config.addValue("gmsec-validation-level", "3");
 
-	GMSEC_INFO << ConnectionManager::getAPIVersion();
+	GMSEC_INFO << "API version: " << ConnectionManager::getAPIVersion();
 
 	try
 	{
 		ConnectionManager connMgr(config);
 
-		GMSEC_INFO << "Opening the connection to the middleware server";
 		connMgr.initialize();
 
-		GMSEC_INFO << connMgr.getLibraryVersion();
+		GMSEC_INFO << "Middleware version: " << connMgr.getLibraryVersion();
 
-		//o Set up the ValidationCallback and subscribe
-		ValidationCallback vc;
-		connMgr.subscribe(PROD_MESSAGE_SUBJECT, &vc);
+		//o Register custom message validator
+		CustomMessageValidator cmv;
+		connMgr.registerMessageValidator(&cmv);
 
-		//o Start the AutoDispatcher
-		connMgr.startAutoDispatch();
+		//o Set up standard/common fields used with all messages
+		unsigned int specVersion = connMgr.getSpecification().getVersion();
+		setupStandardFields(specVersion);
 
-		//o Create and publish a simple Product File Message
-		setupStandardFields(connMgr);
+		//o Create Heartbeat Message
+		//o Note: Message subject and schema ID vary depending on the specification in use
+		const char* subject  = (specVersion > GMSEC_ISD_2018_00 ? HB_MSG_SUBJECT : ALT_HB_MSG_SUBJECT);
+		const char* schemaID = (specVersion > GMSEC_ISD_2018_00 ? "MSG.HB" : "MSG.C2CX.HB");
 
-		mist::message::ProductFileMessage* productMessage = createProductFileMessage(connMgr, "//hostname/dir/filename");
+		MistMessage msg(subject, schemaID, connMgr.getSpecification());
 
-		//o Publish the message to the middleware bus
-		GMSEC_INFO << "Publishing:\n" << productMessage->toXML();
-		connMgr.publish(*productMessage);
+		//o Add PUB-RATE field with illegal value
+		msg.setValue("PUB-RATE", "5");
 
-		delete productMessage;
+		//o For very old specifications, we need to add a MSG-ID field
+		if (specVersion <= GMSEC_ISD_2014_00)
+		{
+			msg.addField("MSG-ID", "12345");
+		}
 
-		productMessage = createProductFileMessage(connMgr, "//badhost/dir/filename");
+		//o Attempt to publish malformed message
+		try
+		{
+			GMSEC_INFO << "Attempting to publish malformed message...";
+			connMgr.publish(msg);
 
-		GMSEC_INFO << "Publishing:\n" << productMessage->toXML();
-		connMgr.publish(*productMessage);
+			GMSEC_WARNING << "Was expecting an error";
+		}
+		catch (const Exception& e)
+		{
+			//o We expect to encounter error with the PUB-RATE field
+			GMSEC_INFO << "This is an expected error:\n" << e.what();
+		}
 
-		delete productMessage;
+		//o Fix PUB-RATE field with legal value
+		msg.setValue("PUB-RATE", "15");
 
-		//o Allow time for the callback to process the last published message
-		TimeUtil::millisleep(2000);
+		//o Publish a good message
+		try
+		{
+			GMSEC_INFO << "Attempting to publish good message...";
+			connMgr.publish(msg);
+
+			GMSEC_INFO << "Message published!";
+		}
+		catch (const Exception& e)
+		{
+			GMSEC_WARNING << "Unexpected error:\n" << e.what();
+		}
 
 		//o Disconnect from the middleware and clean up the Connection
 		connMgr.cleanup();
+
+		//o Clear standard/common fields used with all messages
+		clearStandardFields();
 	}
 	catch (Exception e)
 	{
@@ -163,8 +188,8 @@ int main (int argc, char* argv[])
 
 void initializeLogging(Config& config)
 {
-	const char* logLevel  = config.getValue("LOGLEVEL");
-	const char* logFile   = config.getValue("LOGFILE");
+	const char* logLevel = config.getValue("LOGLEVEL");
+	const char* logFile  = config.getValue("LOGFILE");
 
 	if (!logLevel)
 	{
@@ -177,59 +202,37 @@ void initializeLogging(Config& config)
 }
 
 
-void setupStandardFields(ConnectionManager& connMgr)
+void setupStandardFields(unsigned int specVersion)
 {
-	DataList<Field*> definedFields;
+	DataList<Field*> standardFields;
 
-	StringField missionField("MISSION-ID", "MISSION");
-	StringField satIdField("SAT-ID-PHYSICAL", "SPACECRAFT");
-	StringField facilityField("FACILITY", "GMSEC Lab");
-	StringField componentField("COMPONENT", "validation_custom");
+	StringField mission("MISSION-ID", "MISSION");
+	StringField constellation("CONSTELLATION-ID", "CONSTELLATION");
+	StringField satIdPhys("SAT-ID-PHYSICAL", "SATELLITE");
+	StringField satIdLog("SAT-ID-LOGICAL", "SATELLITE");
+	StringField facility("FACILITY", "GMSEC-LAB");
+	StringField component("COMPONENT", "VALIDATION-CUSTOM");
+	StringField domain1("DOMAIN1", "DOMAIN1");
+	StringField domain2("DOMAIN2", "DOMAIN2");
 
-	definedFields.push_back(&missionField);
-	definedFields.push_back(&satIdField);
-	definedFields.push_back(&facilityField);
-	definedFields.push_back(&componentField);
+	standardFields.push_back(&mission);
+	standardFields.push_back(&constellation);
+	standardFields.push_back(&satIdPhys);
+	standardFields.push_back(&satIdLog);
+	standardFields.push_back(&facility);
+	standardFields.push_back(&component);
 
-	connMgr.setStandardFields(definedFields);
-}
-
-
-mist::message::ProductFileMessage* createProductFileMessage(const ConnectionManager& connMgr, const char* filePath)
-{
-	ProductFile externalFile("External File", "External File Description", "1.0.0", "TXT", filePath);
-
-	mist::message::ProductFileMessage* productMessage = NULL;
-
-	if (connMgr.getSpecification().getVersion() <= GMSEC_ISD_2016_00)
+	if (specVersion >= GMSEC_ISD_2018_00)
 	{
-		productMessage = new mist::message::ProductFileMessage(PROD_MESSAGE_SUBJECT, ResponseStatus::SUCCESSFUL_COMPLETION, "MSG.PROD.AUTO", connMgr.getSpecification());
-	}
-	else
-	{
-		productMessage = new mist::message::ProductFileMessage(PROD_MESSAGE_SUBJECT, ResponseStatus::SUCCESSFUL_COMPLETION, "MSG.PROD", connMgr.getSpecification());
-
-		productMessage->addField("PROD-TYPE", "AUTO");
-		productMessage->addField("PROD-SUBTYPE", "DM");
-
-		productMessage->addField("DOMAIN1", "MY-DOMAIN-1");
-		productMessage->addField("DOMAIN2", "MY-DOMAIN-2");
+		standardFields.push_back(&domain1);
+		standardFields.push_back(&domain2);
 	}
 
-	productMessage->addProductFile(externalFile);
-
-	connMgr.addStandardFields(*productMessage);
-
-	return productMessage;
+	MistMessage::setStandardFields(standardFields);
 }
 
 
-bool isProdMsg(const Message message)
+void clearStandardFields()
 {
-	bool result =
-		strcmp(message.getStringValue("MESSAGE-TYPE"), "MSG") == 0
-		&& strcmp(message.getStringValue("MESSAGE-SUBTYPE"), "PROD") == 0;
-
-	return result;
+	MistMessage::clearStandardFields();
 }
-

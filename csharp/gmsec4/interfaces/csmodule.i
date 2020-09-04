@@ -1,4 +1,3 @@
-
 %{
 class GMSEC_BinaryData
 {
@@ -21,7 +20,7 @@ public:
 %}
 
 %pragma(csharp) imclasscode=%{
-    protected class SWIGByteArrayHelper {
+    internal class SWIGByteArrayHelper : System.MarshalByRefObject {
 
         public delegate void SWIGByteArrayDelegate(global::System.IntPtr data, int size);
         static SWIGByteArrayDelegate bytearrayDelegate = new SWIGByteArrayDelegate(CreateByteArray);
@@ -29,20 +28,26 @@ public:
         [global::System.Runtime.InteropServices.DllImport("$dllimport", EntryPoint="SWIGRegisterByteArrayCallback_$module")]
         public static extern void SWIGRegisterByteArrayCallback_Gmsec(SWIGByteArrayDelegate bytearrayDelegate);
 
-        static void CreateByteArray(global::System.IntPtr data, int size) {
-            if (size == 0) return;
-            arraybuffer = new byte [size];
-            global::System.Runtime.InteropServices.Marshal.Copy(data, arraybuffer, 0, size);
-        }
+        private static byte[] arraybuffer;
 
         static SWIGByteArrayHelper() {
             SWIGRegisterByteArrayCallback_$module(bytearrayDelegate);
         }
+
+        static void CreateByteArray(global::System.IntPtr data, int size) {
+            if (size == 0) return;
+            arraybuffer = new byte[ size ];
+            global::System.Runtime.InteropServices.Marshal.Copy(data, arraybuffer, 0, size);
+        }
+
+        public static byte[] GetBytes() {
+            byte[] a = arraybuffer;
+            arraybuffer = null;
+            return a;
+        }
     }
 
-    static SWIGByteArrayHelper bytearrayHelper = new SWIGByteArrayHelper();
-    static byte[] arraybuffer;
-    internal static byte[] GetBytes() { return arraybuffer; } 
+    public static readonly object binValueLock = new object();
 %}
 
 %insert(runtime) %{
@@ -54,25 +59,23 @@ SWIGEXPORT void SWIGSTDCALL SWIGRegisterByteArrayCallback_$module(SWIG_CSharpByt
 }
 %}
 
-/*
-%typemap(imtype) GMSEC_BIN %{byte[]%}
-*/
-
-/*
-%typemap(cstype) GMSEC_BIN %{byte[]%}
-*/
-
-%typemap(out) GMSEC_BinaryData
-
-%{ SWIG_csharp_bytearray_callback($1.data, $1.size); %}
+%typemap(out) GMSEC_BinaryData %{ SWIG_csharp_bytearray_callback($1.data, $1.size); %}
 
 %typemap(csout) GMSEC_BinaryData {
-    $imcall;
-    if (GmsecPINVOKE.SWIGPendingException.Pending) throw GmsecPINVOKE.SWIGPendingException.Retrieve();
-    return $modulePINVOKE.GetBytes();
+    /* No longer needed, however the code is kept just in case it ever needs to be used again.
+    object lockObj = System.AppDomain.CurrentDomain.GetData("GMSEC-LOCKOBJ");
+
+    if (lockObj == null) {
+        lockObj = $modulePINVOKE.binValueLock;
+    }
+
+    lock(lockObj) {
+    */
+
+    lock($modulePINVOKE.binValueLock) {
+        new $modulePINVOKE.SWIGByteArrayHelper();
+        $imcall;
+        if ($modulePINVOKE.SWIGPendingException.Pending) throw $modulePINVOKE.SWIGPendingException.Retrieve();
+        return $modulePINVOKE.SWIGByteArrayHelper.GetBytes();
+    }
 }
-
-/*
-%typemap(ctype) GMSEC_BIN %{GMSEC_BIN %}
-*/
-

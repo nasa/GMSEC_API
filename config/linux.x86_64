@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -39,9 +39,7 @@ DLINK     = $(CXX) -shared
 SHLIB_EXT = so
 
 INCS      = -I$(GMSEC_HOME)/framework/include \
-            -I$(GMSEC_HOME)/framework/support/include \
-            -I$(LIBXML2_HOME)/include/libxml2 \
-            -I$(LIBXSLT_HOME)/include
+            -I$(GMSEC_HOME)/framework/support/include 
 
 # add COVERAGE for code coverage
 ifeq ($(COVERAGE),1)
@@ -57,13 +55,10 @@ ifeq ($(shell expr $(GCC_VERSION) '>=' 4.5), 1)
 CXXFLAGS  += -std=c++11
 endif
 
-LIBXML2_LIB = $(LIBXML2_HOME)/lib64
-LIBXSLT_LIB = $(LIBXSLT_HOME)/lib64
-
 # define api/example/test applications LDFLAGS
 RPATH    = -Wl,-rpath,'$$ORIGIN' -Wl,-z,origin
-LDFLAGS  = $(COVERAGE) -L$(BINDIR) -lGMSECAPI -ldl -lpthread -L$(LIBXML2_LIB) -lxml2 -L$(LIBXSLT_LIB) -lxslt $(RPATH)
+LDFLAGS  = $(COVERAGE) -L$(BINDIR) -lGMSECAPI -ldl -lpthread $(RPATH)
 
 # define API API_CXXFLAGS and API_LDFLAGS
 API_CXXFLAGS = -fPIC $(CXXFLAGS)
-API_LDFLAGS  = $(COVERAGE) -ldl -lpthread -L$(LIBXML2_LIB) -lxml2 -L$(LIBXSLT_LIB) -lxslt $(RPATH)
+API_LDFLAGS  = $(COVERAGE) -ldl -lpthread $(RPATH)

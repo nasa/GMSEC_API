@@ -82,7 +82,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../SUPPORT/websphere80/include;../websphere/include;../../framework/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../GMSEC_SUPPORT/websphere80/include;../websphere/include;../../framework/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WEBSPHEREMQWRAPPER_EXPORTS;GMSEC_WEBS_EXPORTS;GMSEC_LIBROOTNAME=gmsec_websphere80;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -94,7 +94,7 @@
     <Link>
       <AdditionalDependencies>mqic.LIB;gmsecapi_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../bin/gmsec_websphere80_d.dll</OutputFile>
-      <AdditionalLibraryDirectories>../../objects/$(Configuration);../../../SUPPORT/websphere80//lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../objects/$(Configuration);../../../GMSEC_SUPPORT/websphere80//lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -108,7 +108,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../../SUPPORT/websphere80/include;../websphere/include;../../framework/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../GMSEC_SUPPORT/websphere80/include;../websphere/include;../../framework/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;WEBSPHEREMQWRAPPER_EXPORTS;GMSEC_WEBS_EXPORTS;GMSEC_LIBROOTNAME=gmsec_websphere80;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -120,7 +120,7 @@
     <Link>
       <AdditionalDependencies>mqic.lib;gmsecapi_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../bin/gmsec_websphere80_d.dll</OutputFile>
-      <AdditionalLibraryDirectories>../../objects/$(Configuration);../../../SUPPORT/websphere80/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../objects/$(Configuration);../../../GMSEC_SUPPORT/websphere80/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../SUPPORT/websphere80/include;../websphere/include;../../framework/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../GMSEC_SUPPORT/websphere80/include;../websphere/include;../../framework/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GMSEC_WEBS_EXPORTS;GMSEC_LIBROOTNAME=gmsec_websphere80;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader />
@@ -140,7 +140,7 @@
     <Link>
       <AdditionalDependencies>gmsecapi.lib;mqic.LIB;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../bin/gmsec_websphere80.dll</OutputFile>
-      <AdditionalLibraryDirectories>../../objects/$(Configuration);../../../SUPPORT/websphere80//lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../objects/$(Configuration);../../../GMSEC_SUPPORT/websphere80//lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Release/$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
@@ -155,7 +155,7 @@
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>../../../SUPPORT/websphere80/include;../websphere/include;../../framework/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../../GMSEC_SUPPORT/websphere80/include;../websphere/include;../../framework/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GMSEC_WEBS_EXPORTS;GMSEC_LIBROOTNAME=gmsec_websphere80;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader />
@@ -165,7 +165,7 @@
     <Link>
       <AdditionalDependencies>gmsecapi.lib;mqic.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../bin/gmsec_websphere80.dll</OutputFile>
-      <AdditionalLibraryDirectories>../../objects/$(Configuration);../../../SUPPORT/websphere80/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../objects/$(Configuration);../../../GMSEC_SUPPORT/websphere80/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Release/$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>

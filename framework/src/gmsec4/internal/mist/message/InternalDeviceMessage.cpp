@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -43,14 +43,7 @@ using namespace gmsec::api::mist::internal;
 using namespace gmsec::api::util;
 
 
-static const char* const HEADER_VERSION_STRING    = "HEADER-VERSION";
-static const char* const MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
-static const char* const MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
-static const char* const CONTENT_VERSION_STRING   = "CONTENT-VERSION";
 static const char* const MSG_ID_STRING            = "MSG-ID";
-static const char* const MSG_STRING               = "MSG";
-static const char* const C2CX_STRING              = "C2CX";
-static const char* const DEV_STRING               = "DEV";
 static const char* const NUM_OF_DEVICES_STRING    = "NUM-OF-DEVICES";
 static const char* const C2CX_SUBTYPE_STRING      = "C2CX-SUBTYPE";
 
@@ -98,12 +91,6 @@ InternalDeviceMessage::InternalDeviceMessage(const char* data)
 	  m_list(),
 	  m_deviceIterator(*this)
 {
-	MessageSubclassHelper::checkStringField(MESSAGE_TYPE_STRING, "InternalDeviceMessage()", MSG_STRING, *this);
-
-	MessageSubclassHelper::checkStringField(MESSAGE_SUBTYPE_STRING, "InternalDeviceMessage()", C2CX_STRING, *this);
-
-	MessageSubclassHelper::checkStringField(C2CX_SUBTYPE_STRING, "InternalDeviceMessage()", DEV_STRING, *this);
-
 	GMSEC_U32 numOfDevices = (GMSEC_U32) this->getUnsignedIntegerValue(NUM_OF_DEVICES_STRING);
 
 	for (GMSEC_U32 index = 1; index <= numOfDevices; ++index)
@@ -118,12 +105,6 @@ InternalDeviceMessage::InternalDeviceMessage(const Specification& spec, const ch
 	  m_list(),
 	  m_deviceIterator(*this)
 {
-	MessageSubclassHelper::checkStringField(MESSAGE_TYPE_STRING, "InternalDeviceMessage()", MSG_STRING, *this);
-
-	MessageSubclassHelper::checkStringField(MESSAGE_SUBTYPE_STRING, "InternalDeviceMessage()", C2CX_STRING, *this);
-
-	MessageSubclassHelper::checkStringField(C2CX_SUBTYPE_STRING, "InternalDeviceMessage()", DEV_STRING, *this);
-
 	GMSEC_U32 numOfDevices = (GMSEC_U32) this->getUnsignedIntegerValue(NUM_OF_DEVICES_STRING);
 
 	for (GMSEC_U32 index = 1; index <= numOfDevices; ++index)
@@ -314,9 +295,14 @@ const Device& InternalDeviceMessage::nextDevice()
 }
 
 
-std::string InternalDeviceMessage::buildSchemaID()
+std::string InternalDeviceMessage::buildSchemaID(const Specification& spec)
 {
-	return "MSG.C2CX.DEV";
+	if (spec.getVersion() < GMSEC_ISD_2019_00)
+	{
+		return "MSG.C2CX.DEV";
+	}
+
+	return "MSG.DEV";
 }
 
 

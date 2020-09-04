@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,7 +27,7 @@ libgmsec_perl::DeviceMessage
 	A MistMessage object that is capable of storing Device objects.  
 
 	The Following message schema IDs and their templates are supported:
-	GMSEC.MSG.C2CX.DEV
+	MSG.DEV
 
 =head2 Public Member Subroutines
 

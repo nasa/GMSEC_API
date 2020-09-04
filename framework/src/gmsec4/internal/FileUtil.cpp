@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,6 +17,7 @@
 	#include <unistd.h>
 	#include <dirent.h>
 	#include <dlfcn.h>
+	#include <cstdlib>
 #endif
 
 
@@ -50,11 +51,21 @@ bool FileUtil::getCurrentSharedObjectPath(std::string& path)
 #elif defined(__hpux)
 	if (dladdr((void* )sysUtilDummyFunc, &dl_info) != 0)
 #else
+	// Linux and macOS
 	if (dladdr((const void*) sysUtilDummyFunc, &dl_info) != 0)
 #endif
 	// dladdr returns 0 on error
 	{
-		path = dl_info.dli_fname;
+		char* real_path = realpath(dl_info.dli_fname, NULL);
+		if (real_path != NULL)
+		{
+			path = real_path;
+			free(real_path);
+		}
+		else
+		{
+			path = dl_info.dli_fname;
+		}
 		ret_val = true;
 	}
 #else

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -260,6 +260,13 @@ public class Message : global::System.IDisposable {
   /// <returns>Returns the field value as a string.</returns>
   /// <exception cref="GmsecException">An Exception is thrown if the field cannot be found, or if it cannot successfully be converted to a string.</exception>
   public string GetStringValue(string fieldName) {
+  }
+
+  /// <summary>Reports whether the field, identified by name, is present in the Message.</summary>
+  /// <param name="name">The name of the field</param>
+  /// <returns>True if the field is found; false otherwise.</returns>
+  /// <exception cref="GmsecException">If the subject is null or contains an empty-string.</exception>
+  public bool HasField(string name) {
   }
 
   /// <summary>Returns the field, identified by name, that is associated with the message</summary>

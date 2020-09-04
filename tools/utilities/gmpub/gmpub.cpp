@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -25,7 +25,11 @@ using namespace gmsec::api::mist::message;
 using namespace gmsec::api::util;
 
 
-const char* const DEFAULT_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.GMPUB.HB";
+const char* const GMSEC_MESSAGE_SUBJECT        = "SPECIFICATION.MISSION-ID.SAT-ID-PHYSICAL.MESSAGE-TYPE.MESSAGE-SUBTYPE.COMPONENT";
+const char* const GMSEC_LEGACY_MESSAGE_SUBJECT = "SPECIFICATION.MISSION-ID.SAT-ID-PHYSICAL.MESSAGE-TYPE.MESSAGE-SUBTYPE.COMPONENT.C2CX-SUBTYPE";
+
+const char* const C2MS_MESSAGE_SUBJECT         = "SPECIFICATION.DOMAIN1.DOMAIN2.MISSION-ID.CONSTELLATION-ID.SAT-ID-PHYSICAL.MESSAGE-TYPE.MESSAGE-SUBTYPE.COMPONENT";
+const char* const C2MS_LEGACY_MESSAGE_SUBJECT  = "SPECIFICATION.DOMAIN1.DOMAIN2.MISSION-ID.CONSTELLATION-ID.SAT-ID-PHYSICAL.MESSAGE-TYPE.MESSAGE-SUBTYPE.COMPONENT.C2CX-SUBTYPE";
 
 
 class GMSEC_Publisher : public Utility
@@ -40,10 +44,10 @@ public:
 	bool run();
 
 private:
-	ConnectionManager* connMgr;
-
 	void publish(Message& msg);
 	void publish(GMSEC_U16 counter, GMSEC_U32 interval_ms, const std::string& subject);
+
+	ConnectionManager* connMgr;
 };
 
 
@@ -147,7 +151,7 @@ bool GMSEC_Publisher::run()
 		}
 		else
 		{
-			subject = get("SUBJECT", DEFAULT_MESSAGE_SUBJECT);
+			subject = get("SUBJECT", "");
 		}
 
 		//o Output information
@@ -167,7 +171,6 @@ bool GMSEC_Publisher::run()
 		if (iterations == -1 || iterations >= 1)
 		{
 			GMSEC_INFO << "Publish interval " << interval_ms << " [ms]";
-			GMSEC_INFO << "Message subject '" << subject.c_str() << "'";
 		}
 
 		//o Publish message(s)
@@ -233,9 +236,15 @@ void GMSEC_Publisher::publish(Message& message)
 
 void GMSEC_Publisher::publish(GMSEC_U16 counter, GMSEC_U32 interval_ms, const std::string& subject)
 {
-	MistMessage message(subject.c_str(), "MSG.C2CX.HB", connMgr->getSpecification());
+	const char* schemaID = "HB";
+	const char* subj     = (subject.length() > 0 ? subject.c_str() : "WILL.SET.SUBJECT.LATER");
 
-	message.setValue("MISSION-ID", "MY-MISSION");
+	MistMessage message(subj, schemaID, connMgr->getSpecification());
+
+	message.setValue("MISSION-ID", "MSSN");
+	message.setValue("CONSTELLATION-ID", "CNS1");
+	message.setValue("SAT-ID-PHYSICAL", "SAT1");
+	message.setValue("SAT-ID-LOGICAL", "SAT1");
 	message.setValue("FACILITY", "MY-FACILITY");
 	message.setValue("COMPONENT", "GMPUB");
 
@@ -244,12 +253,12 @@ void GMSEC_Publisher::publish(GMSEC_U16 counter, GMSEC_U32 interval_ms, const st
 		std::stringstream oss;
 		oss << "MY-MESSAGE-ID-" << counter;
 
-		message.addField("MSG-ID", oss.str().c_str());
+		message.setValue("MSG-ID", oss.str().c_str());
 	}
 	else if (connMgr->getSpecification().getVersion() >= mist::GMSEC_ISD_2018_00)
 	{
-		message.addField("DOMAIN1", "MY-DOMAIN-1");
-		message.addField("DOMAIN2", "MY-DOMAIN-2");
+		message.setValue("DOMAIN1", "DOM1");
+		message.setValue("DOMAIN2", "DOM2");
 	}
 
 	message.setValue("COUNTER", (GMSEC_I64) counter);
@@ -258,6 +267,50 @@ void GMSEC_Publisher::publish(GMSEC_U16 counter, GMSEC_U32 interval_ms, const st
 	if (getConfig().getBooleanValue("ENCRYPT", false))
 	{
 		message.addField("SEC-ENCRYPT", true);
+	}
+
+	if (subject.empty())
+	{
+		// Need to set the message's subject based on field contents
+
+		std::string msgSubjPattern;
+
+		Specification::SchemaLevel schemaLevel = connMgr->getSpecification().getSchemaLevel();
+
+		if (connMgr->getSpecification().getVersion() >= GMSEC_ISD_2019_00)
+		{
+			msgSubjPattern = (schemaLevel == Specification::LEVEL_2 ? GMSEC_MESSAGE_SUBJECT : C2MS_MESSAGE_SUBJECT);
+		}
+		else
+		{
+			msgSubjPattern = (schemaLevel == Specification::LEVEL_1 ? GMSEC_LEGACY_MESSAGE_SUBJECT : C2MS_LEGACY_MESSAGE_SUBJECT);
+		}
+
+		std::vector<std::string> fieldNames = Utility::split(msgSubjPattern, ".");
+
+		std::string messageSubject;
+
+		for (std::vector<std::string>::iterator it = fieldNames.begin(); it != fieldNames.end(); ++it)
+		{
+			if (message.hasField(it->c_str()))
+			{
+				if (connMgr->getSpecification().getVersion() < GMSEC_ISD_2018_00 && *it == "CONSTELLATION-ID")
+				{
+					continue;
+				}
+				messageSubject.append(message.getStringValue(it->c_str())).append(".");
+			}
+			else
+			{
+				if ((*it == "SPECIFICATION") && (connMgr->getSpecification().getVersion() < GMSEC_ISD_2018_00))
+				{
+					messageSubject.append("GMSEC.");
+				}
+			}
+		}
+		messageSubject = messageSubject.substr(0, messageSubject.length() - 1);
+
+		message.setSubject(messageSubject.c_str());
 	}
 
 	//o Publish Message

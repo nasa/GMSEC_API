@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -89,6 +89,8 @@ public:
     GMSEC_U64 CALL_TYPE getUnsignedIntegerValue(const char* fieldName) const;
     GMSEC_F64 CALL_TYPE getDoubleValue(const char* fieldName) const;
     const char* CALL_TYPE getStringValue(const char* fieldName) const;
+
+	bool hasField(const char* name) const;
 
 	const Field* CALL_TYPE getField(const char* name) const;
 

@@ -19,7 +19,7 @@ class SpecificationBuddy
 public:
 	static InternalSpecification& getInternal(const Specification& spec)
 	{
-		return *spec.m_iSpec;
+		return *spec.m_internal;
 	}
 };
 

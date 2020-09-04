@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -456,14 +456,14 @@ void ConnectionManager::Publish(Message^ msg)
 }
 
 
-void ConnectionManager::Publish(Message^ msg, Config^ config)
+void ConnectionManager::Publish(Message^ msg, Config^ mwConfig)
 {
 	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
 	THROW_EXCEPTION_IF_NULLPTR(msg, StatusClass::MIST_ERROR, StatusCode::INVALID_MESSAGE, "Message is null");
-	THROW_EXCEPTION_IF_NULLPTR(config, StatusClass::MIST_ERROR, StatusCode::INVALID_CONFIG, "Config is null");
+	THROW_EXCEPTION_IF_NULLPTR(mwConfig, StatusClass::MIST_ERROR, StatusCode::INVALID_CONFIG, "Config is null");
 
 	gmsec::api::Message* nativeMsg = ((Message^) msg)->GetUnmanagedImplementation();
-	gmsec::api::Config*  nativeCfg = ((Config^) config)->GetUnmanagedImplementation();
+	gmsec::api::Config*  nativeCfg = ((Config^) mwConfig)->GetUnmanagedImplementation();
 
 	try
 	{

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -113,11 +113,6 @@ InternalProductFileMessage::InternalProductFileMessage(const char* data)
 	//Check that required fields are present
 	(void) this->getUnsignedIntegerValue(RESPONSE_STATUS_STRING);
 	(void) this->getStringValue(PROD_SUBTYPE_STRING);
-	const char* prodType = (getSpecVersion() < GMSEC_ISD_2018_00 ? this->getStringValue(PROD_TYPE_STRING) : NULL);
-
-	std::string schemaID = buildSchemaID(getKind(), PROD_STRING, prodType, getSpecVersion());
-
-	registerTemplate(schemaID.c_str());
 
 	GMSEC_U16 num_of_files;
 	try
@@ -178,11 +173,12 @@ InternalProductFileMessage::InternalProductFileMessage(const Specification& spec
 	//Check that required fields are present
 	(void) this->getUnsignedIntegerValue(RESPONSE_STATUS_STRING);
 	(void) this->getStringValue(PROD_SUBTYPE_STRING);
+
 	const char* prodType = (getSpecVersion() < GMSEC_ISD_2018_00 ? this->getStringValue(PROD_TYPE_STRING) : NULL);
 
 	std::string schemaID = buildSchemaID(getKind(), PROD_STRING, prodType, getSpecVersion());
 
-	registerTemplate(schemaID.c_str());
+	registerTemplate(spec, schemaID.c_str());
 
 	GMSEC_U16 num_of_files;
 	try

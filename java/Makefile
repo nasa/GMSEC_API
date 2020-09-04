@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -20,6 +20,8 @@ JAR       = $(JAVA_BIN)/jar
 RMIC      = $(JAVA_BIN)/rmic
 JAVA      = $(JAVA_BIN)/java
 JAVADOC   = $(JAVA_BIN)/javadoc
+
+JAVA_OPTS += -Xlint:unchecked
 
 
 # Java stuff
@@ -112,6 +114,7 @@ OBJECTS_4x = \
              $(SRCDIR_4x)/gmsecJNI_LogHandler.o \
              $(SRCDIR_4x)/gmsecJNI_Message.o \
              $(SRCDIR_4x)/gmsecJNI_MessageFieldIterator.o \
+             $(SRCDIR_4x)/gmsecJNI_MessageValidator.o \
              $(SRCDIR_4x)/gmsecJNI_Status.o \
              $(SRCDIR_4x)/gmsecJNI_StringField.o \
              $(SRCDIR_4x)/gmsecJNI_U16Field.o \
@@ -173,13 +176,13 @@ classes:
 
 
 javac_3x: $(JAVA_SOURCES_3x)
-	$(JAVAC) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $^
-	$(JAVAC) -h $(SRCDIR_3x) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $(JNI_SOURCES_3x)
+	$(JAVAC) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $(JAVA_OPTS) $^
+	$(JAVAC) -h $(SRCDIR_3x) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $(JAVA_OPTS) $(JNI_SOURCES_3x)
 
 
 javac_4x: $(JAVA_SOURCES_4x)
-	$(JAVAC) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $^
-	$(JAVAC) -h $(SRCDIR_4x) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $(JNI_SOURCES_4x)
+	$(JAVAC) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $(JAVA_OPTS) $^
+	$(JAVAC) -h $(SRCDIR_4x) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $(JAVA_OPTS) $(JNI_SOURCES_4x)
 
 
 jar:

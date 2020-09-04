@@ -82,14 +82,14 @@
     <OutDir>Release\</OutDir>
     <IntDir>Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <LinkKeyFile>..\..\SUPPORT\windows_snk\GMSEC.snk</LinkKeyFile>
+    <LinkKeyFile>..\..\GMSEC_SUPPORT\windows_snk\GMSEC.snk</LinkKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-SNK|x64'">
     <OutDir>Release\</OutDir>
     <IntDir>Release\</IntDir>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>false</LinkIncremental>
-    <LinkKeyFile>..\..\SUPPORT\windows_snk\GMSEC.snk</LinkKeyFile>
+    <LinkKeyFile>..\..\GMSEC_SUPPORT\windows_snk\GMSEC.snk</LinkKeyFile>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

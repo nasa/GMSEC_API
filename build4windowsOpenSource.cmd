@@ -1,4 +1,4 @@
-rem Copyright 2007-2019 United States Government as represented by the
+rem Copyright 2007-2020 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -62,11 +62,6 @@ MSBuild.exe c.sln /t:Rebuild /p:Configuration=Release /p:Platform=x64
    )
 )
 cd ../..
-
-rem Copy XSLT-related runtime libraries
-copy ..\SUPPORT\libxml2\bin\libxml2.dll bin
-copy ..\SUPPORT\libxslt\bin\libxslt.dll bin
-copy ..\SUPPORT\libxslt\bin\libexslt.dll bin
 
 rem Copy validator scripts
 mkdir bin\validator

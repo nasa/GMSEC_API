@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -81,8 +81,8 @@ extern "C"
 	 * @brief Creates a MnemonicMessage object, and returns a handle to such.
 	 *
 	 * @param[in]  subject  - the message subject
-	 * @param[in]  schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.GMSEC.MSG.MVAL) You may also use the 
+	 * @param[in]  schemaID - the string used to identify the message schema in C2MS or other message specification. The schema ID has the
+	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2019.00.C2MS.MSG.MVAL) You may also use the 
 	 * shorthand notation of messageKind.messageType (e.g. MSG.MVAL)  
 	 * @param[in]  spec     - the specification this message's schema will adhere to
 	 * @param[out] status   - the result of the operation
@@ -108,8 +108,8 @@ extern "C"
 	 * @brief Creates a MnemonicMessage object, and returns a handle to such.
 	 *
 	 * @param[in]  subject  - the message subject
-	 * @param[in]  schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.GMSEC.MSG.MVAL) You may also use the 
+	 * @param[in]  schemaID - the string used to identify the message schema in C2MS or other message specification. The schema ID has the
+	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2019.00.C2MS.MSG.MVAL) You may also use the 
 	 * shorthand notation of messageKind.messageType (e.g. MSG.MVAL)  
 	 * @param[in]  config   - the configuration to associate with the message
 	 * @param[in]  spec     - the specification this message's schema will adhere to

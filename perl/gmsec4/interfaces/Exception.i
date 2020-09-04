@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,17 +16,39 @@ using namespace gmsec::api;
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/Exception.h>
 
-%exception {
-        try
-        {
-                $action
+%feature("director:except") {
+    if ($error != NULL) {
+        void*  argp1 = 0;
+        int res1 = SWIG_Perl_ConvertPtr($error, &argp1, SWIGTYPE_p_gmsec__api__Exception, 0);
+
+        if (SWIG_IsOK(res1)) {
+            gmsec::api::Exception* e = reinterpret_cast<gmsec::api::Exception*>(argp1);
+            throw *e;
         }
-        catch (gmsec::api::Exception &_e)
-        {
-                %raise(SWIG_NewPointerObj((new gmsec::api::Exception(static_cast<const gmsec::api::Exception&> (_e))), SWIGTYPE_p_gmsec__api__Exception, SWIG_OWNER | SWIG_SHADOW),
-                        "libgmsec_perl::Exception",
-                        SWIGTYPE_p_gmsec__api__Exception);
-        } 
+        else {
+            STRLEN len;
+            char* e = SvPV($error, len);
+            if (e != NULL) {
+                throw gmsec::api::Exception(OTHER_ERROR, OTHER_ERROR_CODE, e);
+            }
+            else {
+                throw gmsec::api::Exception(OTHER_ERROR, OTHER_ERROR_CODE, "Unknown error");
+            }
+        }
+    }
+}
+
+%exception {
+    try
+    {
+        $action
+    }
+    catch (const gmsec::api::Exception& e)
+    {
+        %raise (SWIG_NewPointerObj(new gmsec::api::Exception(e), SWIGTYPE_p_gmsec__api__Exception, SWIG_OWNER | SWIG_SHADOW),
+                "libgmsec_perl::Exception",
+                SWIGTYPE_p_gmsec__api__Exception);
+    }
 }
 
 %perlcode%{

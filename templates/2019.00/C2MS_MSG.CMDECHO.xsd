@@ -1,0 +1,299 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Defaults.xsd"/>
+	<xs:include schemaLocation="Fields.xsd"/>
+
+	<xs:simpleType name="CONTENT-VERSION_Type">
+		<xs:restriction base="xs:float">
+			<xs:enumeration value="2019"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="CMD-ECHO-RESULT_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NOTC"/>
+			<xs:enumeration value="GOOD"/>
+			<xs:enumeration value="MISC"/>
+			<xs:enumeration value="TOUT"/>
+			<xs:enumeration value="UNEX"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ECHOED-CMD-FORMAT_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CCSDSPACKET"/>
+			<xs:enumeration value="CCSDSFRAME"/>
+			<xs:enumeration value="CLTU"/>
+			<xs:enumeration value="MNEMONIC"/>
+			<xs:enumeration value="RAW"/>
+			<xs:enumeration value="TDM"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ECHOED-CMD-ENCODING_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="BINARY"/>
+			<xs:enumeration value="DIBIT"/>
+			<xs:enumeration value="TRIBIT"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ECHOED-CMD-TYPE_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="REALTIME"/>
+			<xs:enumeration value="FUTURE"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="MSG.CMDECHO">
+		<xs:complexType>
+			<xs:all>
+
+				<xs:element name="SUBJECT" type="C2MS_SUBJECT_Type"/>
+				<xs:element name="CONTENT">
+					<xs:complexType>
+						<xs:all>
+
+							<xs:element name="CONTENT-VERSION">
+								<xs:annotation>
+									<xs:documentation>Version number for this message.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="CONTENT-VERSION_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="F32"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="REQUEST-ID">
+								<xs:annotation>
+									<xs:documentation>This field’s value is to be the same as the REQUEST-ID the associated REQ message.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:unsignedShort">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="CMD-ECHO-RESULT">
+								<xs:annotation>
+									<xs:documentation>The Command Echo Result</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="CMD-ECHO-RESULT_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-RECEIVE-TIME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Time the echo was received or when the timeout occurred</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="TIME_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-FRAME-COUNTER" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>The echoed command counter; i.e., the command id</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:unsignedInt">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U32"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-SOURCE" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Which user/workposition/proc/schedule the message originated from</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-FORMAT" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Type of command</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="ECHOED-CMD-FORMAT_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-ENCODING" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Type of command encoding; required if ECHOED-CMD-DATA is present</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="ECHOED-CMD-ENCODING_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-DATA" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Received command echo data used to compare with uplinked CMD-DATA</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:hexBinary">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="BINARY"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-VCID" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>CCSDS Virtual Channel ID</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:short">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="I16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-BYPASS" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>CCSDS COP-1 flag for “Bypass of Acceptance Check”, i.e., without verification</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:boolean">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="BOOLEAN"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-APID" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Application Process Identifier</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-PACKET-COUNTER" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation/>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:unsignedInt">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U32"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-CMD-TYPE" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>If REALTIME, execute upon receipt; if FUTURE, execute at ECHOED-SPACECRAFT-EXECUTION-TIME</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="ECHOED-CMD-TYPE_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-RELEASE-TIME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Time the command should begin being released from the front end processor to the remote tracking station</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="TIME_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-EARLIEST-UPLINK-TIME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Absolute or relative time can apply</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="TIME_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-LATEST-UPLINK-TIME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Absolute or relative time can apply</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="TIME_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ECHOED-SPACECRAFT-EXECUTION-TIME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Required if ECHOED-CMD-TYPE=”FUTURE”; absolute or relative time can apply</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="TIME_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

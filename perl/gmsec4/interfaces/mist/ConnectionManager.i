@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -43,11 +43,13 @@ using namespace gmsec::api::mist;
 
 
 //C binding functions that have nothing to do with perl binding
-%ignore gmsec::api::mist::ConnectionManager::registerEventCallback(gmsec::api::Connection::ConnectionEvent, GMSEC_ConnectionMgrEventCallback*);
-%ignore gmsec::api::mist::ConnectionManager::request(const gmsec::api::Message&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
+%ignore gmsec::api::mist::ConnectionManager::registerMessageValidator(GMSEC_MessageValidator*);
+%ignore gmsec::api::mist::ConnectionManager::registerEventCallback(Connection::ConnectionEvent, GMSEC_ConnectionMgrEventCallback*);
+%ignore gmsec::api::mist::ConnectionManager::subscribe(const char*, const Config&, GMSEC_ConnectionMgrCallback*);
+%ignore gmsec::api::mist::ConnectionManager::request(const Message&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
 %ignore gmsec::api::mist::ConnectionManager::cancelRequest(GMSEC_ConnectionMgrReplyCallback*);
-%ignore gmsec::api::mist::ConnectionManager::requestDirective(const char*, const gmsec::api::Field&, const gmsec::api::ustil::DataList<Field*>&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
-%ignore gmsec::api::mist::ConnectionManager::requestSimpleService(const char*, const char*, const gmsec::api::Field&, const gmsec::api::util::DataList<Field*>&, const gmsec::api::util::DataList<ServiceParam*>&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
+%ignore gmsec::api::mist::ConnectionManager::requestDirective(const char*, const Field&, const gmsec::api::util::DataList<Field*>&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
+%ignore gmsec::api::mist::ConnectionManager::requestSimpleService(const char*, const char*, const Field&, const gmsec::api::util::DataList<Field*>&, const gmsec::api::util::DataList<ServiceParam*>&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
 
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/ConnectionManager.h>
@@ -293,6 +295,22 @@ C<libgmsec_perl::ConnectionManager-E<gt>getSpecification()>
 
     A Specification object
 
+=head3 setSpecification
+
+C<libgmsec_perl::ConnectionManager-E<gt>setSpecification()>
+
+    This method will allow for a user to register their custom subclass of the Specification class with the Connection Manager. This custom Specification can implement its own validateMessage() method which can be used to perform validation of messages currently not performed by the GMSEC API.
+
+    Note the API does not assume ownership of the provided Specification object, nor does it make a copy of such. The user is responsible to ensure that the provided Specification object is not destroyed while the ConnectionManager is in possession of such.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $spec - A specialized subsclass of the Specification class
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:>/b><br>
+
+    Exception if the given Specification object is null
+
 =head3 setStandardFields
 
 C<libgmsec_perl::ConnectionManager-E<gt>setStandardFields($standardFields)>
@@ -346,14 +364,18 @@ C<libgmsec_perl::ConnectionManager-E<gt>publish($msg)>
 
 =head3 publish
 
-C<libgmsec_perl::ConnectionManager-E<gt>publish($msg, $config)>
+C<libgmsec_perl::ConnectionManager-E<gt>publish($msg, $mwConfig)>
 
-    If ConnectionManager has been created with "validate" option disabled, this is a pass-though function to the underlying connection.  Otherwise the message will be validated before it is published.  The given configuration object is applied to the message.
+    Publishes the given message to the middleware using the given configuration to enable or disable certain middleware-level publish functionalities (e.g. ActiveMQ - Durable Producer). Message will still be validated if message validation is enabled.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Note:</b><br>
+
+    The actual Message published to the middleware will contain tracking fields; to disable this feature, create a ConnectionManager object with the tracking=off configuration option.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
     $msg - the GMSEC message to be published
-    $config - config object to be used by the publish operation
+    $mwConfig - config object for providing middleware configuration options
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
@@ -529,7 +551,7 @@ C<libgmsec_perl::ConnectionManager-E<gt>createHeartbeatmessage($subject, $heartb
 
     Creates a message and passes ownership to the user.  This message is populated with the standard set of required and optional heartbeat fields, as well as the required common fields defined in setStandardFields().  If validation is enabled for this ConnectionManager and neither the common fields from setStandardFields(), nor the fields supplied in the first argument of this function are sufficient to complete a set of fields required by validation, an error will be returned.
 
-    MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and added to the message automatically, according to the GMSEC Message Standard.
+    MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and added to the message automatically, according to the C2MS Message Standard.
 
     Note that when the user is done with the message, they should destroy it using release.
 
@@ -556,7 +578,7 @@ C<libgmsec_perl::ConnectionManager-E<gt>starthearbeatService($subject, $heartbea
     If users would like to have a COUNTER field added to the published heartbeat message, then the Heartbeat
     Service should be provided with this field within the list of field provided to this method.
 
-    MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and added to the message automatically, according to the GMSEC Message Standard
+    MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and added to the message automatically, according to the C2MS Message Standard
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 

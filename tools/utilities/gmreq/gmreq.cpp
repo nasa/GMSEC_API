@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,11 +19,15 @@
 
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
+using namespace gmsec::api::mist::message;
 using namespace gmsec::api::util;
 
 
-const char* const DEFAULT_REQUEST_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.REQ.DIR.GMRPL";
-const char* const DEFAULT_REPLY_MESSAGE_SUBJECT   = "GMSEC.MY-MISSION.MY-SAT-ID.RESP.DIR.GMRPL.+";
+const char* const GMSEC_REQUEST_MESSAGE_SUBJECT = "GMSEC.MSSN.SAT1.REQ.DIR.GMRPL";
+const char* const GMSEC_REPLY_MESSAGE_SUBJECT   = "GMSEC.MSSN.SAT1.RESP.DIR.GMREQ.+";
+
+const char* const C2MS_REQUEST_MESSAGE_SUBJECT  = "C2MS.DOM1.DOM2.MSSN.CNS1.SAT1.REQ.DIR.GMRPL";
+const char* const C2MS_REPLY_MESSAGE_SUBJECT    = "C2MS.DOM1.DOM2.MSSN.CNS1.SAT1.RESP.DIR.GMREQ.+";
 
 
 class GMSEC_Request : public Utility
@@ -117,11 +121,13 @@ bool GMSEC_Request::run()
 		//o Get information from the command line */
 		std::string msgFile          = get("MSG-FILE", "");
 		std::string cfgFile          = get("CFG-FILE", "");
-		int         msg_timeout_ms   = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
-		int         req_repub_tmo_ms = get("REQ-REPUBLISH-TIMEOUT-MS", 1000);
+		GMSEC_I32   msg_timeout_ms   = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
+		GMSEC_I32   req_repub_tmo_ms = get("REQ-REPUBLISH-TIMEOUT-MS", GMSEC_REQUEST_REPUBLISH_NEVER);
 		std::string subject;
 
 		StdUniquePtr<Message> msg;
+
+		Specification::SchemaLevel schemaLevel = connMgr->getSpecification().getSchemaLevel();
 
 		if (!msgFile.empty())
 		{
@@ -145,7 +151,23 @@ bool GMSEC_Request::run()
 		}
 		else
 		{
-			subject = get("SUBJECT", DEFAULT_REQUEST_MESSAGE_SUBJECT);
+			if (connMgr->getSpecification().getVersion() >= GMSEC_ISD_2019_00)
+			{
+				subject = get("SUBJECT", (schemaLevel == Specification::LEVEL_2 ? GMSEC_REQUEST_MESSAGE_SUBJECT : C2MS_REQUEST_MESSAGE_SUBJECT));
+
+				if ((connMgr->getSpecification().getSchemaLevel() == Specification::LEVEL_1) && (subject.find("C2MS") != std::string::npos))
+				{
+					subject.replace(0, 4, "C2MS-11B");
+				}
+			}
+			else if (connMgr->getSpecification().getVersion() == GMSEC_ISD_2018_00)
+			{
+				subject = get("SUBJECT", (schemaLevel == Specification::LEVEL_1 ? GMSEC_REQUEST_MESSAGE_SUBJECT : C2MS_REQUEST_MESSAGE_SUBJECT));
+			}
+			else
+			{
+				subject = get("SUBJECT", GMSEC_REQUEST_MESSAGE_SUBJECT);
+			}
 		}
 
 		//o Check if we're configured for Open-Response
@@ -153,9 +175,29 @@ bool GMSEC_Request::run()
 
 		if (responseBehavior == "open-resp" || responseBehavior == "OPEN-RESP")
 		{
-			GMSEC_INFO << "Subscribing to Open-Response Subject: " << DEFAULT_REPLY_MESSAGE_SUBJECT;
+			std::string subscribeTo;
 
-			(void) connMgr->subscribe(DEFAULT_REPLY_MESSAGE_SUBJECT);
+			if (connMgr->getSpecification().getVersion() >= GMSEC_ISD_2019_00)
+			{
+				subscribeTo = (schemaLevel == Specification::LEVEL_2 ? GMSEC_REPLY_MESSAGE_SUBJECT : C2MS_REPLY_MESSAGE_SUBJECT);
+
+				if ((connMgr->getSpecification().getSchemaLevel() == Specification::LEVEL_1) && (subject.find("C2MS") != std::string::npos))
+				{
+					subscribeTo.replace(0, 4, "C2MS-11B");
+				}
+			}
+			else if (connMgr->getSpecification().getVersion() == GMSEC_ISD_2018_00)
+			{
+				subscribeTo = (schemaLevel == Specification::LEVEL_1 ? GMSEC_REPLY_MESSAGE_SUBJECT : C2MS_REPLY_MESSAGE_SUBJECT);
+			}
+			else
+			{
+				subscribeTo = GMSEC_REPLY_MESSAGE_SUBJECT;
+			}
+
+			GMSEC_INFO << "Subscribing to Open-Response Subject: " << subscribeTo.c_str();
+
+			(void) connMgr->subscribe(subscribeTo.c_str());
 		}
 
 		//o Output information
@@ -221,13 +263,51 @@ void GMSEC_Request::request(Message& request, int msg_timeout_ms, int req_republ
 
 void GMSEC_Request::request(const std::string& subject, int msg_timeout_ms, int req_republish_period)
 {
+	//o Define standard fields
+	DataList<Field*> standardFields;
+
+	StringField mission("MISSION-ID", "MSSN");
+	StringField cnst("CONSTELLATION-ID", "CNS1");
+	StringField satphys("SAT-ID-PHYSICAL", "SAT1");
+	StringField satlog("SAT-ID-LOGICAL", "SAT1");
+	StringField facility("FACILITY", "MY-FACILITY");
+	StringField comp("COMPONENT", "GMREQ");
+	StringField domain1("DOMAIN1", "DOM1");
+	StringField domain2("DOMAIN2", "DOM2");
+
+	standardFields.add(&mission);
+	standardFields.add(&cnst);
+	standardFields.add(&satphys);
+	standardFields.add(&satlog);
+	standardFields.add(&facility);
+	standardFields.add(&comp);
+
+	if (connMgr->getSpecification().getVersion() >= mist::GMSEC_ISD_2018_00)
+	{
+		standardFields.add(&domain1);
+		standardFields.add(&domain2);
+	}
+
+	MistMessage::setStandardFields(standardFields);
+
 	//o Create message
-	Message request(subject.c_str(), Message::REQUEST);
+	MistMessage request(subject.c_str(), "REQ.DIR", connMgr->getSpecification());
+
+	MistMessage::clearStandardFields();
 
 	//o Add fields to message
-	request.addField("QUESTION", "Does the request/reply functionality still work?");
-	request.addField("COMPONENT", "GMREQ");
+	request.addField("DIRECTIVE-KEYWORD", "QUESTION");
+	request.addField("DIRECTIVE-STRING", "DOES_THE_REQUEST_REPLY_FUNCTIONALITY_STILL_WORK");
 	request.addField("RESPONSE", true);
+
+	if (connMgr->getSpecification().getVersion() == mist::GMSEC_ISD_2014_00)
+	{
+		request.setValue("MSG-ID", "MY-MESSAGE-ID");
+	}
+	else if (connMgr->getSpecification().getVersion() >= mist::GMSEC_ISD_2019_00)
+	{
+		request.addField("REQUEST-ID", (GMSEC_U16) 1);
+	}
 
 	if (getConfig().getBooleanValue("ENCRYPT", false))
 	{

@@ -817,6 +817,24 @@
 ";
 
 
+%feature("docstring") gmsec::api::Message::hasField "
+
+    has_field(self, name: str) -> bool
+
+    Parameters
+    ----------
+    name : The name of the field to reference
+
+    Returns
+    ----------
+    True if the field is found; false otherwise.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the given field name is NULL or contains an empty string.
+";
+
+
 %feature("docstring") gmsec::api::Message::getField "
 
     get_field(self, name: str) -> Field
@@ -828,6 +846,10 @@
     Returns
     ----------
     A reference to the Field, if found, or None if not.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the given field name is NULL or contains an empty string.
 ";
 
 

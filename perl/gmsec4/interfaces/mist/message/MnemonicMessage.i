@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,7 +41,7 @@ C<libgmsec_perl::MnemonicMessage-E<gt>new($subject, $schemaID, $spec)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
 	$subject - the subject string for the message.
-	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL).  You may also use the shorthand notation of messageKind.messageType (e.g. MSG.MVAL)
+	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). Users may also use the shorthand notation of messageKind.messageType (e.g. MSG.MVAL)
 	$spec - a reference to the specification this message's schema will adhere to.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
@@ -55,7 +55,7 @@ C<libgmsec_perl::MnemonicMessage-E<gt>new($subject, $schemaID, $config, $spec)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
 	$subject - the subject string for the message.
-	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). You may also use the shorthand notation messageKind.messageType (e.g. MSG.MVAL)
+	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). Users may also use the shorthand notation messageKind.messageType (e.g. MSG.MVAL)
 	$config - A Configuration object to associate with the message
 	$spec - a reference to the specification this message's schema will adhere to.
 

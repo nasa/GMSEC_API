@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -24,6 +24,7 @@ import gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerCallback;
 import gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerEventCallback;
 import gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerReplyCallback;
 import gov.nasa.gsfc.gmsec.api.mist.Device;
+import gov.nasa.gsfc.gmsec.api.mist.MessageValidator;
 import gov.nasa.gsfc.gmsec.api.mist.Mnemonic;
 import gov.nasa.gsfc.gmsec.api.mist.ProductFile;
 import gov.nasa.gsfc.gmsec.api.mist.ServiceParam;
@@ -54,6 +55,7 @@ public class JNIConnectionManager
 
 	private List<SubscriptionInfo>               subscriptions;
 	private List<ConnectionManagerEventCallback> eventCallbacks;
+	private MessageValidator                     validator;
 
 
 	protected JNIConnectionManager(long cPtr, boolean cMemoryOwn)
@@ -63,6 +65,7 @@ public class JNIConnectionManager
 
 		subscriptions  = Collections.synchronizedList(new ArrayList<SubscriptionInfo>());
 		eventCallbacks = new ArrayList<ConnectionManagerEventCallback>();
+		validator      = null;
 	}
 
 
@@ -85,6 +88,7 @@ public class JNIConnectionManager
 
 			subscriptions.clear();
 			eventCallbacks.clear();
+			validator = null;
 
 			extConnMgr     = null;
 			swigCPtr       = 0;
@@ -176,14 +180,6 @@ public class JNIConnectionManager
 	}
 
 
-	public void setSpecification(Specification spec)
-	{
-		JNISpecification jSpec = Specification.getInternal(spec);
-
-		gmsecJNI.ConnectionManager_SetSpecification(swigCPtr, this, JNISpecification.getCPtr(jSpec), jSpec, spec);
-	}
-
-
 	public void setStandardFields(java.util.List<Field> standardFields)
 	{
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(standardFields);
@@ -219,6 +215,19 @@ public class JNIConnectionManager
 	}
 
 
+	public void registerMessageValidator(MessageValidator val)
+	{
+		long valPtr = JNIMessageValidator.getCPtr(MessageValidator.getInternal(val));
+
+		gmsecJNI.ConnectionManager_RegisterMessageValidator(swigCPtr, this, valPtr);
+
+		// We store a handle to the MessageValidator (in case the user has declared it
+		// as an anonymous object) so that the JVM garbage collector does not dispose of it after it
+		// has been sent over the JNI layer.
+		validator = val;
+	}
+
+
 	public void registerEventCallback(Connection.ConnectionEvent event, ConnectionManagerEventCallback cb) throws GMSEC_Exception
 	{
 		cb.setConnectionManager(this);
@@ -227,8 +236,8 @@ public class JNIConnectionManager
 
 		gmsecJNI.ConnectionManager_RegisterEventCallback(swigCPtr, this, event.ordinal(), cbPtr);
 
-		// We store a handle to the ConnectionManagerEventCallback, in case the user has declared it
-		// as an anonymous object, so that the JVM garbage collector does not dispose of it after it
+		// We store a handle to the ConnectionManagerEventCallback (in case the user has declared it
+		// as an anonymous object) so that the JVM garbage collector does not dispose of it after it
 		// has been sent over the JNI layer.
 		if (eventCallbacks.indexOf(cb) == -1)
 		{
@@ -261,7 +270,7 @@ public class JNIConnectionManager
 		{
 			SubscriptionInfo info = new SubscriptionInfo(new JNIConnMgrSubscriptionInfo(siPtr, false, subject, cb));
 
-			// We store a handle to the SubscriptionInfo object, in case the user has declared
+			// We store a handle to the SubscriptionInfo object in case the user has declared
 			// their ConnectionManagerCallback as an anonymous object.  This way we can prevent
 			// the JVM garbage collector from disposing of the callback.
 			subscriptions.add(info);
@@ -336,10 +345,10 @@ public class JNIConnectionManager
 	}
 
 
-	public void publish(Message msg, Config config) throws GMSEC_Exception
+	public void publish(Message msg, Config mwConfig) throws GMSEC_Exception
 	{
 		JNIMessage jMsg = Message.getInternal(msg);
-		JNIConfig  jCfg = Config.getInternal(config);
+		JNIConfig  jCfg = Config.getInternal(mwConfig);
 
 		gmsecJNI.ConnectionManager_Publish(swigCPtr, this, JNIMessage.getCPtr(jMsg), jMsg, JNIConfig.getCPtr(jCfg), jCfg);
 	}

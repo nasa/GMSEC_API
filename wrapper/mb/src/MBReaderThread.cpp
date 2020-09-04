@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -138,7 +138,9 @@ void MBReaderThread::run()
 		// add the message to reply queue or the message queue accordingly
 		if (gmsecMsg->getKind() == Message::REPLY)
 		{
-			bool processReply = (m_replySubject == gmsecMsg->getSubject());
+			//TODO: Remove functionality from MB(Server) that generates a Resource Message
+#if 0
+			bool processReply = (std::string(gmsecMsg->getSubject()).find(m_replySubject) != std::string::npos);
 
 			if (!processReply)
 			{
@@ -156,6 +158,9 @@ void MBReaderThread::run()
 					processReply = false;
 				}
 			}
+#else
+			bool processReply = true;
+#endif
 
 			if (processReply)
 			{

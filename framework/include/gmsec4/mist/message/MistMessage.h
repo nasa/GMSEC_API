@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -63,10 +63,8 @@ public:
 	* @brief default constructor - Initializes the message instance with a template determined by ID and spec.
 	*
 	* @param subject - the subject string for the message.
-	* @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).
-	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB)    
-	* Not all schemaIDs contain a messageSubtype
+	* @param schemaID - the string used to identify the message schema in C2MS or other message specification
+	* (e.g. 2019.00.C2MS.MSG.HB or MSG.HB).
 	* 
 	* @param spec - A reference to the specification this message's schema will adhere to.
 	*
@@ -81,10 +79,8 @@ public:
 	* @brief default constructor - Initializes the message instance with a template determined by ID, spec, and config.
 	*
 	* @param subject - the subject string for the message.
-	* @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).
-	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB)  
-	* Not all schemaIDs contain a messageSubtype
+	* @param schemaID - the string used to identify the message schema in C2MS or other message specification
+	* (e.g. 2019.00.C2MS.MSG.HB or MSG.HB).
 	* @param config - A configuration to associate with the message.
 	* @param spec - A reference to the specification this message's schema will adhere to.
 	*

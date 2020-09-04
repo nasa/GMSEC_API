@@ -1,0 +1,2013 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4f70fa02-0b2d-41dc-8023-76e4559ba1b6}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\C API">
+      <UniqueIdentifier>{cd9e4897-9d5a-45ee-a1af-194f77e0fa3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\C++ API">
+      <UniqueIdentifier>{893c4eea-1f77-4c89-896b-b63ea7c475f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\C++ API\MIST">
+      <UniqueIdentifier>{fddf84bd-0316-4c2e-a96a-729cc9490e6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\internal">
+      <UniqueIdentifier>{9b8774e5-d9a3-4d80-9dbf-a798e094c80c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\internal\MIST">
+      <UniqueIdentifier>{9f281108-67a1-49cb-ae3a-8a54498f3a0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{be4fd680-2c31-44de-996c-da5139ff1791}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\secure">
+      <UniqueIdentifier>{3087ca79-0398-4cbe-8eac-fc4070fa1b54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\support">
+      <UniqueIdentifier>{4368efe4-4371-490b-9626-3fd60c72efc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{65727802-0e41-491c-b441-53ab72ae4c68}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\C API">
+      <UniqueIdentifier>{f3a6b045-a1c6-4016-b3ca-95c72cfd9af6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\C++ API">
+      <UniqueIdentifier>{9d9cf274-c8f7-4e76-b8b6-a9b3b0e94a8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\C++ API\MIST">
+      <UniqueIdentifier>{7d52e4b0-8c44-4443-bff7-0a622764527b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\internal">
+      <UniqueIdentifier>{feac950d-5c04-4a73-b09b-d1f89731c2d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\internal\MIST">
+      <UniqueIdentifier>{231419a1-b173-484c-9882-88731db7ddef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{103d9615-68d3-4feb-9f43-82f54c910c32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\secure">
+      <UniqueIdentifier>{0d5a0acc-7ecd-4eb8-986a-eb5a4efd5951}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{64367180-4272-4c51-b73a-d17f351bb089}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Header Files 4.0">
+      <UniqueIdentifier>{5208788a-ee6b-4cec-bea7-f6c13344aa0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C++ API">
+      <UniqueIdentifier>{d0cf1fed-629f-4e6a-8650-d50325696f45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C++ API\MIST">
+      <UniqueIdentifier>{3a82af7c-a7e4-49fb-974b-03362a6064a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C++ API\MIST\message">
+      <UniqueIdentifier>{c28ad757-cc4b-4ca6-9e98-746fecb20a74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C++ API\field">
+      <UniqueIdentifier>{be4a376d-4851-4808-87e9-c9b8ed02485b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\internal">
+      <UniqueIdentifier>{2a6806b4-b620-4192-9cdf-ffe6567f8438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\internal\field">
+      <UniqueIdentifier>{2d1ed5f3-0709-4a11-86d7-d6bf5d2874fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\internal\MIST">
+      <UniqueIdentifier>{6d55c321-ecd5-46d1-88b1-b5f5b1b3989d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\internal\MIST\message">
+      <UniqueIdentifier>{e2877067-8606-47f4-b727-25130f96ef73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\internal\performance">
+      <UniqueIdentifier>{75054944-ca80-4912-a9be-ffaefc1a4a91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\internal\util">
+      <UniqueIdentifier>{0f5f649e-55da-432d-b097-4fc9a3b5bde9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\util">
+      <UniqueIdentifier>{55cd197f-1be9-4744-972e-f538439ecf62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C API">
+      <UniqueIdentifier>{28053f3c-3151-4a2d-a20b-e471bc68ecc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C API\field">
+      <UniqueIdentifier>{9d883bd2-b6fc-45e2-b0ff-5f2d41744580}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C API\mist">
+      <UniqueIdentifier>{d6575dea-333c-4dfa-bc3a-77d28aeaed15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C API\mist\message">
+      <UniqueIdentifier>{98116475-ff0d-4071-acdc-02e8b19a7caf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\C API\util">
+      <UniqueIdentifier>{3ed6ae30-af00-4439-80e5-8f303fc3a17b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files 4.0\secure">
+      <UniqueIdentifier>{b80f90ae-64f0-4e92-bf4d-8c97897abfac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0">
+      <UniqueIdentifier>{2416d87b-afec-41a0-914a-cd044934a213}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C++ API">
+      <UniqueIdentifier>{9b672168-520f-4150-bf4d-c573d38b8048}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C++ API\MIST">
+      <UniqueIdentifier>{4ed0e11f-8fe8-427c-a4aa-337532832d95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C++ API\MIST\message">
+      <UniqueIdentifier>{37c5705e-e6e8-4871-8512-0d213e4a7ecd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C++ API\field">
+      <UniqueIdentifier>{fa436010-f917-495e-adfc-e9eb3c7eaed3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\internal">
+      <UniqueIdentifier>{c205c3ad-eb4b-4adb-9289-fb00fde7970d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\internal\MIST">
+      <UniqueIdentifier>{42656f54-cdfe-4a1b-8d04-fc9a51198909}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\internal\MIST\message">
+      <UniqueIdentifier>{18aa3364-fa9e-403f-a7fc-4a4a7b0caa70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\internal\field">
+      <UniqueIdentifier>{fa018ae5-62de-4b84-b596-69da62ebbfec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\internal\performance">
+      <UniqueIdentifier>{6321fe46-e1fa-40e4-9a99-216f5c18b9b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\internal\util">
+      <UniqueIdentifier>{9f8b5e01-03b2-4514-9d12-7244555828f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\util">
+      <UniqueIdentifier>{01811f2e-aab4-4dce-8f95-2dacb5a238a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C API">
+      <UniqueIdentifier>{0438b876-940d-44c5-9508-58f256954abf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C API\field">
+      <UniqueIdentifier>{e7c9e28f-b5e2-4405-95b7-b33f50acfbaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C API\mist">
+      <UniqueIdentifier>{bb642444-c20c-46c5-8d62-6c1eef9e0fb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C API\mist\message">
+      <UniqueIdentifier>{9fb396ca-a969-4f13-909f-06ae7885144e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\C API\util">
+      <UniqueIdentifier>{15f2757a-1779-4eb1-a5d3-d656592f01bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files 4.0\secure">
+      <UniqueIdentifier>{730a8fe3-b1b9-40ea-9e75-0481792fac71}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="framework\src\gmsec\c\config.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\config_c.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\configfile.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\configfile_c.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\connection.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\connection_c.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\connection_factory.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\connection_factory_c.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\field.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\field_c.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\message.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\message_c.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\status.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\c\status_c.cpp">
+      <Filter>Source Files\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\Config.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\ConfigFile.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\ConfigFileIterator.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\Connection.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\ConnectionFactory.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\Field.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\FieldIterator.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\Message.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\Status.cpp">
+      <Filter>Source Files\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\mist\ConnectionManager.cpp">
+      <Filter>Source Files\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\AbstractFieldIterator.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\API4_Adapter.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\BaseConfig.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\BaseConfigFile.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\BaseField.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\BaseStatus.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\DynamicFactory.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\fileutil.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\GarbageCollector.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\InternalAtomics.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\InternalConnection.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\InternalMessage.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mathutil.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\MessageBuddy.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\MessageFieldMap.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\SimpleConfigFileIterator.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\SimpleFieldIterator.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\StatusException.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\strutil.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\Subject.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\TrackingDetails.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\UniqueFilter.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\Value.cpp">
+      <Filter>Source Files\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\AbstractBaseFieldDescriptor.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\AbstractFieldDescriptor.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\BaseCompoundFieldDescriptor.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\BaseConnectionManager.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\BaseContext.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\BaseMessageTemplate.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\BaseSpecification.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\CompoundFieldDescriptor.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\ConnMgrCallbackCache.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\ConnMgrCallbacks.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\Context.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\DescriptorList.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\HeartbeatService.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\MessageTemplate.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\internal\mist\Specification.cpp">
+      <Filter>Source Files\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\Atomics.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\Condition.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\CountDownLatch.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\Encoder.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\Log.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\log_c.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\Mutex.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\StdThread.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\String.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\sysutil.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\Thread.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\timeutil.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\util\timeutil_c.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\secure\Access.cpp">
+      <Filter>Source Files\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\secure\Cipher.cpp">
+      <Filter>Source Files\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\secure\MersenneTwister.cpp">
+      <Filter>Source Files\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\secure\Policy.cpp">
+      <Filter>Source Files\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\secure\Random.cpp">
+      <Filter>Source Files\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec\secure\Signer.cpp">
+      <Filter>Source Files\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\support\src\jsoncpp.cpp">
+      <Filter>Source Files\support</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\support\src\miniz.cpp">
+      <Filter>Source Files\support</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\support\src\tinyxml2.cpp">
+      <Filter>Source Files\support</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\Config.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\ConfigFile.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\ConfigFileIterator.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\Connection.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\Exception.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\Message.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\MessageFieldIterator.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\Status.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\SubscriptionInfo.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\ConnectionManager.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\Device.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\DeviceIterator.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\DeviceMessage.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\DeviceParam.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\Mnemonic.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\MnemonicIterator.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\MnemonicMessage.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\MnemonicSample.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\ProductFile.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\ProductFileIterator.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\ProductFileMessage.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\SchemaIDIterator.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\ServiceParam.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\Specification.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\SubscriptionInfo.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\message\DeviceMessage.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\message\MistMessage.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\message\MnemonicMessage.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\message\ProductFileMessage.cpp">
+      <Filter>Source Files 4.0\C++ API\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\BinaryField.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\BooleanField.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\CharField.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\F32Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\F64Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\I16Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\I32Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\I64Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\I8Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\StringField.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\U16Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\U32Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\U64Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\field\U8Field.cpp">
+      <Filter>Source Files 4.0\C++ API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\ActiveSubscriptions.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\AsyncPublisher.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\CallbackAdapter.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\CallbackLookup.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\ConnectionFactory.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\Dispatcher.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\DynamicFactory.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\Encoder.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\ExclusionFilter.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\FileUtil.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalAtomics.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalAutoDispatcher.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalConfig.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalConfigFile.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalConfigFileIterator.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalConnection.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalException.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalMessage.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalMessageFieldIterator.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalStatus.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalSubscriptionInfo.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\MathUtil.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\MessageAggregationToolkit.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\Middleware.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\MsgFieldMap.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\RequestThread.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\StringUtil.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\Subject.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\SubscriptionDetails.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\SystemUtil.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\TicketMutex.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\TrackingDetails.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\UniqueFilter.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\Value.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\ConnMgrCallbackCache.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\ConnMgrCallbacks.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\FieldTemplate.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\HeartbeatService.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalConnectionManager.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalDeviceIterator.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalDeviceParam.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalMnemonic.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalMnemonicIterator.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalMnemonicSample.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalProductFile.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalProductFileIterator.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalSchemaIDIterator.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalServiceParam.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalSpecification.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalSubscriptionInfo.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\MessagePopulator.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\MessageSubclassHelper.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\MessageTemplate.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\MistCallbackAdapter.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\ResourceInfoGenerator.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\ResourceService.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\SchemaTemplate.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\message\InternalDeviceMessage.cpp">
+      <Filter>Source Files 4.0\internal\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\message\InternalMistMessage.cpp">
+      <Filter>Source Files 4.0\internal\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\message\InternalMnemonicMessage.cpp">
+      <Filter>Source Files 4.0\internal\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\message\InternalProductFileMessage.cpp">
+      <Filter>Source Files 4.0\internal\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalBinaryField.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalBooleanField.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalCharField.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalF32Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalF64Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalField.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalI16Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalI32Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalI64Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalI8Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalStringField.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalU16Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalU32Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalU64Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\field\InternalU8Field.cpp">
+      <Filter>Source Files 4.0\internal\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\performance\PerformanceLogger.cpp">
+      <Filter>Source Files 4.0\internal\performance</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\util\InternalLog.cpp">
+      <Filter>Source Files 4.0\internal\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\util\InternalLoggerStream.cpp">
+      <Filter>Source Files 4.0\internal\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\util\InternalLogStream.cpp">
+      <Filter>Source Files 4.0\internal\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\Atomics.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\Condition.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\CountDownLatch.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\Log.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\LoggerStream.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\LogStream.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\Mutex.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\StdThread.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\util\TimeUtil.cpp">
+      <Filter>Source Files 4.0\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\config.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\config_file.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\config_file_iterator.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\connection.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\message.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\message_field_iterator.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\status.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\subscription_info.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\binary_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\boolean_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\char_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\f32_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\f64_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\i16_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\i32_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\i64_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\i8_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\string_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\u16_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\u32_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\u64_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\field\u8_field.cpp">
+      <Filter>Source Files 4.0\C API\field</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\connection_manager.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\device.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\device_iterator.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\device_param.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\mnemonic.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\mnemonic_iterator.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\mnemonic_sample.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\product_file.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\product_file_iterator.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\schema_id_iterator.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\service_param.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\specification.cpp">
+      <Filter>Source Files 4.0\C API\mist</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\message\device_message.cpp">
+      <Filter>Source Files 4.0\C API\mist\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\message\mist_message.cpp">
+      <Filter>Source Files 4.0\C API\mist\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\message\mnemonic_message.cpp">
+      <Filter>Source Files 4.0\C API\mist\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\mist\message\product_file_message.cpp">
+      <Filter>Source Files 4.0\C API\mist\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\util\log.cpp">
+      <Filter>Source Files 4.0\C API\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\util\timeutil.cpp">
+      <Filter>Source Files 4.0\C API\util</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\secure\Access.cpp">
+      <Filter>Source Files 4.0\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\secure\Cipher.cpp">
+      <Filter>Source Files 4.0\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\secure\MersenneTwister.cpp">
+      <Filter>Source Files 4.0\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\secure\Policy.cpp">
+      <Filter>Source Files 4.0\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\secure\Random.cpp">
+      <Filter>Source Files 4.0\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\secure\Signer.cpp">
+      <Filter>Source Files 4.0\secure</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\c\heartbeat_generator.cpp">
+      <Filter>Source Files 4.0\C API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\HeartbeatGenerator.cpp">
+      <Filter>Source Files 4.0\C++ API</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\InternalHeartbeatGenerator.cpp">
+      <Filter>Source Files 4.0\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalFieldSpecification.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalMessageSpecification.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\FieldSpecification.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\mist\MessageSpecification.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\InternalDevice.cpp">
+      <Filter>Source Files 4.0\internal\MIST\message</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\util\InternalCondition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\util\InternalMutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\CustomMessageValidator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\FieldTemplateDependency.cpp">
+      <Filter>Source Files 4.0\internal\MIST</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework\include\gmsec\c\config.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\config_c.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\configfile.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\configfile_c.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\connection.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\connection_c.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\connection_factory.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\connection_factory_c.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\field.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\field_c.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec_c.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\message.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\message_c.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="SMU_errors.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\status.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\c\status_c.h">
+      <Filter>Header Files\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\Callback.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\Config.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\ConfigFile.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\ConfigFileIterator.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\Connection.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\ConnectionFactory.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\ErrorCallback.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\Field.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\FieldIterator.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec_cpp.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\Message.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\ReplyCallback.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\Status.h">
+      <Filter>Header Files\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\mist\ConnectionManager.h">
+      <Filter>Header Files\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\mist\ConnectionManagerCallback.h">
+      <Filter>Header Files\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\mist\ConnectionManagerErrorCallback.h">
+      <Filter>Header Files\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\mist\ConnectionManagerReplyCallback.h">
+      <Filter>Header Files\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\mist\MIST_errors.h">
+      <Filter>Header Files\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\AbstractFieldIterator.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\API4_Adapter.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\BaseConfig.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\BaseConfigFile.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\BaseField.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\BaseStatus.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\ci_less.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\DynamicFactory.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\ExecutorService.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\fileutil.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\Future.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\GarbageCollector.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\InternalAtomics.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\InternalConnection.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\InternalMessage.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\support\include\json.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\Log.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mathutil.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\MessageBuddy.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\MessageFieldMap.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\rawbuf.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\SimpleConfigFileIterator.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\SimpleFieldIterator.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\StatusException.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\strutil.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\Subject.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\TrackingDetails.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\UniqueFilter.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\Value.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\AbstractBaseFieldDescriptor.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\AbstractFieldDescriptor.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\BaseCompoundFieldDescriptor.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\BaseConnectionManager.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\BaseContext.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\BaseMessageTemplate.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\BaseSimpleFieldDescriptor.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\BaseSpecification.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\CompoundFieldDescriptor.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\ConnMgrCallbackCache.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\ConnMgrCallbacks.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\Context.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\DefaultMessageSchemas.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\DescriptorList.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\FieldAccessTemplate.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\HeartbeatService.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\MessageTemplate.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\SimpleFieldDescriptor.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\internal\mist\Specification.h">
+      <Filter>Header Files\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\Atomics.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\BoundedQueue.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\ConcurrentMap.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\Condition.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\CountDownLatch.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\Deprecated.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\Encoder.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\gshared_ptr.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\hp_bug.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\List.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\Log.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\log_c.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\Mutex.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\Random.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\StdThread.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\String.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\sysutil.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\Thread.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\timeutil.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\timeutil_c.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\util\wdllexp.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\secure\Access.h">
+      <Filter>Header Files\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\secure\Cipher.h">
+      <Filter>Header Files\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\secure\Policy.h">
+      <Filter>Header Files\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\secure\Random.h">
+      <Filter>Header Files\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec\secure\Signer.h">
+      <Filter>Header Files\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\Callback.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\Config.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\ConfigFile.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\ConfigFileIterator.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\Connection.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\Errors.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\EventCallback.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\Exception.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\Fields.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\Message.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\MessageFieldIterator.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\ReplyCallback.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\Status.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\SubscriptionInfo.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\ConnectionManager.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\ConnectionManagerCallback.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\ConnectionManagerEventCallback.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\ConnectionManagerReplyCallback.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\Device.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\DeviceIterator.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\DeviceMessage.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\DeviceParam.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\mist_defs.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\Mnemonic.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\MnemonicIterator.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\MnemonicMessage.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\MnemonicSample.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\ProductFile.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\ProductFileIterator.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\ProductFileMessage.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\SchemaIDIterator.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\ServiceParam.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\Specification.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\SubscriptionInfo.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\message\DeviceMessage.h">
+      <Filter>Header Files 4.0\C++ API\MIST\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\message\MistMessage.h">
+      <Filter>Header Files 4.0\C++ API\MIST\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\message\MnemonicMessage.h">
+      <Filter>Header Files 4.0\C++ API\MIST\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\message\ProductFileMessage.h">
+      <Filter>Header Files 4.0\C++ API\MIST\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\BinaryField.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\BooleanField.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\CharField.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\F32Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\F64Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\I16Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\I32Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\I64Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\I8Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\StringField.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\U16Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\U32Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\U64Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\field\U8Field.h">
+      <Filter>Header Files 4.0\C++ API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\ActiveSubscriptions.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\AsyncPublisher.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\CallbackAdapter.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\CallbackLookup.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\ci_less.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\ConnectionBuddy.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\ConnectionFactory.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\Dispatcher.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\DynamicFactory.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\Encoder.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\ExclusionFilter.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\FileUtil.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\GMSECadapter.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalAtomics.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalAutoDispatcher.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalConfig.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalConfigFile.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalConfigFileIterator.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalConnection.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalException.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalMessage.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalMessageFieldIterator.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalStatus.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalSubscriptionInfo.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\JMS.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\JNI.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\json-forwards.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\MathUtil.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\MessageAggregationToolkit.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\MessageBuddy.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\Middleware.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\MsgFieldMap.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\Rawbuf.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\RequestSpecs.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\RequestThread.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\StringUtil.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\Subject.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\SubscriptionDetails.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\SystemUtil.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\TicketMutex.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\tinyxml2.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\TrackingDetails.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\UniqueFilter.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\Value.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalBinaryField.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalBooleanField.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalCharField.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalF32Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalF64Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalField.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalI16Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalI32Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalI64Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalI8Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalStringField.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalU16Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalU32Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalU64Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\field\InternalU8Field.h">
+      <Filter>Header Files 4.0\internal\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\ConnMgrCallbackCache.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\ConnMgrCallbacks.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\FieldTemplate.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\HeartbeatService.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalConnectionManager.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalDevice.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalDeviceIterator.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalDeviceParam.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalMnemonic.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalMnemonicIterator.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalMnemonicSample.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalProductFile.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalProductFileIterator.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalSchemaIDIterator.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalServiceParam.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalSpecification.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalSubscriptionInfo.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\MessagePopulator.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\MessageSubclassHelper.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\MessageTemplate.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\MistCallbackAdapter.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\ResourceInfoGenerator.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\ResourceService.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\SchemaTemplate.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\SpecificationBuddy.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\message\InternalDeviceMessage.h">
+      <Filter>Header Files 4.0\internal\MIST\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\message\InternalMistMessage.h">
+      <Filter>Header Files 4.0\internal\MIST\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\message\InternalMnemonicMessage.h">
+      <Filter>Header Files 4.0\internal\MIST\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\message\InternalProductFileMessage.h">
+      <Filter>Header Files 4.0\internal\MIST\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\performance\PerformanceLogger.h">
+      <Filter>Header Files 4.0\internal\performance</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\util\InternalLog.h">
+      <Filter>Header Files 4.0\internal\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\util\InternalLoggerStream.h">
+      <Filter>Header Files 4.0\internal\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\util\InternalLogStream.h">
+      <Filter>Header Files 4.0\internal\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\Atomics.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\BoundedQueue.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\Buffer.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\Condition.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\CountDownLatch.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\DataList.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\Deprecated.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\List.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\Log.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\LoggerStream.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\LogHandler.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\LogStream.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\Mutex.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\StdSharedPtr.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\StdThread.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\TimeUtil.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\wdllexp.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\config.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\config_file.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\config_file_iterator.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\connection.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\errors.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\fields.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\message.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\message_field_iterator.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\status.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\subscription_info.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\binary_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\boolean_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\char_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\f32_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\f64_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\i16_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\i32_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\i64_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\i8_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\string_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\u16_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\u32_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\u64_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\field\u8_field.h">
+      <Filter>Header Files 4.0\C API\field</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\connection_manager.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\device.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\device_iterator.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\device_message.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\device_param.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\mist_defs.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\mnemonic.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\mnemonic_iterator.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\mnemonic_message.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\mnemonic_sample.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\product_file.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\product_file_iterator.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\product_file_message.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\schema_id_iterator.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\service_param.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\specification.h">
+      <Filter>Header Files 4.0\C API\mist</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\message\device_message.h">
+      <Filter>Header Files 4.0\C API\mist\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\message\mist_message.h">
+      <Filter>Header Files 4.0\C API\mist\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\message\mnemonic_message.h">
+      <Filter>Header Files 4.0\C API\mist\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\mist\message\product_file_message.h">
+      <Filter>Header Files 4.0\C API\mist\message</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\util\log.h">
+      <Filter>Header Files 4.0\C API\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\util\timeutil.h">
+      <Filter>Header Files 4.0\C API\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\secure\Access.h">
+      <Filter>Header Files 4.0\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\secure\Cipher.h">
+      <Filter>Header Files 4.0\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\secure\Policy.h">
+      <Filter>Header Files 4.0\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\secure\Random.h">
+      <Filter>Header Files 4.0\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\secure\Signer.h">
+      <Filter>Header Files 4.0\secure</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\FieldSpecification.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\mist\MessageSpecification.h">
+      <Filter>Header Files 4.0\C++ API\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalFieldSpecification.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\InternalMessageSpecification.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\cxx.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\c\heartbeat_generator.h">
+      <Filter>Header Files 4.0\C API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\HeartbeatGenerator.h">
+      <Filter>Header Files 4.0\C++ API</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\InternalHeartbeatGenerator.h">
+      <Filter>Header Files 4.0\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\util\StdUniquePtr.h">
+      <Filter>Header Files 4.0\util</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\util\InternalCondition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\util\InternalMutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\util\MutexBuddy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\CustomMessageValidator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="framework\include\gmsec4\internal\mist\FieldTemplateDependency.h">
+      <Filter>Header Files 4.0\internal\MIST</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="buildscript.pl" />
+  </ItemGroup>
+</Project>

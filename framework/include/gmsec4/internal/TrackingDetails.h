@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -49,10 +49,6 @@ const char* const GMSEC_MSG_BEING_SENT = "GMSEC-MSG-BEING-SENT";
 class GMSEC_API TrackingDetails
 {
 private:
-	// Defined, but not implemented.
-	TrackingDetails(const TrackingDetails &);
-
-
 	int fTrackingFlag;
 	int fNodeFlag;
 	int fProcessIdFlag;
@@ -77,6 +73,12 @@ public:
 	 * @brief destructor
 	 */
 	~TrackingDetails();
+
+
+	/** @fn TrackingDetails(const TrackingDetails& other)
+	 * @brief Copy constructor
+	 */
+	TrackingDetails(const TrackingDetails& other);
 
 
 	/** @fn operator=()

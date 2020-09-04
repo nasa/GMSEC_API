@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -24,6 +24,7 @@
 
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
+using namespace gmsec::api::mist::message;
 using namespace gmsec::api::util;
 
 
@@ -43,6 +44,8 @@ private:
 
 	void sendReply(const Message& request, Message& reply);
 	void sendReply(const Message& request, const std::string& subject);
+
+	const char* getFieldValue(const Message& msg, const char* fieldName);
 
 	ConnectionManager* connMgr;
 	Subjects           subjects;
@@ -124,11 +127,14 @@ bool GMSEC_Reply::run()
 		//o Get info from command line
 		std::string msgFile        = get("MSG-FILE", "");
 		std::string cfgFile        = get("CFG-FILE", "");
-		int         msg_timeout_ms = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
-		int         prog_timeout_s = get("PROG-TIMEOUT-S", GMSEC_WAIT_FOREVER);
+		GMSEC_I32   msg_timeout_ms = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
+		GMSEC_I32   prog_timeout_s = get("PROG-TIMEOUT-S", GMSEC_WAIT_FOREVER);
+
+		unsigned int specVersion = connMgr->getSpecification().getVersion();
+		Specification::SchemaLevel schemaLevel = connMgr->getSpecification().getSchemaLevel();
 
 		//o Subscribe
-		determineSubjects(subjects);
+		determineSubjects(specVersion, schemaLevel, subjects);
 
 		//o Subscribe
 		for (size_t i = 0; i < subjects.size(); ++i)
@@ -176,7 +182,8 @@ bool GMSEC_Reply::run()
 					continue;
 				}
 
-				done = (std::string(message->getSubject()) == "GMSEC.TERMINATE");
+				done = (std::string(message->getSubject()) == "GMSEC.TERMINATE" ||
+				        std::string(message->getSubject()) == "C2MS.TERMINATE");
 
 				//o Display the XML representation of the received message
 				GMSEC_INFO << "Received:\n" << message->toXML();
@@ -210,14 +217,12 @@ bool GMSEC_Reply::run()
 					}
 					else
 					{
-						//o Set Status Code. See C2MS document for available status codes.
-						int status_code = 1; // 1 = Acknowledgement
-
-						std::ostringstream tmp;
-						tmp << message->getSubject() << "." << status_code;
-
-						reply_subject = tmp.str();
-						reply_subject.replace(reply_subject.find("REQ"), 4, "RESP.");
+						// Prepare response message subject
+						reply_subject = message->getSubject();
+						reply_subject.replace(reply_subject.find(".REQ."), 5, ".RESP.");
+						size_t comp_pos = reply_subject.find_last_of('.');
+						reply_subject = reply_subject.substr(0, comp_pos+1);
+						reply_subject += (message->hasField("COMPONENT") ? message->getStringValue("COMPONENT") : "FILL");
 					}
 
 					if (reply.get())
@@ -264,23 +269,89 @@ void GMSEC_Reply::sendReply(const Message& request, Message& reply)
 
 void GMSEC_Reply::sendReply(const Message& request, const std::string& subject)
 {
+	//o Get fields from request message that we will add to the reply message
+	const char* mission   = getFieldValue(request, "MISSION-ID");
+	const char* cnst      = getFieldValue(request, "CONSTELLATION-ID");
+	const char* satphys   = getFieldValue(request, "SAT-ID-PHYSICAL");
+	const char* satlog    = getFieldValue(request, "SAT-ID-LOGICAL");
+	const char* facility  = getFieldValue(request, "FACILITY");
+	const char* component = getFieldValue(request, "COMPONENT");
+	const char* msgID     = NULL;
+	const char* requestID = NULL;
+
+	if (connMgr->getSpecification().getVersion() == GMSEC_ISD_2014_00)
+	{
+		msgID = getFieldValue(request, "MSG-ID");
+	}
+	else if (connMgr->getSpecification().getVersion() >= GMSEC_ISD_2019_00)
+	{
+		requestID = getFieldValue(request, "REQUEST-ID");
+	}
+
+	//o Set Status Code. See C2MS document for available status codes.
+	GMSEC_I16 responseStatus = (GMSEC_I16) mist::ResponseStatus::ACKNOWLEDGEMENT;
+
+	std::ostringstream tmp;
+	tmp << subject << "." << responseStatus;
+
 	//o Create reply message
-	Message reply(subject.c_str(), Message::REPLY);
+	MistMessage reply(tmp.str().c_str(), "RESP.DIR", connMgr->getSpecification());
+
+    reply.setValue("MISSION-ID", (mission ? mission : "FILL"));
+    reply.setValue("CONSTELLATION-ID", (cnst ? cnst : "FILL"));
+    reply.setValue("SAT-ID-PHYSICAL", (satphys ? satphys : "FILL"));
+    reply.setValue("SAT-ID-LOGICAL", (satlog ? satlog : "FILL"));
+    reply.setValue("FACILITY", (facility ? facility : "FILL"));
+	reply.setValue("COMPONENT", "GMRPL");
+	reply.addField("RESPONSE-STATUS", responseStatus);
+
+	if (connMgr->getSpecification().getVersion() == GMSEC_ISD_2014_00)
+	{
+		reply.setValue("MSG-ID", (msgID ? msgID : "FILL"));
+	}
+	else if (connMgr->getSpecification().getVersion() >= GMSEC_ISD_2018_00)
+	{
+		const char* dom1 = getFieldValue(request, "DOMAIN1");
+		const char* dom2 = getFieldValue(request, "DOMAIN2");
+
+		reply.setValue("DOMAIN1", (dom1 ? dom1 : "FILL"));
+		reply.setValue("DOMAIN2", (dom2 ? dom2 : "FILL"));
+
+		if (connMgr->getSpecification().getVersion() >= GMSEC_ISD_2019_00)
+		{
+			reply.setValue("REQUEST-ID", (requestID ? requestID : "0"));
+
+			reply.setValue("DESTINATION-COMPONENT", (component ? component : "FILL"));
+		}
+	}
 
 	if (getConfig().getBooleanValue("ENCRYPT", false))
 	{
 		reply.addField("SEC-ENCRYPT", true);
 	}
 
-	//o Add fields to the reply message
-	reply.addField("COMPONENT", "GMRPL");
-	reply.addField("ANSWER", "Sure looks like it!");
-
 	//o Display XML representation of the reply message
 	GMSEC_INFO << "Prepared Reply:\n" << reply.toXML();
 
 	//o Send Reply
 	connMgr->reply(request, reply);
+}
+
+
+const char* GMSEC_Reply::getFieldValue(const Message& msg, const char* fieldName)
+{
+	const char* value;
+
+	try
+	{
+		value = msg.getStringValue(fieldName);
+	}
+	catch (...)
+	{
+		value = NULL;
+	}
+
+	return value;
 }
 
 

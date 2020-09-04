@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -65,8 +65,8 @@ public class ProductFileMessage : MistMessage {
   ///
   /// <param name="subject">The subject string for the message.</param>
   /// <param name="status">RESPONSE-STATUS field to insert into a MSG PROD message.</param>
-  /// <param name="schemaID">The string used to identify the message schema in the GMSEC ISD. The schema ID has the
-  ///                        format of: messageKind.messageType.messageSubtype (e.g. MSG.PROD.AUTO).</param>
+  /// <param name="schemaID">The string used to identify the message schema in C2MS or other message specification. The schema ID has the
+  ///                        format of: messageKind.messageType.messageSubtype (e.g. MSG.PROD).</param>
   /// <param name="spec">A reference to the specification this message's schema will adhere to.</param>
   ///
   /// <exception cref="GmsecException">Thrown if subject is null or contains an empty string.</exception>
@@ -78,8 +78,8 @@ public class ProductFileMessage : MistMessage {
   ///
   /// <param name="subject">The subject string for the message.</param>
   /// <param name="responseStatus">RESPONSE-STATUS field to insert into a MSG PROD message.</param>
-  /// <param name="schemaID">The string used to identify the message schema in the GMSEC ISD. The schema ID has the
-  ///                        format of: messageKind.messageType.messageSubtype (e.g. MSG.PROD.AUTO).</param>
+  /// <param name="schemaID">The string used to identify the message schema in C2MS or other message specification. The schema ID has the
+  ///                        format of: messageKind.messageType.messageSubtype (e.g. MSG.PROD).</param>
   /// <param name="config">A configuration to associate with the message.</param>
   /// <param name="spec">A reference to the specification this message's schema will adhere to.</param>
   ///

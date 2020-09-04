@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,7 +30,7 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMistMessage;
 
 
 /**
- * The DeviceMessage object is an extension of Message, and serves as a container for a GMSEC C2CX Device Message.
+ * The DeviceMessage object is an extension of Message, and serves as a container for a C2CX Device Message.
  * The methods of this class allow for the construction and manipulation of the data within the message.
  *
  * @see Message

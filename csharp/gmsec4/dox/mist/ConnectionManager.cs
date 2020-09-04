@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -117,6 +117,24 @@ public class ConnectionManager : global::System.IDisposable {
   }
 
   /// <summary>
+  /// This method will allow for a user to register their custom subclass of the
+  /// Specification class with the Connection Manager.  This custom Specification can
+  /// implement its own validateMessage() method which can be used to perform validation
+  /// of messages currently not performed by the GMSEC API.
+  /// <p>
+  /// Note the API does not assume ownership of the provided Specification object, nor
+  /// does it make a copy of such. The user is responsible to ensure that
+  /// the provided Specification object is not destroyed while the ConnectionManager is
+  /// in possession of such.
+  /// </summary>
+  ///
+  /// <param name="spec">A specialized subclass of the Specification class</param>
+  ///
+  /// <exception cref="GmsecException">Thrown if the given Specification object is null</exception>
+  public void SetSpecification(Specification spec) {
+  }
+
+  /// <summary>
   /// Sets the internal list of fields that are added to all messages that are created
   /// using the ConnectionManager.
   /// <p>
@@ -125,20 +143,20 @@ public class ConnectionManager : global::System.IDisposable {
   /// validation occurs at the time a message is to be published.
   /// </summary>
   ///
-  /// <param name="standarfields">The list of fields to set as standard fields</param>
-  public void SetStandarfields(FieldList standarfields) {
+  /// <param name="standardFields">The list of fields to set as standard fields</param>
+  public void SetStandardFields(FieldList standardFields) {
   }
 
   /// <summary>
   /// Returns the list of standard fields that are associated with the Connection Manager.
   /// </summary>
-  public FieldList GetStandarfields() {
+  public FieldList GetStandardFields() {
   }
 
   /// <summary>Adds the standard fields (if any) to the given Message object.</summary>
   ///
   /// <param name="msg">The message in which to add the standard fields</param>
-  public void AddStandarfields(Message msg) {
+  public void AddStandardFields(Message msg) {
   }
 
   /// <summary>Registers the given callback for the specified event.</summary>
@@ -255,19 +273,23 @@ public class ConnectionManager : global::System.IDisposable {
   }
 
   /// <summary>
-  /// If this connection manager has been created with "validate"
-  /// option disabled, this is a pass-through function to the underlying connection.
-  /// Otherwise the message will be validated before it is published.  The given
-  /// configuration object is applied to the message.
+  /// Publishes the given message to the middleware using the given configuration to enable or disable
+  /// certain middleware-level publish methodalities (e.g. ActiveMQ - Durable Producer). Message will
+  //  still be validated if message validation is enabled.
+  /// <note type="note">
+  /// The actual Message published to the middleware will contain tracking fields;
+  /// to disable this feature, create a ConnectionManager object with the tracking=off
+  /// configuration option.
+  /// </note>
   /// </summary>
   ///
   /// <param name="msg">The message to publish</param>
-  /// <param name="config">The configuration object to be used by the publish operation</param>
+  /// <param name="mwConfig">The configuration object for providing middleware configuration options</param>
   ///
   /// <exception cref="GmsecException">Thrown if message is non-PUBLISH kind of message.</exception>
   /// <exception cref="GmsecException">Thrown if message fails validation.</exception>
   /// <exception cref="GmsecException">Thrown if a middleware error occurs.</exception>
-  public void Publish(Message msg, Config config) {
+  public void Publish(Message msg, Config mwConfig) {
   }
 
   /// <summary>
@@ -489,11 +511,11 @@ public class ConnectionManager : global::System.IDisposable {
   /// <summary>
   /// This method creates a message and passes ownership to the user. This message is populated with
   /// the standard set of required and optional heartbeat fields, as well as the required common fields defined
-  /// in SetStandarfields(). If validation is enabled for this ConnectionManager and neither the common fields
-  /// from SetStandarfields(), nor the fields supplied in the first argument of this function are sufficient to
+  /// in SetStandardFields(). If validation is enabled for this ConnectionManager and neither the common fields
+  /// from SetStandardFields(), nor the fields supplied in the first argument of this function are sufficient to
   /// complete a set of fields required by validation, an error will be returned.
   /// <p>
-  /// MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
+  /// MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and
   /// added to the message automatically, according to the GMSEC Message Standard
   /// </summary>
   ///
@@ -553,7 +575,7 @@ public class ConnectionManager : global::System.IDisposable {
   /// <summary>
   /// This method creates a Log Message and passes ownership to the user. This message is populated
   /// with the standard set of required and optional log fields, as well as the required common fields
-  /// defined in SetStandarfields. The message is not validated at this time, as MSG-TEXT and SEVERITY
+  /// defined in SetStandardFields. The message is not validated at this time, as MSG-TEXT and SEVERITY
   /// fields must be set by the user at the time the message is to be sent.
   /// <p>
   /// This message automatically is generated with MESSAGE-TYPE and MESSAGE-SUBTYPE

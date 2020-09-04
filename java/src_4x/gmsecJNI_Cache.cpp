@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -35,6 +35,8 @@ void Cache::initialize(JNIEnv* jenv)
 
 	jclass clazz;
 
+	//Note: Method signatures acquired using javap -s <classfile>
+
 	// gov.nasa.gsfc.gmsec.api.Callback initialization
 	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/Callback");
 	methodCallbackOnMessage = getMethod(jenv, clazz, "onMessage", "(Lgov/nasa/gsfc/gmsec/api/Connection;Lgov/nasa/gsfc/gmsec/api/Message;)V");
@@ -50,6 +52,10 @@ void Cache::initialize(JNIEnv* jenv)
 	methodReplyCallbackOnReply = getMethod(jenv, clazz, "onReply", "(Lgov/nasa/gsfc/gmsec/api/Connection;Lgov/nasa/gsfc/gmsec/api/Message;Lgov/nasa/gsfc/gmsec/api/Message;)V");
     fieldReplyCallbackJNIConnection = getFieldID(jenv, clazz, "m_jniConnection", "Lgov/nasa/gsfc/gmsec/api/jni/JNIConnection;");
 
+	// gov.nasa.gsfc.gmsec.api.mist.MessageValidator initialization
+	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/mist/MessageValidator");
+	methodMessageValidatorValidateMessage = getMethod(jenv, clazz, "validateMessage", "(Lgov/nasa/gsfc/gmsec/api/Message;)Lgov/nasa/gsfc/gmsec/api/Status;");
+
 	// gov.nasa.gsfc.gmsec.api.jni.JNIConnection initialization
 	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/jni/JNIConnection");
 	classJNIConnection = clazz;
@@ -60,7 +66,25 @@ void Cache::initialize(JNIEnv* jenv)
 	// gov.nasa.gsfc.gmsec.api.jni.JNIStatus initialization
 	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/jni/JNIStatus");
 	classJNIStatus = clazz;
-	methodStatusInitIJString = getMethod(jenv, clazz, "<init>", "(IILjava/lang/String;I)V");
+	methodStatusInitIJString  = getMethod(jenv, clazz, "<init>", "(IILjava/lang/String;I)V");
+
+	// gov.nasa.gsfc.gmsec.api.Status initialization
+	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/Status");
+	classStatus = clazz;
+    methodStatusGetClass      = getMethod(jenv, clazz, "getClassification", "()Lgov/nasa/gsfc/gmsec/api/StatusClassification;");
+    methodStatusGetCode       = getMethod(jenv, clazz, "getCode", "()Lgov/nasa/gsfc/gmsec/api/StatusCode;");
+    methodStatusGetReason     = getMethod(jenv, clazz, "getReason", "()Ljava/lang/String;");
+    methodStatusGetCustomCode = getMethod(jenv, clazz, "getCustomCode", "()I");
+
+    // gov.nasa.gsfc.gmsec.api.StatusClassification references
+	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/StatusClassification");
+	classStatusClass = clazz;
+    methodStatusClassGetValue = getMethod(jenv, clazz, "getValue", "()I");
+
+    // gov.nasa.gsfc.gmsec.api.StatusCode references
+	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/StatusCode");
+	classStatusCode = clazz;
+    methodStatusCodeGetValue = getMethod(jenv, clazz, "getValue", "()I");
 
 	// gov.nasa.gsfc.gmsec.api.jni.JNIMessage initialization
 	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/jni/JNIMessage");

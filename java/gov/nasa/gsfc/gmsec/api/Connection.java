@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -600,15 +600,15 @@ public class Connection
 
 
 	/**
-	 * Publishes a message to the middleware bus using the config object provided to toggle
-	 * between special middleware-level publish functionalities (e.g. ActiveMQ - Durable Producer).
+	 * Publishes the given message to the middleware using the given configuration to enable or disable 
+	 * certain middleware-level publish functionalities (e.g. ActiveMQ - Durable Producer).
 	 * <p>
 	 * Note: The actual Message published to the middleware will contain tracking fields;
 	 * to disable this feature, create a Connection object with the tracking=off
 	 * configuration option.
 	 *
 	 * @param msg Message to be published
-	 * @param config Config object to be used by the publish operation
+	 * @param mwConfig Config object for providing middleware configuration options
 	 *
 	 * @throws IllegalArgumentException Thrown if either the given Message or Config objects are null.
 	 * @throws GMSEC_Exception Thrown if an error occurs while attempting to publish the message.
@@ -616,18 +616,18 @@ public class Connection
 	 * @see Connection#subscribe(String)
 	 * @see Connection#receive()
 	 */
-	public void publish(Message msg, Config config) throws IllegalArgumentException, GMSEC_Exception
+	public void publish(Message msg, Config mwConfig) throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (msg == null)
 		{
 			throw new IllegalArgumentException("Message is null");
 		}
-		if (config == null)
+		if (mwConfig == null)
 		{
 			throw new IllegalArgumentException("Config is null");
 		}
 
-		m_jniConnection.publish(msg, config);
+		m_jniConnection.publish(msg, mwConfig);
 	}
 
 

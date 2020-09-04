@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,16 +39,22 @@ public class gmsecMIST
 	public final static int GMSEC_ISD_2016_00 = 201600;
 
 	/**
-	 * 2018 version of the GMSEC Interface Specification Document (ISD)
+	 * 2018 version of the Command and Control Message Specification (C2MS)
 	 * for use with ConnectionManager.
 	 */
 	public final static int GMSEC_ISD_2018_00 = 201800;
 
 	/**
-	 * Default version of the GMSEC Interface Specification Document (ISD)
+	 * 2019 version of the Command and Control Message Specification (C2MS)
 	 * for use with ConnectionManager.
 	 */
-	public final static int GMSEC_ISD_CURRENT = GMSEC_ISD_2018_00;
+	public final static int GMSEC_ISD_2019_00 = 201900;
+
+	/**
+	 * Default version
+	 * for use with ConnectionManager.
+	 */
+	public final static int GMSEC_ISD_CURRENT = GMSEC_ISD_2019_00;
 
 
 	/**

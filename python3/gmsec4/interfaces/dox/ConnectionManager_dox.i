@@ -178,9 +178,9 @@
     of this method are sufficient to complete a set of fields
     required by validation, an error will be returned.
 
-    MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be
+    MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be
     generated and added to the message automatically, according to the
-    GMSEC Message Standard.
+    C2MS message standard.
 
     Note: When the user done with the message, they should destroy it
     using release.
@@ -252,17 +252,21 @@
 
 
 
-    publish(self, msg: Message, config: Config)
+    publish(self, msg: Message, mwConfig: Config)
 
-    If this connection manager has been created with \"validate\"
-    option disabled, this is a pass-through method to the underlying
-    connection. Otherwise the message will be validated before it is
-    published. The given Config is applied to the message.
+    Publishes the given message to the middleware
+    using the given configuration to enable or disable certain middleware-level
+    publish functionalities (e.g. ActiveMQ - Durable Producer). Message will still
+    be validated if message validation is enabled.
+
+    Note: The actual Message published to the middleware will contain
+    tracking fields; to disable this feature, create a ConnectionManager
+    with the tracking=off configuration option.
 
     Parameters
     ----------
-    msg    : The Message to be published
-    config : Config to be used by the publish operation
+    msg      : The Message to be published
+    mwConfig : Config object for providing middleware configuration options
 
     Exceptions
     ----------
@@ -729,20 +733,43 @@
 
 ";
 
+%feature("docstring") gmsec::api::mist::ConnectionManager::setSpecification "
+
+    set_specification(self, spec: Specification) -> void
+
+    This method will allow for a user to register their custom subclass of the
+    Specification class with the Connection Manager. This custom Specification can
+    implement its own validateMessage() method which can be used to perform validation
+    of messages currently not performed by the GMSEC API.
+
+    Note: The API does not assume ownership of the provided Specification object, nor
+    does it make a copy of such. The user is responsible to ensure that the provided
+    Specification object is not destroyed while the ConnectionManager is in possession
+    of such.
+
+    Parameters
+    ----------
+    spec: A specialized subclass of the Specification class.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the given Specification is null.
+
+";
+
 %feature("docstring") gmsec::api::mist::ConnectionManager::setStandardFields "
 
     set_standard_fields(self, standardFields: FieldList)
 
-    Sets the internal list of fields which are to be automatically
-    placed in all messages sent by this ConnectionManager. Internal
-    copies of the Fields are made, ownership is not retained by the
+    Sets the internal list of fields that are added to all messages
+    created using the ConnectionManager. Internal
+    copies of the Fields are made, thus ownership is not retained by the
     ConnectionManager. The supplied set of fields will not be validated
     here; validation occurs at the time a message is to be published.
 
     Parameters
     ----------
-    standardFields : FieldList of fields to be copied to the internal set
-                     of fields, which will in turn be appended to all messages.
+    standardFields : FieldList of fields to be set as standard fields
 
 ";
 
@@ -1031,9 +1058,9 @@
     defined, the service will default to the GMSEC standard 30 second
     heartbeat interval.
 
-    MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be
+    MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be
     generated and added to the message automatically, according to the
-    GMSEC Message Standard
+    C2MS Message Standard
 
     Parameters
     ----------

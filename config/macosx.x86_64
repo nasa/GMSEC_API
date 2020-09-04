@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -39,11 +39,11 @@ DLINK      = $(CXX) $(OPT_LIBCPP) -arch x86_64 -dynamiclib
 SHLIB_EXT  = dylib
 JSHLIB_EXT = jnilib
 
+CXX_INCS   = /Library/Developer/CommandLineTools/usr/include/c++/v1
+
 INCS       = -I$(GMSEC_HOME)/include \
              -I$(GMSEC_HOME)/framework/include \
-             -I$(GMSEC_HOME)/framework/support/include \
-             -I$(LIBXML2_HOME)/include/libxml2 \
-             -I$(LIBXSLT_HOME)/include
+             -I$(GMSEC_HOME)/framework/support/include
 
 # add COVERAGE for code coverage
 ifeq ($(COVERAGE),1)
@@ -54,15 +54,12 @@ endif
 CXXFLAGS = $(DEBUG_FLAGS) $(OPT_LIBCPP) -arch x86_64 $(COVERAGE) $(INCS)
 CFLAGS   = $(DEBUG_FLAGS) -arch x86_64 $(COVERAGE) $(INCS)
 
-LIBXML2_LIB = $(LIBXML2_HOME)/lib
-LIBXSLT_LIB = $(LIBXSLT_HOME)/lib
-
 # define api/example/test applications LDFLAGS
 LDFLAGS  = $(COVERAGE) -L$(BINDIR) -lGMSECAPI
 
 # define API API_CXXFLAGS and API_LDFLAGS
 API_CXXFLAGS = $(CXXFLAGS)
-API_LDFLAGS  = $(COVERAGE) -L$(LIBXML2_LIB) -lxml2 -L$(LIBXSLT_LIB) -lxslt
+API_LDFLAGS  = $(COVERAGE)
 
 # define linker flag for generic jms wrapper
 JLINK_FLAGS = $(COVERAGE) -framework JavaVM

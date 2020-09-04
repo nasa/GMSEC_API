@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,6 +30,14 @@ MIST-related enumerations and constants
 	2014 version of the GMSEC Interface Specification Document (ISD)
 
 =item libgmsec_perl::GMSEC_ISD_2016_00
+
+	2016 version of the GMSEC Interface Specification Document (ISD)
+
+=item libgmsec_perl::GMSEC_ISD_2018_00
+
+	2016 version of the GMSEC Interface Specification Document (ISD)
+
+=item libgmsec_perl::GMSEC_ISD_2019_00
 
 	2016 version of the GMSEC Interface Specification Document (ISD)
 
