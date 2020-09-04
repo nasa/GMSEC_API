@@ -1,0 +1,10 @@
+
+namespace std {
+
+/** @brief C++ standard library */
+template <class T> class auto_ptr {
+	T *p;
+};
+
+
+} // namespace std

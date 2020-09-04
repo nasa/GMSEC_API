@@ -1,0 +1,17 @@
+/* Copyright (c) 1991-2003 TIBCO Software Inc. */
+/* All rights reserved. */
+/* For more information, please contact: */
+/* TIBCO Software Inc., Palo Alto, California, USA */ 
+setopt command_feedback always
+/* setopt Server_Names            tcp:_node, tcp:extreme6.gsfc.nasa.gov*/
+
+setopt server_disconnect_mode warm
+setopt project	              rtworks
+
+setopt server_start_delay     0.0
+setopt server_write_timeout   1.0	
+setopt server_start_max_tries 1
+
+
+
+setopt Server_Max_Reconnect_Delay 0.0

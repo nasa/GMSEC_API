@@ -1,0 +1,29 @@
+158a159,162
+> #if 1
+> // GMSEC: moved header to miniz.h
+> #include <miniz.h>
+> #else
+926a931
+> #endif
+931a937
+> #if 0
+934a941
+> #endif
+938a946,947
+> namespace gmsec_miniz {
+> 
+952c961
+< #define MZ_MIN(a,b) (((a)<(b))?(a):(b))
+---
+> #define MZ_MIN(a,b) ((((int)a)<((int) b))?((int)a):((int)b))
+971,974d979
+< #ifdef __cplusplus
+<   extern "C" {
+< #endif
+< 
+4885,4887c4890
+< #ifdef __cplusplus
+< }
+< #endif
+---
+> } // namespace gmsec_miniz

@@ -1,0 +1,25 @@
+# Copyright 2007-2015  United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+ 
+#
+# GMSEC API - Build macros
+#
+
+MAKEFILE      = Makefile
+
+SUPPORT       = $(GMSEC_HOME)/../SUPPORT
+
+BASE_WRAPPERS = mb bolt generic_jms
+
+WRAPPERS      = $(BASE_WRAPPERS) $(MW_WRAPPERS) $(USER_WRAPPERS)
+
+SHLIB_EXT     = so
+JSHLIB_EXT    = so
+
+JAVA_BIN      = $(JDK_HOME)/bin
+
+# Uncomment the definition below if debugging of the API is required.
+#
+#DEBUG_FLAGS   = -g -O0

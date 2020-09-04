@@ -1,0 +1,55 @@
+# Copyright 2007-2015 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
+# Mac OS X x86-64 build configuration for GMSEC API
+
+# load the default macros
+include $(GMSEC_HOME)/config/default
+
+BINDIR      = $(GMSEC_HOME)/bin
+
+# Define java directories
+# Note: Apple and Oracle seem to continuously change the installation
+# directory of the JDK, along with the directory layout of such.
+# Users are advised to verify if the settings below are appropriate
+# for their particular system and installation of JDK.
+#
+JAVA_BIN    = $(JDK_HOME)/bin
+JAVA_INCS   = -I$(JDK_HOME)/include -I$(JDK_HOME)/include/darwin
+
+# Uncomment if using Mac OS X 10.8 (Mountain Lion) or later release.
+#
+OPT_STDCPP = -stdlib=libstdc++
+
+CXX        = g++
+CC         = gcc
+
+LINK       = $(CXX) $(OPT_STDCPP) -arch x86_64
+DLINK      = $(CXX) $(OPT_STDCPP) -arch x86_64 -dynamiclib
+SHLIB_EXT  = dylib
+JSHLIB_EXT = jnilib
+
+INCS       = -I$(GMSEC_HOME)/include \
+             -I$(GMSEC_HOME)/framework/include \
+             -I$(GMSEC_HOME)/framework/support/include
+
+# add COVERAGE for code coverage
+ifeq ($(COVERAGE),1)
+	COVERAGE = --coverage
+endif
+
+# define C/C++ compiler flags
+CXXFLAGS = $(DEBUG_FLAGS) $(OPT_STDCPP) -arch x86_64 $(COVERAGE) $(INCS)
+CFLAGS   = $(DEBUG_FLAGS) -arch x86_64 $(COVERAGE) $(INCS)
+
+# define api/example/test applications LDFLAGS
+LDFLAGS  = $(COVERAGE) -L$(BINDIR) -lGMSECAPI
+
+# define API API_CXXFLAGS and API_LDFLAGS
+API_CXXFLAGS = $(CXXFLAGS)
+API_LDFLAGS  = $(COVERAGE)
+
+# define linker flag for generic jms wrapper
+JLINK_FLAGS = $(COVERAGE) -framework JavaVM
