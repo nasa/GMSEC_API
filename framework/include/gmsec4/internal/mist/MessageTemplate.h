@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,7 +20,7 @@
 
 #include <gmsec4/internal/mist/FieldTemplate.h>
 
-#include <gmsec4/util/DataList.h>
+#include <list>
 
 
 namespace gmsec
@@ -45,7 +45,7 @@ class GMSEC_API MessageTemplate
 {
 public:
 	MessageTemplate();
-	MessageTemplate(const char* schemaID, const gmsec::api::util::DataList<FieldTemplate>& inputFields);
+	MessageTemplate(const char* schemaID, const std::list<FieldTemplate>& inputFields);
 	MessageTemplate(const MessageTemplate& other);
 
 	~MessageTemplate();
@@ -55,12 +55,11 @@ public:
 
 	//Looks for a FieldTemplate with a matching name and returns it as a FieldTemplate
 	const FieldTemplate& getFieldTemplate(const char* name);
-	const FieldTemplate& getFieldTemplate(size_t index);
 
 	const char* getID() const;
 
 	 //Returns the template's FieldTemplates as a GMSEC DataList
-	const gmsec::api::util::DataList<FieldTemplate>& listFieldTemplates() const;
+	const std::list<FieldTemplate>& listFieldTemplates() const;
 
 	//returns an xml that can put used for a message data constructor
 	const char* toXML(const char* subject);
@@ -68,12 +67,12 @@ public:
 private:
 	//helper function, takes a referenced list of FieldTemplates and stores them as a copy.
 	//the template is also assigned a new ID.
-	void setFieldTemplates(const char* schemaID, const gmsec::api::util::DataList<FieldTemplate>& inputFields);
+	void setFieldTemplates(const char* schemaID, const std::list<FieldTemplate>& inputFields);
 
 	//helper function, figure out the kind form the schema ID
 	Message::MessageKind findKind(const char* schemaID);
 
-	typedef gmsec::api::util::DataList<FieldTemplate> FieldTemplateList;
+	typedef std::list<FieldTemplate> FieldTemplateList;
 
 	FieldTemplateList m_fieldTemplates;
 	std::string		  m_id;

@@ -62,7 +62,7 @@
 	<FIELD  NAME="INPUT-FILE.n.FORMAT"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
-	        VALUE="1"
+	        VALUE=""
 	        TYPE="STRING"
 	        DESCRIPTION="Describes the file format."/>
 	<FIELD  NAME="INPUT-FILE.n.VERSION"

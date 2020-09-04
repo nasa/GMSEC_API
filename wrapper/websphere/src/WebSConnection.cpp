@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -584,22 +584,16 @@ WebSConnection::WebSConnection(const Config& config)
 	connectionRetryInterval(DEFAULT_CONN_RETRY_INTERVAL),
 	Hcon(0)
 {
-	std::string persist;
-	std::string threadSafeToggle;
 	std::string filterToggle;
 	std::string asyncPublish;
 	std::string checkAsyncStatus;
 
 	// Try to get the needed values out of the config object.
-	mwConfig(config, "threadSafe", threadSafeToggle);
-	mwConfig(config, "username", username);
-	mwConfig(config, "password", password);
 	mwConfig(config, "server", hostname);
+	mwConfig(config, "filter-dups", filterToggle);
 
-	mwConfig(config, "filter-dups", filterToggle, true);
 	mwConfig(config, "channel", channel, true);
 	mwConfig(config, "queuemanager", qmanager, true);
-	mwConfig(config, "persistent", persist, true);
 	mwConfig(config, "keystore", pKeyReposStem, true);
 	mwConfig(config, "cipher", pCipherSpec, true);
 	mwConfig(config, OPT_ASYNC_PUBLISH, asyncPublish);
@@ -714,11 +708,9 @@ WebSConnection::WebSConnection(const Config& config)
 		maxTopicHandles = 100;		
 	}
 
-	threadSafe = (threadSafeToggle.compare("yes") == 0);
-	useFilter  = (filterToggle.empty() || filterToggle.compare("yes") == 0);
-	persistent = (persist.empty() || persist.compare("yes") == 0);
-	connAsyncPublish = (!asyncPublish.empty() && asyncPublish.compare("true") == 0);
-	connCheckAsyncStatus = (!checkAsyncStatus.empty() && checkAsyncStatus.compare("true") == 0);
+	useFilter = filterToggle.empty() || StringUtil::stringEqualsIgnoreCase(filterToggle.c_str(), "yes");
+	connAsyncPublish = StringUtil::stringEqualsIgnoreCase(asyncPublish.c_str(), "true");
+	connCheckAsyncStatus = StringUtil::stringEqualsIgnoreCase(checkAsyncStatus.c_str(), "true");
 }
 
 
@@ -943,11 +935,11 @@ void WebSConnection::mwPublish(const Message& msg, const Config& config)
 {
 	std::string asyncPublish;
 	mwConfig(config, OPT_ASYNC_PUBLISH, asyncPublish);
-	bool pubAsyncPublish = (!asyncPublish.empty() && asyncPublish.compare("true") == 0);
+	bool pubAsyncPublish = (StringUtil::stringEqualsIgnoreCase(asyncPublish.c_str(), "true"));
 
 	std::string checkAsyncStatus;
 	mwConfig(config, OPT_ASYNC_STATUS_CHECK, checkAsyncStatus);
-	bool pubCheckAsyncStatus = (!checkAsyncStatus.empty() && checkAsyncStatus.compare("true") == 0);
+	bool pubCheckAsyncStatus = (StringUtil::stringEqualsIgnoreCase(checkAsyncStatus.c_str(), "true"));
 
 	ValueMap             meta;
 	Message::MessageKind kind    = msg.getKind();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -160,7 +160,7 @@ void JNIMistErrorCallback::OnError(gmsec::mist::ConnectionManager* connMgr, gmse
 		return;
 	}
 
-    jstring statusString = jenv->NewStringUTF(status->GetString());
+    jstring statusString = makeJavaString(jenv, status->GetString());
 
     if (!jvmOk(jenv, "JNIMistErrorCallback.OnError") || !statusString)
     {   
@@ -298,7 +298,7 @@ void JNIMistReplyCallback::OnError(gmsec::mist::ConnectionManager* connMgr, gmse
 		return;
 	}
 
-    jstring statusString = jenv->NewStringUTF(status->GetString());
+    jstring statusString = makeJavaString(jenv, status->GetString());
 
     if (!jvmOk(jenv, "JNIMistReplyCallback.OnError") || !statusString)
     {   
@@ -436,7 +436,7 @@ void JNIReplyCallback::OnError(gmsec::Connection* connection, gmsec::Message* me
 	jobject jCallback = Cache::getCache().getReplyCallback(this);
 	jmethodID errorMethod = Cache::getCache().methodErrorCallbackOnError;
 	jobject jConnection = Cache::getCache().getConnection(connection);
-	jstring statusString = jenv->NewStringUTF(status->GetString());
+	jstring statusString = makeJavaString(jenv, status->GetString());
 	if (!jvmOk(jenv, "JNIReplyCallback.OnError") || !statusString)
 	{
 		LOG_DEBUG << "JNIReplyCallback.OnError: Unable to create status jstring.";
@@ -535,8 +535,8 @@ void JNIErrorCallback::OnError(gmsec::Connection* connection, gmsec::Message* me
 		return;
 	}
 
-	jstring statusString = jenv->NewStringUTF(status->GetString());
-	if (!jvmOk(jenv, "JNIErrorCallback.OnError: NewStringUTF(status)") || !statusString)
+	jstring statusString = makeJavaString(jenv, status->GetString());
+	if (!jvmOk(jenv, "JNIErrorCallback.OnError: makeJavaString(jenv, status)") || !statusString)
 	{
 		LOG_DEBUG << "JNIErrorCallback: Unable to create status jstring.";
 		return;
@@ -579,7 +579,7 @@ void JNILogHandler::OnMessage(const gmsec::util::LogEntry& entry)
 	jenv->SetIntField(entryObj, Cache::getCache().fieldLogLevel_value, (jint) entry.level);
 	jenv->SetDoubleField(entryObj, Cache::getCache().fieldLogTime_value, (jdouble) entry.time);
 
-	jstring s = jenv->NewStringUTF(entry.message);
+	jstring s = makeJavaString(jenv, entry.message);
 	jenv->SetObjectField(entryObj, Cache::getCache().fieldLogMessage_value, s);
 	jenv->CallVoidMethod(jLogHandler, callbackMethod, entryObj);
 	jvmOk(jenv, "JNILogHandler.OnMessage");

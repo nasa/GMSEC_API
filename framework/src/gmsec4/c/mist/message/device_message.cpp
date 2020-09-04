@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -259,6 +259,34 @@ const GMSEC_Device CALL_TYPE deviceMessageGetDevice(const GMSEC_Message msg, siz
 	}
 
 	return device;
+}
+
+
+GMSEC_DeviceIterator CALL_TYPE deviceMessageGetIterator(GMSEC_Message msg, GMSEC_Status status)
+{
+	GMSEC_DeviceIterator iter = NULL;
+	Status               result;
+
+	const Message*       tmpMsg = reinterpret_cast<const Message*>(msg);
+	const DeviceMessage* devMsg = dynamic_cast<const DeviceMessage*>(tmpMsg);
+
+	if (devMsg)
+	{
+		DeviceIterator& devIter = devMsg->getDeviceIterator();
+
+		iter = &devIter;
+	}
+	else
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "DeviceMessage handle is NULL or is not a DeviceMessage");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return iter;
 }
 
 

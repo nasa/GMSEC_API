@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -111,7 +111,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1
 	{
 		const char* tmp = Connection::getAPIVersion();
 
-		jVersion = jenv->NewStringUTF(tmp);
+		jVersion = makeJavaString(jenv, tmp);
 
 		jvmOk(jenv, "Connection.getAPIVersion");
 	}
@@ -209,7 +209,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1
 		{
 			const char* name = conn->getLibraryRootName();
 
-			jName = jenv->NewStringUTF(name);
+			jName = makeJavaString(jenv, name);
 
 			jvmOk(jenv, "Connection.getLibraryRootName");
 		}
@@ -237,7 +237,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1
 		{
 			const char* version = conn->getLibraryVersion();
 
-			jVersion = jenv->NewStringUTF(version);
+			jVersion = makeJavaString(jenv, version);
 
 			jvmOk(jenv, "Connection.getLibraryVersion");
 		}
@@ -900,7 +900,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1
 		{
 			const char* tmp = conn->getName();
 
-			jName = jenv->NewStringUTF(tmp);
+			jName = makeJavaString(jenv, tmp);
 
 			jvmOk(jenv, "Connection.getName");
 		}
@@ -960,7 +960,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1
 		{
 			const char* tmp = conn->getID();
 
-			jID = jenv->NewStringUTF(tmp);
+			jID = makeJavaString(jenv, tmp);
 
 			jvmOk(jenv, "Connection.getID");
 		}
@@ -988,7 +988,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1
 		{
 			const char* tmp = conn->getMWInfo();
 
-			jInfo = jenv->NewStringUTF(tmp);
+			jInfo = makeJavaString(jenv, tmp);
 
 			jvmOk(jenv, "Connection.getMWInfo");
 		}

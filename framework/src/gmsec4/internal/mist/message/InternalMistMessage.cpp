@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -182,9 +182,9 @@ InternalMistMessage::InternalMistMessage(const char* data)
 	setSpecVersion(version);
 
 	//determine if there is an additional subtype
-	const DataList<SchemaTemplate>& directory = SpecificationBuddy::getInternal(*m_spec).getDirectory();
+	const std::list<SchemaTemplate>& directory = SpecificationBuddy::getInternal(*m_spec).getDirectory();
 
-	for(DataList<SchemaTemplate>::const_iterator it = directory.begin(); it != directory.end(); ++it)
+	for(std::list<SchemaTemplate>::const_iterator it = directory.begin(); it != directory.end(); ++it)
 	{
 		SchemaTemplate temp = *it;
 		std::string name = type;
@@ -222,10 +222,10 @@ void InternalMistMessage::registerTemplate(const char* schemaID)
 		const MessageTemplate& temp = SpecificationBuddy::getInternal(*m_spec).findTemplate(schemaID);
 
 		//found the right template, now add the header fields
-		DataList<FieldTemplate> fields = SpecificationBuddy::getInternal(*m_spec).prepHeaders(schemaID);
-		for(DataList<FieldTemplate>::const_iterator it = temp.listFieldTemplates().begin(); it != temp.listFieldTemplates().end(); ++it)
+		std::list<FieldTemplate> fields = SpecificationBuddy::getInternal(*m_spec).prepHeaders(schemaID);
+		for(std::list<FieldTemplate>::const_iterator it = temp.listFieldTemplates().begin(); it != temp.listFieldTemplates().end(); ++it)
 		{
-			fields.add(*it);
+			fields.push_back(*it);
 		}
 
 		m_template = MessageTemplate(schemaID, fields);
@@ -292,13 +292,10 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 	}
 	catch(...)
 	{//if fieldTemplate does not exist, add StringField to the message
-		addField(StringField(fieldName, value));
+		addField(fieldName, value);
 
-		//MAV -- what now?  Should a new template be added for the new field?
 		return;
 	}
-		
-	//MAV - we should never reach this point if a Field Template was NOT found.
 
 	//found the template, now determine the type
 	std::string type = fieldTemplate.getType();
@@ -310,7 +307,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			std::string str = value;
 			if(str.size()==1)
 			{//value can only be one character
-				addField(CharField(fieldName, (GMSEC_CHAR)value[0]));
+				addField(fieldName, (GMSEC_CHAR) value[0]);
 			}
 			else
 			{
@@ -335,11 +332,11 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		{//the value is indeed a number, but we can only accapt a 0 or 1
 			if(intValue == 1)
 			{
-				addField(BooleanField(fieldName, true));
+				addField(fieldName, true);
 			}
 			else if(intValue == 0)
 			{
-				addField(BooleanField(fieldName, false));
+				addField(fieldName, false);
 			}
 			else
 			{//it is not 0 or 1
@@ -350,11 +347,11 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		}
 		else if(StringUtil::stringEqualsIgnoreCase(value, "true"))
 		{//the value is not a number, so we check to see if it is "true"
-			addField(BooleanField(fieldName, true));
+			addField(fieldName, true);
 		}
 		else if(StringUtil::stringEqualsIgnoreCase(value, "false"))
 		{//not "true", check if it is "false"
-			addField(BooleanField(fieldName, false));
+			addField(fieldName, false);
 		}
 		else
 		{//this value is worthless, we can't do anything with it
@@ -373,7 +370,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if(intValue >= int(std::numeric_limits<GMSEC_I8>::min()) && 
 			   intValue <= int(std::numeric_limits<GMSEC_I8>::max()))
 			{
-				addField(I8Field(fieldName,intValue));
+				addField(fieldName, (GMSEC_I8) intValue);
 			}
 			else
 			{//int is too big to fit into I8, which can lead to undefined behavior
@@ -399,7 +396,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if(intValue >= int(std::numeric_limits<GMSEC_I16>::min()) && 
 			   intValue <= int(std::numeric_limits<GMSEC_I16>::max()))
 			{
-				addField(I16Field(fieldName,intValue));
+				addField(fieldName, (GMSEC_I16) intValue);
 			}
 			else
 			{//int is too big to fit into I16, which can lead to undefined behavior
@@ -422,7 +419,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		
 		if(status == StringUtil::STR2NUM_SUCCESS)
 		{
-			addField(I32Field(fieldName,intValue));
+			addField(fieldName, (GMSEC_I32) intValue);
 		}
 		else
 		{
@@ -438,7 +435,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		
 		if(status == StringUtil::STR2NUM_SUCCESS)
 		{
-			addField(I64Field(fieldName,intValue));
+			addField(fieldName, (GMSEC_I64) intValue);
 		}
 		else
 		{
@@ -457,7 +454,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if(intValue >= 0 && 
 			   intValue <= int(std::numeric_limits<GMSEC_U8>::max()))
 			{
-				addField(U8Field(fieldName,intValue));
+				addField(fieldName, (GMSEC_U8) intValue);
 			}
 			else
 			{//outside limits of a U8, which could produce undefined behavior
@@ -483,7 +480,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if(intValue >= 0 && 
 			   intValue <= int(std::numeric_limits<GMSEC_U16>::max()))
 			{
-				addField(U16Field(fieldName,intValue));
+				addField(fieldName, (GMSEC_U16) intValue);
 			}
 			else
 			{//outside limits of a U16, could produce undefined behavior
@@ -509,7 +506,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if(intValue >= 0 && 
 			   intValue <= int(std::numeric_limits<GMSEC_U32>::max()))
 			{
-				addField(U32Field(fieldName,intValue));
+				addField(fieldName, (GMSEC_U32) intValue);
 			}
 			else
 			{//outside limits
@@ -534,7 +531,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		{
 			if(intValue >=0)
 			{
-				addField(U64Field(fieldName,intValue));
+				addField(fieldName, (GMSEC_U64) intValue);
 			}
 			else
 			{//intValue is a too negative and we don't need such toxicity in our lives
@@ -552,21 +549,11 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 	}
 	else if(type == "F32")
 	{
-		GMSEC_F64 fValue;
-		bool success = StringUtil::stringParseF64(value, fValue);
+		GMSEC_F32 fValue;
+		bool success = StringUtil::stringParseF32(value, fValue);
 		if(success)
 		{
-			if(fValue >= GMSEC_F64(std::numeric_limits<GMSEC_F32>::min()) && 
-			   fValue <= GMSEC_F64(std::numeric_limits<GMSEC_F32>::max()))
-			{
-				addField(F32Field(fieldName, (GMSEC_F32)fValue));
-			}
-			else
-			{//outside limits, not good
-				std::ostringstream err;
-				err << "Template calls for field type GMSEC_F32, but value \"" << value << "\" is outside limits";
-				throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-			}
+			addField(fieldName, fValue);
 		}
 		else
 		{
@@ -581,7 +568,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		bool success = StringUtil::stringParseF64(value, fValue);
 		if(success)
 		{
-			addField(F64Field(fieldName, fValue));
+			addField(fieldName, fValue);
 		}
 		else
 		{
@@ -592,13 +579,12 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 	}
 	else if(type == "STRING")
 	{//a string value can very easily be converted to a string value
-		addField(StringField(fieldName, value));
+		addField(fieldName, value);
 	}
-	//TODO (MAV): Converting string to a binary blob?
 	else if(type == "UNSET")
 	{//field template has a variable data type, meaning it can be whatever it wants
 	 //today, it's a StringField
-		addField(StringField(fieldName, value));
+		addField(fieldName, value);
 	}
 	else
 	{//any types not listed can't be converted
@@ -623,7 +609,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 	}
 	catch(...)
 	{//fieldTemplate does not exist, so just add a new I64Field
-		addField(I64Field(fieldName, value));
+		addField(fieldName, value);
 	}
 
 	//field template found, now determine the type
@@ -633,11 +619,11 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 	{//we'll only accept 0 or 1 as values
 		if(value == 0)
 		{
-			addField(BooleanField(fieldName, false));
+			addField(fieldName, false);
 		}
 		else if(value == 1)
 		{
-			addField(BooleanField(fieldName, true));
+			addField(fieldName, true);
 		}
 		else
 		{
@@ -651,7 +637,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_I8>::min()) && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_I8>::max()))
 		{
-			addField(I8Field(fieldName, (GMSEC_I8)value));
+			addField(fieldName, (GMSEC_I8) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -665,7 +651,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_I16>::min()) && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_I16>::max()))
 		{
-			addField(I16Field(fieldName, (GMSEC_I16)value));
+			addField(fieldName, (GMSEC_I16) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -679,7 +665,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_I32>::min()) && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_I32>::max()))
 		{
-			addField(I32Field(fieldName, (GMSEC_I32)value));
+			addField(fieldName, (GMSEC_I32) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -690,14 +676,14 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 	}
 	else if(type == "I64")
 	{
-		addField(I64Field(fieldName, (GMSEC_I64)value));
+		addField(fieldName, (GMSEC_I64) value);
 	}
 	else if(type == "U8")
 	{
 		if(value >= 0 && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_U8>::max()))
 		{
-			addField(U8Field(fieldName, (GMSEC_U8)value));
+			addField(fieldName, (GMSEC_U8) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -711,7 +697,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= 0 && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_U16>::max()))
 		{
-			addField(U16Field(fieldName, (GMSEC_U16)value));
+			addField(fieldName, (GMSEC_U16) value);
 		}
 		else
 		{//Tharr value be overflowin', Captain!
@@ -725,7 +711,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= 0 && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_U32>::max()))
 		{
-			addField(U32Field(fieldName, (GMSEC_U32)value));
+			addField(fieldName, (GMSEC_U32) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -738,7 +724,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 	{
 		if(value >= 0)
 		{
-			addField(U64Field(fieldName, (GMSEC_U64)value));
+			addField(fieldName, (GMSEC_U64) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -749,42 +735,22 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 	}
 	else if(type == "F32")
 	{
-		if(value >= GMSEC_F64(std::numeric_limits<GMSEC_F32>::min()) && 
-		   value <= GMSEC_F64(std::numeric_limits<GMSEC_F32>::max()))
-		{
-			addField(F32Field(fieldName, (GMSEC_F32)value));
-		}
-		else
-		{//can't cast because it's outside the limits
-			std::ostringstream err;
-			err << "Template calls for field type GMSEC_F32, but value " << value << " is outside limits";
-			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-		}
+		addField(fieldName, (GMSEC_F32) value);
 	}
 	else if(type == "F64")
 	{
-		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_F64>::min()) && 
-		   value >= GMSEC_I64(std::numeric_limits<GMSEC_F64>::max()))
-		{
-			addField(F64Field(fieldName, (GMSEC_F64)value));
-		}
-		else
-		{//can't cast because it's outside the limits
-			std::ostringstream err;
-			err << "Template calls for field type GMSEC_F64, but value " << value << " is outside limits";
-			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-		}
+		addField(fieldName, (GMSEC_F64) value);
 	}
 	else if(type == "STRING")
 	{
 		std::ostringstream oss;
 		oss << value;
-		addField(StringField(fieldName, oss.str().c_str()));
+		addField(fieldName, oss.str().c_str());
 	}
 	else if(type == "UNSET")
 	{//field template has a variable data type, meaning it can be whatever it wants
 	 //today, it's an I64Field
-		addField(I64Field(fieldName, value));
+		addField(fieldName, (GMSEC_I64) value);
 	}
 	else
 	{//any types not listed can't be converted
@@ -809,7 +775,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 	}
 	catch(...)
 	{//fieldTemplate does not exist, so just add a new F64Field
-		addField(F64Field(fieldName, value));
+		addField(fieldName, value);
 	}
 
 	//field template found, now determine the type
@@ -817,13 +783,14 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 
 	if(type == "BOOLEAN")
 	{//we'll only accept 0 or 1 as values
+		//TODO: Fix this. Comparing F64 to an integer!
 		if(value == 0)
 		{
-			addField(BooleanField(fieldName, false));
+			addField(fieldName, false);
 		}
 		else if(value == 1)
 		{
-			addField(BooleanField(fieldName, true));
+			addField(fieldName, true);
 		}
 		else
 		{
@@ -838,7 +805,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I8>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_I8', possible loss of data";
-			addField(I8Field(fieldName, (GMSEC_I8)value));
+			addField(fieldName, (GMSEC_I8) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -853,7 +820,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I16>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_I16', possible loss of data";
-			addField(I16Field(fieldName, (GMSEC_I16)value));
+			addField(fieldName, (GMSEC_I16) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -868,7 +835,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I32>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_I32', possible loss of data";
-			addField(I32Field(fieldName, (GMSEC_I32)value));
+			addField(fieldName, (GMSEC_I32) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -883,7 +850,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I64>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_I64', possible loss of data";
-			addField(I64Field(fieldName, (GMSEC_I64)value));
+			addField(fieldName, (GMSEC_I64) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -898,7 +865,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U8>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_U8', possible loss of data";
-			addField(U8Field(fieldName, (GMSEC_U8)value));
+			addField(fieldName, (GMSEC_U8) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -913,7 +880,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U16>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_U16', possible loss of data";
-			addField(U16Field(fieldName, (GMSEC_U16)value));
+			addField(fieldName, (GMSEC_U16) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -928,7 +895,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U32>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_U32', possible loss of data";
-			addField(U32Field(fieldName, (GMSEC_U32)value));
+			addField(fieldName, (GMSEC_U32) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -943,7 +910,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U64>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_U64', possible loss of data";
-			addField(U64Field(fieldName, (GMSEC_U64)value));
+			addField(fieldName, (GMSEC_U64) value);
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -954,32 +921,22 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 	}
 	else if(type == "F32")
 	{
-		if(value >= GMSEC_F64(std::numeric_limits<GMSEC_F32>::min()) && 
-		   value <= GMSEC_F64(std::numeric_limits<GMSEC_F32>::max()))
-		{
-			addField(F32Field(fieldName, (GMSEC_F32)value));
-		}
-		else
-		{//can't cast because it's outside the limits
-			std::ostringstream err;
-			err << "Template calls for field type GMSEC_F32, but value " << value << " is outside limits";
-			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-		}
+		addField(fieldName, (GMSEC_F32) value);
 	}
 	else if(type == "F64")
 	{
-		addField(F64Field(fieldName, (GMSEC_F64)value));
+		addField(fieldName, (GMSEC_F64) value);
 	}
 	else if(type == "STRING")
 	{
 		std::ostringstream oss;
 		oss << value;
-		addField(StringField(fieldName, oss.str().c_str()));
+		addField(fieldName, oss.str().c_str());
 	}
 	else if(type == "UNSET")
 	{//field template has a variable data type, meaning it can be whatever it wants
 	 //today, it's an F64Field
-		addField(F64Field(fieldName, value));
+		addField(fieldName, value);
 	}
 	else
 	{//any types not listed can't be converted
@@ -989,33 +946,33 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 	}
 }
 
-size_t InternalMistMessage::findFieldTemplateIndex(const char* fieldName)
-{
-	const gmsec::api::util::DataList<FieldTemplate>& fieldTemplates = m_template.listFieldTemplates();
-	
-	for(size_t i=0; i<fieldTemplates.size(); i++)
-	{
-		if(fieldName == fieldTemplates.get(i).getName())
-		{
-			return i;
-		}
-	}
-
-	//if we have made it this far, it means we never found fieldName in m_template
-	//return -1 to indicate the FieldTemplate does not exist
-	return -1;
-
-}
+//size_t InternalMistMessage::findFieldTemplateIndex(const char* fieldName)
+//{
+//	const std::list<FieldTemplate>& fieldTemplates = m_template.listFieldTemplates();
+//	
+//	for(std::list<fieldTemplate>::const_iterator it = fieldTemplates.begin(); it != fieldTemplates.end(); ++it)
+//	{
+//		if(StringUtil::stringEquals(fieldName, it->getName()))
+//		{
+//			return i;
+//		}
+//	}
+//
+//	//if we have made it this far, it means we never found fieldName in m_template
+//	//return -1 to indicate the FieldTemplate does not exist
+//	return -1;
+//
+//}
 
 
 const FieldTemplate& InternalMistMessage::findFieldTemplate(const char* fieldName)
 {
-	//nexted array controls have their placeholder value added to the end of the list
-	DataList<std::string> placeHolders;
+	//nested array controls have their placeholder value added to the end of the list
+	std::list<std::string> placeHolders;
 
 	size_t arrayControlActive = 0;
 
-	for(DataList<FieldTemplate>::const_iterator ft = m_template.listFieldTemplates().begin(); 
+	for(std::list<FieldTemplate>::const_iterator ft = m_template.listFieldTemplates().begin(); 
 		ft != m_template.listFieldTemplates().end(); 
 		++ft)
 	{
@@ -1026,7 +983,7 @@ const FieldTemplate& InternalMistMessage::findFieldTemplate(const char* fieldNam
 		{//we found an array control
 		 //grab the placeholder value for the array control
 			arrayControlActive++;
-			placeHolders.add(temp.getValue());
+			placeHolders.push_back(temp.getValue());
 		}
 		else if(StringUtil::stringEqualsIgnoreCase(temp.getName(), "ARRAY-END") &&
 				StringUtil::stringEqualsIgnoreCase(temp.getMode(), "CONTROL"))
@@ -1047,7 +1004,7 @@ const FieldTemplate& InternalMistMessage::findFieldTemplate(const char* fieldNam
 				{//compare each element of the field template's name at the specified index the field's element at the same index
 					bool notPlaceHolder = true;
 
-					for(DataList<std::string>::const_iterator placeHolder=placeHolders.begin(); placeHolder!=placeHolders.end(); ++placeHolder)
+					for(std::list<std::string>::const_iterator placeHolder=placeHolders.begin(); placeHolder!=placeHolders.end(); ++placeHolder)
 					{//check the current template element to make sure it isn't an index placeholder
 						std::string value = *placeHolder;
 						if(StringUtil::stringEquals(templateNameElements.at(i).c_str(), value.c_str()))
@@ -1198,9 +1155,9 @@ void InternalMistMessage::setSpecVersion(unsigned int version)
 
 void InternalMistMessage::init()
 {	
-	const DataList<FieldTemplate>& fieldTemplates = getTemplate().listFieldTemplates();
+	const std::list<FieldTemplate>& fieldTemplates = getTemplate().listFieldTemplates();
 
-	for(DataList<FieldTemplate>::const_iterator it = fieldTemplates.begin(); it != fieldTemplates.end(); ++it)
+	for(std::list<FieldTemplate>::const_iterator it = fieldTemplates.begin(); it != fieldTemplates.end(); ++it)
 	{
 		FieldTemplate temp = *it;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -108,12 +108,13 @@ public:
 	///
 	/// <exception cref="GMSEC_Exception">
 	/// An exception is thrown if the configuration information cannot be used to deduce a Connection type,
-	/// or if there is a failure to connect to the middleware server.
+	/// or if an anomaly occurs while connecting to the middleware server.
 	/// </exception>
 	void Initialize();
 
 
 	/// <summary>This function disconnects and destroys the underlying Connection object.</summary>
+	/// <exception cref="GMSEC_Exception">If an anomaly occurs while disconnecting</exception>
 	void Cleanup();
 
 
@@ -122,10 +123,6 @@ public:
 
 
 	/// <summary>Returns the Specification object associated with the Connection Manager.</summary>
-	///
-	/// <exception cref="GMSEC_Exception">
-	/// A an exception is thrown if the Connection Manager has not been initialized.
-	/// </exception>
 	Specification^ GetSpecification();
 
 
@@ -458,10 +455,7 @@ public:
 	///
 	/// <returns>The status of the operation.</returns>
 	///
-	/// <exception cref="GMSEC_Exception">
-	/// An exception is thrown if the given Field is not already present in the Heartbeat
-	/// Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
-	/// </exception>
+	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.
 	Status^ ChangeComponentStatus(Field^ componentStatus);
 
 
@@ -476,10 +470,7 @@ public:
 	///
 	/// <returns>The status of the operation.</returns>
 	///
-	/// <exception cref="GMSEC_Exception">
-	/// An exception is thrown if the given Field is not already present in the Heartbeat
-	/// Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
-	/// </exception>
+	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.
 	Status^ ChangeComponentInfo(Field^ componentInfo);
 
 
@@ -494,10 +485,7 @@ public:
 	///
 	/// <returns>The status of the operation.</returns>
 	///
-	/// <exception cref="GMSEC_Exception">
-	/// An exception is thrown if the given Field is not already present in the Heartbeat
-	/// Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
-	/// </exception>
+	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.
 	Status^ ChangeCPUMemory(Field^ cpuMemory);
 
 
@@ -512,11 +500,21 @@ public:
 	///
 	/// <returns>The status of the operation.</returns>
 	///
-	/// <exception cref="GMSEC_Exception">
-	/// An exception is thrown if the given Field is not already present in the Heartbeat
-	/// Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
-	/// </exception>
+	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.
 	Status^ ChangeCPUUtil(Field^ cpuUtil);
+
+
+	/// <summary>
+	/// This method can be used to update or set a field within the Heartbeat Message
+	/// being published by the Heartbeat Service.  If validation is enabled, the field will
+	/// be validated before it is added to the Heartbeat Message.  Should validation pass,
+	/// the field will be persisted to the heartbeat service; otherwise an error is returned.
+	/// </summary>
+	///
+	/// <param name="field">The field containing new or update information for the heartbeat message</param>
+	///
+	/// <returns>The status of the operation.</returns>
+	Status^ SetHeartbeatServiceField(Field^ field);
 
 
 	/// <summary>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -122,7 +122,16 @@ void CALL_TYPE specificationValidateMessage(GMSEC_Specification spec, const GMSE
 	{
 		try
 		{
-			s->validateMessage(*m);
+			// We need to be explicit in calling the base-class validateMessage()
+			// for cases where a user may have registered their own custom function
+			// using connectionManagerSetSpecification().
+			//
+			// In such cases, the user's custom function will be called automatically
+			// when message validation needs to take place, and the user's function in
+			// turn may call the function we are in now.  By being explicit with the call
+			// below, we avoid a severe case of recursion.
+			//
+			s->Specification::validateMessage(*m);
 		}
 		catch (const Exception& e)
 		{

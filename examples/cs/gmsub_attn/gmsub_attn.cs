@@ -73,15 +73,22 @@ namespace gmsub_attn
 		{
 			if (conn != null)
 			{
-                for (int i = info.Count - 1; i >= 0; i--)
-                {
-                    Log.Info("Unsubscribing to " + info[i].GetSubject());
-                    var temp = info[i];
-                    conn.Unsubscribe(ref temp);
-                    info.RemoveAt(i);
-                }
+				for (int i = info.Count - 1; i >= 0; i--)
+				{
+				    Log.Info("Unsubscribing to " + info[i].GetSubject());
+				    var temp = info[i];
+				    conn.Unsubscribe(ref temp);
+				    info.RemoveAt(i);
+				}
 
-                conn.Disconnect();
+				try
+				{
+					conn.Disconnect();
+				}
+				catch (GMSEC_Exception e)
+				{
+					Log.Error(e.ToString());
+				}
 
 				Connection.Destroy(ref conn);
 			}

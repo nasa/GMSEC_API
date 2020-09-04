@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -59,7 +59,7 @@ extern "C"
 	JNIEXPORT jstring JNICALL
 	Java_gov_nasa_gsfc_gmsecapi_jni_gmsecJNI_Log_1LogLevelToString(JNIEnv *jenv, jclass jcls, jint jLevel )
 	{
-		jstring s = jenv->NewStringUTF(Log::ToString((LogLevel)jLevel));
+		jstring s = makeJavaString(jenv, Log::ToString((LogLevel)jLevel));
 		jvmOk(jenv, "LogLevelToString");
 		return s;
 	}
@@ -119,7 +119,7 @@ extern "C"
 	{
 		char buffer[gmsec::util::TIME_BUFSIZE] = {0};
 		gmsec::util::formatTime_s((double)jTime_s, buffer);
-		jstring s = jenv->NewStringUTF(buffer);
+		jstring s = makeJavaString(jenv, buffer);
 		jvmOk(jenv, "TimeUtil.FormatTime_s");
 		return s;
 	}

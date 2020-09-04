@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -79,27 +79,6 @@ private:
 	static std::string CALL_TYPE lookupTypeStr(Field::FieldType ftype);
 
 	static Field* createField(const char* name, const char* type, const char* value, const char* bits, const char* head); 
-
-	// DMW TODO: Move this to strutil.h
-	template<typename T>
-	static T getValue(const char* value)
-	{
-		T result;
-
-		if (value)
-		{
-			std::istringstream iss(value);
-
-			iss >> result;
-
-			if (iss.fail())
-			{
-				// DMW TODO: error with conversion
-			}
-		}
-
-		return result;
-	}
 
 	std::string         m_name;
 	Field::FieldType    m_type;

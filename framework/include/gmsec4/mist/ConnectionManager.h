@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -128,7 +128,7 @@ public:
 	 * successfully returns, the ConnectionManager is ready for message operations.
 	 *
 	 * @throw An Exception is thrown if the configuration information cannot be used to deduce
-	 * a Connection type, or if there is a failure to connect to the middleware server.
+	 * a Connection type, or if an anomaly occurs while connecting to the middleware server.
 	 */
 	void CALL_TYPE initialize();
 
@@ -139,6 +139,10 @@ public:
 	 * @desc Cleanup - This function disconnects and destroys the 
 	 * underlying Connection object, returning an error status if this operation is
 	 * not successful.
+	 *
+	 * @throws Exception if an anomaly occurs while disconnecting
+	 *
+	 * @sa Connection:disconnect()
 	 */
 	void CALL_TYPE cleanup();
 
@@ -158,8 +162,6 @@ public:
 	 * @desc Returns the Specification object associated with the Connection Manager.
 	 *
 	 * @return A Specification object.
-	 *
-	 * @throws An Exception is thrown if the Connection Manager has not been initialized.
 	 */
 	Specification& CALL_TYPE getSpecification() const;
 
@@ -554,8 +556,9 @@ public:
 	 *
 	 * @param componentStatus - Field containing updated information for the Heartbeat Message
 	 *
-	 * @throw An Exception is thrown if the given Field is not already present in the Heartbeat
-	 * Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
+	 * @return The status of the operation.
+	 *
+	 * @note This method has been deprecated.  Use setHeartbeatServiceField() instead.
 	 */
 	Status CALL_TYPE changeComponentStatus(const Field& componentStatus);
 
@@ -570,8 +573,9 @@ public:
 	 *
 	 * @param componentInfo - Field containing updated information for the Heartbeat Message
 	 *
-	 * @throw An Exception is thrown if the given Field is not already present in the Heartbeat
-	 * Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
+	 * @return The status of the operation.
+	 *
+	 * @note This method has been deprecated.  Use setHeartbeatServiceField() instead.
 	 */
 	Status CALL_TYPE changeComponentInfo(const Field& componentInfo);
 
@@ -586,8 +590,9 @@ public:
 	 *
 	 * @param cpuMemory - Field containing updated information for the Heartbeat Message
 	 *
-	 * @throw An Exception is thrown if the given Field is not already present in the Heartbeat
-	 * Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
+	 * @return The status of the operation.
+	 *
+	 * @note This method has been deprecated.  Use setHeartbeatServiceField() instead.
 	 */
 	Status CALL_TYPE changeCPUMemory(const Field& cpuMemory);
 
@@ -602,10 +607,26 @@ public:
 	 *
 	 * @param cpuUtil- Field containing updated information for the Heartbeat Message
 	 *
-	 * @throw An Exception is thrown if the given Field is not already present in the Heartbeat
-	 * Message, or if by adding it to the Heartbeat Message, the message itself becomes invalid.
+	 * @return The status of the operation.
+	 *
+	 * @note This method has been deprecated.  Use setHeartbeatServiceField() instead.
 	 */
 	Status CALL_TYPE changeCPUUtil(const Field& cpuUtil);
+
+
+	/**
+	 * @fn Status setHeartbeatServiceField(const Field& field)
+	 *
+	 * @brief This method can be used to update or set a field within the Heartbeat Message
+	 * being published by the Heartbeat Service.  If validation is enabled, the field will
+	 * be validated before it is added to the Heartbeat Message.  Should validation pass,
+	 * the field will be persisted to the heartbeat service; otherwise an error is returned.
+	 *
+	 * @param field - the field containing new or updated information for the Heartbeat Message
+	 *
+	 * @return The status of the operation.
+	 */
+	Status CALL_TYPE setHeartbeatServiceField(const Field& field);
 
 
 	/**

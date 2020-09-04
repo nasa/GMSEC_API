@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -214,7 +214,7 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	}
 
 
-	m_msgAggregationToolkitShared.reset(new MessageAggregationToolkit(this));
+	m_msgAggregationToolkitShared.reset(new MessageAggregationToolkit(this, config));
 
 	// Check if this Connection object will perform Message aggregation
 	if (config.getBooleanValue(GMSEC_USE_MSG_BINS, false))
@@ -249,9 +249,17 @@ InternalConnection::~InternalConnection()
 	}
 	m_subscriptionRegistry.clear();
 
+	Exception error(NO_ERROR_CLASS, NO_ERROR_CODE, "");
 	if (m_state == Connection::CONNECTED)
 	{
-		disconnect();
+		try
+		{
+			disconnect();
+		}
+		catch (const Exception& e)
+		{
+			error = e;
+		}
 	}
 
 	delete m_callbackAdapter;
@@ -260,6 +268,11 @@ InternalConnection::~InternalConnection()
 	delete m_asyncQueue;
 
 	delete m_connIf;
+
+	if (error.getErrorClass() != NO_ERROR_CLASS)
+	{
+		throw error;
+	}
 }
 
 
@@ -337,7 +350,15 @@ void InternalConnection::disconnect()
 
 		stopMsgAggregationToolkitThread();
 
-		(void) m_connIf->mwDisconnect();
+		Exception error(NO_ERROR_CLASS, NO_ERROR_CODE, "");
+		try
+		{
+			m_connIf->mwDisconnect();
+		}
+		catch (const Exception& e)
+		{
+			error = e;
+		}
 
 		if (m_usePerfLogger)
 		{
@@ -345,6 +366,11 @@ void InternalConnection::disconnect()
 		}
 
 		m_state = Connection::NOT_CONNECTED;
+
+		if (error.getErrorClass() != NO_ERROR_CLASS)
+		{
+			throw error;
+		}
 	}
 }
 
@@ -910,7 +936,7 @@ void InternalConnection::dispatch(const Message& msg)
 			"This method cannot be called when the Auto-Dispatcher is in use");
 	}
 
-	AutoTicket hold(getWriteMutex());
+	AutoTicket hold(getReadMutex());
 
 	std::list<Callback*> callbacks;
 
@@ -948,7 +974,7 @@ void InternalConnection::excludeSubject(const char* subject)
 		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Subject is NULL or is empty-string");
 	}
 
-	if (!getPolicy().isValidSubject(subject))
+	if (!getPolicy().isValidSubscription(subject))
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Subject is invalid");
 	}
@@ -969,7 +995,7 @@ void InternalConnection::removeExcludedSubject(const char* subject)
 		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Subject is NULL or is empty-string");
 	}
 
-	if (!getPolicy().isValidSubject(subject))
+	if (!getPolicy().isValidSubscription(subject))
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Subject is invalid");
 	}
@@ -1435,13 +1461,35 @@ void InternalConnection::initializeTracking()
 {
 	// boolean config values for tracking fields
 	m_tracking.set(m_config.getBooleanValue("tracking", true));
-	m_tracking.setNode(m_config.getBooleanValue("tracking-node", true));
-	m_tracking.setProcessId(m_config.getBooleanValue("tracking-process-id", true));
-	m_tracking.setUserName(m_config.getBooleanValue("tracking-user-name", true));
-	m_tracking.setConnectionId(m_config.getBooleanValue("tracking-connection-id", true));
-	m_tracking.setPublishTime(m_config.getBooleanValue("tracking-publish-time", true));
-	m_tracking.setUniqueId(m_config.getBooleanValue("tracking-unique-id", true));
-	m_tracking.setMwInfo(m_config.getBooleanValue("tracking-mw-info", true));
+
+	if (m_config.getValue("tracking-node"))
+	{
+		m_tracking.setNode(m_config.getBooleanValue("tracking-node", false));
+	}
+	if (m_config.getValue("tracking-process-id"))
+	{
+		m_tracking.setProcessId(m_config.getBooleanValue("tracking-process-id", false));
+	}
+	if (m_config.getValue("tracking-user-name"))
+	{
+		m_tracking.setUserName(m_config.getBooleanValue("tracking-user-name", false));
+	}
+	if (m_config.getValue("tracking-connection-id"))
+	{
+		m_tracking.setConnectionId(m_config.getBooleanValue("tracking-connection-id", false));
+	}
+	if (m_config.getValue("tracking-publish-time"))
+	{
+		m_tracking.setPublishTime(m_config.getBooleanValue("tracking-publish-time", false));
+	}
+	if (m_config.getValue("tracking-unique-id"))
+	{
+		m_tracking.setUniqueId(m_config.getBooleanValue("tracking-unique-id", false));
+	}
+	if (m_config.getValue("tracking-mw-info"))
+	{
+		m_tracking.setMwInfo(m_config.getBooleanValue("tracking-mw-info", false));
+	}
 }
 
 
@@ -1562,56 +1610,59 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	const int OFF   = MESSAGE_TRACKINGFIELDS_OFF;
 	const int UNSET = MESSAGE_TRACKINGFIELDS_UNSET;
 
-	GMSEC_DEBUG << "CONN TRACKING:\n" << connTracking.toString();
-	GMSEC_DEBUG << "MSG TRACKING:\n"  << msgTracking.toString();
+	// Add the Tracking Fields, if enabled
+	bool addTracking = (connTracking.get() == ON && (msgTracking.get() == ON || msgTracking.get() == UNSET));
 
-	// Add the Tracking Fields
-	if ((connTracking.get() != OFF && msgTracking.get() == UNSET) || msgTracking.get() == ON || m_usePerfLogger)
+	if ((addTracking || connTracking.getNode() == ON || msgTracking.getNode() == ON) &&
+	    (connTracking.getNode() != OFF && msgTracking.getNode() != OFF))
 	{
-		if ((connTracking.getNode() != OFF && msgTracking.getNode() == UNSET) || msgTracking.getNode() == ON)
-		{
-			std::string hostname;
-			SystemUtil::getHostName(hostname);
-			msg.addField("NODE", hostname.c_str());
-		}
+		std::string hostname;
+		SystemUtil::getHostName(hostname);
+		msg.addField("NODE", hostname.c_str());
+	}
 
-		if (((connTracking.getProcessId() != OFF && msgTracking.getProcessId() == UNSET) || msgTracking.getProcessId() == ON))
-		{
-			msg.addField("PROCESS-ID", (GMSEC_I16) SystemUtil::getProcessID());
-		}
+	if ((addTracking || connTracking.getProcessId() == ON || msgTracking.getProcessId() == ON) &&
+	    (connTracking.getProcessId() != OFF && msgTracking.getProcessId() != OFF))
+	{
+		msg.addField("PROCESS-ID", (GMSEC_I16) SystemUtil::getProcessID());
+	}
 
-		if (((connTracking.getUserName() != OFF && msgTracking.getUserName() == UNSET) || msgTracking.getUserName() == ON))
-		{
-			msg.addField("USER-NAME", m_userName.c_str());
-		}
+	if ((addTracking || connTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
+	    (connTracking.getUserName() != OFF && msgTracking.getUserName() != OFF))
+	{
+		msg.addField("USER-NAME", m_userName.c_str());
+	}
 
-		if (((connTracking.getConnectionId() != OFF && msgTracking.getConnectionId() == UNSET) || msgTracking.getConnectionId() == ON))
-		{
-			msg.addField("CONNECTION-ID", (GMSEC_U16) m_connectionID);
-		}
+	if ((addTracking || connTracking.getConnectionId() == ON || msgTracking.getConnectionId() == ON) &&
+	    (connTracking.getConnectionId() != OFF && msgTracking.getConnectionId() != OFF))
+	{
+		msg.addField("CONNECTION-ID", (GMSEC_U16) m_connectionID);
+	}
 
-		if (((connTracking.getPublishTime() != OFF && msgTracking.getPublishTime() == UNSET) || msgTracking.getPublishTime() == ON || m_usePerfLogger))
-		{
-			GMSEC_TimeSpec ts = TimeUtil::getCurrentTime();
-			char           curTime[GMSEC_TIME_BUFSIZE];
+	if (m_usePerfLogger || ((addTracking || connTracking.getPublishTime() == ON || msgTracking.getPublishTime() == ON) &&
+	    ((connTracking.getPublishTime() != OFF) && (msgTracking.getPublishTime() != OFF))))
+	{
+		GMSEC_TimeSpec ts = TimeUtil::getCurrentTime();
+		char           curTime[GMSEC_TIME_BUFSIZE];
 
-			TimeUtil::formatTime(ts, curTime);
+		TimeUtil::formatTime(ts, curTime);
 
-			msg.addField("PUBLISH-TIME", curTime);
-		}
+		msg.addField("PUBLISH-TIME", curTime);
+	}
 
-		if (((connTracking.getUniqueId() != OFF && msgTracking.getUniqueId() == UNSET) || msgTracking.getUniqueId() == ON))
-		{
-			std::ostringstream oss;
-			oss << m_connID << "_" << m_messageCounter;
+	if ((addTracking || connTracking.getUniqueId() == ON || msgTracking.getUniqueId() == ON) &&
+	    (connTracking.getUniqueId() != OFF && msgTracking.getUniqueId() != OFF))
+	{
+		std::ostringstream oss;
+		oss << m_connID << "_" << m_messageCounter;
 
-			msg.addField("UNIQUE-ID", oss.str().c_str());
-		}
+		msg.addField("UNIQUE-ID", oss.str().c_str());
+	}
 
-		if (((connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() == UNSET) || msgTracking.getMwInfo() == ON))
-		{
-			msg.addField("MW-INFO", getMWInfo());
-		}
+	if ((addTracking || connTracking.getMwInfo() == ON || msgTracking.getMwInfo() == ON) &&
+	    (connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
+	{
+		msg.addField("MW-INFO", getMWInfo());
 	}
 }
 
@@ -1736,8 +1787,6 @@ void InternalConnection::startMsgAggregationToolkitThread()
 {
 	if (!m_msgAggregationToolkitThread.get())
 	{
-		m_msgAggregationToolkitShared->configure(m_config);
-
 		m_msgAggregationToolkitThread.reset(new StdThread(&MessageAggregationToolkit::runThread, m_msgAggregationToolkitShared));
 
 		GMSEC_DEBUG << "[" << this << "] is starting the Message Aggregation Toolkit Thread";
@@ -1793,4 +1842,14 @@ gmsec::api::util::TicketMutex& InternalConnection::getEventMutex()
 void InternalConnection::usingAPI3x()
 {
 	m_usingAPI3x = true;
+
+	const char* policy = m_config.getValue(secure::SEC_POLICY);
+
+	if (policy == NULL)
+	{
+		Config config;
+		config.addValue(secure::SEC_POLICY, "API3");
+
+		DynamicFactory::initialize(getPolicy(), config);
+	}
 }

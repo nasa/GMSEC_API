@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -148,15 +148,6 @@ void MBConnection::mwConnect()
 	m_sock = new TCPSocketClientArray();
 	m_sock->setConfig(getExternal().getConfig());
 
-	if (!m_readerThread.get())
-	{
-		m_readerThreadShared.reset(new MBReaderThread(m_sock));
-
-		m_readerThreadShared->setConnection(this, m_reqSpecs);
-
-		m_readerThread.reset(new StdThread(&runReaderThread, m_readerThreadShared));
-	}
-
 	// connect to the specifyied server or to
 	// localhost if no server was specified
 	Status status;
@@ -173,6 +164,15 @@ void MBConnection::mwConnect()
 	{
 		// Return server not found error
 		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, CONNECT_SERVER_NOT_FOUND, "No Message Bus Server found");
+	}
+
+	if (!m_readerThread.get())
+	{
+		m_readerThreadShared.reset(new MBReaderThread(m_sock));
+
+		m_readerThreadShared->setConnection(this, m_reqSpecs);
+
+		m_readerThread.reset(new StdThread(&runReaderThread, m_readerThreadShared));
 	}
 
 	m_sock->setDebug(false);
@@ -268,7 +268,7 @@ void MBConnection::mwDisconnect()
 
 	if (status.isError())
 	{
-		GMSEC_WARNING << "Disconnect request to server failed.";
+		GMSEC_DEBUG << "Disconnect request to server failed.";
 	}
 
 	// tell the reader thread to disconnect
@@ -449,9 +449,10 @@ void MBConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 	{
 		if (m_readerThread.get() == NULL || m_readerThreadShared->getConnWasDropped())
 		{
-			mwDisconnect();
+			// RTC 4596
+			getExternal().disconnect();
 
-			throw Exception(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to server host was lost");
+			throw Exception(CONNECTION_ERROR, CONNECTION_LOST, "Connection to server was lost");
 		}
 	}
 	else

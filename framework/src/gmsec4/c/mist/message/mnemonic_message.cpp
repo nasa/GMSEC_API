@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -250,6 +250,34 @@ const GMSEC_Mnemonic CALL_TYPE mnemonicMessageGetMnemonic(const GMSEC_Message ms
 	}
 
 	return mnemonic;
+}
+
+
+GMSEC_MnemonicIterator CALL_TYPE mnemonicMessageGetIterator(GMSEC_Message msg, GMSEC_Status status)
+{
+	GMSEC_MnemonicIterator iter = NULL;
+	Status                 result;
+
+	const Message*         tmpMsg  = reinterpret_cast<const Message*>(msg);
+	const MnemonicMessage* mnemMsg = dynamic_cast<const MnemonicMessage*>(tmpMsg);
+
+	if (mnemMsg)
+	{
+		MnemonicIterator& mnemIter = mnemMsg->getMnemonicIterator();
+
+		iter = &mnemIter;
+	}
+	else
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "MnemonicMessage handle is NULL or is not a MnemonicMessage");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return iter;
 }
 
 

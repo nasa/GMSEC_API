@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -216,7 +216,11 @@ Status DynamicFactory::initialize (Policy &policy, const Config &config)
 
 	if (!value)
 	{
-		ptr = new API3Policy();
+		ptr = new API4Policy();
+	}
+	else if (StringUtil::stringEqualsIgnoreCase(value, "API4"))
+	{
+		ptr = new API4Policy();
 	}
 	else if (StringUtil::stringEqualsIgnoreCase(value, "API3"))
 	{

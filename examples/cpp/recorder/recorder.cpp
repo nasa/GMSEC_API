@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace gmsec::api;
 using namespace gmsec::api::util;
@@ -46,17 +47,20 @@ public:
 	bool run();
 
 private:
-	std::string cfgFilename;
-	ConfigFile  cfgFile;
-	Connection* connection;
-	SubscriptionInfo** info;
+	typedef std::vector<SubscriptionInfo*> Subscriptions;
+
+	std::string   cfgFilename;
+	ConfigFile    cfgFile;
+	Connection*   connection;
+	Subscriptions subscriptions;
 };
 
 
 Recorder::Recorder(const char* filename)
 	: cfgFilename(filename),
 	  cfgFile(),
-	  connection(0)
+	  connection(0),
+	  subscriptions()
 {
 	Config tmp;
 	example::initialize(tmp);
@@ -67,13 +71,22 @@ Recorder::~Recorder()
 {
 	if (connection)
 	{
-		for (size_t i = 0; i < 2; ++i)
+		for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
 		{
-			GMSEC_INFO << "Unsubscribing from " << info[i]->getSubject();
-			connection->unsubscribe(info[i]);
+			SubscriptionInfo* info = *it;
+
+			GMSEC_INFO << "Unsubscribing from " << info->getSubject();
+
+			connection->unsubscribe(info);
 		}
-		delete[] info;
-		connection->disconnect();
+		try
+		{
+			connection->disconnect();
+		}
+		catch (Exception& e)
+		{
+			GMSEC_ERROR << e.what();
+		}
 		Connection::destroy(connection);
 	}
 
@@ -137,9 +150,8 @@ bool Recorder::run()
 
 		//o Create subscriptions from subscription templates in the config file using callback
 		LogCallback cb;
-		info  = new SubscriptionInfo*[2];
-		info[0] = connection->subscribe(rcvLogSubject, &cb);
-		info[1] = connection->subscribe(sndLogSubject, &cb);
+		subscriptions.push_back(connection->subscribe(rcvLogSubject, &cb));
+		subscriptions.push_back(connection->subscribe(sndLogSubject, &cb));
 
 		//o Output some general program information
 		GMSEC_INFO << "Publishing for " << loopCountdown << " seconds.";

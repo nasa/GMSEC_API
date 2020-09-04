@@ -1,4 +1,4 @@
-# Copyright 2007-2016 United States Government as represented by the
+# Copyright 2007-2017 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -185,6 +185,7 @@ INTERNAL4_OBJ	= \
 	$(OBJDIR4)/internal/field/InternalU64Field.o \
 	$(OBJDIR4)/internal/mist/ConnMgrCallbacks.o \
 	$(OBJDIR4)/internal/mist/ConnMgrCallbackCache.o \
+	$(OBJDIR4)/internal/mist/CustomSpecification.o \
 	$(OBJDIR4)/internal/mist/FieldTemplate.o \
 	$(OBJDIR4)/internal/mist/HeartbeatService.o \
 	$(OBJDIR4)/internal/mist/InternalConnectionManager.o \
@@ -244,10 +245,13 @@ CAPI4_OBJ	= \
 	$(COBJDIR4)/field/u8_field.o \
 	$(COBJDIR4)/mist/connection_manager.o \
 	$(COBJDIR4)/mist/device.o \
+	$(COBJDIR4)/mist/device_iterator.o \
 	$(COBJDIR4)/mist/device_param.o \
 	$(COBJDIR4)/mist/mnemonic.o \
+	$(COBJDIR4)/mist/mnemonic_iterator.o \
 	$(COBJDIR4)/mist/mnemonic_sample.o \
 	$(COBJDIR4)/mist/product_file.o \
+	$(COBJDIR4)/mist/product_file_iterator.o \
 	$(COBJDIR4)/mist/schema_id_iterator.o \
 	$(COBJDIR4)/mist/service_param.o \
 	$(COBJDIR4)/mist/specification.o \

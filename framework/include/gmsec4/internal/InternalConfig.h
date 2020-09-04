@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,12 +12,14 @@
 
 #include <gmsec4/util/wdllexp.h>
 
+#include <gmsec4/internal/json-forwards.h>
 #include <gmsec4/internal/tinyxml2.h>
 
 #include <gmsec4/internal/ci_less.h>
 
 #include <string>
 #include <map>
+#include <vector>
 
 
 namespace gmsec
@@ -37,7 +39,7 @@ public:
 
 	InternalConfig(int argc, char* argv[]);
 
-	InternalConfig(const char* xml);
+	InternalConfig(const char* data);
 
 	InternalConfig(const InternalConfig& cfg);
 
@@ -74,11 +76,18 @@ public:
 
 	void CALL_TYPE fromXML(tinyxml2::XMLElement* element);
 
+	const char* CALL_TYPE toJSON(bool standalone = true) const;
+
+	void CALL_TYPE fromJSON(const Json::Value& root);
+
+
 private:
 	// declared, but not implemented.
 	InternalConfig& operator=(const InternalConfig&);
 
 	void CALL_TYPE validateConfigName(const char* name) const;
+
+	void getKeyValuePairs(const std::string& data, std::vector<std::string>& pairs);
 
 	typedef std::map<std::string, std::string, ci_less> ConfigMap;
 	typedef ConfigMap::const_iterator                   ConfigMapIter;
@@ -86,6 +95,7 @@ private:
 	ConfigMap             m_configs;
 	mutable ConfigMapIter m_configIter;
 	mutable std::string   m_xml;
+	mutable std::string   m_json;
 
 };
 

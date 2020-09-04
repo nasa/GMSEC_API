@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -149,7 +149,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Device_1GetN
 		{
 			const char* name = device->getName();
 
-			jName = jenv->NewStringUTF(name);
+			jName = makeJavaString(jenv, name);
 
 			jvmOk(jenv, "Device.getName");
 		}
@@ -285,7 +285,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Device_1GetM
 			{
 				const char* model = device->getModel();
 
-				jModel = jenv->NewStringUTF(model);
+				jModel = makeJavaString(jenv, model);
 
 				jvmOk(jenv, "Device.getModel");
 			}
@@ -369,7 +369,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Device_1GetS
 			{
 				const char* serial = device->getSerial();
 
-				jSerial = jenv->NewStringUTF(serial);
+				jSerial = makeJavaString(jenv, serial);
 
 				jvmOk(jenv, "Device.getSerial");
 			}
@@ -453,7 +453,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Device_1GetV
 			{
 				const char* version = device->getVersion();
 
-				jVersion = jenv->NewStringUTF(version);
+				jVersion = makeJavaString(jenv, version);
 
 				jvmOk(jenv, "Device.getVersion");
 			}
@@ -537,7 +537,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Device_1GetG
 			{
 				const char* group = device->getGroup();
 
-				jGroup = jenv->NewStringUTF(group);
+				jGroup = makeJavaString(jenv, group);
 
 				jvmOk(jenv, "Device.getGroup");
 			}
@@ -621,7 +621,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Device_1GetR
 			{
 				const char* role = device->getRole();
 
-				jRole = jenv->NewStringUTF(role);
+				jRole = makeJavaString(jenv, role);
 
 				jvmOk(jenv, "Device.getRole");
 			}

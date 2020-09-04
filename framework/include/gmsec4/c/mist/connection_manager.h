@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -642,6 +642,8 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  connMgr         - the handle to the ConnectionManager object
 	 * @param[in]  componentStatus - the handle to the field containing component status data
 	 * @param[out] status          - out parameter operation result status
+	 *
+	 * @note This function has been deprecated; use connectionManagerSetHeartbeatField() instead.
 	 */
 	GMSEC_API void connectionManagerChangeComponentStatus(GMSEC_ConnectionMgr connMgr, const GMSEC_Field componentStatus, GMSEC_Status status);
 
@@ -657,6 +659,8 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  connMgr       - the handle to the ConnectionManager object
 	 * @param[in]  componentInfo - the handle to the field containing component information
 	 * @param[out] status        - out parameter operation result status
+	 *
+	 * @note This function has been deprecated; use connectionManagerSetHeartbeatField() instead.
 	 */
 	GMSEC_API void connectionManagerChangeComponentInfo(GMSEC_ConnectionMgr connMgr, const GMSEC_Field componentInfo, GMSEC_Status status);
 
@@ -672,6 +676,8 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  connMgr   - the handle to the ConnectionManager object
 	 * @param[in]  cpuMemory - the handle to the field containing CPU memory data
 	 * @param[out] status    - out parameter operation result status
+	 *
+	 * @note This function has been deprecated; use connectionManagerSetHeartbeatField() instead.
 	 */
 	GMSEC_API void connectionManagerChangeCPUMemory(GMSEC_ConnectionMgr connMgr, const GMSEC_Field cpuMemory, GMSEC_Status status);
 
@@ -687,8 +693,25 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  connMgr - the handle to the ConnectionManager object
 	 * @param[in]  cpuUtil - the handle to the field containing CPU utilization data
 	 * @param[out] status  - out parameter operation result status
+	 *
+	 * @note This function has been deprecated; use connectionManagerSetHeartbeatField() instead.
 	 */
 	GMSEC_API void connectionManagerChangeCPUUtil(GMSEC_ConnectionMgr connMgr, const GMSEC_Field cpuUtil, GMSEC_Status status);
+
+
+	/**
+	 * @fn void connectionManagerSetHeartbeatServiceField(GMSEC_ConnectionMgr connMgr, const GMSEC_Field field, GMSEC_Status status)
+	 *
+	 * @brief Updates the field which is included within the Heartbeat Message being
+	 * published by the Heartbeat Service.  If validatiion is enabled, the message will then be
+	 * re-validated with the modified field set. Should the validation pass, the change will be
+	 * persisted to the heartbeat service, otherwise an error will be included with the status.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[in]  field   - the handle to the field to include within the heartbeat message
+	 * @param[out] status  - out parameter operation result status
+	 */
+	GMSEC_API void connectionManagerSetHeartbeatServiceField(GMSEC_ConnectionMgr connMgr, const GMSEC_Field field, GMSEC_Status status);
 
 
 	/**

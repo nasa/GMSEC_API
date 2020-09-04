@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -11,6 +11,7 @@
 
 #include "gmsecJNI.h"
 #include "gmsecJNI_Jenv.h"
+#include "gmsecJNI_CustomSpecification.h"
 
 #include <gmsec4/mist/Specification.h>
 
@@ -42,7 +43,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Specifica
 		}
 		else
 		{
-			spec = JNI_POINTER_TO_JLONG(new Specification(*config));
+			spec = JNI_POINTER_TO_JLONG(new CustomSpecification(*config));
 		}
 	}
 	JNI_CATCH
@@ -66,7 +67,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Specifica
 		}
 		else
 		{
-			spec = JNI_POINTER_TO_JLONG(new Specification(*other));
+			spec = JNI_POINTER_TO_JLONG(new CustomSpecification(*other));
 		}
 	}
 	JNI_CATCH
@@ -113,7 +114,17 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specification_1
 		}
 		else
 		{
-			spec->validateMessage(*msg);
+			// We need to be explicit in calling the base-class validateMessage()
+			// for cases where a user may have registered their own custom Specification
+			// object using ConnectionManager.setSpecification().
+			//
+			// In such cases, the user's custom Specification's validateMessage() will be
+			// called automatically when message validation needs to take place, and should
+			// that method in turn attempt to call the base-class' version of the method,
+			// we need to be explicit with the call below so as to avoid a severe case of
+			// recursion.
+			//
+			spec->Specification::validateMessage(*msg);
 		}
 	}
 	JNI_CATCH
@@ -190,7 +201,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specificatio
 
 			const char* tmp = spec->getTemplateXML(subject.c_str(), schemaID.c_str());
 
-			xml = jenv->NewStringUTF(tmp);
+			xml = makeJavaString(jenv, tmp);
 
 			jvmOk(jenv, "Specification.getTemplateXML");
 		}

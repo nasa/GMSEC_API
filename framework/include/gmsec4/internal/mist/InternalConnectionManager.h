@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,8 +13,6 @@
 
 #ifndef GMSEC_INTERNAL_CONNECTIONMANAGER_H
 #define GMSEC_INTERNAL_CONNECTIONMANAGER_H
-
-#include <gmsec/util/wdllexp.h>
 
 #include <gmsec4/Config.h>
 #include <gmsec4/Connection.h>
@@ -32,6 +30,8 @@
 #include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/Mutex.h>
 #include <gmsec4/util/StdThread.h>
+
+#include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4_defs.h>
 
@@ -59,6 +59,9 @@ namespace mist
 
 namespace internal
 {
+	// Forward declarations(s)
+	class CustomSpecification;
+
 
 /** @class InternalConnectionManager
 */
@@ -81,6 +84,9 @@ public:
 
 
 	Specification& CALL_TYPE getSpecification() const;
+
+
+	void CALL_TYPE setSpecification(Specification* spec);
 
 
 	void CALL_TYPE setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields);
@@ -149,16 +155,7 @@ public:
 	void CALL_TYPE stopHeartbeatService();
 
 
-	Status CALL_TYPE changeComponentStatus(const Field& componentStatus);
-
-
-	Status CALL_TYPE changeComponentInfo(const Field& componentInfo);
-
-
-	Status CALL_TYPE changeCPUMemory(const Field& cpuMemory);
-
-
-	Status CALL_TYPE changeCPUUtil(const Field& cpuUtil);
+	Status CALL_TYPE setHeartbeatServiceField(const Field& field);
 
 
 	Message CALL_TYPE createLogMessage(const char* subject, const gmsec::api::util::DataList<Field*>& logFields);
@@ -238,6 +235,10 @@ public:
 	                                           const gmsec::api::util::DataList<Field*>& fields);
 
     /* For C-binding only! */
+	void CALL_TYPE setSpecification(Specification* spec, GMSEC_SpecificationValidateMessage* validateMsg);
+
+
+    /* For C-binding only! */
     void CALL_TYPE registerEventCallback(Connection::ConnectionEvent event, GMSEC_ConnectionMgrEventCallback* ecb);
 
 
@@ -299,17 +300,23 @@ private:
 	typedef std::list<SubscriptionInfo*> SubscriptionList;
 
 	// member data
-	Config                     m_config;
-	Connection*                m_connection;
-	bool                       m_validate;
-	Specification*             m_specification;
-	FieldList                  m_standardHeartbeatFields;
-	FieldList                  m_standardLogFields;
-	std::string                m_heartbeatSubject;
-	std::string                m_logSubject;
-	gmsec::api::util::Mutex    m_cmLock;
-	size_t                     m_resourceMessageCounter;
-	SubscriptionList           m_subscriptions;
+	Config                               m_config;
+	Connection*                          m_connection;
+	bool                                 m_validate;
+	Specification*                       m_specification;
+	Specification*                       m_customSpecification;
+	FieldList                            m_standardHeartbeatFields;
+	FieldList                            m_standardLogFields;
+	std::string                          m_heartbeatSubject;
+	std::string                          m_logSubject;
+	size_t                               m_resourceMessageCounter;
+	SubscriptionList                     m_subscriptions;
+	MessagePopulator*                    m_messagePopulator;
+	mutable gmsec::api::util::Mutex      m_cmLock;
+
+	// will be used for support of Callbacks
+	gmsec::api::mist::ConnectionManager* m_parent;
+	MistCallbackAdapter*                 m_callbackAdapter;
 
 	std::auto_ptr<gmsec::api::util::StdThread>       m_hbThread;
 	gmsec::api::util::StdSharedPtr<HeartbeatService> m_hbService;
@@ -317,11 +324,8 @@ private:
 	std::auto_ptr<gmsec::api::util::StdThread>       m_rsrcThread;
 	gmsec::api::util::StdSharedPtr<ResourceService>  m_rsrcService;
 
-	// will be used for support of Callbacks
-	gmsec::api::mist::ConnectionManager*						   m_parent;
-	MistCallbackAdapter*                       m_callbackAdapter;
-
-	MessagePopulator*                          m_messagePopulator;
+	// will be used for support of C binding
+	CustomSpecification* m_ceeCustomSpec;
 };
 
 }  //namespace internal

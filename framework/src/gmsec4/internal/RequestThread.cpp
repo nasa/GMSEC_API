@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -164,10 +164,11 @@ void RequestShared::sendRequests()
 		{
 			if (!pending->isDone && time_s > pending->expireTime_s)
 			{
-				pending->isDone = (pending->republish_ms > 0 ? false : true);
-
 				if (pending->replyCallback)
 				{
+					// Asynchronous Request
+					pending->isDone = (pending->republish_ms > 0 ? false : true);
+
 					Status status(CONNECTION_ERROR, TIMEOUT_OCCURRED, "Request timed out");
 
 					// Kludge to pass the request message to the API 3.x interface.
@@ -177,6 +178,13 @@ void RequestShared::sendRequests()
 					m_connection->replyEvent(pending->replyCallback, status, Connection::REQUEST_TIMEOUT_EVENT);
 
 					m_connection->dispatchEvent(Connection::REQUEST_TIMEOUT_EVENT, status);
+
+					pending->expireTime_s = time_s + pending->republish_ms / 1000;
+				}
+				else
+				{
+					// Synchronous Request
+					pending->isDone = true;
 				}
 
 				GMSEC_DEBUG << "sendRequests: " << pending->id.c_str() << " has expired";

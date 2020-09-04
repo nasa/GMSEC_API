@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -343,6 +343,34 @@ const GMSEC_ProductFile CALL_TYPE productFileMessageGetProductFile(const GMSEC_M
 	}
 
 	return pfile;
+}
+
+
+GMSEC_ProductFileIterator CALL_TYPE productFileMessageGetIterator(GMSEC_Message msg, GMSEC_Status status)
+{
+	GMSEC_ProductFileIterator iter = NULL;
+	Status                    result;
+
+	const Message*            tmpMsg  = reinterpret_cast<const Message*>(msg);
+	const ProductFileMessage* prodMsg = dynamic_cast<const ProductFileMessage*>(tmpMsg);
+
+	if (prodMsg)
+	{
+		ProductFileIterator& prodIter = prodMsg->getProductFileIterator();
+    
+		iter = &prodIter;
+	}
+	else
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ProductFileMessage handle is NULL or is not a ProductFileMessage");
+	}
+    
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return iter;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,7 +42,7 @@ const char* InternalU8Field::toXML() const
 	{
 		std::ostringstream oss;
 
-		oss << "<FIELD TYPE=\"U8\" NAME=\"" << getName() << "\"" << (isHeader() ? " HEAD=\"T\"" : "") << ">"
+		oss << "<FIELD NAME=\"" << getName() << "\" TYPE=\"U8\"" << (isHeader() ? " HEAD=\"T\"" : "") << ">"
 			<< (unsigned int) getValue()
 			<< "</FIELD>";
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -79,7 +79,8 @@ public class gmsecJNI
 	// Config native class functions
 	//
 	public final static native long new_Config();
-	public final static native long new_Config_String(String jarg1[]);
+	public final static native long new_Config_Args(String jarg1[]);
+	public final static native long new_Config_Data(String jarg1);
 	public final static native long new_Config_Copy(long jarg1, JNIConfig config);
 	public final static native void delete_Config(long jarg1, JNIConfig config);
 	public final static native void Config_AddValue(long jarg1, JNIConfig config, String jarg2, String jarg3);
@@ -98,6 +99,7 @@ public class gmsecJNI
 	public final static native void Config_Merge(long jarg1, JNIConfig config, long jarg2, JNIConfig otherConfig, boolean overwriteExisting);
 	public final static native String Config_ToXML(long cfg, JNIConfig config);
 	public final static native void Config_FromXML(long cfg, JNIConfig config, String xml);
+	public final static native String Config_ToJSON(long cfg, JNIConfig config);
 
 
 	// ConfigEntry native class functions
@@ -211,6 +213,7 @@ public class gmsecJNI
 	public final static native void Message_AddConfig(long jarg1, JNIMessage msg, long cfgPtr, JNIConfig config);
 	public final static native long Message_GetConfig(long jarg1, JNIMessage msg);
 	public final static native String Message_GetSubject(long jarg1, JNIMessage msg);
+	public final static native void Message_SetSubject(long jarg1, JNIMessage msg, String subject);
 	public final static native int Message_GetKind(long jarg1, JNIMessage msg);
 	public final static native boolean Message_AddField(long jarg1, JNIMessage msg, long fieldPtr, JNIField field);
 	public final static native void Message_ClearFields(long jarg1, JNIMessage msg);
@@ -412,6 +415,7 @@ public class gmsecJNI
 	public final static native void ConnectionManager_Cleanup(long jarg1, JNIConnectionManager connMgr);
 	public final static native String ConnectionManager_GetLibraryVersion(long jarg1, JNIConnectionManager connMgr);
 	public final static native long ConnectionManager_GetSpecification(long jarg1, JNIConnectionManager connMgr);
+	public final static native void ConnectionManager_SetSpecification(long jarg1, JNIConnectionManager connMgr, long jarg2, JNISpecification jspec, Specification spec);
 	public final static native void ConnectionManager_SetStandardFields(long jarg1, JNIConnectionManager connMgr, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_AddStandardFields(long jarg1, JNIConnectionManager connMgr, long msgPtr, JNIMessage msg);
 	public final static native void ConnectionManager_RegisterEventCallback(long jarg1, JNIConnectionManager connMgr, int event, long cbPtr);
@@ -435,10 +439,7 @@ public class gmsecJNI
 	public final static native long ConnectionManager_CreateHeartbeatMessage(long jarg1, JNIConnectionManager connMgr, String subject, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_StartHeartbeatService(long jarg1, JNIConnectionManager connMgr, String subject, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_StopHeartbeatService(long jarg1, JNIConnectionManager connMgr);
-	public final static native long ConnectionManager_ChangeComponentStatus(long jarg1, JNIConnectionManager connMgr, long jptr, JNIField jfld);
-	public final static native long ConnectionManager_ChangeComponentInfo(long jarg1, JNIConnectionManager connMgr, long jptr, JNIField jfld);
-	public final static native long ConnectionManager_ChangeCPUMemory(long jarg1, JNIConnectionManager connMgr, long jptr, JNIField jfld);
-	public final static native long ConnectionManager_ChangeCPUUtil(long jarg1, JNIConnectionManager connMgr, long jptr, JNIField jfld);
+	public final static native long ConnectionManager_SetHeartbeatServiceField(long jarg1, JNIConnectionManager connMgr, long jptr, JNIField jfld);
 	public final static native long ConnectionManager_CreateLogMessage(long jarg1, JNIConnectionManager connMgr, String subject, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_SetLoggingDefaults(long jarg1, JNIConnectionManager connMgr, String subject, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_PublishLog(long jarg1, JNIConnectionManager connMgr, String logmsg, long fldptr, JNIField jfld);

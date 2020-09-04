@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -296,23 +296,34 @@ static inline int gmsec_leapyear (int year)
 double StringUtil::getTimeFromString(const std::string& timeString)
 {
 	std::vector<std::string> comps = split(timeString, '-');
-	if(comps.size() == 3)
+
+	if (comps.size() == 3)
 	{
 		int year = atoi(comps.at(0).c_str());
-		int doy = atoi(comps.at(1).c_str());
-		std::vector<std::string> subDayComps = split(comps.at(2), ':');
-		if(subDayComps.size() == 3)
-		{
-			int hour = atoi(subDayComps.at(0).c_str());
-			int minute = atoi(subDayComps.at(1).c_str());
-			std::vector<std::string> subSecondComps = split(subDayComps.at(2), '.');
-			if(subSecondComps.size() == 2)
-			{
-				int second = atoi(subSecondComps.at(0).c_str());
-				double milli = atoi(subSecondComps.at(1).c_str());
+		int doy  = atoi(comps.at(1).c_str());
 
-				size_t subs      = subSecondComps.at(1).length();
-				double milli_div = std::pow((double) 10, (double) subs);
+		std::vector<std::string> subDayComps = split(comps.at(2), ':');
+
+		if (subDayComps.size() == 3)
+		{
+			int hour   = atoi(subDayComps.at(0).c_str());
+			int minute = atoi(subDayComps.at(1).c_str());
+
+			std::vector<std::string> subSecondComps = split(subDayComps.at(2), '.');
+
+			if (subSecondComps.size() >= 1)
+			{
+				int    second    = atoi(subSecondComps.at(0).c_str());
+				double milli     = 0;
+				double milli_div = 1;
+
+				// check if we need to handle fractional time
+				if (subSecondComps.size() == 2)
+				{
+					size_t subs = subSecondComps.at(1).length();
+					milli       = atoi(subSecondComps.at(1).c_str());
+					milli_div   = std::pow((double) 10, (double) subs);
+				}
 
 				time_t now = time(NULL);
 				struct tm utc;
@@ -371,7 +382,6 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 				reversed += localTimeOffsetSeconds;
 				double time = reversed + (milli / milli_div);
 				return time;
-
 			}
 		}
 	}
@@ -393,6 +403,27 @@ bool StringUtil::stringParseI32(const char * s, GMSEC_I32 &out)
 	if (s)
 	{
 		GMSEC_I32 x = 0;
+		std::istringstream in(s);
+		in.unsetf(std::ios::skipws);
+		in >> x;
+		if (in && in.eof())
+		{
+			out = x;
+			flag = true;
+		}
+	}
+
+	return flag;
+}
+
+
+bool StringUtil::stringParseF32(const char * s, GMSEC_F32 &out)
+{
+	bool flag = false;
+
+	if (s)
+	{
+		GMSEC_F32 x = 0;
 		std::istringstream in(s);
 		in.unsetf(std::ios::skipws);
 		in >> x;

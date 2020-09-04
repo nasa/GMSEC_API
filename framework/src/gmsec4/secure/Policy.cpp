@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -26,7 +26,7 @@ namespace secure {
 
 // Define DEFAULT_POLICY in config/default for a different policy.
 #ifndef DEFAULT_POLICY
-#define DEFAULT_POLICY API3Policy
+#define DEFAULT_POLICY API4Policy
 #endif
 
 
@@ -428,6 +428,35 @@ bool API3Policy::useCompression() const
 }
 
 
+/*
+ * API4Policy.  This maintains backward compatibility with GMSEC API 3
+ */
+
+API4Policy::API4Policy ()
+	: API3Policy()
+{
+}
+
+
+Status API4Policy::initialize(const Config& localConfig)
+{
+	// Make copy of config
+	Config config = localConfig;
+
+	const char* value = config.getValue(VAL_SUB);
+	if (!value)
+	{
+		config.addValue(VAL_SUB, "true");
+	}
+
+	value = config.getValue(VAL_SUB_LENIENT);
+	if (!value)
+	{
+		config.addValue(VAL_SUB_LENIENT, "false");
+	}
+
+	return API3Policy::initialize(config);
+}
 
 
 /*
