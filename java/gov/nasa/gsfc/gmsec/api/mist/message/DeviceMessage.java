@@ -205,7 +205,10 @@ public class DeviceMessage extends MistMessage
 	 * @throws A GMSEC_Exception is thrown if the specified index is outside the number of devices in the message.
 	 *
 	 * @sa getNumDevices()
+	 *
+	 * @deprecated This method has been deprecated; use DeviceIterator instead.
 	 */
+	@Deprecated
 	public Device getDevice(int index) throws GMSEC_Exception
 	{
 		return ((JNIDeviceMessage) MistMessage.getInternal(this)).getDevice(index);

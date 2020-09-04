@@ -111,6 +111,10 @@ public class Message
 	 *
 	 * @brief Specialized constructor that accepts a Config object.
 	 *
+	 * @note Only Message-related configuration options are held by the Message object.
+	 * These configuration options are NOT included with the message when it is sent
+	 * across the GMSEC Bus.
+	 *
 	 * @param subject - the GMSEC subject to associate with the message.
 	 * @param kind - the kind of message to create.
 	 * @param config - a configuration object that contains message-specific options.
@@ -141,13 +145,13 @@ public class Message
 	 * An XML string should have a format similar to the following:
 	 * @code
 	 * final String XML = "<MESSAGE SUBJECT=\"GMSEC.TEST.XML.SUBJECT\" KIND=\"PUBLISH\">" +
-	 *		      "    <CONFIG>" +
-	 *	     	      "        <PARAMETER NAME=\"FOO\">BAR</PARAMETER>" +
-	 *	     	      "        <PARAMETER NAME=\"DONE\">DEAL</PARAMETER>" +
-	 *	     	      "    </CONFIG>" +
-	 *	     	      "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>" +
-	 *	     	      "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>" +
-	 *	     	      "</MESSAGE>";
+	 *		              "    <CONFIG>" +
+	 *	     	          "        <PARAMETER NAME=\"gmsec-msgfld-store-type\">tree</PARAMETER>" +
+	 *	     	          "        <PARAMETER NAME=\"gmsec-msgfld-store-size\">100</PARAMETER>" +
+	 *	     	          "    </CONFIG>" +
+	 *	     	          "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>" +
+	 *	     	          "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>" +
+	 *	     	          "</MESSAGE>";
 	 * @endcode
 	 *
 	 * A JSON string should have a format similar to the following:
@@ -214,6 +218,10 @@ public class Message
 	 * @fn void addConfig(Config config)
 	 *
 	 * @brief Used to associate configuration object with the message.
+	 *
+	 * @note Only Message-related configuration options are held by the Message object.
+	 * These configuration options are NOT included with the message when it is sent
+	 * across the GMSEC Bus.
 	 *
 	 * @param config - the configuration object.
 	 *

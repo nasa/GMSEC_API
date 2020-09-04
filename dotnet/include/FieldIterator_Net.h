@@ -133,6 +133,7 @@ public enum class FieldSelectorChoice
 ///         if( result3.IsError() ) then () // Handle Error
 /// </code>
 /// </example>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class FieldIterator
 {
 private:

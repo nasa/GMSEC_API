@@ -1,3 +1,5 @@
+<!-- Flight Dynamics Request message -->
+<!-- See Table 5-132 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.REQ.PROD.FD">
 	<FIELD  NAME="START-TIME"
 	        MODE="OPTIONAL"
@@ -90,13 +92,13 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE="FD"
 	        TYPE="STRING"
-	        DESCRIPTION="Product type being requested. See Table 4-29. Product Categories"/>
+	        DESCRIPTION="Product type being requested. See Table 4-21. Product Categories"/>
 	<FIELD  NAME="PROD-SUBTYPE"
 	        MODE="REQUIRED"
 	        FIELD_CLASS="STANDARD"
 	        VALUE="ATT"
 	        TYPE="STRING"
-	        DESCRIPTION="Product subtype being requested. See Table 4-29. Product Categories"/>
+	        DESCRIPTION="Product subtype being requested. See Table 4-21. Product Categories"/>
 	<FIELD  NAME="NUM-OF-PROD-SUBTYPES"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
@@ -113,7 +115,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="First subcategory of the product subtype.  (Subject elements ME5, ME6, etc. of the Product Message)"/>
+	        DESCRIPTION="Nth subcategory of the product subtype.  (Subject elements ME5, ME6, etc. of the Product Message)"/>
 	<FIELD	NAME="ARRAY-END"
 			MODE="CONTROL"
 			DESCRIPTION="Control field indicating the end of an array of object fields"/>

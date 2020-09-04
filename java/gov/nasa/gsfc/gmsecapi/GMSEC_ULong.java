@@ -15,9 +15,12 @@ package gov.nasa.gsfc.gmsecapi;
 
 /** @class GMSEC_ULong
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This is a container class for the GMSEC ulong field type.
  *
  */
+@Deprecated
 public class GMSEC_ULong extends GMSEC_U32
 {
 	/**

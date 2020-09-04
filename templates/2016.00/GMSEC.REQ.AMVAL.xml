@@ -1,3 +1,5 @@
+<!-- Archive Mnemonic Value Request Message -->
+<!-- See Table 5-88 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.REQ.AMVAL">
 	<FIELD  NAME="START-TIME"
 	        MODE="REQUIRED"
@@ -70,7 +72,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE="AAA"
 	        TYPE="STRING"
-	        DESCRIPTION="Product type and subtype being requested. (See Table 4-29. Product Categories... Value is AAA:  Archive and Assessment)"/>
+	        DESCRIPTION="Product type and subtype being requested. (See Table 4-21. Product Categories... Value is AAA:  Archive and Assessment)"/>
 	<FIELD  NAME="PROD-SUBTYPE"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
@@ -149,7 +151,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="NAME of the mnemonic"/>
+	        DESCRIPTION="NAME of the nth mnemonic"/>
 	<FIELD  NAME="MNEMONIC.n.DATA-TYPE"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"

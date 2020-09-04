@@ -22,6 +22,7 @@
 #define gmsec_util_log_c_h
 
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -39,7 +40,7 @@ extern "C"
 	 *
 	 * @sa gmsec_GetReportingLevel()
 	 */
-	GMSEC_API void gmsec_SetReportingLevel(enum LogLevel level);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_SetReportingLevel(enum LogLevel level);
 
 	/** @fn enum LogLevel gmsec_GetReportingLevel()
 	 *
@@ -50,7 +51,7 @@ extern "C"
 	 *
 	 * @sa gmsec_GetReportingLevel()
 	 */
-	GMSEC_API enum LogLevel gmsec_GetReportingLevel();
+	GMSEC_DEPRECATED GMSEC_API enum LogLevel gmsec_GetReportingLevel();
 
 	/** @fn GMSEC_BOOL gmsec_IsLoggingEnabled(enum LogLevel level)
 	 *
@@ -61,7 +62,7 @@ extern "C"
 	 * @sa gmsec_SetReportingLevel() @n
 	 *     gmsec_GetReportingLevel()
 	 */
-	GMSEC_API GMSEC_BOOL gmsec_IsLoggingEnabled(enum LogLevel level);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_BOOL gmsec_IsLoggingEnabled(enum LogLevel level);
 
 	/** @fn void gmsec_RegisterLogHandler(GMSEC_LOGGER_HANDLER *handler)
 	 *
@@ -69,7 +70,7 @@ extern "C"
 	 *
 	 * @param[in] handler - the logger handler
 	 */
-	GMSEC_API void gmsec_RegisterLogHandler(GMSEC_LOGGER_HANDLER *handler);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_RegisterLogHandler(GMSEC_LOGGER_HANDLER *handler);
 
 	/** @fn void gmsec_RegisterLogHandlerByLevel(enum LogLevel level, GMSEC_LOGGER_HANDLER *handler)
 	 *
@@ -78,7 +79,7 @@ extern "C"
 	 * @param[in] level - the logging level
 	 * @param[in] handler - the logger handler
 	 */
-	GMSEC_API void gmsec_RegisterLogHandlerByLevel(enum LogLevel level, GMSEC_LOGGER_HANDLER *handler);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_RegisterLogHandlerByLevel(enum LogLevel level, GMSEC_LOGGER_HANDLER *handler);
 
 	/** @fn const char* gmsec_LogLevelToString(enum LogLevel level)
 	 *
@@ -86,7 +87,7 @@ extern "C"
 	 *
 	 * @param[in] level - the logging level
 	 */
-	GMSEC_API const char* gmsec_LogLevelToString(enum LogLevel level);
+	GMSEC_DEPRECATED GMSEC_API const char* gmsec_LogLevelToString(enum LogLevel level);
 
 	/** @fn enum LogLevel gmsec_LogLevelFromString(const char *level)
 	 *
@@ -94,9 +95,9 @@ extern "C"
 	 *
 	 * @param[in] level - the logging level
 	 */
-	GMSEC_API enum LogLevel gmsec_LogLevelFromString(const char *level);
+	GMSEC_DEPRECATED GMSEC_API enum LogLevel gmsec_LogLevelFromString(const char *level);
 
-	GMSEC_API void gmsec_CAPILog(enum LogLevel level, char *fmt, ...);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_CAPILog(enum LogLevel level, char *fmt, ...);
 
 #ifdef LOG_LEVEL_DEFINE
 #error "Attempting to redefine the log levels"

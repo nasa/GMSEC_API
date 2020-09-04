@@ -18,6 +18,8 @@
 
 #include <gmsec4/mist/message/MistMessage.h>
 
+#include <gmsec4/util/Deprecated.h>
+
 
 namespace gmsec
 {
@@ -48,8 +50,7 @@ namespace message
  *
  * @brief A MistMessage object that is capable of storing Device objects
  * The following message schema IDs and their templates are supported: @n
- * 2014.00.GMSEC.MSG.C2CX.DEV
- * 2016.00.GMSEC.MSG.C2CX.DEV
+ * GMSEC.MSG.C2CX.DEV
  *
  * @sa Message @n
  *	   MistMessage @n
@@ -151,14 +152,20 @@ public:
 	/**
 	 * @fn const Device& getDevice(size_t index) const
 	 *
-	 * @brief Get device numbered at index.
+	 * @brief Get device numbered at index. Note that the index which will be
+	 * retrieved does not correspond to the GMSEC ISD and starts from 0 instead of 1.
+	 * For example, getDevice(0) would return the Device corresponding to
+	 * DEVICE.1.
+	 *
 	 *
 	 * @return Device at specified index inside of DeviceMessage.
 	 *
 	 * @throw Throws an exception if the index specified is not in the
 	 *        range of Devices in the message.
+	 *
+	 * @note This function has been deprecated, use DeviceIterator instead.
 	 */
-	const Device& CALL_TYPE getDevice(size_t index) const;
+	GMSEC_DEPRECATED const Device& CALL_TYPE getDevice(size_t index) const;
 
 
 	/**

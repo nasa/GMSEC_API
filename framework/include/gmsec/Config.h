@@ -22,6 +22,7 @@
 
 
 #include <gmsec/ConfigFile.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -67,7 +68,7 @@ public:
 	/** @fn Config()
 	 * Default Constructor.
 	 */
-	Config();
+	GMSEC_DEPRECATED Config();
 
 	/** @fn Config( int argc, char* argv[] )
 	 * @brief This constructor will parse command line parameters and add
@@ -78,7 +79,7 @@ public:
 	 * @param argc - number of parameters in argv (from main)
 	 * @param argv - an array of char* parameters (from main)
 	 */
-	Config(int argc, char* argv[]);
+	GMSEC_DEPRECATED Config(int argc, char* argv[]);
 
 	/** @fn Config( const char *xml )
 	 * @brief This constructor will create a config and parse values from the passed in xml string.
@@ -88,14 +89,14 @@ public:
 	 *
 	 * @sa FromXML() @n ToXML()
 	 */
-	Config(const char *xml);
+	GMSEC_DEPRECATED Config(const char *xml);
 
 	/** @fn Config( const Config &cfg )
 	 * @brief Basic (and safe) deep copy constructor
 	 *
 	 * @param cfg - config object to copy
 	 */
-	Config(const Config &cfg);
+	GMSEC_DEPRECATED Config(const Config &cfg);
 
 	/** @fn ~Config()
 	 * @brief destructor

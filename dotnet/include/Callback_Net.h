@@ -110,6 +110,7 @@ ref class Status;
 /// </code>
 /// </example>
 /// <seealso cref="Connection::Subscribe(const String ^ subject, Nasa::Gmsec::Net::Callback ^ cb)" />
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class Callback abstract
 {
 private:

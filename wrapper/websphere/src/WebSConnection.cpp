@@ -17,6 +17,8 @@
 
 #include "WebSConnection.h"
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/ConnectionInterface.h>
 #include <gmsec4/internal/InternalConnection.h>
 #include <gmsec4/internal/MessageBuddy.h>
@@ -35,19 +37,6 @@ using namespace gmsec::api::internal;
 
 namespace gmsec_websphere
 {
-
-static const char* DEFAULT_CHANNEL   = "SYSTEM.DEF.SVRCONN";
-static const char* TOPIC_PREFIX      = "";
-static const char* WEBSPHERE_REPLY   = "WEBSPHERE_REPLY_ADDR";
-static const char* WEBSPHERE_SUBJECT = "GMSEC_SUBJECT_WEBSPHERE";
-static const char* WEBSPHERE_KIND    = "GMSEC_KIND_WEBSPHERE";
-static const char* DEFAULT_SUBJECT   = "BOGUS.TOPIC";
-
-static const char* MW_PROP_PATTERN   = "gmsec.%";
-static const char* MW_PROP_PREFIX    = "gmsec.";
-static const char* MW_PROP_SUBJECT   = "SUBJECT";
-static const char* MW_PROP_KIND      = "KIND";
-
 static int DEFAULT_ASYNC_STATUS_MESSAGE_INTERVAL = 100;
 
 static int DEFAULT_MAX_CONN_RETRIES    = 1000;
@@ -65,7 +54,7 @@ static std::string idToMW(const std::string& in);
 static bool        toMQString(MQCHARV &out, const char* p, int count);
 static bool        toMQString(MQCHARV &out, const char* in);
 static std::string idFromMW(const MQCHARV& in);
-static Message*    parseProperties(ValueMap& meta, MQHCONN hcon, MQHMSG hmsg);
+static Message*    parseProperties(ValueMap& meta, MQHCONN hcon, MQHMSG hmsg, const Config& msgConfig);
 static bool        getMetaFromFields(Message& message);
 static void        storeProperty(const Value& value, const std::string& id0, MQHCONN hcon, MQHMSG hmsg);
 static void        storeProperties(const ValueMap &in, MQHCONN hcon, MQHMSG hmsg);
@@ -814,6 +803,8 @@ void WebSConnection::mwConnect()
 		ss << "MQCB ended with reason code " << CReason << ".";
 		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, CReason, ss.str().c_str());
 	}
+
+	getExternal().setConnectionEndpoint(hostname);
 }
 
 
@@ -1090,7 +1081,7 @@ void WebSConnection::mwRequest(const Message& request, std::string& id)
 
 	id = generateUniqueId(requestCounter);
 
-	MessageBuddy::getInternal(request).addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
+	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 
 	if (requestSpecs.useSubjectMapping)
 	{
@@ -1099,7 +1090,7 @@ void WebSConnection::mwRequest(const Message& request, std::string& id)
 	}
 	else
 	{
-		MessageBuddy::getInternal(request).getDetails().setBoolean(OPT_REQ_RESP, true);
+		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
 
 	mwPublish(request, getExternal().getConfig());
@@ -1110,7 +1101,7 @@ void WebSConnection::mwRequest(const Message& request, std::string& id)
 
 void WebSConnection::mwReply(const Message& request, const Message& reply)
 {
-	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
+	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(WEBSPHERE_REPLY));
 
 	if (!uniqueID)
@@ -1236,18 +1227,18 @@ void WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 					{
 						ValueMap& meta = MessageBuddy::getInternal(*msg).getDetails();
 
-						meta.setBoolean(OPT_REQ_RESP, true);
+						meta.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 
 						if (msg->getKind() == Message::REQUEST)
 						{
-							const StringField* idField = dynamic_cast<const StringField*>(msg->getField(REPLY_UNIQUE_ID_FIELD));
+							const StringField* idField = dynamic_cast<const StringField*>(msg->getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
 
 							if (idField)
 							{
-								meta.setString(REPLY_UNIQUE_ID_FIELD, idField->getValue());
+								meta.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, idField->getValue());
 
-								// Remove REPLY_UNIQUE_ID_FIELD from the message
-								msg->clearField(REPLY_UNIQUE_ID_FIELD);
+								// Remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message
+								msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 							}
 						}
 					}
@@ -1270,7 +1261,7 @@ bool WebSConnection::fromMW(const DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg,
 
 	try
 	{
-		msg.reset(parseProperties(meta, hcon, hmsg));
+		msg.reset(parseProperties(meta, hcon, hmsg, getExternal().getMessageConfig()));
 	}
 	catch (const Exception& e)
 	{
@@ -1756,7 +1747,7 @@ std::string idFromMW(const MQCHARV& in)
 }
 
 
-Message* parseProperties(ValueMap& meta, MQHCONN hcon, MQHMSG hmsg)
+Message* parseProperties(ValueMap& meta, MQHCONN hcon, MQHMSG hmsg, const Config& msgConfig)
 {
 	MQIMPO     ipo   = { MQIMPO_DEFAULT };
 	MQPD       mqpd  = { MQPD_DEFAULT };
@@ -1778,7 +1769,7 @@ Message* parseProperties(ValueMap& meta, MQHCONN hcon, MQHMSG hmsg)
 
 	toMQString(iname, MW_PROP_PATTERN);
 
-	std::auto_ptr<Message> msg(new Message(DEFAULT_SUBJECT, Message::PUBLISH));
+	std::auto_ptr<Message> msg(new Message(DEFAULT_SUBJECT, Message::PUBLISH, msgConfig));
 
 	for (bool first = true; true; first = false)
 	{

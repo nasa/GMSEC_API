@@ -18,6 +18,8 @@
 
 #include <gmsec4/Message.h>
 
+#include <gmsec4/util/Deprecated.h>
+
 
 namespace gmsec
 {
@@ -66,7 +68,7 @@ public:
 	 * @param subject - The subject string for the message.
 	 * @param version - The version of the GMSEC message specification to be used.
 	 */
-	MnemonicMessage(const char* subject, unsigned int version);
+	GMSEC_DEPRECATED MnemonicMessage(const char* subject, unsigned int version);
 
 
 	/**
@@ -78,7 +80,7 @@ public:
 	 * @param config  - A configuration to associate with the message.
 	 * @param version - The version of the GMSEC message specification to be used.
 	 */
-	MnemonicMessage(const char* subject, const Config& config, unsigned int version);
+	GMSEC_DEPRECATED MnemonicMessage(const char* subject, const Config& config, unsigned int version);
 
 
 	/**
@@ -88,7 +90,7 @@ public:
 	 *
 	 * @param other - the other MnemonicMessage object to copy.
 	 */
-	MnemonicMessage(const MnemonicMessage& other);
+	GMSEC_DEPRECATED MnemonicMessage(const MnemonicMessage& other);
 
 
 	/**
@@ -98,7 +100,7 @@ public:
 	 *
 	 * @param data - XML or JSON string used to initialize MnemonicMessage.
 	 */
-	MnemonicMessage(const char* data);
+	GMSEC_DEPRECATED MnemonicMessage(const char* data);
 
 
 	/**
@@ -172,7 +174,7 @@ public:
 	 *
 	 * @brief Constructs and returns a MnemonicMessage from an an ordinary message.
 	 */
-	static MnemonicMessage CALL_TYPE convertMessage(const Message& message);
+	GMSEC_DEPRECATED static MnemonicMessage CALL_TYPE convertMessage(const Message& message);
 
 
 private:

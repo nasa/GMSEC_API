@@ -239,7 +239,11 @@ const GMSEC_Device CALL_TYPE deviceMessageGetDevice(const GMSEC_Message msg, siz
 	{
 		try
 		{
+			GMSEC_DISABLE_DEPRECATED_WARNINGS
+
 			Device& tmp = const_cast<Device&>(devMsg->getDevice(index));
+
+			GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 			device = reinterpret_cast<GMSEC_Device>(&tmp);
 		}

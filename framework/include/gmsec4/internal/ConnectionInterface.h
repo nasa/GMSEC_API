@@ -28,6 +28,7 @@
 
 #include <string>
 
+#include <gmsec4/ConfigOptions.h>
 
 namespace gmsec
 {
@@ -41,31 +42,6 @@ namespace internal
 {
 // Forward declaration(s)
 class InternalConnection;
-
-
-const char OPT_REPLY_STRING[]                  = "MW-REPLY-STRING";
-const char OPT_EXPOSE_RESP[]                   = "MW-EXPOSE-RESP";
-const char OPT_MULTI_RESP[]                    = "MW-MULTI-RESP";
-const char OPT_REQ_RESP[]                      = "GMSEC-REQ-RESP";
-
-const char OPT_LOG_PERFORMANCE[]               = "GMSEC-LOG-PERFORMANCE";
-
-const char OPT_MAX_CONN_RETRIES[]              = "MW-MAX-CONN-RETRIES";
-const char OPT_CONN_RETRY_INTERVAL[]           = "MW-CONN-RETRY-INTERVAL";
-
-const char GMSEC_ASYNC_PUBLISH[]               = "GMSEC-ASYNC-PUBLISH";
-const char GMSEC_ASYNC_PUBLISH_QUEUE_DEPTH[]   = "GMSEC-ASYNC-PUBLISH-QUEUE-DEPTH";
-const char GMSEC_ASYNC_PUBLISH_TEARDOWN_WAIT[] = "GMSEC-ASYNC-PUBLISH-TEARDOWN-WAIT";
-
-const char GMSEC_DISABLE_RR[]                  = "GMSEC-DISABLE-RR";
-
-const char GMSEC_USE_MSG_BINS[]                = "GMSEC-USE-MSG-BINS";
-const char GMSEC_MSG_BIN_SIZE[]                = "GMSEC-MSG-BIN-SIZE";
-const char GMSEC_MSG_BIN_TIMEOUT[]             = "GMSEC-MSG-BIN-TIMEOUT";
-
-const char REPLY_UNIQUE_ID_FIELD[]             = "REPLY-UNIQUE-ID";
-
-const char REPLY_SUBJECT_FIELD[]               = "GMSEC_REPLY_SUBJECT";
 
 
 /**

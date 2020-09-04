@@ -43,6 +43,7 @@ namespace Net
 /// </summary>
 /// <seealso cref="GMSECErrorClasses" />
 /// <seealso cref="GMSECErrorCodes" />
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class Status
 {
 private:

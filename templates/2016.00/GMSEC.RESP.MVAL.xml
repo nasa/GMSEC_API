@@ -1,3 +1,5 @@
+<!-- Mnemonic Value Response Message -->
+<!-- See Table 5-76 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.RESP.MVAL">
 	<FIELD  NAME="RESPONSE-STATUS"
 	        MODE="REQUIRED"

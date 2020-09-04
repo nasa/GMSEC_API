@@ -6,133 +6,206 @@
  */
 
 
- 
-/** 
+
+/**
  * @file logging.java
  *
- * A Java demonstration example of GMSEC logging.
- *
+ * This file contains an example outlining the use of the GMSEC API logging
+ * framework.
  */
 
+import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.Log;
-import gov.nasa.gsfc.gmsec.api.util.LogEntry;
-import gov.nasa.gsfc.gmsec.api.util.LogHandler;
 import gov.nasa.gsfc.gmsec.api.util.LogLevel;
+import gov.nasa.gsfc.gmsec.api.util.LogHandler;
+import gov.nasa.gsfc.gmsec.api.util.LogEntry;
 import gov.nasa.gsfc.gmsec.api.util.TimeUtil;
+import gov.nasa.gsfc.gmsec.api.mist.ConnectionManager;
+import gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerCallback;
+import java.util.concurrent.Semaphore;
 
-
-class GenericHandler
+//o Define a baseline LogHandler
+// This will be used by the Log macros; The implementation of onMessage
+// determines how messages will be logged to output
+class BaseHandler extends LogHandler
 {
-	public static void onMessageAux(String source, LogEntry entry)
+	// Use a mutex so messages from different threads don't get mixed up
+	private Semaphore mutex;
+	private String whoAmI = "";
+
+	public BaseHandler(String wai)
 	{
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(source).append(" : ");
-		sb.append(TimeUtil.formatTime(entry.time)).append(" [").append(entry.level.toString()).append("] ");
-		sb.append("[").append(entry.fileName).append(":").append(entry.lineNumber).append("] ");
-		sb.append(entry.message).append("\n");
-
-		String output = sb.toString().replace("\n", "\n\t");
-
-		System.out.println(sb.toString());
+		mutex = new Semaphore(1);
+		whoAmI = wai;
 	}
 
-
-	public static class ErrorHandler extends LogHandler
+	public void onMessage(LogEntry entry)
 	{
-		public void onMessage(LogEntry entry)
+		try
 		{
-			onMessageAux(getClass().getName(), entry);
+			mutex.acquire();
+
+			String time = TimeUtil.formatTime(entry.time);
+
+			System.out.println("[BaseHandler::onMessage] for: " + whoAmI +
+				 " : " + time + " [" + Log.levelToString(entry.level) + "]" +
+				 " [" + entry.fileName + ":" + entry.lineNumber + "] " +
+				 entry.message + "\n\n");
+
+			mutex.release();
 		}
-	}
-
-
-	public static class WarningHandler extends LogHandler
-	{
-		public void onMessage(LogEntry entry)
+		catch(Exception e)
 		{
-			onMessageAux(getClass().getName(), entry);
-		}
-	}
-
-	public static class InfoHandler extends LogHandler
-	{
-		public void onMessage(LogEntry entry)
-		{
-			onMessageAux(getClass().getName(), entry);
-		}
-	}
-
-
-	public static class VerboseHandler extends LogHandler
-	{
-		public void onMessage(LogEntry entry)
-		{
-			onMessageAux(getClass().getName(), entry);
-		}
-	}
-
-
-	public static class DebugHandler extends LogHandler
-	{
-		public void onMessage(LogEntry entry)
-		{
-			onMessageAux(getClass().getName(), entry);
-		}
-	}
-
-	public static class AnyHandler extends LogHandler
-	{
-		public void onMessage(LogEntry entry)
-		{
-			onMessageAux(getClass().getName(), entry);
+			Log.error(e.getMessage());
 		}
 	}
 }
 
+class ErrorHandler extends BaseHandler
+{
+	public ErrorHandler()
+	{
+		super("GMSEC_ERROR");
+	}
+}
+
+class WarningHandler extends BaseHandler
+{
+	public WarningHandler()
+	{
+		super("GMSEC_WARNING");
+	}
+}
+
+class InfoHandler extends BaseHandler
+{
+	public InfoHandler()
+	{
+		super("GMSEC_INFO");
+	}
+}
+
+class VerboseHandler extends BaseHandler
+{
+	public VerboseHandler()
+	{
+		super("GMSEC_VERBOSE");
+	}
+}
+
+class DebugHandler extends BaseHandler
+{
+	public DebugHandler()
+	{
+		super("GMSEC_DEBUG");
+	}
+}
+
+class AnyHandler extends BaseHandler
+{
+	public AnyHandler()
+	{
+		super("ANY_HANDLER");
+	}
+}
 
 public class logging
 {
-	public static void main(String args[])
+	public static void main(String[] args)
 	{
-		GenericHandler.ErrorHandler   errorHandler = new GenericHandler.ErrorHandler();
-		GenericHandler.WarningHandler warningHandler = new GenericHandler.WarningHandler();    
-		GenericHandler.InfoHandler    infoHandler = new GenericHandler.InfoHandler();
-		GenericHandler.VerboseHandler verboseHandler = new GenericHandler.VerboseHandler();    
-		GenericHandler.DebugHandler   debugHandler = new GenericHandler.DebugHandler();    
-		GenericHandler.AnyHandler     anyHandler = new GenericHandler.AnyHandler();    
+		if (args.length < 1)
+		{
+			System.out.println("usage: java logging mw-id=<middleware ID>");
+			System.exit(-1);
+		}
 
-		Log.registerHandler(LogLevel.ERROR, errorHandler);    
-		Log.registerHandler(LogLevel.WARNING, warningHandler);    
-		Log.registerHandler(LogLevel.INFO, infoHandler);    
-		Log.registerHandler(LogLevel.VERBOSE, verboseHandler);    
-		Log.registerHandler(LogLevel.DEBUG, debugHandler);    
+		Config config = new Config(args);
 
-		System.out.println("Setting log level to " + Log.levelFromString("VERBOSE"));
+		//o Create and register log handlers
+		ErrorHandler errorHandler = new ErrorHandler();
+		WarningHandler warningHandler = new WarningHandler();
+		InfoHandler infoHandler = new InfoHandler();
+		VerboseHandler verboseHandler = new VerboseHandler();
+		DebugHandler debugHandler = new DebugHandler();
+		AnyHandler anyHandler = new AnyHandler();
+
+		Log.registerHandler(LogLevel.ERROR, errorHandler);
+		Log.registerHandler(LogLevel.WARNING, warningHandler);
+		Log.registerHandler(LogLevel.INFO, infoHandler);
+		Log.registerHandler(LogLevel.VERBOSE, verboseHandler);
+		Log.registerHandler(LogLevel.DEBUG, debugHandler);
+
+		//o Set logging reporting level
 		Log.setReportingLevel(LogLevel.VERBOSE);
+		Log.verbose("The log reporting level is now set to: " + Log.getReportingLevel());
 
-		Log.info("The reporting level is set to " + Log.getReportingLevel());
+		//o Print the GMSEC API version number using the GMSEC Logging
+		// interface
+		// This is useful for determining which version of the API is
+		// configured within the environment
+		// TODO: Once available, replace this statement with usage of
+		// ConnectionManager::getAPIVersion (See RTC 4798)
+		Log.info(Connection.getAPIVersion());
+
+		try
+		{
+			//o Create the ConnectionManager
+			ConnectionManager connMgr = new ConnectionManager(config);
+
+			//o Connect
+			connMgr.initialize();
+
+			//o Output middleware client library version
+			Log.info(connMgr.getLibraryVersion());
+
+			//o Publish a message
+			publishTestMessage(connMgr, "GMSEC.TEST.PUBLISH");
+
+			//o Disconnect from the middleware and clean up the Connection
+			connMgr.cleanup();
+		}
+		catch (Exception e)
+		{
+			Log.error(e.getMessage());
+			System.exit(-1);
+		}
+
+		//o Unregister log handlers
+		Log.registerHandler(null);
+
+		//o Set log stream to stderr
+		config.addValue("LOGFILE", "STDERR");
+		Log.info("This message should go to stderr, not stdout.  " +
+						 "For example, in bash test by running as:\n" +
+						 "java logging mw-id=bolt 2> testfile.txt\n" +
+						 "... and then check the contents of testfile.txt");
+
+		//o Reset log stream to stdout
+		config.addValue("LOGFILE", "STDOUT");
 
 		Log.error("This is an example error message.");
 		Log.warning("This is an example warning message.");
-		Log.verbose("This is an example verbose message.");
-		// This last message cannot be shown right now because
-		// Log.setReportingLevel(LogLevel.VERBOSE), used above, does not
-		// allow DEBUG messages to come out.
+		Log.verbose("This is an example \"verbose\" message.");
 		Log.debug("This is an example debug message which should not show.");
+
+			// This last message cannot be shown right now because
+	  	// Log::setReportingLevel(logVERBOSE), used above, does not
+	  	// allow DEBUG messages to come out.
+		Log.verbose("This is another example \"verbose\" message.");
 
 		// Set logging reporting level to now allow DEBUG messages to be shown
 		Log.setReportingLevel(LogLevel.DEBUG);
-
-		if (Log.getReportingLevel() == LogLevel.DEBUG)
+		if(Log.getReportingLevel() == LogLevel.DEBUG)
 		{
-			Log.info("Changed reporting level to LogLevel.DEBUG");
+			Log.info("Changed reporting level to logDEBUG");
 		}
 		else
 		{
-			Log.error("Failed to change reporting level to LogLevel.DEBUG");
+			Log.error("Failed to change reporting level to logDEBUG");
 		}
-		Log.debug("This is an example debug message which should show.");
+		// The DEBUG message below will be shown successfully, unlike the last
+		// debug message.
+		Log.debug( "This is an example debug message which should show.");
 
 		Log.debug("NONE reporting level, numerically, is " + Log.levelFromString("NONE"));
 		Log.debug("ERROR reporting level, numerically, is " + Log.levelFromString("ERROR"));
@@ -142,7 +215,7 @@ public class logging
 		Log.debug("VERBOSE reporting level, numerically, is " + Log.levelFromString("VERBOSE"));
 		Log.debug("DEBUG reporting level, numerically, is " + Log.levelFromString("DEBUG"));
 
-		// Register general-purpose handler and test
+		//o Register general-purpose handler and test
 		Log.registerHandler(anyHandler);
 
 		Log.error("NONE reporting level, numerically, is " + Log.levelFromString("NONE"));
@@ -151,5 +224,38 @@ public class logging
 		Log.info("INFO reporting level, numerically, is " + Log.levelFromString("INFO"));
 		Log.verbose("VERBOSE reporting level, numerically, is " + Log.levelFromString("VERBOSE"));
 		Log.debug("DEBUG reporting level, numerically, is " + Log.levelFromString("DEBUG"));
+
+		//o Unregister log handlers
+		Log.registerHandler(null);
+
+		return;
+	}
+
+	public static void publishTestMessage(ConnectionManager connMgr, String subject)
+	{
+		int i = 123;
+		try
+		{
+			//o Create a Message object
+			Message message = new Message(subject, Message.MessageKind.PUBLISH);
+
+			//o Add fields to the Message
+			message.addField("F", false);
+			message.addField("I", (int) i); //I32
+			message.addField("K", (short) i); //I16
+			message.addField("S", "This is a test");
+			message.addField("D", (float) (1 + 1./i)); //F32
+			message.addField("X", "JLMNOPQ".getBytes()); //Bin
+
+			//o Publish Message
+			connMgr.publish(message);
+
+			//o Output the Message's XML string representation by invoking Log macro
+			Log.info("Sent:\n" + message.toXML());
+		}
+		catch(Exception e)
+		{
+			Log.error(e.getMessage());
+		}
 	}
 }

@@ -1,3 +1,5 @@
+<!-- Archive Mnemonic Value Response message -->
+<!-- See Table 6-91 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.RESP.AMVAL">
 	<FIELD  NAME="RESPONSE-STATUS"
 	        MODE="REQUIRED"
@@ -119,13 +121,13 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="NAME of the 1st mnemonic"/>
+	        DESCRIPTION="NAME of the nth mnemonic"/>
 	<FIELD  NAME="MNEMONIC.n.STATUS"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="I16"
-	        DESCRIPTION="Status of the 1st mnemonic: valid mnemonic or valid mnemonic with no data or invalid mnemonic (1:  Valid, 2:  Valid, Nodata, 3:  Invalid"/>
+	        DESCRIPTION="Status of the nth mnemonic: valid mnemonic or valid mnemonic with no data or invalid mnemonic (1:  Valid, 2:  Valid, Nodata, 3:  Invalid"/>
 	<FIELD	NAME="ARRAY-END"
 			MODE="CONTROL"
 			DESCRIPTION="Control field indicating the end of an array of object fields"/>

@@ -73,7 +73,7 @@ InternalProductFileMessage::InternalProductFileMessage(const char* subject,
 													   ResponseStatus::Response responseStatus, 
 													   const char* schemaID,
 													   const Specification& spec)
-	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID), schemaID, spec),
+	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, spec),
 	  m_list(),
 	  m_productFileIterator(*this),
 	  m_responseStatus(responseStatus)
@@ -87,7 +87,7 @@ InternalProductFileMessage::InternalProductFileMessage(const char* subject,
 													   const char* schemaID,
 													   const gmsec::api::Config& config, 
 													   const Specification& spec)
-	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID), schemaID, config, spec),
+	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, config, spec),
 	  m_list(),
 	  m_productFileIterator(*this),
 	  m_responseStatus(responseStatus)
@@ -423,11 +423,11 @@ void InternalProductFileMessage::init(ResponseStatus::Response responseStatus, c
 	for(std::list<FieldTemplate>::const_iterator it = fieldTemplates.begin(); it != fieldTemplates.end(); ++it)
 	{
 		FieldTemplate temp = *it;
-		if(!StringUtil::stringEquals(temp.getValue(), ""))
+		if(temp.hasExplicitType() && temp.hasExplicitValue())
 		{//the field template has a predefined value, so we'll add the field to the message
 			try
 			{
-				std::auto_ptr<Field> field(temp.toField());
+				std::auto_ptr<Field> field(temp.toField(temp.getType()));
 
 				addField(*(field.get()));
 			}

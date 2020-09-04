@@ -40,6 +40,7 @@
 
 #include <gmsec4_defs.h>
 
+#include <gmsec4/util/Deprecated.h>
 #include <gmsec4/util/wdllexp.h>
 
 
@@ -144,7 +145,7 @@ extern "C"
 	 *
 	 * @return XML string representation of the message schema, or NULL if a schema cannot be referenced.
 	 */
-	GMSEC_API const char* specificationGetTemplateXML(GMSEC_Specification spec, const char* subject, const char* schemaID, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API const char* specificationGetTemplateXML(GMSEC_Specification spec, const char* subject, const char* schemaID, GMSEC_Status status);
 
 
 #ifdef __cplusplus

@@ -22,7 +22,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 
 /**
- * @deprecated
+ *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief Basic logging class. This class supports basic logging to any output
  *        stream. This class is thread-safe.
  *        
@@ -32,6 +34,7 @@ import java.io.PrintWriter;
  *  class.
  * 
  */
+@Deprecated
 public class Log
 {
 	protected static Log instance = new Log();

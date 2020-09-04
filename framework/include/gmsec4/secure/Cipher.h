@@ -15,6 +15,8 @@
 
 #include <gmsec4/Config.h>
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/Value.h>
 
 #include <gmsec4/util/Buffer.h>
@@ -143,7 +145,6 @@ private:
 
 
 // RotateCipher is for demonstration purposes.
-const char KEY_DELTA[] = "SEC-CIPHER-DELTA";
 
 class GMSEC_API RotateCipher : public AbstractCipher
 {

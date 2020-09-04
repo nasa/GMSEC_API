@@ -24,48 +24,27 @@ libgmsec_perl::ProductFileMessage
 	A ProductFileMessage object that is capable of storing ProductFile objects.
 
 	The following message schema IDs and their templates are supported:
-	 2014.00.GMSEC.MSG.PROD.AAA 
-	 2014.00.GMSEC.MSG.PROD.AUTO 
-	 2014.00.GMSEC.MSG.PROD.FD 
-	 2014.00.GMSEC.MSG.PROD.MAS 
-	 2014.00.GMSEC.MSG.PROD.PAS 
-	 2014.00.GMSEC.MSG.PROD.SC 
-	 2014.00.GMSEC.MSG.PROD.TAC 
-	 2014.00.GMSEC.REQ.PROD.AAA 
-	 2014.00.GMSEC.REQ.PROD.AUTO 
-	 2014.00.GMSEC.REQ.PROD.FD 
-	 2014.00.GMSEC.REQ.PROD.MAS 
-	 2014.00.GMSEC.REQ.PROD.PAS 
-	 2014.00.GMSEC.REQ.PROD.SC 
-	 2014.00.GMSEC.REQ.PROD.TAC 
-	 2014.00.GMSEC.RESP.PROD.AAA 
-	 2014.00.GMSEC.RESP.PROD.AUTO 
-	 2014.00.GMSEC.RESP.PROD.FD 
-	 2014.00.GMSEC.RESP.PROD.MAS 
-	 2014.00.GMSEC.RESP.PROD.PAS 
-	 2014.00.GMSEC.RESP.PROD.SC 
-	 2014.00.GMSEC.RESP.PROD.TAC 
-	 2016.00.GMSEC.MSG.PROD.AAA 
-	 2016.00.GMSEC.MSG.PROD.AUTO 
-	 2016.00.GMSEC.MSG.PROD.FD 
-	 2016.00.GMSEC.MSG.PROD.MAS 
-	 2016.00.GMSEC.MSG.PROD.PAS 
-	 2016.00.GMSEC.MSG.PROD.SC 
-	 2016.00.GMSEC.MSG.PROD.TAC 
-	 2016.00.GMSEC.REQ.PROD.AAA 
-	 2016.00.GMSEC.REQ.PROD.AUTO 
-	 2016.00.GMSEC.REQ.PROD.FD 
-	 2016.00.GMSEC.REQ.PROD.MAS 
-	 2016.00.GMSEC.REQ.PROD.PAS 
-	 2016.00.GMSEC.REQ.PROD.SC 
-	 2016.00.GMSEC.REQ.PROD.TAC 
-	 2016.00.GMSEC.RESP.PROD.AAA 
-	 2016.00.GMSEC.RESP.PROD.AUTO 
-	 2016.00.GMSEC.RESP.PROD.FD 
-	 2016.00.GMSEC.RESP.PROD.MAS 
-	 2016.00.GMSEC.RESP.PROD.PAS 
-	 2016.00.GMSEC.RESP.PROD.SC 
-	 2016.00.GMSEC.RESP.PROD.TAC
+	 MSG.PROD.AAA 
+	 MSG.PROD.AUTO 
+	 MSG.PROD.FD 
+	 MSG.PROD.MAS 
+	 MSG.PROD.PAS 
+	 MSG.PROD.SC 
+	 MSG.PROD.TAC 
+	 REQ.PROD.AAA 
+	 REQ.PROD.AUTO 
+	 REQ.PROD.FD 
+	 REQ.PROD.MAS 
+	 REQ.PROD.PAS 
+	 REQ.PROD.SC 
+	 REQ.PROD.TAC 
+	 RESP.PROD.AAA 
+	 RESP.PROD.AUTO 
+	 RESP.PROD.FD 
+	 RESP.PROD.MAS 
+	 RESP.PROD.PAS 
+	 RESP.PROD.SC 
+	 RESP.PROD.TAC
 
 =head2 Public Member Subroutines
 
@@ -114,7 +93,7 @@ C<libgmsec_perl::ProductFileMessage-E<gt>new($subject, $responseStatus, $schemaI
 
 	$subject - the subject string for the message.
 	$responseStatus - RESPONSE-STATUS field to insert into the message
-	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO).  Note that not all schemaIDs contain a messageSubtype
+	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO). You may also use shorthand notation of messageKind.messageType.messageSubtype (e.g. MSG.PROD.AUTO) Note that not all schemaIDs contain a messageSubtype
 	$spec - a reference to the specification this message's schema will adhere to.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
@@ -129,7 +108,7 @@ C<libgmsec_perl::ProductFileMessage-E<gt>new($subject, $responseStatus, $schemaI
 
 	$subject - the subject string for the message.
 	$responseStatus - RESPONSE-STATUS field to insert into the message
-	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO).  Note that not all schemaIDs contain a messageSubtype
+	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO). You may also use the shorthand notation of messageKind.messageType.messageSubtype (e.g. MSG.PROD.AUTO) Note that not all schemaIDs contain a messageSubtype
 	$config - A Configuration object to associate with the message
 	$spec - a reference to the specification this message's schema will adhere to.
 

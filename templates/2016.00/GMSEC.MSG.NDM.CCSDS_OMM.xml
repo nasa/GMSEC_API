@@ -1,3 +1,5 @@
+<!-- CCSDS Orbital Mean-Elements Message -->
+<!-- See Table 5-159 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.MSG.NDM.CCSDS-OMM">
 	<FIELD  NAME="NDM-TYPE"
 	        MODE="REQUIRED"
@@ -58,7 +60,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="Format of the DATA field (KVN: Keyword = Value Notation, XML: eXtensible Markup Language, RAW, or BIN (binary))"/>
+	        DESCRIPTION="Format of the DATA field (KVN: Keyword = Value Notation, XML: eXtensible Markup Language, RAW: Raw Data, or BIN: Binary Data)"/>
 	<FIELD  NAME="DATA"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"

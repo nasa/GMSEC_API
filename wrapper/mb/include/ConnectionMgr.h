@@ -108,10 +108,10 @@ private:
 
 
 	/**
-	 * @fn doResourceMessage(const char* buffer, int bufLength)
-	 * send the resource data to the SystemAgent
+	 * @fn doResourceMessage(const gmsec::api::Message& request)
+	 * send the resource data to the requesting component
 	 */
-	void doResourceMessage(const char* buffer, int bufLength);
+	void doResourceMessage(const gmsec::api::Message& request);
 
 
 	/**

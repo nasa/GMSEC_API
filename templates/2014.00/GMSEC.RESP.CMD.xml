@@ -46,6 +46,6 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="UNSET"
+	        TYPE="VARIABLE"
 	        DESCRIPTION="Additional data that may be desired along with the completion status"/>
 </SCHEMA>

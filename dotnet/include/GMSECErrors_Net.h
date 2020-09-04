@@ -36,6 +36,7 @@ namespace Net
 /// <summary>These are general error codes
 /// The error string needs to include general error description, detail
 /// description, and any middleware specific info.</summary>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public enum class GMSECErrorClasses : UInt16
 {
 	/// <summary>An Error has not occurred.</summary>
@@ -83,6 +84,7 @@ public enum class GMSECErrorClasses : UInt16
 
 /// <summary>GMSEC Error codes
 /// These codes correspond to the specific error being generated.</summary>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public enum class GMSECErrorCodes : UInt32
 {
 	/// <summary>The ConnectionFactory object was unable to load one of the needed libraries for the specified middleware</summary>

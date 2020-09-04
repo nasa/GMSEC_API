@@ -22,6 +22,7 @@
 
 #include <gmsec/Config.h>
 #include <gmsec/util/Buffer.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -41,7 +42,7 @@ class GMSEC_API Signer
 {
 public:
 
-	Signer ();
+	GMSEC_DEPRECATED Signer ();
 	~Signer ();
 
 	bool isValid () const;
@@ -107,7 +108,7 @@ protected:
 class GMSEC_API NullSigner : public BaseSigner
 {
 public:
-	NullSigner ();
+	GMSEC_DEPRECATED NullSigner ();
 
 	virtual const char * getID () const;
 	virtual Status initialize (const Config &config);
@@ -119,7 +120,7 @@ public:
 class GMSEC_API DisabledSigner : public BaseSigner
 {
 public:
-	DisabledSigner ();
+	GMSEC_DEPRECATED DisabledSigner ();
 	~DisabledSigner ();
 
 	virtual const char * getID () const;
@@ -133,7 +134,7 @@ public:
 class GMSEC_API Sum32Signer : public BaseSigner
 {
 public:
-	Sum32Signer ();
+	GMSEC_DEPRECATED Sum32Signer ();
 
 	virtual const char * getID () const;
 	virtual Status initialize (const Config &config);

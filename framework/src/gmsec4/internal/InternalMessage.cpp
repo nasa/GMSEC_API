@@ -21,12 +21,12 @@
 #include <gmsec4/internal/StringUtil.h>
 #include <gmsec4/internal/field/InternalField.h>
 
+#include <gmsec4/ConfigOptions.h>
 #include <gmsec4/Exception.h>
 #include <gmsec4/Fields.h>
 
 #include <gmsec4/util/Buffer.h>
 #include <gmsec4/util/Log.h>
-
 
 #include <tinyxml2.h>
 #include <json.h>
@@ -41,8 +41,6 @@ using namespace gmsec::api::internal;
 using namespace gmsec::api::util;
 
 
-static const char*  MSG_FLD_STORAGE_TYPE_OPT = "gmsec-msgfld-store-type";
-static const char*  MSG_FLD_STORAGE_SIZE_OPT = "gmsec-msgfld-store-size";
 static const char*  TREE_TYPE                = "tree";
 static const char*  HASH_TYPE                = "hash";
 static const size_t MSG_FLD_STORAGE_ROLLOVER = 50;
@@ -69,7 +67,7 @@ InternalMessage::InternalMessage(const char* subject, Message::MessageKind kind)
 InternalMessage::InternalMessage(const char* subject, Message::MessageKind kind, const Config& config)
 	: m_subject(),
 	  m_kind(kind),
-	  m_config(config),
+	  m_config(),
 	  m_fields(MsgFieldMap::BINARY_TREE_MAP, MSG_FLD_STORAGE_ROLLOVER),
 	  m_fieldIterator(*this),
 	  m_xml()
@@ -147,12 +145,12 @@ InternalMessage::InternalMessage(const char* data)
 InternalMessage::InternalMessage(const InternalMessage& other)
 	: m_subject(other.m_subject),
 	  m_kind(other.m_kind),
-	  m_config(other.m_config),
+	  m_config(),
 	  m_fields(other.m_fields.getStorageType(), other.m_fields.getRolloverLimit()),
 	  m_fieldIterator(*this),
 	  m_xml()
 {
-	processConfig(m_config);
+	processConfig(other.m_config);
 
 	// copy standard fields (if any)
 	other.copyFields(*this);
@@ -170,18 +168,6 @@ InternalMessage::~InternalMessage()
 
 void InternalMessage::addConfig(const Config& config)
 {
-	const char* name  = 0;
-	const char* value = 0;
-
-	bool hasConfig = config.getFirst(name, value);
-
-	while (hasConfig)
-	{
-		m_config.addValue(name, value);
-
-		hasConfig = config.getNext(name, value);
-	}
-
 	processConfig(config);
 }
 
@@ -712,7 +698,19 @@ const char* InternalMessage::toXML() const
 	{
 		oss << ">" << "\n";
 
-		oss << cfgXML << "\n";
+		// Indent the config string to ensure overall output is pretty
+		std::string strCfgXML = cfgXML;
+		size_t pos = 0;
+
+		strCfgXML.insert(pos, "\t");
+
+		while ((pos = strCfgXML.find('\n', pos)) != std::string::npos)
+		{
+			strCfgXML.replace(pos, 1, "\n\t");
+			pos += 2;
+		}
+
+		oss << strCfgXML << "\n";
 	}
 	if (haveFld)
 	{
@@ -831,12 +829,15 @@ void InternalMessage::processConfig(const Config& config)
 	const char* value = 0;
 
 	bool hasNext = config.getFirst(name, value);
+
 	while (hasNext)
 	{
 		if (!processConfigValue(name, value))
 		{
 			GMSEC_WARNING << "Message configuration item [" << name << "," << value << "] was not used.";
 		}
+
+		m_config.addValue(name, value);
 
 		hasNext = config.getNext(name, value);
 	}
@@ -845,7 +846,7 @@ void InternalMessage::processConfig(const Config& config)
 
 bool InternalMessage::processConfigValue(const char* name, const char* value)
 {
-	if (StringUtil::stringEqualsIgnoreCase(name, MSG_FLD_STORAGE_TYPE_OPT))
+	if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_MSG_FLD_STORAGE_TYPE))
 	{
 		if (StringUtil::stringEqualsIgnoreCase(value, TREE_TYPE))
 		{
@@ -860,12 +861,12 @@ bool InternalMessage::processConfigValue(const char* name, const char* value)
 		else
 		{
 			std::stringstream ss;
-			ss << MSG_FLD_STORAGE_TYPE_OPT << " must be either '" << TREE_TYPE
+			ss << GMSEC_MSG_FLD_STORAGE_TYPE << " must be either '" << TREE_TYPE
 			   << "' or '" << HASH_TYPE << "'; got '" << value << "'.";
 			throw Exception(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
 		}
 	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, MSG_FLD_STORAGE_SIZE_OPT))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_MSG_FLD_STORAGE_SIZE))
 	{
 		std::stringstream ss(value);
 		int limit = 0;
@@ -878,34 +879,28 @@ bool InternalMessage::processConfigValue(const char* name, const char* value)
 		else
 		{
 			std::stringstream ss;
-			ss << MSG_FLD_STORAGE_SIZE_OPT << " value must be a number; got '" << value << "'.";
+			ss << GMSEC_MSG_FLD_STORAGE_SIZE << " value must be a number; got '" << value << "'.";
 			throw Exception(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
 		}
 	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, "subject"))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_SORT_MSG_FIELDS))
 	{
-		setSubject(value);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, "kind"))
-	{
-		Message::MessageKind kind = Message::PUBLISH;
-
-		if (StringUtil::stringEqualsIgnoreCase(value, "publish") || StringUtil::stringEqualsIgnoreCase(value, "GMSEC_MSG_PUBLISH"))
+        if (StringUtil::stringEqualsIgnoreCase(value, "true"))
 		{
-			kind = Message::PUBLISH;
+			m_fields.setStorageType(MsgFieldMap::BINARY_TREE_MAP);
+			m_fields.setRolloverLimit(0);
+			return true;
 		}
-		else if (StringUtil::stringEqualsIgnoreCase(value, "request") || StringUtil::stringEqualsIgnoreCase(value, "GMSEC_MSG_REQUEST"))
+        else if (StringUtil::stringEqualsIgnoreCase(value, "false"))
 		{
-			kind = Message::REQUEST;
+			return true;
 		}
-		else if (StringUtil::stringEqualsIgnoreCase(value, "reply") || StringUtil::stringEqualsIgnoreCase(value, "GMSEC_MSG_REPLY"))
+		else
 		{
-			kind = Message::REPLY;
+			std::stringstream ss;
+			ss << GMSEC_SORT_MSG_FIELDS << " value must be either be true or false.";
+			throw Exception(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
 		}
-
-		setKind(kind);
-		return true;
 	}
 
 	TrackingDetails& tracking = this->getTracking();
@@ -914,51 +909,54 @@ bool InternalMessage::processConfigValue(const char* name, const char* value)
 	static const int TRACK_ON  = MESSAGE_TRACKINGFIELDS_ON;
 
 	// Set the tracking field state
-	if (StringUtil::stringEqualsIgnoreCase(name, "TRACKING"))
+	if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING))
 	{
 		tracking.set(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
-
-	else if (StringUtil::stringEqualsIgnoreCase(name, "TRACKING-NODE"))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_NODE))
 	{
 		tracking.setNode(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
-
-	else if (StringUtil::stringEqualsIgnoreCase(name, "TRACKING-PROCESS-ID"))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_PROCESS_ID))
 	{
 		tracking.setProcessId(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
-
-	else if (StringUtil::stringEqualsIgnoreCase(name, "TRACKING-USER-NAME"))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_USERNAME))
 	{
 		tracking.setUserName(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
-
-	else if (StringUtil::stringEqualsIgnoreCase(name, "TRACKING-CONNECTION-ID"))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_CONNECTION_ID))
 	{
 		tracking.setConnectionId(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
-
-	else if (StringUtil::stringEqualsIgnoreCase(name, "TRACKING-PUBLISH-TIME"))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_PUBLISH_TIME))
 	{
 		tracking.setPublishTime(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
-
-	else if (StringUtil::stringEqualsIgnoreCase(name, "TRACKING-UNIQUE-ID"))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_UNIQUE_ID))
 	{
 		tracking.setUniqueId(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
-
-	else if (StringUtil::stringEqualsIgnoreCase(name, "TRACKING-MW-INFO"))
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_MW_INFO))
 	{
 		tracking.setMwInfo(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
+		return true;
+	}
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS))
+	{
+		tracking.setActiveSubscriptions(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
+		return true;
+	}
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_CONNECTION_ENDPOINT))
+	{
+		tracking.setConnectionEndpoint(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
 

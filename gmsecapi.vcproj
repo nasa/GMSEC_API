@@ -65,6 +65,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -165,6 +166,7 @@
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -265,6 +267,7 @@
 				ProgramDataBaseFileName=".\objects/Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -362,6 +365,7 @@
 				ProgramDataBaseFileName=".\objects/Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1726,6 +1730,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\framework\include\gmsec\util\Deprecated.h"
+					>
+				</File>
+				<File
 					RelativePath=".\framework\include\gmsec\util\Encoder.h"
 					>
 				</File>
@@ -2050,6 +2058,10 @@
 			<Filter
 				Name="internal"
 				>
+				<File
+					RelativePath=".\framework\include\gmsec4\internal\ActiveSubscriptions.h"
+					>
+				</File>
 				<File
 					RelativePath=".\framework\include\gmsec4\internal\AsyncPublisher.h"
 					>
@@ -2464,6 +2476,10 @@
 				</File>
 				<File
 					RelativePath=".\framework\include\gmsec4\util\DataList.h"
+					>
+				</File>
+				<File
+					RelativePath=".\framework\include\gmsec4\util\Deprecated.h"
 					>
 				</File>
 				<File
@@ -4698,6 +4714,50 @@
 			<Filter
 				Name="internal"
 				>
+				<File
+					RelativePath=".\framework\src\gmsec4\internal\ActiveSubscriptions.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
+						/>
+					</FileConfiguration>
+				</File>
 				<File
 					RelativePath=".\framework\src\gmsec4\internal\AsyncPublisher.cpp"
 					>

@@ -15,19 +15,20 @@
 #ifndef GMSEC_API_INTERNAL_CONFIGFILE_H
 #define GMSEC_API_INTERNAL_CONFIGFILE_H
 
-
-#include <gmsec4/util/wdllexp.h>
-
+#include <gmsec4/internal/ci_less.h>
 #include <gmsec4/internal/tinyxml2.h>
 
 #include <gmsec4/Config.h>
+#include <gmsec4/ConfigFile.h>
 #include <gmsec4/ConfigFileIterator.h>
 #include <gmsec4/Message.h>
 
-#include <gmsec4/internal/ci_less.h>
+#include <gmsec4/util/StdSharedPtr.h>
+#include <gmsec4/util/wdllexp.h>
 
 #include <map>
 #include <string>
+#include <list>
 
 
 namespace gmsec
@@ -68,6 +69,9 @@ public:
 
 
 	const char* CALL_TYPE lookupSubscription(const char* name) const;
+
+
+	const ConfigFile::SubscriptionEntry& lookupSubscriptionEntry(const char* name);
 
 
 	void CALL_TYPE addSubscription(const char* name, const char* subscription);
@@ -118,7 +122,7 @@ public:
 	ConfigFile::MessageEntry nextMessage();
 
 
-	ConfigFile::SubscriptionEntry nextSubscription();
+	const ConfigFile::SubscriptionEntry& nextSubscription();
 
 
 	const char* nextCustomElement();
@@ -160,8 +164,9 @@ private:
 
 
 	// private data members
-	typedef std::map<std::string, tinyxml2::XMLElement*, ci_less>  NodeMap;
-	typedef std::map<std::string, std::string> AliasMap;
+	typedef std::map<std::string, tinyxml2::XMLElement*, ci_less> NodeMap;
+	typedef std::map<std::string, std::string>                    AliasMap;
+	typedef util::StdSharedPtr<ConfigFile::SubscriptionEntry>     SubEntry;
 
 	std::string            m_filePath;
 	tinyxml2::XMLDocument* m_xmlDoc;
@@ -181,6 +186,8 @@ private:
 	AliasMap               m_aliasMap;
 
 	ConfigFileIterator     m_iter;
+
+	SubEntry               m_subEntry;
 };
 
 
@@ -233,14 +240,22 @@ public:
 	InternalSubscriptionEntry& operator=(const InternalSubscriptionEntry& other);
 
 	const char* getName() const;
-	const char* getSubject() const;
+	const char* getPattern() const;
 
 	void setName(const char* name);
-	void setSubject(const char* subject);
+	void setPattern(const char* subject);
+
+	bool hasNextExcludedPattern() const;
+	const char* nextExcludedPattern() const; 	
+	void addExcludedPattern(const char* pattern);
 
 private:
-	std::string m_name;
-	std::string m_subject;
+	typedef std::list<std::string> ExcludedPatterns;
+
+	std::string                        m_name;
+	std::string                        m_pattern;
+	ExcludedPatterns                   m_excludedPatterns;
+	mutable ExcludedPatterns::iterator m_excludedPatternsIter;
 };
 
 

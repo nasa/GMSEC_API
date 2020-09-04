@@ -12,7 +12,7 @@ GMSEC_HOME=..
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
 
-TOOLS = gmhelp
+TOOLS = gmhelp utilities
 
 default clean:
 	@ for tool in $(TOOLS); do \

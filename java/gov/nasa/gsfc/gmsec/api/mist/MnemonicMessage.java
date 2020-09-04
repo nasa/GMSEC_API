@@ -12,7 +12,7 @@
  * @brief The MnemonicMessage object is an extension of Message, and serves as
  * a container for a GMSEC MSG MVAL %Message.
  *
- * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.
+ * @deprecated This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist;
@@ -34,7 +34,10 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMnemonicMessage;
  *
  * @brief The MnemonicMessage object is an extension of Message, and serves as a container for a GMSEC MSG MVAL %Message.
  * The methods of this class allow for the construction and manipulation of the data within the message.
+ *
+ * @deprecated This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.MnemonicMessage instead.
  */
+@Deprecated
 public class MnemonicMessage extends Message
 {
 	/**

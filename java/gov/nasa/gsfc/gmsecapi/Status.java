@@ -15,12 +15,15 @@ package gov.nasa.gsfc.gmsecapi;
 
 /** @class Status
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This is the class for holding status information returned by the API
  * function calls to provide feedback.  Status provides an error code
  * and error message specific to the error type, but independent of error
  * source.
  *
  */
+@Deprecated
 public class Status
 {
 	private int fEClass;

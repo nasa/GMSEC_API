@@ -20,6 +20,7 @@
 #ifndef gmsec_util_Condition_h
 #define gmsec_util_Condition_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/Mutex.h>
 #include <gmsec/util/timeutil.h>
 
@@ -113,7 +114,7 @@ public:
 		 *	modules.
 		 *
 		**/
-	Condition();
+	GMSEC_DEPRECATED Condition();
 
 	/**	@fn Condition()
 		 *
@@ -121,7 +122,7 @@ public:
 		 *	modules with an externally managed mutex.
 		 *
 		**/
-	Condition(gmsec::util::Mutex &mutex);
+	GMSEC_DEPRECATED Condition(gmsec::util::Mutex &mutex);
 
 	/**	@fn ~Condition()
 		 *

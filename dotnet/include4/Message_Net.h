@@ -70,6 +70,10 @@ public:
 
 	/// <summary>%Message constructor that accepts a configuration</summary>
 	///
+	/// <note>Only Message-related configuration options are held by the Message object.
+	/// These configuration options are NOT included with the message when it is sent
+	/// across the GMSEC Bus.</note>
+	///
 	/// <param name="subject">The subject/topic to associate with the message</param>
 	/// <param name="kind">The message kind to associate with the message</param>
 	/// <param name="config">A configuration object that contains message-specific options</param>
@@ -118,6 +122,11 @@ public:
 
 
 	/// <summary>Associatates a configuration object with the message</summary>
+	///
+	/// <note>Only Message-related configuration options are held by the Message object.
+	/// These configuration options are NOT included with the message when it is sent
+	/// across the GMSEC Bus.</note>
+	///
 	/// <param name="config">The configuration object</param>
 	/// <exception cref="GMSEC_Exception">If the Config object is null</exception>
 	void AddConfig(Config^ config);

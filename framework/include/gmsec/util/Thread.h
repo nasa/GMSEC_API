@@ -21,6 +21,7 @@
 #define gmsec_util_Thread_h
 
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec/util/gshared_ptr.h>
 
@@ -72,7 +73,7 @@ public:
 
 public:
 
-	Thread(bool selfReferential = false);
+	GMSEC_DEPRECATED Thread(bool selfReferential = false);
 	virtual ~Thread();
 
 
@@ -113,7 +114,7 @@ public:
 	 *	@brief Returns the ID of the calling thread
 	 *
 	**/
-	static id_t CALL_TYPE getCurrentID();
+	GMSEC_DEPRECATED static id_t CALL_TYPE getCurrentID();
 
 
 	/**	@fn join()
@@ -134,7 +135,7 @@ public:
 	 *	another thread.
 	 *
 	**/
-	static void CALL_TYPE yield();
+	GMSEC_DEPRECATED static void CALL_TYPE yield();
 
 
 protected:

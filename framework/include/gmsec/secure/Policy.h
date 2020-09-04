@@ -15,6 +15,7 @@
 #define gmsec_secure_Policy_h
 
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 #include <gmsec/secure/Access.h>
@@ -79,7 +80,7 @@ public:
 		SEC-SIGNER-<PARAM>
 	*/
 
-	Policy ();
+	GMSEC_DEPRECATED Policy ();
 	~Policy ();
 
 	Status initialize (const Config &config);
@@ -204,7 +205,7 @@ class GMSEC_API API3Policy : public AbstractPolicy
 {
 public:
 
-	API3Policy ();
+	GMSEC_DEPRECATED API3Policy ();
 
 	virtual Status initialize (const Config &localConfig);
 
@@ -247,7 +248,7 @@ class GMSEC_API InvalidPolicy : public AbstractPolicy
 {
 public:
 
-	InvalidPolicy (const Status &status);
+	GMSEC_DEPRECATED InvalidPolicy (const Status &status);
 
 	virtual Status initialize (const Config &localConfig);
 

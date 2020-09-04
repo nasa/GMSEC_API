@@ -16,6 +16,8 @@ package gov.nasa.gsfc.gmsecapi.util;
 /**
  * @interface LogHandler
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This interface is for received error callbacks. 
  * A user created class, implemented with this interface, can be passed into 
  * %RegisterHandler() to have user code executed when the identified error
@@ -38,6 +40,7 @@ package gov.nasa.gsfc.gmsecapi.util;
  * @endcode
  *
  */
+@Deprecated
 public interface LogHandler
 {
 	/**

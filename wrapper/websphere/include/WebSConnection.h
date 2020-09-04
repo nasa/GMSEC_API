@@ -20,6 +20,8 @@
 
 #include "gmsec_websphere.h"
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/ConnectionInterface.h>
 #include <gmsec4/internal/UniqueFilter.h>
 
@@ -42,12 +44,12 @@
 
 namespace gmsec_websphere
 {
-
+/*
 const char OPT_MAX_TOPIC_HANDLES[]                   = "MW-MAX-TOPIC-HANDLES";
 const char OPT_ASYNC_PUBLISH[]                       = "MW-ASYNC-PUBLISH";
 const char OPT_ASYNC_STATUS_CHECK[]                  = "MW-ASYNC-STATUS-CHECK";
 const char OPT_ASYNC_STATUS_CHECK_MESSAGE_INTERVAL[] = "MW-ASYNC-STATUS-CHECK-MESSAGE-INTERVAL";
-
+*/
 class WebSConnection;
 
 

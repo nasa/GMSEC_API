@@ -17,10 +17,10 @@
 #include <gmsec4/internal/SystemUtil.h>
 
 #include <gmsec4/Config.h>
+#include <gmsec4/ConfigOptions.h>
 
 #include <gmsec4/util/Log.h>
 #include <gmsec4/util/TimeUtil.h>
-
 
 #include <netdb.h>     // For getaddrinfo() in hostnameToIpv4()
 #include <arpa/inet.h> // For inet_ntoa() in hostnameToIpv4()
@@ -28,7 +28,6 @@
 #include <sstream>
 #include <string>
 #include <stdlib.h>
-
 
 using namespace gmsec::api;
 using namespace gmsec::api::internal;
@@ -38,13 +37,6 @@ using namespace gmsec_zeromq;
 
 
 static void mwConfig(const Config& config, const char* key, std::string& out, bool requirePrefix = false);
-
-
-const char* ZEROMQ_SOCKET_SETTLETIME    = "SOCKET-SETTLETIME";
-const char* ZEROMQ_SUBSCRIBE_ENDPOINT   = "MW-SUB-ENDPOINT";
-const char* ZEROMQ_PUBLISH_ENDPOINT     = "MW-PUB-ENDPOINT";
-const char* ZEROMQ_REPLYLISTEN_ENDPOINT = "MW-REPLISTEN-ENDPOINT";
-
 
 // From internal GMSEC tests, 500ms appears to be enough time
 // for the ZeroMQ socket to settle before performing network operations
@@ -167,6 +159,8 @@ void ZMQConnection::mwConnect()
 		ss << "Unable to create a ZeroMQ Context, errorno code: " << zmq_errno();
 		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, zmq_errno(), ss.str().c_str());
 	}
+
+	getExternal().setConnectionEndpoint(m_pubEndpoint);
 }
 
 
@@ -639,11 +633,11 @@ void ZMQConnection::mwRequest(const Message& request, std::string& id)
 	
 	InternalMessage& intMsg = MessageBuddy::getInternal(request);
 
-	intMsg.addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
+	intMsg.addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 	
 	if (m_requestSpecs.useSubjectMapping)
 	{
-		intMsg.addField(OPT_REPLY_STRING, m_requestSpecs.replySubject.c_str());
+		intMsg.addField(GMSEC_REPLY_SUBJECT, m_requestSpecs.replySubject.c_str());
 
 		// Add the reply address (endpoint) to the message
 		// NOTE: If subject mapping is turned on, this is the ReplyListener endpoint
@@ -653,7 +647,7 @@ void ZMQConnection::mwRequest(const Message& request, std::string& id)
 	}
 	else
 	{
-		intMsg.getDetails().setBoolean(OPT_REQ_RESP, true);
+		intMsg.getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
 
 	// Send request for reply
@@ -665,8 +659,8 @@ void ZMQConnection::mwRequest(const Message& request, std::string& id)
 
 void ZMQConnection::mwReply(const Message& request, const Message& reply)
 {
-	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
-	const StringField* replySubj = dynamic_cast<const StringField*>(request.getField(OPT_REPLY_STRING));
+	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
+	const StringField* replySubj = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_SUBJECT));
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(ZEROMQ_REPLY_ADDRESS));
 
 	if (!uniqueID)
@@ -823,18 +817,18 @@ void ZMQConnection::mwReceive(Message*& message, GMSEC_I32 timeout)
 					{
 						ValueMap& meta = MessageBuddy::getInternal(*message).getDetails();
 
-						meta.setBoolean(OPT_REQ_RESP, true);
+						meta.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 						
 						if (message->getKind() == Message::REQUEST)
 						{
-							// Extract and remove REPLY_UNIQUE_ID_FIELD from the message (if it exists)
-							const StringField* idField = dynamic_cast<const StringField*>(message->getField(REPLY_UNIQUE_ID_FIELD));
+							// Extract and remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message (if it exists)
+							const StringField* idField = dynamic_cast<const StringField*>(message->getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
 
 							if (idField != NULL)
 							{
-								meta.setString(REPLY_UNIQUE_ID_FIELD, idField->getValue());
+								meta.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, idField->getValue());
 
-								message->clearField(REPLY_UNIQUE_ID_FIELD);
+								message->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 							}
 
 							// Extract and remove the REPLY-ADDRESS field from the message (if it exists)
@@ -1011,7 +1005,7 @@ void ZMQConnection::handleMessage(zmq_msg_t* zmqMessage, int zmqMsgSize, zmq_msg
 	// Extract the contents of the encoded meta object from the ZeroMQ message
 	DataBuffer metaBuffer((GMSEC_U8*) zmq_msg_data(metaMessage), metaSize, false);
 
-	std::auto_ptr<Message> message(new Message(subject, Message::PUBLISH));
+	std::auto_ptr<Message> message(new Message(subject, Message::PUBLISH, getExternal().getMessageConfig()));
 
 	// Decode the meta object
 	ValueMap meta;

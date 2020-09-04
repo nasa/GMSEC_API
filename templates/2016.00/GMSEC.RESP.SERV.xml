@@ -1,3 +1,5 @@
+<!-- Simple Service Response Message -->
+<!-- See Table 5-151 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.RESP.SERV">
 	<FIELD  NAME="RESPONSE-STATUS"
 	        MODE="REQUIRED"
@@ -21,6 +23,6 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="UNSET"
+	        TYPE="VARIABLE"
 	        DESCRIPTION="Additional data that may accompany the response"/>
 </SCHEMA>

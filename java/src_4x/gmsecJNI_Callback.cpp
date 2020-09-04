@@ -26,6 +26,12 @@ CxxCallbackProxy::~CxxCallbackProxy()
 	AutoJEnv aje;
 	JNIEnv*  jenv = aje.getEnv();
 
+	if (!jenv)
+	{
+		GMSEC_ERROR << "CxxCallbackProxy::~CxxCallbackProxy() -- unable to attach to the current thread";
+		return;
+	}
+
 	jenv->DeleteGlobalRef(jCallback);
 }
 
@@ -40,6 +46,12 @@ void CxxCallbackProxy::onMessage(Connection& conn, const Message& msg)
 
 	AutoJEnv aje;
 	JNIEnv* jenv = aje.getEnv();
+
+	if (!jenv)
+	{
+		GMSEC_ERROR << "CxxCallbackProxy::onMessage() -- unable to attach to the current thread";
+		return;
+	}
 
 	jmethodID callbackMethod = Cache::getCache().methodCallbackOnMessage;
 	jobject   jniConnection  = jenv->GetObjectField(jCallback, Cache::getCache().fieldCallbackJNIConnection);
@@ -62,6 +74,8 @@ void CxxCallbackProxy::onMessage(Connection& conn, const Message& msg)
 	jenv->CallVoidMethod(jCallback, callbackMethod, jConnection, jMessage);
 
 	jvmOk(jenv, "CxxCallbackProxy.onMessage");
+
+	jenv->DeleteLocalRef(jMessage);
 }
 
 

@@ -20,6 +20,7 @@
 #define IGNORE_GMSEC_API_4_0_TYPES
 
 #include <gmsec_defs.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 #include <gmsec4/util/Log.h>
@@ -80,14 +81,14 @@ class LogStreamImp
 public:
 	std::ostringstream os;
 
-	LogStreamImp();
+	GMSEC_DEPRECATED LogStreamImp();
 	~LogStreamImp();
 };
 
 class GMSEC_API LogStream
 {
 public:
-	LogStream();
+	GMSEC_DEPRECATED LogStream();
 	~LogStream();
 
 	LogStream &operator<<(char x);
@@ -124,8 +125,8 @@ private:
 class GMSEC_API Logger
 {
 public:
-	Logger();
-	Logger(const char *file, int line);
+	GMSEC_DEPRECATED Logger();
+	GMSEC_DEPRECATED Logger(const char *file, int line);
 	~Logger();
 	std::ostream& Get(LogLevel level = logINFO);
 
@@ -146,8 +147,8 @@ private:
 class GMSEC_API LoggerStream
 {
 public:
-	LoggerStream();
-	LoggerStream(const char *file, int line);
+	GMSEC_DEPRECATED LoggerStream();
+	GMSEC_DEPRECATED LoggerStream(const char *file, int line);
 	~LoggerStream();
 	LogStream& Get(LogLevel level = logINFO);
 
@@ -176,7 +177,7 @@ public:
 	 *                logSECURE, logWARNING, logINFO, logVERBOSE, or
 	 *                logDEBUG
 	 */
-	static void SetReportingLevel(LogLevel level);
+	GMSEC_DEPRECATED static void SetReportingLevel(LogLevel level);
 
 	/** @fn GetReportingLevel()
 	 * @brief This function returns the maximum logging level set by the library or
@@ -185,7 +186,7 @@ public:
 	 * @return LogLevel with possible values logNONE, logERROR,
 	 *         logSECURE, logWARNING, logINFO, logVERBOSE, or logDEBUG
 	 */
-	static LogLevel GetReportingLevel();
+	GMSEC_DEPRECATED static LogLevel GetReportingLevel();
 
 	/** @fn RegisterHandler(LogHandler *handler)
 	 * @brief This function registers a LogHandler that will be called for all logging levels.
@@ -193,7 +194,7 @@ public:
 	 * @param handler - Pointer to an instance of a class whose base 
 	 *                  class is LogHandler.
 	 */
-	static void RegisterHandler(LogHandler *handler);
+	GMSEC_DEPRECATED static void RegisterHandler(LogHandler *handler);
 
 	/** @fn RegisterHandler(LogLevel level, LogHandler *handler)
 	 * @brief This function registers a LogHandler that will be called for a specific logging level.
@@ -206,7 +207,7 @@ public:
 	 *                  class is LogHandler.
 	 *
 	 */
-	static void RegisterHandler(LogLevel level, LogHandler *handler);
+	GMSEC_DEPRECATED static void RegisterHandler(LogLevel level, LogHandler *handler);
 
 	/** @fn ToString(LogLevel level)
 	 * @brief This function converts the log level number to a string value
@@ -219,7 +220,7 @@ public:
 	 *         "ERROR," "SECURE," "WARNING," "INFO," "VERBOSE," "DEBUG,"
 	 *         or "INVALID"
 	 */
-	static const char* ToString(LogLevel level);
+	GMSEC_DEPRECATED static const char* ToString(LogLevel level);
 
 	/** @fn FromString(const char *level)
 	 * @brief This function converts the string value to the log level number
@@ -231,19 +232,19 @@ public:
 	 *         logSECURE, logWARNING, logINFO, logVERBOSE, or
 	 *         logDEBUG
 	 */
-	static LogLevel FromString(const char *level);
+	GMSEC_DEPRECATED static LogLevel FromString(const char *level);
 
 	/** @fn SetDefaultStream(std::ostream *s)
 	 * @brief This function allows the user to change the default stream from stderr.
 	 * @param s - std::ostream* which points to new output stream to use.
 	 */
-	static void SetDefaultStream(std::ostream *s);
+	GMSEC_DEPRECATED static void SetDefaultStream(std::ostream *s);
 
 	/*
 	** these are for C API support ONLY
 	*/
-	static void RegisterHandler(GMSEC_LOGGER_HANDLER *handler);
-	static void RegisterHandler(LogLevel level, GMSEC_LOGGER_HANDLER *handler);
+	GMSEC_DEPRECATED static void RegisterHandler(GMSEC_LOGGER_HANDLER *handler);
+	GMSEC_DEPRECATED static void RegisterHandler(LogLevel level, GMSEC_LOGGER_HANDLER *handler);
 
 private:
 	// Log() {};

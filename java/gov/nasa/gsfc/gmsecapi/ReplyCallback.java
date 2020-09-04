@@ -16,6 +16,8 @@ package gov.nasa.gsfc.gmsecapi;
 /**
  * @interface ReplyCallback
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This interface is for received reply from asynchronous requests. 
  * A user created class, implemented with this interface, can be passed into 
  * %Request() to have user code executed asynchronously
@@ -51,6 +53,7 @@ package gov.nasa.gsfc.gmsecapi;
  *
  * @sa Connection::Request(Message request, int timeout, ReplyCallback cb)
  */
+@Deprecated
 public interface ReplyCallback extends ErrorCallback
 {
 	/**

@@ -15,9 +15,12 @@ package gov.nasa.gsfc.gmsecapi;
 
 /** @class GMSEC_I16
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This is a container class for the GMSEC signed 18-bit integer field type.
  *
  */
+@Deprecated
 public class GMSEC_I16
 {
 	public short value;

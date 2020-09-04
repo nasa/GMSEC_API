@@ -11,11 +11,11 @@ include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 .PHONY: default all checkDefs clean
 
 
-default all: checkDefs $(BINDIR)/$(TARGET)
+default all: checkDefs $(TARGET)
 
 
 clean: checkDefs
-	$(RM) $(BINDIR)/$(TARGET)
+	$(RM) $(TARGET)
 	$(RM) *.gcno *.gcda;
 
 
@@ -26,5 +26,5 @@ checkDefs:
 	fi
 
 
-$(BINDIR)/$(TARGET): $(SRCS)
+$(TARGET): $(SRCS)
 	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@

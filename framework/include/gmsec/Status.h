@@ -23,6 +23,7 @@
 
 
 #include <gmsec_defs.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -48,7 +49,7 @@ public:
 	/** @fn Status()
 	 * @brief Create a status set to GMSEC_STATUS_NO_ERROR.
 	 */
-	Status();
+	GMSEC_DEPRECATED Status();
 
 	/** @fn Status(GMSEC_STATUS_CLASS eclass, unsigned int code, const char *text)
 	 * @brief Create a status with specific class, code, and string.
@@ -57,12 +58,12 @@ public:
 	 * @param code - error code
 	 * @param text - error string
 	 */
-	Status(GMSEC_STATUS_CLASS eclass, unsigned int code, const char *text);
+	GMSEC_DEPRECATED Status(GMSEC_STATUS_CLASS eclass, unsigned int code, const char *text);
 
 	/** @fn Status( const Status &st)
 	 * @brief Deep copy constructor.
 	 */
-	Status(const Status &st);
+	GMSEC_DEPRECATED Status(const Status &st);
 
 	/** @fn ~Status()
 	 * @brief Destructor.

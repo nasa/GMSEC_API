@@ -50,7 +50,9 @@ public class MistMessage extends Message
 	 * @brief default constructor - Initializes the message instance with a template determined by ID and spec.
 	 *
 	 * @param subject  - the subject string for the message.
-	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.
+	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).
+	 * You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB) 
 	 * @param spec     - the specification this message's schema will adhere to.
 	 *
 	 * @throws An IllegalArgumentException is thrown if any of the input parameters are invalid.
@@ -80,7 +82,9 @@ public class MistMessage extends Message
 	 * @brief default constructor - initializes an empty message with no template
 	 *
 	 * @param subject  - the subject string for the message.
-	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.
+	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).
+	 * You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB) 
 	 * @param config   - A configuration to associate with the message.
 	 * @param spec     - the specification this message's schema will adhere to.
 	 *

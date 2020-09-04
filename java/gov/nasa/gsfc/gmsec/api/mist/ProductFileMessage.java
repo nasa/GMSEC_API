@@ -12,7 +12,7 @@
  * @brief The ProductFileMessage object is an extension of Message, and serves as a
  * container for a GMSEC C2CX %ProductFile %Message.
  *
- * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
+ * @deprecated This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist;
@@ -35,8 +35,9 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIProductFileMessage;
  * @brief The ProductFileMessage object is an extension of Message, and serves as a container for a GMSEC C2CX %ProductFile %Message.
  * The methods of this class allow for the construction and manipulation of the data within the message.
  *
- * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
+ * @deprecated This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
  */
+@Deprecated
 public class ProductFileMessage extends Message
 {
 	/**

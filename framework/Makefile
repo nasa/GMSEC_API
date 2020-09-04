@@ -135,6 +135,7 @@ CORE4_OBJ	= \
 
 
 INTERNAL4_OBJ	= \
+	$(OBJDIR4)/internal/ActiveSubscriptions.o \
 	$(OBJDIR4)/internal/AsyncPublisher.o \
 	$(OBJDIR4)/internal/CallbackAdapter.o \
 	$(OBJDIR4)/internal/CallbackLookup.o \
@@ -337,34 +338,28 @@ $(COBJDIR):
 	mkdir -p $(COBJDIR)
 
 $(OBJDIR)/%.o: $(OBJDIR)/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 $(COBJDIR)/%.o: $(OBJDIR)/c/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
-
-#$(COBJDIR)/%.o: ./src/gmsec/c/%.cpp
-#	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 $(OBJDIR)/util/%.o: ./src/gmsec/util/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 $(OBJDIR)/internal/%.o: $(OBJDIR)/internal/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 $(OBJDIR)/internal/performance/%.o: ./src/gmsec/internal/performance/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 $(OBJDIR)/secure/%.o: ./src/gmsec/secure/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 $(OBJDIR)/%.o: $(OBJDIR)/mist/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
-
-#$(OBJDIR)/%.o: ./src/gmsec/mist/%.cpp
-#	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 $(OBJDIR)/%.o: ./src/gmsec/internal/mist/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 
 # API 4.x

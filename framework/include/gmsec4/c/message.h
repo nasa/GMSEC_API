@@ -99,6 +99,10 @@ extern "C"
 	 * @note A status object MUST BE CREATED with statusCreate() and
 	 * passed in as the status parameter in order to receive any resulting status.
 	 *
+	 * @note Only Message-related configuration options are held by the Message object.
+	 * These configuration options are NOT included with the message when it is sent
+	 * across the GMSEC Bus.
+	 *
 	 * @param[in]  subject - the subject/top to assign to the message
 	 * @param[in]  msgKind - the message type to assign to the message (either GMSEC_MSG_PUBLISH, GMSEC_MSG_REQUEST, or GMSEC_MSG_REPLY)
 	 * @param[in]  config  - a configuration object to associate with the message.
@@ -127,13 +131,13 @@ extern "C"
      * // Create a Message object with XML text
 	 * 
      * const char* XML = "<MESSAGE SUBJECT=\"GMSEC.TEST.XML.SUBJECT\" KIND=\"PUBLISH\">"
-     *               "    <CONFIG>"
-     *               "        <PARAMETER NAME=\"FOO\">BAR</PARAMETER>"
-     *               "        <PARAMETER NAME=\"DONE\">DEAL</PARAMETER>"
-     *               "    </CONFIG>"
-     *               "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>"
-     *               "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>"
-     *                 "</MESSAGE>";
+     *                   "    <CONFIG>"
+     *                   "        <PARAMETER NAME=\"gmsec-msgfld-store-type\">tree</PARAMETER>"
+     *                   "        <PARAMETER NAME=\"gmsec-msgfld-store-size\">100</PARAMETER>"
+     *                   "    </CONFIG>"
+     *                   "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>"
+     *                   "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>"
+     *                   "</MESSAGE>";
      *
      * GMSEC_Message msgXML = messageCreateUsingData(XML, status);
      * 
@@ -203,6 +207,10 @@ extern "C"
 	 * @fn void messageAddConfig(GMSEC_Message msg, const GMSEC_Config cfg, GMSEC_Status status)
 	 *
 	 * @brief This function adds configuration items to the message. This can be used to pass middleware specific items to the Message object.
+	 *
+	 * @note Only Message-related configuration options are held by the Message object.
+	 * These configuration options are NOT included with the message when it is sent
+	 * across the GMSEC Bus.
 	 *
 	 * @param[in]  msg    - a handle to a Message object
 	 * @param[in]  cfg    - a handle to a Config object

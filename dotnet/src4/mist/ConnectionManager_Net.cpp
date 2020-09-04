@@ -16,6 +16,7 @@
 #include <mist/SubscriptionInfo_Net.h>
 
 #include <field/Field_Net.h>
+#include <field/FieldConverter_Net.h>
 
 #include <Config_Net.h>
 #include <Message_Net.h>
@@ -169,6 +170,23 @@ void ConnectionManager::SetStandardFields(List<Field^>^ standardFields)
 	{
 		throw gcnew GMSEC_Exception(e);
 	}
+}
+
+
+List<Field^>^ ConnectionManager::GetStandardFields()
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
+
+	const gmsec::api::util::DataList<gmsec::api::Field*>& nativeFields = m_impl->getStandardFields();
+
+	List<Field^>^ fields = gcnew List<Field^>();
+
+	for (gmsec::api::util::DataList<gmsec::api::Field*>::iterator it = nativeFields.begin(); it != nativeFields.end(); ++it)
+	{
+		fields->Add(FieldConverter::CreateFieldReference(const_cast<gmsec::api::Field*>(*it)));
+	}
+
+	return fields;
 }
 
 

@@ -392,7 +392,7 @@ const char* InternalField::getStringValue() const
 			break;
 
 		case Field::I8_TYPE:
-			oss << dynamic_cast<const InternalI8Field*>(this)->getValue();
+			oss << (int) dynamic_cast<const InternalI8Field*>(this)->getValue();
 			break;
 
 		case Field::U16_TYPE:
@@ -408,7 +408,7 @@ const char* InternalField::getStringValue() const
 			break;
 
 		case Field::U8_TYPE:
-			oss << dynamic_cast<const InternalU8Field*>(this)->getValue();
+			oss << (unsigned int) dynamic_cast<const InternalU8Field*>(this)->getValue();
 			break;
 
 		case Field::F32_TYPE:
@@ -421,6 +421,10 @@ const char* InternalField::getStringValue() const
 
 		case Field::STRING_TYPE:
 			oss << dynamic_cast<const InternalStringField*>(this)->getValue();
+			break;
+
+		case Field::BIN_TYPE:
+			oss << dynamic_cast<const InternalBinaryField*>(this)->getStringValue().c_str();
 			break;
 
 		default:
@@ -882,7 +886,8 @@ Field::FieldType InternalField::lookupType(const char* typeString)
 	{
 		type = Field::BOOL_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "BIN") || StringUtil::stringEquals(typeString, "BLOB"))
+	else if (StringUtil::stringEquals(typeString, "BIN") || StringUtil::stringEquals(typeString, "BINARY") ||
+	         StringUtil::stringEquals(typeString, "BLOB"))
 	{
 		type = Field::BIN_TYPE;
 	}

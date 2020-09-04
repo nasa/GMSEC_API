@@ -31,7 +31,9 @@ TrackingDetails::TrackingDetails()
 	fConnectionIdFlag(MESSAGE_TRACKINGFIELDS_UNSET),
 	fPublishTimeFlag(MESSAGE_TRACKINGFIELDS_UNSET),
 	fUniqueIdFlag(MESSAGE_TRACKINGFIELDS_UNSET),
-	fMwInfoFlag(MESSAGE_TRACKINGFIELDS_UNSET)
+	fMwInfoFlag(MESSAGE_TRACKINGFIELDS_UNSET),
+	fActiveSubscriptionsFlag(MESSAGE_TRACKINGFIELDS_UNSET),
+	fConnectionEndpointFlag(MESSAGE_TRACKINGFIELDS_UNSET)
 {
 }
 
@@ -46,14 +48,16 @@ TrackingDetails::operator=(const TrackingDetails& other)
 {
 	if (this != &other)
 	{
-		fTrackingFlag     = other.fTrackingFlag;
-		fNodeFlag         = other.fNodeFlag;
-		fProcessIdFlag    = other.fProcessIdFlag;
-		fUserNameFlag     = other.fUserNameFlag;
-		fConnectionIdFlag = other.fConnectionIdFlag;
-		fPublishTimeFlag  = other.fPublishTimeFlag;
-		fUniqueIdFlag     = other.fUniqueIdFlag;
-		fMwInfoFlag       = other.fMwInfoFlag;
+		fTrackingFlag            = other.fTrackingFlag;
+		fNodeFlag                = other.fNodeFlag;
+		fProcessIdFlag           = other.fProcessIdFlag;
+		fUserNameFlag            = other.fUserNameFlag;
+		fConnectionIdFlag        = other.fConnectionIdFlag;
+		fPublishTimeFlag         = other.fPublishTimeFlag;
+		fUniqueIdFlag            = other.fUniqueIdFlag;
+		fMwInfoFlag              = other.fMwInfoFlag;
+		fActiveSubscriptionsFlag = other.fActiveSubscriptionsFlag;
+		fConnectionEndpointFlag  = other.fConnectionEndpointFlag;
 	}
 	return *this;
 }
@@ -107,6 +111,17 @@ int TrackingDetails::getMwInfo() const
 }
 
 
+int TrackingDetails::getActiveSubscriptions() const
+{
+	return fActiveSubscriptionsFlag;
+}
+
+
+int TrackingDetails::getConnectionEndpoint() const
+{
+	return fConnectionEndpointFlag;
+}
+
 
 void TrackingDetails::set(int flag)
 {
@@ -156,15 +171,29 @@ void TrackingDetails::setMwInfo(int flag)
 }
 
 
+void TrackingDetails::setActiveSubscriptions(int flag)
+{
+	fActiveSubscriptionsFlag = flag;
+}
+
+
+void TrackingDetails::setConnectionEndpoint(int flag)
+{
+	fConnectionEndpointFlag = flag;
+}
+
+
 void TrackingDetails::set(const TrackingDetails &other)
 {
-	fTrackingFlag     = other.fTrackingFlag;
-	fNodeFlag         = other.fNodeFlag;
-	fProcessIdFlag    = other.fProcessIdFlag;
-	fUserNameFlag     = other.fUserNameFlag;
-	fConnectionIdFlag = other.fConnectionIdFlag;
-	fPublishTimeFlag  = other.fPublishTimeFlag;
-	fMwInfoFlag       = other.fMwInfoFlag;
+	fTrackingFlag            = other.fTrackingFlag;
+	fNodeFlag                = other.fNodeFlag;
+	fProcessIdFlag           = other.fProcessIdFlag;
+	fUserNameFlag            = other.fUserNameFlag;
+	fConnectionIdFlag        = other.fConnectionIdFlag;
+	fPublishTimeFlag         = other.fPublishTimeFlag;
+	fMwInfoFlag              = other.fMwInfoFlag;
+	fActiveSubscriptionsFlag = other.fActiveSubscriptionsFlag;
+	fConnectionEndpointFlag  = other.fConnectionEndpointFlag;
 }
 
 
@@ -193,14 +222,16 @@ const char* TrackingDetails::toString() const
 {
 	std::ostringstream oss;
 
-	oss << "TRACKING     : " << flagToString(fTrackingFlag) << "\n";
-	oss << "NODE         : " << flagToString(fNodeFlag) << "\n";
-	oss << "PROCESS-ID   : " << flagToString(fProcessIdFlag) << "\n";
-	oss << "USER-NAME    : " << flagToString(fUserNameFlag) << "\n";
-	oss << "CONNECTION-ID: " << flagToString(fConnectionIdFlag) << "\n";
-	oss << "PUBLISH-TIME : " << flagToString(fPublishTimeFlag) << "\n";
-	oss << "UNIQUE-ID    : " << flagToString(fUniqueIdFlag) << "\n";
-	oss << "MW-INFO      : " << flagToString(fMwInfoFlag) << "\n";
+	oss << "TRACKING            : " << flagToString(fTrackingFlag) << "\n";
+	oss << "NODE                : " << flagToString(fNodeFlag) << "\n";
+	oss << "PROCESS-ID          : " << flagToString(fProcessIdFlag) << "\n";
+	oss << "USER-NAME           : " << flagToString(fUserNameFlag) << "\n";
+	oss << "CONNECTION-ID       : " << flagToString(fConnectionIdFlag) << "\n";
+	oss << "PUBLISH-TIME        : " << flagToString(fPublishTimeFlag) << "\n";
+	oss << "UNIQUE-ID           : " << flagToString(fUniqueIdFlag) << "\n";
+	oss << "MW-INFO             : " << flagToString(fMwInfoFlag) << "\n";
+	oss << "ACTIVE-SUBSCRIPTIONS: " << flagToString(fActiveSubscriptionsFlag) << "\n";
+	oss << "MW-CONNECTION-ENDPOINT : " << flagToString(fConnectionEndpointFlag) << "\n";
 	oss << "\n";
 
 	fDetails = oss.str();

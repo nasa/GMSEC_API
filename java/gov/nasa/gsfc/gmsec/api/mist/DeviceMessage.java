@@ -12,7 +12,7 @@
  * @brief The DeviceMessage object is an extension of Message, and serves as a container
  * for a GMSEC C2CX %Device %Message.
  *
- * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
+ * @deprecated This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist;
@@ -35,8 +35,9 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMistMessage;
  * @brief The DeviceMessage object is an extension of Message, and serves as a container for a GMSEC C2CX %Device %Message.
  * The methods of this class allow for the construction and manipulation of the data within the message.
  *
- * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
+ * @deprecated This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.DeviceMessage instead.
  */
+@Deprecated
 public class DeviceMessage extends Message
 {
 	/**

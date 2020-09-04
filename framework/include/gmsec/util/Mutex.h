@@ -22,6 +22,7 @@
 #define gmsec_util_Mutex_h
 
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 // This prevents having to include windows.h
@@ -76,7 +77,7 @@ private:
 	void CALL_TYPE incrDepth();
 
 public:
-	Mutex();
+	GMSEC_DEPRECATED Mutex();
 	virtual ~Mutex();
 
 	/**	@fn enterMutex()
@@ -105,7 +106,7 @@ public:
 class GMSEC_API AutoMutex
 {
 public:
-	AutoMutex(Mutex &m, bool acquire = true);
+	GMSEC_DEPRECATED AutoMutex(Mutex &m, bool acquire = true);
 	~AutoMutex();
 
 	/**	@fn enter()

@@ -34,6 +34,8 @@ public:
 
 	size_t CALL_TYPE getLength() const;
 
+	std::string getStringValue() const;
+
 	virtual const char* CALL_TYPE toXML() const;
 	virtual const char* CALL_TYPE toJSON() const;
 

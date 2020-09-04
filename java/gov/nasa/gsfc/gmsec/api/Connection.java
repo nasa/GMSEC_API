@@ -35,27 +35,46 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIConnection;
  *
  * Example creation and use:
  * @code
+ * import gov.nasa.gsfc.gmsec.api.*;
+ * import gov.nasa.gsfc.gmsec.api.util.Log;
  * 
- * //Create config from command line arguments
- * Config cfg = new Config(argc,argv);
- *
- * try {
- *     // Create the Connection
- *     Connection conn = Connection.create(cfg);
- *
- *     // Establish the connection
- *     conn.connect();
- *
- *     ...
- *
- *     // Disconnect from middleware server
- *     conn.disconnect();
- *
- *     // Destroy the Connection object
- *     Connection.destroy(conn);
- * }
- * catch (IllegalArgumentException | GMSEC_Exception e) {
- *     //handle error
+ * public class TestConn
+ * {
+ *     public static void main(String[] args)
+ *     {
+ *         Config config = new Config(args);
+ * 
+ *         config.addValue("loglevel", "info");
+ * 
+ *         try
+ *         {
+ *             // Create connection
+ *             Connection conn = Connection.create(config);
+ * 
+ *             // Connect to the middleware server
+ *             conn.connect();
+ * 
+ *             // Create a message
+ *             Message msg = new Message("GMSEC.FOO.BAR", Message.MessageKind.PUBLISH);
+ * 
+ *             // Publish the message
+ *             conn.publish(msg);
+ * 
+ *             Log.info("Published Message:\n" + msg.toXML());
+ * 
+ *             // Disconnect from the middleware server
+ *             conn.disconnect();
+ *         }
+ *         catch (GMSEC_Exception e)
+ *         {
+ *             Log.error("Exception: " + e.toString());
+ *         }
+ * 
+ *         // Call shutdown routine for registered middleware(s) to
+ *         // clean up any middleware-related resources.  Currently
+ *         // only ActiveMQ users need to call this.
+ *         Connection.shutdownAllMiddlewares();
+ *     }
  * }
  * @endcode
  *
@@ -925,8 +944,7 @@ public class Connection
 	 * @fn void shutdownAllMiddlewares()
 	 *
 	 * @brief Calls shutdown routines for each middleware that has a shutdown routine
-	 * registered.  If the status returned here is an error, it is not guaranteed that
-	 * all shutdown routines were called.
+	 * registered.
 	 */
 	public static void shutdownAllMiddlewares()
 	{

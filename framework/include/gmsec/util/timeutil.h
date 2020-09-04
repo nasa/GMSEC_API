@@ -17,6 +17,7 @@
 
 
 #include <gmsec_defs.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -45,7 +46,7 @@ GMSEC_API double CALL_TYPE getTime_s(TimeBuffer *buffer = 0);
 * @note buffer must be at least TIME_BUFSIZE characters
 */
 static const int TIME_BUFSIZE = 32;
-GMSEC_API void CALL_TYPE formatTime_s(double time_s, char *buffer);
+GMSEC_DEPRECATED GMSEC_API void CALL_TYPE formatTime_s(double time_s, char *buffer);
 
 /**
 * @fn formatTime_s (const TimeBuffer &b, char *buffer, int subs)
@@ -53,7 +54,7 @@ GMSEC_API void CALL_TYPE formatTime_s(double time_s, char *buffer);
 * @param subs How many digits of subseconds to format [0 .. 9].
 * @note buffer must be at least TIME_BUFSIZE characters
 */
-GMSEC_API void CALL_TYPE formatTime_s(const TimeBuffer &t, char *buffer, int subs);
+GMSEC_DEPRECATED GMSEC_API void CALL_TYPE formatTime_s(const TimeBuffer &t, char *buffer, int subs);
 
 /**
 * @fn getTime_s ()
@@ -61,7 +62,7 @@ GMSEC_API void CALL_TYPE formatTime_s(const TimeBuffer &t, char *buffer, int sub
 * represented by the GMSEC String
 * @note If buffer is non-zero, it will be populated.
 */
-GMSEC_API double CALL_TYPE getCharTime_s(const char * timeString);
+GMSEC_DEPRECATED GMSEC_API double CALL_TYPE getCharTime_s(const char * timeString);
 
 
 } // namespace util

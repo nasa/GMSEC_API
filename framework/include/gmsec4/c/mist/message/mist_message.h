@@ -39,7 +39,8 @@ extern "C"
 	 *
 	 * @param[in]  subject  - the subject string for the message.
 	 * @param[in]  schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.1.MSG.C2CX)
+	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.1.MSG.C2CX). You may also use the 
+	 * shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB)  
 	 * @param[in]  spec     - A reference to the specification this message's schema will adhere to.
 	 * @param[out] status   - the result of the operation.
 	 *
@@ -65,7 +66,8 @@ extern "C"
 	 *
 	 * @param[in]  subject  - the subject string for the message.
 	 * @param[in]  schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.1.MSG.C2CX)
+	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.1.MSG.C2CX) You may also use the 
+	 * shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB)  
 	 * @param[in]  spec     - A reference to the specification this message's schema will adhere to.
 	 * @param[in]  config   - A configuration to associate with the message.
 	 * @param[out] status   - the result of the operation.

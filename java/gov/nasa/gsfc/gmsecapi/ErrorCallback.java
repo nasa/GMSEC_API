@@ -16,6 +16,8 @@ package gov.nasa.gsfc.gmsecapi;
 /**
  * @interface ErrorCallback
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This interface is for received error callbacks. 
  * A user created class, implemented with this interface, can be passed into 
  * %RegisterErrorCallback() to have user code executed when the identified error
@@ -41,6 +43,7 @@ package gov.nasa.gsfc.gmsecapi;
  *
  * @sa Connection::RegisterErrorCallback(String error, ErrorCallback cb)
  */
+@Deprecated
 public interface ErrorCallback
 {
 	/**

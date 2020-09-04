@@ -9,6 +9,8 @@
 #include "MBConnection.h"
 #include "MBWire.h"
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/InternalConnection.h>
 #include <gmsec4/internal/MessageBuddy.h>
 #include <gmsec4/internal/StringUtil.h>
@@ -76,8 +78,8 @@ MBConnection::MBConnection(const Config& config)
 	}
 
 	// get the value for looping messages
-	m_isLoopingMsgs = config.getBooleanValue("loopback", true);
-	m_startServer   = config.getBooleanValue("autostart", false);
+	m_isLoopingMsgs = config.getBooleanValue(MB_LOOPBACK, true);
+	m_startServer   = config.getBooleanValue(MB_AUTOSTART, false);
 
 	if (config.getBooleanValue("compress", false))
 	{
@@ -104,7 +106,7 @@ const char* MBConnection::getLibraryRootName()
 
 const char* MBConnection::getLibraryVersion()
 {
-	return "GMSEC MB Client v"GMSEC_VERSION_NUMBER" [" __DATE__ "]";
+	return "GMSEC MB Client v" GMSEC_VERSION_NUMBER " [" __DATE__ "]";
 }
 
 
@@ -148,6 +150,15 @@ void MBConnection::mwConnect()
 	m_sock = new TCPSocketClientArray();
 	m_sock->setConfig(getExternal().getConfig());
 
+	if (!m_readerThread.get())
+	{
+		m_readerThreadShared.reset(new MBReaderThread(m_sock));
+
+		m_readerThreadShared->setConnection(this, m_reqSpecs);
+
+		m_readerThread.reset(new StdThread(&runReaderThread, m_readerThreadShared));
+	}
+
 	// connect to the specifyied server or to
 	// localhost if no server was specified
 	Status status;
@@ -164,15 +175,6 @@ void MBConnection::mwConnect()
 	{
 		// Return server not found error
 		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, CONNECT_SERVER_NOT_FOUND, "No Message Bus Server found");
-	}
-
-	if (!m_readerThread.get())
-	{
-		m_readerThreadShared.reset(new MBReaderThread(m_sock));
-
-		m_readerThreadShared->setConnection(this, m_reqSpecs);
-
-		m_readerThread.reset(new StdThread(&runReaderThread, m_readerThreadShared));
 	}
 
 	m_sock->setDebug(false);
@@ -212,16 +214,15 @@ void MBConnection::mwConnect()
 		goto cleanup;
 	}
 
-	GMSEC_DEBUG << "Connected to server "
-			    << ((m_server=="") ? "localhost" : m_server.c_str())
-			    << " on port " << m_port << ".";
-
+	GMSEC_DEBUG << "Connected to server(s) " << m_sock->getCurrentServer().c_str();
 	GMSEC_INFO << "Connection established";
+
+	getExternal().setConnectionEndpoint(m_sock->getCurrentServer());
 
 	// look at the loopingMsgs flag and
 	// send tell the server if we don't want
 	// to loop traffic
-	if (m_isLoopingMsgs == 0)
+	if (m_isLoopingMsgs == false)
 	{
 		char cmd[1];
 		cmd[0] = CMD_NLOOP;
@@ -388,7 +389,7 @@ void MBConnection::mwRequest(const Message& request, std::string& id)
 	id = os.str();
 
 	// Add an id for identifying the reply
-	MessageBuddy::getInternal(request).addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
+	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 
 	// Add a field with the subject to publish the reply to
 	MessageBuddy::getInternal(request).addField(MB_MY_SUBJECT_FIELD_NAME, m_reqSpecs.replySubject.c_str());
@@ -399,7 +400,7 @@ void MBConnection::mwRequest(const Message& request, std::string& id)
 
 void MBConnection::mwReply(const Message& request, const Message& reply)
 {
-	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
+	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
 	const StringField* mySubject = dynamic_cast<const StringField*>(request.getField(MB_MY_SUBJECT_FIELD_NAME));
 
 	if (!uniqueID)

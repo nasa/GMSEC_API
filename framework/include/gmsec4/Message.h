@@ -97,10 +97,10 @@ public:
 	 *
 	 * // Check to see if you replaced an existing field
 	 * if (replaced) {
-	 *             //field was replaced
+	 *     //field was replaced
 	 * }
 	 * else {
-	 *      //new field added
+	 *     //new field added
 	 * }
 	 *
 	 * //Create a connection with Connection::create()
@@ -150,7 +150,7 @@ public:
 	 * // To publish a message
 	 * // Create a Message object
 	 * 
-	 * Config cfg(//agruments);
+	 * Config cfg(//message-related config arguments);
 	 *
 	 * Message msgConfig("GMSEC.TEST.CONFIG.SUBJECT", Message::PUBLISH, cfg);
 	 * 
@@ -164,10 +164,10 @@ public:
 	 *
 	 * // Check to see if you replaced an existing field
 	 * if (replaced) {
-	 *             //field was replaced
+	 *     //field was replaced
 	 * }
 	 * else {
-	 *      //new field added
+	 *     //new field added
 	 * }
 	 *
 	 * //Create a connection with Connection::create()
@@ -176,7 +176,7 @@ public:
 	 * try {
 	 *     // Create the Connection
 	 *     Connection* conn = Connection::create(config);
-         *
+     *
 	 *     // Establish the connection
 	 *     conn->connect();
 	 *
@@ -204,6 +204,10 @@ public:
 	 * @param config - a configuration to associate with the message.
 	 *
 	 * @throw An Exception is thrown if the subject is NULL or contains an empty-string.
+	 *
+	 * @note Only Message-related configuration options are held by the Message object.
+	 * These configuration options are NOT included with the message when it is sent
+	 * across the GMSEC Bus.
 	 */
 	Message(const char* subject, MessageKind kind, const Config& config);
 
@@ -219,13 +223,13 @@ public:
 	 * // Create a Message object with XML text
 	 * 
 	 * const char* XML = "<MESSAGE SUBJECT=\"GMSEC.TEST.XML.SUBJECT\" KIND=\"PUBLISH\">"
-	 *               "    <CONFIG>"
-	 *               "        <PARAMETER NAME=\"FOO\">BAR</PARAMETER>"
-	 *               "        <PARAMETER NAME=\"DONE\">DEAL</PARAMETER>"
-	 *               "    </CONFIG>"
-	 *               "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>"
-	 *               "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>"
-	 *                 "</MESSAGE>";
+	 *                   "    <CONFIG>"
+	 *                   "        <PARAMETER NAME=\"gmsec-msgfld-store-type\">tree</PARAMETER>"
+	 *                   "        <PARAMETER NAME=\"gmsec-msgfld-store-size\">200</PARAMETER>"
+	 *                   "    </CONFIG>"
+	 *                   "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>"
+	 *                   "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>"
+	 *                   "</MESSAGE>";
 	 *
 	 * Message msgXML(XML);
 	 * 
@@ -323,14 +327,17 @@ public:
 	/**
 	 * @fn void addConfig(const Config& config)
 	 *
-	 * @brief This function adds configuration items to the message.  This can be used to
-	 * pass middleware specific items to the Message object.
+	 * @brief This function adds configuration items to the message.
 	 *
 	 * @note If a configuration item included within the given config is already associated
 	 * with the message, then the message's configuration item will be replaced with the
 	 * new item.
 	 *
 	 * @param config - Config that contains configuration values to add to the Message.
+	 *
+	 * @note Only Message-related configuration options are held by the Message object.
+	 * These configuration options are NOT included with the message when it is sent
+	 * across the GMSEC Bus.
 	 */
 	void CALL_TYPE addConfig(const Config& config);
 

@@ -17,6 +17,7 @@
 
 #include <gmsec/Message.h>
 #include <gmsec/util/Buffer.h>
+#include <gmsec/util/Deprecated.h>
 
 #include <string.h>	// memcpy
 
@@ -43,7 +44,7 @@ public:
 	 *	@brief Returns a pointer to the singleton encoder object
 	 *
 	**/
-	static Encoder * getEncoder();
+	GMSEC_DEPRECATED static Encoder * getEncoder();
 
 	/**	@fn getProblem() const
 	 *
@@ -164,7 +165,7 @@ public:
 	 *
 	 *  @param in - the value to convert.
 	**/
-	static GMSEC_U32 encodeU32(GMSEC_U32 in);
+	GMSEC_DEPRECATED static GMSEC_U32 encodeU32(GMSEC_U32 in);
 
 
 private:
@@ -194,7 +195,7 @@ public:
 	 *	@brief This function returns the singleton decoder.
 	 *
 	**/
-	static Decoder * getDecoder();
+	GMSEC_DEPRECATED static Decoder * getDecoder();
 
 	/**	@fn getProblem() const
 	 *
@@ -314,7 +315,7 @@ public:
 	 *
 	 *  @param in - the value to convert.
 	**/
-	static GMSEC_U32 decodeU32(GMSEC_U32 in);
+	GMSEC_DEPRECATED static GMSEC_U32 decodeU32(GMSEC_U32 in);
 
 
 private:
@@ -336,7 +337,7 @@ class GMSEC_API MessageEncoder
 {
 public:
 
-	MessageEncoder();
+	GMSEC_DEPRECATED MessageEncoder();
 	~MessageEncoder();
 
 	/**	@fn encode(Message &message, GMSEC_U64 &bytes, char *&data)
@@ -398,7 +399,7 @@ class GMSEC_API MessageDecoder
 {
 public:
 
-	MessageDecoder();
+	GMSEC_DEPRECATED MessageDecoder();
 	~MessageDecoder();
 
 	/**	@fn decode(Message &message, GMSEC_U64 bytes, const char *data)

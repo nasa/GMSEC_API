@@ -144,7 +144,6 @@ public:
 
 	TrackingDetails& getTracking();
 
-protected:
 	void CALL_TYPE processConfig(const Config& config);
 
 	bool CALL_TYPE processConfigValue(const char* name, const char* value);

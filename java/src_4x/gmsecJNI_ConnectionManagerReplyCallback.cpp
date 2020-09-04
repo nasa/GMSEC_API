@@ -21,13 +21,21 @@ CxxConnMgrReplyCallbackProxy::CxxConnMgrReplyCallbackProxy(JNIEnv* env, jobject 
 {
 }
 
+
 CxxConnMgrReplyCallbackProxy::~CxxConnMgrReplyCallbackProxy()
 {
 	AutoJEnv aje;
 	JNIEnv*  jenv = aje.getEnv();
 
+	if (!jenv)
+	{
+		GMSEC_ERROR << "CxxConnMgrReplyCallbackProxy::~CxxConnMgrReplyCallbackProxy() -- unable to attach to the current thread";
+		return;
+	}
+
 	jenv->DeleteGlobalRef(jCallback);
 }
+
 
 void CxxConnMgrReplyCallbackProxy::onEvent(ConnectionManager& connMgr, const Status& status, Connection::ConnectionEvent event)
 {
@@ -39,6 +47,12 @@ void CxxConnMgrReplyCallbackProxy::onEvent(ConnectionManager& connMgr, const Sta
 
 	AutoJEnv aje;
 	JNIEnv* jenv = aje.getEnv();
+
+	if (!jenv)
+	{
+		GMSEC_ERROR << "CxxConnMgrReplyCallbackProxy::onEvent() -- unable to attach to the current thread";
+		return;
+	}
 
 	jmethodID callbackMethod = Cache::getCache().methodConnMgrEventCallbackOnEvent;
 	jobject   jniConnMgr     = jenv->GetObjectField(jCallback, Cache::getCache().fieldReplyCallbackJNIConnMgr);
@@ -71,7 +85,11 @@ void CxxConnMgrReplyCallbackProxy::onEvent(ConnectionManager& connMgr, const Sta
 	jenv->CallVoidMethod(jCallback, callbackMethod, jConnMgr, jStatus, convertEvent(jenv, event));
 
 	jvmOk(jenv, "CxxConnMgrReplyCallbackProxy.onEvent");
+
+	jenv->DeleteLocalRef(jStatus);
+	jenv->DeleteLocalRef(jStatusString);
 }
+
 
 void CxxConnMgrReplyCallbackProxy::onReply(ConnectionManager& connMgr, const Message& request, const Message& reply)
 {
@@ -83,6 +101,12 @@ void CxxConnMgrReplyCallbackProxy::onReply(ConnectionManager& connMgr, const Mes
 
 	AutoJEnv aje;
 	JNIEnv* jenv = aje.getEnv();
+
+	if (!jenv)
+	{
+		GMSEC_ERROR << "CxxConnMgrReplyCallbackProxy::onReply() -- unable to attach to the current thread";
+		return;
+	}
 
 	jmethodID callbackMethod = Cache::getCache().methodConnMgrReplyCallbackOnReply;
 	jobject   jniConnMgr     = jenv->GetObjectField(jCallback, Cache::getCache().fieldReplyCallbackJNIConnMgr);
@@ -111,6 +135,9 @@ void CxxConnMgrReplyCallbackProxy::onReply(ConnectionManager& connMgr, const Mes
 	jenv->CallVoidMethod(jCallback, callbackMethod, jConnMgr, jRequest, jReply);
 
 	jvmOk(jenv, "CxxConnMgrReplyCallbackProxy.onReply");
+
+	jenv->DeleteLocalRef(jRequest);
+	jenv->DeleteLocalRef(jReply);
 }
 
 
