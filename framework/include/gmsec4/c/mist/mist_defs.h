@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,14 +22,19 @@
 #define C_GMSEC_ISD_2014_00 201400
 
 /**
- * @desc Definition for the 2014 version of the GMSEC Interface Specification Document (ISD)
+ * @desc Definition for the 2016 version of the GMSEC Interface Specification Document (ISD)
  */
 #define C_GMSEC_ISD_2016_00 201600
 
 /**
+ * @desc Definition for the 2018 version of the GMSEC Interface Specification Document (ISD)
+ */
+#define C_GMSEC_ISD_2018_00 201800
+
+/**
  * @desc Definition for the default version of the GMSEC Interface Specification Document (ISD)
  */
-#define C_GMSEC_ISD_CURRENT C_GMSEC_ISD_2016_00
+#define C_GMSEC_ISD_CURRENT C_GMSEC_ISD_2018_00
 
 
 /**

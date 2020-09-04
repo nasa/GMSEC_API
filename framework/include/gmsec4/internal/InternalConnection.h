@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -73,6 +73,12 @@ class RequestShared;
 class SubscriptionDetails;
 
 
+// Internal Message Field for handling request/reply operations.
+// This definition should not be defines in ConfigOptions.h!
+//
+const char* const GMSEC_REPLY_UNIQUE_ID_FIELD = "__GMSEC-REPLY-UNIQUE-ID__";
+
+
 /**
  * @struct MessagePublishTask
  * @brief This struct collects a Message and Config for asynchronous publishing
@@ -87,11 +93,10 @@ struct MessagePublishTask
 class GMSEC_API InternalConnection
 {
 public:
-	static const GMSEC_I32 MIN_TIMEOUT_ms       = 10;
-	static const GMSEC_I32 REQUEST_PUBLISH_ms   = 10000;
-	static const GMSEC_I32 REPUBLISH_NEVER      = -1;
-	static const GMSEC_I32 DEFAULT_REPUBLISH_ms = 60000;
-	static const GMSEC_I32 MIN_REPUBLISH_ms     = 100;
+	static const GMSEC_I32 GMSEC_MIN_TIMEOUT_ms     = 10;
+	static const GMSEC_I32 GMSEC_REQUEST_PUBLISH_ms = 10000;
+	static const GMSEC_I32 DEFAULT_REPUBLISH_ms     = 60000;
+	static const GMSEC_I32 GMSEC_MIN_REPUBLISH_ms   = 100;
 
 
 	static const char* CALL_TYPE getAPIVersion();
@@ -154,7 +159,7 @@ public:
 	virtual void CALL_TYPE reply(const Message& request, const Message& reply);
 
 
-	virtual Message* CALL_TYPE receive(GMSEC_I32 timeout = -1);
+	virtual Message* CALL_TYPE receive(GMSEC_I32 timeout = GMSEC_WAIT_FOREVER);
 
 
 	virtual void CALL_TYPE dispatch(const Message& msg);
@@ -221,9 +226,6 @@ public:
 	Config& CALL_TYPE getMessageConfig();
 
 
-	GMSEC_U32 CALL_TYPE getMessageCounter() const;
-
-
 	void CALL_TYPE dispatchEvent(Connection::ConnectionEvent event, const Status& status);
 
 
@@ -231,6 +233,12 @@ public:
 
 
 	RequestSpecs CALL_TYPE getRequestSpecs() const;
+
+
+	void setReplyUniqueID(Message& msg, const std::string& uniqueID);
+
+
+	std::string getReplyUniqueID(const Message& msg);
 
 
 	virtual bool CALL_TYPE onReply(Message* reply);
@@ -259,6 +267,10 @@ public:
 
 	void setConnectionEndpoint(const std::string& endpoint);
 
+	unsigned int getSpecVersion() const;
+
+	int getSpecLevel() const;
+
 	void usingAPI3x();
 
 
@@ -284,9 +296,12 @@ private:
 	void startMsgAggregationToolkitThread();
 	void stopMsgAggregationToolkitThread();
 
+	GMSEC_U32 getNextMessageCounter();
+
 	gmsec::api::util::TicketMutex& getReadMutex();
 	gmsec::api::util::TicketMutex& getWriteMutex();
 	gmsec::api::util::TicketMutex& getEventMutex();
+	gmsec::api::util::TicketMutex& getCounterMutex();
 
 	// defined, but not implemented
 	InternalConnection();
@@ -317,6 +332,7 @@ private:
 	gmsec::api::util::TicketMutex           m_readMutex;
 	gmsec::api::util::TicketMutex           m_writeMutex;
 	gmsec::api::util::TicketMutex           m_eventMutex;
+	gmsec::api::util::TicketMutex           m_counterMutex;
 
 	Config                                  m_config;
 	ConnectionInterface*                    m_connIf;
@@ -366,6 +382,9 @@ private:
 	gmsec::api::Connection*                 m_parent;
 
 	std::string                             m_connectionEndpoint;
+
+	unsigned int                            m_specVersion;
+	int                                     m_specLevel;
 
 	bool                                    m_usingAPI3x;
 

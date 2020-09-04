@@ -1,16 +1,14 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-
-/** @file MnemonicSample.java
- *
- *  @brief This file contains declarations for Mnemonic parameters
-**/
+/**
+ * @file MnemonicSample.java
+ */
 
 package gov.nasa.gsfc.gmsec.api.mist;
 
@@ -24,26 +22,33 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIMnemonicSample;
 
 
 /**
- * @class MnemonicSample
- *
- * @brief This class is a lightweight container for holding information
+ * This class is a lightweight container for holding information
  * on a Mnemonic Sample, and used to generate GMSEC Mnemonic messages by the 
- * ConnectionManager and Device classes
+ * ConnectionManager and Device classes.
  *
- * @sa Mnemonic
- * @sa ConnectionManager
+ * @see Mnemonic
+ * @see ConnectionManager
 */
 public class MnemonicSample
 {
 	private JNIMnemonicSample m_jniMnemonicSample = null;
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param sample Object to reference for acquiring internal JNIMnemonicSample.
+	 * @return Internal JNIMnemonicSample object.
+	 */
 	public static JNIMnemonicSample getInternal(MnemonicSample sample)
 	{
 		return (sample == null ? null : sample.m_jniMnemonicSample);
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param jSample Internal JNIMnemonicSample object.
+	 */
 	public MnemonicSample(JNIMnemonicSample jSample)
 	{
 		m_jniMnemonicSample = jSample;
@@ -56,32 +61,38 @@ public class MnemonicSample
 
 
 	/**
-	 * @enum LimitFlag
-	 *
-	 * @desc LimitFlag enumeration for the Mnemonic object
+	 * LimitFlag enumeration of the Mnemonic object.
 	 */
 	public enum LimitFlag
 	{
-		UNSPECIFIED,          ///< Unspecified
-		NO_LIMIT_VIOLATION,   ///< No Limit Violation
-		RED_LOW,              ///< Red Low
-		YELLOW_LOW,           ///< Yellow Low
-		YELLOW_HIGH,          ///< Yellow High
-		RED_HIGH              ///< Red High
+		/** Unspecified limit. */
+		UNSPECIFIED,
+
+		/** No limit violation occurred. */
+		NO_LIMIT_VIOLATION,
+
+		/** Low red limit violation occurred. */
+		RED_LOW,
+
+		/** Low yellow limit violation occurred. */
+		YELLOW_LOW,
+
+		/** High yellow limit violation occurred. */
+		YELLOW_HIGH,
+
+		/** High red limit violation occurred. */
+		RED_HIGH
 	}
 
 
 	/**
-	 * @fn MnemonicSample(String timestamp, Field rawValue)
+	 * Constructor - Initializes the MnemonicSample object with a timestamp and Raw Value Field.
 	 *
-	 * @brief Constructor - Initializes the MnemonicSample object with 
-	 * a timestamp and value
+	 * @param timestamp The time at which the Mnemonic Sample Raw Value was taken.
+	 * @param rawValue The Raw Value Field of the Mnemonic Sample.
 	 *
-	 * @param timestamp - The time at which the sampled value was taken
-	 * @param rawValue - The raw value of the parameter
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given timestamp string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given Field object is null.
+	 * @throws IllegalArgumentException Thrown if the given timestamp string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given Field object is null.
 	 */
 	public MnemonicSample(String timestamp, Field rawValue) throws IllegalArgumentException
 	{
@@ -99,13 +110,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn MnemonicSample(MnemonicSample other)
+	 * Copy-Constructor - Initializes the MnemonicSample object from another MnemonicSample.
 	 *
-	 * @brief Copy-Constructor - Initializes the MnemonicSample object from another MnemonicSample
+	 * @param other The other MnemonicSample to copy.
 	 *
-	 * @param other - The other MnemonicSample to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given MnemonicSample object is null.
+	 * @throws IllegalArgumentException Thrown if the given MnemonicSample object is null.
 	 */
 	public MnemonicSample(MnemonicSample other) throws IllegalArgumentException
 	{
@@ -119,11 +128,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn String getTimestamp()
+	 * Retrieves the timestamp of the MnemonicSample.
 	 *
-	 * @brief Retrieves the timestamp of the MnemonicSample
-	 *
-	 * @return The timestamp of the MnemonicSample
+	 * @return The timestamp of the MnemonicSample.
 	 */
 	public String getTimestamp()
 	{
@@ -132,11 +139,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn Field getRawValue() const
+	 * Retrieves the Raw Value Field of the MnemonicSample.
 	 *
-	 * @brief Retrieves the value of the MnemonicSample
-	 *
-	 * @return The value of the MnemonicSample
+	 * @return A reference to the Raw Value Field of the MnemonicSample.
 	 */
 	public Field getRawValue()
 	{
@@ -145,12 +150,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean hasEUValue()
+	 * Returns the availability of a MnemonicSample value in engineering units.
 	 *
-	 * @brief Returns the availability of a MnemonicSample value in
-	 * engineering units
-	 *
-	 * @return True if MnemonicSample EU value has been set, false otherwise
+	 * @return True if MnemonicSample EU value has been set, false otherwise.
 	 */
 	public boolean hasEUValue()
 	{
@@ -159,13 +161,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn Field getEUValue() const
+	 * Accessor for getting the EU Value.
 	 *
-	 * @brief Accessor for the EU Value
+	 * @return A reference to the MnemonicSample EU value field.
 	 *
-	 * @return A reference to the MnemonicSample EU value field
-	 *
-	 * @throws A GMSEC_Exception is thrown if the EU value field has not been set
+	 * @throws GMSEC_Exception Thrown if the EU value field has not been set.
 	 */
 	public Field getEUValue() throws GMSEC_Exception
 	{
@@ -174,11 +174,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn void setEUValue(Field value)
+	 * Can be used to set the EU Value Field of the MnemonicSample.
 	 *
-	 * @brief Supplies a field for the MnemonicSample EU value and makes a copy of the field
+	 * @param value The EU Value Field object.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given Field value is null.
+	 * @throws IllegalArgumentException Thrown if the given Field value is null.
 	 */
 	public void setEUValue(Field value) throws IllegalArgumentException
 	{
@@ -192,11 +192,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean hasTextValue()
+	 * Returns the availability of a MnemonicSample Text Value.
 	 *
-	 * @brief Returns the availability of a MnemonicSample text value
-	 *
-	 * @return True if MnemonicSample text value has been set, false otherwise
+	 * @return True if MnemonicSample text value has been set, false otherwise.
 	 */
 	public boolean hasTextValue()
 	{
@@ -205,13 +203,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn String getTextValue()
+	 * Accessor for getting the Text Value of the Mnemonic Sample.
 	 *
-	 * @brief Accessor for the text value
+	 * @return The Text Value string.
 	 *
-	 * @return A reference to the MnemonicSample text value field
-	 *
-	 * @throw A GMSEC_Exception is thrown if the text value field has not been set
+	 * @throws GMSEC_Exception Thrown if the Text Value has not been set.
 	 */
 	public String getTextValue() throws GMSEC_Exception
 	{
@@ -220,11 +216,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn void setTextValue(String value)
+	 * Can be used to set the Text Value of the MnemonicSample.
 	 *
-	 * @brief Supplies a string for the MnemonicSample text value and makes a copy of the string
+	 * @param value The Text Value string.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the value string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the value string is null or contains an empty string.
 	 */
 	public void setTextValue(String value) throws IllegalArgumentException
 	{
@@ -238,11 +234,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean hasFlags()
+	 * Returns the availability of a MnemonicSample flags field.
 	 *
-	 * @brief Returns the availability of a MnemonicSample flags field
-	 *
-	 * @return True if MnemonicSample flags value has been set, false otherwise
+	 * @return True if MnemonicSample flags value has been set, false otherwise.
 	 */
 	public boolean hasFlags()
 	{
@@ -251,13 +245,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn int getFlags() const
+	 * Accessor for getting the Flags value of the MnemonicSample.
 	 *
-	 * @brief Accessor for the flags
+	 * @return The Flags value.
 	 *
-	 * @return A reference to the MnemonicSample flags field
-	 *
-	 * @throw A GMSEC_Exception is thrown if the flags field has not been set
+	 * @throws GMSEC_Exception Thrown if the flags field has not been set.
 	 */
 	public int getFlags() throws GMSEC_Exception
 	{
@@ -266,9 +258,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn void setFlags(int flags)
+	 * Can be used to set the Flags value of the MnemonicSample.
 	 *
-	 * @brief Supplies a GMSEC_I32 for the MnemonicSample flags value
+	 * @param flags The Flags value.
 	 */
 	public void setFlags(int flags)
 	{
@@ -277,11 +269,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean hasLimitEnableDisable()
+	 * Returns the availability of a MnemonicSample Limit Enable/Disable flag.
 	 *
-	 * @brief Returns the availability of a MnemonicSample limit enable/disable flag
-	 *
-	 * @return True if MnemonicSample limit enable/disable flag has been set, false otherwise
+	 * @return True if MnemonicSample Limit Enable/Disable flag has been set, false otherwise.
 	 */
 	public boolean hasLimitEnableDisable()
 	{
@@ -290,13 +280,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean getLimitEnableDisable()
+	 * Accessor for getting the Limit Enable/Disable flag of the MnemonicSample.
 	 *
-	 * @brief Accessor for the limit enable/disable flag 
+	 * @return The MnemonicSample Limit Enable/Disable flag.
 	 *
-	 * @return The MnemonicSample limit enable/disable flag
-	 *
-	 * @throw A GMSEC_Exception is thrown if the limit enable/disable flag has not been set
+	 * @throws GMSEC_Exception Thrown if the Limit Enable/Disable flag has not been set.
 	 */
 	public boolean getLimitEnableDisable() throws GMSEC_Exception
 	{
@@ -305,9 +293,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn void setLimitEnableDisable(boolean value)
+	 * Can be used to set the Limit Enable/Disable flag of the MnemonicSample.
 	 *
-	 * @brief Supplies a boolean flag for the MnemonicSample setLimitEnableDisable(bool value)
+	 * @param value The Limit Enable/Disable flag.
 	 */
 	public void setLimitEnableDisable(boolean value)
 	{
@@ -316,11 +304,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean hasLimit()
+	 * Returns the availability of a MnemonicSample Limit Flag.
 	 *
-	 * @brief Returns the availability of a MnemonicSample limit
-	 *
-	 * @return True if MnemonicSample limit has been set, false otherwise
+	 * @return True if MnemonicSample Limit Flag has been set, false otherwise.
 	 */
 	public boolean hasLimit()
 	{
@@ -329,13 +315,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn LimitFlag getLimit()
+	 * Accessor to get the Limit Flag of the MnemonicSample.
 	 *
-	 * @brief Accessor for the limit
+	 * @return The MnemonicSample Limit Flag.
 	 *
-	 * @return The MnemonicSample limit
-	 *
-	 * @throw A GMSEC_Exception is thrown if the limit has not been set
+	 * @throws GMSEC_Exception Thrown if the Limit Flag has not been set.
 	 */
 	public LimitFlag getLimit() throws GMSEC_Exception
 	{
@@ -344,9 +328,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn void setLimit(LimitFlag flag)
+	 * Can be used to set the Limit Flag of the MnemonicSample.
 	 *
-	 * @brief Supplies a limit flag for the MnemonicSample limit
+	 * @param flag The Limit Flag.
 	 */
 	public void setLimit(LimitFlag flag)
 	{
@@ -355,11 +339,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean hasStalenessStatus()
+	 * Returns the availability of a MnemonicSample Staleness Status.
 	 *
-	 * @brief Returns the availability of a MnemonicSample staleness status
-	 *
-	 * @return True if MnemonicSample staleness has been set, false otherwise
+	 * @return True if MnemonicSample Staleness Status has been set, false otherwise.
 	 */
 	public boolean hasStalenessStatus()
 	{
@@ -368,13 +350,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean getStalenessStatus()
+	 * Accessor to get the Staleness Status flag of the MnemonicSample.
 	 *
-	 * @brief Accessor for the staleness
+	 * @return The MnemonicSample Staleness Status flag.
 	 *
-	 * @return The MnemonicSample staleness
-	 *
-	 * @throw A GMSEC_Exception is thrown if the staleness flag has not been set
+	 * @throws GMSEC_Exception Thrown if the Staleness Status flag has not been set.
 	 */
 	public boolean getStalenessStatus() throws GMSEC_Exception
 	{
@@ -383,9 +363,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn void setStalenessStatus(boolean staleness)
+	 * Can be used to set the Staleness Status flag of the MnemonicSample.
 	 *
-	 * @brief Supplies a staleness flag for the MnemonicSample
+	 * @param staleness The Staleness Status flag.
 	 */
 	public void setStalenessStatus(boolean staleness)
 	{
@@ -394,11 +374,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean hasQuality()
+	 * Returns the availability of a MnemonicSample Quality flag.
 	 *
-	 * @brief Returns the availability of a MnemonicSample quality flag
-	 *
-	 * @return True if MnemonicSample quality has been set, false otherwise
+	 * @return True if MnemonicSample Quality has been set, false otherwise.
 	 */
 	public boolean hasQuality()
 	{
@@ -407,13 +385,11 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn boolean getQuality()
+	 * Accessor for getting the Quality flag.
 	 *
-	 * @brief Accessor for the quality
+	 * @return The MnemonicSample Quality flag.
 	 *
-	 * @return The MnemonicSample quality
-	 *
-	 * @throw A GMSEC_Exception is thrown if the quality flag has not been set
+	 * @throws GMSEC_Exception Thrown if the Quality flag has not been set.
 	 */
 	public boolean getQuality() throws GMSEC_Exception
 	{
@@ -422,9 +398,9 @@ public class MnemonicSample
 
 
 	/**
-	 * @fn void setQuality(boolean quality)
+	 * Can be used to set the Quality flag of the MnemonicSample.
 	 *
-	 * @brief Supplies a quality flag for the MnemonicSample
+	 * @param quality The Quality flag.
 	 */
 	public void setQuality(boolean quality)
 	{

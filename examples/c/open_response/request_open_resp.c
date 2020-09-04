@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -71,6 +71,10 @@ int main(int argc, char* argv[])
  	// here, it automatically enables the 'mw-expose-resp' option.
 	configAddValue(config, "GMSEC-REQ-RESP", "OPEN-RESP", status);
 
+	//o Since this example program uses an invalid message, we ensure the
+	//  validation check is disabled.
+	configAddValue(config, "gmsec-msg-content-validate-all", "false", NULL);
+
 	// If it was not specified in the command-line arguments, set LOGLEVEL
 	// to 'INFO' and LOGFILE to 'stdout' to allow the program report output
 	// on the terminal/command line
@@ -80,9 +84,7 @@ int main(int argc, char* argv[])
 	// interface
 	// This is useful for determining which version of the API is
 	// configured within the environment
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	//o Create the ConnectionManager
 	connMgr = connectionManagerCreate(config, status);
@@ -119,16 +121,12 @@ int main(int argc, char* argv[])
 	//o Display XML representation of request message
 	GMSEC_INFO("Sending request message:\n%s", messageToXML(requestMsg, status));
 
-	//o Send Request Message -- Since we are using open response,
-	// we will have to receive the message using receive().  As such
-	// we will tell request() to return immediately.
+	//o Send Request Message
 	// Timeout periods:
 	// -1 - Wait forever
 	//  0 - Return immediately
 	// >0 - Time in milliseconds before timing out
-	connectionManagerRequest(connMgr, requestMsg, 0, -1, status);
-	checkStatus(status);
-	replyMsg = connectionManagerReceive(connMgr, -1, status);
+	replyMsg = connectionManagerRequest(connMgr, requestMsg, 1000, GMSEC_REQUEST_REPUBLISH_NEVER, status);
 	checkStatus(status);
 
 	// Example error handling for calling request() with a timeout

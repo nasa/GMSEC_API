@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -56,9 +56,7 @@ int main(int argc, char* argv[])
 	// construction of MistMessages
 	config.addValue("GMSEC-SPECIFICATION-VERSION", GMSEC_SPEC_VERSION);
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
@@ -117,10 +115,14 @@ int main(int argc, char* argv[])
 		// Note: Since these Fields contain variable values which are
 		// based on the context in which they are used, they cannot be
 		// automatically populated using MistMessage.
+		char eventTimeBuf[GMSEC_TIME_BUFSIZE];
+		TimeUtil::formatTime(TimeUtil::getCurrentTime(), eventTimeBuf);
+
 		logMsg.addField("SEVERITY", (GMSEC_I16) 1);
 		logMsg.setValue("MSG-TEXT", "Creating an example GMSEC LOG Message");
 		logMsg.setValue("OCCURRENCE-TYPE", "SYS");
 		logMsg.setValue("SUBCLASS", "AST");
+		logMsg.setValue("EVENT-TIME", eventTimeBuf);
 
 		//o Add the standard fields to the LOG message
 		connManager.addStandardFields(logMsg);

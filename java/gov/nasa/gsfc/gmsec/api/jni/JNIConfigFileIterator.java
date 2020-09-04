@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -82,7 +82,7 @@ public class JNIConfigFileIterator
 	{
 		long cPtr = gmsecJNI.ConfigFileIterator_NextConfig(swigCPtr, this);
 
-		return new ConfigFile.ConfigEntry(new JNIConfigEntry(cPtr, false));
+		return new ConfigFile.ConfigEntry(new JNIConfigEntry(cPtr, true));
 	}
 
 
@@ -90,7 +90,7 @@ public class JNIConfigFileIterator
 	{
 		long cPtr = gmsecJNI.ConfigFileIterator_NextMessage(swigCPtr, this);
 
-		return new ConfigFile.MessageEntry(new JNIMessageEntry(cPtr, false));
+		return new ConfigFile.MessageEntry(new JNIMessageEntry(cPtr, true));
 	}
 
 
@@ -98,7 +98,7 @@ public class JNIConfigFileIterator
 	{
 		long cPtr = gmsecJNI.ConfigFileIterator_NextSubscription(swigCPtr, this);
 
-		return new ConfigFile.SubscriptionEntry(new JNISubscriptionEntry(cPtr, false));
+		return new ConfigFile.SubscriptionEntry(new JNISubscriptionEntry(cPtr, true));
 	}
 
 

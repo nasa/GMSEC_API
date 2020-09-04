@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,6 +39,8 @@
 
 #include <activemq/library/ActiveMQCPP.h>
 #endif
+
+#include <sstream>
 
 #define CMS_TYPE_PUBLISH  "PUBLISH"
 #define CMS_TYPE_REQUEST  "REQUEST"
@@ -283,6 +285,11 @@ public:
 				(void) connection->handleCmsReply(message, false);
 			}
 
+			if (msgKind == Message::REPLY && requestSpecs.exposeReplies == false)
+			{
+				return;
+			}
+
 			decaf::util::concurrent::Lock lock(&queue);
 			queue.push(message->clone());
 			queue.notifyAll();
@@ -474,9 +481,12 @@ void CMSTransportListener::onCommand(const decaf::lang::Pointer<activemq::comman
 	{
 		const activemq::commands::BrokerInfo* brokerInfo = dynamic_cast<const activemq::commands::BrokerInfo*>(command.get());
 
-		GMSEC_VERBOSE << "Connected to: " << brokerInfo->getBrokerURL().c_str();
+		if (brokerInfo != NULL)
+		{
+			GMSEC_VERBOSE << "Connected to: " << brokerInfo->getBrokerURL().c_str();
 
-		connection->getExternal().setConnectionEndpoint(brokerInfo->getBrokerURL());
+			connection->getExternal().setConnectionEndpoint(brokerInfo->getBrokerURL());
+		}
 	}
 }
 
@@ -571,9 +581,23 @@ static Mutex &getClassMutex()
 
 
 CMSConnection::CMSConnection(const Config& config)
-	: m_connection(),
+	: m_cmsFactory(),
+	  m_connection(),
 	  m_publishSession(),
+	  m_requestReplyDestination(),
+	  m_requestReplyProducer(),
 	  m_replyConsumer(),
+	  m_subscriptions(),
+	  m_queue(),
+	  m_uniqueFilter(),
+	  m_brokerURI(),
+	  m_connClientId(),
+	  m_username(),
+	  m_password(),
+	  m_keystore(),
+	  m_keystorePassword(),
+	  m_truststore(),
+	  m_truststorePassword(),
 	  m_useFilter(true),
 	  m_reportFailoverEvent(false),
 	  m_requestSpecs(),
@@ -785,7 +809,22 @@ const char* CMSConnection::getMWInfo()
 
 		if (m_connection.get() != NULL)
 		{
+#ifdef WIN32
+			// The CMS::Connection::getClientID() returns an std::string from the
+			// ActiveMQ C++ library; the returned string may not be able to be
+			// deallocated by this middleware wrapper library when operating under
+			// Windoze, so we avoid calling it, and instead, use m_connClientId (if
+			// available).
+			//
+			strm << getLibraryRootName();
+
+			if (!m_connClientId.empty())
+			{
+				strm << ": " << m_connClientId.c_str();
+			}
+#else
 			strm << getLibraryRootName() << ": " << m_connection->getClientID();
+#endif
 		}
 		else
 		{
@@ -858,7 +897,7 @@ void CMSConnection::mwConnect()
 	catch (cms::CMSException &e)
 	{
 		// check if this is an invalid access exception
-		std::string message = e.getMessage();
+		std::string message = e.what();  // call on method that does NOT return an std::string!!!
 
 		size_t p = message.find("Message: User name or password is invalid.");
 		if (p != std::string::npos) 
@@ -879,9 +918,10 @@ void CMSConnection::mwConnect()
 		}
 		else
 		{
-			const char* errmsg = "Error connecting to middleware broker";
-			GMSEC_VERBOSE << errmsg;
-			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, INVALID_CONNECTION, errmsg);
+			std::ostringstream oss;
+			oss << "Error connecting to middleware broker [" << message << "]";
+			GMSEC_VERBOSE << message.c_str();
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, INVALID_CONNECTION, oss.str().c_str());
 		}
 	}
 }
@@ -981,7 +1021,7 @@ void CMSConnection::mwSubscribe(const char *subject0, const Config &config)
 	}
 	catch (cms::CMSException &e)
 	{
-		std::string message(e.getMessage());
+		std::string message(e.what());
 		// check if this is an authorization exception
 		// check if this is an unauthorized exception
 		size_t p = message.find(" is not authorized to read from:");
@@ -1096,7 +1136,7 @@ void CMSConnection::mwPublish(const Message& msg, const Config& config)
 	}
 	catch (cms::CMSException &e)
 	{
-		std::string message = e.getMessage();
+		std::string message = e.what();
 
 		// check if this is an unauthorized exception
 		size_t p = message.find(" is not authorized to write to:");
@@ -1185,16 +1225,14 @@ void CMSConnection::mwRequest(const Message& request, std::string& id)
 void CMSConnection::mwReply(const Message& request, const Message& reply)
 {
 	// Get the Request's Unique ID, and put it into a field in the Reply
-	const StringField* uniqueID = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
+	std::string uniqueID = getExternal().getReplyUniqueID(request);
 
-	if (!uniqueID)
+	if (uniqueID.empty())
 	{
-		GMSEC_VERBOSE << "Request does not contain unique ID field";
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
 
-	// Add the GMSEC_REPLY_UNIQUE_ID_FIELD to the reply message
-	const_cast<Message&>(reply).addField(*uniqueID);
+	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
 
 	try
 	{
@@ -1203,7 +1241,7 @@ void CMSConnection::mwReply(const Message& request, const Message& reply)
 		prepare(reply, cmsReply);
 
 		cmsReply->setCMSType(CMS_TYPE_REPLY);
-		cmsReply->setCMSCorrelationID(uniqueID->getValue());
+		cmsReply->setCMSCorrelationID(uniqueID.c_str());
 
 		Value*            value   = MessageBuddy::getInternal(request).getDetails().getOpaqueValue(tag::REPLY_TO);
 		CMSDestination*   dest    = dynamic_cast<CMSDestination*>(value);

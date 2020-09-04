@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -59,6 +59,16 @@ class GMSEC_API Mnemonic
 	 */
 	Mnemonic(const char* name, const gmsec::api::util::DataList<MnemonicSample*>& samples);
 
+        /**
+         * @fn Mnemonic(const char* name)
+         *
+         * @brief Constructor - Initializes the Mnemonic object with only the name.
+         *
+         * @param name - the name of the Mnemonic
+         *
+         * @throw An Exception is thrown if a NULL or empty name parameter is provided.
+         */
+        Mnemonic(const char* name);
 
 	/**
 	 * @fn Mnemonic(const Mnemonic& mnemonic)

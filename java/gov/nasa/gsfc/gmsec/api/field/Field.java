@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,27 +8,29 @@
 
 /**
  * @file Field.java
- *
- * @brief Base-class for all field classes.
  */
 
 package gov.nasa.gsfc.gmsec.api.field;
 
+import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 import gov.nasa.gsfc.gmsec.api.U64;
-import gov.nasa.gsfc.gmsec.api.jni.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIField;
 
 
 
 /**
- * @class Field
- *
- * @brief Base-class for all field classes.
+ * Base-class for all field classes.
  */
 public class Field
 {
 	protected JNIField m_jniField = null;
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A Field object.
+	 * @return A JNIField object.
+	 */
 	public static JNIField getInternal(Field field)
 	{
 		return (field == null ? null : field.m_jniField);
@@ -36,26 +38,51 @@ public class Field
 
 
 	/**
-	 * @enum FieldType
-	 *
-	 * @desc Enumerated list of possible field types.
+	 * Enumerated list of possible field types.
 	 */
 	public enum FieldType
 	{
-		BIN_TYPE,      ///< Field containing a raw data
-		BOOL_TYPE,     ///< Field containing a boolean value
-		CHAR_TYPE,     ///< Field containing a character value
-		I8_TYPE,       ///< Field containing a signed 8-bit value
-		I16_TYPE,      ///< Field containing a signed 16-bit value
-		I32_TYPE,      ///< Field containing a signed 32-bit value
-		I64_TYPE,      ///< Field containing a signed 64-bit value
-		F32_TYPE,      ///< Field containing a 16-bit float value
-		F64_TYPE,      ///< Field containing a 64-bit float value
-		STRING_TYPE,   ///< Field containing a string
-		U8_TYPE,       ///< Field containing an unsigned 8-bit value
-		U16_TYPE,      ///< Field containing an unsigned 16-bit value
-		U32_TYPE,      ///< Field containing an unsigned 32-bit value
-		U64_TYPE       ///< Field containing an unsigned 64-bit value
+		/** Field containing a raw data */
+		BIN_TYPE,
+
+		/** Field containing a boolean value */
+		BOOL_TYPE,
+
+		/** Field containing a character value */
+		CHAR_TYPE,
+
+		/** Field containing a signed 8-bit value */
+		I8_TYPE,
+
+		/** Field containing a signed 16-bit value */
+		I16_TYPE,
+
+		/** Field containing a signed 32-bit value */
+		I32_TYPE,
+
+		/** Field containing a signed 64-bit value */
+		I64_TYPE,
+
+		/** Field containing a 32-bit float value */
+		F32_TYPE,
+
+		/** Field containing a 64-bit float value */
+		F64_TYPE,
+
+		/** Field containing a string */
+		STRING_TYPE,
+
+		/** Field containing an unsigned 8-bit value */
+		U8_TYPE,
+
+		/** Field containing an unsigned 16-bit value */
+		U16_TYPE,
+
+		/** Field containing an unsigned 32-bit value */
+		U32_TYPE,
+
+		/** Field containing an unsigned 64-bit value */
+		U64_TYPE
 	}
 
 
@@ -86,9 +113,9 @@ public class Field
 
 
 	/**
-	 * @fn String getName()
+	 * Returns the name of this Field object.
 	 *
-	 * @return Returns the name of this Field object.
+	 * @return The name of the field.
 	 */
 	public String getName()
 	{
@@ -97,9 +124,9 @@ public class Field
 
 
 	/**
-	 * @fn Field.FieldType getType()
+	 * Returns the type of this Field object.
 	 *
-	 * @return Returns the type of this Field object.
+	 * @return A field type.
 	 */
 	public Field.FieldType getType()
 	{
@@ -108,9 +135,9 @@ public class Field
 
 
 	/**
-	 * @fn String toXML()
+	 * Returns a string containing the XML representation of the field object.
 	 *
-	 * @return Returns a string containing the XML representation of the field object.
+	 * @return A string.
 	 */
 	public String toXML()
 	{
@@ -119,9 +146,9 @@ public class Field
 
 
 	/**
-	 * @fn String toJSON()
+	 * Returns a string containing the JSON representation of the field object.
 	 *
-	 * @return Returns a string containing the JSON representation of the field object.
+	 * @return A string.
 	 */
 	public String toJSON()
 	{
@@ -130,87 +157,78 @@ public class Field
 
 
 	/**
-	 * @fn long getIntegerValue() const
-	 *
-	 * @brief Attempts to convert the field value into long integer number representation.
+	 * Attempts to convert the field value into long integer number representation.
 	 *
 	 * @return Returns the field value as an integer.
 	 *
-	 * @throws An Exception is thrown if the field cannot be successfully converted to a long integer.
+	 * @throws gov.nasa.gsfc.gmsec.api.GMSEC_Exception Thrown if the field cannot successfully be converted to an integer.
 	 */
-	public long getIntegerValue()
+	public long getIntegerValue() throws GMSEC_Exception
 	{
 		return m_jniField.getIntegerValue();
 	}
 
 
 	/**
-	 * @fn U64 getUnsignedIntegerValue() const
-	 *
-	 * @brief Attempts to convert the field value into U64 representation.
+	 * Attempts to convert the field value into U64 representation.
 	 *
 	 * @return Returns the field value as an integer.
 	 *
-	 * @throws An Exception is thrown if the field cannot be successfully converted to U64.
+	 * @throws gov.nasa.gsfc.gmsec.api.GMSEC_Exception Thrown if the field cannot successfully be converted to a U64 object."
 	 */
-	public U64 getUnsignedIntegerValue()
+	public U64 getUnsignedIntegerValue() throws GMSEC_Exception
 	{
 		return m_jniField.getUnsignedIntegerValue();
 	}
 
 
 	/**
-	 * @fn double getDoubleValue() const
-	 *
-	 * @brief Attempts to convert the field value into a 64-bit floating point number representation.
+	 * Attempts to convert the field value into a 64-bit floating point number representation.
 	 *
 	 * @return Returns the field value as a floating point number.
 	 *
-	 * @throws An Exception is thrown if the field cannot be successfully converted to a double.
+	 * @throws gov.nasa.gsfc.gmsec.api.GMSEC_Exception Thrown if the field cannot successfully be converted to an double.
 	 */
-	public double getDoubleValue()
+	public double getDoubleValue() throws GMSEC_Exception
 	{
 		return m_jniField.getDoubleValue();
 	}
 
 
 	/**
-	 * @fn String getStringValue()
-	 *
-	 * @brief Attempts to convert the field value into string representation.
+	 * Attempts to convert the field value into string representation.
 	 *
 	 * @return Returns the field value as a string.
 	 *
-	 * @throws An Exception is thrown if the field cannot be successfully converted to a string.
+	 * @throws gov.nasa.gsfc.gmsec.api.GMSEC_Exception Thrown if the field cannot successfully be converted to a string.
 	 */
-	public String getStringValue()
+	public String getStringValue() throws GMSEC_Exception
 	{
 		return m_jniField.getStringValue();
 	}
 
 
 	/**
-	 * @fn String getString()
-	 *
-	 * @brief Attempts to convert the field value into string representation.
+	 * Attempts to convert the field value into string representation.
 	 *
 	 * @return Returns the field value as a string.
 	 *
-	 * @throws An Exception is thrown if the field cannot be successfully converted to a string.
+	 * @throws gov.nasa.gsfc.gmsec.api.GMSEC_Exception Thrown if the field cannot successfully be converted to a string.
 	 *
-	 * @deprecated As of release 4.3, replaced by getStringValue()
+	 * @deprecated As of release 4.3, replaced by {@link Field#getStringValue()}.
 	 */
-	public String getString()
+	@Deprecated
+	public String getString() throws GMSEC_Exception
 	{
 		return m_jniField.getStringValue();
 	}
 
 
 	/**
-	 * @fn void isHeader(boolean header)
-	 *
-	 * @brief Can be used to denote whether this is a non-header or header field.
+	 * Can be used to denote whether this is a non-header or header field.
 	 * By default, fields are constructed as non-header.
+	 *
+	 * @param header Flag to denote whether this is a header field or not.
 	 */
 	public void isHeader(boolean header)
 	{
@@ -219,9 +237,9 @@ public class Field
 
 
 	/**
-	 * @fn boolean isHeader()
+	 * Returns whether the Field is a non-header or header field.
 	 *
-	 * @brief Can be used to determine if this is a non-header or header field.
+	 * @return True if header field, false otherwise.
 	 */
 	public boolean isHeader()
 	{

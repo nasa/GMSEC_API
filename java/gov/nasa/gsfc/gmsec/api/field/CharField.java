@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,22 +8,22 @@
 
 /**
  * @file CharField.java
- *
- * @brief Specialized Field class that can be used to retain a single character value.
  */
 
 package gov.nasa.gsfc.gmsec.api.field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNICharField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNICharField;
 
 
 /**
- * @class CharField
- *
- * @brief Specialized Field class that can be used to retain a single character value.
+ * Specialized Field class that can be used to retain a single character value.
  */
 public class CharField extends Field
 {
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A JNICharField object.
+	 */
 	public CharField(JNICharField field)
 	{
 		setInternal(field);
@@ -31,14 +31,12 @@ public class CharField extends Field
 
 
 	/**
-	 * @fn CharField(String name, char data)
+	 * Default constructor.
 	 *
-	 * @brief Default constructor.
+	 * @param name Name of the field.
+	 * @param data Character data to associate with the field.
 	 *
-	 * @param name - name of the field.
-	 * @param data - character data to associate with the field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
 	 */
 	public CharField(String name, char data) throws IllegalArgumentException
 	{
@@ -49,13 +47,11 @@ public class CharField extends Field
 
 
 	/**
-	 * @fn CharField(CharField other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other CharField object to copy.
 	 *
-	 * @param other - the other CharField object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given CharField is null.
+	 * @throws IllegalArgumentException Thrown if the given CharField is null.
 	 */
 	public CharField(CharField other) throws IllegalArgumentException
 	{
@@ -69,9 +65,9 @@ public class CharField extends Field
 
 
 	/**
-	 * @fn char getValue()
+	 * Returns the data stored within the CharField.
 	 *
-	 * @return Returns the data stored within the CharField.
+	 * @return A char value.
 	 */
 	public char getValue()
 	{

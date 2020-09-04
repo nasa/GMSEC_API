@@ -1,13 +1,17 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.field;
 
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
+
+import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 import gov.nasa.gsfc.gmsec.api.U64;
 import gov.nasa.gsfc.gmsec.api.field.Field;
 
@@ -79,25 +83,25 @@ public class JNIField
 	}
 
 
-	public long getIntegerValue()
+	public long getIntegerValue() throws GMSEC_Exception
 	{
 		return gmsecJNI.Field_GetIntegerValue(swigCPtr, this);
 	}
 
 
-	public U64 getUnsignedIntegerValue()
+	public U64 getUnsignedIntegerValue() throws GMSEC_Exception
 	{
 		return gmsecJNI.Field_GetUnsignedIntegerValue(swigCPtr, this);
 	}
 
 
-	public double getDoubleValue()
+	public double getDoubleValue() throws GMSEC_Exception
 	{
 		return gmsecJNI.Field_GetDoubleValue(swigCPtr, this);
 	}
 
 
-	public String getStringValue()
+	public String getStringValue() throws GMSEC_Exception
 	{
 		return gmsecJNI.Field_GetStringValue(swigCPtr, this);
 	}

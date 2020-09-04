@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -35,6 +35,12 @@ using namespace GMSEC::API::MIST;
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::Runtime::InteropServices;
+
+
+String^ ConnectionManager::GetAPIVersion()
+{
+	return gcnew String(gmsec::api::mist::ConnectionManager::getAPIVersion());
+}
 
 
 ConnectionManager::ConnectionManager(Config^ config)
@@ -124,6 +130,22 @@ void ConnectionManager::Cleanup()
 	{
 		throw gcnew GMSEC_Exception(e);
 	}
+}
+
+
+Connection::ConnectionState ConnectionManager::GetState()
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONNECTION_ERROR, StatusCode::INVALID_CONNECTION, "ConnectionManager is null");
+
+	return static_cast<Connection::ConnectionState>(m_impl->getState());
+}
+
+
+String^ ConnectionManager::GetLibraryRootName()
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONNECTION_ERROR, StatusCode::INVALID_CONNECTION, "ConnectionManager is null");
+
+	return gcnew String(m_impl->getLibraryRootName());
 }
 
 
@@ -643,6 +665,66 @@ void ConnectionManager::RemoveExcludedSubject(String^ subject)
 	{
 		FREE_HGLOBAL_IF_NOT_NULLPTR(subjectStr);
 	}
+}
+
+
+String^ ConnectionManager::GetName()
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONNECTION_ERROR, StatusCode::INVALID_CONNECTION, "ConnectionManager is null");
+
+	return gcnew String(m_impl->getName());
+}
+
+
+void ConnectionManager::SetName(String^ name)
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONNECTION_ERROR, StatusCode::INVALID_CONNECTION, "ConnectionManager is null");
+
+	char* nameStr = nullptr;
+
+	try
+	{
+		nameStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(name).ToPointer());
+
+		m_impl->setName(nameStr);
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+	catch (...)
+	{
+		throw gcnew GMSEC_Exception(StatusClass::CONNECTION_ERROR, StatusCode::OUT_OF_MEMORY,
+			"Unable to process name");
+	}
+	finally
+	{
+		FREE_HGLOBAL_IF_NOT_NULLPTR(nameStr);
+	}
+}
+
+
+String^ ConnectionManager::GetID()
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONNECTION_ERROR, StatusCode::INVALID_CONNECTION, "ConnectionManager is null");
+
+	return gcnew String(m_impl->getID());
+}
+
+
+String^ ConnectionManager::GetMWInfo()
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONNECTION_ERROR, StatusCode::INVALID_CONNECTION, "ConnectionManager is null");
+
+	return gcnew String(m_impl->getMWInfo());
+}
+
+
+UInt64 ConnectionManager::GetPublishQueueMessageCount()
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONNECTION_ERROR, StatusCode::INVALID_CONNECTION, "ConnectionManager is null");
+
+	return m_impl->getPublishQueueMessageCount();
 }
 
 
@@ -1450,6 +1532,12 @@ void ConnectionManager::AcknowledgeSimpleService(String^ subject, Message^ reque
 	{
 		FREE_HGLOBAL_IF_NOT_NULLPTR(subjectStr);
 	}
+}
+
+
+void ConnectionManager::ShutdownAllMiddlewares()
+{
+	gmsec::api::mist::ConnectionManager::shutdownAllMiddlewares();
 }
 
 

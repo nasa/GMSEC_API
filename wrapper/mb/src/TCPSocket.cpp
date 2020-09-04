@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -287,7 +287,7 @@ Status TCPSocket::fillAddress(SockAddr* saddr, const size_t saddrlen, const int 
 
 	memset(&hints, 0, sizeof(hints));
 
-	hints.ai_family   = AF_INET;
+	hints.ai_family   = (address == NULL ? AF_INET6 : AF_UNSPEC);
 	hints.ai_flags    = (address == NULL ? AI_PASSIVE : 0);
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_addrlen  = 0;
@@ -297,7 +297,7 @@ Status TCPSocket::fillAddress(SockAddr* saddr, const size_t saddrlen, const int 
 	portstr << port;
 
 	if (getaddrinfo(address, portstr.str().c_str(), &hints, &host_info) != 0  ||
-	    !host_info || !host_info->ai_addr || host_info->ai_family != AF_INET)
+	    !host_info || !host_info->ai_addr || (host_info->ai_family != AF_INET && host_info->ai_family != AF_INET6))
 	{
 #ifdef WIN32
 		status = getLastSocketError();

@@ -35,8 +35,8 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " +  sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
+        return -1
 
-    
 
     # Load the command-line input into a GMSEC Config object
     # A Config object is basically a key-value pair map which is used to
@@ -59,12 +59,9 @@ def main():
     # interface
     # This is useful for determining which version of the API is
     # configured within the environment
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create a ConnectionManager object
         connManager = libgmsec_python.ConnectionManager(config)
 
@@ -128,10 +125,8 @@ def main():
         connManager.publish(devMessage)
         
     except libgmsec_python.Exception as e:
-            
         libgmsec_python.logError(e.what())
         return -1
-        
 
     return 0
 

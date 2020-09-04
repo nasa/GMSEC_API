@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,28 +21,37 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIMessage;
 
 import gov.nasa.gsfc.gmsec.api.jni.mist.JNISpecification;
 
+import java.util.Collection;
+
 
 /**
- * @class Specification
- *
- * @brief The Specification class loads a list of templates from a designated directory
- * that are used to create and validate message schemas.  Each template has an associated ID
+ * The Specification class loads a list of templates from a designated directory
+ * that are used to create and validate message schemas. Each template has an associated ID
  * that is used to identify the kind of message schema the template will be defining.
  *
- * @sa Config
- * @sa SchemaIDIterator
+ * @see Config
+ * @see SchemaIDIterator
  */
 public class Specification
 {
 	private JNISpecification m_jniSpecification = null;
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param spec Object to reference for acquiring internal JNISpecification.
+	 * @return Internal JNISpecification object.
+	 */
 	public static JNISpecification getInternal(Specification spec)
 	{
 		return (spec == null ? null : spec.m_jniSpecification);
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param jSpec Internal JNISpecification object.
+	 */
 	public Specification(JNISpecification jSpec)
 	{
 		m_jniSpecification = jSpec;
@@ -50,14 +59,12 @@ public class Specification
 
 
 	/**
-	 * @fn Specification(Config config)
+	 * Default constructor - initializes the %Specification instance.
 	 *
-	 * @brief Default constructor - initializes the %Specification instance.
+	 * @param config The configuration for the Specification object.
 	 *
-	 * @param config - the configuration for the %Specification object.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the %Config object is null.
-	 * @throws A GMSEC_Exception is thrown if schemas (templates) cannot be loaded.
+	 * @throws IllegalArgumentException Thrown if the %Config object is null.
+	 * @throws GMSEC_Exception Thrown if schemas (templates) cannot be loaded.
 	 */
 	public Specification(Config config) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -71,14 +78,12 @@ public class Specification
 
 
 	/**
-	 * @fn Specification(Specification other)
+	 * Copy constructor - initializes the Specification instance based on another instance.
 	 *
-	 * @brief Copy constructor - initializes the %Specification instance based on another instance.
+	 * @param other The other Specification object to copy.
 	 *
-	 * @param other - the %Specification object to be copied.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the %Specification object is null.
-	 * @throws A GMSEC_Exception is thrown if schemas (templates) cannot be loaded.
+	 * @throws IllegalArgumentException Thrown if the Specification object is null.
+	 * @throws GMSEC_Exception Thrown if schemas (templates) cannot be loaded.
 	 */
 	public Specification(Specification other) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -92,17 +97,15 @@ public class Specification
 
 
 	/**
-	 * @fn void validateMessage(Message msg)
-	 *
-	 * @brief Using the given message's subject, the appropriate template from the message registry
-	 * is referenced.  The contents of the message are then compared to the template to ensure the
-	 * message complies with the GMSEC Interface Specification Document (ISD).  If a template cannot
+	 * Using the given message's subject, the appropriate template from the message registry
+	 * is referenced. The contents of the message are then compared to the template to ensure the
+	 * message complies with the GMSEC Interface Specification Document (ISD). If a template cannot
 	 * be found for the message, then a new template based on the message will be added to the registry.
 	 *
-	 * @param message - the message to be validated.
+	 * @param msg The message to be validated.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the %Message object is null.
-	 * @throws A GMSEC_Exception is thrown if the %Message is invalid.
+	 * @throws IllegalArgumentException Thrown if the Message object is null.
+	 * @throws GMSEC_Exception Thrown if the Message is invalid.
 	 */
 	public void validateMessage(Message msg) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -116,9 +119,7 @@ public class Specification
 
 
 	/**
-	 * @fn SchemaIDIterator getSchemaIDIterator()
-	 *
-	 * @brief Returns a SchemaIDIterator which can be used to iterate over the IDs of the loaded
+	 * Returns a SchemaIDIterator which can be used to iterate over the IDs of the loaded
 	 * templates.
 	 *
 	 * @return A handle to a SchemaIDIterator object.
@@ -130,9 +131,12 @@ public class Specification
 
 
 	/**
-	 * @fn int getVersion()
-	 * @desc Returns the version of the GMSEC Interface Specification Document (ISD) that is referenced
-	 * by the %Specification object.
+	 * Returns the version of the GMSEC Interface Specification Document (ISD) that is referenced
+	 * by the Specification object.
+	 *
+	 * @return The version of the ISD in use.
+	 *
+	 * @see gmsecMIST
 	 */
 	public int getVersion()
 	{
@@ -141,20 +145,27 @@ public class Specification
 
 
 	/**
-	 * @fn String getTemplateXML(String subject, String schemaID)
+	 * Returns a collection of Message Specification objects associated with the Specification.
 	 *
-	 * @brief Returns a message schema, as XML, from the template with the matching schema ID.  This
+	 * @return A collection of MessageSpecifications.
+	 */
+	public Collection<MessageSpecification> getMessageSpecifications()
+	{
+		return m_jniSpecification.getMessageSpecifications();
+	}
+
+
+	/**
+	 * Returns a message schema, as XML, from the template with the matching schema ID. This
 	 * XML data can be used to construct a Message object.
 	 *
-	 * @param subject - the desired subject for the message.
-	 * @param schemaID - the schema ID for the desired template.
+	 * @param subject The desired subject for the message.
+	 * @param schemaID The schema ID for the desired template.
 	 *
 	 * @return XML string representation of the message schema, or null if a schema cannot be referenced.
 	 *
-	 * @throws An IllegalArgumentException is thrown if either the subject or the schemaID are null, or
+	 * @throws IllegalArgumentException Thrown if either the subject or the schemaID are null, or
 	 * contain empty strings.
-	 *
-	 * @deprecated This method has been deprecated.
 	 */
 	@Deprecated
 	public String getTemplateXML(String subject, String schemaID)

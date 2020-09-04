@@ -1,11 +1,7 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
-
-
-
-
 
 GMSEC_HOME =../..
 INTERNAL   = 1
@@ -17,14 +13,26 @@ TARGET   = $(BINDIR)/gmhelp
 SRCS     = gmhelp.cpp
 HDRS     = $(wildcard *.h)
 
-.PHONY: default clean
+.PHONY: message default clean
 
 
-default: $(TARGET)
+default: message $(TARGET)
+
+
+message:
+	@echo
+	@echo
+	@echo "###########################################################"
+	@echo "#"
+	@echo "#  Building gmhelp"
+	@echo "#"
+	@echo "###########################################################"
+
 
 clean:
 	$(RM) $(TARGET)
 	$(RM) *.gcno *.gcda
+
 
 $(TARGET): $(SRCS) $(HDRS)
 	$(CXX) $(CXXFLAGS) $< -o $@ $(LDFLAGS)

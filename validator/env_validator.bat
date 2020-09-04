@@ -1,6 +1,6 @@
 @echo off
 
-rem Copyright 2007-2017 United States Government as represented by the
+rem Copyright 2007-2018 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -143,9 +143,21 @@ if !errorlevel! == 0 (
 	goto endhere
 )
 
+echo %mw_type% | findstr "gmsec_ibmmq" 1>NUL
+if !errorlevel! == 0 (
+	call:CheckWebsphere
+	goto endhere
+)
+
 echo %mw_type% | findstr "gmsec_mb" 1>NUL
 if !errorlevel! == 0 (
 	call:CheckMessageBus
+	goto endhere
+)
+
+echo %mw_type% | findstr "gmsec_opendds" 1>NUL
+if !errorlevel! == 0 (
+	call:CheckOpenDDS
 	goto endhere
 )
 
@@ -220,10 +232,11 @@ echo.       activemq383
 echo.		apollo383
 echo.		amqp
 echo.       bolt
+echo.       ibmmq90
 echo.       mb
 echo.       ss66, ss67, ss68, ss681, ss682 (for TIBCO Smart Sockets)
 echo.       weblogic11
-echo.       websphere71, websphere75
+echo.       websphere71, websphere75, websphere80
 echo.
 echo.Note: It is also acceptable to preface any of the above middleware types
 echo.      with 'gmsec_'.  For example, 'gmsec_activemq383'.
@@ -605,14 +618,16 @@ REM ##
 REM ## CheckEnvironmentVariables
 REM ##
 REM ##########################################################################
-:CheckEnvironmentVariables
+rem Defining tab-space below; do not erase
+set TAB=	
 set env_file=%~dp0\%1.env
 if exist %env_file% (
 	echo.
 	call:Header "Checking for optional %1 environment variables..."
 	FOR /F "eol=# tokens=*" %%l IN ( %env_file% ) DO (
 		IF DEFINED %%l (
-			call::Success "Environment variable %%l is set to '!%%l!'"
+			call::Success "Environment variable %%l is set to:"
+			echo.%TAB%%TAB% !%%l!
 		) else (
 			call::Warning "Environment variable %%l is undefined"
 		)
@@ -756,7 +771,7 @@ REM ##
 REM ##########################################################################
 :CheckBolt
 echo.
-call:Header "Checking middleware dependencies for Bolt..."
+call:Header "Checking middleware dependencies for GMSEC Bolt..."
 
 if exist %GMSEC_BIN%\%mw_type%.dll (
 	call:Success "Found %mw_type%.dll"
@@ -782,7 +797,7 @@ REM ##
 REM ##########################################################################
 :CheckMessageBus
 echo.
-call:Header "Checking middleware dependencies for Message Bus..."
+call:Header "Checking middleware dependencies for GMSEC Message Bus..."
 
 if exist %GMSEC_BIN%\%mw_type%.dll (
 	call:Success "Found %mw_type%.dll"
@@ -798,6 +813,33 @@ if %check_jms% == 1 (
 	call:Header "Checking GMSEC JMS support for GMSEC Message Bus..."
 	call:Warning "GMSEC JMS support not available for GMSEC Message Bus"
 )
+goto:eof
+
+
+REM ##########################################################################
+REM ##
+REM ## CheckOpenDDS
+REM ##
+REM ##########################################################################
+:CheckOpenDDS
+echo.
+call:Header "Checking middleware dependencies for GMSEC OpenDDS..."
+
+if exist %GMSEC_BIN%\%mw_type%.dll (
+	call:Success "Found %mw_type%.dll"
+	echo.
+	call:Header "Checking dependencies for %mw_type%.dll..."
+	call:CheckDependencies %GMSEC_BIN%\%mw_type%.dll 1
+
+) else (
+	call:Failure "Unable to reference %mw_type%.dll"
+)
+if %check_jms% == 1 (
+	echo.
+	call:Header "Checking GMSEC JMS support for GMSEC OpenDDS..."
+	call:Warning "GMSEC JMS support not available for GMSEC OpenDDS"
+)
+call:CheckEnvironmentVariables OpenDDS
 goto:eof
 
 
@@ -903,7 +945,7 @@ if %check_jms% == 1 (
 		)
 	)
 )
-call:CheckEnvironmentVariables websphere
+call:CheckEnvironmentVariables WebSphere
 goto:eof
 
 

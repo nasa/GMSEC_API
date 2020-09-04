@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -11,9 +11,26 @@
 using namespace gmsec::api::mist::message;
 %}
 
+// Methods containing lists that will be redefined
+%ignore gmsec::api::mist::message::MistMessage::setStandardFields(const gmsec::api::util::DataList<gmsec::api::Field*>&);
+
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/message/MistMessage.h>
 
+%extend gmsec::api::mist::message::MistMessage
+{
+    static void CALL_TYPE setStandardFields(const std::list<gmsec::api::Field*>& standardFields)
+    {
+        gmsec::api::util::DataList<gmsec::api::Field*> fields;
+
+        for (std::list<gmsec::api::Field*>::const_iterator it = standardFields.begin(); it != standardFields.end(); ++it)
+        {
+            fields.push_back(*it);
+        }
+
+        MistMessage::setStandardFields(fields);
+    }
+}
 
 %perlcode%{
 =pod
@@ -62,6 +79,22 @@ C<libgmsec_perl::MistMessage-E<gt>new($subject, $schemaID, $config, $spec)>
 C<libgmsec_perl::MistMessage-E<gt>DESTROY()>
 
     Destructor
+
+=head3 setStandardFields
+
+C<libgmsec_perl::MistMessage-E<gt>setStandardFields($standardFields)>
+
+     Sets the internal list of fields which are to be automatically placed in all MistMessage objects that are created.  Internal copies of the Fields are made, and thus ownership of the fields that are provided are not retained by MistMessage.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $standardFields - A list of fields to be copied to the internal set of fields, which will in turn be included with all MistMessage objects that are created.
+
+=head3 clearStandardFields
+
+C<libgmsec_perl::MistMessage-E<gt>clearStandardFields()>
+
+     Destroys the lists of standard fields that are included with MistMessage objects.
 
 =head3 getSchemaID
 

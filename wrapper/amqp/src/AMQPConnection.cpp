@@ -807,10 +807,10 @@ void AMQPConnection::mwRequest(const Message& request, std::string& id)
 void AMQPConnection::mwReply(const Message& request, const Message& reply)
 {
 	// Get the Request's Unique ID, and put it into a field in the Reply
-	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
+	std::string        uniqueID  = getExternal().getReplyUniqueID(request);
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(AMQP_REPLY));
 
-	if (uniqueID == NULL)
+	if (uniqueID.empty())
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
@@ -819,12 +819,14 @@ void AMQPConnection::mwReply(const Message& request, const Message& reply)
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain reply address field");
 	}
 
-	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID->getValue());
+	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
 
 	MessageBuddy::getInternal(reply).setSubject(replyAddr->getValue());
 
 	// Publish the reply
 	mwPublish(reply, getExternal().getConfig());
+
+	MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 	GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() << "]";
 }

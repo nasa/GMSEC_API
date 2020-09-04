@@ -29,7 +29,7 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " +  sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
-
+        return -1
 
 
     # Load the command-line input into a GMSEC Config object
@@ -42,6 +42,10 @@ def main():
     for arg in sys.argv[1:]:
         value = arg.split('=')
         config.addValue(value[0], value[1])
+
+    # Since this example program uses an invalid message, we ensure the
+    # validation check is disabled.
+    config.addValue("gmsec-msg-content-validate-all", "false")
 
 
     # If it was not specified in the command-line arguments, set LOGLEVEL
@@ -56,7 +60,6 @@ def main():
     libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
 
     try:
-        
         # Create the ConnectionManager
         connMgr = libgmsec_python.ConnectionManager(config)
 
@@ -88,25 +91,20 @@ def main():
 
         # Example error handling for calling request() with a timeout
         if (replyMsg):
-                
             # Display the XML string representation of the reply
             libgmsec_python.logInfo("Received replyMsg:\n" + replyMsg.toXML())
 
             # Destroy the replyMsg message
             connMgr.release(replyMsg)
-                
 
         # Disconnect from the middleware and clean up the Connection
         connMgr.cleanup()
         
     except Exception as e:
-    
         libgmsec_python.logError(e.what())
         return -1
-        
 
     return 0
-
 
 
 def initializeLogging(config):

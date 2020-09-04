@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -137,6 +137,13 @@ public:
 	/// <returns>True if a new field was added; false if an existing field was replaced.</returns>
 	/// <exception cref="GMSEC_Exception">If the Field object is null</exception>
 	bool AddField(Field^ field);
+
+
+	/// <summary>Adds each Field in the given list to the Message.
+	/// <param name="fields">The list of field objects</param>
+	/// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
+	/// <exception cref="GMSEC_Exception">If the Field list is null</exception>
+	bool AddFields(System::Collections::Generic::List<Field^>^ fields);
 
 
 	/// <summary>Removes all fields associated with the message</summary>

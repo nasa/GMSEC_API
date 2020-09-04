@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -148,6 +148,8 @@ private:
 	static void runReaderThread(ReaderThreadShared shared);
 	static void stopReaderThread(ReaderThreadShared shared);
 
+	std::string generateUniqueId();
+
 	TCPSocketClientArray*                      m_sock;
 	long                                       m_port;
 	std::string                                m_server;
@@ -161,6 +163,8 @@ private:
 
 	ReaderThread                               m_readerThread;
 	ReaderThreadShared                         m_readerThreadShared;
+
+	GMSEC_U32                                  m_messageCounter;
 };
 
 }  // end namespace gmsec_messagebus

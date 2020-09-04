@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -659,13 +659,13 @@ void ZMQConnection::mwRequest(const Message& request, std::string& id)
 
 void ZMQConnection::mwReply(const Message& request, const Message& reply)
 {
-	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
+	std::string        uniqueID  = getExternal().getReplyUniqueID(request);
 	const StringField* replySubj = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_SUBJECT));
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(ZEROMQ_REPLY_ADDRESS));
 
-	if (!uniqueID)
+	if (uniqueID.empty())
 	{
-		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain UNIQUE-ID field");
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain reply unique id");
 	}
 	if (!replySubj)
 	{
@@ -682,7 +682,7 @@ void ZMQConnection::mwReply(const Message& request, const Message& reply)
 	void* repSocket = NULL;
 	setupSocket(&repSocket, ZMQ_PUB, rAddr);
 
-	MessageBuddy::getInternal(reply).addField(*uniqueID);
+	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
 	MessageBuddy::getInternal(reply).setSubject(replySubj->getValue());
 
 	// Publish the reply
@@ -690,6 +690,8 @@ void ZMQConnection::mwReply(const Message& request, const Message& reply)
 	{
 		mwPublishAux(reply, getExternal().getConfig(), repSocket);
 	
+		MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+
 		GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() << "]";
 
 		// Clean up the reply socket
@@ -697,6 +699,8 @@ void ZMQConnection::mwReply(const Message& request, const Message& reply)
 	}
 	catch (const Exception& e)
 	{
+		MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+
 		// Clean up the reply socket
 		zmq_close(repSocket);
 

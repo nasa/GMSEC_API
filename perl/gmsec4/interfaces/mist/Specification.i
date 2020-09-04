@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,8 +9,11 @@
 
 %{
 #include <gmsec4/mist/Specification.h>
+#include <vector>
 using namespace gmsec::api::mist;
 %}
+
+%ignore gmsec::api::mist::Specification::getMessageSpecifications() const;
 
 %ignore gmsec::api::mist::Specification::getTemplateXML(const char*, const char*);
 
@@ -32,6 +35,32 @@ using namespace gmsec::api::mist;
 
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/Specification.h>
+
+%include <std_vector.i>
+
+namespace std
+{
+    %template(MessageSpecificationList) vector<gmsec::api::mist::MessageSpecification*>;
+}
+
+
+%extend gmsec::api::mist::Specification {
+
+    const std::vector<gmsec::api::mist::MessageSpecification*> CALL_TYPE getMessageSpecifications()
+    {
+        const gmsec::api::util::DataList<gmsec::api::mist::MessageSpecification*>& msgSpecs = self->getMessageSpecifications();
+
+        std::vector<gmsec::api::mist::MessageSpecification*> newMsgSpecs;
+
+        for (gmsec::api::util::DataList<gmsec::api::mist::MessageSpecification*>::const_iterator it = msgSpecs.begin(); it != msgSpecs.end(); ++it)
+        {
+            newMsgSpecs.push_back(*it);
+        }
+
+        return newMsgSpecs;
+    }
+}
+
 
 %perlcode%{
 =pod
@@ -101,6 +130,15 @@ C<libgmsec_perl::Specification-E<gt>getVersion()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
 	The version number of the ISD being used
+
+
+=head3 getMessageSpecifications
+
+C<libgmsec_perl::Specification-E<gt>getMessageSpecifications()>
+    Accessor that returns a vector of MessageSpecification object(s) associated with the Specification
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+    A vector of MessageSpecification objects(s)
 
 =cut
 %}

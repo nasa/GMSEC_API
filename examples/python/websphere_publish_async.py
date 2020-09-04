@@ -41,21 +41,22 @@ class AsyncStatusCheckCallback(libgmsec_python.ConnectionManagerEventCallback):
         self.eventFired = False
 
     def onEvent(self, connMgr, status, event):
-        
         # Print the status of publish operations.  This includes counts
         # for successes, warnings, and errors.
-        
         libgmsec_python.logInfo(status.getReason())
+
         if (status.isError()):
             libgsmsec_python.logError("The first occurrence of a WebSphere MQ Asynchronous Put Response warning or failure returned the WebSphere Reason Code: " + status.getCustomCode())
 
         self.eventFired = True
         
+
 def main():
 
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " +  sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
+        return -1
 
 
     cb = AsyncStatusCheckCallback()
@@ -71,6 +72,9 @@ def main():
         value = arg.split('=')
         config.addValue(value[0], value[1])
 
+    # Since this example program uses an invalid message, we ensure the
+    # validation check is disabled.
+    config.addValue("gmsec-msg-content-validate-all", "false")
 
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
@@ -98,12 +102,9 @@ def main():
 
     # Print the GMSEC API version number using the GMSEC Logging
     # interface
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create the Connection
         connMgr = libgmsec_python.ConnectionManager(config)
 
@@ -126,7 +127,6 @@ def main():
         # (i.e. No sleep operation between each publish operation)
         count = 0
         while (not cb.eventFired):
-                
             # Populate the Message with fields, increment a
             # counter so that a publisher can track how many
             # messages were published (if they are interested)
@@ -153,7 +153,6 @@ def main():
         connMgr.cleanup()
         
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
         

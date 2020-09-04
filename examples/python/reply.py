@@ -30,7 +30,7 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " +  sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
-
+        return -1
 
 
     # Load the command-line input into a GMSEC Config object
@@ -44,18 +44,19 @@ def main():
         value = arg.split('=')
         config.addValue(value[0], value[1])
 
+    # Since this example program uses an invalid message, we ensure the
+    # validation check is disabled.
+    config.addValue("gmsec-msg-content-validate-all", "false")
+
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
     # on the terminal/command line
     initializeLogging(config)
 
     # Output GMSEC API version
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create the Connection
         connMgr = libgmsec_python.ConnectionManager(config)
 
@@ -136,18 +137,19 @@ def main():
 
                 # Send Reply
                 connMgr.reply(requestMsg, replyMsg)
-                        
 
             # Destroy request message to release its memory
             connMgr.release(requestMsg)
+
+        connMgr.cleanup()
                 
         
     except libgmsec_python.Exception as e:
-            
         libgmsec_python.logError(e.what())
         return -1
         
     return 0
+
 
 def initializeLogging(config):
 

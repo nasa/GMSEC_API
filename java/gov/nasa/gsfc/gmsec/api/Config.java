@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file Config.java
- *
- * @brief Class that can be used to store key=value pairs.
  */
 
 package gov.nasa.gsfc.gmsec.api;
@@ -17,14 +15,11 @@ package gov.nasa.gsfc.gmsec.api;
 import gov.nasa.gsfc.gmsec.api.jni.JNIConfig;
 
 
-/** @class Config
- *
- * @brief Encapsulates the parameters necessary for initializing connections.  Used
- * by the Connection, this class provides a generic means of supplying initialization
- * data without being Connection specific.
- *
+/**
+ * Encapsulates key/value parameters.
+ * <p>
  * Example creation and use of Config:
- * @code
+ * <pre>{@code
  * import gov.nasa.gsfc.gmsec.api.*;
  *
  * import java.util.Collection;
@@ -66,23 +61,34 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIConfig;
  *         }
  *     }
  * }
- * @endcode
+ * }</pre>
  *
- * @sa Connection
- * @sa mist.ConnectionManager
- * @sa Message
+ * @see Connection
+ * @see Message
+ * @see gov.nasa.gsfc.gmsec.api.mist.ConnectionManager
+ * @see gov.nasa.gsfc.gmsec.api.mist.Specification
+ * @see gov.nasa.gsfc.gmsec.api.mist.message.MistMessage
  */
 public class Config
 {
 	private JNIConfig m_jniConfig = null;
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param cfg Object to reference for acquiring internal JNIConfig
+	 * @return Internal JNIConfig object
+	 */
 	public static JNIConfig getInternal(Config cfg)
 	{
 		return (cfg == null ? null : cfg.m_jniConfig);
 	}
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param jcfg Internal JNIConfig object
+	 */
 	public Config(JNIConfig jcfg)
 	{
 		m_jniConfig = jcfg;
@@ -90,9 +96,7 @@ public class Config
 
 
 	/**
-	 * @fn Config()
-	 *
-	 * @desc Creates an empty configuration object
+	 * Creates an empty configuration object
 	 */
 	public Config()
 	{
@@ -101,17 +105,15 @@ public class Config
 
 
 	/**
-	 * @fn Config(String[] args)
+	 * Creates an configuration object using the key/value pairs from the
+	 * command-line parameters that are in the form of key=value.
+	 * <p>
+	 * For example, an application could instantiate a Config object when passed parameters such as:
+	 * <pre>{@code
+	 * java gmpub mw-id=bolt server=10.1.2.159
+	 * }</pre>
 	 *
-	 * @brief Creates an configuration object using the key/value pairs from the
-	 * command-line parameters that are in the form of \<key\>=\<value\>.
-	 *
-	 * Example:
-	 * @code
-	 * java gmpub connectionType=gmsec_bolt server=localhost 
-	 * @endcode
-	 *
-	 * @param args - an array of string parameters
+	 * @param args an array of string parameters
 	 */
 	public Config(String[] args)
 	{
@@ -120,34 +122,33 @@ public class Config
 
 
 	/**
-	 * @fn Config(String data)
-	 *
-	 * @brief Creates an configuration object by parsing the key/value pairs from the
-	 * given data string.  The data string can contain either XML or JSON formatted
-	 * configuration data, or contain raw data consisting of white-space separated
-	 * key=value pairs.
-	 *
+	 * Creates an configuration object by parsing the key/value pairs from the
+	 * given data string.
+	 * <p>
+	 * The data string can contain either XML or JSON formatted configuration
+	 * data, or contain raw data consisting of white-space separated key=value pairs.
+	 * <p>
 	 * Example XML string:
-	 * @code
+	 * <pre>{@code
 	 * <CONFIG>
-	 *     <PARAMETER NAME="connectionType">gmsec_bolt</PARAMETER>
+	 *     <PARAMETER NAME="mw-id">bolt</PARAMETER>
 	 *     <PARAMETER NAME="server">10.1.2.159</PARAMETER>
 	 *     <PARAMETER NAME="tracking">true</PARAMETER>
 	 *     <PARAMETER NAME="loglevel">info</PARAMETER>
 	 * </CONFIG>
-	 * @endcode
-	 *
+	 * }</pre>
+	 * <p>
 	 * Example raw-data string:
-	 * @code
-	 * connectionType=gmsec_bolt server=10.1.2.159 tracking=true loglevel=info
-	 * @endcode
+	 * <pre>{@code
+	 * mw-id=bolt server=10.1.2.159 tracking=true loglevel=info
+	 * }</pre>
 	 *
-	 * @param data - data string containing configuration information
+	 * @param data data string containing configuration information
 	 *
-	 * @throws An IllegalArgumentException is thrown if the data string is null, or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the given data string is not parsable.
+	 * @throws IllegalArgumentException Thrown if the data string is null, or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the given data string is not parsable.
 	 *
-	 * @sa toXML()
+	 * @see Config#toXML()
 	 */
 	public Config(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -161,12 +162,10 @@ public class Config
 
 
 	/**
-	 * @fn Config(Config other)
-	 *
-	 * @brief Copy-constructor for initializing a Config object using the configuration
+	 * Copy-constructor for initializing a Config object using the configuration
 	 * values from an existing Config object.
 	 *
-	 * @param other - the existing Config object to copy.
+	 * @param other the existing Config object to copy.
 	 */
 	public Config(Config other)
 	{
@@ -182,14 +181,12 @@ public class Config
 
 
 	/**
-	 * @fn void addValue(String key, String value)
+	 * Stores a key/value pair within the Config object.
 	 *
-	 * @brief Stores a key/value pair within the Config object.
+	 * @param key   the key associated with the value.
+	 * @param value the value associated with the key.
 	 *
-	 * @param key   - the key associated with the value.
-	 * @param value - the value associated with the key.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the key is null or contains an empty string,
+	 * @throws IllegalArgumentException Thrown if the key is null or contains an empty string,
 	 * or if the value is null.
 	 */
 	public void addValue(String key, String value) throws IllegalArgumentException
@@ -208,15 +205,13 @@ public class Config
 
 
 	/**
-	 * @fn boolean clearValue(String key);
+	 * Clears the key, and associated value, from the Config object.
 	 *
-	 * @brief Clears the key, and associated value, from the Config object.
-	 *
-	 * @param key - key of value to clear
+	 * @param key key of value to clear
 	 *
 	 * @return True if the operation was successful; false if the key was not found.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
 	 */
 	public boolean clearValue(String key) throws IllegalArgumentException
 	{
@@ -230,9 +225,7 @@ public class Config
 
 
 	/**
-	 * @fn void clear()
-	 *
-	 * @desc Clears all key/value pairs from the Config object.
+	 * Clears all key/value pairs from the Config object.
 	 */
 	public void clear()
 	{
@@ -241,9 +234,9 @@ public class Config
 
 
 	/**
-	 * @fn java.util.Collection<java.util.Map.Entry<String, String> > entrySet()
+	 * Returns a collection of the key/value pairs stored in the Config object.
 	 *
-	 * @brief Returns a collection of the key/value pairs stored in the Config object.
+	 * @return A Collection of key/value entries.
 	 */
 	public java.util.Collection<java.util.Map.Entry<String, String>> entrySet()
 	{
@@ -252,11 +245,9 @@ public class Config
 
 
 	/**
-	 * @fn java.util.Collection<String> keySet()
+	 * Returns the collection of keys within the Config object.
 	 *
-	 * @brief Returns the collection of keys within the Config object.
-	 *
-	 * @return A collection of key strings.
+	 * @return A Collection of key strings.
 	 */
 	public java.util.Collection<String> keySet()
 	{
@@ -265,15 +256,13 @@ public class Config
 
 
 	/**
-	 * @fn String getValue(String key)
+	 * This method gets a value by key.
 	 *
-	 * @brief This method gets a value by key.
-	 *
-	 * @param key - key of value to get
+	 * @param key key of value to get
 	 *
 	 * @return If the key entry is found, then the associated value is returned; otherwise null is returned.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
 	 */
 	public String getValue(String key) throws IllegalArgumentException
 	{
@@ -287,17 +276,14 @@ public class Config
 
 	
 	/**
-     * @fn String getValue(String key, String defaultValue)
+     * This method gets a value by key.
      *
-     * @brief This method gets a value by key.
-     *
-     * @param key - key of value to get
-	 *
-	 * @param defaultValue - value to be returned if key does not exist
+     * @param key Key of value to get
+	 * @param defaultValue Value to return if the configuration element does not exist.
      *
      * @return If the key entry is found, then the associated value is returned; otherwise defaultValue is returned.
      *
-     * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
+     * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
      */
 	public String getValue(String key, String defaultValue) throws IllegalArgumentException
 	{
@@ -311,18 +297,14 @@ public class Config
 	
 
 	/**
-	 * @fn boolean getBooleanValue(String key)
+	 * Attempts to return the boolean representation of the configuration element.
 	 *
-	 * @brief Attempts to return the boolean representation of the configuration element.
-	 * An exception is thrown if the element does not exist or if there is no valid boolean
-	 * interpretation for the value.
-	 *
-	 * @param key - key of value to get
+	 * @param key key of value to get
 	 *
 	 * @return Boolean value of the keyd configuration element.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the value associated with the configuration element cannot be interpreted as a boolean value.
+	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the value associated with the configuration element cannot be interpreted as a boolean value.
 	 */
 	public boolean getBooleanValue(String key) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -336,17 +318,17 @@ public class Config
 
 
 	/**
-	 * @fn boolean getBooleanValue(String key, boolean defaultValue)
-	 *
-	 * @brief Attempts to return the boolean representation of the configuration element.
+	 * Attempts to return the boolean representation of the configuration element.
+	 * <p>
 	 * If the element does not exist or if there is no valid boolean interpretation of
 	 * the value, then the default value is returned.
 	 *
-	 * @param key - key of value to get
+	 * @param key key of value to get
+	 * @param defaultValue Value to return if the configuration element does not exist.
 	 *
 	 * @return Boolean value of the keyd configuration element, or possibly the default value.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
 	 */
 	public boolean getBooleanValue(String key, boolean defaultValue) throws IllegalArgumentException
 	{
@@ -360,18 +342,14 @@ public class Config
 
 
 	/**
-	 * @fn int getIntegerValue(String key)
+	 * Attempts to return the integer representation of the configuration element.
 	 *
-	 * @brief Attempts to return the integer representation of the configuration element.
-	 * An exception is thrown if the element does not exist or if there is no valid integer 
-	 * interpretation for the value.
+	 * @param key Key of value to get
 	 *
-	 * @param key - key of value to get
+	 * @return integer value of the key configuration element.
 	 *
-	 * @return int value of the keyd configuration element.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the value associated with the configuration element cannot be interpreted as an integer value.
+	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the value associated with the configuration element cannot be interpreted as an integer value.
 	 */
 	public int getIntegerValue(String key) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -385,17 +363,17 @@ public class Config
 
 
 	/**
-	 * @fn int getIntegerValue(String key, int defaultValue)
-	 *
-	 * @brief Attempts to return the boolean representation of the configuration element.
+	 * Attempts to return the boolean representation of the configuration element.
+	 * <p>
 	 * If the element does not exist or if there is no valid integer interpretation of
 	 * the value, then the default value is returned.
 	 *
-	 * @param key - key of value to get
+	 * @param key Key of value to get
+	 * @param defaultValue Value to return if the configuration element does not exist.
 	 *
-	 * @return int value of the keyd configuration element, or possibly the default value.
+	 * @return integer value of the keyd configuration element, or possibly the default value.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
 	 */
 	public int getIntegerValue(String key, int defaultValue) throws IllegalArgumentException
 	{
@@ -409,18 +387,14 @@ public class Config
 
 
 	/**
-	 * @fn double getDoubleValue(String key)
+	 * Attempts to return the double representation of the configuration element.
 	 *
-	 * @brief Attempts to return the double representation of the configuration element.
-	 * An exception is thrown if the element does not exist or if there is no valid double
-	 * interpretation for the value.
-	 *
-	 * @param key - key of value to get
+	 * @param key Key of value to get
 	 *
 	 * @return double value of the keyd configuration element.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the value associated with the configuration element cannot be interpreted as a double value.
+	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the value associated with the configuration element cannot be interpreted as a double value.
 	 */
 	public double getDoubleValue(String key) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -434,17 +408,17 @@ public class Config
 
 
 	/**
-	 * @fn double getDoubleValue(String key, double defaultValue)
-	 *
-	 * @brief Attempts to return the double representation of the configuration element.
+	 * Attempts to return the double representation of the configuration element.
+	 * <p>
 	 * If the element does not exist or if there is no valid double interpretation of
 	 * the value, then the default value is returned.
 	 *
-	 * @param key - key of value to get
+	 * @param key Key of value to get
+	 * @param defaultValue Value to return if the configuration element does not exist.
 	 *
 	 * @return double value of the keyd configuration element, or possibly the default value.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
 	 */
 	public double getDoubleValue(String key, double defaultValue) throws IllegalArgumentException
 	{
@@ -458,28 +432,33 @@ public class Config
 
 
 	/**
-	 * @fn merge(Config other, boolean overwriteExisting)
+	 * Merge the given Config object with the current Config object.
 	 *
-	 * @brief Merge the given %Config object with the current %Config object.
+	 * @param other the Config object from which to read key/value pairs.
+	 * @param overwriteExisting indicates whether to overwrite any existing key/value
+	 * pairs within the working Config object.
 	 *
-	 * @param other - the %Config object from which to read key/value pairs.
-	 * @param overwriteExisting - indicates whether to overwrite any existing key/value
-	 * pairs within the working %Config object.
+	 * @throws IllegalArgumentException Thrown if the given Config object is null.
 	 */
-	public void merge(Config other, boolean overwriteExisting)
+	public void merge(Config other, boolean overwriteExisting) throws IllegalArgumentException
 	{
+		if (other == null)
+		{
+			throw new IllegalArgumentException("Config object is null");
+		}
+
 		m_jniConfig.merge(other, overwriteExisting);
 	}
 
 
 	/**
-	 * @fn String toXML()
-	 *
-	 * @brief Convenience method for converting the Config object into XML representation.
+	 * Convenience method for converting the Config object into XML representation.
+	 * The format is the same as that which is accepted by {@link Config#Config(String)}.
 	 *
 	 * @return XML string
 	 *
-	 * @sa fromXML()
+	 * @see Config#Config(String)
+	 * @see Config#fromXML(String)
 	 */
 	public String toXML()
 	{
@@ -488,27 +467,25 @@ public class Config
 
 
 	/**
-	 * @fn void fromXML(String xml)
-	 *
-	 * @brief This function will read a configuration from an XML string.
+	 * This function will read a configuration from an XML string.
 	 * The format is the same as that which is generated by toXML().
-	 *
+	 * <p>
 	 * Example XML string:
-	 * @code
+	 * <pre>{@code
 	 * <CONFIG>
 	 *     <PARAMETER NAME="connectionType">gmsec_bolt</PARAMETER>
 	 *     <PARAMETER NAME="server">10.1.2.159</PARAMETER>
 	 *     <PARAMETER NAME="tracking">true</PARAMETER>
 	 *     <PARAMETER NAME="loglevel">info</PARAMETER>
 	 * </CONFIG>
-	 * @endcode
+	 * }</pre>
 	 *
-	 * @param xml - XML string representation of a Config object.
+	 * @param xml XML string representation of a Config object.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the XML string is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the given XML string is not parsable.
+	 * @throws IllegalArgumentException Thrown if the XML string is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the given XML string is not parsable.
 	 *
-	 * @sa toXML()
+	 * @see Config#toXML()
 	 */
 	public void fromXML(String xml) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -522,14 +499,12 @@ public class Config
 
 
 	/**
-	 * @fn String toJSON()
-	 *
-	 * @brief This function will dump the Config into JSON format.
-	 * The format is the same as that which is accepted by Config(String data).
+	 * This function will dump the Config into JSON format.
+	 * The format is the same as that which is accepted by {@link Config#Config(String)}.
 	 *
 	 * @return JSON formatted string
 	 *
-	 * @sa Config(String data)
+	 * @see Config#Config(String)
 	 */
 	public String toJSON()
 	{

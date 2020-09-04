@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file Callback.java
- *
- * @brief An interface for receiving messages via a callback.
  */
 
 package gov.nasa.gsfc.gmsec.api;
@@ -19,32 +17,31 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIConnection;
 
 
 /**
- * @class Callback
- *
- * @brief This interface is for received message callbacks. 
- * A user created class, that extends this class, can be passed into 
- * %subscribe() and %request() to have user code executed asynchronously
- * when a message is received.
- * 
+ * This abstract class is for receiving messages using a callback. 
+ * <p>
+ * A user created class, derived from this class, can be passed into 
+ * {@link Connection#subscribe(String, Callback)} to have user code
+ * executed asynchronously when a message is received.
+ * <p>
  * Example Callback class:
- * @code
+ * <pre>{@code
  * class PublishCallback extends Callback
  * {
  *     public void onMessage(Connection conn, Message msg)
  *     {
  *         System.out.println(msg.toXML());
  *
- *         // Do not destroy the message
+ *         // Do not destroy the message or the connection
  *     }
  * }
- * @endcode
- *
+ * }</pre>
+ * <p>
  * Example Callback registration:
- * @code
+ * <pre>{@code
  * SubscriptionInfo info = conn.subscribe("GMSEC.TEST.PUBLISH", new PublishCallback());
- * @endcode
+ * }</pre>
  *
- * @sa Connection::subscribe(String subject, Callback cb)
+ * @see Connection#subscribe(String, Callback)
  */
 public abstract class Callback
 {
@@ -52,24 +49,40 @@ public abstract class Callback
 	private JNIConnection m_jniConnection = null;
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param cb Callback object to reference for acquiring internal JNICallback
+	 * @return Internal JNICallback object
+	 */
 	public static JNICallback getInternal(Callback cb)
 	{
 		return (cb == null ? null : cb.m_jniCallback);
 	}
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @return Internal JNIConnection object
+	 */
 	public JNIConnection getConnection()
 	{
 		return m_jniConnection;
 	}
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param jconn Internal JNIConnection object
+	 */
 	public void setConnection(JNIConnection jconn)
 	{
 		m_jniConnection = jconn;
 	}
 
 
+	/**
+	 * Constructor.
+	 */
 	protected Callback()
 	{
 		m_jniCallback = new JNICallback(this);
@@ -77,18 +90,16 @@ public abstract class Callback
 
 
 	/**
-	 * @fn void onMessage(Connection conn, Message msg)
-	 *
-	 * @brief This function is called by the API in response to a message, from either the
-	 * dispatchMsg() call or inside the auto-dispatcher after a startAutoDispatch() call. A
-	 * class derrived from Callback needs to be registered with a connection, using subscribe()
+	 * This method is called by the API in response to a message, from either the
+	 * dispatch() call or inside the auto-dispatcher after a startAutoDispatch() call. A
+	 * class derived from Callback needs to be registered with a connection, using subscribe()
 	 * in order to be called for a particular subject registration pattern.
-	 *
+	 * <p>
 	 * Please note that if a Callback is registered to multiple connections, onMessage() can be
 	 * invoked concurrently from different connection threads.
 	 * 
-	 * @param conn - connection on which the message was recieved
-	 * @param msg - the recieved message
+	 * @param conn Connection on which the message was received
+	 * @param msg  The received message
 	 */
 	public abstract void onMessage(Connection conn, Message msg);
 }

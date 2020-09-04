@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,9 +17,9 @@
  * GMSEC_Message              msg    = messageCreate("GMSEC.FOO.BAR", GMSEC_MSG_PUBLISH, status);
  * GMSEC_MessageFieldIterator iter   = messageGetFieldIterator(msg, status);
  *
- * while (messageFieldIteratorHasNext(iter) == GMSEC_TRUE)
+ * while (messageFieldIteratorHasNext(iter, status) == GMSEC_TRUE)
  * {
- *     const GMSEC_Field field = messageFieldIteratorNext(iter);
+ *     const GMSEC_Field field = messageFieldIteratorNext(iter, status);
  *
  *     // do something with field
  * }

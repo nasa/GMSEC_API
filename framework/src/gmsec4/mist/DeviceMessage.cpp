@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,6 +21,7 @@
 #include <gmsec4/mist/DeviceIterator.h>
 
 #include <gmsec4/mist/Specification.h>
+#include <gmsec4/mist/mist_defs.h>
 
 #include <gmsec4/Config.h>
 
@@ -39,6 +40,10 @@ DeviceMessage::DeviceMessage(const char* subject, unsigned int version)
 	                                    InternalMistMessage::buildSchemaID(PUBLISH, "C2CX", "DEV", version).c_str(),
 	                                    InternalMistMessage::buildSpecification(version)))
 {
+	if (version > mist::GMSEC_ISD_2016_00)
+	{
+		throw Exception(MIST_ERROR, MSG_LOOKUP_FAILURE, "This class has been deprecated and not compatible with 2018 ISD and greater; use gmsec::api::mist::message::DeviceMessage instead");
+	}
 	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::DeviceMessage instead.";
 }
 
@@ -49,6 +54,10 @@ DeviceMessage::DeviceMessage(const char* subject, const Config& config, unsigned
 	                                    config,
 	                                    InternalMistMessage::buildSpecification(version)))
 {
+	if (version > mist::GMSEC_ISD_2016_00)
+	{
+		throw Exception(MIST_ERROR, MSG_LOOKUP_FAILURE, "This class has been deprecated and not compatible with 2018 ISD and greater; use gmsec::api::mist::message::DeviceMessage instead");
+	}
 	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::DeviceMessage instead.";
 }
 
@@ -63,6 +72,10 @@ DeviceMessage::DeviceMessage(const DeviceMessage& other)
 DeviceMessage::DeviceMessage(const char* data)
 	: Message(new InternalDeviceMessage(data))
 {
+	if (getIntegerValue("CONTENT-VERSION") > mist::GMSEC_ISD_2016_00)
+	{
+		throw Exception(MIST_ERROR, MSG_LOOKUP_FAILURE, "This class has been deprecated and not compatible with 2018 ISD and greater; use gmsec::api::mist::message::DeviceMessage instead");
+	}
 	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::DeviceMessage instead.";
 }
 

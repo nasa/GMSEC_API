@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,6 +16,8 @@
 
 #include <gmsec4/internal/mist/ResourceInfoGenerator.h>
 
+#include <gmsec4/mist/message/MistMessage.h>
+
 #include <gmsec4/mist/mist_defs.h>
 
 #include <gmsec4/Exception.h>
@@ -27,10 +29,8 @@
 #include <gmsec4/internal/StringUtil.h>
 #include <gmsec4/internal/SystemUtil.h>
 
-#include <deque>
 #include <iomanip>
 #include <sstream>
-#include <string>
 #include <cstdlib>
 
 #ifdef WIN32
@@ -90,7 +90,10 @@ using namespace gmsec::api;
 using namespace gmsec::api::internal;
 using namespace gmsec::api::util;
 using namespace gmsec::api::mist;
+using namespace gmsec::api::mist::message;
 using namespace gmsec::api::mist::internal;
+
+using namespace std;
 
 
 std::deque<ResourceInfoGenerator::MainMemoryStats> ResourceInfoGenerator::m_mainMemoryStatsQueue;
@@ -99,7 +102,68 @@ std::deque<ResourceInfoGenerator::CPUStats>        ResourceInfoGenerator::m_cpuS
 std::deque<ResourceInfoGenerator::NetworkStats>    ResourceInfoGenerator::m_networkStatsQueue;
 
 
-void ResourceInfoGenerator::addMainMemoryStats(Message &msg, unsigned int version, size_t movingAverageSamples)
+#ifdef WIN32
+static bool checkStatus(const char* operation, PDH_STATUS status)
+{
+	if (status == ERROR_SUCCESS)
+		return true;
+
+	const char* error = NULL;
+
+	switch (status)
+	{
+	case PDH_CSTATUS_BAD_COUNTERNAME:
+		error = "Bad Counter Name";
+		break;
+	case PDH_CSTATUS_NO_COUNTER:
+		error = "No Counter";
+		break;
+	case PDH_CSTATUS_NO_COUNTERNAME:
+		error = "No Counter Name";
+		break;
+	case PDH_CSTATUS_NO_MACHINE:
+		error = "No machine";
+		break;
+	case PDH_CSTATUS_NO_OBJECT:
+		error = "No object";
+		break;
+	case PDH_FUNCTION_NOT_FOUND:
+		error = "Not found";
+		break;
+	case PDH_INVALID_ARGUMENT:
+		error = "Invalid argument";
+		break;
+	case PDH_INVALID_HANDLE:
+		error = "Invalid handle";
+		break;
+	case PDH_MEMORY_ALLOCATION_FAILURE:
+		error = "Memory allocation failure";
+		break;
+	case PDH_NO_DATA:
+		error = "No data available";
+		break;
+	case PDH_INVALID_DATA:
+		error = "Invalid data";
+		break;
+	case PDH_CSTATUS_ITEM_NOT_VALIDATED:
+		error = "Item not validated";
+		break;
+	default:
+		error = "Unknown error";
+		break;
+	}
+
+	std::ostringstream oss;
+	oss << operation << ": " << error;
+
+	GMSEC_WARNING << oss.str().c_str();
+
+	return false;
+}
+#endif
+
+
+void ResourceInfoGenerator::addMainMemoryStats(MistMessage& msg, unsigned int version, size_t movingAverageSamples)
 {
 	MainMemoryStats stats_this_iteration;
 
@@ -438,26 +502,18 @@ void ResourceInfoGenerator::addMainMemoryStats(Message &msg, unsigned int versio
 	average_total_virtual_memory      /= m_mainMemoryStatsQueue.size(); // This total virtual memory shouldn't change (the average should be the same as a one-time sample), but keep it consistent with the other logic
 	average_available_virtual_memory  /= m_mainMemoryStatsQueue.size();
 
-	msg.addField("MEM.UTIL", average_memory_percent_utilized);
-
-	if(version == GMSEC_ISD_2014_00){
-		msg.addField("MEM.PHYSICAL.TOTAL", average_total_physical_memory); 
-		msg.addField("MEM.PHYSICAL.AVAIL", average_available_physical_memory);
-		msg.addField("MEM.VIRTUAL.TOTAL", average_total_virtual_memory);
-		msg.addField("MEM.VIRTUAL.AVAIL", average_available_virtual_memory);
-	}else if(version == GMSEC_ISD_2016_00){
+	if (version >= GMSEC_ISD_2016_00)
+	{
+		msg.addField("MEM.UTIL", average_memory_percent_utilized);
 		msg.addField("MEM.PHYSICAL.TOTAL", (GMSEC_U64) average_total_physical_memory); 
 		msg.addField("MEM.PHYSICAL.AVAIL", (GMSEC_U64) average_available_physical_memory);
 		msg.addField("MEM.VIRTUAL.TOTAL", (GMSEC_U64) average_total_virtual_memory);
 		msg.addField("MEM.VIRTUAL.AVAIL", (GMSEC_U64) average_available_virtual_memory);
-	}else{
-		GMSEC_WARNING << "Specification version unknown: " << version << ", unable to autopopulate some RAM stats"
-			<< " in Resource message";
 	}
 }
 
 
-void ResourceInfoGenerator::addDiskStats(Message &msg, unsigned int version, size_t movingAverageSamples)
+void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version, size_t movingAverageSamples)
 {
 	//This function responsible for adding:
 	//NUM-OF-DISKS
@@ -721,7 +777,7 @@ void ResourceInfoGenerator::addDiskStats(Message &msg, unsigned int version, siz
 
 	char           buffer[CHAR_BUF_LEN];
 
-	ifstream       ifs("/proc/mounts", ios::in);
+	std::ifstream  ifs("/proc/mounts", std::ios::in);
 
 	GMSEC_I16      num_of_disks = 0;
 
@@ -941,147 +997,31 @@ void ResourceInfoGenerator::addDiskStats(Message &msg, unsigned int version, siz
 		msg.addField(field_key, stats_this_iteration.stats[disk_count].disk_name.c_str());
 
 		StringUtil::stringFormat(field_key, sizeof(field_key), "DISK.%d.SIZE", disk_count+1);
-		if (version == GMSEC_ISD_2014_00)
+		if (version <= GMSEC_ISD_2014_00)
 		{
 			msg.addField(field_key, average_disk_size);
 		}
-		else if (version == GMSEC_ISD_2016_00)
-		{
-			msg.addField(field_key, (GMSEC_U32) average_disk_size);
-		}
 		else
 		{
-			GMSEC_WARNING << "Specification version unknown: " << version << ", unable to autopopulate "
-				<< field_key << " in Resource message";
+			msg.addField(field_key, (GMSEC_U32) average_disk_size);
 		}
 
 		StringUtil::stringFormat(field_key, sizeof(field_key), "DISK.%d.UTIL", disk_count+1);
 		msg.addField(field_key, average_disk_util);
 	}
 
-	if (version == GMSEC_ISD_2014_00)
+	if (version <= GMSEC_ISD_2014_00)
 	{
 		msg.addField("NUM-OF-DISKS", stats_this_iteration.num_of_disks);
 	}
-	else if (version == GMSEC_ISD_2016_00)
+	else
 	{
 		msg.addField("NUM-OF-DISKS", (GMSEC_U16) stats_this_iteration.num_of_disks);
 	}
-	else
-	{
-		GMSEC_WARNING << "Specification version unknown: " << version << ", unable to autopopulate NUM-OF-DISKS "
-			<< " in Resource message";
-	}
 }
 
 
-std::string ResourceInfoGenerator::getOSVersion()
-{
-#ifdef WIN32
-	OSVERSIONINFO osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-    if (GetVersionEx(&osvi) != 0)
-	{
-		std::ostringstream ss;
-		ss << "Windows version: " << osvi.dwMajorVersion << "." << osvi.dwMinorVersion;
-		return ss.str();
-	}
-	else
-	{
-		throw Exception(MIST_ERROR, RESOURCE_INFO_MEMORY_ERROR,
-		                "Failed to query Windows version information");
-	}
-
-#elif defined(__sun) || defined(__hpux) || defined(__linux__) || defined(__APPLE__)
-
-	struct utsname utsname_buf;
-
-	if (uname(&utsname_buf) >= 0) // success
-	{
-		std::ostringstream ss;
-		ss << "OS version:  " << utsname_buf.sysname << " "
-		   << utsname_buf.release << " "
-		   << utsname_buf.version << " "
-		   << utsname_buf.machine;
-
-		return ss.str();
-	}
-	else // failure in query
-	{
-		throw Exception(MIST_ERROR, RESOURCE_INFO_OS_VERSION_ERROR,
-		                "Failed to query OS version");
-	}
-
-#else
-	return "Unknown Operating System";
-#endif    
-}
-
-
-#ifdef WIN32
-static bool checkStatus(const char* operation, PDH_STATUS status)
-{
-	if (status == ERROR_SUCCESS)
-		return true;
-
-	const char* error = NULL;
-
-	switch (status)
-	{
-	case PDH_CSTATUS_BAD_COUNTERNAME:
-		error = "Bad Counter Name";
-		break;
-	case PDH_CSTATUS_NO_COUNTER:
-		error = "No Counter";
-		break;
-	case PDH_CSTATUS_NO_COUNTERNAME:
-		error = "No Counter Name";
-		break;
-	case PDH_CSTATUS_NO_MACHINE:
-		error = "No machine";
-		break;
-	case PDH_CSTATUS_NO_OBJECT:
-		error = "No object";
-		break;
-	case PDH_FUNCTION_NOT_FOUND:
-		error = "Not found";
-		break;
-	case PDH_INVALID_ARGUMENT:
-		error = "Invalid argument";
-		break;
-	case PDH_INVALID_HANDLE:
-		error = "Invalid handle";
-		break;
-	case PDH_MEMORY_ALLOCATION_FAILURE:
-		error = "Memory allocation failure";
-		break;
-	case PDH_NO_DATA:
-		error = "No data available";
-		break;
-	case PDH_INVALID_DATA:
-		error = "Invalid data";
-		break;
-	case PDH_CSTATUS_ITEM_NOT_VALIDATED:
-		error = "Item not validated";
-		break;
-	default:
-		error = "Unknown error";
-		break;
-	}
-
-	std::ostringstream oss;
-	oss << operation << ": " << error;
-
-	GMSEC_WARNING << oss.str().c_str();
-
-	return false;
-}
-#endif
-
-
-void ResourceInfoGenerator::addCPUStats(Message &msg, unsigned int version, size_t movingAverageSamples)
+void ResourceInfoGenerator::addCPUStats(MistMessage& msg, unsigned int version, size_t movingAverageSamples)
 {
 	//This function is responsible for:
 	//NUM-OF-CPUS, I16
@@ -1411,7 +1351,7 @@ void ResourceInfoGenerator::addCPUStats(Message &msg, unsigned int version, size
 
 	CPUTickStruct              cpu_tick_struct;
 
-	ifstream                   ifs("/proc/stat", ios::in);
+	std::ifstream              ifs("/proc/stat", std::ios::in);
 
 	while (ifs.getline(buffer, sizeof(buffer), '\n'))
 	{
@@ -1535,8 +1475,6 @@ void ResourceInfoGenerator::addCPUStats(Message &msg, unsigned int version, size
 	// per call to this function).
 	//
 
-	GMSEC_F32 average_cpu_total_util = 0.0;
-
 	while (m_cpuStatsQueue.size() >= movingAverageSamples)
 	{
 		m_cpuStatsQueue.pop_front();
@@ -1602,11 +1540,6 @@ void ResourceInfoGenerator::addCPUStats(Message &msg, unsigned int version, size
 
 #endif
 
-		if (stats_this_iteration.cpu_total_util == 0.0) // nothing populated by system
-		{
-			average_cpu_total_util += average_cpu_utils;
-		}
-
 		char field_key[CHAR_BUF_LEN];
 
 		StringUtil::stringFormat(field_key, sizeof(field_key), "CPU.%d.UTIL", cpu_count+1);
@@ -1614,39 +1547,18 @@ void ResourceInfoGenerator::addCPUStats(Message &msg, unsigned int version, size
 
 	}// for cpu_count
 
-	if (stats_this_iteration.cpu_total_util == 0.0) // nothing populated by system
+	if (version <= GMSEC_ISD_2014_00)
 	{
-		average_cpu_total_util /= static_cast<GMSEC_F32>(stats_this_iteration.num_cpus);
+		msg.addField("NUM-OF-CPUS", stats_this_iteration.num_cpus);
 	}
 	else
 	{
-		average_cpu_total_util = 0.0;
-
-		std::deque<CPUStats>::iterator it = m_cpuStatsQueue.begin();
-		while (it != m_cpuStatsQueue.end())
-		{
-			average_cpu_total_util += it->cpu_total_util;
-
-			it++;
-		}
-
-		average_cpu_total_util /= static_cast<GMSEC_F32>(m_cpuStatsQueue.size());		
-	}
-
-	msg.addField("CPU.TOTAL.UTIL", average_cpu_total_util);
-	
-	if(version == GMSEC_ISD_2014_00){
-		msg.addField("NUM-OF-CPUS", stats_this_iteration.num_cpus);
-	}else if(version == GMSEC_ISD_2016_00){
 		msg.addField("NUM-OF-CPUS", (GMSEC_U16) stats_this_iteration.num_cpus);
-	}else{
-		GMSEC_WARNING << "Specification version unknown: " << version << ", unable to autopopulate NUM-OF-CPUS "
-			<< " in Resource message";
 	}
 }
 
 
-void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, size_t movingAverageSamples)
+void ResourceInfoGenerator::addNetworkStats(MistMessage& msg, unsigned int version, size_t movingAverageSamples)
 {
 	//This function is responsible for:
 	//NUM-OF-NET-PORTS, I16
@@ -1706,9 +1618,13 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 		pName.append(".NAME");
 		msg.addField(pName.c_str(), pAdapter->AdapterName);
 
+#if 0
+		// This field is NOT defined in the ISD
+		// TODO: Inquire with GMSEC System Engineer if this field should be added.
 		std::string pDesc = ss.str();
 		pDesc.append(".DESC");
 		msg.addField(pDesc.c_str(), pAdapter->Description);
+#endif
 		
 		std::ostringstream macAddr;
 		for (UINT i = 0; i < pAdapter->AddressLength; i++)
@@ -1747,20 +1663,15 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 		++idx;
 	}
 
-	if (version == GMSEC_ISD_2014_00)
+	if (version <= GMSEC_ISD_2014_00)
 	{
 		msg.addField("NUM-OF-NET-PORTS", (GMSEC_I16) idx);
 	}
-	else if (version == GMSEC_ISD_2016_00)
+	else
 	{
 		msg.addField("NUM-OF-NET-PORTS", (GMSEC_U16) idx);
 	}
-	else
-	{
-		GMSEC_WARNING << "Specification version unknown: " << version
-		              << ", unable to autopopulate NUM-OF-NET_PORTS in Resource message";
-	}
-	
+
 	free(pAdapterInfo);
 
 #elif defined(__sun)
@@ -1864,13 +1775,13 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 	}
 
 	
-	if(version == GMSEC_ISD_2014_00){
+	if (version <= GMSEC_ISD_2014_00)
+	{
 		msg.addField("NUM-OF-NET-PORTS", num_net_ports);
-	}else if(version == GMSEC_ISD_2016_00){
+	}
+	else
+	{
 		msg.addField("NUM-OF-NET-PORTS", (GMSEC_U16) num_net_ports);
-	}else{
-		GMSEC_WARNING << "Specification version unknown: " << version << ", unable to autopopulate NUM-OF-NET-PORTS "
-			<< " in Resource message";
 	}
 
 #elif defined(__hpux)
@@ -1996,13 +1907,13 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 		}
 	}
 
-	if(version == GMSEC_ISD_2014_00){
+	if (version <= GMSEC_ISD_2014_00)
+	{
 		msg.addField("NUM-OF-NET-PORTS", num_net_ports);
-	}else if(version == GMSEC_ISD_2016_00){
+	}
+	else
+	{
 		msg.addField("NUM-OF-NET-PORTS", (GMSEC_U16) num_net_ports);
-	}else{
-		GMSEC_WARNING << "Specification version unknown: " << version << ", unable to autopopulate NUM-OF-NET-PORTS "
-			<< " in Resource message";
 	}
 
 #elif defined(__linux__)
@@ -2040,7 +1951,7 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 				//
 				StringUtil::stringFormat(tmp_string, sizeof(tmp_string), "/sys/class/net/%s/address", ifap->ifa_name);
 
-				ifstream ifs(tmp_string, ios::in);
+				std::ifstream ifs(tmp_string, std::ios::in);
 				if (ifs.is_open())
 				{
 					char buffer[CHAR_BUF_LEN];
@@ -2077,20 +1988,14 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 			freeifaddrs(ifap_head); // Please read man page for getifaddrs about dynamic allocation of ifap and the need to (ideally) free it after use
 		}
 
-		if (version == GMSEC_ISD_2014_00)
+		if (version <= GMSEC_ISD_2014_00)
 		{
 			msg.addField("NUM-OF-NET-PORTS", num_net_ports);
 		}
-		else if (version == GMSEC_ISD_2016_00)
+		else
 		{
 			msg.addField("NUM-OF-NET-PORTS", (GMSEC_U16) num_net_ports);
 		}
-		else
-		{
-			GMSEC_WARNING << "Specification version unknown: " << version << ", unable to autopopulate NUM-OF-NET-PORTS "
-				<< " in Resource message";
-		}
-		
 	}
 	else // failure on call to getifaddrs()
 	{
@@ -2113,7 +2018,7 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 
 	FILE* pipe_output_fp = popen("/usr/sbin/netstat -in", "r");
 
-	std::istringstream       iss;
+	std::istringstream iss;
 
 	pipeStreamToInputStream(iss, pipe_output_fp);
 
@@ -2227,13 +2132,13 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 		}
 	}
 
-	if(version == GMSEC_ISD_2014_00){
+	if (version <= GMSEC_ISD_2014_00)
+	{
 		msg.addField("NUM-OF-NET-PORTS", num_net_ports);
-	}else if(version == GMSEC_ISD_2016_00){
+	}
+	else
+	{
 		msg.addField("NUM-OF-NET-PORTS", (GMSEC_U16) num_net_ports);
-	}else{
-		GMSEC_WARNING << "Specification version unknown: " << version << ", unable to autopopulate NUM-OF-NET-PORTS "
-			<< " in Resource message";
 	}
 
 #else
@@ -2243,10 +2148,56 @@ void ResourceInfoGenerator::addNetworkStats(Message &msg, unsigned int version, 
 #endif
 }
 
+
+std::string ResourceInfoGenerator::getOSVersion()
+{
+#ifdef WIN32
+	OSVERSIONINFO osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    if (GetVersionEx(&osvi) != 0)
+	{
+		std::ostringstream ss;
+		ss << "Windows version: " << osvi.dwMajorVersion << "." << osvi.dwMinorVersion;
+		return ss.str();
+	}
+	else
+	{
+		throw Exception(MIST_ERROR, RESOURCE_INFO_MEMORY_ERROR,
+		                "Failed to query Windows version information");
+	}
+
+#elif defined(__sun) || defined(__hpux) || defined(__linux__) || defined(__APPLE__)
+
+	struct utsname utsname_buf;
+
+	if (uname(&utsname_buf) >= 0) // success
+	{
+		std::ostringstream ss;
+		ss << "OS version: " << utsname_buf.sysname << " "
+		   << utsname_buf.release << " "
+		   << utsname_buf.version << " "
+		   << utsname_buf.machine;
+
+		return ss.str();
+	}
+	else // failure in query
+	{
+		throw Exception(MIST_ERROR, RESOURCE_INFO_OS_VERSION_ERROR,
+		                "Failed to query OS version");
+	}
+
+#else
+	return "Unknown Operating System";
+#endif    
+}
+
+
 void ResourceInfoGenerator::pipeStreamToInputStream(std::istringstream& iss,
                                                     FILE*               pStream)
 {
-	ostringstream oss;
+	std::ostringstream oss;
 	char          buffer[CHAR_BUF_LEN];
 	bool          done = false;
 	size_t        tmp_num_chars = 0;
@@ -2273,7 +2224,7 @@ void ResourceInfoGenerator::pipeStreamToInputStream(std::istringstream& iss,
 const char* ResourceInfoGenerator::normalizeMacAddressStr(const char* macAddrStr)
 {
 	char                  buffer[CHAR_BUF_LEN];
-	vector<unsigned char> mac_addr_elements;
+	std::vector<unsigned char> mac_addr_elements;
 	unsigned long long    mac_addr                  = 0;
 	unsigned char         mac_addr_element          = 0;
 	unsigned int          num_mac_addr_elements     = 0; 

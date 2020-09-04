@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -51,24 +51,24 @@ using namespace gmsec::api::internal;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
 
-static const char* HEADER_VERSION_STRING    = "HEADER-VERSION";
-static const char* MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
-static const char* MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
-static const char* CONTENT_VERSION_STRING   = "CONTENT-VERSION";
-static const char* REQ_STRING               = "REQ";
-static const char* RESP_STRING              = "RESP";
-static const char* SERV_STRING              = "SERV";
-static const char* OPERATION_NAME_STRING    = "OPERATION-NAME";
-static const char* OPERATION_NUMBER_STRING  = "OPERATION-NUMBER";
-static const char* DIR_STRING               = "DIR";
-static const char* MSG_ID_STRING            = "MSG-ID";
-static const char* MSG_STRING               = "MSG";
-static const char* RESPONSE_STATUS_STRING   = "RESPONSE-STATUS";
-static const char* C2CX_STRING              = "C2CX";
-static const char* EVENT_TIME_STRING        = "EVENT-TIME";
-static const char* C2CX_SUBTYPE_STRING      = "C2CX-SUBTYPE";
-static const char* RSRC_STRING              = "RSRC";
-static const char* COUNTER_STRING           = "COUNTER";
+static const char* const HEADER_VERSION_STRING    = "HEADER-VERSION";
+static const char* const MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
+static const char* const MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
+static const char* const CONTENT_VERSION_STRING   = "CONTENT-VERSION";
+static const char* const REQ_STRING               = "REQ";
+static const char* const RESP_STRING              = "RESP";
+static const char* const SERV_STRING              = "SERV";
+static const char* const OPERATION_NAME_STRING    = "OPERATION-NAME";
+static const char* const OPERATION_NUMBER_STRING  = "OPERATION-NUMBER";
+static const char* const DIR_STRING               = "DIR";
+static const char* const MSG_ID_STRING            = "MSG-ID";
+static const char* const MSG_STRING               = "MSG";
+static const char* const RESPONSE_STATUS_STRING   = "RESPONSE-STATUS";
+static const char* const C2CX_STRING              = "C2CX";
+static const char* const EVENT_TIME_STRING        = "EVENT-TIME";
+static const char* const C2CX_SUBTYPE_STRING      = "C2CX-SUBTYPE";
+static const char* const RSRC_STRING              = "RSRC";
+static const char* const COUNTER_STRING           = "COUNTER";
 
 
 MessagePopulator::MessagePopulator(unsigned int isdVersion)
@@ -87,17 +87,23 @@ MessagePopulator::~MessagePopulator()
 
 void MessagePopulator::populateSimpleServiceMessage(Message &msg, const char * opName, const Field& opNumber, const DataList<Field*>& fields, const DataList<ServiceParam*>& sParams)
 {
-	msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010);
 	msg.addField(MESSAGE_TYPE_STRING, REQ_STRING);
 	msg.addField(MESSAGE_SUBTYPE_STRING, SERV_STRING);
 
 	if(m_specVersion == GMSEC_ISD_2014_00){
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2012);
 		msg.addField("NUM-OF-PARAMS", (GMSEC_I16) sParams.size());
 		msg.addField(MSG_ID_STRING, generateUniqueID().c_str());
 	}else if(m_specVersion == GMSEC_ISD_2016_00){
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
 		msg.addField("NUM-OF-PARAMS", (GMSEC_U16) sParams.size());
+	}
+	else if (m_specVersion == GMSEC_ISD_2018_00) {
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2018);
+		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32)2018);
+		msg.addField("NUM-OF-PARAMS", (GMSEC_U16)sParams.size());
 	}else{
 		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate CONTENT-VERSION"
 			<< " and NUM-OF-PARAMS in Simple Service message";
@@ -165,18 +171,29 @@ void MessagePopulator::populateSimpleServiceMessage(Message &msg, const char * o
 
 void MessagePopulator::populateDirective(Message &msg, const Field& directiveString, const DataList<Field*>& fields)
 {
-	msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010);
 	msg.addField(MESSAGE_TYPE_STRING, REQ_STRING);
 	msg.addField(MESSAGE_SUBTYPE_STRING, DIR_STRING);
 
-	if(m_specVersion == GMSEC_ISD_2014_00){
+	if (m_specVersion <= GMSEC_ISD_2014_00)
+	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 1.0);
 		msg.addField(MSG_ID_STRING, generateUniqueID().c_str());
-	}else if(m_specVersion == GMSEC_ISD_2016_00){
+	}
+	else if (m_specVersion <= GMSEC_ISD_2016_00)
+	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
-	}else{
+	}
+	else if (m_specVersion <= GMSEC_ISD_2018_00)
+	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2018);
+		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2018);
+	}
+	else
+	{
 		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate CONTENT-VERSION"
-			<< " in Directive message";
+		              << " in Directive message";
 	}
 	
 	msg.addField(directiveString);
@@ -466,6 +483,8 @@ void MessagePopulator::destroyFields(FieldList& flist)
 }
 
 
+//DEPRECATED with API 4.5
+#if 0
 void MessagePopulator::populateLogMessage(Message &msg, const DataList<Field*>& logFields, FieldList &standardFieldList)
 {
 	for (FieldList::const_iterator it = standardFieldList.begin(); it != standardFieldList.end(); ++it)
@@ -493,7 +512,6 @@ void MessagePopulator::populateLogMessage(Message &msg, const DataList<Field*>& 
 
 	msg.addField(StringField(MESSAGE_TYPE_STRING, MSG_STRING));
 	msg.addField(StringField(MESSAGE_SUBTYPE_STRING, "LOG"));
-	msg.addField(F32Field(HEADER_VERSION_STRING, (GMSEC_F32) 2010.0));
 
 	// If the message already contains the EVENT-TIME field, then do NOT overwrite it.
 	if (msg.getField(EVENT_TIME_STRING) == NULL)
@@ -507,11 +525,18 @@ void MessagePopulator::populateLogMessage(Message &msg, const DataList<Field*>& 
 
 	if (m_specVersion == GMSEC_ISD_2014_00)
 	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010.0);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 1.0);
 	}
 	else if(m_specVersion == GMSEC_ISD_2016_00)
 	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010.0);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
+	}
+	else if (m_specVersion == GMSEC_ISD_2018_00)
+	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2018);
+		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32)2018);
 	}
 	else
 	{
@@ -519,8 +544,11 @@ void MessagePopulator::populateLogMessage(Message &msg, const DataList<Field*>& 
 			<< " in Log message";
 	}
 }
+#endif
 
 
+//DEPRECATED with API 4.5
+#if 0
 void MessagePopulator::populateHeartbeatMessage(Message &msg, const DataList<Field*>& hbFields, FieldList &standardFieldList)
 {
 	for (FieldList::const_iterator it = standardFieldList.begin(); it != standardFieldList.end(); ++it)
@@ -550,30 +578,39 @@ void MessagePopulator::populateHeartbeatMessage(Message &msg, const DataList<Fie
 	msg.addField(StringField(MESSAGE_TYPE_STRING, MSG_STRING));
 	msg.addField(StringField(MESSAGE_SUBTYPE_STRING, C2CX_STRING));
 	msg.addField(StringField(C2CX_SUBTYPE_STRING, "HB"));
-	msg.addField(F32Field(HEADER_VERSION_STRING, (GMSEC_F32) 2010.0));
 
 	if(m_specVersion == GMSEC_ISD_2014_00){
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010.0);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2013.0);
 	}else if(m_specVersion == GMSEC_ISD_2016_00){
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010.0);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
+	}else if (m_specVersion == GMSEC_ISD_2018_00) {
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2018);
+		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32)2018);
 	}else{
 		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate CONTENT-VERSION"
 			<< " in Heartbeat message";
 	}
 }
+#endif
 
 
 void MessagePopulator::populateSimpleServiceAck(Message &msg, ResponseStatus::Response ssResponse, const DataList<Field*>& fields)
 {
-	msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010);
 	msg.addField(MESSAGE_TYPE_STRING, RESP_STRING);
 	msg.addField(MESSAGE_SUBTYPE_STRING, SERV_STRING);
 
 	if(m_specVersion == GMSEC_ISD_2014_00){
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2012.0);
 		msg.addField(MSG_ID_STRING, generateUniqueID().c_str());
 	}else if(m_specVersion == GMSEC_ISD_2016_00){
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
+	}else if (m_specVersion == GMSEC_ISD_2018_00) {
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2018);
+		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32)2018);
 	}else{
 		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate CONTENT-VERSION"
 			<< " in Simple Service response message";
@@ -595,15 +632,19 @@ void MessagePopulator::populateSimpleServiceAck(Message &msg, ResponseStatus::Re
 
 void MessagePopulator::populateDirectiveAck(Message &msg, ResponseStatus::Response ssResponse, const DataList<Field*>& fields)
 {
-	msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010);
 	msg.addField(MESSAGE_TYPE_STRING, RESP_STRING);
 	msg.addField(MESSAGE_SUBTYPE_STRING, DIR_STRING);
 
 	if(m_specVersion == GMSEC_ISD_2014_00){
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 1.0);
 		msg.addField(MSG_ID_STRING, generateUniqueID().c_str());
 	}else if(m_specVersion == GMSEC_ISD_2016_00){
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
+	}else if (m_specVersion == GMSEC_ISD_2018_00) {
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2018);
+		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32)2018);
 	}else{
 		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate CONTENT-VERSION"
 			<< " in Directive response message";
@@ -623,41 +664,50 @@ void MessagePopulator::populateDirectiveAck(Message &msg, ResponseStatus::Respon
 }
 
 
+//DEPRECATED with API 4.5
+#if 0
 void MessagePopulator::populateResourceStaticMembers(Message &msg, size_t counter)
 {
-	msg.addField(HEADER_VERSION_STRING, (GMSEC_F32) 2010);
 	msg.addField(MESSAGE_TYPE_STRING, MSG_STRING);
 	msg.addField(MESSAGE_SUBTYPE_STRING, C2CX_STRING);
 	msg.addField(C2CX_SUBTYPE_STRING, RSRC_STRING);
 
-	if(m_specVersion == GMSEC_ISD_2014_00){
+	if (m_specVersion <= GMSEC_ISD_2014_00)
+	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2010.0);
 		msg.addField(COUNTER_STRING, (GMSEC_I16) counter);
-	}else if(m_specVersion == GMSEC_ISD_2016_00){
+	}
+	else if (m_specVersion <= GMSEC_ISD_2016_00)
+	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2010);
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
 		msg.addField(COUNTER_STRING, (GMSEC_U16) counter);
-	}else{
+	}
+	else if (m_specVersion <= GMSEC_ISD_2018_00)
+	{
+		msg.addField(HEADER_VERSION_STRING, (GMSEC_F32)2018);
+		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2018);
+		msg.addField(COUNTER_STRING, (GMSEC_I16) counter);
+	}
+	else
+	{
 		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate CONTENT-VERSION"
-			<< " in Resource message";
+		              << " in Resource message";
 	}
 }
+#endif
 
 
 std::string MessagePopulator::generateUniqueID()
 {
-	std::ostringstream oss;
-	std::string user;
 	std::string host;
-
-	SystemUtil::getUserName(user);
 	SystemUtil::getHostName(host);
 
-	oss << user << "." 
-		<< host << "."
-		<< SystemUtil::getProcessID() << "."
-		<< TimeUtil::getCurrentTime().nanoseconds;
+	std::ostringstream uniqueID;
+	uniqueID << host << "."
+	         << SystemUtil::getProcessID() << "."
+	         << TimeUtil::getCurrentTime().nanoseconds;
 
-	std::string subject = oss.str();
-
-	return subject;
+	return uniqueID.str();
 }

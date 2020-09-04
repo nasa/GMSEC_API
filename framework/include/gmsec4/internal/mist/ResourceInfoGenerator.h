@@ -1,7 +1,5 @@
-#ifndef GMSEC_INTERNAL_RESOURCEINFOGENERATOR_H
-#define GMSEC_INTERNAL_RESOURCEINFOGENERATOR_H
-
-#include <gmsec4/Message.h>
+#ifndef GMSEC_MIST_INTERNAL_RESOURCEINFOGENERATOR_H
+#define GMSEC_MIST_INTERNAL_RESOURCEINFOGENERATOR_H
 
 #include <gmsec4_defs.h>
 
@@ -9,29 +7,33 @@
 #include <vector>
 #include <deque>
 
-using namespace std;
-
-
 
 namespace gmsec
 {
 namespace api
 {
-	
 namespace mist
 {
-
+	// Forward declaration(s)
+	namespace message
+	{
+		class MistMessage;
+	}
 namespace internal
 {
 
-class GMSEC_API ResourceInfoGenerator
+class ResourceInfoGenerator
 {
 public:
-	static void addMainMemoryStats(Message &msg, unsigned int version, size_t movingAverageSamples = 1);
-	static void addDiskStats(Message &msg, unsigned int version, size_t movingAverageSamples = 1);
+	static void addMainMemoryStats(message::MistMessage& msg, unsigned int version, size_t movingAverageSamples = 1);
+
+	static void addDiskStats(message::MistMessage& msg, unsigned int version, size_t movingAverageSamples = 1);
+
+	static void addCPUStats(message::MistMessage& msg, unsigned int version, size_t movingAverageSamples = 1);
+
+	static void addNetworkStats(message::MistMessage& msg, unsigned int version, size_t movingAverageSamples = 1);
+
 	static std::string getOSVersion();
-	static void addCPUStats(Message &msg, unsigned int version, size_t movingAverageSamples = 1);
-	static void addNetworkStats(Message &msg, unsigned int version, size_t movingAverageSamples = 1);
 
 private:
 	static void pipeStreamToInputStream(std::istringstream& iss, FILE* pStream);
@@ -59,8 +61,8 @@ private:
 	struct StatsForOneDisk
 	{
 		std::string disk_name;
-	        GMSEC_F32   disk_size;
-	        GMSEC_F32   disk_util;
+        GMSEC_F32   disk_size;
+        GMSEC_F32   disk_util;
 	};
 
 	struct DiskStats
@@ -97,7 +99,6 @@ private:
 	static std::deque<DiskStats>       m_diskStatsQueue;
 	static std::deque<CPUStats>        m_cpuStatsQueue;
 	static std::deque<NetworkStats>    m_networkStatsQueue;
-
 };
 
 }

@@ -1,4 +1,4 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -117,6 +117,8 @@ CORE4_OBJ	= \
 	$(OBJDIR4)/mist/DeviceIterator.o \
 	$(OBJDIR4)/mist/DeviceMessage.o \
 	$(OBJDIR4)/mist/DeviceParam.o \
+	$(OBJDIR4)/mist/FieldSpecification.o \
+	$(OBJDIR4)/mist/MessageSpecification.o \
 	$(OBJDIR4)/mist/Mnemonic.o \
 	$(OBJDIR4)/mist/MnemonicIterator.o \
 	$(OBJDIR4)/mist/MnemonicMessage.o \
@@ -193,6 +195,8 @@ INTERNAL4_OBJ	= \
 	$(OBJDIR4)/internal/mist/InternalDevice.o \
 	$(OBJDIR4)/internal/mist/InternalDeviceIterator.o \
 	$(OBJDIR4)/internal/mist/InternalDeviceParam.o \
+	$(OBJDIR4)/internal/mist/InternalFieldSpecification.o \
+	$(OBJDIR4)/internal/mist/InternalMessageSpecification.o \
 	$(OBJDIR4)/internal/mist/InternalMnemonic.o \
 	$(OBJDIR4)/internal/mist/InternalMnemonicIterator.o \
 	$(OBJDIR4)/internal/mist/InternalMnemonicSample.o \
@@ -320,7 +324,16 @@ OBJECTS  = $(CORE_OBJ)  $(INTERNAL_OBJ)  $(UTIL_OBJ)  $(CAPI_OBJ)  $(SECURE_OBJ)
 OBJECTS += $(CORE4_OBJ) $(INTERNAL4_OBJ) $(UTIL4_OBJ) $(CAPI4_OBJ) $(SECURE4_OBJ)
 OBJECTS += $(SUPPORT_OBJ)
 
-default: library
+default: message library
+
+message:
+	@echo
+	@echo
+	@echo "###########################################################"
+	@echo "#"
+	@echo "#  Building Core API Framework"
+	@echo "#"
+	@echo "###########################################################"
 
 library: $(COBJDIR) $(COBJDIR4) $(BINDIR)/$(TARGET)
 

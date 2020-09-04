@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,6 +20,7 @@
 
 #include <gmsec4/Fields.h>
 
+#include <gmsec4/util/DataList.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4_defs.h>
@@ -32,10 +33,18 @@ namespace gmsec
 
 namespace api
 {
-// Forward declaration(s)
-class Config;
-class Field;
-class MessageFieldIterator;
+	// Forward declaration(s)
+	class Config;
+	class Field;
+	class MessageFieldIterator;
+
+	namespace mist {
+		namespace message {
+			namespace internal {
+				class InternalMistMessage;
+			}
+		}
+	}
 
 namespace internal
 {
@@ -418,6 +427,8 @@ public:
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
 	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
+	 *
 	 * @sa bool addField(const Field& field)
 	 */
 	bool CALL_TYPE addField(const char* name, GMSEC_BIN bin, size_t len);
@@ -429,6 +440,8 @@ public:
 	 * @brief Adds a BooleanField to the Message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
+	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
 	 *
 	 * @sa bool addField(const Field& field)
 	 */
@@ -442,6 +455,8 @@ public:
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
 	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
+	 *
 	 * @sa bool addField(const Field& field)
 	 */
 	bool CALL_TYPE addField(const char* name, GMSEC_CHAR value);
@@ -453,6 +468,8 @@ public:
 	 * @brief Adds an F32Field to the Message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
+	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
 	 *
 	 * @sa bool addField(const Field& field)
 	 */
@@ -466,6 +483,8 @@ public:
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
 	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
+	 *
 	 * @sa bool addField(const Field& field)
 	 */
 	bool CALL_TYPE addField(const char*  name, GMSEC_F64 value);
@@ -477,6 +496,8 @@ public:
 	 * @brief Adds an I8Field to the Message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
+	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
 	 *
 	 * @sa bool addField(const Field& field)
 	 */
@@ -490,6 +511,8 @@ public:
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
 	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
+	 *
 	 * @sa bool addField(const Field& field)
 	 */
 	bool CALL_TYPE addField(const char*  name, GMSEC_I16 value);
@@ -501,6 +524,8 @@ public:
 	 * @brief Adds I32Field to the Message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
+	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
 	 *
 	 * @sa bool addField(const Field& field)
 	 */
@@ -514,6 +539,8 @@ public:
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
 	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
+	 *
 	 * @sa bool addField(const Field& field)
 	 */
 	bool CALL_TYPE addField(const char*  name, GMSEC_I64 value);
@@ -526,6 +553,8 @@ public:
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
 	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
+	 *
 	 * @sa bool addField(const Field& field)
 	 */
 	bool CALL_TYPE addField(const char*  name, const char* value);
@@ -534,9 +563,11 @@ public:
 	/**
 	 * @fn bool addField(const char* name, GMSEC_U8 value)
 	 *
-	 * @brief Adds an U8Field to the Message.
+	 * @brief Adds a U8Field to the Message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
+	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
 	 *
 	 * @sa bool addField(const Field& field)
 	 */
@@ -546,9 +577,11 @@ public:
 	/**
 	 * @fn bool addField(const char* name, GMSEC_U16 value)
 	 *
-	 * @brief Adds an U16Field to the Message.
+	 * @brief Adds a U16Field to the Message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
+	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
 	 *
 	 * @sa bool addField(const Field& field)
 	 */
@@ -558,9 +591,11 @@ public:
 	/**
 	 * @fn bool addField(const char* name, GMSEC_U32 value)
 	 *
-	 * @brief Adds an U32Field to the Message.
+	 * @brief Adds a U32Field to the Message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
+	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
 	 *
 	 * @sa bool addField(const Field& field)
 	 */
@@ -570,13 +605,26 @@ public:
 	/**
 	 * @fn bool addField(const char* name, GMSEC_U64 value)
 	 *
-	 * @brief Adds an U64Field to the Message.
+	 * @brief Adds a U64Field to the Message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
+	 *
+	 * @throws An Exception is thrown if the given field name is null or contains an empty string.
 	 *
 	 * @sa bool addField(const Field& field)
 	 */
 	bool CALL_TYPE addField(const char*  name, GMSEC_U64 value);
+
+
+	/**
+	 * @fn bool addFields(const gmsec::api::util::DataList<Field*> fields)
+	 *
+	 * @brief Adds each Field in the given list to the Message.
+	 *
+	 * @return Returns true if any existing field in the Message has been replaced; false otherwise.
+	 *
+	 */
+	bool CALL_TYPE addFields(const gmsec::api::util::DataList<Field*>& fields);
 
 
 	/**
@@ -1055,6 +1103,7 @@ private:
 	friend class gmsec::api::internal::GMSECadapter;
 	friend class gmsec::api::internal::MessageBuddy;
 	friend class gmsec::api::internal::InternalMessageFieldIterator;
+	friend class gmsec::api::mist::message::internal::InternalMistMessage;
 
 	// defined, but not implemented
 	Message();

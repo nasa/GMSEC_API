@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,12 +20,14 @@
 
 #include <gmsec4/Config.h>
 #include <gmsec4/Exception.h>
+#include <gmsec4/Message.h>
 
 
 using namespace GMSEC::API;
 using namespace GMSEC::API::MIST;
 using namespace GMSEC::API::MIST::MESSAGE;
 using namespace System;
+using namespace System::Collections::Generic;
 using namespace System::Runtime::InteropServices;
 
 
@@ -99,6 +101,46 @@ MistMessage::MistMessage(System::String^ subject, System::String^ schemaID, Conf
 }
 
 
+MistMessage::MistMessage(Message^ msg)
+	: Message((gmsec::api::Message*) nullptr, false)
+{
+	THROW_EXCEPTION_IF_NULLPTR(msg, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "Message is null");
+
+	try
+	{
+		gmsec::api::Message* msgNative = msg->GetUnmanagedImplementation();
+
+		m_impl  = new gmsec::api::mist::message::MistMessage(*msgNative);
+		m_owned = true;
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+}
+
+
+MistMessage::MistMessage(Message^ msg, Config^ specConfig)
+	: Message((gmsec::api::Message*) nullptr, false)
+{
+	THROW_EXCEPTION_IF_NULLPTR(msg, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "Message is null");
+	THROW_EXCEPTION_IF_NULLPTR(specConfig, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "Config is null");
+
+	try
+	{
+		gmsec::api::Message* msgNative = msg->GetUnmanagedImplementation();
+		gmsec::api::Config*  cfgNative = specConfig->GetUnmanagedImplementation();
+
+		m_impl  = new gmsec::api::mist::message::MistMessage(*msgNative, *cfgNative);
+		m_owned = true;
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+}
+
+
 MistMessage::MistMessage(MistMessage^ other)
 	: Message((gmsec::api::Message*) nullptr, false)
 {
@@ -148,6 +190,32 @@ MistMessage::MistMessage(System::String^ data)
 MistMessage::~MistMessage()
 {
 	this->!MistMessage();
+}
+
+
+void MistMessage::SetStandardFields(List<Field^>^ standardFields)
+{
+	THROW_EXCEPTION_IF_NULLPTR(standardFields, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "List of Standard Fields is null");
+
+	gmsec::api::util::DataList<gmsec::api::Field*> nativeFields;
+
+	for (int i = 0; i < standardFields->Count; ++i)
+	{
+		Field^ field = standardFields[i];
+
+		if (field != nullptr)
+		{
+			nativeFields.push_back(field->GetChild());
+		}
+	}
+
+	gmsec::api::mist::message::MistMessage::setStandardFields(nativeFields);
+}
+
+
+void MistMessage::ClearStandardFields()
+{
+	gmsec::api::mist::message::MistMessage::clearStandardFields();
 }
 
 

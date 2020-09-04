@@ -30,6 +30,8 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " + sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
+        return -1
+
 
     # Load the command-line input into a GMSEC Config object
     config = libgmsec_python.Config()
@@ -42,7 +44,6 @@ def main():
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
     # on the terminal/command line
-
 
     initializeLogging(config);
 
@@ -76,12 +77,13 @@ def main():
     # GMSEC-SCHEMA-PATH)
     config.addValue("GMSEC-SCHEMA-PATH", "templates")
 
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    # Since this example relies on the 2016.00 version of the templates,
+    # we indicate such within the configuration object.
+    config.addValue("GMSEC-SPECIFICATION-VERSION", "201600");
+
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-       
         connMgr = libgmsec_python.ConnectionManager(config)
 
         libgmsec_python.logInfo("Opening the connection to the middleware server")
@@ -126,19 +128,14 @@ def main():
         badMessage = libgmsec_python.MistMessage(EXAMPLE_MESSAGE_SUBJECT, "MSG.LOG", connMgr.getSpecification())
 
         try:
-                
             connMgr.publish(badMessage)
-                
         except libgmsec_python.Exception as e:
+            libgmsec_python.logError("This is error is expected:\n" + e.what())
                 
-            libgmsec_python.logError(e.what())
-                
-
         # Disconnect from the middleware and clean up the Connection
         connMgr.cleanup()
         
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
 

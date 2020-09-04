@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,6 +41,12 @@
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::util;
+
+
+const char* CALL_TYPE connectionManagerGetAPIVersion()
+{
+	return ConnectionManager::getAPIVersion();
+}
 
 
 GMSEC_ConnectionMgr CALL_TYPE connectionManagerCreate(const GMSEC_Config config, GMSEC_Status status)
@@ -189,27 +195,72 @@ void CALL_TYPE connectionManagerCleanup(GMSEC_ConnectionMgr connMgr, GMSEC_Statu
 }
 
 
-const char* CALL_TYPE connectionManagerGetLibraryVersion(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+GMSEC_ConnectionState CALL_TYPE connectionManagerGetState(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
 {
-	Status             result;
-
-	const char*        libver  = NULL;
-	ConnectionManager* mgr     = reinterpret_cast<ConnectionManager*>(connMgr);
+	Status                result;
+	GMSEC_ConnectionState state = GMSEC_NOT_CONNECTED;
+	ConnectionManager*    mgr   = reinterpret_cast<ConnectionManager*>(connMgr);
 
 	if (!mgr)
 	{
 		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
-	} 
+	}
 	else
 	{
-		try
+		switch (mgr->getState())
 		{
-			libver = mgr->getLibraryVersion();
+			case Connection::NOT_CONNECTED: state = GMSEC_NOT_CONNECTED; break;
+			case Connection::CONNECTED:     state = GMSEC_CONNECTED;     break;
+			case Connection::RECONNECTING:  state = GMSEC_RECONNECTING;  break;
 		}
-		catch (Exception& e)
-		{
-			result = Status(e);
-		}
+	}    
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return state;
+}
+
+
+const char* CALL_TYPE connectionManagerGetLibraryRootName(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+{
+	Status             result;
+	const char*        rootname = NULL;
+	ConnectionManager* mgr      = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		rootname = mgr->getLibraryRootName();
+	}    
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return rootname;
+}
+
+
+const char* CALL_TYPE connectionManagerGetLibraryVersion(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+{
+	Status             result;
+	const char*        libver = NULL;
+	ConnectionManager* mgr    = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		libver = mgr->getLibraryVersion();
 	}    
 
 	if (status)
@@ -1021,6 +1072,130 @@ void CALL_TYPE connectionManagerRemoveExcludedSubject(GMSEC_ConnectionMgr connMg
 }
 
 
+const char* CALL_TYPE connectionManagerGetName(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+{
+	Status             result;
+	const char*        name = NULL;
+	ConnectionManager* mgr  = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		name = mgr->getName();
+	}    
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return name;
+}
+
+
+void CALL_TYPE connectionManagerSetName(GMSEC_ConnectionMgr connMgr, const char* name, GMSEC_Status status)
+{
+	Status             result;
+	ConnectionManager* mgr  = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			mgr->setName(name);
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}    
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+}
+
+
+const char* CALL_TYPE connectionManagerGetID(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+{
+	Status             result;
+	const char*        id  = NULL;
+	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		id = mgr->getID();
+	}    
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return id;
+}
+
+
+const char* CALL_TYPE connectionManagerGetMWInfo(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+{
+	Status             result;
+	const char*        info = NULL;
+	ConnectionManager* mgr  = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		info = mgr->getMWInfo();
+	}    
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return info;
+}
+
+
+GMSEC_U64 CALL_TYPE connectionManagerGetPublishQueueMessageCount(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+{
+	Status             result;
+	GMSEC_U64          count = 0;
+	ConnectionManager* mgr   = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		count = mgr->getPublishQueueMessageCount();
+	}    
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return count;
+}
+
+
 GMSEC_Message CALL_TYPE connectionManagerCreateHeartbeatMessage(GMSEC_ConnectionMgr connMgr, const char* subject, const GMSEC_Field fields[], size_t numFields, GMSEC_Status status)
 {
 	GMSEC_Message msg = NULL;
@@ -1768,6 +1943,12 @@ GMSEC_Message CALL_TYPE connectionManagerRequestSimpleService(GMSEC_ConnectionMg
 	}
 
 	return reply;
+}
+
+
+void CALL_TYPE connectionManagerShutdownAllMiddlewares(void)
+{
+	Connection::shutdownAllMiddlewares();
 }
 
 

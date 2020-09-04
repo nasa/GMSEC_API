@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -58,7 +58,8 @@ public:
 		GMD_ERROR_EVENT = 6,
 		WSMQ_ASYNC_STATUS_CHECK_EVENT = 7,
 		ALL_EVENTS = 8,
-		MSG_PUBLISH_FAILURE_EVENT = 9
+		MSG_PUBLISH_FAILURE_EVENT = 9,
+		INVALID_MESSAGE_EVENT = 10
 	};
 
 
@@ -123,6 +124,7 @@ public:
 	/// when messages matching the subject or pattern are received.</summary>
 	/// <param name="subject">The subject string to use for registering the subscription.</param>
 	/// <returns>A handle to a SubscriptionInfo object, which is required when cancelling a subscription.</returns>
+	/// <exception cref="GMSEC_Exception">If an error occurs while attempting to subscribe.</exception>
 	/// <seealso cref="Connection::Unsubscribe"/>
 	SubscriptionInfo^ Subscribe(System::String^ subject);
 
@@ -134,6 +136,7 @@ public:
 	/// <param name="subject">The subject string to use for registering the subscription.</param>
 	/// <param name="cb">The callback to associate with the subscription.</param>
 	/// <returns>A handle to a SubscriptionInfo object, which is required when cancelling a subscription.</returns>
+	/// <exception cref="GMSEC_Exception">If an error occurs while attempting to subscribe.</exception>
 	/// <seealso cref="Connection::Unsubscribe"/>
 	SubscriptionInfo^ Subscribe(System::String^ subject, Callback^ cb);
 
@@ -143,6 +146,7 @@ public:
 	/// <param name="subject">The subject string to use for registering the subscription.</param>
 	/// <param name="config">The configuration object.</param>
 	/// <returns>A handle to a SubscriptionInfo object, which is required when cancelling a subscription.</returns>
+	/// <exception cref="GMSEC_Exception">If an error occurs while attempting to subscribe.</exception>
 	/// <seealso cref="Connection::Unsubscribe"/>
 	SubscriptionInfo^ Subscribe(System::String^ subject, Config^ config);
 
@@ -157,6 +161,7 @@ public:
 	/// <param name="config">The configuration object.</param>
 	/// <param name="cb">The callback to associate with the subscription.</param>
 	/// <returns>A handle to a SubscriptionInfo object, which is required when cancelling a subscription.</returns>
+	/// <exception cref="GMSEC_Exception">If an error occurs while attempting to subscribe.</exception>
 	/// <seealso cref="Connection::Unsubscribe"/>
 	SubscriptionInfo^ Subscribe(System::String^ subject, Config^ config, Callback^ cb);
 
@@ -164,6 +169,7 @@ public:
 	/// <summary>Unsubscribes to a particular subject pattern, and will stop the reception of messages that match
 	/// this pattern. It will also remove the registration of any callbacks with this subject pattern.</summary>
 	/// <param name="info">A reference to the SubscriptionInfo object that is associated with a subscription.</param>
+	/// <exception cref="GMSEC_Exception">If an error occurs while attempting to unsubscribe.</exception>
 	void Unsubscribe(SubscriptionInfo^ %info);
 
 
@@ -201,10 +207,10 @@ public:
 	/// <param name="request">The request message</param>
 	/// <param name="timeout">The maximum time (in milliseconds) to wait for a reply</param>
 	/// <param name="rcb">The reply callback to use to receive the reply</param>
-	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1)
-    ///                            it will never republish a request message.  If set to 0, the period will default to 60000ms,
-    ///                            unless the user has provided an alternate time period via the Config object used to create
-	///                            the Connection object.  The minimum republish period allowed is 100ms.</param>
+	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
+	///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	///                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	///                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.</param>
 	/// <exception cref="GMSEC_Exception">If an error occurs while attempting to issue the request or receive the reply message.</exception>
 	void Request(Message^ request, System::Int32 timeout, ReplyCallback^ rcb, System::Int32 republish_ms);
 
@@ -213,10 +219,10 @@ public:
 	/// the reply is received or the timeout is reached. The timeout value is expressed in milliseconds.</summary>
 	/// <param name="request">The request message</param>
 	/// <param name="timeout">The maximum time (in milliseconds) to wait for a reply</param>
-	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1)
-    ///                            it will never republish a request message.  If set to 0, the period will default to 60000ms,
-    ///                            unless the user has provided an alternate time period via the Config object used to create
-	///                            the Connection object.  The minimum republish period allowed is 100ms.</param>
+	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
+	///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	///                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	///                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.</param>
 	/// <exception cref="GMSEC_Exception">If an error occurs while attempting to issue the request or receive the reply message.</exception>
 	/// <seealso cref="Connection::Release"/>
 	Message^ Request(Message^ request, System::Int32 timeout, System::Int32 republish_ms);

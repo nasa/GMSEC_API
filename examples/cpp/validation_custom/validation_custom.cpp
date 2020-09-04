@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -33,7 +33,7 @@ const char* PROD_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.PROD.PRODUCT_MES
 //o Helper functions
 void initializeLogging(Config& config);
 void setupStandardFields(ConnectionManager& connMgr);
-mist::message::ProductFileMessage createProductFileMessage(const ConnectionManager& connMgr, const char* filePath);
+mist::message::ProductFileMessage* createProductFileMessage(const ConnectionManager& connMgr, const char* filePath);
 bool isProdMsg(Message message);
 
 //o Create a callback and define message content validation logic which will
@@ -107,10 +107,9 @@ int main (int argc, char* argv[])
 
 	//o Enable Message validation.  This parameter is "false" by default.
 	config.addValue("GMSEC-MSG-CONTENT-VALIDATE", "true");
+	config.addValue("gmsec-validation-level", "3");
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
@@ -131,14 +130,23 @@ int main (int argc, char* argv[])
 		//o Create and publish a simple Product File Message
 		setupStandardFields(connMgr);
 
-		mist::message::ProductFileMessage productMessage = createProductFileMessage(connMgr, "//hostname/dir/filename");
+		mist::message::ProductFileMessage* productMessage = createProductFileMessage(connMgr, "//hostname/dir/filename");
 
 		//o Publish the message to the middleware bus
-		connMgr.publish(productMessage);
+		GMSEC_INFO << "Publishing:\n" << productMessage->toXML();
+		connMgr.publish(*productMessage);
+
+		delete productMessage;
 
 		productMessage = createProductFileMessage(connMgr, "//badhost/dir/filename");
 
-		connMgr.publish(productMessage);
+		GMSEC_INFO << "Publishing:\n" << productMessage->toXML();
+		connMgr.publish(*productMessage);
+
+		delete productMessage;
+
+		//o Allow time for the callback to process the last published message
+		TimeUtil::millisleep(2000);
 
 		//o Disconnect from the middleware and clean up the Connection
 		connMgr.cleanup();
@@ -187,14 +195,30 @@ void setupStandardFields(ConnectionManager& connMgr)
 }
 
 
-mist::message::ProductFileMessage createProductFileMessage(const ConnectionManager& connMgr, const char* filePath)
+mist::message::ProductFileMessage* createProductFileMessage(const ConnectionManager& connMgr, const char* filePath)
 {
 	ProductFile externalFile("External File", "External File Description", "1.0.0", "TXT", filePath);
 
-	mist::message::ProductFileMessage productMessage(PROD_MESSAGE_SUBJECT, ResponseStatus::SUCCESSFUL_COMPLETION, Message::PUBLISH, "AUTO", "DM", connMgr.getSpecification());
-	productMessage.addProductFile(externalFile);
+	mist::message::ProductFileMessage* productMessage = NULL;
 
-	connMgr.addStandardFields(productMessage);
+	if (connMgr.getSpecification().getVersion() <= GMSEC_ISD_2016_00)
+	{
+		productMessage = new mist::message::ProductFileMessage(PROD_MESSAGE_SUBJECT, ResponseStatus::SUCCESSFUL_COMPLETION, "MSG.PROD.AUTO", connMgr.getSpecification());
+	}
+	else
+	{
+		productMessage = new mist::message::ProductFileMessage(PROD_MESSAGE_SUBJECT, ResponseStatus::SUCCESSFUL_COMPLETION, "MSG.PROD", connMgr.getSpecification());
+
+		productMessage->addField("PROD-TYPE", "AUTO");
+		productMessage->addField("PROD-SUBTYPE", "DM");
+
+		productMessage->addField("DOMAIN1", "MY-DOMAIN-1");
+		productMessage->addField("DOMAIN2", "MY-DOMAIN-2");
+	}
+
+	productMessage->addProductFile(externalFile);
+
+	connMgr.addStandardFields(*productMessage);
 
 	return productMessage;
 }

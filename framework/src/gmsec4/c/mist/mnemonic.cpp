@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -54,6 +54,12 @@ GMSEC_Mnemonic CALL_TYPE mnemonicCreate(const char* name, const GMSEC_MnemonicSa
 	}
 
 	return mnemonic;
+}
+
+
+GMSEC_Mnemonic CALL_TYPE mnemonicCreateWithNoSamples(const char* name, GMSEC_Status status)
+{
+    return mnemonicCreate(name, 0, 0, status);
 }
 
 

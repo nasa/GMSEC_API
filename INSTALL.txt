@@ -1,5 +1,5 @@
  
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -13,8 +13,7 @@ This file describes how to build the GMSEC API from the open source
 distribution. The steps in this file assume you have:
 
 * the source code for the API, located in a directory named GMSEC_API
-* for Windows systems: Visual Studio 2008 (or newer)
-* for Solaris 10 systems: Sun One Compiler CC, make and gmake
+* for Windows systems: Visual Studio 2017
 * for all other systems: make and the GNU Compiler Collection
         * Red Hat Enterprise Linux 6: gcc 4.4.6, GNU make 3.81 [1]
         * Red Hat Enterprise Linux 7: gcc 4.8.5, GNU make 3.82 [1]
@@ -30,11 +29,19 @@ distribution. The steps in this file assume you have:
         * ActivePerl 5.14.2 (build 1402)
 		* SWIG 3.0.10 or later
 		* the manifest tool (mt.exe) from the Windows SDK
-* for Python:
+* for Python 2:
         * Python 2.7
 		* SWIG 3.0.10 or later
 		* (non-Windows): python-devel package
-
+* for Python 3:
+        * Python 3.6
+		* SWIG 3.0.10 or later
+		* (non-Windows): python36u package, available through IUS 
+						(https://centos7.iuscommunity.org/ius-release.rpm)
+* for C# (non-windows):
+		* Mono JIT Compiler 5.16.0 or later
+		
+		
 Please note that this is intended as a "getting started" document. After
 you are familiar with the build process, you will probably want to tailor
 it to your system.
@@ -54,6 +61,21 @@ will have to build SWIG before you are able to build the API.  For build and
 installation instructions, please refer to the README file contained in the
 SWIG open source distribution package.
 
+The API has two additional dependencies, libxml2 and libxslt, which are third 
+party, open source libraries for parsing and transforming XML formatted files.
+Binaries for libxslt and libxml2 are available at:
+
+For Windows:
+	http://xmlsoft.org/sources/win32/
+	
+For Linux (via RPM):
+	libxml2 and libxml2-devel packages
+	libxslt and libxslt-devel packages
+	
+The libraries can also be built from source, which are also available from the
+xmlsoft.org website. Build and installation instructions are included with 
+the source code.
+
 
 Building GMSEC API extensions
 -----------------------------------------
@@ -71,6 +93,14 @@ middleware, the SUPPORT directory would have
 
         + SUPPORT/
             + mwx/
+                + include/
+                + lib/
+                + ...
+            + libxml2/
+                + include/
+                + lib/
+                + ...
+            + libxslt/
                 + include/
                 + lib/
                 + ...
@@ -104,9 +134,9 @@ Add all of the following to your PATH:
 * GMSEC_API\bin (the full path to this directory)
 * the path to perl.exe (to build the Perl binding)
 * the path to javac (to build the Java binding)
-* the .NET Framework 3.5 directory
+* the .NET Framework 4 directory
 * the path to mt.exe (in the Windows SDK)
-* Visual Studio 9.0's Common7/IDE, VC, and VC/bin directories
+* Visual Studio 2017's Common7/IDE, VC/Auxiliary/Build, and VC/Tools/MSVC directories
 
 For example:
 set JDK_HOME=C:\Program Files\Java\jdk1.8.0_131
@@ -115,9 +145,9 @@ set PYTHON_HOME=C:\Python27
 set SWIG_HOME=C:\swig-3.0.10
 set PATH=%PATH%;C:\GMSEC_API\bin;C:\Perl\bin;C:\Program Files\Java\jdk1.8.131\bin;
 set PATH=%PATH%;C:\Windows\Microsoft.NET\Framework\v3.5
-set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE
-set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC;
-    C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin
+set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE
+set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build;
+    C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.13.26128\bin\Hostx64\x64
 
 Please note that when setting environment variables in this fashion, they will
 only be available for any processes that are run within the same command line
@@ -146,9 +176,7 @@ e.g. copy perl514.lib perl.lib
 
 Building the C++, C#, Java, Perl, and Python APIs:
 ---------------------------------------
-Next, open GMSEC_API\gmsecapi_opensource.sln in Visual Studio 2008.  If using
-a later version of Visual Studio (e.g., VS 2010 or VS 2012), Visual Studio
-will prompt to upgrade the project files.
+Next, open GMSEC_API\gmsecapi_opensource.sln in Visual Studio 2017.
 
 Choose the "Release" Solution Configuration (located in the toolbar) and select
 the appropriate architecture for your system (Win32 or x64). In the
@@ -160,8 +188,8 @@ Configuration, then rebuild the solution.
 
 You may need to generate a strong-name key file (.SNK) in order to rebuild with
 the "Release-SNK" Solution Configuration. To do this, click Start, point to All
-Programs, point to Microsoft Visual Studio 2008, point to Visual Studio Tools,
-then click Visual Studio 2008 Command Prompt. From the Command Prompt, navigate
+Programs, point to Microsoft Visual Studio 2017, point to Visual Studio Tools,
+then click Developer Command Prompt for VS 2017. From the Command Prompt, navigate
 to the GMSEC API extension SUPPORT/windows_snk (you may need to create this 
 directory). Then execute:
 		sn -k GMSEC.snk
@@ -194,7 +222,7 @@ executables will be placed in the GMSEC_API/bin directory.
 
 C# Examples:
 ---------------------
-Open GMSEC_API\examples\cs\cs.sln in Visual Studio. Choose the
+Open GMSEC_API\examples\csharp-dotnet\cs.sln in Visual Studio. Choose the
 Release configuration. In the Solution Explorer, right-click the solution
 and select "Rebuild Solution". (Requires that the C++ API be built.)  The
 executables will be placed in the GMSEC_API/bin directory.
@@ -217,9 +245,8 @@ entities will reside in the GMSEC_API\bin directory.
 Proceed to the section "Testing the Build" below.
 
 
-
 =========================================================================
-                        Unix/Linux systems:
+                        Linux/macOS systems:
 =========================================================================
 
 Environment Variable Settings:
@@ -232,14 +259,9 @@ of the following:
  Platform                 Setting
 -------------            ------------
 Linux x86 (gcc)          linux.x86
-Linux x86_64 (gcc)       linux.x86_64
+Linux x86_64 (gcc)       linux.x86_64 or linux.x86_64-32bit
 
-Mac OS X x86 (gcc)       macosx.x86
 Mac OS X x86_64 (gcc)    macosx.x86_64
-Mac OS X PPC 32 (gcc)    macosx.ppc
-
-Solaris 10 SPARC (CC)    solaris.sparc.CC
-Solaris 10 SPARC (gcc)   solaris.sparc.gcc
 
 
 The configuration files associated with these platforms are in
@@ -304,6 +326,11 @@ discerned by the Makefile executing "python --version").
 
 e.g. export PYTHON_INC=/usr/include/python
 
+For Python3 support, set PYTHON3_HOME to the location where Python3 development
+folder is located.
+
+e.g. export PYTHON3_HOME=/usr
+
 
 SWIG HOME :
 -----------
@@ -322,7 +349,6 @@ shared libraries depends on the operating system:
 -------------         ----------------------
 Linux                 LD_LIBRARY_PATH
 Mac OS X              DYLD_LIBRARY_PATH
-Solaris               LD_LIBRARY_PATH
 
 
 Update the environment variable corresponding to the platform to include
@@ -337,9 +363,9 @@ of the various middleware wrappers that can be built are listed in the
 GMSEC_API/wrapper directory.
 
 For example, in Bash, the following statement would indicate that the ActiveMQ
-C++ 3.8.1, the C2, and the C2-NSS wrappers should be built:
+C++ 3.9.4 and the IBM MQ 9.0 wrappers should be built:
 
-    export MW_WRAPPERS="activemq381 c2 c2_nss"
+    export MW_WRAPPERS="activemq394 ibmmq90"
 
 NOTE:
 -----
@@ -355,8 +381,6 @@ To begin building the GMSEC API, execute the following commands:
 
     $ cd GMSEC_API
     $ make              # for RHEL, Mac
-or
-    $ gmake             # for HP-UX, Solaris
 
 When the make-process has completed, the GMSEC API will have been built, along
 with related software, such as the C and C++ example applications, and the
@@ -387,7 +411,11 @@ Python Examples:
 The examples are Python scripts and therefore do not need to be compiled.
 They are located in the directory :
 
+	For Python 2:
 	GMSEC_API/examples/python
+	
+	For Python 3:
+	GMSEC_API/examples/python3
 
 
 Java Examples:
@@ -439,6 +467,7 @@ e.g.
 (Linux) export PYTHONPATH=<Full path to the API>/GMSEC_API/bin:
 				<Full path to the API>/GMSEC_API/bin/lib/GMSECAPI4
 
+
 =========================================================================
                        Testing the Build:
 =========================================================================
@@ -455,8 +484,8 @@ You should see Bolt listening for a connection, something like this:
 	waiting for connections on /0.0.0.0:9100
 
 3.) Start a GMSEC subscriber as such:
-* For Unix Systems type: ./gmsub connectiontype=gmsec_bolt
-* For Window Systems type: gmsub.exe connectiontype=gmsec_bolt
+* For Unix Systems type: ./gmsub mw-id=bolt
+* For Window Systems type: gmsub.exe mw-id=bolt
 
 You should see the subscriber estabish a connection and listening for a
 message for which it has subscribed, something like this:
@@ -472,37 +501,45 @@ message for which it has subscribed, something like this:
 
 
 4.) Execute a GMSEC publisher as such:
-* For Unix Systems type: ./gmpub connectiontype=gmsec_bolt
-* For Window Systems type: gmpub.exe connectiontype=gmsec_bolt
+* For Unix Systems type: ./gmpub mw-id=bolt
+* For Window Systems type: gmpub.exe mw-id=bolt
 
 You should see the publisher connect to Bolt and publish a series
 of messages, something like this:
 
-2013-347-11:03:46.395 [INFO] [gmpub.cpp:79] GMSEC API v3.5.4 [12/12/2013]
+2018-304-16:09:59.133 [INFO] [gmpub.cpp:102] GMSEC API v4.5 [10/30/2018]
 
-2013-347-11:03:46.400 [INFO] [gmpub.cpp:95] Middleware version = 1.0
+2018-304-16:09:59.145 [INFO] [gmsec/BoltConnection.cpp:239] [0,40,0] : Connection established
 
-2013-347-11:03:46.400 [INFO] [gmpub.cpp:98] Using subject 'GMSEC.TEST.PUBLISH'
+2018-304-16:09:59.145 [INFO] [gmpub.cpp:113] Middleware version = Bolt 4.5
 
-2013-347-11:03:46.400 [INFO] [gmpub.cpp:99] Publishing 1 message(s)
+2018-304-16:09:59.145 [INFO] [gmpub.cpp:160] Publishing 1 message(s)
 
-2013-347-11:03:46.400 [INFO] [gmpub.cpp:128] working
+2018-304-16:09:59.145 [INFO] [gmpub.cpp:165] Publish interval 1000 [ms]
 
-2013-347-11:03:46.400 [INFO] [gmpub.cpp:205] Sending:
-<MESSAGE SUBJECT="GMSEC.TEST.PUBLISH" KIND="PUBLISH">
-	<FIELD TYPE="CHAR" NAME="C">c</FIELD>
-	<FIELD TYPE="I32" NAME="COUNT">0</FIELD>
-	<FIELD TYPE="F64" NAME="D" BITS="4000000000000000">2</FIELD>
-	<FIELD TYPE="F32" NAME="E" BITS="40000000">2</FIELD>
-	<FIELD TYPE="BOOL" NAME="F">FALSE</FIELD>
-	<FIELD TYPE="I32" NAME="I">1</FIELD>
-	<FIELD TYPE="I16" NAME="J">1</FIELD>
-	<FIELD TYPE="U16" NAME="K">1</FIELD>
-	<FIELD TYPE="STRING" NAME="S">This is a test</FIELD>
-	<FIELD TYPE="BOOL" NAME="T">TRUE</FIELD>
-	<FIELD TYPE="U32" NAME="U">1</FIELD>
-	<FIELD TYPE="BIN" NAME="X">4A4C4D4E4F5051</FIELD>
-</MESSAGE>
+2018-304-16:09:59.145 [INFO] [gmpub.cpp:166] Message subject 'GMSEC.TEST.PUBLISH'
+
+2018-304-16:09:59.146 [INFO] [gmpub.cpp:248] Published:
+	<MESSAGE SUBJECT="GMSEC.TEST.PUBLISH" KIND="PUBLISH">
+		<FIELD NAME="BIN-FIELD" TYPE="BIN">4A4C4D4E4F5051</FIELD>
+		<FIELD NAME="BOOL-FIELD-FALSE" TYPE="BOOL">FALSE</FIELD>
+		<FIELD NAME="BOOL-FIELD-TRUE" TYPE="BOOL">TRUE</FIELD>
+		<FIELD NAME="CHAR-FIELD" TYPE="CHAR">c</FIELD>
+		<FIELD NAME="COUNT" TYPE="I32">0</FIELD>
+		<FIELD NAME="F32-FIELD" TYPE="F32" BITS="40000000">2</FIELD>
+		<FIELD NAME="F64-FIELD" TYPE="F64" BITS="4000000000000000">2</FIELD>
+		<FIELD NAME="I16-FIELD" TYPE="I16">1</FIELD>
+		<FIELD NAME="I32-FIELD" TYPE="I32">1</FIELD>
+		<FIELD NAME="I64-FIELD" TYPE="I64">1</FIELD>
+		<FIELD NAME="I8-FIELD" TYPE="I8">1</FIELD>
+		<FIELD NAME="STRING-FIELD" TYPE="STRING">This is a test</FIELD>
+		<FIELD NAME="U16-FIELD" TYPE="U16">1</FIELD>
+		<FIELD NAME="U32-FIELD" TYPE="U32">1</FIELD>
+		<FIELD NAME="U64-FIELD" TYPE="U64">1</FIELD>
+		<FIELD NAME="U8-FIELD" TYPE="U8">1</FIELD>
+	</MESSAGE>
+
+2018-304-16:09:59.245 [INFO] [gmsec/BoltConnection.cpp:231] [0,39,0] : Connection disconnected
 
 
 =========================================================================

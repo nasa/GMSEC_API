@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,21 +8,21 @@
 
 /**
  * @file F32Field.java
- *
- * @brief Specialized Field class that can be used to retain a 32-bit floating point value.
  */
 package gov.nasa.gsfc.gmsec.api.field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIF32Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIF32Field;
 
 
 /**
- * @class F32Field
- *
- * @brief Specialized Field class that can be used to retain a 32-bit floating point value.
+ * Specialized Field class that can be used to retain a 32-bit floating point value.
  */
 public class F32Field extends Field
 {
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A JNIF32Field object.
+	 */
 	public F32Field(JNIF32Field field)
 	{
 		setInternal(field);
@@ -30,14 +30,12 @@ public class F32Field extends Field
 
 
 	/**
-	 * @fn F32Field(String name, float data)
+	 * Default constructor.
 	 *
-	 * @brief Default constructor.
+	 * @param name Name of the field.
+	 * @param data Data to associate with the field.
 	 *
-	 * @param name - name of the field.
-	 * @param data - data to associate with the field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
 	 */
 	public F32Field(String name, float data) throws IllegalArgumentException
 	{
@@ -48,13 +46,11 @@ public class F32Field extends Field
 
 
 	/**
-	 * @fn F32Field(F32Field other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other F32Field object to copy.
 	 *
-	 * @param other - the other F32Field object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given F32Field object is null.
+	 * @throws IllegalArgumentException Thrown if the given F32Field object is null.
 	 */
 	public F32Field(F32Field other) throws IllegalArgumentException
 	{
@@ -68,9 +64,9 @@ public class F32Field extends Field
 
 
 	/**
-	 * @fn float getValue()
+	 * Returns the data stored within the F32Field.
 	 *
-	 * @return Returns the data stored within the F32Field.
+	 * @return A float value.
 	 */
 	public float getValue()
 	{

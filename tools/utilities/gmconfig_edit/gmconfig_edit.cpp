@@ -1,12 +1,9 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
-
-
 
 
 /** 
@@ -15,7 +12,9 @@
  */
 
 #include "gmconfig_edit.h"
-#include "../example.h"
+
+#include <gmsec4/Config.h>
+#include <gmsec4/ConfigFile.h>
 
 #include <algorithm>
 #include <sstream>
@@ -28,6 +27,79 @@
 #else
 	#include <cstdlib>
 #endif
+
+
+GmsecConfigEdit::GmsecConfigEdit(const gmsec::api::Config& config)
+	: Utility(config),
+	  m_configFile(new gmsec::api::ConfigFile()),
+	  m_menuItems(),
+	  m_unsavedChanges(false)
+{
+	initialize();
+
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Create new configuration",        this, &GmsecConfigEdit::newConfiguration));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Load existing configuration",     this, &GmsecConfigEdit::loadConfiguration));
+
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Add a subscription definition",   this, &GmsecConfigEdit::addSubscription));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Add a configuration definition",  this, &GmsecConfigEdit::addConfiguration));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Add a message definition",        this, &GmsecConfigEdit::addMessage));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Add a custom XML content",        this, &GmsecConfigEdit::addCustomXML));
+
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Find subscription content",       this, &GmsecConfigEdit::findSubscription));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Find configuration content",      this, &GmsecConfigEdit::findConfiguration));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Find message content",            this, &GmsecConfigEdit::findMessage));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Find custom XML content",         this, &GmsecConfigEdit::findCustomXML));
+
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Remove subscription definition",  this, &GmsecConfigEdit::removeSubscription));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Remove configuration definition", this, &GmsecConfigEdit::removeConfiguration));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Remove message definition",       this, &GmsecConfigEdit::removeMessage));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Remove custom XML content",       this, &GmsecConfigEdit::removeCustomXML));
+
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Display current configuration",   this, &GmsecConfigEdit::displayConfigFile));
+
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Destroy current configuration",   this, &GmsecConfigEdit::destroyConfiguration));
+
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Save configuration to file",      this, &GmsecConfigEdit::saveConfiguration));
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Save configuration to new file",  this, &GmsecConfigEdit::saveConfigurationFile));
+
+	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Quit",                            this, &GmsecConfigEdit::quit));
+}
+
+
+GmsecConfigEdit::~GmsecConfigEdit()
+{
+	delete m_configFile;
+}
+
+
+void GmsecConfigEdit::processMenuSelection()
+{
+	std::cout << "\n\nPlease choose one of the following options:\n\n";
+
+	std::cout << menu() << std::endl;
+
+	bool validSelection = false;
+	size_t choice = 0;
+	while (!validSelection)
+	{
+		choice = getInput<size_t>(">> ");
+
+		validSelection = (choice > 0 && choice <= m_menuItems.size());
+
+		if (!validSelection)
+		{
+			std::cout << "Invalid selection; please try again...\n" << std::endl;
+		}
+	}
+
+	bool result = m_menuItems[choice-1].callback.execute();
+
+	std::cout << (result ? "Ok" : "Fail") << ".\n" << std::endl;
+
+	std::string enter;
+	std::cout << "Press <enter> to continue...";
+	std::getline(std::cin, enter);
+}
 
 
 bool GmsecConfigEdit::newConfiguration()
@@ -150,16 +222,9 @@ bool GmsecConfigEdit::findSubscription()
 		try {
 			(void) m_configFile->lookupSubscriptionEntry(name.c_str());
 			success = true;
-		}
-		catch (const gmsec::api::Exception& e) {
-		}
-
-		if (success)
-		{
 			std::cout << "Subscription entry with name '" << name << "' exists in active configuration." << std::endl;
 		}
-		else
-		{
+		catch (...) {
 			std::cout << "Subscription entry with name '" << name << "' not found in active configuration." << std::endl;
 		}
 	}
@@ -768,50 +833,6 @@ bool GmsecConfigEdit::haveConfigFile() const
 }
 
 
-GmsecConfigEdit::GmsecConfigEdit(int argc, char** argv)
-	: m_configFile(new gmsec::api::ConfigFile()),
-	  m_menuItems(),
-	  m_unsavedChanges(false)
-{
-	gmsec::api::Config config(argc, argv);
-
-	gmsec::api::example::initialize(config);
-
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Create new configuration",        this, &GmsecConfigEdit::newConfiguration));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Load existing configuration",     this, &GmsecConfigEdit::loadConfiguration));
-
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Add a subscription definition",   this, &GmsecConfigEdit::addSubscription));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Add a configuration definition",  this, &GmsecConfigEdit::addConfiguration));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Add a message definition",        this, &GmsecConfigEdit::addMessage));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Add a custom XML content",        this, &GmsecConfigEdit::addCustomXML));
-
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Find subscription content",       this, &GmsecConfigEdit::findSubscription));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Find configuration content",      this, &GmsecConfigEdit::findConfiguration));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Find message content",            this, &GmsecConfigEdit::findMessage));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Find custom XML content",         this, &GmsecConfigEdit::findCustomXML));
-
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Remove subscription definition",  this, &GmsecConfigEdit::removeSubscription));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Remove configuration definition", this, &GmsecConfigEdit::removeConfiguration));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Remove message definition",       this, &GmsecConfigEdit::removeMessage));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Remove custom XML content",       this, &GmsecConfigEdit::removeCustomXML));
-
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Display current configuration",   this, &GmsecConfigEdit::displayConfigFile));
-
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Destroy current configuration",   this, &GmsecConfigEdit::destroyConfiguration));
-
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Save configuration to file",      this, &GmsecConfigEdit::saveConfiguration));
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Save configuration to new file",  this, &GmsecConfigEdit::saveConfigurationFile));
-
-	m_menuItems.push_back(MenuItem<GmsecConfigEdit>("Quit",                            this, &GmsecConfigEdit::quit));
-}
-
-
-GmsecConfigEdit::~GmsecConfigEdit()
-{
-	delete m_configFile;
-}
-
-
 std::string GmsecConfigEdit::menu() const
 {
 	static std::ostringstream menu;
@@ -829,39 +850,11 @@ std::string GmsecConfigEdit::menu() const
 }
 
 
-void GmsecConfigEdit::processMenuSelection()
-{
-	std::cout << "\n\nPlease choose one of the following options:\n\n";
-
-	std::cout << menu() << std::endl;
-
-	bool validSelection = false;
-	size_t choice = 0;
-	while (!validSelection)
-	{
-		choice = getInput<size_t>(">> ");
-
-		validSelection = (choice > 0 && choice <= m_menuItems.size());
-
-		if (!validSelection)
-		{
-			std::cout << "Invalid selection; please try again...\n" << std::endl;
-		}
-	}
-
-	bool result = m_menuItems[choice-1].callback.execute();
-
-	std::cout << (result ? "Ok" : "Fail") << ".\n" << std::endl;
-
-	std::string enter;
-	std::cout << "Press <enter> to continue...";
-	std::getline(std::cin, enter);
-}
-
-
 int main(int argc, char** argv)
 {
-	GmsecConfigEdit gcf(argc, argv);
+	gmsec::api::Config config(argc, argv);
+
+	GmsecConfigEdit gcf(config);
 
 	std::cout << "\nWelcome to gmconfig_edit!";
 

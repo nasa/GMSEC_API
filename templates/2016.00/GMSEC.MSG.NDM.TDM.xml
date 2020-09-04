@@ -64,7 +64,7 @@
 	<FIELD  NAME="DATA-QUALITY"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
-	        VALUE=""
+	        VALUE="RAW~~VALIDATED~~DEGRADED"
 	        TYPE="STRING"
 	        DESCRIPTION="Raw = no quality check, Validated = checked and passed, Degraded = checked with quality issues."/>
 	<FIELD  NAME="FORMAT"

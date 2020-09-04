@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file MistMessage.java
- *
- * @brief The file contains the public interface to generic MIST Messages.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist.message;
@@ -18,23 +16,23 @@ import gov.nasa.gsfc.gmsec.api.Config;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 import gov.nasa.gsfc.gmsec.api.Message;
 
+import gov.nasa.gsfc.gmsec.api.field.Field;
+
 import gov.nasa.gsfc.gmsec.api.mist.Specification;
 
 import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMistMessage;
 
 
 /**
- * @class MistMessage
- *
- * @brief This Message object shares all of the functionality of standard messages,
+ * This Message object shares all of the functionality of standard messages,
  * but can also be auto-populated based on how the message schema identifies itself within
  * the given specification.
  *
- * @sa Message
- * @sa Config
- * @sa Specification
- * @sa Field
- * @sa MsgFieldIterator
+ * @see Message
+ * @see Config
+ * @see Specification
+ * @see Field
+ * @see gov.nasa.gsfc.gmsec.api.MessageFieldIterator
  */
 public class MistMessage extends Message
 {
@@ -45,18 +43,16 @@ public class MistMessage extends Message
 
 
 	/**
-	 * @fn MistMessage(String subject, String schemaID, Specification spec)
+	 * Constructor - Initializes the message instance with a template determined by ID and spec.
 	 *
-	 * @brief default constructor - Initializes the message instance with a template determined by ID and spec.
-	 *
-	 * @param subject  - the subject string for the message.
-	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+	 * @param subject  The subject string for the message.
+	 * @param schemaID The string used to identify the message schema in the GMSEC ISD.  The schema ID has the
 	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).
 	 * You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB) 
-	 * @param spec     - the specification this message's schema will adhere to.
+	 * @param spec     The specification this message's schema will adhere to.
 	 *
-	 * @throws An IllegalArgumentException is thrown if any of the input parameters are invalid.
-	 * @throws A GMSEC_Exception is thrown if an invalid schema ID is given.
+	 * @throws IllegalArgumentException Thrown if any of the input parameters are invalid.
+	 * @throws GMSEC_Exception Thrown if an invalid schema ID is given.
 	 */
 	public MistMessage(String subject, String schemaID, Specification spec)
 		throws IllegalArgumentException, GMSEC_Exception
@@ -77,19 +73,17 @@ public class MistMessage extends Message
 
 
 	/**
-	 * @fn MistMessage(String subject, String schemaID, Config config, Specification spec)
+	 * Constructor - initializes an empty message with no template
 	 *
-	 * @brief default constructor - initializes an empty message with no template
-	 *
-	 * @param subject  - the subject string for the message.
-	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+	 * @param subject  The subject string for the message.
+	 * @param schemaID The string used to identify the message schema in the GMSEC ISD.  The schema ID has the
 	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).
 	 * You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB) 
-	 * @param config   - A configuration to associate with the message.
-	 * @param spec     - the specification this message's schema will adhere to.
+	 * @param config   A configuration to associate with the message.
+	 * @param spec     The specification this message's schema will adhere to.
 	 *
-	 * @throws An IllegalArgumentException is thrown if any of the input parameters are invalid.
-	 * @throws A GMSEC_Exception is thrown if an invalid schema ID is given.
+	 * @throws IllegalArgumentException Thrown if any of the input parameters are invalid.
+	 * @throws GMSEC_Exception Thrown if an invalid schema ID is given.
 	 */
 	public MistMessage(String subject, String schemaID, Config config, Specification spec)
 		throws IllegalArgumentException, GMSEC_Exception
@@ -114,17 +108,15 @@ public class MistMessage extends Message
 
 
 	/**
-	 * @fn MistMessage(String data)
+	 * Initializes a MistMessage using an XML or JSON string
 	 *
-	 * @brief Initializes a MistMessage using an XML or JSON string
+	 * @param data XML or JSON string used to initialize the message
 	 *
-	 * @param data - XML or JSON string used to initialize the message
+	 * @throws IllegalArgumentException Thrown if any of the data string is invalid.
+	 * @throws GMSEC_Exception Thrown if data string contains invalid XML or JSON statement(s).
 	 *
-	 * @throws An IllegalArgumentException is thrown if any of the data string is invalid.
-	 * @throws A GMSEC_Exception is thrown if data string contains invalid XML or JSON statement(s).
-	 *
-	 * @sa Message.toXML()
-	 * @sa Message.toJSON()
+	 * @see Message#toXML()
+	 * @see Message#toJSON()
 	 */
 	public MistMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -140,13 +132,11 @@ public class MistMessage extends Message
 
 
 	/**
-	 * @fn MistMessage(MistMessage other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other MIST message object to copy.
 	 *
-	 * @param other - the other MIST message object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given MIST message object is null.
+	 * @throws IllegalArgumentException Thrown if the given MIST message object is null.
 	 */
 	public MistMessage(MistMessage other) throws IllegalArgumentException
 	{
@@ -162,9 +152,76 @@ public class MistMessage extends Message
 
 
 	/**
-	 * @fn String getSchemaID()
+	 * Special constructor that constructs a MistMessage using a simple Message.
 	 *
-	 * @brief Returns a string that identifies the schema that the Message is based off of.
+	 * @param msg The simple Message to reference while building the MistMessage
+	 *
+	 * @throws IllegalArgumentException Thrown if the given Message object is null.
+	 * @throws GMSEC_Exception Thrown if the given Message does not house sufficient information to construct a MistMessage.
+	 */
+	public MistMessage(Message msg) throws IllegalArgumentException, GMSEC_Exception
+	{
+		this(msg, new Config());
+	}
+
+
+	/**
+	 * Special constructor that builds a MistMessage using a simple Message.
+	 *
+	 * @param msg The simple Message to reference while building the MistMessage
+	 * @param specConfig The specification configuration to apply when constructing the MistMessage
+	 *
+	 * @throws IllegalArgumentException Thrown if the given Message object is null.
+	 * @throws IllegalArgumentException Thrown if the given Config object is null.
+	 * @throws GMSEC_Exception Thrown if the given Message does not house sufficient information to construct a MistMessage.
+	 */
+	public MistMessage(Message msg, Config specConfig) throws IllegalArgumentException, GMSEC_Exception
+	{
+		super((JNIMistMessage) null);
+
+		if (msg == null)
+		{
+			throw new IllegalArgumentException("Message cannot be null");
+		}
+		if (specConfig == null)
+		{
+			throw new IllegalArgumentException("Config cannot be null");
+		}
+
+		registerChild(new JNIMistMessage(Message.getInternal(msg), Config.getInternal(specConfig)));
+	}
+
+
+	/**
+	 * Sets the internal list of fields which are to be automatically placed in all
+	 * MistMessage objects that are created.  Internal copies of the Fields are made, and
+	 * thus ownership of the fields that are provided are not retained by MistMessage.
+	 *
+	 * @param standardFields The array of fields to be copied to the internal set of fields,
+	 * which will in turn be included with all MistMessage objects that are created.
+	 */
+	public static void setStandardFields(java.util.List<Field> standardFields)
+	{
+		if (standardFields != null && standardFields.size() > 0)
+		{
+			JNIMistMessage.setStandardFields(standardFields);
+		}
+	}
+
+
+	/**
+	 * Destroys the lists of standard fields that are included with MistMessage objects.
+	 */
+	public static void clearStandardFields()
+	{
+		JNIMistMessage.clearStandardFields();
+	}
+
+
+	/**
+	 * Returns a string that identifies the schema that the Message is based off of.
+	 *
+	 * @return A schema ID string.
 	 */
 	public String getSchemaID()
 	{
@@ -173,19 +230,17 @@ public class MistMessage extends Message
 
 
 	/**
-	 * @fn void setValue(String fieldName, String value) throws IllegalArgumentException, GMSEC_Exception
-	 *
-	 * @brief Sets the value for a field indicated by user.  The value's type is automatically
+	 * Sets the value for a field indicated by user.  The value's type is automatically
 	 * determined by the function depending on the message schema being used.  If the field 
 	 * does not have a required type, a new StringField will be created with the specified name 
 	 * and value.
 	 * 
-	 * @param fieldName - name of the field to be modified/created
-	 * @param value     - the value of the field.  The value's type is automatically determined based on the message schema.
+	 * @param fieldName Name of the field to be modified/created
+	 * @param value     The value of the field.  The value's type is automatically determined based on the message schema.
 	 *
-	 * @throws An IllegalArgumentException is thrown if either the field name or the value are null.  Note
+	 * @throws IllegalArgumentException Thrown if either the field name or the value are null.  Note
 	 * field name cannot contain an empty string.
-	 * @throws An GMSEC_Exception is thrown if the input value's type cannot be converted into the type required
+	 * @throws GMSEC_Exception Thrown if the input value's type cannot be converted into the type required
 	 * by the field, or if the string is too big when converting to char.
 	 */
 	public void setValue(String fieldName, String value) throws IllegalArgumentException, GMSEC_Exception
@@ -204,18 +259,16 @@ public class MistMessage extends Message
 
 
 	/**
-	 * @fn void setValue(String fieldName, long value) throws IllegalArgumentException, GMSEC_Exception
-	 *
-	 * @brief Sets the value for a field indicated by user.  The value's type is automatically
+	 * Sets the value for a field indicated by user.  The value's type is automatically
 	 * determined by the function depending on the message schema being used.  If the field 
 	 * does not have a required type, a new I64Field will be created with the specified name 
 	 * and value.
 	 * 
-	 * @param fieldName - name of the field to be modified/created
-	 * @param value     - the value of the field.  The value's type is automatically determined based on the message schema.
+	 * @param fieldName Name of the field to be modified/created
+	 * @param value     The value of the field.  The value's type is automatically determined based on the message schema.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null or contains an empty string.
-	 * @throws An GMSEC_Exception is thrown if the input value's type cannot be converted into the type required
+	 * @throws IllegalArgumentException Thrown if the field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the input value's type cannot be converted into the type required
 	 * by the field, or if the string is too big when converting to char.
 	 */
 	public void setValue(String fieldName, long value) throws IllegalArgumentException, GMSEC_Exception
@@ -230,18 +283,16 @@ public class MistMessage extends Message
 
 
 	/**
-	 * @fn void setValue(String fieldName, double value) throws IllegalArgumentException, GMSEC_Exception
-	 *
-	 * @brief Sets the value for a field indicated by user.  The value's type is automatically
+	 * Sets the value for a field indicated by user.  The value's type is automatically
 	 * determined by the function depending on the message schema being used.  If the field 
 	 * does not have a required type, a new F64Field will be created with the specified name 
 	 * and value.
 	 * 
-	 * @param fieldName - name of the field to be modified/created
-	 * @param value     - the value of the field.  The value's type is automatically determined based on the message schema.
+	 * @param fieldName Name of the field to be modified/created
+	 * @param value     The value of the field.  The value's type is automatically determined based on the message schema.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null or contains an empty string.
-	 * @throws An GMSEC_Exception is thrown if the input value's type cannot be converted into the type required
+	 * @throws IllegalArgumentException Thrown if the field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the input value's type cannot be converted into the type required
 	 * by the field, or if the string is too big when converting to char.
 	 */
 	public void setValue(String fieldName, double value) throws IllegalArgumentException, GMSEC_Exception

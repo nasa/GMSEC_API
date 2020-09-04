@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -91,7 +91,7 @@ public:
 
 	PacketType fix(int in) const {
 		PacketType fixed = PACKET_VOID;
-		if (in > 0 || in < PACKET_END)
+		if (in > 0 && in < PACKET_END)
 			fixed = (PacketType) table[in];
 		return fixed;
 	}

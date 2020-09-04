@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,22 +8,22 @@
 
 /**
  * @file I16Field.java
- *
- * @brief Specialized Field class that can be used to retain a signed 16-bit value.
  */
 
 package gov.nasa.gsfc.gmsec.api.field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNII16Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII16Field;
 
 
 /**
- * @class I16Field
- *
- * @brief Specialized Field class that can be used to retain a signed 16-bit value.
+ * Specialized Field class that can be used to retain a signed 16-bit value.
  */
 public class I16Field extends Field
 {
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A JNII16Field object.
+	 */
 	public I16Field(JNII16Field field)
 	{
 		setInternal(field);
@@ -31,14 +31,12 @@ public class I16Field extends Field
 
 
 	/**
-	 * @fn I16Field(String name, short data)
+	 * Default constructor.
 	 *
-	 * @brief Default constructor.
+	 * @param name Name of the field.
+	 * @param data Data to associate with the field.
 	 *
-	 * @param name - name of the field.
-	 * @param data - data to associate with the field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
 	 */
 	public I16Field(String name, short data) throws IllegalArgumentException
 	{
@@ -49,13 +47,11 @@ public class I16Field extends Field
 
 
 	/**
-	 * @fn I16Field(I16Field other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other I16Field object to copy.
 	 *
-	 * @param other - the other I16Field object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given I16Field is null.
+	 * @throws IllegalArgumentException Thrown if the given I16Field is null.
 	 */
 	public I16Field(I16Field other) throws IllegalArgumentException
 	{
@@ -69,9 +65,9 @@ public class I16Field extends Field
 
 
 	/**
-	 * @fn short getValue()
+	 * Returns the data stored within the I16Field.
 	 *
-	 * @return Returns the data stored within the I16Field.
+	 * @return A short value.
 	 */
 	public short getValue()
 	{

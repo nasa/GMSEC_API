@@ -31,7 +31,7 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " +  sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
-
+        return -1
 
 
     # Load the command-line input into a GMSEC Config object
@@ -55,12 +55,9 @@ def main():
     # interface
     # This is useful for determining which version of the API is
     # configured within the environment
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-            
         # Create a ConnectionManager object
         # This is the linchpin for all communications between the
         # GMSEC API and the middleware server
@@ -103,24 +100,23 @@ def main():
 
         # Example error handling for calling receive() with a timeout
         if (message != None):
-                
             libgmsec_python.logInfo("Received message:\n" + message.toXML())
                 
         libgmsec_python.logInfo("Waiting 5 seconds to demonstrate that a second message will not be received")
         message = connMgr.receive(5000)
 
         if (message != None):
-                
             libgmsec_python.logError("Unexpectedly received a filtered message:\n" + message.toXML())
-                
 
         # Disconnect from the middleware and clean up the Connection
         connMgr.cleanup()
         
-    except Exception as e:
-        
+    except libgmsec_python.Exception as e:
         libgmsec_python.logError(e.what())
-        
+        return -1
+
+    return 0
+
 
 def initializeLogging(config):
 

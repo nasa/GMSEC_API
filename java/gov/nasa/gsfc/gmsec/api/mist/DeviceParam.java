@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -7,10 +7,9 @@
 
 
 
-/** @file DeviceParam.java
- *
- *  @brief This file contains declarations for Simple Device containers
-**/
+/**
+ * @file DeviceParam.java
+ */
 
 package gov.nasa.gsfc.gmsec.api.mist;
 
@@ -24,50 +23,56 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIDeviceParam;
 
 
 /**
- * @class DeviceParam
- *
- * @brief This class is a container for holding information
+ * This class is a container for holding information
  * on a Simple Device parameter, and used to generate GMSEC Simple Device
- * messages by the ConnectionManager class
+ * messages by the ConnectionManager class.
  *
- * @sa ConnectionManager @n
- *		
-*/
+ * @see ConnectionManager
+ */
 public class DeviceParam
 {
 	private JNIDeviceParam m_jniParam = null;
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param param Object to reference for acquiring internal JNIDeviceParam.
+	 * @return Internal JNIDeviceParam object.
+	 */
 	public static JNIDeviceParam getInternal(DeviceParam param)
 	{
 		return (param == null ? null : param.m_jniParam);
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param jParam Internal JNIDeviceParam object.
+	 */
 	public DeviceParam(JNIDeviceParam jParam)
 	{
 		m_jniParam = jParam;
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 */
 	protected DeviceParam()
 	{
 	}
 
 
 	/**
-	 * @fn DeviceParam(String name, String timestamp, Field field)
+	 * Constructor - Initializes the DeviceParam object with a name, a timestamp and a Field (containing a sampled value).
 	 *
-	 * @brief Constructor - Initializes the DeviceParam object with 
-	 * a name, a timestamp and a Field (containing a sampled value).
+	 * @param name  The name of the DeviceParam.
+	 * @param timestamp The time at which the sampled value was taken.
+	 * @param field The field containing sampled value.
 	 *
-	 * @param name  - The name of the DeviceParam
-	 * @param timestamp - The time at which the sampled value was taken
-	 * @param field - The field containing sampled value
-	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the timestamp string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the Field object is null.
+	 * @throws IllegalArgumentException Thrown if the subject string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the timestamp string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the Field object is null.
 	 */
 	public DeviceParam(String name, String timestamp, Field field) throws IllegalArgumentException
 	{
@@ -89,13 +94,11 @@ public class DeviceParam
 
 
 	/**
-	 * @fn DeviceParam(DeviceParam other)
+	 * Constructor - Initializes the DeviceParam object from another DeviceParam.
 	 *
-	 * @brief Constructor - Initializes the DeviceParam object from another DeviceParam
+	 * @param other The other DeviceParam to copy.
 	 *
-	 * @param other - The other DeviceParam to inherit values from
-	 *
-	 * @throws An IllegalArgumentException is thrown if the DeviceParam object that is given is null.
+	 * @throws IllegalArgumentException Thrown if the DeviceParam object that is given is null.
 	 */
 	public DeviceParam(DeviceParam other) throws IllegalArgumentException
 	{
@@ -109,11 +112,9 @@ public class DeviceParam
 
 
 	/**
-	 * @fn String getName()
+	 * Retrieves the name of the DeviceParam.
 	 *
-	 * @brief Retrieves the name of the DeviceParam
-	 *
-	 * @return The name of the DeviceParam
+	 * @return The name of the DeviceParam.
 	 */
 	public String getName()
 	{
@@ -122,11 +123,9 @@ public class DeviceParam
 
 
 	/**
-	 * @fn String getTimestamp()
+	 * Retrieves the timestamp of the DeviceParam.
 	 *
-	 * @brief Retrieves the timestamp of the DeviceParam
-	 *
-	 * @return The timestamp of the DeviceParam
+	 * @return The timestamp of the DeviceParam.
 	 */
 	public String getTimestamp()
 	{
@@ -135,11 +134,9 @@ public class DeviceParam
 
 
 	/**
-	 * @fn Field getValue()
+	 * Retrieves the Field value associated with the DeviceParam.
 	 *
-	 * @brief Retrieves the Field value associated with the DeviceParam
-	 *
-	 * @return The Field value of the DeviceParam
+	 * @return The Field value of the DeviceParam.
 	 */
 	public Field getValue()
 	{

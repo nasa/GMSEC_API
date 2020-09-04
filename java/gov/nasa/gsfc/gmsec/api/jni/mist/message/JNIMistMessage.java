@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,15 +12,23 @@ import gov.nasa.gsfc.gmsec.api.Config;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 import gov.nasa.gsfc.gmsec.api.Message;
 
+import gov.nasa.gsfc.gmsec.api.field.Field;
+
 import gov.nasa.gsfc.gmsec.api.mist.Specification;
+
+import gov.nasa.gsfc.gmsec.api.util.Log;
 
 import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
 import gov.nasa.gsfc.gmsec.api.jni.JNIConfig;
 import gov.nasa.gsfc.gmsec.api.jni.JNIMessage;
 
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIField;
+
+import gov.nasa.gsfc.gmsec.api.jni.mist.ArrayListConverter;
 import gov.nasa.gsfc.gmsec.api.jni.mist.JNISpecification;
 
-import gov.nasa.gsfc.gmsec.api.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class JNIMistMessage extends JNIMessage
@@ -35,13 +43,13 @@ public class JNIMistMessage extends JNIMessage
 		sb.append(version);
 		sb.insert(4, ".");
 
-		sb.append(".GMSEC");
+		sb.append(".GMSEC.");
 
 		switch (kind)
 		{
-			case PUBLISH: sb.append(".MSG"); break;
-			case REQUEST: sb.append(".REQ"); break;
-			case REPLY  : sb.append(".RESP"); break;
+			case PUBLISH: sb.append("MSG"); break;
+			case REQUEST: sb.append("REQ"); break;
+			case REPLY  : sb.append("RESP"); break;
 		}
 
 		if (type != null && !type.isEmpty())
@@ -110,6 +118,28 @@ public class JNIMistMessage extends JNIMessage
 	public JNIMistMessage(JNIMistMessage jOther)
 	{
 		this(gmsecJNI.new_MistMessageCopy(JNIMistMessage.getCPtr(jOther), jOther), true);
+	}
+
+
+	public JNIMistMessage(JNIMessage jMsg, JNIConfig jSpecConfig) 
+	{
+		this(gmsecJNI.new_MistMessageFromMessage(JNIMessage.getCPtr(jMsg), jMsg, JNIConfig.getCPtr(jSpecConfig), jSpecConfig), true);
+	}
+
+
+	public static void setStandardFields(List<Field> standardFields)
+	{
+		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(standardFields);
+		JNIField[] jFields    = ArrayListConverter.listToJNIFields(standardFields);
+		int        numFields  = (standardFields == null ? 0 : standardFields.size());
+
+		gmsecJNI.MistMessageSetStandardFields(jFieldPtrs, jFields, numFields);
+	}
+
+
+	public static void clearStandardFields()
+	{
+		gmsecJNI.MistMessageClearStandardFields();
 	}
 
 

@@ -77,3 +77,14 @@
     -------
     a reference to a SchemaIDIterator object
 ";
+
+%feature("docstring") gmsec::api::mist::Specification::getMessageSpecifications"
+
+    getMessageSpecifications(self) -> list
+
+    Accessor that returns the list of MessageSpecification object(s) associated with the Specification
+
+    Returns
+    -------
+    A list of MessageSpecification object(s) associated with the Specification
+";

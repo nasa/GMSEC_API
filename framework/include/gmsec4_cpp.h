@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,7 +9,7 @@
 /**  @file gmsec4_cpp.h
  *
  * @brief This file contains includes for all required header files for the C++ 4.x API
-*/
+ */
 
 #ifndef GMSEC4_CPP_H
 #define GMSEC4_CPP_H
@@ -20,6 +20,7 @@
 #include <gmsec4/ConfigFile.h>
 #include <gmsec4/ConfigFileIterator.h>
 #include <gmsec4/Config.h>
+#include <gmsec4/ConfigOptions.h>
 #include <gmsec4/Connection.h>
 #include <gmsec4/Errors.h>
 #include <gmsec4/EventCallback.h>
@@ -36,16 +37,15 @@
 #include <gmsec4/mist/ConnectionManager.h>
 #include <gmsec4/mist/ConnectionManagerReplyCallback.h>
 #include <gmsec4/mist/Device.h>
-#include <gmsec4/mist/DeviceMessage.h>                          // DEPRECATED
 #include <gmsec4/mist/DeviceParam.h>
 #include <gmsec4/mist/DeviceIterator.h>
+#include <gmsec4/mist/FieldSpecification.h>
+#include <gmsec4/mist/MessageSpecification.h>
 #include <gmsec4/mist/mist_defs.h>
 #include <gmsec4/mist/Mnemonic.h>
-#include <gmsec4/mist/MnemonicMessage.h>                        // DEPRECATED
 #include <gmsec4/mist/MnemonicSample.h>
 #include <gmsec4/mist/MnemonicIterator.h>
 #include <gmsec4/mist/ProductFile.h>
-#include <gmsec4/mist/ProductFileMessage.h>                     // DEPRECATED
 #include <gmsec4/mist/ProductFileIterator.h>
 #include <gmsec4/mist/SchemaIDIterator.h>
 #include <gmsec4/mist/ServiceParam.h>

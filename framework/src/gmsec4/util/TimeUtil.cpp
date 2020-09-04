@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -271,10 +271,10 @@ bool operator==(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
 
 bool operator>(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
 {
-	if (time1 == time0)
+	if (time1.seconds == time0.seconds && time1.nanoseconds == time0.nanoseconds)
 		return false;
 
-	GMSEC_TimeSpec delta = TimeUtil::diffTime(time1, time0);
+	GMSEC_TimeSpec delta = gmsec::api::util::TimeUtil::diffTime(time1, time0);
 
 	if ((delta.seconds < 0) || (delta.seconds == 0 && delta.nanoseconds < 0))
 		return false;
@@ -285,9 +285,46 @@ bool operator>(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
 
 bool operator<(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
 {
-	return !(time1 > time0);
+	if (time1.seconds == time0.seconds && time1.nanoseconds == time0.nanoseconds)
+		return false;
+
+	GMSEC_TimeSpec delta = gmsec::api::util::TimeUtil::diffTime(time1, time0);
+
+	if ((delta.seconds > 0) || (delta.seconds == 0 && delta.nanoseconds > 0))
+		return true;
+
+	return false;
 }
 
 }  // end namespace util
 }  // end namespace api
 }  // end namespace gmsec
+
+
+bool operator==(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
+{
+	return time1.seconds == time0.seconds && time1.nanoseconds == time0.nanoseconds;
+}
+
+
+bool operator>(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
+{
+	if (time1 == time0)
+		return false;
+
+	GMSEC_TimeSpec delta = gmsec::api::util::TimeUtil::diffTime(time1, time0);
+
+	if ((delta.seconds < 0) || (delta.seconds == 0 && delta.nanoseconds < 0))
+		return false;
+
+	return true;
+}
+
+
+bool operator<(const GMSEC_TimeSpec& time1, const GMSEC_TimeSpec& time0)
+{
+	if (time1 == time0)
+		return false;
+
+	return !(time1 > time0);
+}

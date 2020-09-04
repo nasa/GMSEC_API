@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,26 +8,26 @@
 
 /**
  * @file TimeUtil.java
- *
- * @brief Utility methods for converting time from one format to another.
  */
 
 package gov.nasa.gsfc.gmsec.api.util;
 
-import gov.nasa.gsfc.gmsec.api.jni.*;
+import gov.nasa.gsfc.gmsec.api.jni.util.JNITimeUtil;
 
 
 /**
- * @class TimeUtil
- *
- * @brief TimeUtil class
+ * A Time Utility class
  */
 public class TimeUtil
 {
+	// To prevent users from instantiating this class.
+	private TimeUtil() {}
+
+
 	/**
-	 * @fn static TimeSpec getCurrentTime()
+	 * Returns the current time in seconds since Jan 1, 1970 00:00::00 UTC.
 	 *
-	 * @brief Returns the current time in seconds since Jan 1, 1970 00:00::00 UTC.
+	 * @return A TimeSpec object.
 	 */
 	public static TimeSpec getCurrentTime()
 	{
@@ -36,11 +36,13 @@ public class TimeUtil
 
 
 	/**
-	 * @fn static String formatTime(TimeSpec time)
+	 * Returns a GMSEC time string YYYY-DDD-HH-MM-SS.sss for the given TimeSpec.
 	 *
-	 * @brief Returns a GMSEC time string YYYY-DDD-HH-MM-SS.sss for the given TimeSpec.
+	 * @param spec A TimeSpec time
 	 *
-	 * @param spec - a TimeSpec time
+	 * @return A time string.
+	 *
+	 * @see TimeUtil#getCurrentTime()
 	 */
 	public static String formatTime(TimeSpec spec)
 	{
@@ -54,12 +56,14 @@ public class TimeUtil
 
 
 	/**
-	 * @fn static String formatTime(TimeSpec time, int subs)
+	 * Returns a GMSEC time string YYYY-DDD-HH-MM-SS[....sss] for the given TimeSpec.
 	 *
-	 * @brief Returns a GMSEC time string YYYY-DDD-HH-MM-SS.sss for the given TimeSpec.
+	 * @param spec       A TimeSpec time
+	 * @param subseconds The number of digits to allow for subseconds [0 .. 9].
 	 *
-	 * @param spec       - a TimeSpec time
-	 * @param subseconds - the number of digits to allow for subseconds [0 .. 9].
+	 * @return A time string.
+	 *
+	 * @see TimeUtil#getCurrentTime()
 	 */
 	public static String formatTime(TimeSpec spec, int subseconds)
 	{

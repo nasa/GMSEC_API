@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,14 +30,15 @@ using namespace gmsec::api::mist::internal;
 
 
 FieldTemplate::FieldTemplate()
-	 :  m_xml(),
-		m_name(),
-		m_mode(),
-		m_class(),
-		m_value(),
-		m_types(),
-		m_description(),
-		m_size()
+	: m_xml(),
+	  m_name(),
+	  m_modifiedName(),
+	  m_mode(),
+	  m_class(),
+	  m_values(),
+	  m_types(),
+	  m_description(),
+	  m_size()
 {
 }
 
@@ -45,17 +46,32 @@ FieldTemplate::FieldTemplate()
 FieldTemplate::FieldTemplate(const std::string& fieldName, 
 							 const std::string& fieldMode, 
 							 const std::string& fieldClass, 
-							 const std::string& fieldValue, 
+							 const std::list<std::string>& fieldValues, 
 							 const std::list<std::string>& fieldTypes, 
 							 const std::string& fieldDescription)
-							 :  m_xml(),
-								m_name(fieldName),
-								m_mode(fieldMode),
-								m_class(fieldClass),
-								m_value(fieldValue),
-								m_types(fieldTypes),
-								m_description(fieldDescription),
-								m_size()
+	: m_xml(),
+	  m_name(fieldName),
+	  m_modifiedName(fieldName),
+	  m_mode(fieldMode),
+	  m_class(fieldClass),
+	  m_values(fieldValues),
+	  m_types(fieldTypes),
+	  m_description(fieldDescription),
+	  m_size()
+{
+}
+
+
+FieldTemplate::FieldTemplate(const FieldTemplate& other)
+	: m_xml(other.m_xml),
+	  m_name(other.m_name),
+	  m_modifiedName(other.m_modifiedName),
+	  m_mode(other.m_mode),
+	  m_class(other.m_class),
+	  m_values(other.m_values),
+	  m_types(other.m_types),
+	  m_description(other.m_description),
+	  m_size(other.m_size)
 {
 }
 
@@ -67,25 +83,31 @@ FieldTemplate::~FieldTemplate()
 
 std::string FieldTemplate::getName() const
 {
-	return m_name.c_str();
+	return m_name;
+}
+
+
+std::string FieldTemplate::getModifiedName() const
+{
+	return m_modifiedName;
 }
 
 
 std::string FieldTemplate::getMode() const
 {
-	return m_mode.c_str();
+	return m_mode;
 }
 
 
 std::string FieldTemplate::getClass() const
 {
-	return m_class.c_str();
+	return m_class;
 }
 
 
-std::string FieldTemplate::getValue() const
+std::list<std::string> FieldTemplate::getValues() const
 {
-	return m_value.c_str();
+	return m_values;
 }
 
 
@@ -174,23 +196,85 @@ std::list<Field::FieldType> FieldTemplate::getTypes() const
 
 std::string FieldTemplate::getDescription() const
 {
-	return m_description.c_str();
+	return m_description;
 }
 
 
 std::string FieldTemplate::getSize() const
 {
-	return m_size.c_str();
+	return m_size;
 }
 
 std::string FieldTemplate::getType() const
 {
-	return *m_types.begin();
+	return hasExplicitType() ? *m_types.begin() : "";
+}
+
+std::string FieldTemplate::getValue() const
+{
+	return hasExplicitValue() ? *m_values.begin() : "";
+}
+
+std::string FieldTemplate::getConcatenatedTypes() const
+{
+	if (!m_types.empty())
+	{
+		std::string types;
+
+		for (std::list<std::string>::const_iterator it = m_types.begin(); it != m_types.end(); ++it)
+		{
+			if (it != m_types.begin())
+			{
+				types += ", ";
+			}
+			types += *it;
+		}
+
+		return types;
+	}
+	else
+	{
+		return "";
+	}
+}
+
+std::string FieldTemplate::getConcatenatedValues() const
+{
+	if (!m_values.empty())
+	{
+		std::string values;
+
+		for (std::list<std::string>::const_iterator it = m_values.begin(); it != m_values.end(); ++it)
+		{
+			if (it != m_values.begin())
+			{
+				values += ", ";
+			}
+			values += *it;
+		}
+
+		return values;
+	}
+	else
+	{
+		return "";
+	}
+}
+
+std::string FieldTemplate::getArrayControlValue() const
+{
+	return StringUtil::stringEqualsIgnoreCase(m_mode.c_str(), "CONTROL") ? *m_values.begin() : "";
 }
 
 void FieldTemplate::setName(const std::string& name)
 {
 	m_name = name;
+}
+
+
+void FieldTemplate::setModifiedName(const std::string& name)
+{
+	m_modifiedName = name;
 }
 
 
@@ -206,9 +290,15 @@ void FieldTemplate::setClass(const std::string& value)
 }
 
 
+void FieldTemplate::setValues(const std::list<std::string>& values)
+{
+	m_values = values;
+}
+
 void FieldTemplate::setValue(const std::string& value)
 {
-	m_value = value;
+	m_values.clear();
+	m_values.push_back(value);
 }
 
 
@@ -230,19 +320,24 @@ void FieldTemplate::setDescription(const std::string& description)
 
 bool FieldTemplate::hasExplicitType() const
 {
-	if(m_types.size() == 1)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return m_types.size() == 1;
 }
 
 bool FieldTemplate::hasExplicitValue() const
-{
-	return !m_value.empty();
+{//to have an explicitly defined value, there can only be one value present that is not a range and the type must be explicitly defined
+	if (m_values.size() == 1 && hasExplicitType())
+	{
+		std::string value = *m_values.begin();
+		if (value.find("..") != std::string::npos && !StringUtil::stringEqualsIgnoreCase(getType().c_str(), "STRING"))
+			return false;
+		else if ((StringUtil::stringEquals(&value.at(value.length() - 1), "+") ||
+				  StringUtil::stringEquals(&value.at(value.length() - 1), "-")) &&
+				  !StringUtil::stringEqualsIgnoreCase(value.c_str(), "STRING"))
+			return false;
+		else
+			return true;
+	}
+	else return false;
 }
 
 bool FieldTemplate::isTypeVariable() const
@@ -251,7 +346,7 @@ bool FieldTemplate::isTypeVariable() const
 	for(std::list<std::string>::const_iterator it = m_types.begin(); it != m_types.end(); ++it)
 	{
 		std::string type = *it;
-		if(StringUtil::stringEquals(type.c_str(), "UNSET") || StringUtil::stringEquals(type.c_str(), "VARIABLE"))
+		if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "UNSET") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "VARIABLE"))
 		{
 			variable = true;
 		}
@@ -261,10 +356,7 @@ bool FieldTemplate::isTypeVariable() const
 
 bool FieldTemplate::isHeader() const
 {
-	if(m_class == "HEADER")
-		return true;
-	else
-		return false;
+	return StringUtil::stringEqualsIgnoreCase(m_class.c_str(), "HEADER");
 }
 
 
@@ -280,7 +372,7 @@ std::string FieldTemplate::toXML(const std::string& type) const
 
 	oss << "<FIELD TYPE=\"" << (type=="UNSET" || type=="VARIABLE" ? "STRING" : type) << "\" NAME=\"" << m_name << "\"" 
 		<< (isHeader() ? " HEAD=\"T\"" : "") << ">"
-		<< m_value
+		<< (hasExplicitType() ? getValue() : "")
 		<< "</FIELD>";
 
 	m_xml = oss.str();

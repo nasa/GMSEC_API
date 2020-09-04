@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,19 +8,14 @@
 
 /**
  * @file Status.java
- *
- * @brief This is the class for holding status information returned by the API
- * function calls to provide feedback.
  */
 
 package gov.nasa.gsfc.gmsec.api;
 
 
 /**
- * @class Status
- *
- * @brief This is the class for holding status information returned by the API
- * function calls to provide feedback.  Status provides an error code
+ * This is the class for holding status information returned by the API
+ * function calls to provide feedback. Status provides an error code
  * and error message specific to the error type, but independent of error
  * source.
  */
@@ -33,9 +28,7 @@ public class Status
 
 
 	/**
-	 * @fn Status()
-	 *
-	 * @brief Default Constructor.
+	 * Constructor.
 	 */
 	public Status()
 	{
@@ -44,16 +37,14 @@ public class Status
 
 
 	/**
-	 * @fn Status(StatusClassification clazz, StatusCode code, String reason)
+	 * Constructs a Status object with the given error class, code and message.
 	 *
-	 * @brief Constructs a Status object with the given error class, code and message.
+	 * @param clazz  Value indicating source of the error
+	 * @param code   Value indicating reason for the error
+	 * @param reason Explanation for the error
 	 *
-	 * @param clazz  - value indicating source of the error
-	 * @param code   - value indicating reason for the error
-	 * @param reason - explanation for the error
-	 *
-	 * @sa StatusClassification.java
-	 * @sa StatusCode.java
+	 * @see StatusClassification
+	 * @see StatusCode
 	 */
 	public Status(StatusClassification clazz, StatusCode code, String reason)
 	{
@@ -62,17 +53,15 @@ public class Status
 
 
 	/**
-	 * @fn Status(StatusClassification clazz, StatusCode code, String reason, int customCode)
+	 * Constructs a Status object with the given error class, code, custom code and message.
 	 *
-	 * @brief Constructs a Status object with the given error class, code, custom code and message.
+	 * @param clazz      Value indicating source of the error
+	 * @param code       Value indicating reason for the error
+	 * @param reason     Explanation for the error
+	 * @param customCode Custom error code (typically middleware specific) regarding the root cause of the error
 	 *
-	 * @param clazz      - value indicating source of the error
-	 * @param code       - value indicating reason for the error
-	 * @param reason     - explanation for the error
-	 * @param customCode - custom error code (typically middleware specific) regarding the root cause of the error
-	 *
-	 * @sa StatusClassification.java
-	 * @sa StatusCode.java
+	 * @see StatusClassification
+	 * @see StatusCode
 	 */
 	public Status(StatusClassification clazz, StatusCode code, String reason, int customCode)
 	{
@@ -84,11 +73,9 @@ public class Status
 
 
 	/**
-	 * @fn Status(Status other)
+	 * Construct Status object using values from an existing Status object.
 	 *
-	 * @brief Construct Status object using values from an existing Status object.
-	 *
-	 * @param other - Status object to copy.
+	 * @param other Status object to copy.
 	 */
 	public Status(Status other)
 	{
@@ -103,13 +90,11 @@ public class Status
 
 
 	/**
-	 * @fn isError()
+	 * Used to determine whether the Status object is reporting an error or not.
+	 * <p>
+	 * Note: Only the status class is examine; the status code is not checked.
 	 *
-	 * @brief Used to determine whether the Status object is reporting an error or not.
-	 *
-	 * @note Only the status class is examine; the status code is not checked.
-	 *
-	 * @return bool - false if the status class is set to NO_ERROR; true otherwise.
+	 * @return False if the status class is set to NO_ERROR; true otherwise.
 	 */
 	public boolean isError()
 	{
@@ -118,11 +103,15 @@ public class Status
 
 
 	/**
-	 * @fn get()
+	 * This function will return a verbose error string that contains the
+	 * Status class, code, custom code and reason.
+	 * <p>
+	 * The format is as follows:
+	 * <pre>{@code
+	 * [class,code,custom code] : reason
+	 * }</pre>
 	 *
-	 * @brief This function will return a verbose error string that contains the
-	 * Status class, code, custom code and reason.  The format is as follows:@n
-	 * [<i>class</i>,<i>code</i>,<i>custom code<i>] : <i>reason</i>
+	 * @return The error string associated with the Status object.
 	 */
 	public String get()
 	{
@@ -135,16 +124,14 @@ public class Status
 
 
 	/**
-	 * @fn set(StatusClassification clazz, StatusCode code, String reason)
+	 * Used to set error class, error code, and error text for the Status object.
 	 *
-	 * @brief Used to set error class, error code, and error text for the Status object.
+	 * @param clazz  Error class
+	 * @param code   Error code
+	 * @param reason Error string
 	 *
-	 * @param clazz  - error class
-	 * @param code   - error code
-	 * @param reason - error string
-	 *
-	 * @sa StatusClassification.java
-	 * @sa StatusCode.java
+	 * @see StatusClassification
+	 * @see StatusCode
 	 */
 	public void set(StatusClassification clazz, StatusCode code, String reason)
 	{
@@ -153,17 +140,15 @@ public class Status
 
 
 	/**
-	 * @fn set(StatusClassification clazz, StatusCode code, int customCode, String reason)
+	 * Used to set error class, error code, custom code, and error text for the Status object.
 	 *
-	 * @brief Used to set error class, error code, custom code, and error text for the Status object.
+	 * @param clazz      Error class
+	 * @param code       Error code
+	 * @param reason     Error string
+	 * @param customCode Custom code (typically from middleware)
 	 *
-	 * @param clazz      - error class
-	 * @param code       - error code
-	 * @param reason     - error string
-	 * @param customCode - custome code (typically from middleware)
-	 *
-	 * @sa StatusClassification.java
-	 * @sa StatusCode.java
+	 * @see StatusClassification
+	 * @see StatusCode
 	 */
 	public void set(StatusClassification clazz, StatusCode code, String reason, int customCode)
 	{
@@ -175,13 +160,11 @@ public class Status
 
 
 	/**
-	 * @fn StatusClassification getClassification()
+	 * Returns the error class associated with the Status object.
 	 *
-	 * @brief Returns the error class associated with the Status object.
+	 * @return A StatusClassification enumerated value.
 	 *
-	 * @return A status class.
-	 *
-	 * @sa StatusClassification.java
+	 * @see StatusClassification
 	 */
 	public StatusClassification getClassification()
 	{
@@ -190,13 +173,11 @@ public class Status
 
 
 	/**
-	 * @fn setClassification(StatusClassification clazz)
+	 * This will set the status classification.
 	 *
-	 * @brief This will set the error class.
+	 * @param clazz Status classification value
 	 *
-	 * @param clazz - error class value
-	 *
-	 * @sa StatusClassification.java
+	 * @see StatusClassification
 	 */
 	public void setClassification(StatusClassification clazz)
 	{
@@ -205,13 +186,11 @@ public class Status
 
 
 	/**
-	 * @fn StatusCode getCode()
+	 * Returns the status code associated with the Status object.
 	 *
-	 * @brief Returns the error code associated with the Status object.
+	 * @return A StatusCode enumerated value.
 	 *
-	 * @return A status code.
-	 *
-	 * @sa StatusCode.java
+	 * @see StatusCode
 	 */
 	public StatusCode getCode()
 	{
@@ -220,13 +199,11 @@ public class Status
 
 
 	/**
-	 * @fn setCode(StatusCode code)
+	 * This will set the status code.
 	 *
-	 * @brief This will set the error code.
+	 * @param code Status code enumerated value
 	 *
-	 * @param code - error value
-	 *
-	 * @sa StatusCode.java
+	 * @see StatusCode
 	 */
 	public void setCode(StatusCode code)
 	{
@@ -235,9 +212,7 @@ public class Status
 
 
 	/**
-	 * @fn String getReason()
-	 *
-	 * @brief Returns the error message associated with the Status object.
+	 * Returns the error message associated with the Status object.
 	 *
 	 * @return A string containing the error message.
 	 */
@@ -248,9 +223,9 @@ public class Status
 
 
 	/**
-	 * @fn setReason(String reason)
+	 * This will set the error string text.
 	 *
-	 * @brief This will set the error string text.
+	 * @param reason The error text string.
 	 */
 	public void setReason(String reason)
 	{
@@ -259,11 +234,9 @@ public class Status
 
 
 	/**
-	 * @fn int getCustomCode()
+	 * Returns the custom code associated with the Status object.
 	 *
-	 * @brief Returns the custom code associated with the Status object.
-	 *
-	 * @return A integer value.
+	 * @return The custom code.
 	 */
 	public int getCustomCode()
 	{
@@ -272,11 +245,9 @@ public class Status
 
 
 	/**
-	 * @fn setCustomCode(int customCode)
+	 * This will set the (middleware) specific error code.
 	 *
-	 * @brief This will set the (middleware) specific error code.
-	 *
-	 * @param customCode - error value, typically middleware specific
+	 * @param customCode Error value, typically middleware specific
 	 */
 	public void setCustomCode(int customCode)
 	{
@@ -285,9 +256,7 @@ public class Status
 
 
 	/**
-	 * @fn reset()
-	 *
-	 * @brief This clears resets the Status object to a 'no error' state.
+	 * This clears the Status object to a 'no error' state.
 	 */
 	public void reset()
 	{

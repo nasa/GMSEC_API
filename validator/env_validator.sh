@@ -1,4 +1,4 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -13,6 +13,7 @@ function ShowUsage
 	echo "    activemq383, activemq384"
 	echo "    amqp"
 	echo "    bolt"
+	echo "    ibmmq90"
 	echo "    mb"
 	echo "    ss66, ss67, ss681, ss682 (for TIBCO Smart Sockets)"
 	echo "    websphere71, websphere75, websphere80"
@@ -310,9 +311,15 @@ function CheckGMSEC
 	done
 	unset IFS
 
-	if [ ! -z $gmsec_api_bin ]; then
-		Success "Found Core GMSEC library libGMSECAPI.${lib_ext} using $ld_lib_path_type"
-		Success "Library libGMSECAPI.${lib_ext} found in $gmsec_api_bin"
+	# Core API library file not found using Library Path; assume that it
+	# resides one level above the location where this script resides.
+	if [ -z $gmsec_api_bin ]; then
+		tmp="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+		gmsec_api_bin=$(dirname $tmp)
+	fi
+
+	if [[ -e $gmsec_api_bin/libGMSECAPI.${lib_ext} ]]; then
+		Success "Found Core GMSEC library libGMSECAPI.${lib_ext} in $gmsec_api_bin"
 
 		# Check to ensure we have the appropriate version of the GMSEC API for the
 		# current architecture.
@@ -368,7 +375,7 @@ function CheckGMSEC
 			fi
 		fi
 	else
-		Failure "Core GMSEC library libGMSECAPI.${lib_ext} not found while searching $ld_lib_path_type"
+		Failure "Core GMSEC library libGMSECAPI.${lib_ext} not found"
 		result=1
 	fi
 }
@@ -403,7 +410,7 @@ function CheckJava
     fi
 
 	if [ ! -z $java_home ]; then
-		java_ver=$($java_home/bin/java -version 2>&1 | grep "java version" | cut -d' ' -f3 | cut -d'"' -f2)
+		java_ver=$($java_home/bin/java -version 2>&1 | grep "version" | cut -d' ' -f3 | cut -d'"' -f2)
 
 		Success "Detected Java $java_ver"
 
@@ -580,7 +587,7 @@ function CheckApollo
 function CheckBolt
 {
 	echo
-	echo "${txtcyn}Checking confiuration for GMSEC Bolt...${txtrst}"
+	echo "${txtcyn}Checking middleware dependencies for GMSEC Bolt...${txtrst}"
 
 	# Check if all dependencies are satisfied for mw_type
 	#
@@ -619,6 +626,28 @@ function CheckMessageBus
 	# Check for environment variables
 	#
 	CheckEnvironmentVariables MB
+}
+
+function CheckOpenDDS
+{
+	echo
+	echo "${txtcyn}Checking middleware dependencies for GMSEC OpenDDS...${txtrst}"
+
+	# Check if all dependencies are satisfied for mw_type
+	#
+	CheckDependencies ${gmsec_api_bin}/lib${mw}.${lib_ext} true
+
+	# Check if using JMS wrappers
+	#
+	if [ $check_jms == true ]; then
+		echo
+		echo "${txtcyn}Checking JMS support for GMSEC OpenDDS...${txtrst}"
+		Warning "Not supported"
+	fi
+
+	# Check for environment variables
+	#
+	CheckEnvironmentVariables OpenDDS
 }
 
 function CheckSmartSocket
@@ -828,7 +857,9 @@ case $mw_type in
 	*"activemq"*)   check_mwtype=amq     ;;
 	*"amqp")        check_mwtype=amqp    ;;
 	*"bolt")        check_mwtype=bolt    ;;
+	*"ibmmq"*)      check_mwtype=ibmmq   ;;
 	*"mb")          check_mwtype=mb      ;;
+	*"opendds"*)    check_mwtype=opendds ;;
 	*"ss"*)         check_mwtype=ss      ;;
 	*"websphere"*)  check_mwtype=ws      ;;
 	*"zeromq"*)     check_mwtype=zeromq  ;;
@@ -922,7 +953,9 @@ CheckGMSEC
 		"amq")		CheckActiveMQ;;
 		"amqp")		CheckAMQP;;
 		"bolt")		CheckBolt;;
+		"ibmmq")	CheckWebSphere;;
 		"mb")		CheckMessageBus;;
+		"opendds")	CheckOpenDDS;;
 		"ss")		CheckSmartSocket;;
 		"ws")		CheckWebSphere;;
 		"zeromq")	CheckZeroMQ;;

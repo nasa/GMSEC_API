@@ -1,0 +1,14 @@
+<DIRECTORY NAME="2016.00">
+    <SCHEMA NAME="HEADER"
+        DEFINITION="MESSAGE-TYPE.MESSAGE-SUBTYPE"
+        LEVEL-0="GMSEC"
+        DESCRIPTION="Common Headers found in all messages, contains default schema definition"/>			
+    <SCHEMA NAME="HEADER"
+        DEFINITION="MESSAGE-TYPE.MESSAGE-SUBTYPE"
+        LEVEL-1="EXAMPLE"
+        DESCRIPTION="Example of an addendum header definition.  Note how the level number and the level name has changed to reflect the new addendum."/>
+    <SCHEMA NAME="MSG.LOG"
+        DEFINITION="MESSAGE-TYPE.MESSAGE-SUBTYPE"
+        LEVEL-1="EXAMPLE"
+        DESCRIPTION="Example LOG Message definition"/>
+</DIRECTORY>

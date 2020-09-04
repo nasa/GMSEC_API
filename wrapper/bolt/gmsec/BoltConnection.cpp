@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -493,12 +493,17 @@ void BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
 		{
 			details.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 
-			const StringField& idField = message->getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+			try
+			{
+				getExternal().setReplyUniqueID(*message, message->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
 
-			details.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, idField.getValue());
-
-			// Remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message.
-			message->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+				// Remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message.
+				message->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+			}
+			catch (...)
+			{
+				GMSEC_WARNING << "GMSEC_REPLY_UNIQUE_ID field is missing!";
+			}
 		}
 	}
 }
@@ -592,14 +597,7 @@ void BoltConnection::mwRequestAux(Message& message, SharedPacket& packet, std::s
 void BoltConnection::mwReplyAux(Message& request, Message& reply, SharedPacket& packet)
 {
 	// Get the Request's Unique ID, and put it into a field in the Reply
-	const StringField* idField = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
-
-	if (!idField)
-	{
-		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
-	}
-
-	std::string corrID(idField->getValue());
+	std::string corrID(getExternal().getReplyUniqueID(request));
 	std::string reqReplyTo = "<NOT FOUND>";
 
 	MessageBuddy::getInternal(request).getDetails().getString(tag::REPLY_TO, reqReplyTo);
@@ -611,7 +609,7 @@ void BoltConnection::mwReplyAux(Message& request, Message& reply, SharedPacket& 
 
 	GMSEC_DEBUG << "mwReply: corrID=" << corrID.c_str() << " reqReplyTo=" << reqReplyTo.c_str();
 
-	reply.addField(*idField);
+	reply.addField(GMSEC_REPLY_UNIQUE_ID_FIELD, getExternal().getReplyUniqueID(request).c_str());
 
 	makePacket(reply, packet, PACKET_REPLY);
 

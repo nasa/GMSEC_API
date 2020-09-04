@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,6 +13,8 @@
 #include <gmsec4/internal/mist/MessageTemplate.h>
 #include <gmsec4/internal/mist/FieldTemplate.h>
 
+#include <gmsec4/util/DataList.h>
+
 #include <string>
 
 
@@ -22,7 +24,7 @@ namespace api
 {
 	// Forward declaration(s)
 	class Config;
-	class Status;
+	class Message;
 
 namespace mist
 {
@@ -54,6 +56,12 @@ public:
 	InternalMistMessage(const InternalMistMessage& other);
 
 
+	InternalMistMessage(const Message& msg);
+
+
+	InternalMistMessage(const Message& msg, const Config& specConfig);
+
+
 	InternalMistMessage(const char* data);
 
 
@@ -63,6 +71,12 @@ public:
 	bool isValid() const;
 	void validate();
 	void invalidate();
+
+	static void setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields);
+
+	static void clearStandardFields();
+
+	static void destroyStandardFields();
 
 	const char* getSchemaID() const;
 
@@ -76,6 +90,10 @@ public:
 	void setValue(const char* fieldName, GMSEC_F64 value);
 
 	void init();
+
+	std::string deduceSchemaID(const InternalMessage& msg);
+
+	void convertMessage(const Message& msg, const Config& specConfig);
 
 	// Helper methods to assist with preserving compatibility between MIST2 messages and those from MIST3
 	static std::string buildSchemaID(Message::MessageKind kind, const char* type, const char* subType, unsigned int version);
@@ -106,6 +124,9 @@ private:
 	//this template contains the schema to be used for both populating the message
 	//as well as for use by validation (to be implemented)
 	gmsec::api::mist::internal::MessageTemplate m_template;
+
+	//List of standard fields (if any) that are included with all Mist Messages
+	static gmsec::api::util::DataList<Field*> m_standardFields;
 };
 
 } // namespace internal

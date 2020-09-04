@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -566,6 +566,24 @@ extern "C"
 	 * @return Returns GMSEC_TRUE if the field is replacing one with the same name; GMSEC_FALSE otherwise.
 	 */
 	GMSEC_API GMSEC_BOOL messageAddU64Field(GMSEC_Message msg, const char* name, GMSEC_U64 value, GMSEC_Status status);
+
+
+    /**
+     * @fn GMSEC_BOOL messageAddFields(GMSEC_Message msg, const GMSEC_Field fields[], size_t numFields, GMSEC_Status status)
+     *
+     * @brief Adds each Field in the given array to the Message.
+	 *
+	 * @note A status object MUST BE CREATED with statusCreate() and
+	 * passed in as the status parameter in order to receive any resulting status.
+	 *
+	 * @param[in]  msg       - the handle to the Message object
+	 * @param[in]  fields    - the array of fields to add to the message
+	 * @param[in]  numFields - the number of fields in the array
+	 * @param[out] status    - the result of the operation
+     *
+     * @return Returns GMSEC_TRUE if any existing field in the Message has been replaced; GMSEC_FALSE otherwise.
+     */
+	GMSEC_API GMSEC_BOOL messageAddFields(GMSEC_Message msg, const GMSEC_Field fields[], size_t numFields, GMSEC_Status status);
 
 
 	/**

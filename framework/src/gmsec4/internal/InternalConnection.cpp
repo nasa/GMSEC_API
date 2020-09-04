@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -47,6 +47,8 @@
 #include <gmsec4/ReplyCallback.h>
 #include <gmsec4/SubscriptionInfo.h>
 
+#include <gmsec4/mist/mist_defs.h>
+
 #include <gmsec4/util/Log.h>
 #include <gmsec4/util/TimeUtil.h>
 
@@ -91,7 +93,7 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	  m_mwInfo(),
 	  m_autoDispatcher(this, m_readMutex, m_writeMutex),
 	  m_defaultRepublish_ms(DEFAULT_REPUBLISH_ms),
-	  m_requestPublish_ms(REQUEST_PUBLISH_ms),
+	  m_requestPublish_ms(GMSEC_REQUEST_PUBLISH_ms),
 	  m_subscriptions(),
 	  m_subscriptionRegistry(),
 	  m_exclusionFilter(new ExclusionFilter()),
@@ -106,8 +108,16 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	  m_callbackAdapter(0),
 	  m_parent(0),
 	  m_connectionEndpoint(),
+	  m_specVersion(0),
+	  m_specLevel(-1),
 	  m_usingAPI3x(false)
 {
+	// Determine if we have been configured to use a particular specification (ISD) version;
+	// if not, then fall back to using the default specification version.
+	m_specVersion = getConfig().getIntegerValue(GMSEC_MESSAGE_SPEC_VERSION, (int) m_specVersion);
+	m_specLevel   = getConfig().getIntegerValue(GMSEC_SCHEMA_LEVEL, m_specLevel);
+
+
 	// Establish connection ID
 	m_connectionID = ++s_instanceCount;
 
@@ -177,32 +187,65 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 
 	if (asyncQueueDepthCfg)
 	{
-		GMSEC_I32 depth;
+		bool error = false;
 
-		if (!StringUtil::stringParseI32(asyncQueueDepthCfg, depth))
+		try
+		{
+			int tmp = StringUtil::getValue<int>(asyncQueueDepthCfg);
+
+			if (tmp <= 0)
+			{
+				error = true;
+			}
+			else
+			{
+				m_asyncQueueDepth = (size_t) tmp;
+			}
+		}
+		catch (...)
+		{
+			error = true;
+		}
+
+		if (error)
 		{
 			GMSEC_WARNING << "Invalid value for " << GMSEC_ASYNC_PUBLISH_QUEUE_DEPTH
 				<< ", defaulting to 1000. Value given is: " << asyncQueueDepthCfg;
 
-			depth = 1000;
+			m_asyncQueueDepth = 1000;
 		}
-
-		m_asyncQueueDepth = depth;
 	}
 
 	if (asyncTeardownCfg)
 	{
-		GMSEC_I32 waitTime;
+		bool error = false;
 
-		if (!StringUtil::stringParseI32(asyncTeardownCfg, waitTime))
+		try
+		{
+			int tmp = StringUtil::getValue<int>(asyncTeardownCfg);
+
+			if (tmp <= 0)
+			{
+				error = true;
+			}
+			else
+			{
+				m_asyncTeardownWait = (size_t) tmp;
+			}
+			m_asyncTeardownWait = StringUtil::getValue<unsigned int>(asyncTeardownCfg);
+		}
+		catch (...)
+		{
+			error = true;
+		}
+
+		if (error)
 		{
 			GMSEC_WARNING << "Invalid value for " << GMSEC_ASYNC_PUBLISH_TEARDOWN_WAIT
 				<< ", defaulting to 1000. Value given is: " << asyncTeardownCfg;
 
-			waitTime = 1000;
+			m_asyncTeardownWait = 1000;
 		}
-
-		m_asyncTeardownWait = waitTime;
 	}
 
 	// Client may elect to use asynchronous publishing via the configuration passed to
@@ -300,7 +343,7 @@ InternalConnection::~InternalConnection()
 
 	if (error.getErrorClass() != NO_ERROR_CLASS)
 	{
-		throw error;
+		GMSEC_ERROR << error.what();
 	}
 }
 
@@ -322,6 +365,7 @@ void InternalConnection::connect()
 	if (status.isError())
 	{
 		m_connIf->mwDisconnect();
+		m_state = Connection::NOT_CONNECTED;
 		throw Exception(status);
 	}
 
@@ -656,6 +700,8 @@ void InternalConnection::publish(const Message& msg, const Config& config)
 		}
 		else
 		{
+			AutoTicket hold(getWriteMutex());
+
 			m_connIf->mwPublish(msg, config);
 		}
 	}
@@ -692,6 +738,8 @@ void InternalConnection::request(const Message& request, GMSEC_I32 timeout, Repl
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Message has invalid subject");
 	}
 
+	StdSharedPtr<PendingRequest> pending;
+
 	// We make a clone of the user's request message so that the API can manage the lifeline of such.
 	// The user is responsible for managing the lifeline of their request message.
 	Message* requestClone = new Message(request);
@@ -706,9 +754,7 @@ void InternalConnection::request(const Message& request, GMSEC_I32 timeout, Repl
 		MessageBuddy::getInternal(*requestClone).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
 
-	insertTrackingFields(*requestClone);
-
-	StdSharedPtr<PendingRequest> pending(new PendingRequest(requestClone, timeout, republish_ms));
+	pending.reset(new PendingRequest(requestClone, timeout, republish_ms));
 
 	pending->replyCallback = cb;
 	pending->multiResponse = m_requestSpecs.multiResponse;
@@ -747,6 +793,8 @@ Message* InternalConnection::request(const Message& request, GMSEC_I32 timeout, 
 
 	Message* reply = NULL;
 
+	StdSharedPtr<PendingRequest> pending;
+
 	// We make a clone of the user's request message so that the API can manage the lifeline of such.
 	// The user is responsible for managing the lifeline of their request message.
 	Message* requestClone = new Message(request);
@@ -761,9 +809,7 @@ Message* InternalConnection::request(const Message& request, GMSEC_I32 timeout, 
 		MessageBuddy::getInternal(*requestClone).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
 
-	insertTrackingFields(*requestClone);
-
-	StdSharedPtr<PendingRequest> pending(new PendingRequest(requestClone, timeout, republish_ms));
+	pending.reset(new PendingRequest(requestClone, timeout, republish_ms));
 
 	{
 		Condition& condition = m_requestShared->getCondition();
@@ -822,12 +868,15 @@ Message* InternalConnection::request(const Message& request, GMSEC_I32 timeout, 
 
 					// API 3.x expected immediate return on timeout if the republish_ms period is 0ms.
 					// This of course is a bug, but we will allow it to persevere.
-					if ((m_usingAPI3x && republish_ms == DEFAULT_REPUBLISH_ms) || (republish_ms == REPUBLISH_NEVER))
+					if ((m_usingAPI3x && republish_ms == 0) || (republish_ms == GMSEC_REQUEST_REPUBLISH_NEVER))
 					{
 						result = localResult;
 					}
 
-					pending->expireTime_s += (republish_ms / 1000.0);
+					if (republish_ms > 0)
+					{
+						pending->expireTime_s += (republish_ms / 1000.0);
+					}
 				}
 			}
 		}
@@ -902,12 +951,15 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 
 	insertTrackingFields(const_cast<Message&>(reply));
 
+	AutoTicket hold(getWriteMutex());
+
 	if (noSubjectMapping)
 	{
 		// We do NOT include the Reply Subject within a message field.
 		// And we publish the reply message instead of using the traditional
 		// middleware reply method.
 		Config config = Config();
+
 		m_connIf->mwPublish(reply, config);
 	}
 	else
@@ -920,6 +972,7 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 		MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_SUBJECT_FIELD);
 	}
 
+	MessageBuddy::getInternal(request).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 	MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 	removeTrackingFields(const_cast<Message&>(reply));
@@ -1143,12 +1196,6 @@ Config& InternalConnection::getMessageConfig()
 }
 
 
-GMSEC_U32 InternalConnection::getMessageCounter() const
-{
-	return m_messageCounter;
-}
-
-
 void InternalConnection::dispatchEvent(Connection::ConnectionEvent event, const Status& status)
 {
 	AutoTicket lock(getEventMutex());
@@ -1179,6 +1226,26 @@ RequestSpecs InternalConnection::getRequestSpecs() const
 }
 
 
+void InternalConnection::setReplyUniqueID(Message& msg, const std::string& uniqueID)
+{
+	ValueMap& details = MessageBuddy::getInternal(msg).getDetails();
+
+	details.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID);
+}
+
+
+std::string InternalConnection::getReplyUniqueID(const Message& msg)
+{
+	std::string uniqueID;
+
+	ValueMap& details = MessageBuddy::getInternal(msg).getDetails();
+
+	details.getString(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID);
+
+	return uniqueID;
+}
+
+
 bool InternalConnection::onReply(Message* reply)
 {
 	bool replyDelivered = true;
@@ -1196,7 +1263,10 @@ bool InternalConnection::onReply(Message* reply)
 
 		replyDelivered = false;
 
-		GMSEC_WARNING << "InternalConnection[" << this << "] RequestShared is NOT running";
+		if (m_requestSpecs.useSubjectMapping)
+		{
+			GMSEC_WARNING << "InternalConnection[" << this << "] RequestShared is NOT running";
+		}
 	}
 
 	return replyDelivered;
@@ -1228,6 +1298,8 @@ void InternalConnection::issueRequestToMW(const Message& request, std::string& i
 	Message requestCopy(request);
 
 	insertTrackingFields(requestCopy);
+
+	AutoTicket hold(getWriteMutex());
 
 	m_connIf->mwRequest(requestCopy, id);
 }
@@ -1395,6 +1467,19 @@ void InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
 			m_perfLoggerShared->dispatchLog(msg->getSubject(), pubTime->getValue());
 		}
 	}
+
+	if (msg && (msg->getKind() == Message::REQUEST || msg->getKind() == Message::REPLY))
+	{
+		try
+		{
+			setReplyUniqueID(*msg, msg->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
+			msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+		}
+		catch (...)
+		{
+			//ignore error; reply was generated by open-response configured client
+		}
+	}
 }
 
 
@@ -1498,39 +1583,39 @@ void InternalConnection::initializeTracking()
 
 	if (m_config.getValue(GMSEC_TRACKING_NODE))
 	{
-		m_tracking.setNode(m_config.getBooleanValue(GMSEC_TRACKING_NODE, false));
+		m_tracking.setNode(m_config.getBooleanValue(GMSEC_TRACKING_NODE, true));
 	}
 	if (m_config.getValue(GMSEC_TRACKING_PROCESS_ID))
 	{
-		m_tracking.setProcessId(m_config.getBooleanValue(GMSEC_TRACKING_PROCESS_ID, false));
+		m_tracking.setProcessId(m_config.getBooleanValue(GMSEC_TRACKING_PROCESS_ID, true));
 	}
 	if (m_config.getValue(GMSEC_TRACKING_USERNAME))
 	{
-		m_tracking.setUserName(m_config.getBooleanValue(GMSEC_TRACKING_USERNAME, false));
+		m_tracking.setUserName(m_config.getBooleanValue(GMSEC_TRACKING_USERNAME, true));
 	}
 	if (m_config.getValue(GMSEC_TRACKING_CONNECTION_ID))
 	{
-		m_tracking.setConnectionId(m_config.getBooleanValue(GMSEC_TRACKING_CONNECTION_ID, false));
+		m_tracking.setConnectionId(m_config.getBooleanValue(GMSEC_TRACKING_CONNECTION_ID, true));
 	}
 	if (m_config.getValue(GMSEC_TRACKING_PUBLISH_TIME))
 	{
-		m_tracking.setPublishTime(m_config.getBooleanValue(GMSEC_TRACKING_PUBLISH_TIME, false));
+		m_tracking.setPublishTime(m_config.getBooleanValue(GMSEC_TRACKING_PUBLISH_TIME, true));
 	}
 	if (m_config.getValue(GMSEC_TRACKING_UNIQUE_ID))
 	{
-		m_tracking.setUniqueId(m_config.getBooleanValue(GMSEC_TRACKING_UNIQUE_ID, false));
+		m_tracking.setUniqueId(m_config.getBooleanValue(GMSEC_TRACKING_UNIQUE_ID, true));
 	}
 	if (m_config.getValue(GMSEC_TRACKING_MW_INFO))
 	{
-		m_tracking.setMwInfo(m_config.getBooleanValue(GMSEC_TRACKING_MW_INFO, false));
+		m_tracking.setMwInfo(m_config.getBooleanValue(GMSEC_TRACKING_MW_INFO, true));
 	}
 	if (m_config.getValue(GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS))
 	{
-		m_tracking.setActiveSubscriptions(m_config.getBooleanValue(GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS, false));
+		m_tracking.setActiveSubscriptions(m_config.getBooleanValue(GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS, true));
 	}
 	if (m_config.getValue(GMSEC_TRACKING_CONNECTION_ENDPOINT))
 	{
-		m_tracking.setConnectionEndpoint(m_config.getBooleanValue(GMSEC_TRACKING_CONNECTION_ENDPOINT, false));
+		m_tracking.setConnectionEndpoint(m_config.getBooleanValue(GMSEC_TRACKING_CONNECTION_ENDPOINT, true));
 	}
 }
 
@@ -1641,10 +1726,6 @@ void InternalConnection::insertTrackingFields(Message& msg)
 		return;
 	}
 
-	AutoTicket hold(getWriteMutex());
-
-	++m_messageCounter;
-
 	const TrackingDetails& connTracking = getTracking();
 	const TrackingDetails& msgTracking  = MessageBuddy::getInternal(msg).getTracking();
 
@@ -1660,25 +1741,42 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	{
 		std::string hostname;
 		SystemUtil::getHostName(hostname);
-		msg.addField("NODE", hostname.c_str());
+		StringField field("NODE", hostname.c_str());
+		field.isHeader(true);
+		msg.addField(field);
 	}
 
 	if ((addTracking || connTracking.getProcessId() == ON || msgTracking.getProcessId() == ON) &&
 	    (connTracking.getProcessId() != OFF && msgTracking.getProcessId() != OFF))
 	{
-		msg.addField("PROCESS-ID", (GMSEC_I16) SystemUtil::getProcessID());
+		if (getSpecVersion() == gmsec::api::mist::GMSEC_ISD_2014_00 || getSpecVersion() == gmsec::api::mist::GMSEC_ISD_2016_00)
+		{
+			I16Field field("PROCESS-ID", (GMSEC_I16) SystemUtil::getProcessID());
+			field.isHeader(true);
+			msg.addField(field);
+		}
+		else
+		{
+			U32Field field("PROCESS-ID", (GMSEC_U16) SystemUtil::getProcessID());
+			field.isHeader(true);
+			msg.addField(field);
+		}
 	}
 
 	if ((addTracking || connTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
 	    (connTracking.getUserName() != OFF && msgTracking.getUserName() != OFF))
 	{
-		msg.addField("USER-NAME", m_userName.c_str());
+		StringField field("USER-NAME", m_userName.c_str());
+		field.isHeader(true);
+		msg.addField(field);
 	}
 
 	if ((addTracking || connTracking.getConnectionId() == ON || msgTracking.getConnectionId() == ON) &&
 	    (connTracking.getConnectionId() != OFF && msgTracking.getConnectionId() != OFF))
 	{
-		msg.addField("CONNECTION-ID", (GMSEC_U16) m_connectionID);
+		U32Field field("CONNECTION-ID", (GMSEC_U32) m_connectionID);
+		field.isHeader(true);
+		msg.addField(field);
 	}
 
 	if (m_usePerfLogger || ((addTracking || connTracking.getPublishTime() == ON || msgTracking.getPublishTime() == ON) &&
@@ -1689,70 +1787,81 @@ void InternalConnection::insertTrackingFields(Message& msg)
 
 		TimeUtil::formatTime(ts, curTime);
 
-		msg.addField("PUBLISH-TIME", curTime);
+		StringField field("PUBLISH-TIME", curTime);
+		field.isHeader(true);
+		msg.addField(field);
 	}
 
 	if ((addTracking || connTracking.getUniqueId() == ON || msgTracking.getUniqueId() == ON) &&
 	    (connTracking.getUniqueId() != OFF && msgTracking.getUniqueId() != OFF))
 	{
-		std::ostringstream oss;
-		oss << m_connID << "_" << m_messageCounter;
+		GMSEC_U32 counter = getNextMessageCounter();
 
-		msg.addField("UNIQUE-ID", oss.str().c_str());
+		std::ostringstream oss;
+		oss << m_connID << "_" << counter;
+
+		StringField field("UNIQUE-ID", oss.str().c_str());
+		field.isHeader(true);
+		msg.addField(field);
 	}
 
 	if ((addTracking || connTracking.getMwInfo() == ON || msgTracking.getMwInfo() == ON) &&
 	    (connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
 	{
-		msg.addField("MW-INFO", getMWInfo());
+		StringField field("MW-INFO", getMWInfo());
+		field.isHeader(true);
+		msg.addField(field);
 	}
 
-	if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
-	    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+	// We only add NUM-OF-SUBSCRIPTIONS, SUBSCRIPTION.n.SUBJECT-PATTERN, and MW-CONNECTION-ENDPOINT
+	// when working with a configuration other than the 2014 or 2016 ISDs. This is to ensure that
+	// messages built per those ISD version remain compliant.
+	//
+	// If the user has not indicated which ISD to work with, then these tracking fields will be
+	// included in the message.
+	if (getSpecVersion() == 0 || getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
 	{
 		try
 		{
-			// We only apply ACTIVE-SUBSCRIPTIONS field to C2CX HB Messages.
+			// We only include subscription subject-pattern field(s) to C2CX HB Messages.
 			const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
 
 			if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
 			{
-				std::set<std::string> activeSubs = s_activeSubscriptions.getTopics();
-
-				msg.addField("NUM-OF-SUBSCRIPTIONS", (GMSEC_U16) activeSubs.size());
-
-				if (activeSubs.size() > 0)
+				if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
+		    	    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
 				{
-					int n = 1;
-					for (std::set<std::string>::iterator it = activeSubs.begin(); it != activeSubs.end(); ++it, ++n)
-					{
-						std::ostringstream fieldName;
-						fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+					std::set<std::string> activeSubs = s_activeSubscriptions.getTopics();
 
-						msg.addField(fieldName.str().c_str(), it->c_str());
+					msg.addField("NUM-OF-SUBSCRIPTIONS", (GMSEC_U16) activeSubs.size());
+
+					if (activeSubs.size() > 0)
+					{
+						int n = 1;
+						for (std::set<std::string>::iterator it = activeSubs.begin(); it != activeSubs.end(); ++it, ++n)
+						{
+							std::ostringstream fieldName;
+							fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+
+							msg.addField(fieldName.str().c_str(), it->c_str());
+						}
 					}
 				}
-			}
-		}
-		catch (...)
-		{
-			// Ignore exception; message is not a C2CX HB message.
-		}
-	}
 
-	if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
-	    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
-	{
-		try
-		{
-			// We only apply ACTIVE-SUBSCRIPTIONS field to C2CX HB Messages.
-			const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
+				if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
+		    	    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
+				{
+					const char* endpoint = (m_connectionEndpoint.empty() ? "unknown" : m_connectionEndpoint.c_str());
 
-			if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
-			{
-				const char* endpoint = (m_connectionEndpoint.empty() ? "unknown" : m_connectionEndpoint.c_str());
-
-				msg.addField("MW-CONNECTION-ENDPOINT", endpoint);
+					if (getSpecLevel() == 0)
+					{
+						msg.addField("CONNECTION-ENDPOINT", endpoint);
+					}
+					else
+					{
+						msg.addField("MW-CONNECTION-ENDPOINT", endpoint);
+					}
+				}
 			}
 		}
 		catch (...)
@@ -1776,13 +1885,87 @@ void InternalConnection::removeTrackingFields(Message& msg)
 	}
 	else
 	{
-		msg.clearField("NODE");
-		msg.clearField("PROCESS-ID");
-		msg.clearField("USER-NAME");
-		msg.clearField("CONNECTION-ID");
-		msg.clearField("PUBLISH-TIME");
-		msg.clearField("UNIQUE-ID");
-		msg.clearField("MW-INFO");
+		const TrackingDetails& connTracking = getTracking();
+		const TrackingDetails& msgTracking  = MessageBuddy::getInternal(msg).getTracking();
+
+		const int ON    = MESSAGE_TRACKINGFIELDS_ON;
+		const int OFF   = MESSAGE_TRACKINGFIELDS_OFF;
+		const int UNSET = MESSAGE_TRACKINGFIELDS_UNSET;
+
+		// Remove the Tracking Fields, if they have been added by the API
+		bool addTracking = (connTracking.get() == ON && (msgTracking.get() == ON || msgTracking.get() == UNSET));
+
+		if ((addTracking || connTracking.getNode() == ON || msgTracking.getNode() == ON) &&
+		    (connTracking.getNode() != OFF && msgTracking.getNode() != OFF))
+		{
+			msg.clearField("NODE");
+		}
+		if ((addTracking || connTracking.getProcessId() == ON || msgTracking.getProcessId() == ON) &&
+		    (connTracking.getProcessId() != OFF && msgTracking.getProcessId() != OFF))
+		{
+			msg.clearField("PROCESS-ID");
+		}
+		if ((addTracking || connTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
+		    (connTracking.getUserName() != OFF && msgTracking.getUserName() != OFF))
+		{
+			msg.clearField("USER-NAME");
+		}
+		if ((addTracking || connTracking.getConnectionId() == ON || msgTracking.getConnectionId() == ON) &&
+		    (connTracking.getConnectionId() != OFF && msgTracking.getConnectionId() != OFF))
+		{
+			msg.clearField("CONNECTION-ID");
+		}
+		if ((addTracking || connTracking.getPublishTime() == ON || msgTracking.getPublishTime() == ON) &&
+		    (connTracking.getPublishTime() != OFF && msgTracking.getPublishTime() != OFF))
+		{
+			msg.clearField("PUBLISH-TIME");
+		}
+		if ((addTracking || connTracking.getUniqueId() == ON || msgTracking.getUniqueId() == ON) &&
+		    (connTracking.getUniqueId() != OFF && msgTracking.getUniqueId() != OFF))
+		{
+			msg.clearField("UNIQUE-ID");
+		}
+		if ((addTracking || connTracking.getMwInfo() == ON || msgTracking.getMwInfo() == ON) &&
+		    (connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
+		{
+			msg.clearField("MW-INFO");
+		}
+
+		if (getSpecVersion() == 0 || getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
+		{
+			try
+			{
+				const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
+		
+				if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
+				{
+					if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
+					    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+					{
+						GMSEC_I64 numSubscriptions = msg.getIntegerValue("NUM-OF-SUBSCRIPTIONS");
+		
+						for (GMSEC_I64 n = 1; n <= numSubscriptions; ++n)
+						{
+							std::ostringstream fieldName;
+							fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+		
+							msg.clearField(fieldName.str().c_str());
+						}
+		
+						msg.clearField("NUM-OF-SUBSCRIPTIONS");
+					}
+				}
+				if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
+				    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
+				{
+					msg.clearField("MW-CONNECTION-ENDPOINT");
+				}
+			}
+			catch (...)
+			{
+				// Ignore exception; message is not a C2CX HB message.
+			}
+		}
 	}
 }
 
@@ -1793,9 +1976,9 @@ void InternalConnection::resolveRequestTimeout(GMSEC_I32& timeout_ms)
 	{
 		timeout_ms = GMSEC_WAIT_FOREVER;
 	}
-	else if (timeout_ms < MIN_TIMEOUT_ms)
+	else if (timeout_ms < GMSEC_MIN_TIMEOUT_ms)
 	{
-		timeout_ms = MIN_TIMEOUT_ms;
+		timeout_ms = GMSEC_MIN_TIMEOUT_ms;
 	}
 }
 
@@ -1808,11 +1991,11 @@ void InternalConnection::resolveRepublishInterval(GMSEC_I32& republish_ms)
 	}
 	else if (republish_ms < 0)
 	{
-		republish_ms = REPUBLISH_NEVER;
+		republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER;
 	}
-	else if (republish_ms > 0 && (republish_ms < MIN_REPUBLISH_ms))
+	else if (republish_ms > 0 && (republish_ms < GMSEC_MIN_REPUBLISH_ms))
 	{
-		republish_ms = MIN_REPUBLISH_ms;
+		republish_ms = GMSEC_MIN_REPUBLISH_ms;
 	}
 }
 
@@ -1917,6 +2100,14 @@ void InternalConnection::stopMsgAggregationToolkitThread()
 }
 
 
+GMSEC_U32 InternalConnection::getNextMessageCounter()
+{
+	AutoTicket hold(getCounterMutex());
+
+	return ++m_messageCounter;
+}
+
+
 gmsec::api::util::TicketMutex& InternalConnection::getReadMutex()
 {
 	return m_readMutex;
@@ -1935,9 +2126,27 @@ gmsec::api::util::TicketMutex& InternalConnection::getEventMutex()
 }
 
 
+gmsec::api::util::TicketMutex& InternalConnection::getCounterMutex()
+{
+	return m_counterMutex;
+}
+
+
 void InternalConnection::setConnectionEndpoint(const std::string& endpoint)
 {
 	m_connectionEndpoint = endpoint;
+}
+
+
+unsigned int InternalConnection::getSpecVersion() const
+{
+	return m_specVersion;
+}
+
+
+int InternalConnection::getSpecLevel() const
+{
+	return m_specLevel;
 }
 
 

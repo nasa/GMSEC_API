@@ -28,10 +28,10 @@ def main(argv=None):
     if(len(sys.argv) <=1):        
         usageMessage = ("\nUsage: configfile <filename>\n")
         print usageMessage
-        return
+        return -1
+
 
     try:
-            
         initializeLogging()
 
         # load configuration file
@@ -69,14 +69,12 @@ def main(argv=None):
 
         # Acquire and display all Config entries
         while (iterator.hasNextConfig()):
-               
             entry = iterator.nextConfig()
 
             libgmsec_python.logInfo("\nConfig Name: " + entry.getName() + "\nConfig:\n" + entry.getConfig().toXML())
             
         # Acquire and display all Message entries
         while (iterator.hasNextMessage()):
-                
             entry = iterator.nextMessage()
 
             libgmsec_python.logInfo("\nMessage Name: " + entry.getName() + "\nMessage:\n" + entry.getMessage().toXML())
@@ -84,25 +82,21 @@ def main(argv=None):
 
         # Acquire and display all subscription entries
         while (iterator.hasNextSubscription()):
-                
             entry = iterator.nextSubscription()
 
             libgmsec_python.logInfo("\nSubscription Name: " + entry.getName() + "\nSubscription Topic: " + entry.getPattern())
             
             while (entry.hasNextExcludedPattern()):
-
                 libgmsec_python.logInfo("\nExcluded Pattern: " + entry.nextExcludedPattern())                
 
         # Acquire and display all custom XML entries
         while (iterator.hasNextCustomElement()):
-                
             element = iterator.nextCustomElement()
 
             libgmsec_python.logInfo("\nCustom XML Element:\n" + element)
                 
         
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
         

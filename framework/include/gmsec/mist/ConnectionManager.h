@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -437,7 +437,7 @@ class GMSEC_API ConnectionManager
 		 */
 		Status CALL_TYPE Publish(Message *msg, const Config &config);
 
-		/** @fn Request(Message *request, GMSEC_I32 timeout, ConnectionManagerReplyCallback *cb, GMSEC_I32 republish_ms = 0)
+		/** @fn Request(Message *request, GMSEC_I32 timeout, ConnectionManagerReplyCallback *cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 		 * @brief Request - If this connection manager has been created with "validate"
 		 * option disabled, this is a pass-through function to the underlying connection.
 		 * However, if this BaseConnectionManager is set to validate its messages, the message
@@ -449,11 +449,11 @@ class GMSEC_API ConnectionManager
 		 * @param cb - callback to call when reply is receieved
 		 * @return status - result of the request operation
 		 *
-		 * @sa Connection::Request(Message *request, GMSEC_I32 timeout, ReplyCallback *cb, GMSEC_I32 republish_ms = 0) @n
+		 * @sa Connection::Request(Message *request, GMSEC_I32 timeout, ReplyCallback *cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER) @n
 		 */
-		Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, ConnectionManagerReplyCallback *cb, GMSEC_I32 republish_ms = 0);
+		Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, ConnectionManagerReplyCallback *cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
-		/** @fn Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = 0)
+		/** @fn Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 		 * @brief Request - If this connection manager has been created with "validate"
 		 * option disabled, this is a pass-through function to the underlying connection.
 		 * However, if this BaseConnectionManager is set to validate its messages, the message
@@ -468,9 +468,9 @@ class GMSEC_API ConnectionManager
 		 * value supplied at the Connection object's creation time.
 		 * @return status - result of the request operation
 		 *
-		 * @sa Connection::Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = 0) @n
+		 * @sa Connection::Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER) @n
 		 */
-		Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = 0);
+		Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 		/** @fn Reply(Message *request,Message *reply)
 		 * @brief Reply - If this connection manager has been created with "validate"

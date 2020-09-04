@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,24 +8,20 @@
 
 /**
  * @file LogHandler.java
- *
- * @brief An interface for receiving log events.
  */
 
 package gov.nasa.gsfc.gmsec.api.util;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNILogHandler;
+import gov.nasa.gsfc.gmsec.api.jni.util.JNILogHandler;
 
 
 /**
- * @class LogHandler
- *
- * @brief This abstract class is for receiving log events.
+ * This abstract class is for receiving log events.
  * A user created class, extending this class, can be passed into 
  * Log.registerHandler() to have user code executed when a log event occurs.
- *
+ * <p>
  * Example LogHandler class:
- * @code
+ * <pre>{@code
  * class MyLogHandler extends LogHandler
  * {
  *     public void onMessage(LogEntry entry)
@@ -41,28 +37,36 @@ import gov.nasa.gsfc.gmsec.api.jni.JNILogHandler;
  *        System.out.println(sb.toString());
  *     }
  * }
- * @endcode
- *
+ * }</pre>
+ * <p>
  * Example LogHandler registration:
- * @code
+ * <pre>{@code
  * Log.registerHandler(new MyLogHandler());
- * @endcode
+ * }</pre>
  *
- * @sa Log
- * @sa LogEntry
- * @sa TimeUtil
+ * @see Log
+ * @see LogEntry
+ * @see TimeUtil
  */
 public abstract class LogHandler
 {
 	private JNILogHandler m_jniLogHandler = null;
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param handler A LogHandler object.
+	 * @return A JNILogHandler object.
+	 */
 	public static JNILogHandler getInternal(LogHandler handler)
 	{
 		return (handler == null ? null : handler.m_jniLogHandler);
 	}
 
 
+	/**
+	 * Constructor.
+	 */
 	protected LogHandler()
 	{
 		m_jniLogHandler = new JNILogHandler(this);
@@ -70,11 +74,9 @@ public abstract class LogHandler
 
 
 	/**
-	 * @fn void onMessage(LogEntry entry)
-	 *
-	 * @brief This function is called by the API in response to a log message.
+	 * This method is called by the API in response to a log message.
 	 * 
-	 * @param entry - the log entry
+	 * @param entry The log entry
 	 */
 	public abstract void onMessage(LogEntry entry);
 }

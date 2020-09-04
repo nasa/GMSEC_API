@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -26,12 +26,11 @@ using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::Runtime::InteropServices;
 
-
-Mnemonic::Mnemonic(String^ name, List<MnemonicSample^>^ samples)
+void Mnemonic::ConstructorImplementation(String^ name, List<MnemonicSample^>^ samples)
 {
-	THROW_EXCEPTION_IF_NULLPTR(samples, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "Sample list is null");
+        THROW_EXCEPTION_IF_NULLPTR(samples, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "Sample list is null");
 
-	char* nameStr = nullptr;
+        char* nameStr = nullptr;
 
 	try
 	{
@@ -61,6 +60,17 @@ Mnemonic::Mnemonic(String^ name, List<MnemonicSample^>^ samples)
 	{
 		FREE_HGLOBAL_IF_NOT_NULLPTR(nameStr);
 	}
+}
+
+Mnemonic::Mnemonic(String^ name, List<MnemonicSample^>^ samples)
+{
+        ConstructorImplementation(name, samples);	
+}
+
+
+Mnemonic::Mnemonic(String^ name)
+{
+        ConstructorImplementation(name, gcnew List<MnemonicSample^>());
 }
 
 

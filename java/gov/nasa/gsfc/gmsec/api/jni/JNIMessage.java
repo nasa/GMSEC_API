@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -11,6 +11,24 @@ package gov.nasa.gsfc.gmsec.api.jni;
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.field.*;
 
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIBinaryField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIBooleanField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNICharField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII16Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII32Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII64Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII8Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIF32Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIF64Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIStringField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU16Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU32Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU64Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU8Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIFieldConverter;
+
+import java.util.Collection;
 
 
 public class JNIMessage
@@ -316,6 +334,22 @@ public class JNIMessage
 	public boolean addField(String name, U64 data)
 	{
 		return addField(new U64Field(name, data));
+	}
+
+
+	public boolean addFields(Collection<Field> fields)
+	{
+		boolean fieldReplaced = false;
+
+		for (Field field : fields)
+		{
+			if (field != null)
+			{
+				fieldReplaced |= addField(field);
+			}
+		}
+
+		return fieldReplaced;
 	}
 
 

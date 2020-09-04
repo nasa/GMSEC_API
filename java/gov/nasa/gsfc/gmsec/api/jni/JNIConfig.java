@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,7 +12,7 @@ import gov.nasa.gsfc.gmsec.api.Config;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 
 import gov.nasa.gsfc.gmsec.api.util.Log;
-import gov.nasa.gsfc.gmsec.api.jni.JNILog;
+import gov.nasa.gsfc.gmsec.api.jni.util.JNILog;
 
 import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleImmutableEntry;

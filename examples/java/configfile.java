@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -94,7 +94,7 @@ public class configfile{
 				ConfigFile.SubscriptionEntry entry = iter.nextSubscription();
 
 				Log.info("\nSubscription Name: " + entry.getName() +
-								 "\nSubscription     :\n" + entry.getSubject());
+								 "\nSubscription     :\n" + entry.getPattern());
 			}
 
 			// Acquire and display all custom XML entries

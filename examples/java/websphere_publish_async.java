@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -61,6 +61,10 @@ public class websphere_publish_async
 
 		Config config = new Config(args);
 
+		//o Since this example program uses an invalid message, we ensure the
+		//  validation check is disabled.
+		config.addValue("gmsec-msg-content-validate-all", "false");
+
 		initializeLogging(config);
 
 		//o Toggle the WebSphere MQ client libraries-level asynchronous publish
@@ -82,9 +86,7 @@ public class websphere_publish_async
 		// For the sake of this example, we will use 500 messages.
 		config.addValue("MW-ASYNC-STATUS-CHECK-MESSAGE-INTERVAL", "500");
 
-		// TODO: Once available, replace this statement with usage of
-		// ConnectionManager::getAPIVersion (See RTC 4798)
-		Log.info(Connection.getAPIVersion());
+		Log.info(ConnectionManager.getAPIVersion());
 
 		try
 		{

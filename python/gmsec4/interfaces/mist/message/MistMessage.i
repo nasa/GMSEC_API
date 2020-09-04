@@ -11,6 +11,24 @@
 using namespace gmsec::api::mist::message;
 %}
 
+// Methods containing lists that will be redefined
+%ignore gmsec::api::mist::message::MistMessage::setStandardFields(const gmsec::api::util::DataList<gmsec::api::Field*>&);
+
 %include "dox/MistMessage_dox.i"
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/message/MistMessage.h>
+
+%extend gmsec::api::mist::message::MistMessage
+{
+    static void CALL_TYPE setStandardFields(const std::list<gmsec::api::Field*>& standardFields)
+    {
+        gmsec::api::util::DataList<gmsec::api::Field*> fields;
+
+        for (std::list<gmsec::api::Field*>::const_iterator it = standardFields.begin(); it != standardFields.end(); ++it)
+        {
+            fields.push_back(*it);
+        }
+
+        MistMessage::setStandardFields(fields);
+    }
+}

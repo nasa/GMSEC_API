@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -60,7 +60,7 @@ public class Server
 			channel.socket().bind(address, options.backlogSize);
 
 			Log.info(source, Version.GMSEC_BOLT_VERSION);
-			Log.info(source, "waiting for connections on " + address);
+			Log.info(source, "waiting for connections on " + channel.getLocalAddress());
 
 			while (true)
 				assign(channel.accept());

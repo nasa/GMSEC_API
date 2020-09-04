@@ -7,35 +7,63 @@
 
 /**
  * @file StatusClassification.java
- *
- * @brief Types and constants for the gmsec API related to error classes.
  */
 
 package gov.nasa.gsfc.gmsec.api;
 
 
 /**
- * @enum StatusClassification
- * @desc Error/Status Class codes (used with Status and Exception classes)
+ * Error/Status Class codes (used with Status and Exception classes)
  */
 public enum StatusClassification
 {
-	NO_ERROR(0),                ///< No error
-	FACTORY_ERROR(1),           ///< Error creating Connection object
-	CONNECTION_ERROR(2),        ///< Error within Connection class
-	CONFIG_ERROR(3),            ///< Error within Config class
-	MIDDLEWARE_ERROR(4),        ///< Middleware specific error
-	MSG_ERROR(5),               ///< Error within Message class
-	FIELD_ERROR(6),             ///< Error within Field class
-	CALLBACK_ERROR(7),          ///< Error using a callback
-	CALLBACK_LOOKUP_ERROR(8),   ///< Error referencing a callback object
-	CONFIGFILE_ERROR(9),        ///< Error within ConfigFile class
-	ITERATOR_ERROR(10),         ///< Error using iterrator
-	POLICY_ERROR(11),           ///< Error with policy
-	DISPATCHER_ERROR(12),       ///< Error with AutoDispatcher
-	MIST_ERROR(13),             ///< MIST error
-	CUSTOM_ERROR(49),           ///< Custom error
-	OTHER_ERROR(50);            ///< Other error
+	/** No error */
+	NO_ERROR(0),
+
+	/** Error creating Connection object */
+	FACTORY_ERROR(1),
+
+	/** Error within Connection class */
+	CONNECTION_ERROR(2),
+
+	/** Error within Config class */
+	CONFIG_ERROR(3),
+
+	/** Middleware specific error */
+	MIDDLEWARE_ERROR(4),
+
+	/** Error within Message class */
+	MSG_ERROR(5),
+
+	/** Error within Field class */
+	FIELD_ERROR(6),
+
+	/** Error using a callback */
+	CALLBACK_ERROR(7),
+
+	/** Error referencing a callback object */
+	CALLBACK_LOOKUP_ERROR(8),
+
+	/** Error within ConfigFile class */
+	CONFIGFILE_ERROR(9),
+
+	/** Error using iterrator */
+	ITERATOR_ERROR(10),
+
+	/** Error with policy */
+	POLICY_ERROR(11),
+
+	/** Error with AutoDispatcher */
+	DISPATCHER_ERROR(12),
+
+	/** MIST Error */
+	MIST_ERROR(13),
+
+	/** Custom error */
+	CUSTOM_ERROR(49),
+
+	/** Other error */
+	OTHER_ERROR(50);
 
 	private int value;
 	private StatusClassification(int value) { this.value = value; }
