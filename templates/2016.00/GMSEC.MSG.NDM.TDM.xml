@@ -1,3 +1,5 @@
+<!-- Tracking Data Message -->
+<!-- See Table 5-161 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.MSG.NDM.TDM">
 	<FIELD  NAME="NDM-TYPE"
 	        MODE="REQUIRED"
@@ -63,18 +65,18 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="BIN"
+	        TYPE="STRING"
 	        DESCRIPTION="Raw = no quality check, Validated = checked and passed, Degraded = checked with quality issues."/>
 	<FIELD  NAME="FORMAT"
 	        MODE="REQUIRED"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="Format of the DATA field...  KVN: Keyword = Value Notation, XML: eXtensible Markup Language, RAW, or BIN (binary)"/>
+	        DESCRIPTION="Format of the DATA field (KVN: Keyword = Value Notation, XML: eXtensible Markup Language, RAW: Raw Data, or BIN: Binary Data)"/>
 	<FIELD  NAME="DATA"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="BIN"
+	        TYPE="STRING, BINARY"
 	        DESCRIPTION="Structured Navigation Data Message"/>
 </SCHEMA>

@@ -95,6 +95,7 @@ ref class Message;
 /// </example>
 /// <seealso cref="Connection" />
 /// <seealso cref="Message" />
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class Config
 {
 private:

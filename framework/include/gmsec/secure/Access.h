@@ -22,6 +22,7 @@
 
 #include <gmsec/Status.h>
 #include <gmsec/Config.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -47,7 +48,7 @@ public:
 		LIMIT
 	};
 
-	Access ();
+	GMSEC_DEPRECATED Access ();
 	~Access ();
 
 	bool isValid () const;

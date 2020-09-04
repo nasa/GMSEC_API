@@ -4,8 +4,28 @@
 # All Rights Reserved.
 
 
+GMSEC_HOME=../../..
+
+include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
 SRCS   = logging.cpp
 TARGET = logging
 
-include ../AppMake.mf
+
+default: checkDefs $(TARGET)
+
+
+clean: checkDefs
+	$(RM) $(TARGET)
+	$(RM) *.gcno *.gcda
+
+
+checkDefs:
+	@ if [ -z $(TARGET) ]; then \
+		echo "TARGET is not defined"; \
+		exit 1; \
+	fi
+
+
+$(TARGET): $(SRCS)
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@

@@ -22,6 +22,7 @@
 #define gmsec_ConfigFile_h
 
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec/ConfigFileIterator.h>
 #include <gmsec/Status.h>
@@ -101,7 +102,7 @@ public:
 	 *
 	 * @brief Basic constructor that creates an empty configuration file object.
 	 */
-	ConfigFile();
+	GMSEC_DEPRECATED ConfigFile();
 
 	/** @fn ConfigFile(const char *filepath)
 	 * @note This constructor has been deprecated.  Use ConfigFile() instead.
@@ -110,7 +111,7 @@ public:
 	 *
 	 * @param filepath - full or relative path to configuration file
 	 */
-	ConfigFile(const char *filepath);
+	GMSEC_DEPRECATED ConfigFile(const char *filepath);
 
 	/** @fn ~ConfigFile()
 	 * @brief Destructor.

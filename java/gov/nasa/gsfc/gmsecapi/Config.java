@@ -21,6 +21,8 @@ import gov.nasa.gsfc.gmsecapi.jni.JNIConfig;
 
 /** @class Config
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief Encapsulates the parameters necessary for initializing connections.  Used
  * by the ConnectionFactory, this class provides a generic means of supplying
  * initialization data without being Connection specific.
@@ -43,6 +45,7 @@ import gov.nasa.gsfc.gmsecapi.jni.JNIConfig;
  * @sa Connection @n
  *	   Message
  */
+@Deprecated
 public class Config
 {
 	private JNIConfig fConfig = null;

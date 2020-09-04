@@ -17,6 +17,7 @@
 
 #include <gmsec4/c/mist/mist_defs.h>
 
+#include <gmsec4/util/Deprecated.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4_defs.h>
@@ -186,7 +187,7 @@ extern "C"
 	 *
 	 * @sa deviceMessageGetNumDevices
 	 */
-	GMSEC_API const GMSEC_Device deviceMessageGetDevice(const GMSEC_Message msg, size_t index, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API const GMSEC_Device deviceMessageGetDevice(const GMSEC_Message msg, size_t index, GMSEC_Status status);
 
 
 	/**

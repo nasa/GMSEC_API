@@ -28,35 +28,10 @@
 #include <gmsec4/util/Mutex.h>
 #include <gmsec4/util/TimeUtil.h>
 
+#include <gmsec4/internal/StringUtil.h>
 #include <gmsec4/internal/SystemUtil.h>
 
 #include <string>
-
-
-struct ActionInfo
-{
-	ActionInfo(double interval)
-		: last_s(gmsec::api::util::TimeUtil::getCurrentTime_s(0)),
-		  interval_s(interval)
-	{
-	}
-
-	bool tryNow()
-	{
-		bool flag = false;
-		double now_s = gmsec::api::util::TimeUtil::getCurrentTime_s(0);
-		if (now_s - last_s >= interval_s)
-		{
-			flag = true;
-			last_s = now_s;
-		}
-		return flag;
-	}
-
-private:
-	double last_s;
-	double interval_s;
-};
 
 
 namespace gmsec
@@ -74,25 +49,15 @@ HeartbeatService::HeartbeatService(const Config& config, const Message& msgTempl
 	  m_msg(msgTemplate),
 	  m_pubInterval(30),
 	  m_counter(0),
+	  m_publishAction(0),
 	  m_startupLatch(1),
 	  m_shutdownLatch(1)
 {
-	//GMSEC ISD has changed to be use a U16 pub rate. We want this code to be flexible enough to understand
-	//both the old and new formats. 
+	const Field* pubRate = m_msg.getField("PUB-RATE");
 
-	const I16Field* pubRateField = dynamic_cast<const I16Field*>(m_msg.getField("PUB-RATE"));
-
-	if (pubRateField)
+	if (pubRate)
 	{
-		GMSEC_I16 pubRate = pubRateField->getValue();
-		m_pubInterval = pubRate;
-	} else 
-	{
-		const U16Field* pubRateFieldU = dynamic_cast<const U16Field*>(m_msg.getField("PUB-RATE"));
-		if(pubRateFieldU)
-		{
-			m_pubInterval = pubRateFieldU->getValue();
-		}
+		m_pubInterval = (GMSEC_U16) pubRate->getUnsignedIntegerValue();
 	}
 
 	m_alive.set(false);
@@ -113,7 +78,28 @@ HeartbeatService::~HeartbeatService()
 void HeartbeatService::setField(const Field& field)
 {
 	gmsec::api::util::AutoMutex lock(m_msgMutex);
-	m_msg.addField(field);
+
+	if (gmsec::api::util::StringUtil::stringEquals(field.getName(), "PUB-RATE"))
+	{
+		GMSEC_I64 rate = field.getIntegerValue();
+
+		if (rate > 0)
+		{
+			m_msg.addField(field);
+
+			m_pubInterval = (GMSEC_U16) rate;
+
+			m_publishAction->setInterval(m_pubInterval);
+		}
+		else
+		{
+			throw Exception(MIST_ERROR, VALUE_OUT_OF_RANGE, "Setting HeartbeatService PUB-RATE to zero or less is not permitted");
+		}
+	}
+	else
+	{
+		m_msg.addField(field);
+	}
 }
 
 
@@ -163,7 +149,7 @@ void HeartbeatService::run()
 
 		m_startupLatch.countDown();
 
-		ActionInfo publish(m_pubInterval);
+	  	m_publishAction.reset(new ActionInfo(m_pubInterval));
 
 		// Flag that will be used to indicate that we should publish
 		// first heartbeat message immediately upon starting the
@@ -181,7 +167,7 @@ void HeartbeatService::run()
 			}
 			else
 			{
-				publishMsg = publish.tryNow();
+				publishMsg = m_publishAction->tryNow();
 			}
 
 			if (publishMsg)
@@ -266,6 +252,33 @@ Status HeartbeatService::teardownService()
 
 	return status;
 }
+
+
+HeartbeatService::ActionInfo::ActionInfo(double interval)
+	: last_s(gmsec::api::util::TimeUtil::getCurrentTime_s(0)),
+	  interval_s(interval)
+{
+}
+
+
+bool HeartbeatService::ActionInfo::tryNow()
+{
+	bool flag = false;
+	double now_s = gmsec::api::util::TimeUtil::getCurrentTime_s(0);
+	if (now_s - last_s >= interval_s)
+	{
+		flag = true;
+		last_s = now_s;
+	}
+	return flag;
+}
+
+
+void HeartbeatService::ActionInfo::setInterval(double interval)
+{
+	interval_s = interval;
+}
+
 
 } //namespace internal
 } //namespace mist

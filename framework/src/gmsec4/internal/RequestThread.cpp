@@ -356,13 +356,13 @@ void RequestShared::deliverReply(Message* reply)
 
 	try
 	{
-		const StringField& field = reply->getStringField(REPLY_UNIQUE_ID_FIELD);
+		const StringField& field = reply->getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 		replyID = field.getValue();
 	}
 	catch (...)
 	{
-		GMSEC_WARNING << "RequestShared::deliverReply: no " << REPLY_UNIQUE_ID_FIELD << " in reply message";
+		GMSEC_WARNING << "RequestShared::deliverReply: no " << GMSEC_REPLY_UNIQUE_ID_FIELD << " in reply message";
 		delete reply;
 		return;
 	}

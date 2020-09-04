@@ -136,7 +136,7 @@ Status DynamicFactory::determineLibrary(const Config& config, const char* key, s
 
 	// should the library basename depend on the object type?
 
-	const char* fullyQualified = config.getValue(FULLY_QUALIFIED_POLICY);
+	const char* fullyQualified = config.getValue(GMSEC_POLICY_FULL_PATH);
 
 	if (fullyQualified && StringUtil::stringIsTrue(fullyQualified))
 	{
@@ -212,7 +212,7 @@ Status DynamicFactory::initialize (Policy &policy, const Config &config)
 
 	// TODO: clean this up.  There should be a registry of known types so the
 	// particular type names do not appear here.
-	const char* value = config.getValue(SEC_POLICY);
+	const char* value = config.getValue(GMSEC_POLICY);
 
 	if (!value)
 	{
@@ -229,7 +229,7 @@ Status DynamicFactory::initialize (Policy &policy, const Config &config)
 
 	if (!ptr)
 	{
-		CreatorFunction creator = getCreator(status, config, SEC_POLICY, "createPolicy");
+		CreatorFunction creator = getCreator(status, config, GMSEC_POLICY, "createPolicy");
 
 		if (!status.isError() && creator)
 		{
@@ -259,7 +259,7 @@ Status DynamicFactory::initialize (Random &random, const Config &config)
 
 	AbstractRandom* ptr = 0;
 
-	const char* value = config.getValue(POLICY_ACCESS);
+	const char* value = config.getValue(GMSEC_POLICY_ACCESS);
 	if (!value)
 	{
 		ptr = new MersenneTwister();
@@ -304,7 +304,7 @@ Status DynamicFactory::initialize (Access &access, const Config &config)
 
 	AbstractAccess* ptr = 0;
 
-	const char* value = config.getValue(POLICY_ACCESS);
+	const char* value = config.getValue(GMSEC_POLICY_ACCESS);
 
 	if (!value)
 	{
@@ -313,7 +313,7 @@ Status DynamicFactory::initialize (Access &access, const Config &config)
 
 	if (!ptr)
 	{
-		CreatorFunction creator = getCreator(status, config, POLICY_ACCESS, "CreateAccess");
+		CreatorFunction creator = getCreator(status, config, GMSEC_POLICY_ACCESS, "CreateAccess");
 
 		if (!status.isError() && creator)
 		{
@@ -350,7 +350,7 @@ Status DynamicFactory::initialize (Cipher &cipher, const Config &config)
 
 	AbstractCipher* ptr = 0;
 
-	const char * value = config.getValue(POLICY_CIPHER);
+	const char * value = config.getValue(GMSEC_POLICY_CIPHER);
 
 	if (!value)
 	{
@@ -359,7 +359,7 @@ Status DynamicFactory::initialize (Cipher &cipher, const Config &config)
 
 	if (!ptr)
 	{
-		CreatorFunction creator = getCreator(status, config, POLICY_CIPHER, "CreateCipher");
+		CreatorFunction creator = getCreator(status, config, GMSEC_POLICY_CIPHER, "CreateCipher");
 
 		if (!status.isError() && creator)
 		{
@@ -396,7 +396,7 @@ Status DynamicFactory::initialize (Signer &signer, const Config &config)
 
 	AbstractSigner* ptr = 0;
 
-	const char* value = config.getValue(POLICY_SIGNER);
+	const char* value = config.getValue(GMSEC_POLICY_SIGNER);
 
 	if (!value)
 	{
@@ -405,7 +405,7 @@ Status DynamicFactory::initialize (Signer &signer, const Config &config)
 
 	if (!ptr)
 	{
-		CreatorFunction creator = getCreator(status, config, POLICY_SIGNER, "CreateSigner");
+		CreatorFunction creator = getCreator(status, config, GMSEC_POLICY_SIGNER, "CreateSigner");
 
 		if (!status.isError() && creator)
 		{

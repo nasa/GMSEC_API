@@ -323,7 +323,11 @@ const GMSEC_ProductFile CALL_TYPE productFileMessageGetProductFile(const GMSEC_M
 	{
 		try
 		{
+			GMSEC_DISABLE_DEPRECATED_WARNINGS
+
 			ProductFile& tmp = const_cast<ProductFile&>(prodFileMsg->getProductFile(index));
+
+			GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 			pfile = reinterpret_cast<GMSEC_ProductFile>(&tmp);
 		}

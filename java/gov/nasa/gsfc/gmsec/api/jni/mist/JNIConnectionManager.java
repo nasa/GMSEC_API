@@ -37,6 +37,7 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIConfig;
 import gov.nasa.gsfc.gmsec.api.jni.JNIField;
 import gov.nasa.gsfc.gmsec.api.jni.JNIMessage;
 import gov.nasa.gsfc.gmsec.api.jni.JNIStatus;
+import gov.nasa.gsfc.gmsec.api.jni.JNIFieldConverter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -169,6 +170,23 @@ public class JNIConnectionManager
 		int        numFields  = (standardFields == null ? 0 : standardFields.size());
 
 		gmsecJNI.ConnectionManager_SetStandardFields(swigCPtr, this, jFieldPtrs, jFields, numFields);
+	}
+
+
+	public java.util.List<Field> getStandardFields()
+	{
+		java.util.List<Field> standardFields = new java.util.ArrayList<Field>();
+
+		long[] fieldPtrs = gmsecJNI.ConnectionManager_GetStandardFields(swigCPtr, this);
+
+		for (int i = 0; i < fieldPtrs.length; ++i)
+		{
+			Field field = JNIFieldConverter.createFieldReference(fieldPtrs[i]);
+
+			standardFields.add(field);
+		}
+
+		return standardFields;
 	}
 
 

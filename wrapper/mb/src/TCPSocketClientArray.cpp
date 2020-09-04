@@ -23,6 +23,8 @@
 #include <unistd.h>
 #endif
 
+#include <sstream>
+
 using namespace gmsec::api;
 using namespace gmsec::api::util;
 
@@ -144,6 +146,8 @@ Status TCPSocketClientArray::connect(int port, const char* servers)
 	int failures = 0;
 	Status result;
 
+	std::ostringstream endpoints;
+
 	for (int i = 0; i < m_nsocks; ++i)
 	{
 		result = m_sock[i]->connect(ports[i], serverNames[i].c_str());
@@ -152,12 +156,18 @@ Status TCPSocketClientArray::connect(int port, const char* servers)
 		{
 			++failures;
 		}
+		else
+		{
+			endpoints << (endpoints.str().empty() ? "" : ",") << serverNames[i];
+		}
 	}
 
 	m_shouldBeConnected.set(true);
 
 	if (failures < m_nsocks)
 	{
+		currentServer = endpoints.str();
+
 		Status good_result;
 		return good_result;
 	}
@@ -338,7 +348,8 @@ int TCPSocketClientArray::checkDuplicate(const char* buffer, int len)
 	}
 
 	Message* msg = NULL;
-	MBWire::deserialize(buffer, len, msg);
+	Config   msgConfig;
+	MBWire::deserialize(buffer, len, msg, msgConfig);
 
 	if (msg == NULL)
 	{
@@ -375,15 +386,15 @@ int TCPSocketClientArray::checkDuplicate(const char* buffer, int len)
 	else
 	{
 		// Create a structure of 'unique_id' and 'when' it was received.
-		TTMsg msg;
-		msg.when = time(NULL);
-		msg.msg = unique_id;
+		TTMsg ttmsg;
+		ttmsg.when = time(NULL);
+		ttmsg.msg = unique_id;
 
 		// Insert the unique_id into the unique_id set.
 		m_msgs_set.insert(unique_id);
 
 		// Store the 'unique_id' and 'when' it was received.
-		m_prev_msg.push_back(msg);
+		m_prev_msg.push_back(ttmsg);
 	}
 
 	time_t now = time(NULL);
@@ -449,6 +460,7 @@ Status TCPSocketClientArray::write(const char *buffer, int len, const char *uniq
 		buf2 = tmp;
 	}
 	currentServer = "";
+
 	bool is_good_result = false;
 	Status result;
 	// if (unique_id != NULL) printf("Wrote unique_id = '%s'\n", buf2 + len + 1);

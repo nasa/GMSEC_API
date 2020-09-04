@@ -1,3 +1,5 @@
+<!-- Replay Telemetry Response Message -->
+<!-- See Table 5-64 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.RESP.RTLM">
 	<FIELD  NAME="RESPONSE-STATUS"
 	        MODE="REQUIRED"
@@ -21,6 +23,6 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="UNSET"
+	        TYPE="VARIABLE"
 	        DESCRIPTION="Additional data that may be desired along with the completion status.  Type is dependent upon response."/>
 </SCHEMA>

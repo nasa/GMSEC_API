@@ -2,20 +2,22 @@
 
 #include <gmsec4/Config.h>
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <iostream>
 
 
-const char* BROKER_USAGE        = "ZMQBroker publish-endpoint=<protocol>://<url>:<port> subscribe-endpoint=<protocol>://<url>:<port>";
-const char* BROKER_PUB_ENDPOINT = "publish-endpoint";
-const char* BROKER_SUB_ENDPOINT = "subscribe-endpoint";
+//const char* BROKER_USAGE        = "ZMQBroker publish-endpoint=<protocol>://<url>:<port> subscribe-endpoint=<protocol>://<url>:<port>";
+//const char* BROKER_PUB_ENDPOINT = "publish-endpoint";
+//const char* BROKER_SUB_ENDPOINT = "subscribe-endpoint";
 
 
 int main (int argc, char* argv[])
 {
 	gmsec::api::Config config(argc, argv);
 
-	const char* pubEndpoint = config.getValue(BROKER_PUB_ENDPOINT);
-	const char* subEndpoint = config.getValue(BROKER_SUB_ENDPOINT);
+	const char* pubEndpoint = config.getValue(ZEROMQ_PUB_ENDPOINT);
+	const char* subEndpoint = config.getValue(ZEROMQ_SUB_ENDPOINT);
 
 	if (pubEndpoint == 0 && subEndpoint == 0)
 	{

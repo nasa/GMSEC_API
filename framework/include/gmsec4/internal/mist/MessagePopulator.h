@@ -25,6 +25,7 @@
 #include <gmsec4/util/DataList.h>
 
 #include <list>
+#include <string>
 
 namespace gmsec
 {
@@ -46,6 +47,10 @@ public:
 
 	void CALL_TYPE setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields);
 
+	const gmsec::api::util::DataList<Field*>& getStandardFields() const;
+
+	void CALL_TYPE addStandardFields(Message& msg) const;
+
 	void CALL_TYPE populateSimpleServiceMessage(Message &msg, const char * opName, const Field& opNumber, const gmsec::api::util::DataList<Field*>& fields, const gmsec::api::util::DataList<ServiceParam*>& sParams);
 
 	void CALL_TYPE populateDirective(Message &msg, const Field& directiveString, const gmsec::api::util::DataList<Field*>& fields);
@@ -64,11 +69,10 @@ public:
 
 	static void CALL_TYPE destroyFields(FieldList& flist);
 
-	void CALL_TYPE addStandardFields(Message& msg) const;
-
-	const gmsec::api::util::DataList<Field*>& getStandardFields() const;
-
 private:
+
+	std::string generateUniqueID();
+
 	unsigned int m_specVersion;
 	FieldList    m_standardFieldsAllMsgs;
 };

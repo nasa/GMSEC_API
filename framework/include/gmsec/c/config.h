@@ -53,6 +53,7 @@
 #ifndef gmsec_c_config_h
 #define gmsec_c_config_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -75,7 +76,7 @@ extern "C"
 	 *
 	 * @sa gmsec_DestroyConfig()
 	 */
-	GMSEC_API void gmsec_CreateConfig(GMSEC_CONFIG_OBJECT *cfg, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_CreateConfig(GMSEC_CONFIG_OBJECT *cfg, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_CreateConfigParams(GMSEC_CONFIG_OBJECT *cfg, int argc, char *argv[], GMSEC_STATUS_OBJECT status)
@@ -95,7 +96,7 @@ extern "C"
 	 *
 	 * @sa gmsec_DestroyConfig()
 	 */
-	GMSEC_API void gmsec_CreateConfigParams(GMSEC_CONFIG_OBJECT *cfg, int argc, char *argv[], GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_CreateConfigParams(GMSEC_CONFIG_OBJECT *cfg, int argc, char *argv[], GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_DestroyConfig(GMSEC_CONFIG_OBJECT *cfg, GMSEC_STATUS_OBJECT status)
@@ -111,7 +112,7 @@ extern "C"
 	 * @sa gmsec_CreateConfig() @n
 	 *	   gmsec_CreateConfigParams()
 	 */
-	GMSEC_API void gmsec_DestroyConfig(GMSEC_CONFIG_OBJECT *cfg, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_DestroyConfig(GMSEC_CONFIG_OBJECT *cfg, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_ConfigAddValue(GMSEC_CONFIG_OBJECT cfg, const char *name, const char *value, GMSEC_STATUS_OBJECT status)
@@ -126,7 +127,7 @@ extern "C"
 	 * @param[in]     value - value of field
 	 * @param[out]    status - out parameter operation result status
 	 */
-	GMSEC_API void gmsec_ConfigAddValue(GMSEC_CONFIG_OBJECT cfg, const char *name, const char *value, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_ConfigAddValue(GMSEC_CONFIG_OBJECT cfg, const char *name, const char *value, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_ConfigClearValue(GMSEC_CONFIG_OBJECT cfg, const char *name, GMSEC_STATUS_OBJECT status)
@@ -140,7 +141,7 @@ extern "C"
 	 * @param[in]     name - name of value to clear
 	 * @param[out]    status - out parameter operation result status
 	 */
-	GMSEC_API void gmsec_ConfigClearValue(GMSEC_CONFIG_OBJECT cfg, const char *name, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_ConfigClearValue(GMSEC_CONFIG_OBJECT cfg, const char *name, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_ConfigGetValue(GMSEC_CONFIG_OBJECT cfg, const char *name, const char **value, GMSEC_STATUS_OBJECT status)
@@ -156,7 +157,7 @@ extern "C"
 	 * @param[out] value - out parameter value of field (if available)
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void gmsec_ConfigGetValue(GMSEC_CONFIG_OBJECT cfg, const char *name, const char **value, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_ConfigGetValue(GMSEC_CONFIG_OBJECT cfg, const char *name, const char **value, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_ConfigClear(GMSEC_CONFIG_OBJECT cfg, GMSEC_STATUS_OBJECT status)
@@ -168,7 +169,7 @@ extern "C"
 	 * @param[in]  cfg - handle of config to clear
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void gmsec_ConfigClear(GMSEC_CONFIG_OBJECT cfg, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_ConfigClear(GMSEC_CONFIG_OBJECT cfg, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_ConfigGetFirst(GMSEC_CONFIG_OBJECT cfg, const char **name, const char **value, GMSEC_STATUS_OBJECT status)
@@ -185,7 +186,7 @@ extern "C"
 	 * @param[out] value - out parameter field value
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void gmsec_ConfigGetFirst(GMSEC_CONFIG_OBJECT cfg, const char **name, const char **value, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_ConfigGetFirst(GMSEC_CONFIG_OBJECT cfg, const char **name, const char **value, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_ConfigGetNext(GMSEC_CONFIG_OBJECT cfg, const char **name, const char **value, GMSEC_STATUS_OBJECT status)
@@ -202,7 +203,7 @@ extern "C"
 	 * @param[out] value - out parameter field value
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void gmsec_ConfigGetNext(GMSEC_CONFIG_OBJECT cfg, const char **name, const char **value, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_ConfigGetNext(GMSEC_CONFIG_OBJECT cfg, const char **name, const char **value, GMSEC_STATUS_OBJECT status);
 
 	/** @fn gmsec_ConfigToXML(GMSEC_CONFIG_OBJECT cfg, const char **xml, GMSEC_STATUS_OBJECT status)
 	 *
@@ -218,7 +219,7 @@ extern "C"
 	 *
 	 * @sa gmsec_ConfigFromXML
 	 */
-	GMSEC_API void gmsec_ConfigToXML(GMSEC_CONFIG_OBJECT cfg, const char **xml, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_ConfigToXML(GMSEC_CONFIG_OBJECT cfg, const char **xml, GMSEC_STATUS_OBJECT status);
 
 	/** @fn gmsec_ConfigFromXML(GMSEC_CONFIG_OBJECT cfg, const char *xml, GMSEC_STATUS_OBJECT status)
 	 *
@@ -243,7 +244,7 @@ extern "C"
 	 *
 	 * @sa gmsec_ConfigToXML
 	 */
-	GMSEC_API void gmsec_ConfigFromXML(GMSEC_CONFIG_OBJECT cfg, const char *xml, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void gmsec_ConfigFromXML(GMSEC_CONFIG_OBJECT cfg, const char *xml, GMSEC_STATUS_OBJECT status);
 
 #ifdef __cplusplus
 }	// extern "C"

@@ -184,7 +184,7 @@ public class ConnectionManager
 	/**
 	 * @fn String getLibraryVersion()
 	 *
-	 * @desc getLibraryVersion - This function returns the library version,
+	 * @desc This function returns the library version,
 	 * returning an error status if this operation is not successful. 
 	 */
 	public String getLibraryVersion() throws GMSEC_Exception
@@ -209,11 +209,10 @@ public class ConnectionManager
 	/**
 	 * @fn void setStandardFields(java.util.List<Field> standardFields)
 	 *
-	 * @brief Sets the internal list of fields which are to be automatically placed in all messages
-	 * sent by this ConnectionManager. 
-	 * Internal copies of the Fields are made, ownership is not retained by the 
-	 * ConnectionManager. The supplied set of fields will not be validated here, validation
-	 * occurs at the time a message is to be published. 
+	 * @brief Sets the internal list of fields that are added to all messages that are created
+	 * using the ConnectionManager.  Internal copies of the provided Fields are made, thus
+	 * ownership is not retained by the ConnectionManager. The supplied set of fields will not
+	 * be validated here; validation occurs at the time a message is to be published.
 	 *
 	 * @param standardFields - The array of fields to be copied to the internal set of fields to
 	 * be appended to all messages.
@@ -224,6 +223,19 @@ public class ConnectionManager
 		{
 			m_jniConnMgr.setStandardFields(standardFields);
 		}
+	}
+
+
+	/**
+	 * @fn java.util.List<Field> getStandardFields()
+	 *
+	 * @brief Returns the list of standard fields that have been set within the Connection Manager.
+	 *
+	 * @sa setStandardFields()
+	 */
+	public java.util.List<Field> getStandardFields()
+	{
+		return m_jniConnMgr.getStandardFields();
 	}
 
 
@@ -976,6 +988,10 @@ public class ConnectionManager
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given Field is null.
 	 * @throws A GMSEC_Exception is thrown is thrown if an unexpected error occurs.
+	 *
+	 * @note If a (valid) PUB-RATE field is passed to this method, and the Heartbeat Service
+	 * is running, then the Heartbeat Service publish rate will be changed to the provided
+	 * rate.  Note that a publish rate of 0 seconds or less will be treated as an error.
 	 */
 	public Status setHeartbeatServiceField(Field field)
 		throws IllegalArgumentException, GMSEC_Exception

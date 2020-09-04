@@ -10,26 +10,30 @@
 /** 
  * @file logging.cpp
  * 
- * This file contains a simple example of using the GMSEC API logging framework
- * 
+ * This file contains an example outlining the use of the GMSEC API logging
+ * framework.
  */
 
-#include "../example.h"
-
-#include <gmsec4/util/Mutex.h>
-#include <gmsec4/util/TimeUtil.h>
+#include <gmsec4_cpp.h>
 
 #include <iostream>
 #include <string>
 
 using namespace gmsec::api;
 using namespace gmsec::api::util;
+using namespace gmsec::api::mist;
+
+//o Helper functions
+void publishTestMessage(ConnectionManager* connMgr, const char* subject);
 
 
+//o Define a baseline LogHandler
+// This will be used by the Log macros; The implementation of onMessage
+// determines how messages will be logged to output
 class BaseHandler : public LogHandler
 {
 private:
-	// Using mutex so messages from different threads don't get mixed up
+	// Use a mutex so messages from different threads don't get mixed up
 	Mutex       mutex;
 	std::string whoAmI;
 
@@ -57,6 +61,7 @@ public:
 };
 
 
+// Different Handlers can be implemented for each logging level, if so desired
 class ErrorHandler : public BaseHandler
 {
 public:
@@ -77,17 +82,20 @@ public:
 	InfoHandler() : BaseHandler("GMSEC_INFO") {}
 };
 
+
 class VerboseHandler: public BaseHandler
 {
 public:
 	VerboseHandler() : BaseHandler("GMSEC_VERBOSE") {}
 };
 
+
 class DebugHandler: public BaseHandler
 {
 public:
 	DebugHandler() : BaseHandler("GMSEC_DEBUG") {}
 };
+
 
 class AnyHandler: public BaseHandler
 {
@@ -96,46 +104,15 @@ public:
 };
 
 
-void publishTestMessage(Connection* connection, const char* subject)
-{
-	int i = 123;
-
-	//o Create message
-	Message message(subject, Message::PUBLISH);
-
-	//o Add fields to the message
-	message.addField("F", false);
-	message.addField("I", (GMSEC_I32) i);
-	message.addField("K", (GMSEC_U16) i);
-	message.addField("S", "This is a test");
-	message.addField("D", (GMSEC_F32) (1 + 1./i));
-	message.addField("X", (GMSEC_BIN) "JLMNOPQ", 7);
-
-	//o Publish Message
-	GMSEC_INFO << "Sending:\n" << message.toXML();
-	connection->publish(message);
-}
-
-
 int main(int argc, char* argv[])
 {
-	Config config(argc, argv);
-
-	example::addToConfigFromFile(config);
-
-	if (example::isOptionInvalid(config, argc))
+	if (argc <= 1)
 	{
-		std::cout << "\nusage: logging" << " connectiontype=<middleware> "
-		          << "[ <parameter>=<value> ]\n"
-		          << "\n\tNote that the parameter 'connectiontype' is required. "
-		          << "\n\tThe rest of other parameters are optional.\n"
-		          << "\n\tserver=<server name> "
-		          << "(required if middleware is not bolt/MB locally)"
-		          << "\n\tloglevel=<log level>"
-		          << "\n\nFor more infomration, see API User's Guide\n";
-
+		std::cout << "usage: " << argv[0] << " mw-id=<middleware ID>" << std::endl;
 		return -1;
 	}
+
+	Config config(argc, argv);
 
 	//o Create and register log handlers
 	ErrorHandler   errorHandler;
@@ -155,35 +132,30 @@ int main(int argc, char* argv[])
 	Log::setReportingLevel(logVERBOSE);
 	GMSEC_VERBOSE << "The log reporting level is now set to: " << Log::getReportingLevel();
 
-	//o Output GMSEC API version
+	//o Print the GMSEC API version number using the GMSEC Logging
+	// interface
+	// This is useful for determining which version of the API is
+	// configured within the environment
+	// TODO: Once available, replace this statement with usage of
+	// ConnectionManager::getAPIVersion (See RTC 4798)
 	GMSEC_INFO << Connection::getAPIVersion();
 
 	try
 	{
-		//o Create the Connection
-		Connection* connection = Connection::create(config);
-
-		//o output connection middleware version
-		GMSEC_INFO << connection->getLibraryVersion();
+		//o Create the ConnectionManager
+		ConnectionManager connMgr(config);
 
 		//o Connect
-		connection->connect();
+		connMgr.initialize();
+
+		//o Output middleware client library version
+		GMSEC_INFO << connMgr.getLibraryVersion();
 
 		//o Publish a message
-		publishTestMessage(connection, "GMSEC.TEST.PUBLISH");
+		publishTestMessage(&connMgr, "GMSEC.TEST.PUBLISH");
 
-		//o Disconnect
-		try
-		{
-			connection->disconnect();
-		}
-		catch (Exception& e)
-		{
-			GMSEC_ERROR << e.what();
-		}
-
-		//o Destroy the Connection
-		Connection::destroy(connection);
+		//o Disconnect from the middleware and clean up the Connection
+		connMgr.cleanup();
 	}
 	catch (Exception& e)
 	{
@@ -224,8 +196,9 @@ int main(int argc, char* argv[])
 	{
 		GMSEC_ERROR << "Failed to change reporting level to logDEBUG";
 	}
+	// The DEBUG message below will be shown successfully, unlike the last
+	// debug message.
 	GMSEC_DEBUG << "This is an example debug message which should show.";
-	// This should be shown successfully, unlike the last debug message.
 
 	GMSEC_DEBUG << "NONE reporting level, numerically, is "    << Log::fromString("NONE");
 	GMSEC_DEBUG << "ERROR reporting level, numerically, is "   << Log::fromString("ERROR");
@@ -247,4 +220,30 @@ int main(int argc, char* argv[])
 
 	//o Unregister log handlers
 	Log::registerHandler((LogHandler*) NULL);
+
+	return 0;
 }
+
+
+void publishTestMessage(ConnectionManager* connMgr, const char* subject)
+{
+	int i = 123;
+
+	//o Create a Message object
+	Message message(subject, Message::PUBLISH);
+
+	//o Add fields to the Message
+	message.addField("F", false);
+	message.addField("I", (GMSEC_I32) i);
+	message.addField("K", (GMSEC_U16) i);
+	message.addField("S", "This is a test");
+	message.addField("D", (GMSEC_F32) (1 + 1./i));
+	message.addField("X", (GMSEC_BIN) "JLMNOPQ", 7);
+
+	//o Publish Message 
+	connMgr->publish(message);
+
+	//o Output the Message's XML string representation by invoking Log macro
+	GMSEC_INFO << "Sent:\n" << message.toXML();
+}
+

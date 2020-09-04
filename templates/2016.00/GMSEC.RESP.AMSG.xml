@@ -1,3 +1,5 @@
+<!-- Archive Message Retrieval Response -->
+<!-- See Table 5-22 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.RESP.AMSG">
 	<FIELD  NAME="RESPONSE-STATUS"
 	        MODE="REQUIRED"
@@ -34,13 +36,13 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE="AAA"
 	        TYPE="STRING"
-	        DESCRIPTION="Product type and subtype being requested. (See Table 4-29. Product Categories)"/>
+	        DESCRIPTION="Product type being requested. (See Table 4-22. Product Categories)"/>
 	<FIELD  NAME="PROD-SUBTYPE"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE="MSG"
 	        TYPE="STRING"
-	        DESCRIPTION=""/>
+	        DESCRIPTION="Product subtype being requested. (See Table 4-22. Product Categories)"/>
 	<FIELD  NAME="NUM-OF-PROD-SUBTYPES"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
@@ -101,6 +103,6 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="BIN"
+	        TYPE="BINARY"
 	        DESCRIPTION="The file content"/>
 </SCHEMA>

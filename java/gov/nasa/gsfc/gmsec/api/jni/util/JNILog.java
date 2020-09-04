@@ -142,6 +142,11 @@ public class JNILog
 
 	public static void registerHandler(LogHandler handler)
 	{
+		if (handler == null)
+		{
+			handler = getDefaultLogHandler();
+		}
+
 		long handlerPtr = JNILogHandler.getCPtr(LogHandler.getInternal(handler));
 
 		gmsecJNI.Log_RegisterHandler(handlerPtr);
@@ -158,6 +163,11 @@ public class JNILog
 
 	public static void registerHandler(LogLevel level, LogHandler handler)
 	{
+		if (handler == null)
+		{
+			handler = getDefaultLogHandler();
+		}
+
 		long handlerPtr = JNILogHandler.getCPtr(LogHandler.getInternal(handler));
 
 		gmsecJNI.Log_RegisterHandler(level.getValue(), handlerPtr);

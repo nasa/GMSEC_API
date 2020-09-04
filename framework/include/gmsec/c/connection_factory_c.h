@@ -29,6 +29,7 @@
 #ifndef gmsec_c_connection_factory_c_h
 #define gmsec_c_connection_factory_c_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -43,7 +44,7 @@ extern "C"
 	 *
 	 * @return the current GMSEC API version string
 	 */
-	GMSEC_API const char * CALL_TYPE GetAPIVersion();
+	GMSEC_DEPRECATED GMSEC_API const char * CALL_TYPE GetAPIVersion();
 
 	/** @fn CreateConnection(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status)
 	 *
@@ -58,7 +59,7 @@ extern "C"
 	 * @param[out] conn - Connection Handle
 	 * @param[out] status - operation status
 	 */
-	GMSEC_API void CALL_TYPE CreateConnection(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE CreateConnection(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn CreateConnectionForType(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status)
@@ -76,7 +77,7 @@ extern "C"
 	 *
 	 * @sa DestroyConnection()
 	 */
-	GMSEC_API void CALL_TYPE CreateConnectionForType(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE CreateConnectionForType(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn CreateConnectionForConfig(GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status)
@@ -124,7 +125,7 @@ extern "C"
 	 * @param[out] conn - Connection Handle
 	 * @param[out] status - operation status
 	 */
-	GMSEC_API void CALL_TYPE CreateConnectionForConfig(GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE CreateConnectionForConfig(GMSEC_CONFIG_HANDLE config, GMSEC_CONNECTION_HANDLE *conn, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn DestroyConnection(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status)
@@ -139,7 +140,7 @@ extern "C"
 	 *
 	 * @sa CreateConnection()
 	 */
-	GMSEC_API void CALL_TYPE DestroyConnection(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE DestroyConnection(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
 
 #ifdef __cplusplus
 }	// extern "C"

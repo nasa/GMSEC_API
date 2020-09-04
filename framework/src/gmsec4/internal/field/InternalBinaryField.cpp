@@ -53,26 +53,32 @@ size_t InternalBinaryField::getLength() const
 }
 
 
+std::string InternalBinaryField::getStringValue() const
+{
+	std::ostringstream oss;
+
+	static const char* hex = "0123456789ABCDEF";
+
+	const GMSEC_U8* tmp = (GMSEC_U8*) m_blob;
+	for (size_t i = 0; i < m_length; ++i)
+	{
+		int upper = unsigned(tmp[i]) / 16;
+		int lower = unsigned(tmp[i]) % 16;
+
+		oss << hex[upper] << hex[lower];
+	}
+
+	return oss.str();
+}
+
+
 const char* InternalBinaryField::toXML() const
 {
 	if (m_xml.empty())
 	{
-		static const char* hex = "0123456789ABCDEF";
-
 		std::ostringstream oss;
 
-		oss << "<FIELD NAME=\"" << getName() << "\" TYPE=\"BIN\"" << (isHeader() ? " HEAD=\"T\"" : "") << ">";
-
-		const GMSEC_U8* tmp = (GMSEC_U8*) m_blob;
-		for (size_t i = 0; i < m_length; ++i)
-		{
-			int upper = unsigned(tmp[i]) / 16;
-			int lower = unsigned(tmp[i]) % 16;
-
-			oss << hex[upper] << hex[lower];
-		}
-
-		oss << "</FIELD>";
+		oss << "<FIELD NAME=\"" << getName() << "\" TYPE=\"BIN\"" << (isHeader() ? " HEAD=\"T\"" : "") << ">" << getStringValue().c_str() << "</FIELD>";
 
 		m_xml = oss.str();
 	}
@@ -90,20 +96,9 @@ const char* InternalBinaryField::toJSON() const
 		oss << "{\"NAME\":\"" << getName() << "\","
 			<< (isHeader() ? "\"HEAD\":\"T\"," : "")
 			<< "\"TYPE\":\"BIN\","
-			<< "\"VALUE\":\"";
-
-		static const char* hex = "0123456789ABCDEF";
-
-		const GMSEC_U8* tmp = (GMSEC_U8*) m_blob;
-		for (size_t i = 0; i < m_length; ++i)
-		{
-			int upper = unsigned(tmp[i]) / 16;
-			int lower = unsigned(tmp[i]) % 16;
-
-			oss << hex[upper] << hex[lower];
-		}
-
-		oss << "\"}";
+			<< "\"VALUE\":\""
+			<< getStringValue().c_str()
+			<< "\"}";
 
 		m_json = oss.str();
 	}

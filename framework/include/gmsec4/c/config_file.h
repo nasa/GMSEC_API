@@ -158,8 +158,25 @@ extern "C"
 	 * @param[out] status  - the result of the operation
 	 *
 	 * @return The subscription subject/topic associated with the subscription entry.
+	 *
+	 * @note This function has been deprecated; use configFileLookupSubscriptionEntry() instead to acquire a handle to
+	 * a SubscriptionEntry object.
 	 */
 	GMSEC_API const char* configFileLookupSubscription(const GMSEC_ConfigFile cfgFile, const char* name, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_SubscriptionEntry_Handle configFileLookupSubscriptionEntry(GMSEC_ConfigFile cfgFile, const char* name, GMSEC_Status status)
+	 *
+	 * @brief This function will attempt to locate and return a handle to a Subscription Entry that is defined within the config file.
+	 *
+	 * @param[in]  cfgFile - the handle to the ConfigFile object
+	 * @param[in]  name    - the name of the configuration object to reference
+	 * @param[out] status  - the result of the operation
+	 *
+	 * @return A handle to the found Config object, or NULL if not found.  For the latter case, refer to the status for the error reason.
+	 */  
+	GMSEC_API GMSEC_SubscriptionEntry_Handle configFileLookupSubscriptionEntry(GMSEC_ConfigFile cfgFile, const char* name, GMSEC_Status status);
 
 
 	/**
@@ -313,6 +330,62 @@ extern "C"
 	 * @return A handle to a ConfigFileIterator object.
 	 */
 	GMSEC_API GMSEC_ConfigFileIterator configFileGetIterator(GMSEC_ConfigFile cfgFile, GMSEC_Status status);
+
+
+	/**
+	 * Functions related to SubscriptionEntry
+	 */
+
+	/**
+	 * @fn const char* subscriptionEntryGetName(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status)
+	 *
+	 * @brief This function returns the name of a subscription entry object
+	 *
+	 * @param[in]  subEntry - the handle to the SubscriptionEntry object
+	 * @param[out] status   - the result of the operation
+	 * 
+	 * @return The name of a SubscriptionEntry object
+	 */
+	GMSEC_API const char* subscriptionEntryGetName(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status);
+
+
+	/**
+	 * @fn const char* subscriptionEntryGetPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status)
+	 *
+	 * @brief This function returns the pattern for a subscription entry object
+	 *
+	 * @param[in]  subEntry - the handle to the SubscriptionEntry object
+	 * @param[out] status   - the result of the operation
+	 * 
+	 * @return The pattern of a SubscriptionEntry object
+	 */
+	GMSEC_API const char* subscriptionEntryGetPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_BOOL subscriptionEntryHasNextExcludedPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status)
+	 *
+	 * @brief This function returns true if there is a next excluded pattern in a subscription entry object
+	 *
+	 * @param[in]  subEntry - the handle to the SubscriptionEntry object
+	 * @param[out] status   - the result of the operation
+	 *
+	 * @return Whether or not there is a next excluded pattern
+	 */
+	GMSEC_API GMSEC_BOOL subscriptionEntryHasNextExcludedPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status);
+
+
+	/**
+	 * @fn const char* subscriptionEntryNextExcludedPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status)
+	 *
+	 * @brief This functions returns the next excluded pattern in a subscription entry object
+	 *
+	 * @param[in]  subEntry - the handle to the SubscriptionEntry object
+	 * @param[out] status   - the result of the operation
+	 * 
+	 * @return The next excluded pattern
+	 */
+	GMSEC_API const char* subscriptionEntryNextExcludedPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status);
 
 
 #ifdef __cplusplus

@@ -20,6 +20,8 @@ import gov.nasa.gsfc.gmsecapi.jni.JNIConfigFile;
 
 /** @class ConfigFile
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This class encapsulates the load. parse, and use of standard XML configuration files.
  *
  *  Example configuration file format:
@@ -59,6 +61,7 @@ import gov.nasa.gsfc.gmsecapi.jni.JNIConfigFile;
  *  @endcode
  * 
  */
+@Deprecated
 public class ConfigFile
 {
 	private JNIConfigFile fConfigFile;

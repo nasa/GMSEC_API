@@ -24,6 +24,7 @@
 
 
 #include <gmsec/Field.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -94,7 +95,7 @@ public:
 	/** @fn FieldIterator()
 	 * @brief Initialize a FieldIterator without a selector.
 	 */
-	FieldIterator();
+	GMSEC_DEPRECATED FieldIterator();
 
 
 	/** @fn FieldIterator(FieldSelector &selector)
@@ -102,7 +103,7 @@ public:
 	 * Only Fields which the selector function returns true for will be
 	 * returned by the iterator.
 	 */
-	FieldIterator(FieldSelector selector);
+	GMSEC_DEPRECATED FieldIterator(FieldSelector selector);
 
 
 	/** @fn ~FieldIterator()

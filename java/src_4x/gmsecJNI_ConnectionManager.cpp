@@ -312,6 +312,43 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
+JNIEXPORT jlongArray JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1GetStandardFields
+  (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr)
+{
+	jlongArray standardFields = 0;
+
+	try
+	{
+		ConnectionManager* connMgr = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
+
+		if (!connMgr)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
+		}
+		else
+		{
+			const DataList<Field*>& fields = connMgr->getStandardFields();
+
+			GMSEC_U64* fieldAddrs = new GMSEC_U64[fields.size()];
+
+			size_t n = 0;
+			for (DataList<Field*>::iterator it = fields.begin(); it != fields.end(); ++it, ++n)
+			{
+				fieldAddrs[n] = GMSEC_U64(*it);
+			}
+
+			standardFields = jenv->NewLongArray(fields.size());
+			jenv->SetLongArrayRegion(standardFields, 0, fields.size(), (jlong*) fieldAddrs);
+
+			delete [] fieldAddrs;
+		}
+	}
+	JNI_CATCH
+
+	return standardFields;
+}
+
+
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1AddStandardFields
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jMsgPtr, jobject jMsg)
 {
@@ -1789,7 +1826,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestSimpleService__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_mist_JNIServiceParam_2III
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jstring jOpName, jlong jOpNumFieldPtr, jobject jOpNumField, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields, jlongArray jServiceParamPtrs, jobjectArray jServiceParams, jint jNumServiceParams, jint jTimeout, jint jRepublish_ms)
 {
-	jlong jMsg = 0;
+	jlong jReply = 0;
 
 	try
 	{
@@ -1839,11 +1876,11 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMana
 
 				try
 				{
-					Message* msg = connMgr->requestSimpleService(subject.c_str(), opName.c_str(), *opNumFld, fields, params, (GMSEC_I32) jTimeout, (GMSEC_I32) jRepublish_ms);
+					Message* reply = connMgr->requestSimpleService(subject.c_str(), opName.c_str(), *opNumFld, fields, params, (GMSEC_I32) jTimeout, (GMSEC_I32) jRepublish_ms);
 
-					if (msg)
+					if (reply)
 					{
-						jMsg = JNI_POINTER_TO_JLONG(new Message(*msg));
+						jReply = JNI_POINTER_TO_JLONG(reply);
 					}
 				}
 				catch (Exception& e)
@@ -1855,7 +1892,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMana
 	}
 	JNI_CATCH
 
-	return jMsg;
+	return jReply;
 }
 
 

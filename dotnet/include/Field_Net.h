@@ -111,6 +111,7 @@ ref class Message;
 /// if( result3.IsError() ) then () // Handle Error
 /// </code>
 /// </example>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class Field
 {
 private:

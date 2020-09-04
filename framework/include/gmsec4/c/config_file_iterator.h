@@ -151,6 +151,32 @@ extern "C"
 	GMSEC_API void configFileIteratorReset(GMSEC_ConfigFileIterator iter, GMSEC_Status status);
 
 
+	/**
+	 * @fn GMSEC_BOOL configFileIteratorHasNextSubscriptionEntry(GMSEC_ConfigFileIterator iter, GMSEC_Status status)
+	 *
+	 * @brief Determines if there is a next subscription entry in the iterator
+	 *
+	 * @param[in]  iter   - the handle to the ConfigFileIterator object
+	 * @param[out] status - the result of the operation; always succeeds if valid ConfigFileIterator handle is given.
+	 *
+	 * @return Whether or not there is a next subscription entry
+	 */
+	GMSEC_API GMSEC_BOOL CALL_TYPE configFileIteratorHasNextSubscriptionEntry(GMSEC_ConfigFileIterator iter, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_SubscriptionEntry_Handle configFileIteratorNextSubscriptionEntry(GMSEC_ConfigFileIterator iter, GMSEC_Status status)
+	 *
+	 * @brief Returns the handle to the next Subscription Entry object.
+	 *
+	 * @param[in]  iter   - the handle to the ConfigFileIterator object
+	 * @param[out] status - the result of the operation; always succeeds if valid ConfigFileIterator handle is given.
+	 *
+	 * @return The next subscription subject/topic, or NULL if no more subscription elements are available.
+	 */ 
+	GMSEC_API GMSEC_SubscriptionEntry_Handle configFileIteratorNextSubscriptionEntry(GMSEC_ConfigFileIterator iter, GMSEC_Status status);
+
+
 #ifdef __cplusplus
 }	// extern "C"
 #endif

@@ -59,32 +59,56 @@ namespace internal
  *
  * Example creation and use:
  * @code
+ * #include <gmsec4_cpp.h>
  * 
- * //Create config from command line arguments
- * Config cfg(argc,argv);
+ * using namespace gmsec::api;
+ * 
+ * int main(int argc, char** argv)
+ * {
+ *     Config      config(argc, argv);
+ *     Connection* conn = NULL;
+ * 
+ *     config.addValue("loglevel", "info");
+ * 
+ *     try
+ *     {
+ *         // Create connection
+ *         conn = Connection::create(config);
+ * 
+ *         // Connect to the middleware server
+ *         conn->connect();
+ * 
+ *         // Create a message
+ *         Message msg("GMSEC.FOO.BAR", Message::PUBLISH);
+ * 
+ *         // Publish the message
+ *         conn->publish(msg);
  *
- * try {
- *     // Create the Connection
- *     Connection* conn = Connection::create(cfg);
- *
- *     // Establish the connection
- *     conn->connect();
- *
- *     ...
- *
- *     // Disconnect from middleware server
- *     conn->disconnect();
- *
- *     // Destroy the Connection object
- *     Connection::destroy(conn);
- * }
- * catch (Exception& e) {
- *     //handle error
+ *         GMSEC_INFO << "Published Message:\n" << msg.toXML();
+ * 
+ *         // Disconnect from the middleware server
+ *         conn->disconnect();
+ *     }
+ *     catch (const Exception& e)
+ *     {
+ *         GMSEC_ERROR << "Exception: " << e.what();
+ *     }
+ * 
+ *     if (conn != NULL)
+ *     {
+ *         // Destroy the connection 
+ *         Connection::destroy(conn);
+ *     }
+ * 
+ *     // Call shutdown routine for registered middleware(s) to
+ *     // clean up any middleware-related resources.  Currently
+ *     // only ActiveMQ users need to call this.
+ *     Connection::shutdownAllMiddlewares();
  * }
  * @endcode
  *
  * @sa Config
-*/
+ */
 
 class GMSEC_API Connection
 {

@@ -15,8 +15,10 @@ package gov.nasa.gsfc.gmsecapi.util;
 
 /** 
  * @class LogLevel
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
  * @brief Log level definition
  */
+@Deprecated
 public class LogLevel
 {
 	public static final int NONE	= 0;

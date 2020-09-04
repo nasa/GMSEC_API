@@ -46,7 +46,7 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="UNSET"
+	        TYPE="VARIABLE"
 	        DESCRIPTION="Version number identifier of the reporting component. Component must ascertain the data type before accessing the value (e.g. with a function call).  Of type 'Variable' in the GMSEC ISD."/>
 	<FIELD  NAME="CPU-MEM"                                                  
 	        MODE="OPTIONAL"                                                 

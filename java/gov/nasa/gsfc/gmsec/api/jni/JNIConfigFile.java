@@ -125,6 +125,14 @@ public class JNIConfigFile
 	}
 
 
+	public ConfigFile.SubscriptionEntry lookupSubscriptionEntry(String name)
+	{
+		long cPtr = gmsecJNI.ConfigFile_LookupSubscriptionEntry(swigCPtr, this, name);
+
+		return new ConfigFile.SubscriptionEntry(new JNISubscriptionEntry(cPtr, false));
+	}
+
+
 	public void addSubscription(String name, String subject)
 	{
 		gmsecJNI.ConfigFile_AddSubscription(swigCPtr, this, name, subject);

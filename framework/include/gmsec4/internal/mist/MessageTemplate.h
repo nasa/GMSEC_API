@@ -51,7 +51,7 @@ public:
 	~MessageTemplate();
 	
 	//Looks for a FieldTemplate with a matching name and returns it as a Field*
-	Field* getField(const char* name);
+	Field* getField(const char* name, const char* type);
 
 	//Looks for a FieldTemplate with a matching name and returns it as a FieldTemplate
 	const FieldTemplate& getFieldTemplate(const char* name);
@@ -61,7 +61,7 @@ public:
 	 //Returns the template's FieldTemplates as a GMSEC DataList
 	const std::list<FieldTemplate>& listFieldTemplates() const;
 
-	//returns an xml that can put used for a message data constructor
+	//returns an xml that can be used for a message data constructor
 	const char* toXML(const char* subject);
 
 private:

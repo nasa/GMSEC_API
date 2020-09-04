@@ -9,24 +9,30 @@ GMSEC_HOME = ../..
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
-DIRS = gmconfig_c \
-       gm_msg_config_c \
-       gmmist_services_c \
-       gmmist_validation_c \
-       gmpub_c \
-       gmpub_c_wsmq_async \
-       gmreq_c \
-       gmreq_c_cb \
-       gmrpl_c \
-       gmrpl_c_cb \
-       gmsub_c \
-       gmsub_c_cb \
-       gmsub_c_disp \
-       gmsub_c_disp_rr \
-       logging_c \
-       recorder \
-       replier \
-       requestor
+DIRS = configfile \
+	connection_state \
+	device_message \
+	heartbeat_service \
+	log_message \
+	logging \
+	message_bins \
+	message_field_iterator \
+	mnemonic_message \
+	msg_field_container \
+	open_response \
+	product_message \
+	publish \
+	reply \
+	reply_async \
+	request \
+	request_async \
+	resource_service \
+	subject_filtering \
+	subscribe \
+	subscribe_async \
+	validation_addendum \
+	validation_custom \
+	websphere_publish_async
 
 
 .PHONE: default all clean

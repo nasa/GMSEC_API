@@ -13,21 +13,27 @@ This file describes how to build the GMSEC API from the open source
 distribution. The steps in this file assume you have:
 
 * the source code for the API, located in a directory named GMSEC_API
-* for Windows systems: Visual Studio 2008 (or 2010)
+* for Windows systems: Visual Studio 2008 (or newer)
 * for Solaris 10 systems: Sun One Compiler CC, make and gmake
 * for all other systems: make and the GNU Compiler Collection
-        * Red Hat Enterprise Linux 3: gcc 3.2.3, GNU make 3.79.1 [1]
-        * Red Hat Enterprise Linux 4: gcc 3.4.6, GNU make 3.80 [1]
-        * Red Hat Enterprise Linux 5: gcc 4.1.2, GNU make 3.81 [1]
         * Red Hat Enterprise Linux 6: gcc 4.4.6, GNU make 3.81 [1]
+        * Red Hat Enterprise Linux 7: gcc 4.8.5, GNU make 3.82 [1]
         * Mac OS X (PowerPC): gcc 4.0.1, GNU make 3.81
         * Mac OS X (Intel): gcc 4.0.1, GNU make 3.80
         * Mac OS X (Intel): gcc LLVM 5.1 (clang-503.0.40), GNU make 3.81
-        * HP-UX 11.11: gcc 4.1.2, gmake
-* for Java: JDK and JRE version 1.5 or higher
-* for Perl (non-Windows): (threaded) Perl 5.8.8 or later
-* for Perl (Windows): ActivePerl 5.14.2 (build 1402) and the manifest tool
-  (mt.exe) from the Windows SDK
+* for Java: Oracle JDK version 1.8 or higher
+* for Perl (non-Windows):
+        * (threaded) Perl 5.8.8 or later
+		* the Simplified Wrapper and Interface Generator (SWIG)
+		  3.0.10 or later
+* for Perl (Windows):
+        * ActivePerl 5.14.2 (build 1402)
+		* SWIG 3.0.10 or later
+		* the manifest tool (mt.exe) from the Windows SDK
+* for Python:
+        * Python 2.7
+		* SWIG 3.0.10 or later
+		* (non-Windows): python-devel package
 
 Please note that this is intended as a "getting started" document. After
 you are familiar with the build process, you will probably want to tailor
@@ -41,9 +47,12 @@ binaries for distribution. Many alternative tools and versions will work.
 
 The tools tagged [1] are the defaults shipped on those systems.
 
-Past open source GMSEC API distributions had dependencies on libxml2,
-zlib, and Xerces. GMSEC API 3.6 has removed those external dependencies.
-GMSEC API 3.6 no longer depends on the GMSEC_API_SUPPORT.tgz tar-ball.
+Simplified Wrapper and Interface Generator (SWIG) is a third party, open
+source tool used to build the 4.X Perl and Python language bindings of the
+GMSEC API.  For users wishing to pursue an open source build of the API, you
+will have to build SWIG before you are able to build the API.  For build and
+installation instructions, please refer to the README file contained in the
+SWIG open source distribution package.
 
 
 Building GMSEC API extensions
@@ -85,6 +94,9 @@ Define an environment variable JDK_HOME:
 Define an environment variable named PERL5_HOME:
 * Set to your Perl5 installation directory (not the bin directory)
 
+Define an environment variable named PYTHON_HOME:
+* Set to your Python installation directory (not the bin directory)
+
 Define an environment variable named SWIG_HOME:
 * Set to your SWIG installation directory (not the bin directory)
 
@@ -97,10 +109,11 @@ Add all of the following to your PATH:
 * Visual Studio 9.0's Common7/IDE, VC, and VC/bin directories
 
 For example:
-set JDK_HOME=C:\Program Files\Java\jdk1.5.0_22
+set JDK_HOME=C:\Program Files\Java\jdk1.8.0_131
 set PERL5_HOME=C:\Perl64
+set PYTHON_HOME=C:\Python27
 set SWIG_HOME=C:\swig-3.0.10
-set PATH=%PATH%;C:\GMSEC_API\bin;C:\Perl\bin;C:\Program Files\Java\jdk1.5.0_22\bin;
+set PATH=%PATH%;C:\GMSEC_API\bin;C:\Perl\bin;C:\Program Files\Java\jdk1.8.131\bin;
 set PATH=%PATH%;C:\Windows\Microsoft.NET\Framework\v3.5
 set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE
 set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC;
@@ -114,8 +127,9 @@ To set environment variables so that they affect all processes, open up the
 Environment Variables settings in Windows (search for "environment" in the start
 menu and add/modify variables as needed*.
 
-* If you already have a process open when modifying the variables, the new
-settings will not take place until you restart the process.
+* If you already have a process (e.g. command prompt, cygwin, or visual studio)
+  open when modifying the variables, the new settings will not take place until
+  you restart the process.
 
 Preliminary Step for Perl API:
 ----------------------------------
@@ -130,7 +144,7 @@ e.g. copy perl514.lib perl.lib
 
 (The perl.lib file is used during the linking process of the 4.X Perl API build)
 
-Building the C++, C#, Java, and Perl APIs:
+Building the C++, C#, Java, Perl, and Python APIs:
 ---------------------------------------
 Next, open GMSEC_API\gmsecapi_opensource.sln in Visual Studio 2008.  If using
 a later version of Visual Studio (e.g., VS 2010 or VS 2012), Visual Studio
@@ -164,6 +178,12 @@ At the Windows command prompt, from the GMSEC_API\perl\gmsec directory, execute:
         nmake
         nmake install
 
+Utilities (e.g. gmpub, gmsub, etc.):
+---------------------
+Open GMSEC_API\tools\utilities\utilities.sln in Visual Studio. Choose the 
+Release configuration. In the Solution Explorer, right-click the solution
+and select "Rebuild Solution". (Requires that the C++ API be built.) The
+executables will be placed in the GMSEC_API/bin directory.
 
 C++ Examples:
 ---------------------
@@ -218,13 +238,8 @@ Mac OS X x86 (gcc)       macosx.x86
 Mac OS X x86_64 (gcc)    macosx.x86_64
 Mac OS X PPC 32 (gcc)    macosx.ppc
 
-Solaris 10 x86 (CC)      solaris.x86.CC
 Solaris 10 SPARC (CC)    solaris.sparc.CC
 Solaris 10 SPARC (gcc)   solaris.sparc.gcc
-
-HP-UX PA-RISC2 (gcc)     hpux.pa
-HP-UX IA64 (aCC)         hpux.ia64.aCC
-HP-UX IA64 (gcc)         hpux.ia64.gcc
 
 
 The configuration files associated with these platforms are in
@@ -245,15 +260,22 @@ compiler, other tools).
 JDK PATH:
 ---------
 Set the JDK_HOME environment variable to your JDK installation
-e.g.  export JDK_HOME=/usr/java/jdk1.5.0_22
+e.g.  export JDK_HOME=/usr/java/jdk1.8.0_131
 
 For Mac users, here's an example of your JDK_HOME
-e.g.  export JDK_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_71.jdk/Contents/Home/
+e.g.  export JDK_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.131.jdk/Contents/Home/
+
 
 PATH :
 ------
-If not already set, the appropriate version of Perl needs
-to be in your PATH.
+Ensure that the path to the Perl and Python executables are set in the
+PATH environment variable so that they can be readily accessed via command
+line.
+
+Note that if Python and Perl were installed as a default package with the
+operating system, then they are already included in /usr/bin and nothing
+needs to be done here.
+
 
 CLASSPATH :
 -----------
@@ -262,7 +284,8 @@ in the GMSEC_API/bin directory after a successful builld.
 
         GMSEC_API/bin/gmsecapi.jar
 
-PERL5 INCLUDE PATH :
+		
+PERL5 LIBRARIES :
 --------------------
 Set the PERL5_LIB environment variable to the directory containing the library
 files for your installation of Perl 5.
@@ -272,10 +295,22 @@ directory in question contains a subdirectory named "CORE")
 
 e.g.  export PERL5_LIB=/usr/lib64/perl5
 
-SWIG PATH :
+
+PYTHON DEVELOPMENT HEADERS :
+-------------
+Set the PYTHON_INC environment variable to the directory containing the Python
+development header files WITHOUT the Python version number (This will be
+discerned by the Makefile executing "python --version").
+
+e.g. export PYTHON_INC=/usr/include/python
+
+
+SWIG HOME :
 -----------
 Set the SWIG_HOME environment variable to your SWIG installation directory
+
 e.g.  export SWIG_HOME=/home/user/tools/swig-3.0.10
+
 
 For running the GMSEC API examples:
 -----------------------------------
@@ -288,12 +323,11 @@ shared libraries depends on the operating system:
 Linux                 LD_LIBRARY_PATH
 Mac OS X              DYLD_LIBRARY_PATH
 Solaris               LD_LIBRARY_PATH
-HP-UX old             SHLIB_PATH
-HP-UX modern          LD_LIBRARY_PATH
 
 
 Update the environment variable corresponding to the platform to include
 the fully qualified GMSEC_API/bin directory.
+
 
 MW_WRAPPERS :
 -----------
@@ -310,7 +344,7 @@ C++ 3.8.1, the C2, and the C2-NSS wrappers should be built:
 NOTE:
 -----
 If you've added these environment settings to a file such as ".profile",
-".cshrc", or "bashrc", etc., you will need to source these files in order to
+".cshrc", or ".bashrc", etc., you will need to source these files in order to
 incorporate these settings into your environment.
 
 
@@ -346,6 +380,14 @@ The examples are Perl scripts and therefore do not need to be compiled.
 They are located in the directory :
 
 	GMSEC_API/examples/perl
+	
+	
+Python Examples:
+--------------------
+The examples are Python scripts and therefore do not need to be compiled.
+They are located in the directory :
+
+	GMSEC_API/examples/python
 
 
 Java Examples:
@@ -353,6 +395,49 @@ Java Examples:
 The Java example code residing in GMSEC_API/examples/java is not compiled
 as part of the top level API build process, therefore each Java example
 code snippet is left to be built as a user exercise.
+
+
+=========================================================================
+                       Runtime Environment:
+=========================================================================
+
+Java Programs:
+------------------
+In order to run programs with the Java API, the gmsecapi.jar file must be
+present in the CLASSPATH:
+
+e.g.
+(Windows) set CLASSPATH=<Full path to the API>/GMSEC_API/bin/gmsecapi.jar
+(Linux) export CLASSPATH=<Full path to the API>/GMSEC_API/bin/gmsecapi.jar
+
+
+Perl Programs:
+------------------
+In order to run programs with the Perl API, the GMSEC_API/bin and
+GMSEC_API/bin/lib/GMSECAPI4 directories must be set in the PERL5LIB
+environment variable.
+
+PLEASE NOTE that this is not the same as the PERL5_LIB variable used
+for building the API.
+
+e.g.
+(Windows) set PERL5LIB=<Full path to the API>/GMSEC_API/bin;
+				<Full path to the API>/GMSEC_API/bin/lib/GMSECAPI4
+(Linux) export PERL5LIB=<Full path to the API>/GMSEC_API/bin:
+				<Full path to the API>/GMSEC_API/bin/lib/GMSECAPI4
+
+
+Python Programs:
+------------------
+In order to run programs with the Python API, the GMSEC_API/bin and
+GMSEC_API/bin/lib/GMSECAPI4 directories must be set in the PYTHONPATH
+environment variable.
+
+e.g.
+(Windows) set PYTHONPATH=<Full path to the API>/GMSEC_API/bin;
+				<Full path to the API>/GMSEC_API/bin/lib/GMSECAPI4
+(Linux) export PYTHONPATH=<Full path to the API>/GMSEC_API/bin:
+				<Full path to the API>/GMSEC_API/bin/lib/GMSECAPI4
 
 =========================================================================
                        Testing the Build:

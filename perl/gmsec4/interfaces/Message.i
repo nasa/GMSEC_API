@@ -202,8 +202,8 @@ C<libgmsec_perl::Message-E<gt>new($xml)>
 
         my $xml = "<MESSAGE SUBJECT=\"GMSEC.TEST.XML.SUBJECT\" KIND=\"PUBLISH\">"
                   . "       <CONFIG>"
-                  . "           <PARAMETER NAME=\"FOO\">BAR</PARAMETER>"
-                  . "           <PARAMETER NAME=\"DONE\">DEAL</PARAMETER>"
+                  . "           <PARAMETER NAME=\"gmsec-msgfld-store-type\">tree</PARAMETER>"
+                  . "           <PARAMETER NAME=\"gmsec-msgfld-store-size\">100</PARAMETER>"
                   . "        </CONFIG>"
                   . "        <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>"
                   . "        <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>"

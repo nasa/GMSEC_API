@@ -219,10 +219,10 @@ API3Policy::API3Policy ()
 Status API3Policy::initialize (const Config &localConfig)
 {
 	// Should we validate subjects?  We did not in the past, so default false.
-	fValidateSubjects = localConfig.getBooleanValue(VAL_SUB, false);
+	fValidateSubjects = localConfig.getBooleanValue(GMSEC_VALIDATE_SUBJECT, false);
 
 	// If we are validating subjects, should we be lenient?  We have been through 3.1
-	fLenientSubjects = localConfig.getBooleanValue(VAL_SUB_LENIENT, true);
+	fLenientSubjects = localConfig.getBooleanValue(GMSEC_VALIDATE_SUBJECT_LENIENT, true);
 
 	fEncodeHeader = localConfig.getBooleanValue(ENCODE_HEADER, true);
 
@@ -443,16 +443,16 @@ Status API4Policy::initialize(const Config& localConfig)
 	// Make copy of config
 	Config config = localConfig;
 
-	const char* value = config.getValue(VAL_SUB);
+	const char* value = config.getValue(GMSEC_VALIDATE_SUBJECT);
 	if (!value)
 	{
-		config.addValue(VAL_SUB, "true");
+		config.addValue(GMSEC_VALIDATE_SUBJECT, "true");
 	}
 
-	value = config.getValue(VAL_SUB_LENIENT);
+	value = config.getValue(GMSEC_VALIDATE_SUBJECT_LENIENT);
 	if (!value)
 	{
-		config.addValue(VAL_SUB_LENIENT, "false");
+		config.addValue(GMSEC_VALIDATE_SUBJECT_LENIENT, "false");
 	}
 
 	return API3Policy::initialize(config);

@@ -18,6 +18,8 @@ import gov.nasa.gsfc.gmsecapi.jni.JNIConnection;
 
 /** @class Connection
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief The connection class provides services available on an implemented GMSEC
  * connection.  An application can create multiple connection objects with
  * different parameters and different middleware.  Creating multiple connections
@@ -45,6 +47,7 @@ import gov.nasa.gsfc.gmsecapi.jni.JNIConnection;
  * @sa ConnectionFactory @n
  *      Config
  */
+@Deprecated
 public class Connection
 {
 	private JNIConnection m_JNIconn = null;

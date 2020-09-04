@@ -22,6 +22,8 @@ import gov.nasa.gsfc.gmsecapi.Message;
 /**
  * @interface ConnectionManagerCallback
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This interface is for received message callbacks. 
  * A user created class, implemented with this interface, can be passed into 
  * %Subscribe() and to have user code executed asynchronously
@@ -49,6 +51,7 @@ import gov.nasa.gsfc.gmsecapi.Message;
  *
  * @sa ConnectionManager::Subscribe(String subject, ConnectionManagerCallback cb) @n
  */
+@Deprecated
 public interface ConnectionManagerCallback
 {
 	/** @fn OnMessage(ConnectionManager connMgr, Message msg)

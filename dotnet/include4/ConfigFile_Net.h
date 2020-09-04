@@ -129,7 +129,17 @@ public:
 		System::String^ GetName();
 
 		/// <summary>Returns the subject/topic associated with the Subscription entry.</summary>
+		///<note>This function has been deprecated; use getPattern() instead.</note>
 		System::String^ GetSubject();
+		
+		/// <summary>Returns the pattern associated with the Subscription entry.</summary>
+		System::String^ GetPattern();
+		
+		/// <summary>Returns the next excluded pattern associated with the Subscription entry.</summary>
+		System::String^ NextExcludedPattern();
+
+		/// <summary>Returns whether there is a next excluded pattern associated with the Subscription entry.</summary>
+		bool HasNextExcludedPattern();	
 
 		~SubscriptionEntry();
 
@@ -224,9 +234,16 @@ public:
 
 
 	/// <summary>Returns the subscription subject/topic associated with the given name.</summary>
+	///<note>This function has been deprecated; use lookupsubscriptionEntry instead.</note>
 	/// <param name="name">The name of the subscription</param>
 	/// <exception cref="GMSEC_Exception">Thrown if a subscription with the given name does not exist.</exception>
 	System::String^ LookupSubscription(System::String^ name);
+
+
+	/// <summary>Returns the Subscription Entry associated with the given name.</summary>
+	/// <param name="name">The name of the subscription</param>
+	/// <exception cref="GMSEC_Exception">Thrown if a Subscription Entry with the given name does not exist.</exception>
+	ConfigFile::SubscriptionEntry^ LookupSubscriptionEntry(System::String^ name);
 
 
 	/// <summary>Adds the subscription subject/topic with the given name.</summary>

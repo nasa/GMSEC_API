@@ -18,6 +18,8 @@
 
 #include <gmsec4_defs.h>
 
+//#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/ConnectionInterface.h>
 #include <gmsec4/internal/UniqueFilter.h>
 #include <gmsec4/internal/Encoder.h>

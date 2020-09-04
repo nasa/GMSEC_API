@@ -60,17 +60,11 @@ public class Log
 	 *
 	 * @brief Registers a LogHandler that will be called for all logging levels.
 	 *
-	 * @param handler - An instance of a class whose implementation is LogHandler.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given LogHandler is null.
+	 * @param handler - An instance of a class which extends LogHandler, or null to
+	 * restore the default log handler.
 	 */
-	public static void registerHandler(LogHandler handler) throws IllegalArgumentException
+	public static void registerHandler(LogHandler handler)
 	{
-		if (handler == null)
-		{
-			throw new IllegalArgumentException("LogHandler is null");
-		}
-
 		JNILog.registerHandler(handler);
 	}
 
@@ -85,17 +79,11 @@ public class Log
 	 *                LogLevel.SECURE, LogLevel.WARNING, LogLevel.INFO,
 	 *                LogLevel.VERBOSE, and LogLevel.DEBUG.
 	 *
-	 * @param handler - An instance of a class whose implementation is LogHandler.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given LogHandler is null.
+	 * @param handler - An instance of a class which extends LogHandler, or null to
+	 * restore the default log handler.
 	 */
-	public static void registerHandler(LogLevel level, LogHandler handler) throws IllegalArgumentException
+	public static void registerHandler(LogLevel level, LogHandler handler)
 	{
-		if (handler == null)
-		{
-			throw new IllegalArgumentException("LogHandler is null");
-		}
-
 		JNILog.registerHandler(level, handler);
 	}
 

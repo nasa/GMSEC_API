@@ -25,6 +25,7 @@
 
 
 #include <gmsec/Config.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/sysutil.h>
 #include <gmsec/util/wdllexp.h>
 
@@ -55,7 +56,7 @@ public:
 	 *
 	 * @return the current GMSEC API version string
 	 */
-	static const char * CALL_TYPE GetAPIVersion();
+	GMSEC_DEPRECATED static const char * CALL_TYPE GetAPIVersion();
 
 	/** @fn Create(GMSEC_CONNECTION_TYPE connectionType, Config *cfg, Connection *&conn)
 	 *
@@ -67,7 +68,7 @@ public:
 	 * @param conn - out parameter, created connection
 	 * @return status - result of the operation
 	 */
-	static Status CALL_TYPE Create(GMSEC_CONNECTION_TYPE connectionType, Config *cfg, Connection *&conn);
+	GMSEC_DEPRECATED static Status CALL_TYPE Create(GMSEC_CONNECTION_TYPE connectionType, Config *cfg, Connection *&conn);
 
 	/** @fn Create(Config *cfg, Connection *&conn)
 	 *
@@ -103,7 +104,7 @@ public:
 	 *
 	 * @note Status results for any error will have a class code of GMSEC_STATUS_FACTORY_ERROR (DR 2046).
 	 */
-	static Status CALL_TYPE Create(Config *cfg, Connection *&conn);
+	GMSEC_DEPRECATED static Status CALL_TYPE Create(Config *cfg, Connection *&conn);
 
 	/** @fn Destroy(Connection *conn)
 	 * @brief This function is used to destroy a connection
@@ -113,21 +114,21 @@ public:
 	 *
 	 * @note Status results for any error will have a class code of GMSEC_STATUS_FACTORY_ERROR (DR 2046).
 	 */
-	static Status CALL_TYPE Destroy(Connection *conn);
+	GMSEC_DEPRECATED static Status CALL_TYPE Destroy(Connection *conn);
 
 	/** @fn shutdownAllMiddlewares()
 	* @brief Calls shutdown routines for each middleware that has a shutdown routine
 	*   registered.  If the status returned here is an error, it
 	*   is not guaranteed that all shutdown routines were called.
 	*/
-	static Status ShutdownAllMiddlewares();
+	GMSEC_DEPRECATED static Status ShutdownAllMiddlewares();
 
 	/** @fn shutdownMiddleware(name)
 	* @brief Calls the shutdown routine for the middleware with the given name.
 	* @param name A string representing the library name of the gmsec wrapper for
 	*   the middleware to shutdown; e.g., "gmsec_mb".
 	*/
-	static Status ShutdownMiddleware(const char *name);
+	GMSEC_DEPRECATED static Status ShutdownMiddleware(const char *name);
 
 };
 

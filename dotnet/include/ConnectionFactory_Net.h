@@ -47,6 +47,7 @@ namespace Net
 /// type but does not actually establish the connection. The Connection object method <see cref="Connection::Connect()"/>
 /// is required to establish the software bus connection.
 /// </summary>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class ConnectionFactory
 {
 public:

@@ -18,6 +18,8 @@
 
 #include <gmsec4/mist/message/MistMessage.h>
 
+#include <gmsec4/util/Deprecated.h>
+
 
 namespace gmsec
 {
@@ -47,12 +49,9 @@ namespace message
  *
  * @brief A MistMessage object that is capable of storing Mnemonic objects
  * The following message schema IDs and their templates are supported: @n
- * 2014.00.GMSEC.MSG.MVAL @n
- * 2014.00.GMSEC.REQ.MVAL @n
- * 2014.00.GMSEC.RESP.MVAL @n
- * 2016.00.GMSEC.MSG.MVAL @n
- * 2016.00.GMSEC.REQ.MVAL @n
- * 2016.00.GMSEC.RESP.MVAL
+ * MSG.MVAL @n
+ * REQ.MVAL @n
+ * RESP.MVAL @n
  *
  * @sa Message @n
  *	   MistMessage @n
@@ -70,7 +69,9 @@ public:
 	 * @brief constructor - Initializes the message instance with a given schema ID
 	 *
 	 * @param subject - The subject string for the message.
-	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.
+	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+	 * format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). You may also
+	 * use the shorthand notation of messageKind.messageType (e.g. MSG.MVAL).
 	 * @param spec - A reference to the specification this message's schema will adhere to.
 	 * 
 	 * @throw An exception is thrown if Specification fails to load the template directory or if schemaID is not a valid ID.
@@ -87,7 +88,8 @@ public:
 	 *
 	 * @param subject - The subject string for the message.
 	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	 * format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL)
+	 * format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). You may also
+	 * use the shorthand notation of messageKind.messageType (e.g. MSG.MVAL).
 	 * @param config - A configuration to associate with the message.
 	 * @param spec - A reference to the specification this message's schema will adhere to.
 	 * 
@@ -150,13 +152,18 @@ public:
 	/**
 	 * @fn const Mnemonic& getMnemonic(size_t index) const
 	 *
-	 * @brief Get mnemonic numbered at index.
+	 * @brief Get mnemonic numbered at index. Note that the index which will be
+	 * retrieved does not correspond to the GMSEC ISD and starts from 0 instead of 1.
+	 * For example, getMnemonic(0) would return the Mnemonic corresponding to
+	 * MNEMONIC.1.
 	 *
 	 * @return Mnemonic at specified index inside of MnemonicMessage.
 	 *
 	 * @throw Throws an exception if the index specified is not in the range of Mnemonics in this message.
+	 *
+	 * @note This function has been deprecated, use MnemonicIterator instead.
 	 */
-	const Mnemonic& CALL_TYPE getMnemonic(size_t index) const;
+	GMSEC_DEPRECATED const Mnemonic& CALL_TYPE getMnemonic(size_t index) const;
 
 
 	/**

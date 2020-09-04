@@ -497,12 +497,12 @@ void MessageEncoder::encode(const Field &field)
 	Field::FieldType type = field.getType();
 
 	GMSEC_U16 tmp = type;
-#ifdef GMSEC_C2
+
 	if (field.isHeader())
 	{
 		tmp |= GMSEC_FLAG_HEADER_FIELD;
 	}
-#endif
+
 	encoder->putU16(&tmp, current);
 	encoder->putString(field.getName(), current);
 
@@ -1573,9 +1573,7 @@ Field* MessageDecoder::decodeField()
 		decoder->getU16(current, &tmp);
 		if (tmp & GMSEC_FLAG_HEADER_FIELD)
 		{
-#ifdef GMSEC_C2
 			isHeader = true;
-#endif
 			tmp ^= GMSEC_FLAG_HEADER_FIELD;
 		}
 		type = static_cast<Field::FieldType>(tmp);

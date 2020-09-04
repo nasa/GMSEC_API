@@ -230,7 +230,11 @@ const GMSEC_Mnemonic CALL_TYPE mnemonicMessageGetMnemonic(const GMSEC_Message ms
 	{
 		try
 		{
+			GMSEC_DISABLE_DEPRECATED_WARNINGS
+
 			Mnemonic& tmp = const_cast<Mnemonic&>(mnemMsg->getMnemonic(index));
+
+			GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 			mnemonic = reinterpret_cast<GMSEC_Mnemonic>(&tmp);
 		}

@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 {
 	Config config(argc, argv);
 
-	printf("MBServer v "GMSEC_VERSION_NUMBER" ["
+	printf("MBServer v" GMSEC_VERSION_NUMBER " ["
 	       __DATE__
 	       "]\n");
 

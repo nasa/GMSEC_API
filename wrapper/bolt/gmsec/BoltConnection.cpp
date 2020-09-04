@@ -9,6 +9,8 @@
 
 #include <BoltConnection.h>
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/InternalConnection.h>
 #include <gmsec4/internal/MessageBuddy.h>
 #include <gmsec4/internal/Rawbuf.h>
@@ -161,7 +163,7 @@ BoltConnection::BoltConnection(const Config& config)
 		myTag = buffer.str();
 	}
 
-	logInfo.mwGet = config.getBooleanValue("MW-HIDE-MWGET", true);
+	logInfo.mwGet = config.getBooleanValue(BOLT_HIDE_MWGET, true);
 }
 
 
@@ -355,9 +357,9 @@ static Message::MessageKind mapTypeToKind(PacketType type)
 }
 
 
-static Message* parseProperties(const Meta& meta, Message::MessageKind kind)
+static Message* parseProperties(const Meta& meta, Message::MessageKind kind, const Config& msgConfig)
 {
-	Message* message = new Message("BOGUS.TOPIC", kind);
+	Message* message = new Message("BOGUS.TOPIC", kind, msgConfig);
 	ValueMap details;
 	bool     haveSubject = false;
 
@@ -459,7 +461,7 @@ void BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
 
 	if (meta)
 	{
-		message = parseProperties(*meta, kind);
+		message = parseProperties(*meta, kind, getExternal().getMessageConfig());
 	}
 
 	if (message)
@@ -489,14 +491,14 @@ void BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
 
 		if (kind == Message::REQUEST && (meta != NULL && meta->getReplyTo().empty()))
 		{
-			details.setBoolean(OPT_REQ_RESP, true);
+			details.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 
-			const StringField& idField = message->getStringField(REPLY_UNIQUE_ID_FIELD);
+			const StringField& idField = message->getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
-			details.setString(REPLY_UNIQUE_ID_FIELD, idField.getValue());
+			details.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, idField.getValue());
 
-			// Remove REPLY_UNIQUE_ID_FIELD from the message.
-			message->clearField(REPLY_UNIQUE_ID_FIELD);
+			// Remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message.
+			message->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 		}
 	}
 }
@@ -546,12 +548,12 @@ void BoltConnection::mwPublishAux(const Message& message, SharedPacket& packet)
 
 			bool reqResp = false;
 
-			intMsg.getDetails().getBoolean(OPT_REQ_RESP, reqResp, &reqResp);
+			intMsg.getDetails().getBoolean(GMSEC_REQ_RESP_BEHAVIOR, reqResp, &reqResp);
 
 			if (reqResp)
 			{
 				Meta *meta = packet.get()->getMeta();
-				meta->add(Property::createFlag(OPT_REQ_RESP, true));
+				meta->add(Property::createFlag(GMSEC_REQ_RESP_BEHAVIOR, true));
 			}
 		}
 	}
@@ -566,13 +568,13 @@ void BoltConnection::mwRequestAux(Message& message, SharedPacket& packet, std::s
 {
 	uniqueID = generateID();
 
-	message.addField(REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
+	message.addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
 
 	RequestSpecs specs = getExternal().getRequestSpecs();
 
 	if (!specs.useSubjectMapping)
 	{
-		MessageBuddy::getInternal(message).getDetails().setBoolean(OPT_REQ_RESP, true);
+		MessageBuddy::getInternal(message).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
 
 	makePacket(message, packet, PACKET_REQUEST, &uniqueID);
@@ -590,7 +592,7 @@ void BoltConnection::mwRequestAux(Message& message, SharedPacket& packet, std::s
 void BoltConnection::mwReplyAux(Message& request, Message& reply, SharedPacket& packet)
 {
 	// Get the Request's Unique ID, and put it into a field in the Reply
-	const StringField* idField = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
+	const StringField* idField = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
 
 	if (!idField)
 	{
@@ -676,6 +678,11 @@ void SingleConnection::mwConnect()
 	{
 		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
 	}
+
+	std::ostringstream endpoint;
+	endpoint << connection->getServer().host << ":" << connection->getServer().port;
+
+	getExternal().setConnectionEndpoint(endpoint.str());
 
 	if (specs.requestReplyEnabled)
 	{
@@ -805,7 +812,7 @@ const char* SingleConnection::getMWInfo()
 MultipleConnection::MultipleConnection(const Config& config)
 	: BoltConnection(config)
 {
-	filter.setDebug(config.getBooleanValue("MW-LOG-FILTER", false));
+	filter.setDebug(config.getBooleanValue(BOLT_LOG_FILTER, false));
 }
 
 
@@ -873,6 +880,8 @@ void MultipleConnection::mwConnect()
 		myReplyHandler = new MyPacketHandler(*this, true);
 	}
 
+	std::ostringstream endpoints;
+
 	for (ConnIt i = connections.begin(); i != connections.end(); ++i)
 	{
 		bolt::Connection *connection = *i;
@@ -881,6 +890,13 @@ void MultipleConnection::mwConnect()
 		connection->setReplyHandler(myReplyHandler);
 
 		multi.update(result);
+
+		if (!result.isError())
+		{
+			const Server s = connection->getServer();
+
+			endpoints << (endpoints.str().empty() ? "" : ",") << s.host << ":" << s.port;
+		}
 	}
 
 	Status status = multi.get();

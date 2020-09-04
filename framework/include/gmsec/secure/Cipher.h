@@ -22,6 +22,7 @@
 #include <gmsec/Config.h>
 #include <gmsec/util/Buffer.h>
 #include <gmsec/internal/Value.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 namespace gmsec {
@@ -43,7 +44,7 @@ public:
 		Instantiates a null cipher.
 	*/
 
-	Cipher ();
+	GMSEC_DEPRECATED Cipher ();
 	~Cipher ();
 
 	bool isValid () const;
@@ -99,7 +100,7 @@ public:
 class GMSEC_API NullCipher : public AbstractCipher
 {
 public:
-	NullCipher ();
+	GMSEC_DEPRECATED NullCipher ();
 
 	virtual bool isValid () const;
 	virtual const char * getID () const;
@@ -124,7 +125,7 @@ class GMSEC_API DisabledCipher : public AbstractCipher
 {
 public:
 
-	DisabledCipher ();
+	GMSEC_DEPRECATED DisabledCipher ();
 	virtual ~DisabledCipher ();
 
 	virtual bool isValid () const;
@@ -151,7 +152,7 @@ class GMSEC_API RotateCipher : public AbstractCipher
 {
 public:
 
-	RotateCipher ();
+	GMSEC_DEPRECATED RotateCipher ();
 
 	virtual bool isValid () const;
 	virtual const char * getID () const;

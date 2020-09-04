@@ -4,29 +4,6 @@
 # All Rights Reserved.
 
 
-
-
-if [[ -f ../../include/gmsec_version.h ]]; then
-	version=$(cat ../../include/gmsec_version.h | grep GMSEC_VERSION_NUMBER | awk -F\" '{print $2}')
-elif [[ -f ../version.inf ]]; then
-	version=$(cat ../version.inf)
-else
-	version=__API_VERSION__
-fi
-
-# Only define colors (for text) when stdout is associated with a terminal.
-if [ -t 1 ]; then
-	txtrst=$(tput sgr0)    # Text reset
-	txtred=$(tput setaf 1) # Red
-	txtgrn=$(tput setaf 2) # Green
-	txtyel=$(tput setaf 3) # Yellow
-	txtblu=$(tput setaf 4) # Blue
-	txtpur=$(tput setaf 5) # Purple
-	txtcyn=$(tput setaf 6) # Cyan
-	txtwht=$(tput setaf 7) # White
-fi
-
-
 function ShowUsage
 {
 	echo "Usage: $0 <mw> [check_JMS]"
@@ -784,7 +761,7 @@ function CheckEnvironmentVariables
 {
 	mw=$1
 	lower_mw="$(echo $mw | tr '[A-Z]' '[a-z]')"
-	env_file=$lower_mw.env
+	env_file=$working_dir/$lower_mw.env
 
 	if [ -f $env_file ]; then
 		echo
@@ -814,6 +791,7 @@ if [ $# -lt 1 ]; then
 	exit 1
 fi
 
+
 working_dir=$(dirname $0)
 mw_type=$1
 gmsec_api_bin=
@@ -821,6 +799,28 @@ path_found=
 java_home=
 java_ver=
 result=0
+
+
+if [[ -f $working_dir/../../include/gmsec_version.h ]]; then
+	version=$(cat $working_dir/../../include/gmsec_version.h | grep GMSEC_VERSION_NUMBER | awk -F\" '{print $2}')
+elif [[ -f ../version.inf ]]; then
+	version=$(cat ../version.inf)
+else
+	version=__API_VERSION__
+fi
+
+# Only define colors (for text) when stdout is associated with a terminal.
+if [ -t 1 ]; then
+	txtrst=$(tput sgr0)    # Text reset
+	txtred=$(tput setaf 1) # Red
+	txtgrn=$(tput setaf 2) # Green
+	txtyel=$(tput setaf 3) # Yellow
+	txtblu=$(tput setaf 4) # Blue
+	txtpur=$(tput setaf 5) # Purple
+	txtcyn=$(tput setaf 6) # Cyan
+	txtwht=$(tput setaf 7) # White
+fi
+
 
 # Check validity of input for middleware type
 #

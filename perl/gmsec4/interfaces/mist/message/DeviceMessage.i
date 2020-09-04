@@ -25,8 +25,7 @@ libgmsec_perl::DeviceMessage
 	A MistMessage object that is capable of storing Device objects.  
 
 	The Following message schema IDs and their templates are supported:
-	2014.00.GMSEC.MSG.C2CX.DEV
-	2016.00.GMSEC.MSG.C2CX.DEV
+	GMSEC.MSG.C2CX.DEV
 
 =head2 Public Member Subroutines
 

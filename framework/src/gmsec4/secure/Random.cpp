@@ -15,6 +15,8 @@
 #include <fstream>
 #endif
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/secure/Random.h>
 
 #include <gmsec4/internal/SystemUtil.h>
@@ -282,7 +284,7 @@ Status SystemRandom::initialize(const Config &config)
 
 #else /* not WIN32 */
 
-	const char * value = config.getValue("SEC-RANDOM-PATH");
+	const char * value = config.getValue(GMSEC_RANDOM_PATH);
 	if (value)
 	{
 		path = value;

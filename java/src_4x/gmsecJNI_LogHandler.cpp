@@ -88,6 +88,8 @@ void CxxLogHandlerProxy::onMessage(const LogEntry& entry)
 		jenv->CallVoidMethod(jLogHandler, callbackMethod, logEntryObj);
 
 		jvmOk(jenv, "JNILogHandler.onMessage");
+
+		jenv->DeleteLocalRef(logEntryObj);
 	}
 	else
 	{

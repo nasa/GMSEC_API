@@ -65,7 +65,7 @@ namespace internal
 InternalMnemonicMessage::InternalMnemonicMessage(const char* subject, 
 												 const char* schemaID,
 												 const Specification& spec)
-	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID), schemaID, spec),
+	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, spec),
 	  m_list(),
 	  m_mnemonicIterator(*this)
 {
@@ -77,7 +77,7 @@ InternalMnemonicMessage::InternalMnemonicMessage(const char* subject,
 												 const char* schemaID,
 												 const gmsec::api::Config& config, 
 												 const Specification& spec)
-	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID), schemaID, config, spec),
+	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, config, spec),
 	  m_list(),
 	  m_mnemonicIterator(*this)
 {

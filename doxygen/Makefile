@@ -3,14 +3,14 @@
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
 
-DOX_CFG_FILES = gmsec_c_dox gmsec_c_4x_dox gmsec_cpp_dox gmsec_cpp_4x_dox gmsec_java_dox gmsec_java_4x_dox
+DOX_CFG_FILES = gmsec_c_3x_dox gmsec_c_4x_dox gmsec_cpp_3x_dox gmsec_cpp_4x_dox gmsec_java_3x_dox gmsec_java_4x_dox gmsec_python_4x_dox
 
 GMSEC_HOME    = ..
 DOCS          = $(GMSEC_HOME)/../GMSEC_API_DOCS/docs
 
 PERL_3X       = ../perl/gmsec
 PERL_3X_LIB   = $(PERL_3X)/lib
-PERL_3X_DOCS  = manual/perl
+PERL_3X_DOCS  = manual/perl_3x
 
 PERL_4X              = ../perl/gmsec4
 PERL_4X_INTERFACES   = $(PERL_4X)/interfaces

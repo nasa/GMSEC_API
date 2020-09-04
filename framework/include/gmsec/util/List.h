@@ -23,6 +23,8 @@
 #ifndef gmsec_util_List_h
 #define gmsec_util_List_h
 
+#include <gmsec/util/Deprecated.h>
+
 #include <vector>
 #include <cstddef>
 
@@ -49,7 +51,7 @@ public:
 	*	@brief Standard constructor. 
 	*
 	*/
-	List(){
+	GMSEC_DEPRECATED List(){
 
 	}
 

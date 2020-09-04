@@ -20,6 +20,9 @@ import gov.nasa.gsfc.gmsecapi.Message;
 
 
 /** @class ConnectionManagerReplyCallback
+ *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This class is the abstract base class for received replies from asynchronous request messages.
  * A user created class, derrived from this class, can be passed into
  * %Request() to have user code executed asynchronously when a reply is received or when an error occurs.
@@ -59,7 +62,8 @@ import gov.nasa.gsfc.gmsecapi.Message;
  * if (result.IsError())
  *     // handle error
  * @endcode
-*/
+ */
+@Deprecated
 public interface ConnectionManagerReplyCallback extends ConnectionManagerErrorCallback
 {
 	/** @fn OnReply(ConnectionManager connMgr, Message request, Message reply)

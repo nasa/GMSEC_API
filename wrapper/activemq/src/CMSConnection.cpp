@@ -16,6 +16,8 @@
 
 #include "CMSDestination.h"
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/InternalConnection.h>
 #include <gmsec4/internal/MessageBuddy.h>
 #include <gmsec4/internal/Rawbuf.h>
@@ -26,6 +28,7 @@
 #include <gmsec4/Connection.h>
 #include <gmsec4/Exception.h>
 
+#include <activemq/commands/BrokerInfo.h>
 #include <activemq/core/ActiveMQConnection.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Long.h>
@@ -465,6 +468,19 @@ CMSTransportListener::~CMSTransportListener()
 }
 
 
+void CMSTransportListener::onCommand(const decaf::lang::Pointer<activemq::commands::Command> command)
+{
+	if (command->isBrokerInfo())
+	{
+		const activemq::commands::BrokerInfo* brokerInfo = dynamic_cast<const activemq::commands::BrokerInfo*>(command.get());
+
+		GMSEC_VERBOSE << "Connected to: " << brokerInfo->getBrokerURL().c_str();
+
+		connection->getExternal().setConnectionEndpoint(brokerInfo->getBrokerURL());
+	}
+}
+
+
 void CMSTransportListener::transportInterrupted()
 {
 	if (connection)
@@ -812,16 +828,6 @@ void CMSConnection::mwConnect()
 			m_connection->setClientID(m_connClientId);
 		}
 
-		m_publishSession.reset(m_connection->createSession());
-
-		if (m_requestSpecs.requestReplyEnabled && m_requestSpecs.useSubjectMapping)
-		{
-			m_requestReplyDestination.reset(m_publishSession->createTopic(m_requestSpecs.replySubject));
-			m_requestReplyProducer.reset(m_publishSession->createProducer(m_requestReplyDestination.get()));
-			m_replyConsumer.reset(m_publishSession->createConsumer(m_requestReplyDestination.get()));
-			m_replyConsumer->setMessageListener(new ReplyListener(this));
-		}
-
 		m_exceptionListener = new CMSExceptionListener(this);
 		m_connection->setExceptionListener(m_exceptionListener);
 
@@ -830,6 +836,16 @@ void CMSConnection::mwConnect()
 		{
 			m_transportListener = new CMSTransportListener(this, m_reportFailoverEvent);
 			amqConnection->addTransportListener(m_transportListener);
+		}
+
+		m_publishSession.reset(m_connection->createSession());
+
+		if (m_requestSpecs.requestReplyEnabled && m_requestSpecs.useSubjectMapping)
+		{
+			m_requestReplyDestination.reset(m_publishSession->createTopic(m_requestSpecs.replySubject));
+			m_requestReplyProducer.reset(m_publishSession->createProducer(m_requestReplyDestination.get()));
+			m_replyConsumer.reset(m_publishSession->createConsumer(m_requestReplyDestination.get()));
+			m_replyConsumer->setMessageListener(new ReplyListener(this));
 		}
 
 		m_connection->start();
@@ -891,10 +907,10 @@ gmsec_amqcms::SubscriptionInfo* CMSConnection::makeSubscriptionInfo(const std::s
 	std::auto_ptr<cms::Topic>           topic(m_publishSession->createTopic(in));
 	std::auto_ptr<cms::MessageConsumer> consumer;
 
-	if (config.getBooleanValue("durable-subscribe", false))
+	if (config.getBooleanValue(AMQ_DURABLE_SUBSCRIBE, false))
 	{
-		const char* clientId    = config.getValue("durable-client-id");
-		const char* msgSelector = config.getValue("durable-message-selector");
+		const char* clientId    = config.getValue(AMQ_DURABLE_CLIENT_ID);
+		const char* msgSelector = config.getValue(AMQ_DURABLE_MSG_SELECTOR);
 
 		if (!clientId)
 		{
@@ -1039,13 +1055,13 @@ void CMSConnection::mwPublish(const Message& msg, const Config& config)
 
 		prepare(msg, cmsMsg);
 
-		if (config.getBooleanValue("durable-publish", false))
+		if (config.getBooleanValue(AMQ_DURABLE_PUBLISH, false))
 		{
 			int priority = 4;
 			long long timeToLive = 30000;
 
-			const char* priorityStr   = config.getValue("durable-priority");
-			const char* timeToLiveStr = config.getValue("durable-time-to-live");
+			const char* priorityStr   = config.getValue(AMQ_DURABLE_PRIORITY);
+			const char* timeToLiveStr = config.getValue(AMQ_DURABLE_TTL);
 
 			if (priorityStr)
 			{
@@ -1134,13 +1150,13 @@ void CMSConnection::mwRequest(const Message& request, std::string& id)
 
 	std::auto_ptr<cms::Message> cmsRequest;
 
-	MessageBuddy::getInternal(request).addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
+	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 
 	try
 	{
 		if (!m_requestSpecs.useSubjectMapping)
 		{
-			MessageBuddy::getInternal(request).getDetails().setBoolean(OPT_REQ_RESP, true);
+			MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 		}
 
 		prepare(request, cmsRequest);
@@ -1169,7 +1185,7 @@ void CMSConnection::mwRequest(const Message& request, std::string& id)
 void CMSConnection::mwReply(const Message& request, const Message& reply)
 {
 	// Get the Request's Unique ID, and put it into a field in the Reply
-	const StringField* uniqueID = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
+	const StringField* uniqueID = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
 
 	if (!uniqueID)
 	{
@@ -1177,7 +1193,7 @@ void CMSConnection::mwReply(const Message& request, const Message& reply)
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
 
-	// Add the REPLY_UNIQUE_ID_FIELD to the reply message
+	// Add the GMSEC_REPLY_UNIQUE_ID_FIELD to the reply message
 	const_cast<Message&>(reply).addField(*uniqueID);
 
 	try
@@ -1336,9 +1352,9 @@ static const char* kindToCMSType(Message::MessageKind kind)
 }
 
 
-static Message* parseProperties(const cms::Message& cmsMessage, Message::MessageKind msgKind, ValueMap& meta)
+static Message* parseProperties(const cms::Message& cmsMessage, Message::MessageKind msgKind, const Config& msgConfig, ValueMap& meta)
 {
-	std::auto_ptr<Message> message(new Message("BOGUS.TOPIC", msgKind));
+	std::auto_ptr<Message> message(new Message("BOGUS.TOPIC", msgKind, msgConfig));
 
 	std::string subject;
 
@@ -1506,7 +1522,7 @@ void CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMessag
 
 	ValueMap meta;
 
-	msgManager.reset(parseProperties(*cmsMessage, msgKind, meta));
+	msgManager.reset(parseProperties(*cmsMessage, msgKind, getExternal().getMessageConfig(), meta));
 
 	// need to copy destination for reply
 	if (msgKind == Message::REQUEST)
@@ -1576,14 +1592,14 @@ void CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMessag
 	{
 		ValueMap& msgMeta = MessageBuddy::getInternal(*gmsecMessage).getDetails();
 
-		msgMeta.setBoolean(OPT_REQ_RESP, true);
+		msgMeta.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 
-		const StringField& field    = gmsecMessage->getStringField(REPLY_UNIQUE_ID_FIELD);
+		const StringField& field    = gmsecMessage->getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 		const char*        uniqueID = field.getValue();
 
-		msgMeta.setString(REPLY_UNIQUE_ID_FIELD, uniqueID);
+		msgMeta.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID);
 
-		gmsecMessage->clearField(REPLY_UNIQUE_ID_FIELD);
+		gmsecMessage->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 	}
 }
 

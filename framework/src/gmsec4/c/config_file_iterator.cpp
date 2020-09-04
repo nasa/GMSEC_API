@@ -216,7 +216,7 @@ GMSEC_SubscriptionEntry CALL_TYPE configFileIteratorNextSubscription(GMSEC_Confi
 			const ConfigFile::SubscriptionEntry& nativeEntry = cfi->nextSubscription();
 
 			entry.name    = nativeEntry.getName();
-			entry.subject = nativeEntry.getSubject();
+			entry.subject = nativeEntry.getPattern();
 		}
 		catch (Exception& e)
 		{
@@ -284,4 +284,64 @@ void CALL_TYPE configFileIteratorReset(GMSEC_ConfigFileIterator iter, GMSEC_Stat
 	{
 		*(reinterpret_cast<Status*>(status)) = result;
 	}
+}
+
+
+GMSEC_BOOL CALL_TYPE configFileIteratorHasNextSubscriptionEntry(GMSEC_ConfigFileIterator iter, GMSEC_Status status)
+{
+	GMSEC_BOOL flag = GMSEC_FALSE;
+	Status     result;
+
+	const ConfigFileIterator* cfi = reinterpret_cast<const ConfigFileIterator*>(iter);
+
+	if (!cfi)
+	{
+		result = Status(ITERATOR_ERROR, UNINITIALIZED_OBJECT, "ConfigFileIterator handle is NULL");
+	}
+	else
+	{
+		flag = (cfi->hasNextSubscription() ? GMSEC_TRUE : GMSEC_FALSE);
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return flag;
+}
+
+
+GMSEC_SubscriptionEntry_Handle CALL_TYPE configFileIteratorNextSubscriptionEntry(GMSEC_ConfigFileIterator iter, GMSEC_Status status)
+{
+	GMSEC_SubscriptionEntry_Handle entry = NULL;
+	Status                         result;
+
+	ConfigFileIterator* cfi = reinterpret_cast<ConfigFileIterator*>(iter);
+
+	if (!cfi)
+	{
+		result = Status(ITERATOR_ERROR, UNINITIALIZED_OBJECT, "ConfigFileIterator handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			ConfigFile::SubscriptionEntry& nativeEntry =
+				const_cast<ConfigFile::SubscriptionEntry&>(cfi->nextSubscription());
+
+			entry = reinterpret_cast<GMSEC_SubscriptionEntry_Handle>(&nativeEntry);
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return entry;
 }

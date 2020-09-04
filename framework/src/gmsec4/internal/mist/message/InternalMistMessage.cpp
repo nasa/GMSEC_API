@@ -219,16 +219,18 @@ void InternalMistMessage::registerTemplate(const char* schemaID)
 {
 	try
 	{
-		const MessageTemplate& temp = SpecificationBuddy::getInternal(*m_spec).findTemplate(schemaID);
+		std::string id = schemaID;   // note: schemaID has already been verified to be non-NULL
+
+		const MessageTemplate& temp = SpecificationBuddy::getInternal(*m_spec).findTemplate(id.c_str());
 
 		//found the right template, now add the header fields
-		std::list<FieldTemplate> fields = SpecificationBuddy::getInternal(*m_spec).prepHeaders(schemaID);
+		std::list<FieldTemplate> fields = SpecificationBuddy::getInternal(*m_spec).prepHeaders(id.c_str());
 		for(std::list<FieldTemplate>::const_iterator it = temp.listFieldTemplates().begin(); it != temp.listFieldTemplates().end(); ++it)
 		{
 			fields.push_back(*it);
 		}
 
-		m_template = MessageTemplate(schemaID, fields);
+		m_template = MessageTemplate(id.c_str(), fields);
 	}
 	catch(Exception& e)
 	{
@@ -978,15 +980,15 @@ const FieldTemplate& InternalMistMessage::findFieldTemplate(const char* fieldNam
 	{
 		FieldTemplate temp = *ft;
 
-		if(StringUtil::stringEqualsIgnoreCase(temp.getName(), "ARRAY-START") &&
-		   StringUtil::stringEqualsIgnoreCase(temp.getMode(), "CONTROL"))
+		if(StringUtil::stringEqualsIgnoreCase(temp.getName().c_str(), "ARRAY-START") &&
+		   StringUtil::stringEqualsIgnoreCase(temp.getMode().c_str(), "CONTROL"))
 		{//we found an array control
 		 //grab the placeholder value for the array control
 			arrayControlActive++;
 			placeHolders.push_back(temp.getValue());
 		}
-		else if(StringUtil::stringEqualsIgnoreCase(temp.getName(), "ARRAY-END") &&
-				StringUtil::stringEqualsIgnoreCase(temp.getMode(), "CONTROL"))
+		else if(StringUtil::stringEqualsIgnoreCase(temp.getName().c_str(), "ARRAY-END") &&
+				StringUtil::stringEqualsIgnoreCase(temp.getMode().c_str(), "CONTROL"))
 		{//we can remove the last last value since we're done with it
 			arrayControlActive--;
 		}
@@ -1035,7 +1037,7 @@ const FieldTemplate& InternalMistMessage::findFieldTemplate(const char* fieldNam
 		}
 		else
 		{//regular field
-			if(StringUtil::stringEquals(temp.getName(), fieldName))
+			if(StringUtil::stringEquals(temp.getName().c_str(), fieldName))
 			{
 				return *ft;
 			}
@@ -1100,27 +1102,29 @@ Specification InternalMistMessage::buildSpecification(unsigned int version)
 }
 
 
-Message::MessageKind InternalMistMessage::findKind(const char* schemaID)
+Message::MessageKind InternalMistMessage::findKind(const char* schemaID, unsigned int version)
 {
 	if (!schemaID || std::string(schemaID).empty())
 	{
 		throw Exception(MSG_ERROR, UNKNOWN_MSG_TYPE, "SchemaID cannot be NULL nor contain an empty string");
 	}
 
-	//schema ID: major.minor.schemaLevel.messagekind.messagetype.<optionalmessagesubtype>
-	//             0     1        2           3           4                5
+	// The types of Schema IDs that the API (currently) supports.
+	//
+	// Schema ID Type 1: major.minor.schemaLevel.messagekind.messagetype.<optionalmessagesubtype>
+	// Schema ID Type 2: messagekind.messagetype.<optionalmessagesubtype>
+
 	std::vector<std::string> elements = StringUtil::split(schemaID, '.');
+	std::string kind;
 
-	if(elements.size() < 5 || //a valid schema ID contains at least 5 elements
-	   elements.at(0).size() != 4 || //the first element must be a 4 digit major version
-	   elements.at(1).size() != 2) //the second element must be a 2 digit minor revision
+	if (elements.size() >= 5)        // Type 1
 	{
-		std::ostringstream err;
-		err << schemaID << " is not a valid schema ID";
-		throw Exception(MSG_ERROR, UNKNOWN_MSG_TYPE, err.str().c_str());
+		kind = elements.at(3);
 	}
-
-	std::string kind = elements.at(3);
+	else if (elements.size() >= 2)   // Type 2
+	{
+		kind = elements.at(0);
+	}
 
 	if(StringUtil::stringEqualsIgnoreCase(kind.c_str(), "MSG"))
 	{
@@ -1161,11 +1165,11 @@ void InternalMistMessage::init()
 	{
 		FieldTemplate temp = *it;
 
-		if(!StringUtil::stringEquals(temp.getValue(), ""))
-		{//the field template has a predefined value, so we'll add the field to the message
+		if(temp.hasExplicitType() && temp.hasExplicitValue())
+		{//the field template has an explicitly defined type and value, so we'll add the field to the message
 			try
 			{
-				std::auto_ptr<Field> field(temp.toField());
+				std::auto_ptr<Field> field(temp.toField(temp.getType()));
 
 				addField(*(field.get()));
 			}

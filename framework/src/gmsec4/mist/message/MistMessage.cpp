@@ -27,13 +27,13 @@ using namespace gmsec::api::mist::message::internal;
 
 
 MistMessage::MistMessage(const char* subject, const char* schemaID, const Specification& spec)
-	: Message(new InternalMistMessage(subject, InternalMistMessage::findKind(schemaID), schemaID, spec))
+	: Message(new InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, spec))
 {
 }
 
 
 MistMessage::MistMessage(const char* subject, const char* schemaID, const gmsec::api::Config& config, const Specification& spec)
-	: Message(new InternalMistMessage(subject, InternalMistMessage::findKind(schemaID), schemaID, spec))
+	: Message(new InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, spec))
 {
 }
 

@@ -17,6 +17,8 @@
 
 #include <gmsec4/Exception.h>
 
+#include <gmsec4/util/Deprecated.h>
+
 
 using namespace gmsec::api;
 using namespace gmsec::api::jni;
@@ -181,6 +183,7 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specification_1
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specification_1GetTemplateXML
   (JNIEnv *jenv, jclass jcls, jlong jSpecPtr, jobject jSpec, jstring jSubject, jstring jSchemaID)
 {
@@ -210,6 +213,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specificatio
 
 	return xml;
 }
+GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 
 #ifdef __cplusplus
