@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -61,9 +61,7 @@ public class request_open_resp
  		initializeLogging(config);
 
 		//o Output GMSEC API version
-		// TODO: Once available, replace this statement with usage of
-		// ConnectionManager::getAPIVersion (See RTC 4798)
- 		Log.info(Connection.getAPIVersion());
+ 		Log.info(ConnectionManager.getAPIVersion());
 
 		try
 		{
@@ -95,15 +93,12 @@ public class request_open_resp
 			//o Display XML representation of request message
 			Log.info("Sending request message:\n" + requestMsg.toXML());
 
-			//o Send Request Message -- Since we are using open response,
-			// we will have to receive the message using receive().  As such
-			// we will tell request() to return immediately.
+			//o Send Request Message
 			// Timeout periods:
 			// -1 - Wait forever
 			//  0 - Return immediately
 			// >0 - Time in milliseconds before timing out
-			connMgr.request(requestMsg, 0, -1);
-			Message replyMsg = connMgr.receive(-1);
+			Message replyMsg = connMgr.request(requestMsg, 1000, gmsecAPI.REQUEST_REPUBLISH_NEVER);
 
 			// Example error handling for calling request() with a timeout
 			if (replyMsg != null)

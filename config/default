@@ -11,14 +11,26 @@ MAKEFILE      = Makefile
 
 SUPPORT       = $(GMSEC_HOME)/../SUPPORT
 
-BASE_WRAPPERS = mb bolt generic_jms
+ifndef LIBXML2_HOME
+LIBXML2_HOME  = /usr
+endif
+
+ifndef LIBXSLT_HOME
+LIBXSLT_HOME  = /usr
+endif
+
+BASE_WRAPPERS = mb
+
+ifdef JDK_HOME
+BASE_WRAPPERS += bolt generic_jms
+
+JAVA_BIN      = $(JDK_HOME)/bin
+endif
 
 WRAPPERS      = $(BASE_WRAPPERS) $(MW_WRAPPERS) $(USER_WRAPPERS)
 
 SHLIB_EXT     = so
 JSHLIB_EXT    = so
-
-JAVA_BIN      = $(JDK_HOME)/bin
 
 # Uncomment the definition below if debugging of the API is required.
 #

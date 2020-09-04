@@ -36,6 +36,11 @@
     validate (optional): boolean flag to indicate whether the ConnectionManager should validate messages (default is false)
     version (optional): the version of the GMSEC message specification to be used in validating messages (default is GMSEC_ISD_CURRENT)
 
+    Exceptions
+    ----------
+    An Exception is thrown if the configuration information cannot be used to deduce
+        a Connection type, or if an anomaly occurs while loading schemas for the specified ISD.
+
 ";
 
 %feature("docstring") gmsec::api::mist::ConnectionManager::requestDirective "
@@ -85,11 +90,10 @@
     timeout: The time to wait before a response to the message will no longer
         be routed to the supplied callback
     cb: the callback to be invoked upon reception of a response message
-    republish_ms: request message resubmission interval (in milliseconds). If set
-        to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-        period will default to 60000ms, unless the user has provided an alternate time period via
-        the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-        is 100ms.
+    republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+        value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+        the period will default to 60000ms, unless the user has provided an alternate time period via the
+        Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
     Exceptions
     ----------
@@ -118,11 +122,10 @@
         with the directive message.
     timeout: The time to wait before a response to the message will no longer
         be routed to the supplied callback
-    republish_ms: request message resubmission interval (in milliseconds). If set
-        to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-        period will default to 60000ms, unless the user has provided an alternate time period via
-        the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-        is 100ms.
+    republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+        value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+        the period will default to 60000ms, unless the user has provided an alternate time period via the
+        Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
     Exceptions
     ----------
@@ -200,7 +203,6 @@
 
     Exceptions
     ----------
-    An Exception is thrown if the ConnectionManager has not been initialized.
     An Exception is thrown if the callback is NULL.
 
 ";
@@ -425,11 +427,10 @@
     timeout: The time to wait before a response to the message will no longer
         be routed to the supplied callback
     cb: the callback to be invoked upon reception of a response message
-    republish_ms: request message resubmission interval (in milliseconds). If set
-        to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-        period will default to 60000ms, unless the user has provided an alternate time period via
-        the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-        is 100ms.
+    republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+        value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+        the period will default to 60000ms, unless the user has provided an alternate time period via the
+        Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
     Exceptions
     ----------
@@ -460,11 +461,10 @@
         invocation
     timeout: The time to wait before a response to the message will no longer
         be routed to the supplied callback
-    republish_ms: request message resubmission interval (in milliseconds). If set
-        to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-        period will default to 60000ms, unless the user has provided an alternate time period via
-        the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-        is 100ms.
+    republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+        value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+        the period will default to 60000ms, unless the user has provided an alternate time period via the
+        Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
     Exceptions
     ----------
@@ -587,11 +587,10 @@
     request: message to be sent
     timeout: maximum time to wait for reply (in milliseconds)
     cb: callback to call when reply is received
-    republish_ms: request message resubmission interval (in milliseconds). If set
-        to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-        period will default to 60000ms, unless the user has provided an alternate time period via
-        the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-        is 100ms.
+    republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+        value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+        the period will default to 60000ms, unless the user has provided an alternate time period via the
+        Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
     Exceptions
     ----------
@@ -613,11 +612,10 @@
     ----------
     request: message to be sent
     timeout: maximum time to wait for reply (in milliseconds)
-    republish_ms: request message resubmission interval (in milliseconds). If set
-        to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-        period will default to 60000ms, unless the user has provided an alternate time period via
-        the Config object used to create the ConnectionManager object.  The minimum republish period allowed
-        is 100ms.
+    republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+        value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+        the period will default to 60000ms, unless the user has provided an alternate time period via the
+        Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
     Returns
     -------
@@ -1036,16 +1034,12 @@
 
     initialize(self)
 
-    Uses the config object supplied in the
-    constructor to establish a connection with the defined GMSEC middleware server.
-    The underlying connection object is created and connected in one operation,
-    returning an error status if either operation is a failure. Once this call
-    successfully returns, the ConnectionManager is ready for message operations.
+    Establishes a connection with the GMSEC middleware server.
+    Once this call successfully returns, the ConnectionManager is ready for message operations.
 
     Exceptions
     ----------
-    An Exception is thrown if the configuration information cannot be used to deduce
-    a Connection type, or if an anomaly occurs while connecting to the middleware server.
+    An Exception is thrown if an anomaly occurs while connecting to the middleware server.
 
 ";
 
@@ -1059,6 +1053,9 @@
     the message will be published at an interval supplied by the \"PUB-RATE\" field regardless of validation
     results. If no \"PUB-RATE\" has been defined, the service will default to the GMSEC standard 30 second
     heartbeat interval.
+
+    If users would like to have a COUNTER field added to the published heartbeat message, then the Heartbeat
+    Service should be provided with this field within the list of field provided to this method.
 
     MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
     added to the message automatically, according to the GMSEC Message Standard

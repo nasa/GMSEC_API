@@ -1,0 +1,23 @@
+<SCHEMA NAME="2016.00.EXAMPLE.MSG.LOG">
+        <FIELD NAME="NUM-OF-EVENTS"
+               MODE="REQUIRED"
+               FIELD_CLASS="STANDARD"
+               VALUE=""
+               TYPE="U16"
+               DESCRIPTION="The number of errors which have occurred since the last LOG Message"/>
+        <FIELD NAME="ARRAY-START"
+               MODE="CONTROL"
+               VALUE="n"
+               SIZE="NUM-OF-EVENTS"
+               DESCRIPTION=" Control field indicating the start of an array of object fields"/>
+        <FIELD NAME="EVENT.n"
+               MODE="REQUIRED"
+               FIELD_CLASS="STANDARD"
+               VALUE=""
+               TYPE="STRING"
+               DESCRIPTION="This is an example field template"/>
+        <FIELD NAME="ARRAY-END"
+               MODE="CONTROL"
+               DESCRIPTION="Control field indicating the end of an array of object fields"/>
+</SCHEMA>
+

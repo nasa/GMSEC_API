@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -34,7 +34,7 @@ const char* PROD_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.PROD.PRODUCT_MES
 //o Helper functions
 void initializeLogging(GMSEC_Config config, GMSEC_Status status);
 void checkStatus(GMSEC_Status status);
-void setupStandardFields(GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+void setupStandardFields(GMSEC_ConnectionMgr connMgr, int specVersion, GMSEC_Status status);
 GMSEC_Message createProductFileMessage(const GMSEC_ConnectionMgr connMgr, const char* filePath, GMSEC_Status status);
 GMSEC_BOOL isProdMsg(GMSEC_Message message, GMSEC_Status status);
 
@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
 	GMSEC_Config config;
 	GMSEC_ConnectionMgr connMgr;
 	GMSEC_Message productMessage;
+    int specVersion;
 
 	if (argc <= 1)
 	{
@@ -125,9 +126,7 @@ int main(int argc, char* argv[])
 	//o Enable Message validation.  This parameter is "false" by default.
 	configAddValue(config, "GMSEC-MSG-CONTENT-VALIDATE", "true", status);
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	connMgr = connectionManagerCreate(config, status);
 	checkStatus(status);
@@ -146,8 +145,12 @@ int main(int argc, char* argv[])
 	connectionManagerStartAutoDispatch(connMgr, status);
 	checkStatus(status);
 
+    //o Determine the specification we are using
+    specVersion = specificationGetVersion(connectionManagerGetSpecification(connMgr, status), status);
+	checkStatus(status);
+
 	//o Create and publish a simple Product File Message
-	setupStandardFields(connMgr, status);
+	setupStandardFields(connMgr, specVersion, status);
 
 	productMessage = createProductFileMessage(connMgr, "//hostname/dir/filename", status);
 
@@ -206,9 +209,11 @@ void checkStatus(GMSEC_Status status)
 	exit(-1);
 }
 
-void setupStandardFields(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+void setupStandardFields(GMSEC_ConnectionMgr connMgr, int specVersion, GMSEC_Status status)
 {
-	size_t numFields = 4;
+	size_t numFields = (specVersion <= C_GMSEC_ISD_2016_00 ? 4 : 6);
+	size_t i;
+
 	GMSEC_Field* definedFields = malloc(sizeof(GMSEC_Field) * numFields);
 
 	definedFields[0] = stringFieldCreate("MISSION-ID", "MISSION", status);
@@ -223,13 +228,21 @@ void setupStandardFields(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
 	definedFields[3] = stringFieldCreate("COMPONENT", "log_message", status);
 	checkStatus(status);
 
+	if (specVersion >= C_GMSEC_ISD_2018_00)
+	{
+		definedFields[4] = stringFieldCreate("DOMAIN1", "MY-DOMAIN-1", status);
+		checkStatus(status);
+		definedFields[5] = stringFieldCreate("DOMAIN2", "MY-DOMAIN-2", status);
+		checkStatus(status);
+	}
+
 	connectionManagerSetStandardFields(connMgr, definedFields, numFields, status);
 	checkStatus(status);
 
-	fieldDestroy(&definedFields[0]);
-	fieldDestroy(&definedFields[1]);
-	fieldDestroy(&definedFields[2]);
-	fieldDestroy(&definedFields[3]);
+	for (i = 0; i < numFields; ++i)
+	{
+		fieldDestroy(&definedFields[i]);
+	}
 
 	free(definedFields);
 }

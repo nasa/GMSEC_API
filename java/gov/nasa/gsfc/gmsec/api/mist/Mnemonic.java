@@ -1,16 +1,14 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-
-/** @file Mnemonic.java
- *
- *  @brief This file contains declarations for Mnemonic containers
-**/
+/**
+ * @file Mnemonic.java
+ */
 
 package gov.nasa.gsfc.gmsec.api.mist;
 
@@ -24,47 +22,54 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIMnemonic;
 
 
 /**
- * @class Mnemonic
- *
- * @brief This class is a lightweight container for holding information
+ * This class is a lightweight container for holding information
  * on a Mnemonic, and used to generate GMSEC Mnemonic messages by the 
- * ConnectionManager class
+ * ConnectionManager class.
  *
- * @sa ConnectionManager @n
+ * @see ConnectionManager
  */
 public class Mnemonic
 {
 	private JNIMnemonic m_jniMnemonic = null;
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param obj Mnemonic object to reference for acquiring internal JNIMnemonic.
+	 * @return Internal JNIMnemonic object.
+	 */
 	public static JNIMnemonic getInternal(Mnemonic obj)
 	{
 		return (obj == null ? null : obj.m_jniMnemonic);
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param jMnemonic Internal JNIMnemonic object.
+	 */
 	public Mnemonic(JNIMnemonic jMnemonic)
 	{
 		m_jniMnemonic = jMnemonic;
 	}
 
 
+	/**
+	 * Default constructor.
+	 */
 	protected Mnemonic()
 	{
 	}
 
 
 	/**
-	 * @fn Mnemonic(String name, java.util.List<MnemonicSample> samples)
+	 * Constructor - Initializes the Mnemonic object with a set of MnemonicSample information.
 	 *
-	 * @brief Constructor - Initializes the Mnemonic object with a set of
-	 * MnemonicSample information
+	 * @param name The name of the Mnemonic.
+	 * @param samples The list of MnemonicSample objects.
 	 *
-	 * @param name - The name of the Mnemonic
-	 * @param samples - The list of MnemonicSample objects
-	 *
-	 * @throw An IllegalArgumentException is thrown if the name is null, or contains an empty string.
-	 * @throw An IllegalArgumentException is thrown if the MnemonicSample list is null.
+	 * @throws IllegalArgumentException Thrown if the name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the MnemonicSample list is null.
 	 */
 	public Mnemonic(String name, java.util.List<MnemonicSample> samples) throws IllegalArgumentException
 	{
@@ -82,13 +87,24 @@ public class Mnemonic
 
 
 	/**
-	 * @fn Mnemonic(Mnemonic other)
+	 * Constructor - Initializes a Mnemonic object with only its name.
 	 *
-	 * @brief Copy-Constructor - Makes a copy of the given Mnemonic object.
+	 * @param name The name of the Mnemonic.
 	 *
-	 * @param other - The Mnemonic to copy.
+	 * @throws IllegalArgumentException Thrown if the name is null, or contains an empty string.
+	 */
+	public Mnemonic(String name) throws IllegalArgumentException
+	{
+	    this(name, new java.util.ArrayList<MnemonicSample>());
+    }
+
+
+	/**
+	 * Copy-Constructor - Makes a copy of the given Mnemonic object.
 	 *
-	 * @throw An IllegalArgumentException is thrown if the Mnemonic object is null.
+	 * @param other The Mnemonic to copy.
+	 *
+	 * @throws IllegalArgumentException Thrown if the Mnemonic object is null.
 	 */
 	public Mnemonic(Mnemonic other) throws IllegalArgumentException
 	{
@@ -102,11 +118,9 @@ public class Mnemonic
 
 
 	/**
-	 * @fn String getName()
+	 * Retrieves the name of the Mnemonic.
 	 *
-	 * @brief Retrieves the name of the Mnemonic
-	 *
-	 * @return The name of the Mnemonic
+	 * @return The name of the Mnemonic.
 	 */
 	public String getName()
 	{
@@ -115,11 +129,9 @@ public class Mnemonic
 
 
 	/**
-	 * @fn boolean statusAvailable()
+	 * Returns the availability of a Mnemonic status.
 	 *
-	 * @brief Returns the availability of a Mnemonic status
-	 *
-	 * @return True if a Mnemonic status has been set, false otherwise
+	 * @return True if a Mnemonic status has been set, false otherwise.
 	 */
 	public boolean statusAvailable()
 	{
@@ -128,13 +140,11 @@ public class Mnemonic
 
 
 	/**
-	 * @fn Field getStatus()
+	 * Accessor for the Mnemonic status.
 	 *
-	 * @brief Accessor for the Mnemonic status
+	 * @return A reference to the Mnemonic status field.
 	 *
-	 * @return A reference to the Mnemonic status field
-	 *
-	 * @throw A GMSEC_Exception is thrown if the status field has not been set
+	 * @throws GMSEC_Exception Thrown if the status field has not been set.
 	 */
 	public Field getStatus() throws GMSEC_Exception
 	{
@@ -143,11 +153,11 @@ public class Mnemonic
 
 
 	/**
-	 * @fn void setStatus(Field status)
+	 * Sets the given Status Field for the Mnemonic.
 	 *
-	 * @brief Supplies a Status for the Mnemonic and makes a copy of the field
+	 * @param status The status Field.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given Field object is null.
+	 * @throws IllegalArgumentException Thrown if the given Field object is null.
 	 */
 	public void setStatus(Field status) throws IllegalArgumentException
 	{
@@ -161,11 +171,9 @@ public class Mnemonic
 
 
 	/**
-	 * @fn boolean unitsAvailable()
+	 * Returns the availability of Mnemonic units.
 	 *
-	 * @brief Returns the availability of Mnemonic units
-	 *
-	 * @return True if Mnemonic units have been set, false otherwise
+	 * @return True if Mnemonic units have been set, false otherwise.
 	 */
 	public boolean unitsAvailable()
 	{
@@ -174,13 +182,11 @@ public class Mnemonic
 
 
 	/**
-	 * @fn String getUnits()
+	 * Accessor for the Mnemonic units.
 	 *
-	 * @brief Accessor for the Mnemonic units
+	 * @return A reference to the Mnemonic units string.
 	 *
-	 * @return A reference to the Mnemonic units string
-	 *
-	 * @throw A GMSEC_Exception is thrown if the units string has not been set
+	 * @throws GMSEC_Exception Thrown if the units string has not been set.
 	 */
 	public String getUnits() throws GMSEC_Exception
 	{
@@ -189,11 +195,11 @@ public class Mnemonic
 
 
 	/**
-	 * @fn void setUnits(String units)
+	 * Sets the given units string for the Mnemonic.
 	 *
-	 * @brief Supplies a units string for the Mnemonic and makes a copy of the string
+	 * @param units The units string.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given units string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given units string is null, or contains an empty string.
 	 */
 	public void setUnits(String units) throws IllegalArgumentException
 	{
@@ -207,11 +213,9 @@ public class Mnemonic
 
 
 	/**
-	 * @fn long getSampleCount()
+	 * Returns the number of samples for this Mnemonic.
 	 *
-	 * @brief Returns the number of samples for this Mnemonic
-	 *
-	 * @return the number of mnemonic samples associated with the object
+	 * @return the number of mnemonic samples associated with the object.
 	 */
 	public long getSampleCount()
 	{
@@ -220,15 +224,13 @@ public class Mnemonic
 
 
 	/**
-	 * @fn MnemonicSample getSample(long idx)
+	 * Returns a reference to a MnemonicSample held in this object.
 	 *
-	 * @brief Returns a reference to a MnemonicSample held in this object
+	 * @param idx A zero-based index of the MnemonicSample object to access.
 	 *
-	 * @param idx - the zero-based index of the MnemonicSample object to access
+	 * @return A reference to the requested MnemonicSample object.
 	 *
-	 * @return A reference to the requested MnemonicSample object
-	 *
-	 * @throw A GMSEC_Exception is thrown if the index supplied is out of bounds
+	 * @throws GMSEC_Exception Thrown if the index supplied is out of bounds.
 	 */
 	public MnemonicSample getSample(long idx) throws GMSEC_Exception
 	{
@@ -237,13 +239,11 @@ public class Mnemonic
 
 	                              
 	/**
-	 * @fn void addSample(MnemonicSample sample)
+	 * Adds a single MnemonicSample to the current list of samples.
 	 *
-	 * @brief Adds a single MnemonicSample to the current list of samples.
+	 * @param sample The MnemonicSample object
 	 *
-	 * @param param - the MnemonicSample object
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given MnemonicSample is null.
+	 * @throws IllegalArgumentException Thrown if the given MnemonicSample is null.
 	 */
 	public void addSample(MnemonicSample sample) throws IllegalArgumentException
 	{

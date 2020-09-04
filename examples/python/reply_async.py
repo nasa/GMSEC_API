@@ -43,7 +43,6 @@ class ExampleCallback(libgmsec_python.ConnectionManagerCallback):
     def onMessage(self, connMgr, message):
         
         try:
-            
             # Display the XML representation of the received message
             libgmsec_python.logInfo("[ExampleCallback:onMessage] Received:\n" + message.toXML())
 
@@ -51,11 +50,9 @@ class ExampleCallback(libgmsec_python.ConnectionManagerCallback):
             component = ""
 
             try:
-                     
                 component = message.getStringField("COMPONENT").getValue()
                     
             except Exception as e:
-                        
                 libgmsec_python.logWarning("COMPONENT field is not available: " + e.what())
                         
 
@@ -99,7 +96,6 @@ class ExampleCallback(libgmsec_python.ConnectionManagerCallback):
             self.replySent = True
                 
         except libgmsec_python.Exception as e:
-                
             libgmsec_python.logError("[ExampleCallback::onMessage] " + e.what())
 
 
@@ -108,6 +104,7 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " +  sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
+        return -1
 
     # Load the command-line input into a GMSEC Config object
     # A Config object is basically a key-value pair map which is used to
@@ -120,6 +117,10 @@ def main():
         value = arg.split('=')
         config.addValue(value[0], value[1])
 
+    # Since this example program uses an invalid message, we ensure the
+    # validation check is disabled.
+    config.addValue("gmsec-msg-content-validate-all", "false")
+
 
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
@@ -127,12 +128,9 @@ def main():
     initializeLogging(config)
 
     # Output GMSEC API version
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create the Connection
         connMgr = libgmsec_python.ConnectionManager(config)
 
@@ -152,27 +150,13 @@ def main():
 
         # Loop while waiting for the asynchronous response until done
         while (cb.replySent == False):
-
             libgmsec_python.TimeUtil.millisleep(100)
                 
-
-            #  Wait for a few moments to ensure that the asynchronous reply
-            # transaction went through with the middleware before closing
-            # the connection and exiting the process
-            for i in range (0,5):
-
-                libgmsec_python.TimeUtil.millisleep(100)
-                
-
-            # Clean up
+        # Clean up
         connMgr.stopAutoDispatch()
-        #try:
 
         connMgr.cleanup()
-        #    except libgmsec_python.Excpetion as e:
-        #        print 'here'
-        #        print e.what()
-        #    print '1'
+
     except libgmsec_python.Exception as e:
         libgmsec_python.logError(e.what())
 

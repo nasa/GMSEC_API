@@ -1,9 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
 
 
-javac -classpath ../../bin/gmsecapi.jar:. *.java
+if [ -z $JDK_HOME ]; then
+	echo "JDK_HOME is undefined."
+	exit 1
+fi
+
+echo "Building java examples..."
+$JDK_HOME/bin/javac -classpath ../../bin/gmsecapi.jar:. -Xlint:deprecation *.java

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,23 +8,23 @@
 
 /**
  * @file U64Field.java
- *
- * @brief Specialized Field class that can be used to retain an unsigned 64-bit value.
  */
 
 package gov.nasa.gsfc.gmsec.api.field;
 
 import gov.nasa.gsfc.gmsec.api.U64;
-import gov.nasa.gsfc.gmsec.api.jni.JNIU64Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU64Field;
 
 
 /**
- * @class U64Field
- *
- * @brief Specialized Field class that can be used to retain an unsigned 64-bit value.
+ * Specialized Field class that can be used to retain an unsigned 64-bit value.
  */
 public class U64Field extends Field
 {
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A JNIU64Field object.
+	 */
 	public U64Field(JNIU64Field field)
 	{
 		setInternal(field);
@@ -32,15 +32,13 @@ public class U64Field extends Field
 
 
 	/**
-	 * @fn U64Field(String name, U64 data)
+	 * Default constructor.
 	 *
-	 * @brief Default constructor.
+	 * @param name Name of the field.
+	 * @param data Data to associate with the field.
 	 *
-	 * @param name - name of the field.
-	 * @param data - data to associate with the field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null, or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the data value is null.
+	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the data value is null.
 	 */
 	public U64Field(String name, U64 data) throws IllegalArgumentException
 	{
@@ -56,13 +54,11 @@ public class U64Field extends Field
 
 
 	/**
-	 * @fn U64Field(U64Field other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other U64Field object to copy.
 	 *
-	 * @param other - the other U64Field object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given U64Field object is null.
+	 * @throws IllegalArgumentException Thrown if the given U64Field object is null.
 	 */
 	public U64Field(U64Field other) throws IllegalArgumentException
 	{
@@ -76,9 +72,9 @@ public class U64Field extends Field
 
 
 	/**
-	 * @fn U64 getValue()
+	 * Returns the data stored within the U64Field.
 	 *
-	 * @return Returns the data stored within the U64Field.
+	 * @return A U64 object.
 	 */
 	public U64 getValue()
 	{

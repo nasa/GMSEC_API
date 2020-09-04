@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -45,17 +45,17 @@ using namespace gmsec::api::mist::message;
 using namespace gmsec::api::util;
 
 
-static const char* HEADER_VERSION_STRING    = "HEADER-VERSION";
-//static const char* MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
-static const char* MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
-//static const char* CONTENT_VERSION_STRING   = "CONTENT-VERSION";
-//static const char* MSG_STRING               = "MSG";
-static const char* PROD_STRING              = "PROD";
-static const char* RESPONSE_STATUS_STRING   = "RESPONSE-STATUS";
-static const char* PROD_TYPE_STRING         = "PROD-TYPE";
-static const char* PROD_SUBTYPE_STRING      = "PROD-SUBTYPE";
-static const char* NUM_OF_FILES_STRING      = "NUM-OF-FILES";
-static const char* NUM_OF_INPUT_FILES_STRING= "NUM-OF-INPUT-FILES";
+static const char* const HEADER_VERSION_STRING    = "HEADER-VERSION";
+//static const char* const MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
+static const char* const MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
+//static const char* const CONTENT_VERSION_STRING   = "CONTENT-VERSION";
+//static const char* const MSG_STRING               = "MSG";
+static const char* const PROD_STRING              = "PROD";
+static const char* const RESPONSE_STATUS_STRING   = "RESPONSE-STATUS";
+static const char* const PROD_TYPE_STRING         = "PROD-TYPE";
+static const char* const PROD_SUBTYPE_STRING      = "PROD-SUBTYPE";
+static const char* const NUM_OF_FILES_STRING      = "NUM-OF-FILES";
+static const char* const NUM_OF_INPUT_FILES_STRING= "NUM-OF-INPUT-FILES";
 
 
 namespace gmsec
@@ -114,22 +114,23 @@ InternalProductFileMessage::InternalProductFileMessage(const char* data)
 	  m_list(),
 	  m_productFileIterator(*this)
 {
-	MessageSubclassHelper::checkFloatField(HEADER_VERSION_STRING, "InternalProductFileMessage()",
-		2010.0, *this);
-
-	MessageSubclassHelper::checkStringField(MESSAGE_SUBTYPE_STRING, "InternalProductFileMessage()",
-		PROD_STRING, *this);
-
+	MessageSubclassHelper::checkStringField(MESSAGE_SUBTYPE_STRING, "InternalProductFileMessage()", PROD_STRING, *this);
 
 	std::string prodType = MessageSubclassHelper::extractStringField(PROD_TYPE_STRING, "InternalProductFileMessage::InternalProductFileMessage()", *this);
-	std::string schemaID = buildSchemaID(getKind(), PROD_STRING, prodType.c_str(), getSpecVersion());
-	registerTemplate(schemaID.c_str());
+	const char* type = NULL;
 
+	if (getSpecVersion() < GMSEC_ISD_2018_00)
+	{
+		type = prodType.c_str();
+	}
+
+	std::string schemaID = buildSchemaID(getKind(), PROD_STRING, type, getSpecVersion());
+	registerTemplate(schemaID.c_str());
 
 	GMSEC_U16 num_of_files;
 	try
 	{
-		if(getSpecVersion() == GMSEC_ISD_2016_00)
+		if (getSpecVersion() >= GMSEC_ISD_2016_00)
 		{
 			num_of_files = MessageSubclassHelper::extractU16Field(NUM_OF_FILES_STRING, 
 								"InternalProductFileMessage::InternalProductFileMessage()", *this);
@@ -150,7 +151,8 @@ InternalProductFileMessage::InternalProductFileMessage(const char* data)
 	{//request messages uses a differently named field for its productfile count
 		try
 		{
-			if(getSpecVersion() == GMSEC_ISD_2016_00){
+			if (getSpecVersion() >= GMSEC_ISD_2016_00)
+			{
 				num_of_files = MessageSubclassHelper::extractU16Field(NUM_OF_INPUT_FILES_STRING, 
 									"InternalProductFileMessage::InternalProductFileMessage()", *this);
 			}
@@ -178,6 +180,7 @@ InternalProductFileMessage::InternalProductFileMessage(const char* data)
 	m_productType = MessageSubclassHelper::extractStringField(PROD_TYPE_STRING, 
 												  "InternalProductFileMessage::InternalProductFileMessage()",
 												  *this);
+
 	m_productSubtype = MessageSubclassHelper::extractStringField(PROD_SUBTYPE_STRING, 
 												  "InternalProductFileMessage::InternalProductFileMessage()",
 												  *this);
@@ -193,22 +196,14 @@ void InternalProductFileMessage::addProductFile(const ProductFile& productFile)
 {
 	m_list.push_back(productFile);
 
-	if(getSpecVersion() == GMSEC_ISD_2014_00){
-		addField(NUM_OF_FILES_STRING, (GMSEC_I16) m_list.size());
-	}else if(getSpecVersion() == GMSEC_ISD_2016_00){
-		addField(NUM_OF_FILES_STRING, (GMSEC_U16) m_list.size());
-	}else{
-		GMSEC_WARNING << "Specification version unknown: " << getSpecVersion() << ", unable to autopopulate"
-			<< " Product Message " << NUM_OF_FILES_STRING;
-	}
-	
+	setValue(NUM_OF_FILES_STRING, (GMSEC_I64) m_list.size());
 
 	std::ostringstream ss;
 	ss << "FILE." << m_list.size();
 	std::string fileCountStr = ss.str();
 
 	std::string nameCount = fileCountStr;
-	nameCount.append(".NAME");
+	nameCount.append(".NAME-PATTERN");
 	addField(nameCount.c_str(), productFile.getName());
 
 	std::string descCount = fileCountStr;
@@ -236,12 +231,13 @@ void InternalProductFileMessage::addProductFile(const ProductFile& productFile)
 		size_t size = productFile.getContents(fileContents);
 		std::string sizeCount = fileCountStr;
 		sizeCount.append(".SIZE");
-		if(getSpecVersion() == GMSEC_ISD_2014_00){
+		if (getSpecVersion() <= GMSEC_ISD_2014_00)
+		{
 			addField(sizeCount.c_str(), (GMSEC_I32) size);
-		}else if(getSpecVersion() == GMSEC_ISD_2016_00){
+		}
+		else
+		{
 			addField(sizeCount.c_str(), (GMSEC_U32) size);
-		}else{
-			GMSEC_WARNING << "Specification version unknown: " << getSpecVersion() << ", unable to autopopulate" << " Product Message " << sizeCount.c_str();
 		}
 
 		std::string dataCount = fileCountStr;
@@ -327,12 +323,12 @@ const ProductFile& InternalProductFileMessage::nextProductFile()
 
 ProductFile InternalProductFileMessage::extractMessageProductFile(size_t index)
 {
-	char           tmp_name[256];
+	char tmp_name[256];
 	
-	GMSEC_I32   product_size;
-	GMSEC_BIN   product_data        = NULL;
+	GMSEC_I32 product_size;
+	GMSEC_BIN product_data = NULL;
 
-	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "FILE.%u.NAME", index);
+	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "FILE.%u.NAME-PATTERN", index);
 	std::string product_name = MessageSubclassHelper::extractStringField(tmp_name, 
 													  "InternalProductFileMessage::extractMessageProductFile()",
 													  *this);
@@ -358,11 +354,11 @@ ProductFile InternalProductFileMessage::extractMessageProductFile(size_t index)
 
 	std::string product_uri;
 	bool product_uri_exists = MessageSubclassHelper::getOptionalString(tmp_name, *this, product_uri);
-	
+
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "FILE.%u.SIZE", index);
 
 	bool product_size_exists;
-	if (getSpecVersion() == GMSEC_ISD_2016_00)
+	if (getSpecVersion() >= GMSEC_ISD_2016_00)
 	{
 		GMSEC_U32 uProductSize;
 		product_size_exists = MessageSubclassHelper::getOptionalU32(tmp_name, *this, uProductSize);
@@ -372,7 +368,6 @@ ProductFile InternalProductFileMessage::extractMessageProductFile(size_t index)
 	{
 		product_size_exists = MessageSubclassHelper::getOptionalI32(tmp_name, *this, product_size);
 	}
-		
 
 	StringUtil::stringFormat(tmp_name, sizeof(tmp_name), "FILE.%u.DATA", index);
 
@@ -419,15 +414,18 @@ ProductFile InternalProductFileMessage::extractMessageProductFile(size_t index)
 
 void InternalProductFileMessage::init(ResponseStatus::Response responseStatus, const char* schemaID)
 {	
-	const std::list<FieldTemplate>& fieldTemplates = getTemplate().listFieldTemplates();
-	for(std::list<FieldTemplate>::const_iterator it = fieldTemplates.begin(); it != fieldTemplates.end(); ++it)
+	const MessageTemplate::FieldTemplateList& fieldTemplates = getTemplate().getFieldTemplates();
+
+	for (MessageTemplate::FieldTemplateList::const_iterator it = fieldTemplates.begin(); it != fieldTemplates.end(); ++it)
 	{
-		FieldTemplate temp = *it;
-		if(temp.hasExplicitType() && temp.hasExplicitValue())
-		{//the field template has a predefined value, so we'll add the field to the message
+		FieldTemplate* temp = *it;
+
+		if (temp->hasExplicitType() && temp->hasExplicitValue())
+		{
+			//the field template has a predefined value, so we'll add the field to the message
 			try
 			{
-				std::auto_ptr<Field> field(temp.toField(temp.getType()));
+				std::auto_ptr<Field> field(temp->toField(temp->getType()));
 
 				addField(*(field.get()));
 			}
@@ -437,6 +435,7 @@ void InternalProductFileMessage::init(ResponseStatus::Response responseStatus, c
 			}
 		}
 	}
+
 	setValue(RESPONSE_STATUS_STRING, (GMSEC_I64)responseStatus);	
 }
 

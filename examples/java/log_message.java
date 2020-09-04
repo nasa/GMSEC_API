@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,6 +22,7 @@
 
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.Log;
+import gov.nasa.gsfc.gmsec.api.util.TimeUtil;
 import gov.nasa.gsfc.gmsec.api.mist.ConnectionManager;
 import gov.nasa.gsfc.gmsec.api.field.I16Field;
 import gov.nasa.gsfc.gmsec.api.field.StringField;
@@ -51,9 +52,7 @@ public class log_message
 		// construction of MistMessages
 		config.addValue("GMSEC-SPECIFICATION-VERSION", GMSEC_SPEC_VERSION);
 
-		// TODO: Once available, replace this statement with usage of
-		// ConnectionManager::getAPIVersion (See RTC 4798)
-		Log.info(Connection.getAPIVersion());
+		Log.info(ConnectionManager.getAPIVersion());
 
 		try
 		{
@@ -112,10 +111,13 @@ public class log_message
 			// Note: Since these Fields contain variable values which are
 			// based on the context in which they are used, they cannot be
 			// automatically populated using MistMessage.
+			String eventTime = TimeUtil.formatTime(TimeUtil.getCurrentTime());
+
 			logMsg.addField("SEVERITY", (short) 1);
 			logMsg.setValue("MSG-TEXT", "Creating an example GMSEC LOG Message");
 			logMsg.setValue("OCCURRENCE-TYPE", "SYS");
 			logMsg.setValue("SUBCLASS", "AST");
+			logMsg.setValue("EVENT-TIME", eventTime);
 
 			//o Add the standard fields to the LOG message
 			connManager.addStandardFields(logMsg);

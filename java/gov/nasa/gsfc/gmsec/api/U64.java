@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file U64.java
- *
- * @brief This is a container class for the GMSEC unsigned 64-bit integer field type.
  */
 
 package gov.nasa.gsfc.gmsec.api;
@@ -18,9 +16,7 @@ import java.math.BigInteger;
 
 
 /**
- * @class U64
- *
- * @brief This is a container class for the GMSEC unsigned 64-bit integer field type.
+ * This is a container class for the GMSEC unsigned 64-bit integer field type.
  */
 public class U64
 {
@@ -28,19 +24,19 @@ public class U64
 
 
 	/**
-	 * @desc Minimum value (0) allowed for U64 type.
+	 * Minimum value (0) allowed for U64 type.
 	 */
 	public static final BigInteger MIN_VALUE = BigInteger.ZERO;
 
 
 	/**
-	 * @desc Maximum value (2^64 - 1) allowed for U64 type.
+	 * Maximum value (2^64 - 1) allowed for U64 type.
 	 */
 	public static final BigInteger MAX_VALUE = new BigInteger("18446744073709551615");
 
 
 	/**
-	 * @desc Enforce allowable range for U64 values.
+	 * Enforce allowable range for U64 values.
 	 */
 	private BigInteger checkRange(BigInteger arg) throws IllegalArgumentException
 	{
@@ -61,9 +57,7 @@ public class U64
 
 
 	/**
-	 * @fn U64()
-	 *
-	 * @brief construct with value equal to MIN_VALUE
+	 * Construct U64 object with value equal to MIN_VALUE
 	 */
 	public U64()
 	{
@@ -72,13 +66,11 @@ public class U64
 
 
 	/**
-	 * @fn U64(BigInteger value)
+	 * Construct U64 object with the given value
 	 *
-	 * @brief construct with given value
+	 * @param value The value to assign to the U64 object.
 	 *
-	 * @param value - the value to assign to the U64 object.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
+	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
 	public U64(BigInteger value) throws IllegalArgumentException
 	{
@@ -87,14 +79,12 @@ public class U64
 
 
 	/**
-	 * @fn U64(String value)
+	 * Construct U64 object with the given decimal string representation of a BigInteger.
 	 *
-	 * @brief construct with given decimal string representation of a BigInteger.
+	 * @param value The decimal string representation of a BigInteger.
 	 *
-	 * @param value - the decimal string representation of a BigInteger.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given string value is not in the range of [MIN_VALUE, MAX_VALUE].
-	 * @throws A NumberFormatException is thrown if the value in the given string is not a valid representation of a number.
+	 * @throws IllegalArgumentException Thrown if the given string value is not in the range of [MIN_VALUE, MAX_VALUE].
+	 * @throws NumberFormatException Thrown if the value in the given string is not a valid representation of a number.
 	 */
 	public U64(String value) throws IllegalArgumentException
 	{
@@ -103,13 +93,11 @@ public class U64
 
 
 	/**
-	 * @fn U64(U64 other)
+	 * Copy constructor
 	 *
-	 * @brief Copy constructor
+	 * @param other The U64 object to copy
 	 *
-	 * @param other - the U64 object to copy
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given U64 object is null.
+	 * @throws IllegalArgumentException Thrown if the given U64 object is null.
 	 */
 	public U64(U64 other) throws IllegalArgumentException
 	{
@@ -123,13 +111,11 @@ public class U64
 
 
 	/**
-	 * @fn set(BigInteger value)
+	 * Set U64 object with the given value.
 	 *
-	 * @brief Set U64 object with given value.
+	 * @param value The value to assign to the U64 object.
 	 *
-	 * @param value - the value to assign to the U64 object.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
+	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
 	public void set(BigInteger value) throws IllegalArgumentException
 	{
@@ -138,9 +124,7 @@ public class U64
 
 
 	/*
-	 * @fn BigInteger get()
-	 *
-	 * @desc Returns the underlying value within the U64 object.
+	 * Returns the underlying value within the U64 object.
 	 */
 	public BigInteger get()
 	{
@@ -149,9 +133,7 @@ public class U64
 
 
 	/**
-	 * @fn String toString()
-	 *
-	 * @desc Returns the U64 value as a printable string.
+	 * Returns the U64 value as a printable string.
 	 */
 	public String toString()
 	{

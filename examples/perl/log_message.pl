@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 
-#
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -53,9 +52,7 @@ sub main
 	# construction of MistMessages
 	$config->addValue("GMSEC-SPECIFICATION-VERSION", $GMSEC_SPEC_VERSION);
 
-	# TODO: Once available, replace this statement with usage of
-	# ConnectionManager::getAPIVersion (See RTC 4798)
-	libgmsec_perl::LogInfo(libgmsec_perl::Connection::getAPIVersion());
+	libgmsec_perl::LogInfo(libgmsec_perl::ConnectionManager::getAPIVersion());
 
 	eval
 	{
@@ -108,10 +105,14 @@ sub main
 		# Note: Since these Fields contain variable values which are
 		# based on the context in which they are used, they cannot be
 		# automatically populated using MistMessage.
+		my $eventTime = "YYYY-DDD-HH:MM:SS.sss";
+		libgmsec_perl::TimeUtil::formatTime(libgmsec_perl::TimeUtil::getCurrentTime(), $eventTime);
+
 		$logMsg->addField(libgmsec_perl::I16Field->new("SEVERITY", 1));
 		$logMsg->setValue("MSG-TEXT", "Creating an example GMSEC LOG Message");
 		$logMsg->setValue("OCCURRENCE-TYPE", "SYS");
 		$logMsg->setValue("SUBCLASS", "AST");
+		$logMsg->setValue("EVENT-TIME", $eventTime);
 
 		#o Add the standard fields to the LOG message
 		$connManager->addStandardFields($logMsg);

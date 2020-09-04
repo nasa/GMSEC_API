@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -401,7 +401,7 @@ public:
 	 */
 	Status CALL_TYPE Publish(Message *msg, const Config &config);
 
-	/** @fn Request(Message *request, GMSEC_I32 timeout, Callback *cb, GMSEC_I32 republish_ms = 0)
+	/** @fn Request(Message *request, GMSEC_I32 timeout, Callback *cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 * @brief This function will send a request asyncronously. The callback will be called for the reply
 	 * if it is received within the specified timeout. This function will not block.
 	 * The timeout value is expressed in milliseconds.
@@ -417,9 +417,9 @@ public:
 	 * @param cb - Callback to call when reply is receieved
 	 * @return status - result of the request operation
 	 */
-	GMSEC_DEPRECATED Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, Callback *cb, GMSEC_I32 republish_ms = 0);
+	GMSEC_DEPRECATED Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, Callback *cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
-	/** @fn Request(Message *request, GMSEC_I32 timeout, ReplyCallback *cb, GMSEC_I32 republish_ms = 0)
+	/** @fn Request(Message *request, GMSEC_I32 timeout, ReplyCallback *cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 * @brief This function will send a request asyncronously. The callback will be called for the reply
 	 * if it is received within the specified timeout. This function will not block.
 	 * The timeout value is expressed in milliseconds.
@@ -432,9 +432,9 @@ public:
 	 * @param cb - Callback to call when reply is receieved
 	 * @return status - result of the request operation
 	 */
-	Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, ReplyCallback *cb, GMSEC_I32 republish_ms = 0);
+	Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, ReplyCallback *cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
-	/** @fn Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = 0)
+	/** @fn Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 * @brief This function will send a request, wait for the specified timeout, and return the received reply
 	 * This function will block until the reply is received or the timeout is reached.
 	 * The timeout value is expressed in milliseconds.
@@ -447,7 +447,7 @@ public:
 	 * value supplied at the Connection object's creation time.
 	 * @return status - result of the request operation
 	 */
-	Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = 0);
+	Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, Message *&reply, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 	/** @fn Reply(Message *request,Message *reply)
 	 * @brief This function will send a reply to a given request.

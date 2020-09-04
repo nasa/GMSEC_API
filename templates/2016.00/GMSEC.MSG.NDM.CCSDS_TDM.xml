@@ -64,8 +64,8 @@
 	<FIELD  NAME="DATA-QUALITY"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
-	        VALUE=""
-	        TYPE="BIN"
+	        VALUE="RAW~~VALIDATED~~DEGRADED"
+	        TYPE="STRING"
 	        DESCRIPTION="Raw = no quality check, Validated = checked and passed, Degraded = checked with quality issues."/>
 	<FIELD  NAME="FORMAT"
 	        MODE="REQUIRED"
@@ -77,6 +77,6 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="BIN"
+	        TYPE="STRING, BIN"
 	        DESCRIPTION="Structured Navigation Data Message"/>
 </SCHEMA>

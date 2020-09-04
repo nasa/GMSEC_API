@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,29 +22,30 @@
 //o Helper functions
 void checkStatus(GMSEC_Status status);
 void initializeLogging(GMSEC_Config config, GMSEC_Status status);
-void populateMessage(GMSEC_Message message, int count, GMSEC_Status status);
 
-//o Define an EventCallback to report the status of WebSphere async publications
-// Note: The WebSphere MQ client libraries only report the first warning or
-// failure code encountered during the series of message publications made
-// since the last time that the client libraries retrieved the status of
-// asynchronous publish operations.
+
 void connectionStateCallback(GMSEC_ConnectionMgr connMgr, GMSEC_Status status, GMSEC_ConnectionEvent event)
 {
-	// Perform some action based on the type of event that occurred
-	if (event == GMSEC_CONN_SUCCESSFUL_EVENT)
+	switch (event)
 	{
-		GMSEC_INFO("Connected to the middleware server");
-	}
-	else if (event == GMSEC_CONN_BROKEN_EVENT)
-	{
-		GMSEC_INFO("Connection to the middleware lost or terminated");
-	}
-	else if (event == GMSEC_CONN_RECONNECT_EVENT)
-	{
-		GMSEC_INFO("Attempting to reestablish the connection to the middleware");
+	case GMSEC_CONN_SUCCESSFUL_EVENT:
+		GMSEC_INFO("[event]: Connected to the middleware server");
+		break;
+
+	case GMSEC_CONN_BROKEN_EVENT:
+		GMSEC_INFO("[event]: Connection to the middleware lost or terminated");
+		break;
+
+	case GMSEC_CONN_RECONNECT_EVENT:
+		GMSEC_INFO("[event]: Attempting to reestablish the connection to the middleware");
+		break;
+
+	default:
+		GMSEC_INFO("[event]: %s", statusGet(status));
+		break;
 	}
 }
+
 
 int main (int argc, char* argv[])
 {
@@ -68,16 +69,10 @@ int main (int argc, char* argv[])
 
 	//o Print the GMSEC API version number using the GMSEC Logging
 	// interface
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	//o Create the Connection
 	connMgr = connectionManagerCreate(config, status);
-	checkStatus(status);
-
-	//o Connect
-	connectionManagerInitialize(connMgr, status);
 	checkStatus(status);
 
 	//o Register the event callback with the connection to catch
@@ -90,6 +85,10 @@ int main (int argc, char* argv[])
 	connectionManagerRegisterEventCallback(connMgr, GMSEC_CONN_BROKEN_EVENT, connectionStateCallback, status);
 	checkStatus(status);
 	connectionManagerRegisterEventCallback(connMgr, GMSEC_CONN_RECONNECT_EVENT, connectionStateCallback, status);
+	checkStatus(status);
+
+	//o Connect
+	connectionManagerInitialize(connMgr, status);
 	checkStatus(status);
 
 	//o Output middleware version
@@ -140,41 +139,4 @@ void checkStatus(GMSEC_Status status)
 
 	GMSEC_ERROR(statusGet(status));
 	exit(-1);
-}
-
-void populateMessage(GMSEC_Message message, int count, GMSEC_Status status)
-{
-	// Note: Since C is a strongly-typed language, it is possible to use
-	// type casting to add Field objects to a Message without having to
-	// first create a Field object, then add it to the message.
-	messageAddCharField(message, "CHAR-FIELD", 'c', status);
-	checkStatus(status);
-	messageAddBooleanField(message, "BOOL-FIELD-TRUE", GMSEC_TRUE, status);
-	checkStatus(status);
-	messageAddBooleanField(message, "BOOL-FIELD-FALSE", GMSEC_FALSE, status);
-	checkStatus(status);
-	messageAddI8Field(message, "I8-FIELD", (GMSEC_I8) count, status);
-	checkStatus(status);
-	messageAddI16Field(message, "I16-FIELD", (GMSEC_I16) count, status);
-	checkStatus(status);
-	messageAddI32Field(message, "I32-FIELD", (GMSEC_I32) count, status);
-	checkStatus(status);
-	messageAddI64Field(message, "I64-FIELD", (GMSEC_I64) count, status);
-	checkStatus(status);
-	messageAddU8Field(message, "U8-FIELD", (GMSEC_U8) count, status);
-	checkStatus(status);
-	messageAddU16Field(message, "U16-FIELD", (GMSEC_U16) count, status);
-	checkStatus(status);
-	messageAddU32Field(message, "U32-FIELD", (GMSEC_U32) count, status);
-	checkStatus(status);
-	messageAddU64Field(message, "U64-FIELD", (GMSEC_U64) count, status);
-	checkStatus(status);
-	messageAddStringField(message, "STRING-FIELD", "This is a test", status);
-	checkStatus(status);
-	messageAddF32Field(message, "F32-FIELD", (GMSEC_F32) (1 + 1. / count), status);
-	checkStatus(status);
-	messageAddF64Field(message, "F64-FIELD", (GMSEC_F64) (1 + 1. / count), status);
-	checkStatus(status);
-	messageAddBinaryField(message, "BIN-FIELD", (GMSEC_BIN) "JLMNOPQ", 7, status);
-	checkStatus(status);
 }

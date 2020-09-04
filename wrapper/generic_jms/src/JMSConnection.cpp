@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -376,8 +376,7 @@ JMSConnection::JMSConnection(const Config& config)
 		int code = jvm->AttachCurrentThread((void **) &env, NULL);
 		if (code < 0 || !env)
 		{
-			GMSEC_ERROR << "error: getJNIEnv: attach failed: " << code;
-			return;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, code, "getJNIEnv: attach failed");
 		}
 
 		// this potentially has to move for Java
@@ -388,14 +387,15 @@ JMSConnection::JMSConnection(const Config& config)
 	}
 	else if (count > 1)
 	{
-		GMSEC_ERROR << "error: getJavaVM: multiple JVMs!";
-		return;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_111, "getJavaVM: multiple JVMs!");
 	}
 	else
 	{
 		jvmArgs.push_front("-Djava.compiler=NONE");
 		jvmArgs.push_front("-Djava.class.path=" + jvmClasspath);
+#if !defined(JNI_VERSION_1_8) && defined(JNI_VERSION_1_6)
 		jvmArgs.push_front("-Xss2m");  // Set JVM stack size; see https://issues.apache.org/jira/browse/DAEMON-363
+#endif
 
 		JavaVMOption *options = new JavaVMOption[jvmArgs.size()];
 		int n = 0;
@@ -424,8 +424,7 @@ JMSConnection::JMSConnection(const Config& config)
 
 		if (result == JNI_ERR || !env)
 		{
-			GMSEC_ERROR << "Error invoking the JVM: " << result;
-			return;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, result, "Error invoking the JVM");
 		}
 	}
 
@@ -433,10 +432,10 @@ JMSConnection::JMSConnection(const Config& config)
 	cache = getCache(env);
 	if (!cache)
 	{
-		GMSEC_ERROR << "Error installing JMS cache";
-		return;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_111, "Error installing JMS cache");
 	}
 
+	Exception error(NO_ERROR_CLASS, NO_ERROR_CODE, "");
 	try
 	{
 		//
@@ -481,10 +480,16 @@ JMSConnection::JMSConnection(const Config& config)
 	catch (const Exception& e)
 	{
 		GMSEC_ERROR << "In JMSConnection Constructor, exception [ " << e.what() << " ]";
+		error = e;
 	}
 	JNI_CATCH(env)
 
 	detachMe(jvm);
+
+	if (error.getErrorClass() != NO_ERROR_CLASS)
+	{
+		throw error;
+	}
 }
 
 
@@ -756,12 +761,10 @@ void JMSConnection::mwRequest(const Message& request, std::string& id)
 void JMSConnection::mwReply(const Message& request, const Message& reply)
 {
 	// Get the Request's Unique ID, and put it into a field in the Reply
-	try {
-		const StringField& uniqueID = request.getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+	std::string uniqueID = getExternal().getReplyUniqueID(request);
 
-		MessageBuddy::getInternal(reply).addField(uniqueID);
-	}
-	catch (...) {
+	if (uniqueID.empty())
+	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Unique ID field");
 	}
 
@@ -774,7 +777,11 @@ void JMSConnection::mwReply(const Message& request, const Message& reply)
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Reply Address field");
 	}
 
+	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
+
 	mwPublish(reply, getExternal().getConfig());
+
+	MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 	GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() << ']';
 }

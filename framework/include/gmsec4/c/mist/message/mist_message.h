@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -113,6 +113,46 @@ extern "C"
 	 * @sa messageDestroy
 	 */
 	GMSEC_API GMSEC_Message mistMessageCreateCopy(const GMSEC_Message other, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_Message mistMessageCreateFromMessage(const GMSEC_Message msg, GMSEC_Config specConfig, GMSEC_Status status)
+	 *
+	 * @brief Special constructor that builds a %MistMessage using a simple %Message.
+	 *
+	 * @param[in]  msg        - the simple %Message to reference while building the %MistMessage.
+	 * @param[in]  specConfig - optional (i.e. can be NULL) %Specification configuration to apply when constructing the %MistMessage.
+	 * @param[out] status     - the result of the operation.
+	 *
+	 * @return A handle to a Message object, or NULL if an error occurs.  If the latter occurs, check the status.
+	 *
+	 * @sa messageCreate
+	 * @sa messageDestroy
+	 * @sa createConfig
+	 */
+	GMSEC_API GMSEC_Message mistMessageCreateFromMessage(const GMSEC_Message msg, const GMSEC_Config specConfig, GMSEC_Status status);
+
+
+	/**
+	 * @fn void mistMessageSetStandardFields(const GMSEC_Field fields[], size_t numFields, GMSEC_Status status)
+	 *
+	 * @brief Sets the internal list of fields which are to be automatically placed in all
+	 * MistMessage objects that are created.  Internal copies of the Fields are made, and
+	 * thus ownership of the fields that are provided are not retained by MistMessage.
+	 *
+	 * @param[in]  fields    - the array of fields to be copied to the internal set of fields
+	 * @param[in]  numFields - the number of fields in the array
+	 * @param[out] status    - the result of the operation
+	 */
+	GMSEC_API void mistMessageSetStandardFields(const GMSEC_Field fields[], size_t numFields, GMSEC_Status status);
+
+
+	/**
+	 * @fn void mistMessageClearStandardFields()
+	 *
+	 * @brief Destroys the lists of standard fields that are included with MistMessage objects.
+	 */
+	GMSEC_API void mistMessageClearStandardFields();
 
 
 	/**

@@ -1,4 +1,4 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -13,15 +13,11 @@ TARGET	        = _libgmsec_python.so
 SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_SWG        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/python -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
-SWIG_OPTS       = -c++ -python -threads -classic $(SWIG_SWG)
-
-ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
-SWIG_OPTS      += -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
-endif
+SWIG_OPTS       = -c++ -python -threads -classic $(SWIG_SWG) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
 
 FRAMEWORK_DIR   = ../../framework
 
-GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include
+GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include/c++/$(shell $(CXX) -dumpversion)
 PYTHON_VERSION  = $(shell python --version 2>&1 | cut -d' ' -f2 | awk 'BEGIN{FS="."}{print $$1"."$$2}')
 PYTHON_INCS     = -I$(PYTHON_INC)$(PYTHON_VERSION)
 API_CXXFLAGS   += $(PYTHON_INCS)
@@ -42,7 +38,32 @@ WRAPPED_OBJ     = $(INTERFACEDIR)/libgmsec_python_wrap.o
 OBJECTS        += $(WRAPPED_OBJ)
 
 
-default: $(WRAPPED_SRC) $(WRAPPED_OBJ) $(BINDIR)/$(TARGET) install
+default: check_swig message $(WRAPPED_SRC) $(WRAPPED_OBJ) $(BINDIR)/$(TARGET) install
+
+
+check_swig:
+	@if [ -z $(SWIG_HOME) ]; then \
+		echo; \
+		echo; \
+		echo "###########################################################"; \
+		echo "#"; \
+		echo "# SWIG_HOME is not defined"; \
+		echo "#"; \
+		echo "# Skipping build of Python binding for API 4.x"; \
+		echo "#"; \
+		echo "###########################################################"; \
+		exit 1; \
+	fi
+
+
+message:
+	@echo
+	@echo
+	@echo "###########################################################"
+	@echo "#"
+	@echo "#  Building Python binding of the GMSEC API"
+	@echo "#"
+	@echo "###########################################################"
 
 
 $(INTERFACEDIR)/%_wrap.cxx: $(INTERFACEDIR)/%.i
@@ -65,4 +86,4 @@ install:
 
 clean:
 	find $(INTERFACEDIR) \( -name '*.cxx' -o -name '*.py' -o -name '*.o' -o -name '*.h' -o -name 'Makefile' -o -name 'help' -o -name 'pm_to_blib' -o -name 'blib' \) -exec rm -rf {} \;
-	rm -rf $(BINDIR)/$(TARGET) $(PYTHON4_BINDIR)
+	$(RM) -f $(BINDIR)/$(TARGET) $(PYTHON4_BINDIR)/libgmsec_python.py

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1207C278-BBEE-466B-A69C-43C6840AEF5F}</ProjectGuid>
+    <RootNamespace>gmsec_java_mb</RootNamespace>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.27428.2015</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <NMakeBuildCommandLine>nmake /f "Makefile.nt"</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake /f "Makefile.nt" /a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine />
+    <NMakeOutput>..\bin\gmsecapi.jar</NMakeOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine>nmake /f "Makefile.nt"</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake /f "Makefile.nt" /a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine />
+    <NMakeOutput>..\bin\gmsecapi.jar</NMakeOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <NMakeBuildCommandLine>nmake /f "Makefile.nt"</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake /f "Makefile.nt" /a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine />
+    <NMakeOutput>..\bin\gmsecapi.jar</NMakeOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine>nmake /f "Makefile.nt"</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake /f "Makefile.nt" /a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine />
+    <NMakeOutput>..\bin\gmsecapi.jar</NMakeOutput>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="gov\nasa\gsfc\gmsecapi\base\Connection.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\base\Message.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\Callback.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\Config.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\ConfigFile.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\Connection.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\ConnectionFactory.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\ErrorCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\Field.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\gmsecAPI.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_Bin.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_Bool.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_Char.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_Double.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_F32.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_F64.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_Float.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_I16.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_I32.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_I64.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_I8.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_Long.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_Short.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_String.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_U16.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_U32.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_U8.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_ULong.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\GMSEC_UShort.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\internal\CallbackLookup.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\internal\ConnectionImpl.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\internal\Dispatcher.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\internal\MessageImpl.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\internal\RequestDispatcher.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\internal\StatusException.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\gmsecJNI.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNIConfig.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNIConnection.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNIConnectionFactory.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNIConnectionManager.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNIField.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNILog.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNIMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNIStatus.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNIThreadUtil.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\jni\JNITimeUtil.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\Log.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\Message.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\mist\ConnectionManager.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\mist\ConnectionManagerCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\mist\ConnectionManagerErrorCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\mist\ConnectionManagerReplyCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\ReplyCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\Status.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\util\Log.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\util\LogEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\util\LogHandler.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\util\LogLevel.java" />
+    <None Include="gov\nasa\gsfc\gmsecapi\util\TimeUtil.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\Callback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\Config.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\ConfigFile.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\ConfigFileIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\Connection.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\EventCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\BinaryField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\BooleanField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\CharField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\F32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\F64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\I16Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\I32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\I64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\I8Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\StringField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\U16Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\U32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\U64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\field\U8Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\gmsecAPI.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\GMSEC_Exception.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIBinaryField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIBooleanField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNICharField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIF32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIF64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIFieldConverter.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNII16Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNII32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNII64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNII8Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIStringField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIU16Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIU32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIU64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\field\JNIU8Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\gmsecJNI.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNICallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIConfig.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIConfigEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIConfigFile.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIConfigFileIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIConnection.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIEventCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIMessageEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIMessageFieldIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIReplyCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNIStatus.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNISubscriptionEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\JNISubscriptionInfo.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\ArrayListConverter.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIConnectionManager.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIConnMgrCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIConnMgrEventCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIConnMgrReplyCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIConnMgrSubscriptionInfo.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIDevice.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIDeviceIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIDeviceParam.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIMnemonic.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIMnemonicIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIMnemonicSample.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIProductFile.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIProductFileIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNISchemaIDIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNIServiceParam.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\JNISpecification.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\message\JNIDeviceMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\message\JNIMistMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\message\JNIMnemonicMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\mist\message\JNIProductFileMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\util\JNILog.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\util\JNILogHandler.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\util\JNITimeSpec.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\jni\util\JNITimeUtil.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\Message.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\MessageFieldIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\ConnectionManager.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\ConnectionManagerCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\ConnectionManagerEventCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\ConnectionManagerReplyCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\Device.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\DeviceIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\DeviceParam.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\gmsecMIST.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\message\DeviceMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\message\MistMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\message\MnemonicMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\message\ProductFileMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\Mnemonic.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\MnemonicIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\MnemonicSample.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\ProductFile.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\ProductFileIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\SchemaIDIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\ServiceParam.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\Specification.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\mist\SubscriptionInfo.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\ReplyCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\Status.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\SubscriptionInfo.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\U16.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\U32.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\U64.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\U8.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\util\Log.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\util\LogEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\util\LogHandler.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\util\LogLevel.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\util\SystemValidator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\util\TimeSpec.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api\util\TimeUtil.java" />
+    <None Include="Makefile.nt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,10 +1,9 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
 
 
 /**
@@ -16,74 +15,107 @@
  * 
  */
 
-#include "../example.h"
+#include "../Utility.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
+#include <time.h>
+
 using namespace gmsec::api;
+using namespace gmsec::api::util;
 
 
-class gmrpl
+class GMSEC_Reply : public Utility
 {
 public:
-	gmrpl(Config& config);
-	~gmrpl();
+	GMSEC_Reply(const Config& config);
+
+	~GMSEC_Reply();
+
+	void usage(const std::string& programName);
+
 	bool run();
 
 private:
 	typedef std::vector<std::string>       Subjects;
 	typedef std::vector<SubscriptionInfo*> Subscriptions;
 
-	Config&       config;
+	void sendReply(const Message& request, Message& reply);
+	void sendReply(const Message& request, const std::string& subject);
+
 	Connection*   connection;
 	Subjects      subjects;
 	Subscriptions subscriptions;
-
 };
 
 
-gmrpl::gmrpl(Config &c)
-	: config(c),
+GMSEC_Reply::GMSEC_Reply(const Config& c)
+	: Utility(c),
 	  connection(0),
 	  subjects(),
 	  subscriptions()
 {
-	/* Initialize config */
-	example::initialize(c);
+	/* Initialize utility */
+	initialize();
 }
 
 
-gmrpl::~gmrpl()
+GMSEC_Reply::~GMSEC_Reply()
 {
-	if (connection)
+	try
 	{
-		for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
+		if (connection)
 		{
-			SubscriptionInfo* info = *it;
+			for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
+			{
+				SubscriptionInfo* info = *it;
 
-			GMSEC_INFO << "Unsubscribing from " << info->getSubject();
+				GMSEC_INFO << "Unsubscribing from " << info->getSubject();
 
-			connection->unsubscribe(info);
-		}
+				connection->unsubscribe(info);
+			}
 
-		try
-		{
 			connection->disconnect();
-		}
-		catch (Exception& e)
-		{
-			GMSEC_ERROR << e.what();
-		}
 
-		Connection::destroy(connection);
+			Connection::destroy(connection);
+		}
+	}
+	catch (const Exception& e)
+	{
+		GMSEC_ERROR << e.what();
 	}
 
 	Connection::shutdownAllMiddlewares();
 }
 
 
-bool gmrpl::run()
+void GMSEC_Reply::usage(const std::string& programName)
+{
+	Utility::usage(programName);
+
+	std::cerr << "\n\t\t* subject=<message subject>"
+	          << "\n"
+	          << "\n\t\t* msg-file=<file with message definition>"
+	          << "\n"
+	          << "\n\t\t* cfg-file=<configuration file>"
+	          << "\n"
+	          << "\n\t\t\tNote: msg-name must be defined when using cfg-file"
+	          << "\n"
+	          << "\n\t\t* msg-name=<name of message within configuration file>"
+	          << "\n"
+	          << "\n\t\t* msg-timeout-ms=<timeout period (milliseconds)>"
+	          << "\n"
+	          << "\n\t\t* prog-timeout-s=<timeout period (seconds)>"
+	          << "\n"
+	          << "\n\t\t\tNote: msg-timeout-ms must be defined to use prog-timeout-s"
+	          << "\n"
+	          << std::endl;
+}
+
+
+bool GMSEC_Reply::run()
 {
 	bool success = true;
 
@@ -93,7 +125,7 @@ bool gmrpl::run()
 	try
 	{
 		//o Create the Connection
-		connection = Connection::create(config);
+		connection = Connection::create(getConfig());
 
 		//o Connect
 		connection->connect();
@@ -102,12 +134,13 @@ bool gmrpl::run()
 		GMSEC_INFO << connection->getLibraryVersion();
 
 		//o Get info from command line
-		std::string subject        = example::get(config, "SUBJECT", "GMSEC.MISSION.SAT_ID.REQ.CMD.GMRPL");
-		int         msg_timeout_ms = example::get(config, "MSG_TIMEOUT_MS", GMSEC_WAIT_FOREVER);
-		int         prog_timeout_s = example::get(config, "PROG_TIMEOUT_S", GMSEC_WAIT_FOREVER);
+		std::string msgFile        = get("MSG-FILE", "");
+		std::string cfgFile        = get("CFG-FILE", "");
+		int         msg_timeout_ms = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
+		int         prog_timeout_s = get("PROG-TIMEOUT-S", GMSEC_WAIT_FOREVER);
 
 		//o Subscribe
-		example::determineSubjects(config, subjects);
+		determineSubjects(subjects);
 
 		//o Subscribe
 
@@ -155,10 +188,11 @@ bool gmrpl::run()
 				done = (std::string(message->getSubject()) == "GMSEC.TERMINATE");
 
 				//o Display the XML representation of the received message
-				GMSEC_INFO << "Received\n" << message->toXML();
+				GMSEC_INFO << "Received:\n" << message->toXML();
 
-				//o check for request
-				if (message->getKind() == Message::REQUEST)
+				//o check if we have a request message, and whether a response is required
+				if (message->getKind() == Message::REQUEST &&
+				    (message->getField("RESPONSE") == NULL || message->getIntegerValue("RESPONSE") == 1))
 				{
 					const char* component = 0;
 
@@ -167,35 +201,56 @@ bool gmrpl::run()
 						const StringField& compField = message->getStringField("COMPONENT");
 						component = compField.getValue();
 					}
-					catch (Exception& e) {
+					catch (const Exception& e) {
 						GMSEC_WARNING << e.what();
 					}
 
-					//o Set Status Code.  See API Interface Specification for available status codes.
-					const char* status_code = "1"; // 1 = Acknowledgement
+					std::auto_ptr<Message> reply;
+					std::string            reply_subject;
 
-					std::ostringstream reply_subject;
-					reply_subject << "GMSEC.MISSION.SAT_ID.RESP."
-					              << (component ? component : "UNKNOWN-COMPONENT") << "."
-					              << status_code;
-
-					//o Create reply message
-					Message reply(reply_subject.str().c_str(), Message::REPLY);
-
-					//o Add fields to the reply message
-					reply.addField("COMPONENT", "GMRPL");
-					reply.addField("ANSWER", "Sure looks like it!");
-
-					if (config.getBooleanValue("ENCRYPT", false))
+					if (!msgFile.empty())
 					{
-						reply.addField("SEC-ENCRYPT", true);
+						reply.reset(readMessageFile(msgFile));
+
+						reply_subject = reply->getSubject();
+					}
+					else if (!cfgFile.empty())
+					{
+						std::string msgName = get("MSG-NAME", "");
+
+						if (msgName.empty())
+						{
+							GMSEC_ERROR << "When using cfg-file option, user must also provide msg-name option";
+							return false;
+						}
+
+						reply.reset(readConfigFile(cfgFile, msgName));
+
+						reply_subject = reply->getSubject();
+					}
+					else
+					{
+						//o Set Status Code.  See API Interface Specification for available status codes.
+						int status_code = 1; // 1 = Acknowledgement
+
+						std::ostringstream tmp;
+						tmp << "GMSEC.MISSION.SAT_ID.RESP.DIR."
+					        << (component ? component : "UNKNOWN-COMPONENT") << "."
+					        << status_code;
+
+						reply_subject = tmp.str();
 					}
 
-					//o Display XML representation of the reply message
-					GMSEC_INFO << "Prepared Reply:\n" << reply.toXML();
-
-					//o Send Reply
-					connection->reply(*message, reply);
+					if (reply.get())
+					{
+						// Send custom reply
+						sendReply(*message, *(reply.get()));
+					}
+					else
+					{
+						// Send canned reply
+						sendReply(*message, reply_subject);
+					}
 				}
 
 				//o Destroy request message */
@@ -203,7 +258,7 @@ bool gmrpl::run()
 			}
 		}
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
 		GMSEC_ERROR << e.what();
 		success = false;
@@ -213,17 +268,56 @@ bool gmrpl::run()
 }
 
 
+void GMSEC_Reply::sendReply(const Message& request, Message& reply)
+{
+	if (getConfig().getBooleanValue("ENCRYPT", false))
+	{
+		reply.addField("SEC-ENCRYPT", true);
+	}
+
+	//o Display XML representation of the reply message
+	GMSEC_INFO << "Prepared Reply:\n" << reply.toXML();
+
+	//o Send Reply
+	connection->reply(request, reply);
+}
+
+
+void GMSEC_Reply::sendReply(const Message& request, const std::string& subject)
+{
+	//o Create reply message
+	Message reply(subject.c_str(), Message::REPLY);
+
+	if (getConfig().getBooleanValue("ENCRYPT", false))
+	{
+		reply.addField("SEC-ENCRYPT", true);
+	}
+
+	//o Add fields to the reply message
+	reply.addField("COMPONENT", "GMRPL");
+	reply.addField("ANSWER", "Sure looks like it!");
+
+	//o Display XML representation of the reply message
+	GMSEC_INFO << "Prepared Reply:\n" << reply.toXML();
+
+	//o Send Reply
+	connection->reply(request, reply);
+}
+
+
 int main(int argc, char* argv[])
 {
 	Config config(argc, argv);
 
-	example::addToConfigFromFile(config);
+	GMSEC_Reply gmrpl(config);
 
-	if (example::isOptionInvalid(config, argc, "gmrpl"))
+	gmrpl.addToConfigFromFile();
+
+	if (gmrpl.isOptionInvalid(argc, "gmrpl"))
 	{
-		example::printUsage("gmrpl");
-		return -1;
+		gmrpl.usage("gmrpl");
+		return 1;
 	}
 
-	return (gmrpl(config).run() ? 0 : -1);
+	return gmrpl.run() ? 0 : 1;
 }

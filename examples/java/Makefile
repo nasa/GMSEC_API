@@ -1,8 +1,7 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
-
 
 
 JAVAC     = $(JDK_HOME)/bin/javac
@@ -13,7 +12,7 @@ CLASSPATH =../../bin/gmsecapi.jar:.
 
 
 all: checkJDK
-	$(JAVAC) -cp $(CLASSPATH) *.java
+	$(JAVAC) -cp $(CLASSPATH) -Xlint:deprecation *.java
 
 
 clean:

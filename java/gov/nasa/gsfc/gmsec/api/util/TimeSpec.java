@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,16 +8,13 @@
 
 /**
  * @file TimeSpec.java
- *
- * @brief GMSEC Time Specification definition
  */
 
 package gov.nasa.gsfc.gmsec.api.util;
 
 
 /** 
- * @class TimeSpec
- * @brief GMSEC Time Specification definition
+ * GMSEC Time Specification definition
  */
 public class TimeSpec
 {
@@ -26,9 +23,7 @@ public class TimeSpec
 
 
 	/**
-	 * @fn TimeSpec()
-	 *
-	 * @desc Constructor that sets time to Jan 1 1970 00:00:00 UTC.
+	 * Constructor that sets time to Jan 1 1970 00:00:00 UTC.
 	 */
 	public TimeSpec()
 	{
@@ -38,12 +33,10 @@ public class TimeSpec
 
 
 	/**
-	 * @fn TimeSpec(long seconds, long nanoseconds)
+	 * Constructor that sets the time to the given time period.
 	 *
-	 * @desc Constructor that sets time to Jan 1 1970 00:00:00 UTC.
-	 *
-	 * @param seconds     - seconds since Jan 1 1970 00:00:00 UTC
-	 * @param nanoseconds - fractional seconds
+	 * @param seconds     Seconds since Jan 1 1970 00:00:00 UTC
+	 * @param nanoseconds Fractional seconds
 	 */
 	public TimeSpec(long seconds, long nanoseconds)
 	{
@@ -64,11 +57,9 @@ public class TimeSpec
 
 
 	/**
-	 * @fn TimeSpec(TimeSpec other)
+	 * Copy constructor
 	 *
-	 * @desc Copy constructor
-	 *
-	 * @param other - the TimeSpec object to copy
+	 * @param other The TimeSpec object to copy
 	 */
 	public TimeSpec(TimeSpec other)
 	{
@@ -78,9 +69,9 @@ public class TimeSpec
 
 
 	/**
-	 * @fn long getSeconds()
+	 * Returns the number of seconds since Jan 1 1970 00:00:00 UTC.
 	 *
-	 * @desc Returns the number of seconds since Jan 1 1970 00:00:00 UTC.
+	 * @return The number of seconds.
 	 */
 	public long getSeconds()
 	{
@@ -89,10 +80,10 @@ public class TimeSpec
 
 
 	/**
-	 * @fn long getNanoseconds()
-	 *
-	 * @desc Returns the fractional portion of seconds since Jan 1 1970 00:00:00 UTC.
+	 * Returns the fractional portion of seconds since Jan 1 1970 00:00:00 UTC.
 	 * Range is from 0 to 1E9-1.
+	 *
+	 * @return The number of nanoseconds.
 	 */
 	public long getNanoseconds()
 	{

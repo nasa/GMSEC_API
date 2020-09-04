@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,7 +9,7 @@
 // Status class functions
 //
 
-#include "gmsecJNI.h"
+#include "gov_nasa_gsfc_gmsec_api_jni_gmsecJNI.h"
 #include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 
@@ -20,11 +20,14 @@
 
 #include <gmsec4/mist/message/MistMessage.h>
 
+#include <gmsec4/util/DataList.h>
+
 
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::message;
 using namespace gmsec::api::jni;
+using namespace gmsec::api::util;
 
 
 #ifdef __cplusplus
@@ -136,6 +139,36 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MistMessa
 }
 
 
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MistMessageFromMessage
+  (JNIEnv *jenv, jclass jclass, jlong jMsgPtr, jobject jMsg, jlong jConfigPtr, jobject jConfig)
+{
+	MistMessage* created = 0;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+		Config*  cfg = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+		if (!msg)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		if (!cfg)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+		}
+
+		if (jvmOk(jenv, "MistMessage(Message, Config)"))
+		{
+			created = new MistMessage(*msg, *cfg);
+		}
+	}
+	JNI_CATCH
+
+	return JNI_POINTER_TO_JLONG(created);
+}
+
+
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_delete_1MistMessage
   (JNIEnv *jenv, jclass jcls, jlong jMistMsgPtr, jobject jMistMsg)
 {
@@ -153,6 +186,37 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_delete_1MistMes
 		}
 	}
 	JNI_CATCH
+}
+
+
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MistMessageSetStandardFields
+  (JNIEnv *jenv, jclass jcls, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields)
+{
+	try
+	{
+		DataList<Field*> fields;
+		size_t           numFields = (size_t) jNumFields;
+
+		if (numFields > 0)
+		{
+			jlong* fldptrs = jenv->GetLongArrayElements(jFieldPtrs, JNI_FALSE);
+
+			for (size_t i = 0; i < numFields; ++i)
+			{
+				fields.push_back(JNI_JLONG_TO_FIELD(fldptrs[i]));
+			}
+		}
+
+		MistMessage::setStandardFields(fields);
+	}
+	JNI_CATCH
+}
+
+
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MistMessageClearStandardFields
+  (JNIEnv *jenv, jclass jcls)
+{
+	MistMessage::clearStandardFields();
 }
 
 

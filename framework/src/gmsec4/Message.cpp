@@ -185,6 +185,12 @@ bool Message::addField(const char* name, GMSEC_U64 value)
 }
 
 
+bool Message::addFields(const gmsec::api::util::DataList<Field*>& fields)
+{
+	return m_iMessage->addFields(fields);
+}
+
+
 void Message::clearFields()
 {
 	m_iMessage->clearFields();

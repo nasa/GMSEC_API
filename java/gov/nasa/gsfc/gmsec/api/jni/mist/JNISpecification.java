@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,6 +8,7 @@
 
 package gov.nasa.gsfc.gmsec.api.jni.mist;
 
+import gov.nasa.gsfc.gmsec.api.mist.MessageSpecification;
 import gov.nasa.gsfc.gmsec.api.mist.SchemaIDIterator;
 import gov.nasa.gsfc.gmsec.api.mist.Specification;
 
@@ -18,6 +19,8 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIMessage;
 import gov.nasa.gsfc.gmsec.api.jni.mist.JNISchemaIDIterator;
 
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
+
+import java.util.List;
 
 
 public class JNISpecification
@@ -91,6 +94,12 @@ public class JNISpecification
 	public int getVersion()
 	{
 		return gmsecJNI.Specification_GetVersion(swigCPtr, this);
+	}
+
+
+	public List<MessageSpecification> getMessageSpecifications()
+	{
+		return gmsecJNI.Specification_GetMessageSpecifications(swigCPtr, this);
 	}
 
 

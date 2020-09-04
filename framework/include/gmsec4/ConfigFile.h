@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -110,6 +110,24 @@ public:
 	class GMSEC_API ConfigEntry
 	{
 	public:
+		/** @cond
+		 *  Copy constructor.
+		 */
+		ConfigEntry(const ConfigEntry& other);
+		/** @endcond */
+
+		/** @cond
+		 *  Destructor.
+		 */
+		~ConfigEntry();
+		/** @endcond */
+
+		/** @cond
+		 *  Overloaded assignment operator.
+		 */
+		ConfigEntry& operator=(const ConfigEntry& other);
+		/** @endcond */
+
 		/**
 		 * @fn const char* getName() const
 		 *
@@ -129,9 +147,6 @@ public:
 		friend class internal::InternalConfigFileIterator;
 
 		ConfigEntry();
-		ConfigEntry(const ConfigEntry& other);
-		~ConfigEntry();
-		ConfigEntry& operator=(const ConfigEntry& other);
 
 		void CALL_TYPE setName(const char* name);
 		void CALL_TYPE setConfig(const Config& cfg);
@@ -148,6 +163,24 @@ public:
 	class GMSEC_API MessageEntry
 	{
 	public:
+		/** @cond
+		 *  Copy constructor.
+		 */
+		MessageEntry(const MessageEntry& other);
+		/** @endcond */
+
+		/** @cond
+		 *  Destructor.
+		 */
+		~MessageEntry();
+		/** @endcond */
+
+		/** @cond
+		 *  Overloaded assignment operator.
+		 */
+		MessageEntry& operator=(const MessageEntry& other);
+		/** @endcond */
+
 		/**
 		 * @fn const char* getName() const
 		 *
@@ -167,9 +200,6 @@ public:
 		friend class internal::InternalConfigFileIterator;
 
 		MessageEntry();
-		MessageEntry(const MessageEntry& other);
-		~MessageEntry();
-		MessageEntry& operator=(const MessageEntry& other);
 
 		void CALL_TYPE setName(const char* name);
 		void CALL_TYPE setMessage(const Message& msg);
@@ -186,7 +216,23 @@ public:
 	class GMSEC_API SubscriptionEntry
 	{
 	public:
+		/** @cond
+		 *  Copy constructor.
+		 */
+		SubscriptionEntry(const SubscriptionEntry& other);
+		/** @endcond */
+
+		/** @cond
+		 *  Destructor.
+		 */
 		~SubscriptionEntry();
+		/** @endcond */
+
+		/** @cond
+		 *  Overloaded assignment operator.
+		 */
+		SubscriptionEntry& operator=(const SubscriptionEntry& other);
+		/** @endcond */
 
 		/**
 		 * @fn const char* getName() const
@@ -230,8 +276,6 @@ public:
 		friend class internal::InternalConfigFileIterator;
 
 		SubscriptionEntry();
-		SubscriptionEntry(const SubscriptionEntry& other);
-		SubscriptionEntry& operator=(const SubscriptionEntry& other);
 
 		void CALL_TYPE setName(const char* name);
 		void CALL_TYPE setSubject(const char* subject);

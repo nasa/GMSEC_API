@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -139,7 +139,8 @@ public:
 		GMD_ERROR_EVENT = 6,                  ///< SmartSockets Guaranteed Message Delivery (GMD) error.
 		WSMQ_ASYNC_STATUS_CHECK_EVENT = 7,    ///< WebSphere MQ Asynchronous Put status check.
 		ALL_EVENTS = 8,                       ///< Monitor all events.
-		MSG_PUBLISH_FAILURE_EVENT = 9                   ///< Failure occured while attempting to publish aggregated message.
+		MSG_PUBLISH_FAILURE_EVENT = 9,        ///< Failure occured while attempting to publish aggregated message.
+		INVALID_MESSAGE_EVENT = 10            ///< Message failed validation
 	};
 
 
@@ -240,6 +241,7 @@ public:
 
 	/**
 	 * @fn SubscriptionInfo* subscribe(const char* subject, Callback* cb = NULL)
+	 *
 	 * @brief This function subscribes to a particular subject or pattern and
 	 * associates a callback to be called when messages matching the subject
 	 * or pattern are received. If all subscriptions are performed using this
@@ -248,7 +250,7 @@ public:
 	 * will need to be called to ensure registered Callbacks are called.
 	 *
 	 * Example subscription patterns:
-	 *
+	 * @code
 	 * // this will match only messages with this exact subject @n
 	 * SubscriptionInfo* info = conn->subscribe("GMSEC.MISSION.CONST.SAT.EVT.MSG");
 	 *
@@ -269,6 +271,7 @@ public:
 	 * // this will match any GMSEC-compliant message, and forward these messages to a callback @n
 	 * MyCallback cb; @n
 	 * SubscriptionInfo* info = conn->subscribe("GMSEC.>", &cb);
+	 * @endcode
 	 *
 	 * @note
 	 * Although subscription behavior is outlined as above, the actual behavior for a
@@ -277,7 +280,7 @@ public:
 	 * @param subject - subject pattern to match received messages
 	 * @param cb - callback to be called when message is received
 	 *
-	 * @return SubscriptionInfo * - handle used to cancel or modify subscription.
+	 * @return SubscriptionInfo handle used to cancel or modify subscription.
 	 * Connection maintains ownership of SubscriptionInfo; user should not delete but instead call unsubscribe()
 	 * to free resource.
 	 *
@@ -307,7 +310,7 @@ public:
 	 * @param config  - config object to be used for subscription operation
 	 * @param cb      - callback to be called when message is received
 	 *
-	 * @return SubscriptionInfo * - handle used to cancel or modify subscription.
+	 * @return SubscriptionInfo handle used to cancel or modify subscription.
 	 * Connection maintains ownership of SubscriptionInfo; user should not delete but instead call unsubscribe()
 	 * to free resource.
 	 *
@@ -321,11 +324,15 @@ public:
 
 	/**
 	 * @fn void unsubscribe(SubscriptionInfo*& info)
+	 *
 	 * @brief This function unsubscribes to a particular subject pattern, and will stop
 	 * the reception of messages that match this pattern. It will also remove the
 	 * registration of any callbacks with this subject pattern.
 	 *
 	 * @param info - SubscriptionInfo handle from subscription.
+	 *
+	 * @throw Exception if SubscriptionInfo object is null or originated from a different Connection object.
+	 * @throw Exception if error occurs at the middleware level.
 	 *
 	 * @sa subscribe() @n
 	 *     receive() @n
@@ -408,7 +415,7 @@ public:
 
 
 	/**
-	 * @fn void request(const Message& request, GMSEC_I32 timeout, ReplyCallback* cb, GMSEC_I32 republish_ms = 0)
+	 * @fn void request(const Message& request, GMSEC_I32 timeout, ReplyCallback* cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 * @brief This function will send a request asyncronously. The callback will be
 	 * called for the reply if it is received within the specified timeout. This
 	 * function will not block. The timeout value is expressed in milliseconds.
@@ -420,21 +427,20 @@ public:
 	 * @param request - request message to be sent
 	 * @param timeout - maximum time to wait for reply (in milliseconds)
 	 * @param cb - Callback to call when reply is received
-	 * @param republish_ms - request message resubmission interval (in milliseconds). If set
-	 * to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-	 * period will default to 60000ms, unless the user has provided an alternate time period via
-	 * the Config object used to create the Connection object.  The minimum republish period allowed
-	 * is 100ms.
+	 * @param republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 * value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 * the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 * Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @throw Exception on error with generating async request, or if ReplyCallback is NULL.
 	 *
 	 * @sa cancelRequest()
 	 */
-	void CALL_TYPE request(const Message& request, GMSEC_I32 timeout, ReplyCallback* cb, GMSEC_I32 republish_ms = 0);
+	void CALL_TYPE request(const Message& request, GMSEC_I32 timeout, ReplyCallback* cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 
 	/**
-	 * @fn Message* request(const Message& request, GMSEC_I32 timeout, GMSEC_I32 republish_ms = 0)
+	 * @fn Message* request(const Message& request, GMSEC_I32 timeout, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 * @brief This function will send a request, wait for the specified timeout, and return
 	 * the received reply.
 	 * This function will block until the reply is received or the timeout is reached.
@@ -446,11 +452,10 @@ public:
 	 *
 	 * @param request - request message to be sent
 	 * @param timeout - maximum time to wait for reply (in milliseconds)
-	 * @param republish_ms - request message resubmission interval (in milliseconds). If set
-	 * to a negative value (eg. -1) it will never republish a request message. If set to 0, the
-	 * period will default to 60000ms, unless the user has provided an alternate time period via
-	 * the Config object used to create the Connection object.  The minimum republish period allowed
-	 * is 100ms.
+	 * @param republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 * value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 * the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 * Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @return Reply Message, or null if no reply received in time
 	 *
@@ -458,7 +463,7 @@ public:
 	 *
 	 * @sa release()
 	 */
-	Message* CALL_TYPE request(const Message& request, GMSEC_I32 timeout, GMSEC_I32 republish_ms = 0);
+	Message* CALL_TYPE request(const Message& request, GMSEC_I32 timeout, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER);
 
 
 	/**
@@ -469,7 +474,7 @@ public:
 	 *
 	 * @param cb - The ReplyCallback to disassociate from any pending requests.
 	 *
-	 * @sa void request(const Message& request, GMSEC_I32 timeout, ReplyCallback* cb, GMSEC_I32 republish_ms = 0)
+	 * @sa void request(const Message& request, GMSEC_I32 timeout, ReplyCallback* cb, GMSEC_I32 republish_ms = GMSEC_REQUEST_REPUBLISH_NEVER)
 	 */
 	void CALL_TYPE cancelRequest(ReplyCallback* cb);
 

@@ -1,7 +1,22 @@
-package gov.nasa.gsfc.gmsec.api.jni;
+/*
+ * Copyright 2007-2018 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
+ * No copyright is claimed in the United States under Title 17, U.S. Code.
+ * All Rights Reserved.
+ */
+
+
+/**
+ * @file FieldConverter.java
+ */
+
+package gov.nasa.gsfc.gmsec.api.jni.field;
+
 
 import gov.nasa.gsfc.gmsec.api.field.*;
-import gov.nasa.gsfc.gmsec.api.jni.*;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
+import gov.nasa.gsfc.gmsec.api.jni.field.*;
 
 
 public class JNIFieldConverter

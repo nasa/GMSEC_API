@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -58,6 +58,7 @@
 #include <gmsec4_defs.h>
 
 #include <gmsec4/util/wdllexp.h>
+#include <gmsec4/util/Deprecated.h>
 
 
 #ifdef __cplusplus
@@ -111,7 +112,7 @@ extern "C"
 	 *
 	 * @note This function has been deprecated; use configCreateUsingData() instead.
 	 */
-	GMSEC_API GMSEC_Config configCreateUsingXML(const char* xml, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_Config configCreateUsingXML(const char* xml, GMSEC_Status status);
 
 
 	/**

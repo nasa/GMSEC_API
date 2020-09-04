@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -54,6 +54,10 @@ int main(int argc, char* argv[])
 	// etc.
 	Config config(argc, argv);
 
+	//o Since this example program uses an invalid message, we ensure the
+	//  validation check is disabled.
+	config.addValue("gmsec-msg-content-validate-all", "false");
+
 	//o Ensure that the open-response is enabled
  	// Note: Other subscribing applications should set the configuration
  	// option 'mw-expose-resp' to 'true' in order to receive exposed replies
@@ -70,9 +74,7 @@ int main(int argc, char* argv[])
 	// interface
 	// This is useful for determining which version of the API is
 	// configured within the environment
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
@@ -105,15 +107,12 @@ int main(int argc, char* argv[])
 		//o Display XML representation of request message
 		GMSEC_INFO << "Sending request message:\n" << requestMsg.toXML();
 
-		//o Send Request Message -- Since we are using open response,
-		// we will have to receive the message using receive().  As such
-		// we will tell request() to return immediately.
+		//o Send Request Message
 		// Timeout periods:
 		// -1 - Wait forever
 		//  0 - Return immediately
 		// >0 - Time in milliseconds before timing out
-		connMgr.request(requestMsg, 0);
-		Message* replyMsg = connMgr.receive(-1);
+		Message* replyMsg = connMgr.request(requestMsg, 1000, GMSEC_REQUEST_REPUBLISH_NEVER);
 
 		// Example error handling for calling request() with a timeout
 		if (replyMsg)

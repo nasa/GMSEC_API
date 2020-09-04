@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -50,10 +50,12 @@ extern "C"
 	 *
 	 * @return A handle to a ProductFileMessage object, or NULL if an error occurs.  In case of the latter, check the status.
 	 *
+	 * @sa productFileMessageCreateWithSpec(const char*, GMSEC_ResponseStatus, GMSEC_MessageKind, const char*, const char*, const GMSEC_Specification, GMSEC_Status);
 	 * @sa messageDestroy
 	 * @sa C_GMSEC_ISD_2014_00
 	 * @sa C_GMSEC_ISD_CURRENT
 	 */
+	GMSEC_DEPRECATED
 	GMSEC_API GMSEC_Message productFileMessageCreate(const char* subject, GMSEC_ResponseStatus response, const char* type, const char* subtype, unsigned int version, GMSEC_Status status);
 
 
@@ -74,10 +76,12 @@ extern "C"
 	 *
 	 * @return A handle to a ProductFileMessage object, or NULL if an error occurs.  In case of the latter, check the status.
 	 *
+	 * @sa productFileMessageCreateWithConfigAndSpec(const char*, GMSEC_ResponseStatus, GMSEC_MessageKind, const char*, const char*, const GMSEC_Config, const GMSEC_Specification, GMSEC_Status);
 	 * @sa messageDestroy
 	 * @sa C_GMSEC_ISD_2014_00
 	 * @sa C_GMSEC_ISD_CURRENT
 	 */
+	GMSEC_DEPRECATED
 	GMSEC_API GMSEC_Message productFileMessageCreateWithConfig(const char* subject, const GMSEC_Config config, GMSEC_ResponseStatus response, const char* type, const char* subtype, unsigned int version, GMSEC_Status status);
 
 

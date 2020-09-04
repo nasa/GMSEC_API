@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -66,6 +66,10 @@ public:
 	//
 	static bool CALL_TYPE testEquals(const Field& first, const Field& second);
 
+	static Field::FieldType CALL_TYPE lookupType(const char* typeStr);
+
+	static std::string CALL_TYPE lookupTypeStr(Field::FieldType ftype);
+
 protected:
 	InternalField(const char* name, Field::FieldType type);
 
@@ -74,10 +78,6 @@ protected:
 	mutable std::string m_json;
 
 private:
-	static Field::FieldType CALL_TYPE lookupType(const char* typeStr);
-
-	static std::string CALL_TYPE lookupTypeStr(Field::FieldType ftype);
-
 	static Field* createField(const char* name, const char* type, const char* value, const char* bits, const char* head); 
 
 	std::string         m_name;

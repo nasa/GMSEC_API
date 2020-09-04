@@ -1,12 +1,9 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
-
-
 
 
 /** 
@@ -16,6 +13,8 @@
 
 #ifndef GMSEC_CONFIG_EDIT_H
 #define GMSEC_CONFIG_EDIT_H
+
+#include "../Utility.h"
 
 #include "callback.h"
 
@@ -30,6 +29,7 @@ namespace gmsec
 {
 namespace api
 {
+	class Config;
 	class ConfigFile;
 }
 };
@@ -49,10 +49,11 @@ struct MenuItem
 };
 
 
-class GmsecConfigEdit
+class GmsecConfigEdit : public gmsec::api::util::Utility
 {
 public:
-	GmsecConfigEdit(int argc, char** argv);
+	GmsecConfigEdit(const gmsec::api::Config& config);
+
 	~GmsecConfigEdit();
 
 	void processMenuSelection();

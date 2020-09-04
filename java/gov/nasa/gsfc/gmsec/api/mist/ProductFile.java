@@ -1,16 +1,14 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-
-/** @file ProductFile.java
- *
- *  @brief This file contains declarations for ProductFile containers
-**/
+/**
+ * @file ProductFile.java
+ */
 
 package gov.nasa.gsfc.gmsec.api.mist;
 
@@ -22,26 +20,32 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIProductFile;
 
 
 /**
- * @class ProductFile
- *
- * @brief This class is a lightweight container for holding information
+ * This class is a lightweight container for holding information
  * on a Product File, and used to generate GMSEC Product File messages by the 
- * ConnectionManager class
+ * ConnectionManager class.
  *
- * @sa ConnectionManager @n
- *		
-*/
+ * @see ConnectionManager
+ */
 public class ProductFile
 {
 	private JNIProductFile m_jniProductFile = null;
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param obj ProductFile object to reference for acquiring internal JNIProductFile.
+	 * @return Internal JNIProductFile object.
+	 */
 	public static JNIProductFile getInternal(ProductFile obj)
 	{
 		return (obj == null ? null : obj.m_jniProductFile);
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param jProductFile Internal JNIProductFile object.
+	 */
 	public ProductFile(JNIProductFile jProductFile)
 	{
 		m_jniProductFile = jProductFile;
@@ -54,21 +58,19 @@ public class ProductFile
 
 
 	/**
-	 * @fn ProductFile(String name, String description, String version, String format, String uri)
+	 * Constructor - Initializes the ProductFile object with a URI to describe a commonly accessible resource.
 	 *
-	 * @brief Constructor - Initializes the ProductFile object with a URI to describe a commonly accessible resource
+	 * @param name The name of the file.
+	 * @param description The description of the file.
+	 * @param version The version of the file.
+	 * @param format The descriptor for the file format.
+	 * @param uri The URI for the file.
 	 *
-	 * @param name - The name of the file
-	 * @param description - The description of the file
-	 * @param version - The version of the file
-	 * @param format - The descriptor for the file format
-	 * @param uri - The URI for the file
-	 *
-	 * @throws An IllegalArgumentException is thrown if the ProductFile name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the ProductFile description is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the ProductFile version is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the ProductFile format is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the ProductFile URI is null.
+	 * @throws IllegalArgumentException Thrown if the ProductFile name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the ProductFile description is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the ProductFile version is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the ProductFile format is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the ProductFile URI is null.
 	 */
 	public ProductFile(String name, String description, String version, String format, String uri)
 		throws IllegalArgumentException
@@ -85,22 +87,19 @@ public class ProductFile
 
 
 	/**
-	 * @fn ProductFile(String name, String description, String version, String format, byte[] data)
+	 * Constructor - Initializes the ProductFile object with the binary contents of the file.
 	 *
-	 * @brief Constructor - Initializes the ProductFile object with 
-	 * the binary contents of the file
+	 * @param name The name of the file.
+	 * @param description The description of the file.
+	 * @param version The version of the file.
+	 * @param format The descriptor for the file format.
+	 * @param data The binary contents of the file.
 	 *
-	 * @param name - The name of the file
-	 * @param description - The description of the file
-	 * @param version - The version of the file
-	 * @param format - The descriptor for the file format
-	 * @param data - The binary contents of the file
-	 *
-	 * @throws An IllegalArgumentException is thrown if the ProductFile name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the ProductFile description is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the ProductFile version is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the ProductFile format is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the data object is null.
+	 * @throws IllegalArgumentException Thrown if the ProductFile name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the ProductFile description is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the ProductFile version is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the ProductFile format is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the data object is null.
 	 */
 	public ProductFile(String name, String description, String version, String format, byte[] data)
 		throws IllegalArgumentException
@@ -117,13 +116,11 @@ public class ProductFile
 
 
 	/**
-	 * @fn ProductFile(ProductFile other)
+	 * Copy-Constructor - copies information from the given ProductFile.
 	 *
-	 * @brief Copy-Constructor - copies information from the given ProductFile.
+	 * @param other The ProductFile to copy.
 	 *
-	 * @param other - The ProductFile to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given ProductFile is null.
+	 * @throws IllegalArgumentException Thrown if the given ProductFile is null.
 	 */
 	public ProductFile(ProductFile other) throws IllegalArgumentException
 	{
@@ -137,11 +134,9 @@ public class ProductFile
 
 
 	/**
-	 * @fn String getName()
+	 * Retrieves the name of the ProductFile.
 	 *
-	 * @brief Retrieves the name of the ProductFile
-	 *
-	 * @return The name of the ProductFile
+	 * @return The name of the ProductFile.
 	 */
 	public String getName()
 	{
@@ -150,11 +145,9 @@ public class ProductFile
 
 
 	/**
-	 * @fn String getDescription()
+	 * Retrieves the description of the ProductFile.
 	 *
-	 * @brief Retrieves the description of the ProductFile
-	 *
-	 * @return The description of the ProductFile
+	 * @return The description of the ProductFile.
 	 */
 	public String getDescription()
 	{
@@ -163,11 +156,9 @@ public class ProductFile
 
 
 	/**
-	 * @fn String getVersion()
+	 * Retrieves the version of the ProductFile.
 	 *
-	 * @brief Retrieves the version of the ProductFile
-	 *
-	 * @return The version of the ProductFile
+	 * @return The version of the ProductFile.
 	 */
 	public String getVersion()
 	{
@@ -176,11 +167,9 @@ public class ProductFile
 
 
 	/**
-	 * @fn String getFormat()
+	 * Retrieves the format of the ProductFile.
 	 *
-	 * @brief Retrieves the format of the ProductFile
-	 *
-	 * @return The format of the ProductFile
+	 * @return The format of the ProductFile.
 	 */
 	public String getFormat()
 	{
@@ -189,11 +178,9 @@ public class ProductFile
 
 
 	/**
-	 * @fn boolean isURIAvailable()
+	 * Returns the availability of a ProductFile URI.
 	 *
-	 * @brief Returns the availability of a ProductFile URI
-	 *
-	 * @return True if a ProductFile URI has been set, false otherwise
+	 * @return True if a ProductFile URI has been set, false otherwise.
 	 */
 	public boolean isURIAvailable()
 	{
@@ -202,13 +189,11 @@ public class ProductFile
 
 
 	/**
-	 * @fn String getURI()
+	 * Accessor for the ProductFile URI.
 	 *
-	 * @brief Accessor for the ProductFile URI.
+	 * @return A reference to the ProductFile URI string.
 	 *
-	 * @return A reference to the ProductFile URI string
-	 *
-	 * @throw A GMSEC_Exception is thrown if the URI string has not been set
+	 * @throws GMSEC_Exception Thrown if the URI string has not been set.
 	 */
 	public String getURI() throws GMSEC_Exception
 	{
@@ -217,11 +202,9 @@ public class ProductFile
 
 
 	/**
-	 * @fn boolean contentsAvailable()
+	 * Returns the availability of a ProductFile file content.
 	 *
-	 * @brief Returns the availability of a ProductFile file content
-	 *
-	 * @return True if a ProductFile file content has been set, false otherwise
+	 * @return True if a ProductFile file content has been set, false otherwise.
 	 */
 	public boolean contentsAvailable()
 	{
@@ -230,13 +213,11 @@ public class ProductFile
 
 
 	/**
-	 * @fn byte[] getContents()
+	 * Accessor for the ProductFile file content.
 	 *
-	 * @brief Accessor for the ProductFile file content
+	 * @return A byte array containing the ProductFile's content.
 	 *
-	 * @return A byte array containing the ProductFile's content
-	 *
-	 * @throw A GMSEC_Exception is thrown if the file content has not been set, or
+	 * @throws GMSEC_Exception Thrown if the file content has not been set, or
 	 * if the contents are unavailable.
 	 */
 	public byte[] getContents() throws GMSEC_Exception

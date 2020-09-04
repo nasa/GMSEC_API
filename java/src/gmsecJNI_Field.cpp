@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,7 +12,7 @@
 // Field class functions
 //
 
-#include "gmsecJNI.h"
+#include "gov_nasa_gsfc_gmsecapi_jni_gmsecJNI.h"
 #include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 

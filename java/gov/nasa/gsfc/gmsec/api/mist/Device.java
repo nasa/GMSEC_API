@@ -1,16 +1,14 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-/** @file Device.java
- *
- *  @brief This file contains declarations for public interfaces to Device 
- *         containers.
-**/
+/**
+ * @file Device.java
+ */
 
 package gov.nasa.gsfc.gmsec.api.mist;
 
@@ -27,26 +25,30 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIDevice;
 
 
 /**
- * @class Device
- *
- * @brief This class is a lightweight container for holding information
+ * This class is a lightweight container for holding information
  * on a Device, and used to generate GMSEC Device messages by the 
- * ConnectionManager class
- *
- * @sa DeviceMessage
- * @sa ConnectionManager
+ * ConnectionManager class.
 */
 public class Device
 {
 	private JNIDevice m_jniDevice = null;
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param obj Object to reference for acquiring internal JNIDevice.
+	 * @return Internal JNIDevice object.
+	 */
 	public static JNIDevice getInternal(Device obj)
 	{
 		return (obj == null ? null : obj.m_jniDevice);
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param jDevice Internal JNIDevice object.
+	 */
 	public Device(JNIDevice jDevice)
 	{
 		m_jniDevice = jDevice;
@@ -59,29 +61,34 @@ public class Device
 
 
 	/**
-	 * @enum DeviceStatus
-	 *
-	 * @desc Status enumeration for the Device object
+	 * Status enumeration of the Device object.
 	 */
 	public enum DeviceStatus
 	{
-		DEBUG,           ///< DEBUG
-		NOMINAL_GREEN,   ///< NOMINAL GREEN
-		YELLOW,          ///< YELLOW
-		ORANGE,          ///< ORANGE
-		RED              ///< RED
+		/** Debug status. */
+		DEBUG,
+
+		/** Nominal status. */
+		NOMINAL_GREEN,
+
+		/** Yellow status. */
+		YELLOW,
+
+		/** Orange status. */
+		ORANGE,
+
+		/** Red status. */
+		RED
 	};
 
 
 	/**
-	 * @fn Device(String name, DeviceStatus status)
+	 * Constructor - Initializes the Device object with no DeviceParam information.
 	 *
-	 * @brief Constructor - Initializes the Device object with no DeviceParam information
+	 * @param name The name of the device GMSEC connection object.
+	 * @param status The status of the device.
 	 *
-	 * @param name - The name of the Device GMSEC connection object
-	 * @param status - The status of the Device
-	 *
-	 * @throws An IllegalArgumentException is thrown if the device name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the device name is null, or contains an empty string.
 	 */
 	public Device(String name, DeviceStatus status) throws IllegalArgumentException
 	{
@@ -95,17 +102,14 @@ public class Device
 
 
 	/**
-	 * @fn Device(String name, DeviceStatus status, java.util.List<DeviceParam> params)
+	 * Constructor - Initializes the device object with a set of device parameter information.
 	 *
-	 * @brief Constructor - Initializes the Device object with a set of
-	 * Device parameter information
+	 * @param name The name of the device GMSEC connection object.
+	 * @param status The status of the device.
+	 * @param params The list of device parameters.
 	 *
-	 * @param name - The name of the Device GMSEC connection object
-	 * @param status - The status of the Device
-	 * @param params - The list of Device parameters
-	 *
-	 * @throws An IllegalArgumentException is thrown if the device name is null, or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the DeviceParam list is null.
+	 * @throws IllegalArgumentException Thrown if the device name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the DeviceParam list is null.
 	 */
 	public Device(String name, DeviceStatus status, java.util.List<DeviceParam> params) throws IllegalArgumentException
 	{
@@ -123,13 +127,11 @@ public class Device
 
 
 	/**
-	 * @fn Device(Device other)
+	 * Copy-Constructor - Copies the information from the given Device object.
 	 *
-	 * @brief Copy-Constructor - Copies the information from the given Device object.
+	 * @param other The Device object to copy.
 	 *
-	 * @param other - The Device object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given Device object is null.
+	 * @throws IllegalArgumentException Thrown if the given Device object is null.
 	 */
 	public Device(Device other) throws IllegalArgumentException
 	{
@@ -143,11 +145,9 @@ public class Device
 
 
 	/**
-	 * @fn String getName()
+	 * Retrieves the name of the device.
 	 *
-	 * @brief Retrieves the name of the device
-	 *
-	 * @return The name of the device
+	 * @return The name of the device.
 	 */
 	public String getName()
 	{
@@ -156,11 +156,9 @@ public class Device
 
 
 	/**
-	 * @fn boolean numberAvailable()
+	 * Returns the availability of a device number field.
 	 *
-	 * @brief Returns the availability of a device number field.
-	 *
-	 * @return True if a device number field has been set; false otherwise
+	 * @return True if a device number field has been set; false otherwise.
 	 */
 	public boolean numberAvailable()
 	{
@@ -169,13 +167,11 @@ public class Device
 
 
 	/**
-	 * @fn Field getNumber()
+	 * Accessor to get the device number field.
 	 *
-	 * @brief Accessor for the device number field.
+	 * @return A reference to the device number Field.
 	 *
-	 * @return A reference to the device number Field
-	 *
-	 * @throws A GMSEC_Exception is thrown if the device number Field has not been set
+	 * @throws GMSEC_Exception Thrown if the device number Field has not been set.
 	 */
 	public Field getNumber() throws GMSEC_Exception
 	{
@@ -184,13 +180,11 @@ public class Device
 
 
 	/**
-	 * @fn void setNumber(Field number)
+	 * Assigns the given device number Field to this object.
 	 *
-	 * @brief Assigns the given device number Field to this object.
+	 * @param number The device number Field.
 	 *
-	 * @param number - the device number Field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given number Field object is null.
+	 * @throws IllegalArgumentException Thrown if the given number Field object is null.
 	 */
 	public void setNumber(Field number) throws IllegalArgumentException
 	{
@@ -204,11 +198,9 @@ public class Device
 
 
 	/**
-	 * @fn boolean modelAvailable()
+	 * Returns the availability of a device model.
 	 *
-	 * @brief Returns the availability of a device model
-	 *
-	 * @return True if a device model has been set, false otherwise
+	 * @return True if a device model has been set, false otherwise.
 	 */
 	public boolean modelAvailable()
 	{
@@ -217,13 +209,11 @@ public class Device
 
 
 	/**
-	 * @fn String getModel()
+	 * Accessor to get the device model.
 	 *
-	 * @brief Accessor for the device model
+	 * @return A reference to the device model string.
 	 *
-	 * @return A reference to the device model string
-	 *
-	 * @throws A GMSEC_Exception is thrown if the model has not been assigned to the Device.
+	 * @throws GMSEC_Exception Thrown if the model has not been assigned to the device.
 	 */
 	public String getModel() throws GMSEC_Exception
 	{
@@ -232,11 +222,11 @@ public class Device
 
 
 	/**
-	 * @fn void setModel(String model)
+	 * Assigns the given string as the model number of the device.
 	 *
-	 * @brief Assigns the given string as the model for the Device.
+	 * @param model The model number (as a string).
 	 *
-	 * @throws An IllegalArgumentException is thrown if the model string is null, or if it contains an empty-string.
+	 * @throws IllegalArgumentException Thrown if the model number string is null, or if it contains an empty-string.
 	 */
 	public void setModel(String model) throws IllegalArgumentException
 	{
@@ -250,11 +240,9 @@ public class Device
 
 
 	/**
-	 * @fn boolean serialAvailable()
+	 * Returns the availability of a device serial number.
 	 *
-	 * @brief Returns the availability of a device serial number
-	 *
-	 * @return True if a device serial number has been set, false otherwise
+	 * @return True if a device serial number has been set, false otherwise.
 	 */
 	public boolean serialAvailable()
 	{
@@ -263,13 +251,11 @@ public class Device
 
 
 	/**
-	 * @fn String getSerial()
+	 * Accessor to get the device serial number.
 	 *
-	 * @brief Accessor for the device serial number
+	 * @return The device serial number string.
 	 *
-	 * @return A reference to the device serial number string
-	 *
-	 * @throws A GMSEC_Exception is thrown if the serial number string has not been set with this object.
+	 * @throws GMSEC_Exception Thrown if the serial number string has not been set with this object.
 	 */
 	public String getSerial() throws GMSEC_Exception
 	{
@@ -278,11 +264,11 @@ public class Device
 
 
 	/**
-	 * @fn void setSerial(String serial)
+	 * Assigns the given string as the serial number of the device.
 	 *
-	 * @brief Assigns the given string as the serial number for the Device.
+	 * @param serial The serial number (as a string).
 	 *
-	 * @throws An IllegalArgumentException is thrown if the serial string is null, or if it contains an empty-string.
+	 * @throws IllegalArgumentException Thrown if the serial string is null, or if it contains an empty-string.
 	 */
 	public void setSerial(String serial) throws IllegalArgumentException
 	{
@@ -296,11 +282,9 @@ public class Device
 
 
 	/**
-	 * @fn boolean versionAvailable()
+	 * Returns the availability of a device version.
 	 *
-	 * @brief Returns the availability of a device version
-	 *
-	 * @return True if a device version has been set, false otherwise
+	 * @return True if a device version has been set, false otherwise.
 	 */
 	public boolean versionAvailable()
 	{
@@ -309,13 +293,11 @@ public class Device
 
 
 	/**
-	 * @fn String getVersion()
+	 * Accessor to get the device version.
 	 *
-	 * @brief Accessor for the device version
+	 * @return The device version string.
 	 *
-	 * @return The device version string
-	 *
-	 * @throws A GMSEC_Exception is thrown if the version string has not been assigned to the Device.
+	 * @throws GMSEC_Exception Thrown if the version string has not been assigned to the device.
 	 */
 	public String getVersion() throws GMSEC_Exception
 	{
@@ -324,11 +306,11 @@ public class Device
 
 
 	/**
-	 * @fn void setVersion(String version)
+	 * Assigns the given version number to the device.
 	 *
-	 * @brief Supplies a Version for the Device and makes a copy of the string
+	 * @param version The version number (as a string).
 	 *
-	 * @throws An IllegalArgumentException is thrown if the version string is null, or if it contains an empty-string.
+	 * @throws IllegalArgumentException Thrown if the version string is null, or if it contains an empty-string.
 	 */
 	public void setVersion(String version) throws IllegalArgumentException
 	{
@@ -342,11 +324,9 @@ public class Device
 
 
 	/**
-	 * @fn boolean groupAvailable()
+	 * Returns the availability of a device group.
 	 *
-	 * @brief Returns the availability of a Device Group
-	 *
-	 * @return True if a Device Group has been set, false otherwise
+	 * @return True if a device group has been set, false otherwise.
 	 */
 	public boolean groupAvailable()
 	{
@@ -355,13 +335,11 @@ public class Device
 
 
 	/**
-	 * @fn String getGroup()
+	 * Accessor to get the device group.
 	 *
-	 * @brief Accessor for the Device Group
+	 * @return A reference to the device group string.
 	 *
-	 * @return A reference to the Device Group string
-	 *
-	 * @throws A GMSEC_Exception is thrown if the Group field has not been set
+	 * @throws GMSEC_Exception Thrown if the group field has not been set.
 	 */
 	public String getGroup() throws GMSEC_Exception
 	{
@@ -370,11 +348,11 @@ public class Device
 
 
 	/**
-	 * @fn void setGroup(String group)
+	 * Assigns the given group to the device.
 	 *
-	 * @brief Supplies a Group for the Device and makes a copy of the string
+	 * @param group The name of the group.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the group string is null, or if it contains an empty-string.
+	 * @throws IllegalArgumentException Thrown if the group string is null, or if it contains an empty-string.
 	 */
 	public void setGroup(String group) throws IllegalArgumentException
 	{
@@ -388,11 +366,9 @@ public class Device
 
 
 	/**
-	 * @fn boolean roleAvailable()
+	 * Returns the availability of a device role.
 	 *
-	 * @brief Returns the availability of a Device Role
-	 *
-	 * @return True if a Device Role has been set, false otherwise
+	 * @return True if a device role has been set, false otherwise.
 	 */
 	public boolean roleAvailable()
 	{
@@ -401,13 +377,11 @@ public class Device
 
 
 	/**
-	 * @fn String getRole()
+	 * Accessor to get the device role.
 	 *
-	 * @brief Accessor for the Device Role
+	 * @return A reference to the device role string.
 	 *
-	 * @return A reference to the Device Role string
-	 *
-	 * @throws A GMSEC_Exception is thrown if the Role field has not been set
+	 * @throws GMSEC_Exception Thrown if the role field has not been set.
 	 */
 	public String getRole() throws GMSEC_Exception
 	{
@@ -416,11 +390,11 @@ public class Device
 
 
 	/**
-	 * @fn void setRole(String role)
+	 * Assigns the given role to the device.
 	 *
-	 * @brief Supplies a Role for the Device and makes a copy of the string
+	 * @param role The role the device supports.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the role string is null, or if it contains an empty-string.
+	 * @throws IllegalArgumentException Thrown if the role string is null, or if it contains an empty-string.
 	 */
 	public void setRole(String role) throws IllegalArgumentException
 	{
@@ -434,11 +408,9 @@ public class Device
 
 
 	/**
-	 * @fn DeviceStatus getStatus()
+	 * Accessor to get the device status.
 	 *
-	 * @brief Accessor for the Device Status
-	 *
-	 * @return The Device Status enumeration
+	 * @return The device status.
 	 */
 	public DeviceStatus getStatus()
 	{
@@ -447,9 +419,9 @@ public class Device
 
 
 	/**
-	 * @fn void setStatus(DeviceStatus status)
+	 * Assigns the given status to the device.
 	 *
-	 * @brief Supplies a Status for the Device and makes a copy of the string
+	 * @param status The device status.
 	 */
 	public void setStatus(DeviceStatus status)
 	{
@@ -458,11 +430,9 @@ public class Device
 
 
 	/**
-	 * @fn boolean infoAvailable()
+	 * Returns the availability of a device info field.
 	 *
-	 * @brief Returns the availability of a Device Info field
-	 *
-	 * @return True if a Device Info field has been set, false otherwise
+	 * @return True if a device info field has been set, false otherwise.
 	 */
 	public boolean infoAvailable()
 	{
@@ -471,13 +441,11 @@ public class Device
 
 
 	/**
-	 * @fn Field getInfo()
+	 * Accessor for getting the device info Field.
 	 *
-	 * @brief Accessor for the Device Info
+	 * @return A reference to the device info field.
 	 *
-	 * @return A reference to the Device Info field
-	 *
-	 * @throws A GMSEC_Exception is thrown if the Info field has not been set
+	 * @throws GMSEC_Exception Thrown if the info field has not been set.
 	 */
 	public Field getInfo() throws GMSEC_Exception
 	{
@@ -486,11 +454,11 @@ public class Device
 
 
 	/**
-	 * @fn void setInfo(Field info)
+	 * Assigns the given info Field to the device.
 	 *
-	 * @brief Supplies a Info for the Device and makes a copy of the field
+	 * @param info The Field containing information about the device.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the info Field is null.
+	 * @throws IllegalArgumentException Thrown if the info Field is null.
 	 */
 	public void setInfo(Field info) throws IllegalArgumentException
 	{
@@ -504,11 +472,9 @@ public class Device
 
 
 	/**
-	 * @fn long getParamCount()
+	 * Returns the number of parameters for this device.
 	 *
-	 * @brief Returns the number of parameters for this Device
-	 *
-	 * @return the number of parameters
+	 * @return The number of parameters.
 	 */
 	public long getParamCount()
 	{
@@ -517,15 +483,13 @@ public class Device
 
 
 	/**
-	 * @fn DeviceParam getParam(long index)
+	 * Returns a reference to a DeviceParam held in this object.
 	 *
-	 * @brief Returns a reference to a DeviceParam held in this object
+	 * @param index The zero-based index of the DeviceParam object to access.
 	 *
-	 * @param index - the zero-based index of the DeviceParam object to access
+	 * @return A reference to the requested DeviceParam object.
 	 *
-	 * @return A reference to the requested DeviceParam object
-	 *
-	 * @throws A GMSEC_Exception if the index supplied is out of bounds
+	 * @throws GMSEC_Exception Thrown if the index supplied is out of bounds.
 	 */
 	public DeviceParam getParam(long index) throws GMSEC_Exception
 	{
@@ -534,13 +498,11 @@ public class Device
 
 
 	/**
-	 * @fn void addParam(DeviceParam param)
+	 * Adds the given DeviceParam to the device.
 	 *
-	 * @brief Adds a single DeviceParam to the current list
+	 * @param param The new DeviceParam object.
 	 *
-	 * @param param - the new DeviceParam object
-	 *
-	 * @throws An IllegalArgumentException is thrown if the DeviceParam object is null.
+	 * @throws IllegalArgumentException Thrown if the DeviceParam object is null.
 	 */
 	public void addParam(DeviceParam param) throws IllegalArgumentException
 	{

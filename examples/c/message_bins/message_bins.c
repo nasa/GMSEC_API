@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -50,8 +50,12 @@ int main(int argc, char* argv[])
 
 	config = configCreateWithArgs(argc, argv);
 
+	//o Since this example program uses an invalid message, we ensure the
+	//  validation check is disabled.
+	configAddValue(config, "gmsec-msg-content-validate-all", "false", NULL);
+
 	//o Enable Message Binning
-	configAddValue(config, "GMSEC-USE-MESSAGE-BINS", "true", status);
+	configAddValue(config, "GMSEC-USE-MSG-BINS", "true", status);
 	//o Specify the number of messages to be aggregated prior to publishing
 	// the aggregate message to the middleware server (This applies to all
 	// of the messages which match the subject(s) provided in the
@@ -59,17 +63,20 @@ int main(int argc, char* argv[])
 	// Note: The aggregate message will be sent to the middleware server
 	// immediately upon this many messages being published, regardless of
 	// the value supplied for GMSEC-MSG-BIN-TIMEOUT.
-	configAddValue(config, "GMSEC-MSG-BIN-SIZE", "5", status);
+	configAddValue(config, "GMSEC-MSG-BIN-SIZE", "10", status);
+
 	//o Specify a timeout (in milliseconds) for the aggregate message to be
 	// sent to the middleware server
 	// Note: The aggregate message will be sent to the middleware server
 	// after this period of time if the message bin does not fill up (per
 	// the value provided for GMSEC-MSG-BIN-SIZE) prior to this timeout
 	configAddValue(config, "GMSEC-MSG-BIN-TIMEOUT", "5000", status);
+
 	//o Specify the subjects to aggreate messages for.
 	// Note: Subscription wildcard syntax can be used here, and has been
 	// supported since GMSEC API version 4.3.
 	configAddValue(config, "GMSEC-MSG-BIN-SUBJECT-1", "GMSEC.*.PUBLISH", status);
+
 	//o Specify any subjects that should be excluded from being aggregated
 	// This is useful if a wildcard subscription is provided in one of the
 	// GMSEC-MSG-BIN-SUBJECT-N parameters.
@@ -77,9 +84,7 @@ int main(int argc, char* argv[])
 
 	initializeLogging(config, status);
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	connMgr = connectionManagerCreateUsingValidation(config, GMSEC_FALSE, status);
 	checkStatus(status);

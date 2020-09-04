@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -496,7 +496,7 @@ void MessageEncoder::encode(const Field &field)
 {
 	Field::FieldType type = field.getType();
 
-	GMSEC_U16 tmp = type;
+	GMSEC_U16 tmp = (GMSEC_U16) type;
 
 	if (field.isHeader())
 	{
@@ -517,7 +517,7 @@ void MessageEncoder::encode(const Field &field)
 	case Field::BOOL_TYPE:
 	{
 		bool value = dynamic_cast<const BooleanField&>(field).getValue();
-		GMSEC_U8 tmp = value ? 1 : 0;
+		GMSEC_U8 tmp = (GMSEC_U8)(value ? 1 : 0);
 		encoder->putU8(&tmp, current);
 		break;
 	}
@@ -945,7 +945,7 @@ static void get1ByteI8(const char *&pi, GMSEC_I8 *po)
 
 static void get1ByteU8(const char *&pi, GMSEC_U8 *po)
 {
-	po[0] = pi[0];
+	po[0] = (GMSEC_U8) pi[0];
 	pi += 1;
 }
 

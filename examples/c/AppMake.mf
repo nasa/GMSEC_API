@@ -8,6 +8,9 @@ GMSEC_HOME=../../..
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
+CFLAGS += -I$(GMSEC_HOME)/include
+
+
 .PHONY: default all checkDefs clean
 
 
@@ -16,7 +19,6 @@ default all: checkDefs $(TARGET)
 
 clean: checkDefs
 	$(RM) $(TARGET)
-	$(RM) *.gcno *.gcda;
 
 
 checkDefs:

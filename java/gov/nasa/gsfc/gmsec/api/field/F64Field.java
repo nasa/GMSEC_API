@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,22 +8,22 @@
 
 /**
  * @file F64Field.java
- *
- * @brief Specialized Field class that can be used to retain a 64-bit floating point value.
  */
 
 package gov.nasa.gsfc.gmsec.api.field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIF64Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIF64Field;
 
 
 /**
- * @class F64Field
- *
- * @brief Specialized Field class that can be used to retain a 64-bit floating point value.
+ * Specialized Field class that can be used to retain a 64-bit floating point value.
  */
 public class F64Field extends Field
 {
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A JNIF64Field object.
+	 */
 	public F64Field(JNIF64Field field)
 	{
 		setInternal(field);
@@ -31,14 +31,12 @@ public class F64Field extends Field
 
 
 	/**
-	 * @fn F64Field(String name, double data)
+	 * Default constructor.
 	 *
-	 * @brief Default constructor.
+	 * @param name Name of the field.
+	 * @param data Data to associate with the field.
 	 *
-	 * @param name - name of the field.
-	 * @param data - data to associate with the field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
 	 */
 	public F64Field(String name, double data) throws IllegalArgumentException
 	{
@@ -49,11 +47,11 @@ public class F64Field extends Field
 
 
 	/**
-	 * @fn F64Field(F64Field other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other F64Field object to copy.
 	 *
-	 * @param other - the other F64Field object to copy.
+	 * @throws IllegalArgumentException Thrown if the given F64Field object is null.
 	 */
 	public F64Field(F64Field other) throws IllegalArgumentException
 	{
@@ -67,9 +65,9 @@ public class F64Field extends Field
 
 
 	/**
-	 * @fn double getValue()
+	 * Returns the data stored within the F64Field.
 	 *
-	 * @return Returns the data stored within the F64Field.
+	 * @return A double value.
 	 */
 	public double getValue()
 	{

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,7 +42,11 @@ InternalMnemonic::InternalMnemonic(const char* name, const DataList<MnemonicSamp
 	for (DataList<MnemonicSample*>::const_iterator it = samples.begin(); it != samples.end(); ++it)
 	{
 		const MnemonicSample* sample = *it;
-		m_sampleList.add(new MnemonicSample(*sample));
+
+		if (sample)
+		{
+			m_sampleList.add(new MnemonicSample(*sample));
+		}
 	}
 }
 
@@ -58,13 +62,16 @@ InternalMnemonic::InternalMnemonic(const InternalMnemonic& other)
 	for (DataList<MnemonicSample*>::const_iterator it = other.m_sampleList.begin(); it != other.m_sampleList.end(); ++it)
 	{
 		const MnemonicSample* sample = *it;
-		m_sampleList.add(new MnemonicSample(*sample));
+
+		if (sample)
+		{
+			m_sampleList.add(new MnemonicSample(*sample));
+		}
 	}
 
-	if(m_hasStatus){
+	if (m_hasStatus)
+	{
 		setStatus(*other.m_status);
-	}else{
-		m_status = NULL;
 	}
 }
 
@@ -76,7 +83,7 @@ InternalMnemonic& InternalMnemonic::operator=(const InternalMnemonic& other)
 
 		if (other.m_status)
         {
-            m_status    = gmsec::api::internal::InternalField::makeFieldCopy(*other.m_status);
+            m_status = gmsec::api::internal::InternalField::makeFieldCopy(*other.m_status);
         }
 		m_hasStatus = other.m_hasStatus;
 
@@ -86,7 +93,11 @@ InternalMnemonic& InternalMnemonic::operator=(const InternalMnemonic& other)
 		for (DataList<MnemonicSample*>::const_iterator it = other.m_sampleList.begin(); it != other.m_sampleList.end(); ++it)
 		{
 			const MnemonicSample* sample = *it;
-			m_sampleList.add(new MnemonicSample(*sample));
+
+			if (sample)
+			{
+				m_sampleList.add(new MnemonicSample(*sample));
+			}
 		}
     }
  

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file Message.java
- *
- * @brief The Message object is a container for GMSEC Messages.
  */
 
 package gov.nasa.gsfc.gmsec.api;
@@ -17,11 +15,11 @@ package gov.nasa.gsfc.gmsec.api;
 import gov.nasa.gsfc.gmsec.api.field.*;
 import gov.nasa.gsfc.gmsec.api.jni.JNIMessage;
 
+import java.util.Collection;
+
 
 /**
- * @class Message
- *
- * @brief The Message object is a container for GMSEC Messages.
+ * The Message object is a container for GMSEC Messages.
  * The methods of this class allow the construction and manipulation of the data in a message.
  */
 public class Message
@@ -29,18 +27,31 @@ public class Message
 	private JNIMessage m_jniMessage = null;
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param child A JNIMessage object.
+	 */
 	public Message(JNIMessage child)
 	{
 		m_jniMessage = child;
 	}
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param msg A Message object.
+	 * @return A JNIMessage object.
+	 */
 	public static JNIMessage getInternal(Message msg)
 	{
 		return (msg == null ? null : msg.m_jniMessage);
 	}
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param jMsg A JNIMessage object.
+	 */
 	protected void registerChild(JNIMessage jMsg)
 	{
 		m_jniMessage = jMsg;
@@ -48,25 +59,26 @@ public class Message
 
 
 	/**
-	 * @enum MessageKind
-	 *
-	 * @desc Enumerated list of possible Message types.
+	 * Enumerated list of possible Message types.
 	 */
 	public enum MessageKind
 	{
-		PUBLISH,  ///< For messages that will be published
-		REQUEST,  ///< For messages that will be issued as requests
-		REPLY     ///< For messages that will serve as a reply (to a request)
+		/** For messages that will be published. */
+		PUBLISH,
+
+		/** For messages that will be issued as requests. */
+		REQUEST,
+
+		/** For messages that will serve as a reply (to a request). */
+		REPLY
 	}
 
 
 	/**
-	 * @fn Message(String subject, MessageKind kind)
-	 *
-	 * @brief Default constructor.
-	 *
+	 * Constructor.
+	 * <p>
 	 * Example creation and use:
-	 * @code
+	 * <pre>{@code
 	 * // create message with subject and kind
 	 * //
 	 * Config config = new Config(args);
@@ -88,12 +100,12 @@ public class Message
 	 * ...
 	 *
 	 * Connection.destroy(conn);
-	 * @endcode
+	 * }</pre>
 	 *
-	 * @param subject - the GMSEC subject to associate with the message.
-	 * @param kind - the kind of message to create.
+	 * @param subject The GMSEC subject to associate with the message.
+	 * @param kind The kind of message to create.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the subject string is null, or contains an empty string.
 	 */
 	public Message(String subject, MessageKind kind) throws IllegalArgumentException
 	{
@@ -107,19 +119,17 @@ public class Message
 
 
 	/**
-	 * @fn Message(String subject, MessageKind kind, Config config)
-	 *
-	 * @brief Specialized constructor that accepts a Config object.
-	 *
-	 * @note Only Message-related configuration options are held by the Message object.
+	 * Specialized constructor that accepts a Config object.
+	 * <p>
+	 * Note: Only Message-related configuration options are held by the Message object.
 	 * These configuration options are NOT included with the message when it is sent
 	 * across the GMSEC Bus.
 	 *
-	 * @param subject - the GMSEC subject to associate with the message.
-	 * @param kind - the kind of message to create.
-	 * @param config - a configuration object that contains message-specific options.
+	 * @param subject The GMSEC subject to associate with the message.
+	 * @param kind The kind of message to create.
+	 * @param config A configuration object that contains message-specific options.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty string,
+	 * @throws IllegalArgumentException Thrown if the subject string is null, or contains an empty string,
 	 * or if the Config object is null.
 	 */
 	public Message(String subject, MessageKind kind, Config config) throws IllegalArgumentException
@@ -138,12 +148,10 @@ public class Message
 
 
 	/**
-	 * @fn Message(String data)
-	 *
-	 * @brief Specialized constructor that initializes the message instance using either XML or JSON text.
-	 *
+	 * Specialized constructor that initializes the message instance using either XML or JSON text.
+	 * <p>
 	 * An XML string should have a format similar to the following:
-	 * @code
+	 * <pre>{@code
 	 * final String XML = "<MESSAGE SUBJECT=\"GMSEC.TEST.XML.SUBJECT\" KIND=\"PUBLISH\">" +
 	 *		              "    <CONFIG>" +
 	 *	     	          "        <PARAMETER NAME=\"gmsec-msgfld-store-type\">tree</PARAMETER>" +
@@ -152,10 +160,10 @@ public class Message
 	 *	     	          "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>" +
 	 *	     	          "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>" +
 	 *	     	          "</MESSAGE>";
-	 * @endcode
-	 *
+	 * }</pre>
+	 * <p>
 	 * A JSON string should have a format similar to the following:
-	 * @code
+	 * <pre>{@code
 	 * final String JSON = "{\"MESSAGE\":{" +
 	 *	               "  \"KIND\":\"PUBLISH\"," +
 	 *	               "  \"SUBJECT\":\"GMSEC.TEST.JSON.SUBJECT\"," +
@@ -173,15 +181,15 @@ public class Message
 	 *		       "  ]" +
 	 *		       "  }" +
 	 *			"}";
-	 * @endcode
+	 * }</pre>
 	 *
-	 * @param data - the XML or JSON string that represents a GMSEC message.
+	 * @param data The XML or JSON string that represents a GMSEC message.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the data string is null, or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the data string cannot be parsed.
+	 * @throws IllegalArgumentException Thrown if the data string is null, or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the data string cannot be parsed.
 	 *
-	 * @sa toXML()
-	 * @sa toJSON()
+	 * @see Message#toXML()
+	 * @see Message#toJSON()
 	 */
 	public Message(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -195,13 +203,11 @@ public class Message
 
 
 	/**
-	 * @fn Message(Message other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other message object to copy.
 	 *
-	 * @param other - the other message object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given Message object is null.
+	 * @throws IllegalArgumentException Thrown if the given Message object is null.
 	 */
 	public Message(Message other) throws IllegalArgumentException
 	{
@@ -215,17 +221,15 @@ public class Message
 
 
 	/**
-	 * @fn void addConfig(Config config)
-	 *
-	 * @brief Used to associate configuration object with the message.
-	 *
-	 * @note Only Message-related configuration options are held by the Message object.
+	 * Used to associate configuration object with the message.
+	 * <p>
+	 * Note: Only Message-related configuration options are held by the Message object.
 	 * These configuration options are NOT included with the message when it is sent
 	 * across the GMSEC Bus.
 	 *
-	 * @param config - the configuration object.
+	 * @param config The configuration object.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given Config object is null.
+	 * @throws IllegalArgumentException Thrown if the given Config object is null.
 	 */
 	public void addConfig(Config config) throws IllegalArgumentException
 	{
@@ -239,9 +243,9 @@ public class Message
 
 
 	/**
-	 * @fn Config getConfig()
+	 * Returns the reference to the Config object associated with the message.
 	 *
-	 * @return A reference to the Config object associated with the message.
+	 * @return A Config object.
 	 */
 	public Config getConfig()
 	{
@@ -250,9 +254,9 @@ public class Message
 
 
 	/**
-	 * @fn String getSubject()
+	 * Returns a String containing the subject/topic associated with the message.
 	 *
-	 * @return A String containing the subject/topic associated with the message.
+	 * @return The message subject.
 	 */
 	public String getSubject()
 	{
@@ -261,13 +265,11 @@ public class Message
 
 
 	/**
-	 * @fn void setSubject(String subject)
+	 * Allows for the setting/changing of the message subject.
 	 *
-	 * @brief Allows for the setting/changing of the message subject.
+	 * @param subject The subject/topic to associate with the message
 	 *
-	 * @param subject - the subject/topic to associate with the message
-	 *
-	 * @throws An IllegalArgumentException is thrown if the subject is null or contains
+	 * @throws IllegalArgumentException Thrown if the subject is null or contains
 	 * an empty string.
 	 */
 	public void setSubject(String subject)
@@ -282,9 +284,9 @@ public class Message
 
 
 	/**
-	 * @fn MessageKind getKind()
+	 * Returns an enumerated value representing the MessageKind associated with the message.
 	 *
-	 * @return An enumerated value representing the MessageKind associated with the message.
+	 * @return The message kind.
 	 */
 	public MessageKind getKind()
 	{
@@ -293,13 +295,13 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(Field field)
+	 * Adds the given Field object to the Message.
 	 *
-	 * @brief Adds the given Field object to the Message.
+	 * @param field The field to add to the message.
 	 *
 	 * @return Returns true if the Field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given Field object is null.
+	 * @throws IllegalArgumentException Thrown if the given Field object is null.
 	 */
 	public boolean addField(Field field) throws IllegalArgumentException
 	{
@@ -313,17 +315,15 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, byte[] data)
+	 * Adds a BinaryField to the message using the given data.
 	 *
-	 * @brief Adds a BinaryField to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - data object
+	 * @param name Field name
+	 * @param data Byte array of data
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given byte array is null.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given byte array is null.
 	 */
 	public boolean addField(String name, byte[] data) throws IllegalArgumentException
 	{
@@ -341,16 +341,14 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, boolean data)
+	 * Adds a BooleanField to the message using the given data.
 	 *
-	 * @brief Adds a BooleanField to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean addField(String name, boolean data) throws IllegalArgumentException
 	{
@@ -364,16 +362,14 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, char data)
+	 * Adds a CharField to the message using the given data.
 	 *
-	 * @brief Adds a CharField to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean addField(String name, char data) throws IllegalArgumentException
 	{
@@ -387,16 +383,14 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, byte data)
+	 * Adds an I8Field to the message using the given data.
 	 *
-	 * @brief Adds an I8Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean addField(String name, byte data) throws IllegalArgumentException
 	{
@@ -410,16 +404,14 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, short data)
+	 * Adds an I16Field to the message using the given data.
 	 *
-	 * @brief Adds an I16Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean addField(String name, short data) throws IllegalArgumentException
 	{
@@ -433,16 +425,14 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, int data)
+	 * Adds an I32Field to the message using the given data.
 	 *
-	 * @brief Adds an I32Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean addField(String name, int data) throws IllegalArgumentException
 	{
@@ -456,16 +446,14 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, long data)
+	 * Adds an I64Field to the message using the given data.
 	 *
-	 * @brief Adds an I64Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean addField(String name, long data) throws IllegalArgumentException
 	{
@@ -479,17 +467,15 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, U8 data)
+	 * Adds an U8Field to the message using the given data.
 	 *
-	 * @brief Adds an U8Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given data object is null.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given data object is null.
 	 */
 	public boolean addField(String name, U8 data) throws IllegalArgumentException
 	{
@@ -507,17 +493,15 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, U16 data)
+	 * Adds an U16Field to the message using the given data.
 	 *
-	 * @brief Adds an U16Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - data object
+	 * @param name Field name
+	 * @param data Data object
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given data object is null.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given data object is null.
 	 */
 	public boolean addField(String name, U16 data) throws IllegalArgumentException
 	{
@@ -535,17 +519,15 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, U32 data)
+	 * Adds an U32Field to the message using the given data.
 	 *
-	 * @brief Adds an U32Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - data object
+	 * @param name Field name
+	 * @param data Data object
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given data object is null.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given data object is null.
 	 */
 	public boolean addField(String name, U32 data) throws IllegalArgumentException
 	{
@@ -563,17 +545,15 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, U64 data)
+	 * Adds an U64Field to the message using the given data.
 	 *
-	 * @brief Adds an U64Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - data object
+	 * @param name Field name
+	 * @param data Data object
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given data object is null.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given data object is null.
 	 */
 	public boolean addField(String name, U64 data) throws IllegalArgumentException
 	{
@@ -591,16 +571,14 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, float data)
+	 * Adds an F32Field to the message using the given data.
 	 *
-	 * @brief Adds an F32Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean addField(String name, float data) throws IllegalArgumentException
 	{
@@ -614,16 +592,14 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, double data)
+	 * Adds an F64Field to the message using the given data.
 	 *
-	 * @brief Adds an F64Field to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - value
+	 * @param name Field name
+	 * @param data Value
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean addField(String name, double data) throws IllegalArgumentException
 	{
@@ -637,17 +613,15 @@ public class Message
 
 
 	/**
-	 * @fn boolean addField(String name, String data)
+	 * Adds a StringField to the message using the given data.
 	 *
-	 * @brief Adds a StringField to the message using the given data.
-	 *
-	 * @param name - field name
-	 * @param data - string data
+	 * @param name Field name
+	 * @param data String data
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given data value is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given data value is null or contains an empty string.
 	 */
 	public boolean addField(String name, String data) throws IllegalArgumentException
 	{
@@ -665,9 +639,27 @@ public class Message
 
 
 	/**
-	 * @fn void clearFields()
+	 * Adds each Field in the given Collection to the Message.
 	 *
-	 * @brief Removes all Fields from the Message.
+	 * @param fields Collection of field objects
+	 *
+	 * @return Returns true if any existing field in the Message has been replaced; false otherwise.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given Collection is null.
+	 */
+	public boolean addFields(Collection<Field> fields) throws IllegalArgumentException
+	{
+		if (fields == null)
+		{
+			throw new IllegalArgumentException("Field collection is null");
+		}
+
+		return m_jniMessage.addFields(fields);
+	}
+
+
+	/**
+	 * Removes all Fields from the Message.
 	 */
 	public void clearFields()
 	{
@@ -676,15 +668,13 @@ public class Message
 
 
 	/**
-	 * @fn boolean clearField(String name)
+	 * Removes the Field from this message by name.
 	 *
-	 * @brief Removes the Field from this message by name.
-	 *
-	 * @param name - the name of the Field to remove.
+	 * @param name the name of the Field to remove.
 	 *
 	 * @return Returns true if the field was removed; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public boolean clearField(String name) throws IllegalArgumentException
 	{
@@ -698,16 +688,14 @@ public class Message
 
 
 	/**
-	 * @fn long getIntegerValue(String fieldName)
+	 * Attempts to convert the field value into an 64-bit integer number representation.
 	 *
-	 * @brief Attempts to convert the field value into an 64-bit integer number representation.
-	 *
-	 * @param fieldName - the name of the field from which to reference the value.
+	 * @param fieldName The name of the field from which to reference the value.
 	 *
 	 * @return Returns the field value as an integer value.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to an integer.
 	 */
 	public long getIntegerValue(String fieldName) throws GMSEC_Exception
@@ -722,16 +710,14 @@ public class Message
 
 
 	/**
-	 * @fn U64 getUnsignedIntegerValue(String fieldName)
+	 * Attempts to convert the field value into a U64 number representation.
 	 *
-	 * @brief Attempts to convert the field value into a U64 number representation.
-	 *
-	 * @param fieldName - the name of the field from which to reference the value.
+	 * @param fieldName The name of the field from which to reference the value.
 	 *
 	 * @return Returns the field value as a U64 value.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a U64.
 	 */
 	public U64 getUnsignedIntegerValue(String fieldName) throws GMSEC_Exception
@@ -746,16 +732,14 @@ public class Message
 
 
 	/**
-	 * @fn double getDoubleValue(String fieldName)
+	 * Attempts to convert the field value into an 64-bit floating-point number representation.
 	 *
-	 * @brief Attempts to convert the field value into an 64-bit floating-point number representation.
-	 *
-	 * @param fieldName - the name of the field from which to reference the value.
+	 * @param fieldName The name of the field from which to reference the value.
 	 *
 	 * @return Returns the field value as a floating-point value.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a floating-point value.
 	 */
 	public double getDoubleValue(String fieldName) throws GMSEC_Exception
@@ -770,16 +754,14 @@ public class Message
 
 
 	/**
-	 * @fn String getStringValue(String fieldName)
+	 * Attempts to convert the field value into string representation.
 	 *
-	 * @brief Attempts to convert the field value into string representation.
-	 *
-	 * @param fieldName - the name of the field from which to reference the value.
+	 * @param fieldName The name of the field from which to reference the value.
 	 *
 	 * @return Returns the field value as a string value.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a string value.
 	 */
 	public String getStringValue(String fieldName) throws GMSEC_Exception
@@ -794,16 +776,14 @@ public class Message
 
 
 	/**
-	 * @fn Field getField(String name)
-	 *
-	 * @brief This function will return the named Field object contained within the Message
+	 * This function will return the named Field object contained within the Message
 	 * object, if it exists. Otherwise a null handle is returned.
 	 *
-	 * @param name - the name of the Field to reference.
+	 * @param name The name of the Field to reference.
 	 *
-	 * @return A handle to the field, if it is found; a null handle otherwise.
+	 * @return A handle to the Field, if it is found; null otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
 	public Field getField(String name) throws IllegalArgumentException
 	{
@@ -817,14 +797,14 @@ public class Message
 
 
 	/**
-	 * @fn FieldType getFieldType(String name)
+	 * Returns the FieldType associated with the named field.
 	 *
-	 * @brief Returns the FieldType associated with the named field.
+	 * @param name The name of the Field to reference.
 	 *
-	 * @param name - the name of the Field to reference.
+	 * @return A Field.FieldType value.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found.
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found.
 	 */
 	public Field.FieldType getFieldType(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -838,12 +818,14 @@ public class Message
 
 
 	/**
-	 * @fn BinaryField getBinaryField(String name)
+	 * Returns a handle to the BinaryField referenced by the given name.
 	 *
-	 * @brief Returns a handle to the BinaryField referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not a BinaryField.
+	 * @return A BinaryField.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not a BinaryField.
 	 */
 	public BinaryField getBinaryField(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -857,12 +839,14 @@ public class Message
 
 
 	/**
-	 * @fn BooleanField getBooleanField(String name)
+	 * Returns a handle to the BooleanField referenced by the given name.
 	 *
-	 * @brief Returns a handle to the BooleanField referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not a BooleanField.
+	 * @return A BooleanField.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not a BooleanField.
 	 */
 	public BooleanField getBooleanField(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -876,12 +860,14 @@ public class Message
 
 
 	/**
-	 * @fn CharField getCharField(String name)
+	 * Returns a handle to the CharField referenced by the given name.
 	 *
-	 * @brief Returns a handle to the CharField referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not a CharField.
+	 * @return A CharField.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not a CharField.
 	 */
 	public CharField getCharField(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -895,12 +881,14 @@ public class Message
 
 
 	/**
-	 * @fn F32Field getF32Field(String name)
+	 * Returns a handle to the F32Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the F32Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not an F32Field.
+	 * @return An F32Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not an F32Field.
 	 */
 	public F32Field getF32Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -914,12 +902,14 @@ public class Message
 
 
 	/**
-	 * @fn F64Field getF64Field(String name)
+	 * Returns a handle to the F64Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the F64Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not an F32Field.
+	 * @return An F64Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not an F32Field.
 	 */
 	public F64Field getF64Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -933,12 +923,14 @@ public class Message
 
 
 	/**
-	 * @fn I8Field getI8Field(String name)
+	 * Returns a handle to the I8Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the I8Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not an I8Field.
+	 * @return An I8Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not an I8Field.
 	 */
 	public I8Field getI8Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -952,12 +944,14 @@ public class Message
 
 
 	/**
-	 * @fn I16Field getI16Field(String name)
+	 * Returns a handle to the I16Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the I16Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not an I16Field.
+	 * @return An I16Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not an I16Field.
 	 */
 	public I16Field getI16Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -971,12 +965,14 @@ public class Message
 
 
 	/**
-	 * @fn I32Field getI32Field(String name)
+	 * Returns a handle to the I32Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the I32Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not an I32Field.
+	 * @return An I32Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not an I32Field.
 	 */
 	public I32Field getI32Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -990,12 +986,14 @@ public class Message
 
 
 	/**
-	 * @fn I64Field getI64Field(String name)
+	 * Returns a handle to the I64Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the I64Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not an I64Field.
+	 * @return An I64Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not an I64Field.
 	 */
 	public I64Field getI64Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -1009,12 +1007,14 @@ public class Message
 
 
 	/**
-	 * @fn U8Field getU8Field(String name)
+	 * Returns a handle to the U8Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the U8Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not a U8Field.
+	 * @return A U8Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not a U8Field.
 	 */
 	public U8Field getU8Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -1028,12 +1028,14 @@ public class Message
 
 
 	/**
-	 * @fn U16Field getU16Field(String name)
+	 * Returns a handle to the U16Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the U16Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not a U16Field.
+	 * @return A U16Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not a U16Field.
 	 */
 	public U16Field getU16Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -1047,12 +1049,14 @@ public class Message
 
 
 	/**
-	 * @fn U32Field getU32Field(String name)
+	 * Returns a handle to the U32Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the U32Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not a U16Field.
+	 * @return A U32Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not a U16Field.
 	 */
 	public U32Field getU32Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -1066,12 +1070,14 @@ public class Message
 
 
 	/**
-	 * @fn U64Field getU64Field(String name)
+	 * Returns a handle to the U64Field referenced by the given name.
 	 *
-	 * @brief Returns a handle to the U64Field referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not a U16Field.
+	 * @return A U64Field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not a U16Field.
 	 */
 	public U64Field getU64Field(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -1085,12 +1091,14 @@ public class Message
 
 
 	/**
-	 * @fn StringField getStringField(String name)
+	 * Returns a handle to the StringField referenced by the given name.
 	 *
-	 * @brief Returns a handle to the StringField referenced by the given name.
+	 * @param name The name of the field to retrieve.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the field cannot be found or is not a StringField.
+	 * @return A StringField.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the field cannot be found or is not a StringField.
 	 */
 	public StringField getStringField(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -1104,9 +1112,9 @@ public class Message
 
 
 	/**
-	 * @fn int getFieldCount()
+	 * Returns the number of fields associated with this message.
 	 *
-	 * @brief Returns the number of fields associated with this message.
+	 * @return The number of fields in the message.
 	 */
 	public int getFieldCount()
 	{
@@ -1115,16 +1123,14 @@ public class Message
 
 
 	/**
-	 * @fn void copyFields(Message toMsg)
+	 * This method will copy all fields from this message to the given message.
+	 * <p>
+	 * Note: The fields are NOT copied by reference.  As such, the original message and its fields
+	 * can be destroyed or modified after it has been copied to the new message.
 	 *
-	 * @brief This method will copy all fields from this message to the given message.
+	 * @param toMsg The message into which to copy the fields
 	 *
-	 * @note The fiels are NOT copied by reference.  As such, the original message and its fields
-	 * can be destroyed or modified after it has been copieid to the new message.
-	 *
-	 * @param toMsg - the message into which to copy the fields
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given Message object is null.
+	 * @throws IllegalArgumentException Thrown if the given Message object is null.
 	 */
 	public void	copyFields(Message toMsg) throws IllegalArgumentException
 	{
@@ -1138,9 +1144,9 @@ public class Message
 
 
 	/**
-	 * @fn String toXML()
+	 * Returns an XML string representation of the message.
 	 *
-	 * @brief Returns an XML string representation of the message.
+	 * @return The XML string representation of the message.
 	 */
 	public String toXML()
 	{
@@ -1149,9 +1155,9 @@ public class Message
 
 
 	/**
-	 * @fn String toJSON()
+	 * Returns an JSON string representation of the message.
 	 *
-	 * @brief Returns an JSON string representation of the message.
+	 * @return The JSON string representation of the message.
 	 */
 	public String toJSON()
 	{
@@ -1160,11 +1166,11 @@ public class Message
 
 
 	/**
-	 * @fn long getSize()
-	 *
-	 * @brief Returns the physical storage size of the message in bytes.  Please note that
+	 * Returns the physical storage size of the message in bytes.  Please note that
 	 * additional tracking data fields are added to messages at the time of publication,
 	 * which will affect the size of the message.
+	 *
+	 * @return The message size.
 	 */
 	public long getSize()
 	{
@@ -1173,17 +1179,15 @@ public class Message
 
 
 	/**
-	 * @fn MessageFieldIterator getFieldIterator()
-	 *
-	 * @brief Method that allows the callee to get the MessageFieldIterator associated with the %Message.
-	 * This iterator will allow for applications to iterate over the Field objects stored within the %Message.
+	 * Method that allows the callee to get the MessageFieldIterator associated with the Message.
+	 * This iterator will allow for applications to iterate over the Field objects stored within the Message.
 	 * The iterator is reset each time getFieldIterator() is called.  The iterator itself is destroyed when the
-	 * %Message object is destroyed.
-	 *
-	 * @note Only one MessageFieldIterator object is associated with a %Message object; multiple calls to
+	 * Message object is destroyed.
+	 * <p>
+	 * Note: Only one MessageFieldIterator object is associated with a Message object; multiple calls to
 	 * getFieldIterator() will return a reference to the same MessageFieldIterator object.  Each call will reset the iterator.
 	 *
-	 * @return A reference to a MessageFieldIterator object.
+	 * @return A MessageFieldIterator.
 	 */
 	public MessageFieldIterator getFieldIterator()
 	{
@@ -1192,19 +1196,17 @@ public class Message
 
 
 	/**
-	 * @fn MessageFieldIterator getFieldIterator(MessageFieldIterator.Selector selector)
-	 *
-	 * @brief Method that allows the callee to get the MessageFieldIterator associated with the %Message.
-	 * This iterator will allow for applications to iterate over the Field objects stored within the %Message.
+	 * Method that allows the callee to get the MessageFieldIterator associated with the Message.
+	 * This iterator will allow for applications to iterate over the Field objects stored within the Message.
 	 * The iterator is reset each time getFieldIterator() is called.  The iterator itself is destroyed when the
-	 * %Message object is destroyed.
-	 *
-	 * @note Only one MessageFieldIterator object is associated with a %Message object; multiple calls to
+	 * Message object is destroyed.
+	 * <p>
+	 * Note: Only one MessageFieldIterator object is associated with a Message object; multiple calls to
 	 * getFieldIterator() will return a reference to the same MessageFieldIterator object.  Each call will reset the iterator.
 	 *
-	 * @param selector - the type of MessageFieldIterator to return.
+	 * @param selector The type of MessageFieldIterator to return.
 	 *
-	 * @return A reference to a MessageFieldIterator object.
+	 * @return A MessageFieldIterator.
 	 */
 	public MessageFieldIterator getFieldIterator(MessageFieldIterator.Selector selector)
 	{

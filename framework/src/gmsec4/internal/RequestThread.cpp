@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -164,10 +164,13 @@ void RequestShared::sendRequests()
 		{
 			if (!pending->isDone && time_s > pending->expireTime_s)
 			{
+				GMSEC_DEBUG << "sendRequests: " << pending->id.c_str() << " has timed out";
+
+				pending->isDone = (pending->republish_ms == GMSEC_REQUEST_REPUBLISH_NEVER);
+
 				if (pending->replyCallback)
 				{
-					// Asynchronous Request
-					pending->isDone = (pending->republish_ms > 0 ? false : true);
+					// Dealing with an Asynchronous Request
 
 					Status status(CONNECTION_ERROR, TIMEOUT_OCCURRED, "Request timed out");
 
@@ -179,15 +182,11 @@ void RequestShared::sendRequests()
 
 					m_connection->dispatchEvent(Connection::REQUEST_TIMEOUT_EVENT, status);
 
-					pending->expireTime_s = time_s + pending->republish_ms / 1000;
+					if (!pending->isDone)
+					{
+						pending->expireTime_s = time_s + pending->republish_ms / 1000;
+					}
 				}
-				else
-				{
-					// Synchronous Request
-					pending->isDone = true;
-				}
-
-				GMSEC_DEBUG << "sendRequests: " << pending->id.c_str() << " has expired";
 			}
 
 			if (pending->isDone)
@@ -359,6 +358,8 @@ void RequestShared::deliverReply(Message* reply)
 		const StringField& field = reply->getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 		replyID = field.getValue();
+
+		reply->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 	}
 	catch (...)
 	{
@@ -366,7 +367,6 @@ void RequestShared::deliverReply(Message* reply)
 		delete reply;
 		return;
 	}
-
 
 	PendingRequest* pending = findPending(replyID);
 

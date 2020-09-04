@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -26,6 +26,7 @@
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::message;
+using namespace gmsec::api::util;
 
 
 GMSEC_Message CALL_TYPE mistMessageCreate(const char* subject,
@@ -154,6 +155,78 @@ GMSEC_Message CALL_TYPE mistMessageCreateCopy(const GMSEC_Message other, GMSEC_S
 	}
 
 	return msg;
+}
+
+
+GMSEC_Message CALL_TYPE mistMessageCreateFromMessage(const GMSEC_Message msg, const GMSEC_Config specConfig, GMSEC_Status status)
+{
+	GMSEC_Message retMsg = NULL;
+	Message*      cxxMsg = reinterpret_cast<Message*>(msg);
+	Config*       cxxCfg = reinterpret_cast<Config*>(specConfig);
+	Status        result;
+
+	try
+	{
+		if (!cxxMsg)
+		{
+			result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Message handle is NULL");
+		}
+		else
+		{
+			if (cxxCfg == NULL)
+			{
+				retMsg = reinterpret_cast<GMSEC_Message>(new MistMessage(*cxxMsg));
+			}
+			else
+			{
+				retMsg = reinterpret_cast<GMSEC_Message>(new MistMessage(*cxxMsg, *cxxCfg));
+			}
+		}
+	}
+	catch (const Exception& e)
+	{
+		result = Status(e);
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return retMsg;
+}
+
+
+void CALL_TYPE mistMessageSetStandardFields(const GMSEC_Field fields[], size_t numFields, GMSEC_Status status)
+{
+	Status result;
+
+	if (!fields || numFields == 0)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Array of standard Fields is NULL or field count is zero");
+	}
+	else
+	{
+		DataList<Field*> standardFields;
+
+		for (size_t i = 0; i < numFields; ++i)
+		{
+			standardFields.push_back(reinterpret_cast<Field*>(fields[i]));
+		}
+
+		MistMessage::setStandardFields(standardFields);
+	}
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+}
+
+
+void CALL_TYPE mistMessageClearStandardFields()
+{
+	MistMessage::clearStandardFields();
 }
 
 

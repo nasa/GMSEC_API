@@ -1,57 +1,59 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "publish", "publish\publish.vcproj", "{44532841-B2C8-4566-9A7A-30065C0C17A7}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2037
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "publish", "publish\publish.vcxproj", "{44532841-B2C8-4566-9A7A-30065C0C17A7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "subscribe", "subscribe\subscribe.vcproj", "{F2B3A191-7F19-43AF-9FBC-178DE08D51B3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "subscribe", "subscribe\subscribe.vcxproj", "{F2B3A191-7F19-43AF-9FBC-178DE08D51B3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "request", "request\request.vcproj", "{187E7DD9-83D2-4546-8705-93EE37FF04B3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "request", "request\request.vcxproj", "{187E7DD9-83D2-4546-8705-93EE37FF04B3}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reply", "reply\reply.vcproj", "{8613828F-A52E-4522-953A-844CE7B31F1C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reply", "reply\reply.vcxproj", "{8613828F-A52E-4522-953A-844CE7B31F1C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "subscribe_async", "subscribe_async\subscribe_async.vcproj", "{7B1C02E9-0596-4D58-A1F6-3AADC0624272}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "subscribe_async", "subscribe_async\subscribe_async.vcxproj", "{7B1C02E9-0596-4D58-A1F6-3AADC0624272}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "request_async", "request_async\request_async.vcproj", "{069CAE28-DC30-4857-A3A0-1D9F6DE5BE17}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "request_async", "request_async\request_async.vcxproj", "{069CAE28-DC30-4857-A3A0-1D9F6DE5BE17}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reply_async", "reply_async\reply_async.vcproj", "{6FE0AC19-E90F-4992-BAF8-9C59C486F220}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reply_async", "reply_async\reply_async.vcxproj", "{6FE0AC19-E90F-4992-BAF8-9C59C486F220}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "request_open_resp", "open_response\request_open_resp.vcproj", "{669672BD-6953-4E25-B724-EF4B4ED1DAD9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "request_open_resp", "open_response\request_open_resp.vcxproj", "{669672BD-6953-4E25-B724-EF4B4ED1DAD9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reply_open_resp", "open_response\reply_open_resp.vcproj", "{8A293FF7-4177-4204-AAF0-823355BED240}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reply_open_resp", "open_response\reply_open_resp.vcxproj", "{8A293FF7-4177-4204-AAF0-823355BED240}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "logging\logging.vcproj", "{EA744030-0612-4E57-B5DB-799047070E00}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logging", "logging\logging.vcxproj", "{EA744030-0612-4E57-B5DB-799047070E00}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "publish_subject_filter", "subject_filtering\publish_subject_filter.vcproj", "{FCA71805-F7C0-43D1-8B86-F02385BEA68F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "publish_subject_filter", "subject_filtering\publish_subject_filter.vcxproj", "{FCA71805-F7C0-43D1-8B86-F02385BEA68F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "subscribe_subject_filter", "subject_filtering\subscribe_subject_filter.vcproj", "{745ACA2D-9E1B-4E23-BE6B-50071D7931E0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "subscribe_subject_filter", "subject_filtering\subscribe_subject_filter.vcxproj", "{745ACA2D-9E1B-4E23-BE6B-50071D7931E0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "message_field_iterator", "message_field_iterator\message_field_iterator.vcproj", "{77543A18-1531-4C18-8181-12B2A98FFE73}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "message_field_iterator", "message_field_iterator\message_field_iterator.vcxproj", "{77543A18-1531-4C18-8181-12B2A98FFE73}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "message_bins", "message_bins\message_bins.vcproj", "{EA68AC25-7E25-4CE1-AF17-EC273FDB19C6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "message_bins", "message_bins\message_bins.vcxproj", "{EA68AC25-7E25-4CE1-AF17-EC273FDB19C6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "heartbeat_service", "heartbeat_service\heartbeat_service.vcproj", "{034C86D9-4E4A-4111-B250-46FCFFD6314E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "heartbeat_service", "heartbeat_service\heartbeat_service.vcxproj", "{034C86D9-4E4A-4111-B250-46FCFFD6314E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_message", "device_message\device_message.vcproj", "{52448BDA-1E06-4AAB-9E06-353DDAAD529F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_message", "device_message\device_message.vcxproj", "{52448BDA-1E06-4AAB-9E06-353DDAAD529F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "log_message", "log_message\log_message.vcproj", "{3953A7CE-553F-4304-A4B8-EACE0482D562}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "log_message", "log_message\log_message.vcxproj", "{3953A7CE-553F-4304-A4B8-EACE0482D562}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "product_message", "product_message\product_message.vcproj", "{63F430C4-4A8C-4E32-B9D7-F663EAE8D4DA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "product_message", "product_message\product_message.vcxproj", "{63F430C4-4A8C-4E32-B9D7-F663EAE8D4DA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mnemonic_message", "mnemonic_message\mnemonic_message.vcproj", "{019F9C22-A71B-4BA9-882C-BAB026BE8508}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mnemonic_message", "mnemonic_message\mnemonic_message.vcxproj", "{019F9C22-A71B-4BA9-882C-BAB026BE8508}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "validation_custom", "validation_custom\validation_custom.vcproj", "{7D20FA34-41FC-4C0C-A0BA-264D4D6E05D7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "validation_custom", "validation_custom\validation_custom.vcxproj", "{7D20FA34-41FC-4C0C-A0BA-264D4D6E05D7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "validation_addendum", "validation_addendum\validation_addendum.vcproj", "{5BBD01A8-7A75-4C1F-8A0F-A9696B82B0C0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "validation_addendum", "validation_addendum\validation_addendum.vcxproj", "{5BBD01A8-7A75-4C1F-8A0F-A9696B82B0C0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "websphere_publish_async", "websphere_publish_async\websphere_publish_async.vcproj", "{165FB038-4DA1-438D-94B4-EB180360D254}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "websphere_publish_async", "websphere_publish_async\websphere_publish_async.vcxproj", "{165FB038-4DA1-438D-94B4-EB180360D254}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "configfile", "configfile\configfile.vcproj", "{8857AB87-9740-410D-B40B-B4F7DD4D6862}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "configfile", "configfile\configfile.vcxproj", "{8857AB87-9740-410D-B40B-B4F7DD4D6862}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "connection_state", "connection_state\connection_state.vcproj", "{3278747C-7810-4D73-9309-F5B8159D1398}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "connection_state", "connection_state\connection_state.vcxproj", "{3278747C-7810-4D73-9309-F5B8159D1398}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msg_field_container", "msg_field_container\msg_field_container.vcproj", "{BC2F4001-6BA1-4246-ADE9-3F4F994F5FC7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msg_field_container", "msg_field_container\msg_field_container.vcxproj", "{BC2F4001-6BA1-4246-ADE9-3F4F994F5FC7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resource_service", "resource_service\resource_service.vcproj", "{88BBA076-F05C-471E-A090-78B0D3772B3B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "resource_service", "resource_service\resource_service.vcxproj", "{88BBA076-F05C-471E-A090-78B0D3772B3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -272,5 +274,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A6C39ED0-105B-4ADB-BAC2-A030357A0A07}
 	EndGlobalSection
 EndGlobal

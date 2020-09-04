@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,11 +20,7 @@ using namespace gmsec_messagebus;
 
 Status TCPSocketClient::connect(int port)
 {
-	Status status;
-
-	status = connect(port, "localhost");
-
-	return status;
+	return connect(port, "localhost");
 }
 
 
@@ -61,7 +57,7 @@ Status TCPSocketClient::connect(int port, const char * server)
 		return status;
 	}
 
-	m_sock = socket(AF_INET, SOCK_STREAM, 0);
+	m_sock = socket(m_pAddr->sa_family, SOCK_STREAM, 0);
 	if (m_sock < 0)
 	{
 		return getLastSocketError();
@@ -76,7 +72,7 @@ Status TCPSocketClient::connect(int port, const char * server)
 	#define OPT_TYPE const void*
 #endif
 	int t = 1;
-	if (setsockopt(m_sock, IPPROTO_TCP,TCP_NODELAY, (OPT_TYPE) &t,sizeof(t)) < 0)
+	if (setsockopt(m_sock, IPPROTO_TCP, TCP_NODELAY, (OPT_TYPE) &t, sizeof(t)) < 0)
 	{
 		return getLastSocketError();
 	}
@@ -94,7 +90,11 @@ Status TCPSocketClient::connect(int port, const char * server)
 		GMSEC_WARNING << "Unable to set socket SO_RCVBUF size to " << size << " bytes.";
 	}
 
-	if (::connect(m_sock, m_pAddr, sizeof(SockAddrIn)) < 0)
+	// Ideally we would use the size-of SockAddrIn, however not all OSes support this; hence we will
+	// deduce the sockaddr size based on the INET domain in use.
+	size_t sockaddr_len = (m_pAddr->sa_family == AF_INET6 ? sizeof(sockaddr_in6) : sizeof(sockaddr_in));
+
+	if (::connect(m_sock, m_pAddr, sockaddr_len) < 0)
 	{
 		return getLastSocketError();
 	}

@@ -1,9 +1,14 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
+
+
+//
+// Note: This file is best viewed if tabstop is set to 8 (spaces).
+//
 
 #ifndef GMSEC_CONFIG_OPTIONS_H
 #define GMSEC_CONFIG_OPTIONS_H
@@ -11,14 +16,19 @@
 namespace gmsec{
 namespace api{
 
-const char* const GMSEC_REQ_REPUBLISH_MS		= "REPUBLISH-MS";
-const char* const GMSEC_TOGGLE_MSG_VALIDATE		= "GMSEC-MSG-CONTENT-VALIDATE";
+const char* const GMSEC_MIDDLEWARE_ID			= "MW-ID";
+const char* const GMSEC_CONN_TYPE			= "ConnectionType";
+
+const char* const GMSEC_MSG_CONTENT_VALIDATE		= "GMSEC-MSG-CONTENT-VALIDATE";      //deprecated
+const char* const GMSEC_MSG_CONTENT_VALIDATE_ALL	= "GMSEC-MSG-CONTENT-VALIDATE-ALL";
+const char* const GMSEC_MSG_CONTENT_VALIDATE_SEND	= "GMSEC-MSG-CONTENT-VALIDATE-SEND";
+const char* const GMSEC_MSG_CONTENT_VALIDATE_RECV	= "GMSEC-MSG-CONTENT-VALIDATE-RECV";
 const char* const GMSEC_MESSAGE_SPEC_VERSION		= "GMSEC-SPECIFICATION-VERSION";
 const char* const GMSEC_SCHEMA_PATH			= "GMSEC-SCHEMA-PATH";
 const char* const GMSEC_VALIDATION_LEVEL		= "GMSEC-VALIDATION-LEVEL";
 const char* const GMSEC_SCHEMA_LEVEL			= "GMSEC-SCHEMA-LEVEL";
-const char* const GMSEC_MIDDLEWARE_ID			= "MW-ID";
-const char* const GMSEC_CONN_TYPE			= "ConnectionType";
+const char* const GMSEC_LEGACY_SCHEMA_FILES		= "GMSEC-LEGACY-SCHEMA-FILES";
+
 
 const char* const GMSEC_TRACKING			= "TRACKING";
 const char* const GMSEC_TRACKING_NODE			= "TRACKING-NODE";
@@ -35,6 +45,9 @@ const char* const GMSEC_REPLY_SUBJECT         		= "MW-REPLY-STRING";
 const char* const GMSEC_EXPOSE_RESP            		= "MW-EXPOSE-RESP";
 const char* const OPT_MULTI_RESP               		= "MW-MULTI-RESP";
 const char* const GMSEC_REQ_RESP_BEHAVIOR      		= "GMSEC-REQ-RESP";
+const char* const GMSEC_REQ_REPUBLISH_MS		= "REPUBLISH-MS";
+const char* const GMSEC_REPLY_SUBJECT_FIELD    		= "GMSEC_REPLY_SUBJECT";
+const char* const GMSEC_DISABLE_RR             		= "GMSEC-DISABLE-RR";
 
 const char* const GMSEC_LOG_PERFORMANCE        		= "GMSEC-LOG-PERFORMANCE";
 
@@ -45,23 +58,17 @@ const char* const GMSEC_ASYNC_PUBLISH               	= "GMSEC-ASYNC-PUBLISH";
 const char* const GMSEC_ASYNC_PUBLISH_QUEUE_DEPTH   	= "GMSEC-ASYNC-PUBLISH-QUEUE-DEPTH";
 const char* const GMSEC_ASYNC_PUBLISH_TEARDOWN_WAIT	= "GMSEC-ASYNC-PUBLISH-TEARDOWN-WAIT";
 
-const char* const GMSEC_DISABLE_RR             		= "GMSEC-DISABLE-RR";
-
 const char* const GMSEC_USE_MSG_BINS           		= "GMSEC-USE-MSG-BINS";
 const char* const GMSEC_MSG_BIN_SIZE           		= "GMSEC-MSG-BIN-SIZE";
 const char* const GMSEC_MSG_BIN_TIMEOUT        		= "GMSEC-MSG-BIN-TIMEOUT";
 
-const char* const GMSEC_REPLY_UNIQUE_ID_FIELD  		= "REPLY-UNIQUE-ID";
-
-const char* const GMSEC_REPLY_SUBJECT_FIELD    		= "GMSEC_REPLY_SUBJECT";
-
 const char* const GMSEC_MSG_FLD_STORAGE_TYPE		= "GMSEC-MSGFLD-STORE-TYPE";
 const char* const GMSEC_MSG_FLD_STORAGE_SIZE		= "GMSEC-MSGFLD-STORE-SIZE";
-const char* const GMSEC_SORT_MSG_FIELDS				= "GMSEC-SORT-MSG-FIELDS";
+const char* const GMSEC_SORT_MSG_FIELDS			= "GMSEC-SORT-MSG-FIELDS";
 
 
-namespace secure{
-
+namespace secure
+{
 const char* const GMSEC_RANDOM_PATH		        = "SEC-RANDOM-PATH";
 const char* const GMSEC_CIPHER_DELTA		        = "SEC-CIPHER-DELTA";
 const char* const GMSEC_RANDOM_SEED_NUMBER	        = "SEC-RANDOM-SEED-NUMBER";
@@ -140,6 +147,7 @@ const char* const OPT_MAX_TOPIC_HANDLES              	= "MW-MAX-TOPIC-HANDLES";
 const char* const OPT_ASYNC_PUBLISH                  	= "MW-ASYNC-PUBLISH";
 const char* const OPT_ASYNC_STATUS_CHECK             	= "MW-ASYNC-STATUS-CHECK";
 const char* const OPT_ASYNC_STATUS_CHECK_MESSAGE_INTERVAL = "MW-ASYNC-STATUS-CHECK-MESSAGE-INTERVAL";
+const char* const OPT_MESSAGE_WAIT_PERIOD               = "MW-MESSAGE-WAIT-PERIOD";
 
 const char* const DEFAULT_CHANNEL   			= "SYSTEM.DEF.SVRCONN";
 const char* const TOPIC_PREFIX      			= ""; 

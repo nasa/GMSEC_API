@@ -1,12 +1,14 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.util;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
 
 import gov.nasa.gsfc.gmsec.api.util.Log;
 import gov.nasa.gsfc.gmsec.api.util.LogEntry;
@@ -22,10 +24,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 public class JNILog
 {
 	private static Map<LogLevel, LogHandler> logHandlers = new HashMap<LogLevel, LogHandler>();
+
+	private static final Logger LOGGER = Logger.getLogger(JNILog.class.getName());
 
 
 	public static class DefaultLogHandler extends LogHandler
@@ -54,8 +61,7 @@ public class JNILog
 			}
 			catch (IOException e)
 			{
-				System.err.println("*** Error writing log ***\n");
-				System.err.println(output);
+				LOGGER.log(Level.WARNING, "Unable to write log to configured file writer.\n");
 			}
 		}
 
@@ -65,7 +71,12 @@ public class JNILog
 			{
 				if (writer instanceof FileWriter)
 				{
-					try{ writer.close(); } catch (IOException e) { System.err.println("ERROR: Unable to close file."); }
+					try{
+						writer.close();
+					}
+					catch (IOException e) {
+						LOGGER.log(Level.WARNING, "Unable to close file writer.\n");
+					}
 				}
 
 				writer = new PrintWriter(System.err);
@@ -74,7 +85,12 @@ public class JNILog
 			{
 				if (writer instanceof FileWriter)
 				{
-					try{ writer.close(); } catch (IOException e) { System.err.println("ERROR: Unable to close file."); }
+					try{
+						writer.close();
+					}
+					catch (IOException e) {
+						LOGGER.log(Level.WARNING, "Unable to close file writer.\n");
+					}
 				}
 
 				writer = new PrintWriter(System.out);
@@ -83,7 +99,12 @@ public class JNILog
 			{
 				if (writer instanceof FileWriter)
 				{
-					try{ writer.close(); } catch (IOException e) { System.err.println("ERROR: Unable to close file."); }
+					try{
+						writer.close();
+					}
+					catch (IOException e) {
+						LOGGER.log(Level.WARNING, "Unable to close file writer.\n");
+					}
 
 					writer = new PrintWriter(System.err);
 				}
@@ -96,7 +117,7 @@ public class JNILog
 				}
 				catch (IOException e)
 				{
-					System.err.println("ERROR: Unable to open and/or append to log file\n");
+					LOGGER.log(Level.WARNING, "Unable to open and/or append to log file.\n");
 				}
 			}
 		}

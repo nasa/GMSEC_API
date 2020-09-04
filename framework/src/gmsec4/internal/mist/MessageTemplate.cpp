@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,6 +13,8 @@
 **/
 
 #include <gmsec4/internal/mist/MessageTemplate.h>
+
+#include <gmsec4/internal/mist/FieldTemplate.h>
 
 #include <gmsec4/Config.h>
 #include <gmsec4/Errors.h>
@@ -34,49 +36,83 @@ using namespace gmsec::api::mist::internal;
 
 
 MessageTemplate::MessageTemplate()
-	: m_fieldTemplates(),
-  	  m_id()
+  	: m_id(),
+	  m_fieldTemplates()
 {
 }
 
-MessageTemplate::MessageTemplate(const char* schemaID, const std::list<FieldTemplate>& inputFields)
-	: m_fieldTemplates(inputFields),
-	  m_id(schemaID)
+
+MessageTemplate::MessageTemplate(const char* schemaID, const FieldTemplateList& inputFields)
+	: m_id(schemaID),
+	  m_fieldTemplates()
 {
+	// We need to make a deep-copy of the FieldTemplate(s)
+	for (FieldTemplateList::const_iterator it = inputFields.begin(); it != inputFields.end(); ++it)
+	{
+		m_fieldTemplates.push_back(new FieldTemplate(*(*it)));
+	}
 }
+
 
 MessageTemplate::MessageTemplate(const MessageTemplate& other)
-	: m_fieldTemplates(other.listFieldTemplates()),
-	  m_id(other.getID())
+	: m_id(other.m_id),
+	  m_fieldTemplates()
 {
+	// We need to make a deep-copy of the FieldTemplate(s)
+	for (FieldTemplateList::const_iterator it = other.m_fieldTemplates.begin(); it != other.m_fieldTemplates.end(); ++it)
+	{
+		m_fieldTemplates.push_back(new FieldTemplate(*(*it)));
+	}
 }
+
 
 MessageTemplate::~MessageTemplate()
 {
+	cleanup();
 }
 
-void MessageTemplate::setFieldTemplates(const char* schemaID, const std::list<FieldTemplate>& inputFields)
+
+MessageTemplate& MessageTemplate::operator=(const MessageTemplate& other)
 {
-	m_id = schemaID;
-	m_fieldTemplates.clear();
-	m_fieldTemplates = inputFields;
+	if (this != &other)
+	{
+		this->setFieldTemplates(other.m_id.c_str(), other.m_fieldTemplates);
+	}
+
+	return *this;
 }
+
+
+void MessageTemplate::setFieldTemplates(const char* schemaID, const FieldTemplateList& inputFields)
+{
+	cleanup();
+
+	m_id = schemaID;
+
+	// We need to make a deep-copy of the FieldTemplate(s)
+	for (FieldTemplateList::const_iterator it = inputFields.begin(); it != inputFields.end(); ++it)
+	{
+		m_fieldTemplates.push_back(new FieldTemplate(*(*it)));
+	}
+}
+
 
 Field* MessageTemplate::getField(const char* name, const char* type)
 {
 	Field* field = NULL;
 
-	for(std::list<FieldTemplate>::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
+	for (FieldTemplateList::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
 	{
-		FieldTemplate temp = *it;
-		if(StringUtil::stringEquals(temp.getName().c_str(), name))
+		FieldTemplate* temp = *it;
+
+		if (StringUtil::stringEquals(temp->getName().c_str(), name))
 		{
-			field = temp.toField(type);
+			field = temp->toField(type);
 			break;
 		}
 	}
 
-	if(!field)
+	if (!field)
 	{
 		GMSEC_DEBUG << "The Message template " << m_id.c_str() 
 					<< " could not find a field template with name " << name;
@@ -85,15 +121,16 @@ Field* MessageTemplate::getField(const char* name, const char* type)
 	return field;
 }
 
+
 const FieldTemplate& MessageTemplate::getFieldTemplate(const char* name)
 {
-	for(FieldTemplateList::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
+	for (FieldTemplateList::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
 	{
-		const FieldTemplate& temp = *it;
+		const FieldTemplate* temp = *it;
 		
-		if(temp.getName() == name)
+		if (temp->getName() == name)
 		{
-			return temp;
+			return *temp;
 		}
 	}
 
@@ -102,25 +139,39 @@ const FieldTemplate& MessageTemplate::getFieldTemplate(const char* name)
 	throw Exception(MIST_ERROR, FIELD_TEMPLATE_NOT_FOUND, err.str().c_str());
 }
 
+
 const char* MessageTemplate::getID() const
 {
 	return m_id.c_str();
 }
 
-const std::list<FieldTemplate>& MessageTemplate::listFieldTemplates() const
+
+const MessageTemplate::FieldTemplateList& MessageTemplate::getFieldTemplates() const
 {
 	return m_fieldTemplates;
 }
+
+
+void MessageTemplate::cleanup()
+{
+	for (FieldTemplateList::iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
+	{
+		delete *it;
+	}
+	m_fieldTemplates.clear();
+}
+
 
 Message::MessageKind MessageTemplate::findKind(const char* schemaID)
 {
 	std::vector<std::string> id = StringUtil::split(schemaID, '.');
 	std::string kind;
 
-	for(std::vector<std::string>::const_iterator it = id.begin(); it != id.end(); ++it)
+	for (std::vector<std::string>::const_iterator it = id.begin(); it != id.end(); ++it)
 	{
 		kind = *it;
-		if(kind ==  "MSG")
+
+		if (kind ==  "MSG")
 		{
 			return Message::PUBLISH;
 		}
@@ -137,8 +188,8 @@ Message::MessageKind MessageTemplate::findKind(const char* schemaID)
 	std::ostringstream err;
 	err << "MessageTemplate::findKind(): unable to determine the MessageKind \"" << kind.c_str() << "\"";
 	throw Exception(MSG_ERROR, UNKNOWN_MSG_TYPE, err.str().c_str());
-
 }
+
 
 const char* MessageTemplate::toXML(const char* subject)
 {
@@ -148,29 +199,31 @@ const char* MessageTemplate::toXML(const char* subject)
 	//field templates within an array control don't get added because the array size has not been defined yet.
 	int arrayControlActive = 0;
 
-	for(FieldTemplateList::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
-	{//add fields
-		FieldTemplate fieldTemplate = *it;
+	for (FieldTemplateList::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
+	{
+		//add fields
+		FieldTemplate* fieldTemplate = *it;
 
-		if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(),  "CONTROL") && StringUtil::stringEquals(fieldTemplate.getName().c_str(), "ARRAY-START"))
+		if (StringUtil::stringEquals(fieldTemplate->getMode().c_str(),  "CONTROL") && StringUtil::stringEquals(fieldTemplate->getName().c_str(), "ARRAY-START"))
 		{
 			arrayControlActive++;
 		}
-		else if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(), "CONTROL") && StringUtil::stringEquals(fieldTemplate.getName().c_str(), "ARRAY-END"))
+		else if (StringUtil::stringEquals(fieldTemplate->getMode().c_str(), "CONTROL") && StringUtil::stringEquals(fieldTemplate->getName().c_str(), "ARRAY-END"))
 		{
 			arrayControlActive--;
 		}
 
-		if(arrayControlActive == 0 && fieldTemplate.hasExplicitType() && fieldTemplate.hasExplicitValue())
+		if (arrayControlActive == 0 && fieldTemplate->hasExplicitType() && fieldTemplate->hasExplicitValue())
 		{
 			try
 			{
-				std::auto_ptr<Field> field(fieldTemplate.toField(fieldTemplate.getType()));
+				std::auto_ptr<Field> field(fieldTemplate->toField(fieldTemplate->getType()));
 
 				msg.addField(*(field.get()));
 			}
 			catch(...)
-			{//ignore control fields, do nothing
+			{
+				//ignore control fields, do nothing
 			}
 		}
 	}
@@ -178,5 +231,4 @@ const char* MessageTemplate::toXML(const char* subject)
 	m_xml = msg.toXML();
 
 	return m_xml.c_str();
-
 }

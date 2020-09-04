@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -33,9 +33,14 @@ namespace mist
 	static const unsigned int GMSEC_ISD_2016_00 = 201600;
 
 	/**
+	 * @desc 2016 version of the GMSEC Interface Specification Document (ISD)
+	 */
+	static const unsigned int GMSEC_ISD_2018_00 = 201800;
+
+	/**
 	 * @desc Current version of the GMSEC Interface Specification Document (ISD)
-	*/
-	static const unsigned int GMSEC_ISD_CURRENT = GMSEC_ISD_2016_00;
+	 */
+	static const unsigned int GMSEC_ISD_CURRENT = GMSEC_ISD_2018_00;
 
 	/**
      * @enum ResponseStatus

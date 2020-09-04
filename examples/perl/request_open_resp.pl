@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 
-#
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -61,6 +60,10 @@ sub main
  	# here, it automatically enables the 'mw-expose-resp' option.
 	$config->addValue("GMSEC-REQ-RESP", "OPEN-RESP");
 
+    #o Since this example program uses an invalid message, we ensure the
+    #  validation check is disabled.
+    $config->addValue("gmsec-msg-content-validate-all", "false");
+
 	#o If it was not specified in the command-line arguments, set LOGLEVEL
 	# to 'INFO' and LOGFILE to 'stdout' to allow the program report output
 	# on the terminal/command line
@@ -70,9 +73,7 @@ sub main
 	# interface
 	# This is useful for determining which version of the API is
 	# configured within the environment
-	# TODO: Once available, replace this statement with usage of
-	# ConnectionManager::getAPIVersion (See RTC 4798)
-	libgmsec_perl::LogInfo(libgmsec_perl::Connection::getAPIVersion());
+	libgmsec_perl::LogInfo(libgmsec_perl::ConnectionManager::getAPIVersion());
 
 	eval
 	{
@@ -105,15 +106,12 @@ sub main
 		#o Display XML representation of request message
 		libgmsec_perl::LogInfo("Sending request message:\n" . $requestMsg->toXML());
 
-		#o Send Request Message -- Since we are using open response,
-		# we will have to receive the message using receive().  As such
-		# we will tell request() to return immediately.
+		#o Send Request Message
 		# Timeout periods:
 		# -1 - Wait forever
 		#  0 - Return immediately
 		# >0 - Time in milliseconds before timing out
-		$connMgr->request($requestMsg, 0);
-		my $replyMsg = $connMgr->receive(-1);
+		my $replyMsg = $connMgr->request($requestMsg, 1000, $libgmsec_perl::GMSEC_REQUEST_REPUBLISH_NEVER);
 
 		# Example error handling for calling request() with a timeout
 		if ($replyMsg)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,11 +8,6 @@
 
 /**
  * @file ProductFileMessage.java
- *
- * @brief The ProductFileMessage object is an extension of Message, and serves as a
- * container for a GMSEC C2CX %ProductFile %Message.
- *
- * @deprecated This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist;
@@ -30,32 +25,26 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIProductFileMessage;
 
 
 /**
- * @class ProductFileMessage
- *
- * @brief The ProductFileMessage object is an extension of Message, and serves as a container for a GMSEC C2CX %ProductFile %Message.
+ * The ProductFileMessage object is an extension of Message, and serves as a container for a GMSEC C2CX Product File Message.
  * The methods of this class allow for the construction and manipulation of the data within the message.
  *
- * @deprecated This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
+ * @deprecated This class has been deprecated; use {@link gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage} instead.
  */
 @Deprecated
 public class ProductFileMessage extends Message
 {
 	/**
-	 * @fn ProductFileMessage(String subject, gmsecMIST.ResponseStatus status, String productType, String productSubtype, int version)
+	 * Specialized constructor where a GMSEC Interface Specification Document version number can be specified.
 	 *
-	 * @brief Specialized constructor where a GMSEC Interface Specification Document version number can be specified.
+	 * @param subject        The GMSEC subject to associate with the message.
+	 * @param status         The value for the RESPONSE-STATUS field of the Product File %Message.
+	 * @param productType    The string value for the PROD-TYPE field of the Product File %Message.
+	 * @param productSubtype The string value for the PROD-SUBTYPE field of the Product File %Message.
+	 * @param version        The version of the GMSEC ISD to be used.
 	 *
-	 * @param subject        - the GMSEC subject to associate with the message.
-	 * @param status         - the value for the RESPONSE-STATUS field of the Product File %Message.
-	 * @param productType    - the string value for the PROD-TYPE field of the Product File %Message.
-	 * @param productSubtype - the string value for the PROD-SUBTYPE field of the Product File %Message.
-	 * @param version        - the version of the GMSEC ISD to be used.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given subject string is null, or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given product type string is null, or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given product subtype string is null, or contains an empty string.
-	 *
-	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
+	 * @throws IllegalArgumentException Thrown if the given subject string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given product type string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given product subtype string is null, or contains an empty string.
 	 */
 	public ProductFileMessage(String subject, gmsecMIST.ResponseStatus status, String productType, String productSubtype, int version)
 		throws IllegalArgumentException
@@ -82,24 +71,20 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn ProductFileMessage(String subject, Config config, gmsecMIST.ResponseStatus status, String productType, String productSubtype, int version)
+	 * Specialized constructor that accepts a Config object, and where a GMSEC Interface Specification Document
+	 * version number can be specified.
 	 *
-	 * @brief Specialized constructor that accepts a Config object, and where a GMSEC Interface Specification Document
-	 * version number can be speficied.
+	 * @param subject        The GMSEC subject to associate with the message.
+	 * @param config         A configuration object that contains message-specific options.
+	 * @param status         The value for the RESPONSE-STATUS field of the Product File %Message.
+	 * @param productType    The string value for the PROD-TYPE field of the Product File %Message.
+	 * @param productSubtype The string value for the PROD-SUBTYPE field of the Product File %Message.
+	 * @param version        The version of the GMSEC ISD to be used.
 	 *
-	 * @param subject        - the GMSEC subject to associate with the message.
-	 * @param config         - a configuration object that contains message-specific options.
-	 * @param status         - the value for the RESPONSE-STATUS field of the Product File %Message.
-	 * @param productType    - the string value for the PROD-TYPE field of the Product File %Message.
-	 * @param productSubtype - the string value for the PROD-SUBTYPE field of the Product File %Message.
-	 * @param version        - the version of the GMSEC ISD to be used.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given subject string is null, or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given Config is null.
-	 * @throws An IllegalArgumentException is thrown if the given product type string is null, or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the given product subtype string is null, or contains an empty string.
-	 *
-	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
+	 * @throws IllegalArgumentException Thrown if the given subject string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given Config is null.
+	 * @throws IllegalArgumentException Thrown if the given product type string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the given product subtype string is null, or contains an empty string.
 	 */
 	public ProductFileMessage(String subject, Config config, gmsecMIST.ResponseStatus status, String productType, String productSubtype, int version)
 		throws IllegalArgumentException
@@ -130,16 +115,12 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn ProductFileMessage(String data)
+	 * Specialized constructor that initializes the message instance using either XML or JSON text.
 	 *
-	 * @brief Specialized constructor that initializes the message instance using either XML or JSON text.
+	 * @param data The XML or JSON string that represents a GMSEC message.
 	 *
-	 * @param data - the XML or JSON string that represents a GMSEC message.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given data string is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the data string cannot be parsed.
-	 *
-	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
+	 * @throws IllegalArgumentException Thrown if the given data string is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the data string cannot be parsed.
 	 */
 	public ProductFileMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -157,15 +138,11 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn ProductFileMessage(ProductFileMessage other)
+	 * Copy constructor that initializes the message instance using another ProductFileMessage object.
 	 *
-	 * @brief Copy constructor that initializes the message instance using another ProductFileMessage object.
+	 * @param other The other ProductFileMessage object to copy.
 	 *
-	 * @param other - the other ProductFileMessage object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given ProductFileMessage is null.
-	 *
-	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
+	 * @throws IllegalArgumentException Thrown if the given ProductFileMessage is null.
 	 */
 	public ProductFileMessage(ProductFileMessage other) throws IllegalArgumentException
 	{
@@ -183,13 +160,13 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn void addProductFile(ProductFile productFile)
+	 * Adds the given ProductFile to the list of ProductFiles associated with this message.
 	 *
-	 * @brief Adds the given ProductFile to the list of ProductFiles associated with this message.
+	 * @param productFile The ProductFile object to add to the message.
 	 *
-	 * @param productFile - the ProductFile object to add to the message.
+	 * @throws IllegalArgumentException Thrown if the given ProductFile is null.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given ProductFile is null.
+	 * @see ProductFile
 	 */
 	public void addProductFile(ProductFile productFile) throws IllegalArgumentException
 	{
@@ -203,15 +180,16 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn ProductFile getProductFile(int index)
+	 * Returns ProductFile object at specified index.
 	 *
-	 * @brief Returns ProductFile object at specified index.
+	 * @param index The zero-based index for accessing the ProductFile associated with the message.
 	 *
 	 * @return A ProductFile object.
 	 *
-	 * @throws A GMSEC_Exception is thrown if the specified index is outside the number of ProductFiles in the message.
+	 * @throws GMSEC_Exception Thrown if the specified index is outside the number of ProductFiles in the message.
 	 *
-	 * @sa getNumProductFiles()
+	 * @see ProductFileMessage#getNumProductFiles()
+	 * @see ProductFile
 	 */
 	public ProductFile getProductFile(int index) throws GMSEC_Exception
 	{
@@ -220,13 +198,11 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn int getNumProductFiles()
-	 *
-	 * @brief Returns the number of ProductFile objects associated with this ProductFileMessage.
+	 * Returns the number of ProductFile objects associated with this ProductFileMessage.
 	 *
 	 * @return The number of ProductFile objects.
 	 *
-	 * @sa getProductFile()
+	 * @see ProductFileMessage#getProductFile(int)
 	 */
 	public int getNumProductFiles()
 	{
@@ -235,9 +211,8 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn gmsecMIST.ResponseStatus getResponseStatus()
-	 *
-	 * @return Returns the enumerated value contained within the message's RESPONSE-STATUS field.
+	 * Returns the enumerated value contained within the message's RESPONSE-STATUS field.
+	 * @return Enumerated value contained within the message's RESPONSE-STATUS field.
 	 */
 	public gmsecMIST.ResponseStatus getResponseStatus()
 	{
@@ -246,9 +221,8 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn String getProductType()
-	 *
-	 * @return Returns the product type string contained within the message's PROD-TYPE field.
+	 * Returns the product type string contained within the message's PROD-TYPE field.
+	 * @return The product type string contained within the message's PROD-TYPE field.
 	 */
 	public String getProductType()
 	{
@@ -257,9 +231,8 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn String getProductSubtype()
-	 *
-	 * @return Returns the product subtype string contained within the message's PROD-SUBTYPE field.
+	 * Returns the product subtype string contained within the message's PROD-SUBTYPE field.
+	 * @return The product subtype string contained within the message's PROD-SUBTYPE field.
 	 */
 	public String getProductSubtype()
 	{
@@ -268,17 +241,17 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn ProductFileIterator getProductFileIterator()
-	 *
-	 * @brief Method that allows the callee to get the ProductFileIterator associated with the %ProductFileMessage.
-	 * This iterator will allow for applications to iterate over the ProductFile objects stored within the %ProductFileMessage.
-	 * The iterator is reset each time getProductFileIterator() is called.  The iterator itself is destroyed when the
-	 * %ProductFileMessage object is destroyed.
-	 *
-	 * @note Only one ProductFileIterator object is associated with a %ProductFileMessage object; multiple calls to
-	 * getProductFileIterator() will return a reference to the same ProductFileIterator object.  Each call will reset the iterator.
+	 * Method that allows the callee to get the ProductFileIterator associated with the ProductFileMessage.
+	 * This iterator will allow for applications to iterate over the ProductFile objects stored within the ProductFileMessage.
+	 * The iterator is reset each time getProductFileIterator() is called. The iterator itself is destroyed when the
+	 * ProductFileMessage object is destroyed.
+	 * <p>
+	 * Note: Only one ProductFileIterator object is associated with a ProductFileMessage object; multiple calls to
+	 * getProductFileIterator() will return a reference to the same ProductFileIterator object. Each call will reset the iterator.
 	 *
 	 * @return A reference to a ProductFileIterator object.
+	 *
+	 * @see ProductFileIterator
 	 */
 	public ProductFileIterator getProductFileIterator()
 	{
@@ -287,13 +260,13 @@ public class ProductFileMessage extends Message
 
 
 	/**
-	 * @fn ProductFileMessage convertMessage(Message msg)
+	 * Constructs and returns a ProductFileMessage that is created using the given Message.
 	 *
-	 * @brief Constructs and returns a ProductFileMessage that is created using the given Message.
+	 * @param msg The message to convert.
 	 *
 	 * @return A ProductFileMessage object.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given Message is null.
+	 * @throws IllegalArgumentException Thrown if the given Message is null.
 	 */
 	public static ProductFileMessage convertMessage(Message msg) throws IllegalArgumentException
 	{

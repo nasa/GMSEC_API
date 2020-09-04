@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,6 +31,7 @@
 
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
+using namespace gmsec::api::util;
 
 const char* EXAMPLE_MESSAGE_SUBJECT     = "GMSEC.AGGREGATE.PUBLISH";
 const char* EXAMPLE_BIN_EXCLUDE_SUBJECT = "GMSEC.BIN-EXCLUDE.PUBLISH";
@@ -50,8 +51,12 @@ int main (int argc, char* argv[])
 
 	Config config(argc, argv);
 
+	//o Since this example program uses an invalid message, we ensure the
+	//  validation check is disabled.
+	config.addValue("gmsec-msg-content-validate-all", "false");
+
 	//o Enable Message Binning
-	config.addValue("GMSEC-USE-MESSAGE-BINS", "true");
+	config.addValue("GMSEC-USE-MSG-BINS", "true");
 
 	//o Specify the number of messages to be aggregated prior to publishing
 	// the aggregate message to the middleware server (This applies to all
@@ -60,7 +65,7 @@ int main (int argc, char* argv[])
 	// Note: The aggregate message will be sent to the middleware server
 	// immediately upon this many messages being published, regardless of
 	// the value supplied for GMSEC-MSG-BIN-TIMEOUT.
-	config.addValue("GMSEC-MSG-BIN-SIZE", "5");
+	config.addValue("GMSEC-MSG-BIN-SIZE", "10");
 
 	//o Specify a timeout (in milliseconds) for the aggregate message to be
 	// sent to the middleware server
@@ -81,9 +86,7 @@ int main (int argc, char* argv[])
 
 	initializeLogging(config);
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
@@ -98,7 +101,7 @@ int main (int argc, char* argv[])
 			//o Create a message 
 			Message message(EXAMPLE_MESSAGE_SUBJECT, Message::PUBLISH);
 
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 5; ++i)
 			{
 				populateMessage(message, i+1);
 
@@ -107,7 +110,7 @@ int main (int argc, char* argv[])
 
 				//o Display the XML string representation of the Message for
 				// the sake of review
-				GMSEC_INFO << "Published message: " << message.toXML();
+				GMSEC_INFO << "Published message:\n" << message.toXML();
 			}
 		}
 
@@ -125,7 +128,7 @@ int main (int argc, char* argv[])
 
 			//o Display the XML string representation of the Message for
 			// the sake of review
-			GMSEC_INFO << "Published message: " << message.toXML();
+			GMSEC_INFO << "Published message:\n" << message.toXML();
 		}
 
 		//o Disconnect from the middleware and clean up the Connection

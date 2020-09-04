@@ -1,10 +1,9 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
 
 
 /**
@@ -16,38 +15,43 @@
  * 
  */
 
-#include "../example.h"
+#include "../Utility.h"
 
-#include <string>
+#include <memory>
 
 using namespace gmsec::api;
+using namespace gmsec::api::util;
 
 
-class gmreq
+class GMSEC_Request : public Utility
 {
 public:
-	gmreq(Config& config);
-	~gmreq();
+	GMSEC_Request(const Config& config);
+
+	~GMSEC_Request();
+
+	void usage(const std::string& programName);
+
 	bool run();
 
 private:
-	Config&     config;
 	Connection* connection;
 
-	void request(int iteration, const std::string& subject);
+	void request(Message& msg, int msg_timeout_ms, int req_republish_period);
+	void request(const std::string& subject, int msg_timeout_ms, int req_republish_period);
 };
 
 
-gmreq::gmreq(Config& c)
-	: config(c),
+GMSEC_Request::GMSEC_Request(const Config& c)
+	: Utility(c),
 	  connection(0)
 {
-	// Initialize Config
-	example::initialize(c);
+	// Initialize utility
+	initialize();
 }
 
 
-gmreq::~gmreq()
+GMSEC_Request::~GMSEC_Request()
 {
 	if (connection)
 	{
@@ -67,7 +71,29 @@ gmreq::~gmreq()
 }
 
 
-bool gmreq::run()
+void GMSEC_Request::usage(const std::string& programName)
+{
+	Utility::usage(programName);
+
+	std::cerr << "\n\t\t* subject=<message subject>"
+	          << "\n"
+	          << "\n\t\t* msg-file=<file with message definition>"
+	          << "\n"
+	          << "\n\t\t* cfg-file=<configuration file>"
+	          << "\n"
+	          << "\n\t\t\tNote: msg-name must be defined when using cfg-file"
+	          << "\n"
+	          << "\n\t\t* msg-name=<name of message within configuration file>"
+	          << "\n"
+	          << "\n\t\t* msg-timeout-ms=<timeout period (milliseconds)>"
+	          << "\n"
+	          << "\n\t\t* req-republish-timeout-ms=<timeout period (milliseconds)>"
+	          << "\n"
+	          << std::endl;
+}
+
+
+bool GMSEC_Request::run()
 {
 	bool success = true;
 
@@ -77,22 +103,61 @@ bool gmreq::run()
 	try
 	{
 		//o Create the Connection
-		connection = Connection::create(config);
+		connection = Connection::create(getConfig());
 
 		//o Connect
 		connection->connect();
 
-		//o Get information from the command line */
-		std::string subject        = example::get(config, "SUBJECT", "GMSEC.MISSION.SAT_ID.REQ.CMD.GMRPL");
-		int         msg_timeout_ms = example::get(config, "MSG_TIMEOUT_MS", GMSEC_WAIT_FOREVER);
-
 		//o output connection middleware version
 		GMSEC_INFO << connection->getLibraryVersion();
+
+		//o Get information from the command line */
+		std::string msgFile          = get("MSG-FILE", "");
+		std::string cfgFile          = get("CFG-FILE", "");
+		int         msg_timeout_ms   = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
+		int         req_repub_tmo_ms = get("REQ-REPUBLISH-TIMEOUT-MS", GMSEC_REQUEST_REPUBLISH_NEVER);
+		std::string subject;
+
+		std::auto_ptr<Message> msg;
+
+		if (!msgFile.empty())
+		{
+			msg.reset(readMessageFile(msgFile));
+
+			subject = msg->getSubject();
+		}
+		else if (!cfgFile.empty())
+		{
+			std::string msgName = get("MSG-NAME", "");
+
+			if (msgName.empty())
+			{
+				GMSEC_ERROR << "When using cfg-file option, user must also provide msg-name option";
+				return false;
+			}
+
+			msg.reset(readConfigFile(cfgFile, msgName));
+
+			subject = msg->getSubject();
+		}
+		else
+		{
+			subject = get("SUBJECT", "GMSEC.MISSION.SAT_ID.REQ.CMD.GMRPL");
+		}
 
 		//o Output information
 		GMSEC_INFO << "Using subject '" << subject.c_str() << "'";
 
-		request(msg_timeout_ms, subject);
+		if (msg.get())
+		{
+			// Send custom request message
+			request(*(msg.get()), msg_timeout_ms, req_repub_tmo_ms);
+		}
+		else
+		{
+			// Send canned request message
+			request(subject, msg_timeout_ms, req_repub_tmo_ms);
+		}
 	}
 	catch (Exception& e)
 	{
@@ -104,7 +169,44 @@ bool gmreq::run()
 }
 
 
-void gmreq::request(int msg_timeout_ms, const std::string& subject)
+void GMSEC_Request::request(Message& request, int msg_timeout_ms, int req_republish_period)
+{
+	if (getConfig().getBooleanValue("ENCRYPT", false))
+	{
+		request.addField("SEC-ENCRYPT", true);
+	}
+
+	//o Display XML representation of request message
+	GMSEC_INFO << "Requesting:\n" << request.toXML();
+
+	// If the RESPONSE field is not present, or it is and its value is true, then seek
+	// a reply.  Otherwise do not.
+	if (request.getField("RESPONSE") == NULL || request.getIntegerValue("RESPONSE") == 1)
+	{
+		//o Send Request Message
+		Message* reply = connection->request(request, msg_timeout_ms, req_republish_period);
+
+		if (reply)
+		{
+			//o Got reply; display XML representation of reply message
+			GMSEC_INFO << "Received reply:\n" << reply->toXML();
+
+			//o Destroy the reply message
+			connection->release(reply);
+		}
+		else
+		{
+			GMSEC_WARNING << "Reply message not receive after a timeout of " << msg_timeout_ms << " msec.";
+		}
+	}
+	else
+	{
+		(void) connection->request(request, 10, -1);
+	}
+}
+
+
+void GMSEC_Request::request(const std::string& subject, int msg_timeout_ms, int req_republish_period)
 {
 	//o Create message
 	Message request(subject.c_str(), Message::REQUEST);
@@ -112,8 +214,9 @@ void gmreq::request(int msg_timeout_ms, const std::string& subject)
 	//o Add fields to message
 	request.addField("QUESTION", "Does the request/reply functionality still work?");
 	request.addField("COMPONENT", "GMREQ");
+	request.addField("RESPONSE", true);
 
-	if (config.getBooleanValue("ENCRYPT", false))
+	if (getConfig().getBooleanValue("ENCRYPT", false))
 	{
 		request.addField("SEC-ENCRYPT", true);
 	}
@@ -122,7 +225,7 @@ void gmreq::request(int msg_timeout_ms, const std::string& subject)
 	GMSEC_INFO << "Requesting:\n" << request.toXML();
 
 	//o Send Request Message
-	Message* reply = connection->request(request, msg_timeout_ms);
+	Message* reply = connection->request(request, msg_timeout_ms, req_republish_period);
 
 	if (reply)
 	{
@@ -143,13 +246,15 @@ int main(int argc, char* argv[])
 {
 	Config config(argc, argv);
 
-	example::addToConfigFromFile(config);
+	GMSEC_Request gmreq(config);
 
-	if (example::isOptionInvalid(config, argc))
+	gmreq.addToConfigFromFile();
+
+	if (gmreq.isOptionInvalid(argc))
 	{
-		example::printUsage("gmreq");
-		return -1;
+		gmreq.usage("gmreq");
+		return 1;
 	}
 
-	gmreq(config).run();
+	gmreq.run();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,8 +15,8 @@ import gov.nasa.gsfc.gmsec.api.field.Field;
 import gov.nasa.gsfc.gmsec.api.mist.MnemonicSample;
 
 import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
-import gov.nasa.gsfc.gmsec.api.jni.JNIField;
-import gov.nasa.gsfc.gmsec.api.jni.JNIFieldConverter;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIFieldConverter;
 
 
 public class JNIMnemonic
@@ -25,7 +25,7 @@ public class JNIMnemonic
 	protected boolean swigCMemOwn;
 
 
-	public JNIMnemonic(long cPtr, boolean cMemoryOwn)
+        public JNIMnemonic(long cPtr, boolean cMemoryOwn)
 	{
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;
@@ -68,6 +68,12 @@ public class JNIMnemonic
 			ArrayListConverter.listToJNIMnemonicSamples(samples),
 			(samples == null ? 0 : samples.size())), true);
 	}
+
+
+	public JNIMnemonic(String name)
+        {
+        	this(name, new java.util.ArrayList<MnemonicSample>());
+        }
 
 
 	public JNIMnemonic(JNIMnemonic other)

@@ -11,21 +11,44 @@
 using namespace gmsec::api::mist;
 %}
 
+%ignore gmsec::api::mist::ProductFile(const char*, const char*, const char*, const char*, GMSEC_BIN, size_t);
 %ignore gmsec::api::mist::ProductFile::getContents(GMSEC_BIN&) const;
 
 %include "dox/ProductFile_dox.i"
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/ProductFile.h>
 
-%extend gmsec::api::mist::ProductFile {
 
-    GMSEC_BIN CALL_TYPE getContents()
+%typemap(in) (char* name, char* description, char* version, char* format, char* data, size_t fileSize)
+{
+    if (!PyByteArray_Check($input))
     {
-        GMSEC_BIN contents = NULL;
-
-        self->getContents(contents);
-
-        return contents;
+        SWIG_exception_fail(SWIG_TypeError, "Bad argument");
     }
 
+    $1 = (char*) PyByteArray_AsString($input);
+    $2 = (char*) PyByteArray_AsString($input);
+    $3 = (char*) PyByteArray_AsString($input);
+    $4 = (char*) PyByteArray_AsString($input);
+    $5 = (PyObject*) PyByteArray_FromObject($input);
+    $6 = (size_t) PyByteArray_Size($input);
+}
+
+
+%extend gmsec::api::mist::ProductFile
+{
+    ProductFile(char* name, char* description, char* version, char* format, PyObject* data, size_t fileSize)
+    {
+        char* blob = PyByteArray_AsString(data);
+
+        return new ProductFile(name, description, version, format, (GMSEC_BIN) blob, fileSize);
+    }
+
+    PyObject* CALL_TYPE getContents()
+    {
+        GMSEC_BIN contents = NULL;
+        size_t    fileSize = self->getContents(contents);
+
+        return PyByteArray_FromStringAndSize((const char*) contents, (Py_ssize_t) fileSize);
+    }
 }

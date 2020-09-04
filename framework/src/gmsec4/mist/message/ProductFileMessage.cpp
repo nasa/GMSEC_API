@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -37,9 +37,14 @@ ProductFileMessage::ProductFileMessage(const char* subject,
 									   const Specification& spec)
 	: MistMessage(new InternalProductFileMessage(subject,
 	                                             responseStatus,
-	                                             InternalMistMessage::buildSchemaID(kind, "PROD", productType, spec.getVersion()).c_str(),
+	                                             InternalMistMessage::buildSchemaID(kind, "PROD", (spec.getVersion() >= GMSEC_ISD_2018_00 ? NULL : productType), spec.getVersion()).c_str(),
 	                                             spec))
 {
+	if (spec.getVersion() >= GMSEC_ISD_2018_00)
+	{
+		this->addField("PROD-TYPE", productType);
+		this->addField("PROD-SUBTYPE", productSubtype);
+	}
 }
 
 
@@ -52,10 +57,15 @@ ProductFileMessage::ProductFileMessage(const char* subject,
 									   const Specification& spec)
 	: MistMessage(new InternalProductFileMessage(subject,
 	                                             responseStatus,
-	                                             InternalMistMessage::buildSchemaID(kind, "PROD", productType, spec.getVersion()).c_str(),
+	                                             InternalMistMessage::buildSchemaID(kind, "PROD", (spec.getVersion() >= GMSEC_ISD_2018_00 ? NULL : productType), spec.getVersion()).c_str(),
 	                                             config,
 	                                             spec))
 {
+	if (spec.getVersion() >= GMSEC_ISD_2018_00)
+	{
+		this->addField("PROD-TYPE", productType);
+		this->addField("PROD-SUBTYPE", productSubtype);
+	}
 }
 
 

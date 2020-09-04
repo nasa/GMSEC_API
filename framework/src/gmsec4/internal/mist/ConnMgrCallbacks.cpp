@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,50 +9,57 @@
 
 #include <gmsec4/internal/mist/ConnMgrCallbacks.h>
 
+#include <gmsec4/internal/mist/ConnMgrCallbackCache.h>
+
+#include <gmsec4/internal/ConnectionBuddy.h>
+
 #include <gmsec4/mist/ConnectionManager.h>
 #include <gmsec4/mist/ConnectionManagerCallback.h>
 #include <gmsec4/mist/ConnectionManagerEventCallback.h>
 #include <gmsec4/mist/ConnectionManagerReplyCallback.h>
-
-#include <gmsec4/internal/mist/ConnMgrCallbackCache.h>
+#include <gmsec4/mist/Specification.h>
 
 #include <gmsec4/Message.h>
 #include <gmsec4/Status.h>
 
+#include <gmsec4/util/Log.h>
 
-namespace gmsec
-{
-namespace api
-{
-namespace mist
-{
-namespace internal
-{
+
+using namespace gmsec::api;
+using namespace gmsec::api::internal;
+using namespace gmsec::api::mist;
+using namespace gmsec::api::mist::internal;
+
 
 //
 // CMCallback -- supports ConnectionManagerCallback
 //
-CMCallback::CMCallback(ConnectionManager* manager, ConnectionManagerCallback* cb)
+CMCallback::CMCallback(ConnectionManager* manager, ConnectionManagerCallback* cb, bool doValidate)
 	: m_mgr(manager),
-	  m_cb(cb)
+	  m_cb(cb),
+	  m_doValidate(doValidate)
 {
-}
-
-
-ConnectionManager* CMCallback::getManager() const
-{
-	return m_mgr;
-}
-
-
-ConnectionManagerCallback* CMCallback::getCallback() const
-{
-	return m_cb;
 }
 
 
 void CMCallback::onMessage(Connection& conn, const Message& msg)
 {
+	if (m_doValidate)
+	{
+		try
+		{
+			m_mgr->getSpecification().validateMessage(msg);
+		}
+		catch (const Exception& e)
+		{
+			GMSEC_WARNING << "Received invalid message; reason:\n" << e.what();
+
+			ConnectionBuddy::getInternal(conn).dispatchEvent(Connection::INVALID_MESSAGE_EVENT, Status(e));
+
+			return;
+		}
+	}
+
 	m_cb->onMessage(*m_mgr, msg);
 }
 
@@ -67,18 +74,6 @@ CMEventCallback::CMEventCallback(ConnectionManager* manager, ConnectionManagerEv
 }
 
 
-ConnectionManager* CMEventCallback::getManager() const
-{
-	return m_mgr;
-}
-
-
-ConnectionManagerEventCallback* CMEventCallback::getCallback() const
-{
-	return m_cb;
-}
-
-
 void CMEventCallback::onEvent(Connection& conn, const Status& status, Connection::ConnectionEvent event)
 {
 	m_cb->onEvent(*m_mgr, status, event);
@@ -88,27 +83,32 @@ void CMEventCallback::onEvent(Connection& conn, const Status& status, Connection
 //
 // CMReplyCallback -- supports ConnectionManagerReplyCallback
 //
-CMReplyCallback::CMReplyCallback(ConnectionManager* manager, ConnectionManagerReplyCallback* cb)
+CMReplyCallback::CMReplyCallback(ConnectionManager* manager, ConnectionManagerReplyCallback* cb, bool doValidate)
 	: m_mgr(manager),
-	  m_cb(cb)
+	  m_cb(cb),
+	  m_doValidate(doValidate)
 {
-}
-
-
-ConnectionManager* CMReplyCallback::getManager() const
-{
-	return m_mgr;
-}
-
-
-ConnectionManagerReplyCallback* CMReplyCallback::getCallback() const
-{
-	return m_cb;
 }
 
 
 void CMReplyCallback::onReply(Connection& conn, const Message& req, const Message& rep)
 {
+	if (m_doValidate)
+	{
+		try
+		{
+			m_mgr->getSpecification().validateMessage(rep);
+		}
+		catch (const Exception& e)
+		{
+			GMSEC_WARNING << "Received invalid response message; reason:\n" << e.what();
+
+			ConnectionBuddy::getInternal(conn).dispatchEvent(Connection::INVALID_MESSAGE_EVENT, Status(e));
+
+			return;
+		}
+	}
+
 	m_cb->onReply(*m_mgr, req, rep);
 }
 
@@ -117,8 +117,3 @@ void CMReplyCallback::onEvent(Connection& conn, const Status& status, Connection
 {
 	m_cb->onEvent(*m_mgr, status, event);
 }
-
-} //namespace internal
-} //namespace mist
-} //namespace api
-} //namespace gmsec

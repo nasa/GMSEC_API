@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,16 +20,16 @@ ConfigOption ws_client_opt1 =
 {
 " *  connectionType=<string>",
 
-"        <string> must be either gmsec_websphere71 or gmsec_websphere75.\n"
+"        <string> must be either gmsec_websphere75 or gmsec_websphere80.\n"
 "        [required]",
 
 "        Used to specify the type of connection object to set up.  For WebSphere\n"
-"        clients, this must be set to either gmsec_websphere71 or\n"
-"        gmsec_websphere75.",
+"        clients, this must be set to either gmsec_websphere75 or\n"
+"        gmsec_websphere80.",
 
 "        Examples:\n"
-"            connectionType=gmsec_websphere71\n"
 "            connectionType=gmsec_websphere75\n"
+"            connectionType=gmsec_websphere80\n"
 "        \n"
 "        Note: For information regarding using the GMSEC Generic JMS wrapper\n"
 "        with WebSphere, run 'gmhelp generic_jms websphere'."
