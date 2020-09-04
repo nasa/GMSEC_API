@@ -49,7 +49,7 @@ namespace gmsec_amqp
 
 
 static Status storeProperties(ValueMap& header, pn_data_t* properties);
-static Status parseProperties(Message& message, ValueMap& meta, pn_data_t* properties);
+static void   parseProperties(Message& message, ValueMap& meta, pn_data_t* properties);
 
 
 SubscriptionInfo::SubscriptionInfo(const AMQPSubscription& amqpSubscription,
@@ -174,7 +174,7 @@ void SubscriptionInfo::run()
 			}
 
 			tracker = pn_messenger_incoming_tracker(threadMessenger);
-			(void) amqpSub.conn->handleMessage(message, isReply);
+			amqpSub.conn->handleMessage(message, isReply);
 			pn_messenger_accept(threadMessenger, tracker, 0);
 
 			// Clean up the proton message once it is no longer needed
@@ -302,9 +302,8 @@ static Status storeProperties(ValueMap& meta, pn_data_t* properties)
 }
 
 
-static Status parseProperties(Message& message, ValueMap& meta, pn_data_t* properties)
+static void parseProperties(Message& message, ValueMap& meta, pn_data_t* properties)
 {
-	Status      status;
 	std::string subject;
 	
 	pn_data_next(properties);
@@ -384,8 +383,6 @@ static Status parseProperties(Message& message, ValueMap& meta, pn_data_t* prope
 	}
 
 	pn_data_exit(properties);
-
-	return status;
 }
 
 
@@ -486,10 +483,8 @@ const char* AMQPConnection::getMWInfo()
 }
 
 
-Status AMQPConnection::mwConnect()
+void AMQPConnection::mwConnect()
 {
-	Status result;
-
 	// Initialize request specs
 	specs = getExternal().getRequestSpecs();
 
@@ -502,8 +497,7 @@ Status AMQPConnection::mwConnect()
 
 	if (!getAMQPURIConfig())
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Unable to read 'amqp.xml'.", 1);
-		return result;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, 1, "Unable to read 'amqp.xml'");
 	}
 
 	pubMessenger = pn_messenger(NULL);
@@ -548,8 +542,7 @@ Status AMQPConnection::mwConnect()
 
 	if (!confirmed)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Connect: Connection timed out.", 1);
-		return result;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, 1, "Connect: Connection timed out");
 	}
 
 	// If subject mapping is turned on, set up and start the reply listening thread
@@ -574,22 +567,17 @@ Status AMQPConnection::mwConnect()
 			int reason = subscribeCondition.wait(3000);
 			if (reason != AMQPConnection::LISTENING && reason != AMQPConnection::GOT_MESSAGE)
 			{
-				result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Unable to start reply listener", AMQPConnection::UNABLE_TO_SUBSCRIBE);
-				return result;
+				throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, AMQPConnection::UNABLE_TO_SUBSCRIBE, "Unable to start reply listener");
 			}
 
 			subscriptions[specs.replySubject] = reqSubInfo;
 		}
 	}
-
-	return result;
 }
 
 
-Status AMQPConnection::mwDisconnect()
+void AMQPConnection::mwDisconnect()
 {
-	Status result;
-
 	pn_messenger_free(pubMessenger);
 
 	for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
@@ -601,18 +589,14 @@ Status AMQPConnection::mwDisconnect()
 		subInfo.reset();
 	}
 	subscriptions.clear();
-
-	return result;
 }
 
 
-Status AMQPConnection::mwSubscribe(const char* subject, const Config& config)
+void AMQPConnection::mwSubscribe(const char* subject, const Config& config)
 {
-	Status result;
-
 	if (subscriptions.count(fixSubject(subject)) > 0)
 	{
-		return result;
+		return;
 	}
 
 	bool allowReplies = false;
@@ -649,17 +633,13 @@ Status AMQPConnection::mwSubscribe(const char* subject, const Config& config)
 
 	if (!ableToSubscribe)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Unable to subscribe", AMQPConnection::UNABLE_TO_SUBSCRIBE);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, AMQPConnection::UNABLE_TO_SUBSCRIBE, "Unable to subscribe");
 	}
-
-	return result;
 }
 
 
-Status AMQPConnection::mwUnsubscribe(const char* subject)
+void AMQPConnection::mwUnsubscribe(const char* subject)
 {
-	Status result;
-
 	std::string fixedSub = fixSubject(subject);
 
 	AutoMutex subMutex(subscribeCondition.getMutex());
@@ -668,8 +648,7 @@ Status AMQPConnection::mwUnsubscribe(const char* subject)
 
 	if (it == subscriptions.end())
 	{
-		result.set(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject");
 	}
 
 	SharedSubscriptionInfo subInfo = it->second;
@@ -681,14 +660,13 @@ Status AMQPConnection::mwUnsubscribe(const char* subject)
 	subscriptions.erase(fixedSub);
 
 	GMSEC_DEBUG << "[Unsubscribed successfully: " << subject << "]";
-
-	return result;
 }
 
 
-Status AMQPConnection::mwPublish(const Message& msg, const Config& config)
+void AMQPConnection::mwPublish(const Message& msg, const Config& config)
 {
-	Status            result;
+	AutoTicket lock(m_mutex);
+
 	int               amqpResult;
 	std::string       fullAddress;
 
@@ -705,9 +683,9 @@ Status AMQPConnection::mwPublish(const Message& msg, const Config& config)
 	amqpResult = pn_message_set_content_type(amqpMsg, (const char*) (&kind));
 	if (amqpResult)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Problem setting message kind in AMQP message.", amqpResult);
 		pn_message_free(amqpMsg);
-		return result;
+
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, amqpResult, "Problem setting message kind in AMQP message");
 	}
 
 	// Get/Set subject
@@ -716,9 +694,9 @@ Status AMQPConnection::mwPublish(const Message& msg, const Config& config)
 	amqpResult = pn_message_set_subject(amqpMsg, subject);
 	if (amqpResult)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Problem setting subject in AMQP message.", amqpResult);
 		pn_message_free(amqpMsg);
-		return result;
+
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, amqpResult, "Problem setting subject in AMQP message");
 	}
 
 	// Add subject to address and set as message address
@@ -726,18 +704,21 @@ Status AMQPConnection::mwPublish(const Message& msg, const Config& config)
 	amqpResult = pn_message_set_address(amqpMsg, fullAddress.c_str());
 	if (amqpResult)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Problem setting AMQP address in AMQP message.", amqpResult);
 		pn_message_free(amqpMsg);
-		return result;
+
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, amqpResult, "Problem setting AMQP address in AMQP message");
 	}
 
 	// Get/Set message body
 	DataBuffer buffer;
-	result = getExternal().getPolicy().package(const_cast<Message&>(msg), buffer, meta);
+
+	Status result = getExternal().getPolicy().package(const_cast<Message&>(msg), buffer, meta);
+
 	if (result.isError())
 	{
 		pn_message_free(amqpMsg);
-		return result;
+
+		throw Exception(result);
 	}
 
 	body = pn_message_body(amqpMsg);
@@ -752,9 +733,9 @@ Status AMQPConnection::mwPublish(const Message& msg, const Config& config)
 	}
 	if (amqpResult)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Problem converting GMSEC data to AMQP data.", amqpResult);
 		pn_message_free(amqpMsg);
-		return result;
+
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, amqpResult, "Problem converting GMSEC data to AMQP data");
 	}
 
 	pn_messenger_start(pubMessenger);
@@ -767,15 +748,16 @@ Status AMQPConnection::mwPublish(const Message& msg, const Config& config)
 	if (result.isError())
 	{
 		pn_message_free(amqpMsg);
-		return result;
+
+		throw Exception(result);
 	}
 
 	amqpResult = pn_messenger_put(pubMessenger, amqpMsg);
 	if (amqpResult)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Problem storing AMQP data.", amqpResult);
 		pn_message_free(amqpMsg);
-		return result;
+
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, amqpResult, "Problem storing AMQP data");
 	}
 
 	tracker = pn_messenger_outgoing_tracker(pubMessenger);
@@ -785,22 +767,22 @@ Status AMQPConnection::mwPublish(const Message& msg, const Config& config)
 	amqpResult = pn_messenger_send(pubMessenger, -1);
 	if (amqpResult)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Problem sending AMQP data.", amqpResult);
-		return result;
+		pn_message_free(amqpMsg);
+
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, amqpResult, "Problem sending AMQP data");
 	}
 
 	pn_message_free(amqpMsg);
 	pn_messenger_stop(pubMessenger);
-
-	return result;
 }
 
 
-Status AMQPConnection::mwRequest(const Message& request, std::string& id)
+void AMQPConnection::mwRequest(const Message& request, std::string& id)
 {
-	Status result;
-
-	id = generateUniqueId(++requestCounter);
+	{
+		AutoTicket lock(m_mutex);
+		id = generateUniqueId(++requestCounter);
+	}
 
 	MessageBuddy::getInternal(request).addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
 
@@ -814,63 +796,40 @@ Status AMQPConnection::mwRequest(const Message& request, std::string& id)
 	}
 
 	// Send request for reply (subscription thread was started on connection)
-	result = mwPublish(request, getExternal().getConfig());
+	mwPublish(request, getExternal().getConfig());
 
-	if (!result.isError())
-	{
-		GMSEC_DEBUG << "[Request sent successfully: " << request.getSubject() << "]";
-	}
-	else
-	{
-		GMSEC_DEBUG << "[Problem sending request: " << request.getSubject() << "]";
-	}
-
-	return result;
+	GMSEC_DEBUG << "[Request sent successfully: " << request.getSubject() << "]";
 }
 
 
-Status AMQPConnection::mwReply(const Message& request, const Message& reply)
+void AMQPConnection::mwReply(const Message& request, const Message& reply)
 {
-	Status result;
-
 	// Get the Request's Unique ID, and put it into a field in the Reply
-	const StringField* uniqueID = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
-
-	if (uniqueID != NULL)
-	{
-		MessageBuddy::getInternal(reply).addField(REPLY_UNIQUE_ID_FIELD, uniqueID->getValue());
-	}
-	else
-	{
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
-		return result;
-	}
-
-	// Get the reply address from the request and set it as the subject
+	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(AMQP_REPLY));
 
-	if (replyAddr != NULL)
+	if (uniqueID == NULL)
 	{
-		MessageBuddy::getInternal(reply).setSubject(replyAddr->getValue());
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
-	else
+	if (replyAddr == NULL)
 	{
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain reply address field");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain reply address field");
 	}
+
+	MessageBuddy::getInternal(reply).addField(REPLY_UNIQUE_ID_FIELD, uniqueID->getValue());
+
+	MessageBuddy::getInternal(reply).setSubject(replyAddr->getValue());
 
 	// Publish the reply
-	result = mwPublish(reply, getExternal().getConfig());
+	mwPublish(reply, getExternal().getConfig());
 
 	GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() << "]";
-	
-	return result;
 }
 
 
-Status AMQPConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
+void AMQPConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 {
-	Status result;
 	double start_s;
 	bool   done = false;
 	bool   first = true;
@@ -930,7 +889,6 @@ Status AMQPConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 
 		if (sigMismatchFlag)
 		{
-			result.set(POLICY_ERROR, INVALID_SIGNATURE, "Signature mismatch");
 			sigMismatchFlag = false;
 			continue;
 		}
@@ -942,13 +900,20 @@ Status AMQPConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 			{
 				// Read it off of the queue and check the result for errors
 				MsgSubscriptionResult* msgResult = queue.front();
-				
-				result = msgResult->status;
-				
-				if (!result.isError() && msgResult->message != NULL)
-				{
-					msg = msgResult->message;
 
+				msg = msgResult->message;
+				Status result = msgResult->status;
+
+				queue.pop();
+				delete msgResult;
+
+				if (result.isError())
+				{
+					throw Exception(result);
+				}
+
+				if (msg != NULL)
+				{
 					const StringField* id = dynamic_cast<const StringField*>(msg->getField("UNIQUE-ID"));
 
 					if (useFilter && id != NULL)
@@ -989,41 +954,21 @@ Status AMQPConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 				}
 				else
 				{
-					// Will exit loop, remove item from queue and return the error message
 					done = true;
 				}
-				
-				// Remove from queue
-				queue.pop();
-
-				delete msgResult;
 			}
 		}
 		else if (reason == MESSENGER_ERROR)
 		{
-			result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Messenger Error", AMQPConnection::MESSENGER_ERROR);
-			done = true;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, AMQPConnection::MESSENGER_ERROR, "Messenger Error");
 		}
 		else if (reason == COULDNT_GET_MESSAGE)
 		{
-			result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Could not retrieve message", AMQPConnection::COULDNT_GET_MESSAGE);
-			done = true;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, AMQPConnection::COULDNT_GET_MESSAGE, "Could not retrieve message");
 		}
 
 		first = false;
 	}
-
-	// Handle any outstanding errors
-	if (result.isError())
-	{
-		// error already assigned
-	}
-	else if (msg != NULL)
-	{
-		GMSEC_DEBUG << "[Received published message: " << msg->getSubject() << "]";
-	}
-
-	return result;
 }
 
 
@@ -1198,7 +1143,6 @@ std::string AMQPConnection::unfixSubject(const char* str)
 
 void AMQPConnection::handleMessage(pn_message_t* message, bool replies)
 {
-	Status                 result;
 	std::auto_ptr<Message> gmsecMessage;
 	pn_bytes_t             bodyBytes;
 	pn_data_t*             body;
@@ -1230,25 +1174,21 @@ void AMQPConnection::handleMessage(pn_message_t* message, bool replies)
 	gmsecMessage.reset(new Message(subject, kind));
 
 	properties = pn_message_properties(message);
-	result     = parseProperties(*gmsecMessage.get(), meta, properties);
+	parseProperties(*gmsecMessage.get(), meta, properties);
+
+	Status result = getExternal().getPolicy().unpackage(*gmsecMessage.get(), buffer, meta);
 
 	if (result.isError())
 	{
-		GMSEC_WARNING << "Unable to extract meta-data from message";
-		return;
-	}
+		if (result.getCode() == INVALID_SIGNATURE)
+		{
+			sigMismatchFlag = true;
+			AutoMutex hold(queueCondition.getMutex());
+			queueCondition.signal(GOT_MESSAGE);
+		}
 
-	result = getExternal().getPolicy().unpackage(*gmsecMessage.get(), buffer, meta);
-
-	if(result.getCode() == INVALID_SIGNATURE)
-	{
-		sigMismatchFlag = true;
-		AutoMutex hold(queueCondition.getMutex());
-		queueCondition.signal(GOT_MESSAGE);
-	}
-	if (result.isError())
-	{
 		GMSEC_WARNING << "Unable to unpackage message";
+		enqueueResult(result, NULL);
 		return;
 	}
 
@@ -1277,13 +1217,13 @@ void AMQPConnection::handleMessage(pn_message_t* message, bool replies)
 		{
 			Message* reply = gmsecMessage.release();
 
-			if (enqueue)
-			{
-				gmsecMessage.reset(new Message(*reply));
-			}
-
 			if (reply)
 			{
+				if (enqueue)
+				{
+					gmsecMessage.reset(new Message(*reply));
+				}
+
 				getExternal().onReply(reply);
 			}
 		}
@@ -1293,8 +1233,6 @@ void AMQPConnection::handleMessage(pn_message_t* message, bool replies)
 	{
 		enqueueResult(result, (result.isError() ? 0 : gmsecMessage.release()));
 	}
-
-	return;
 }
 
 

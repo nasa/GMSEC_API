@@ -305,16 +305,16 @@ static void storeProperties(const ValueMap &header, Meta &meta)
 }
 
 
-Status BoltConnection::makePacket(const Message& message, SharedPacket& packet, PacketType type, std::string* useID)
+void BoltConnection::makePacket(const Message& message, SharedPacket& packet, PacketType type, std::string* useID)
 {
-	Status status;
-
 	DataBuffer data;
 	ValueMap header;
-	status = getExternal().getPolicy().package(const_cast<Message&>(message), data, header);
-	if (status.isError())
+
+	Status result = getExternal().getPolicy().package(const_cast<Message&>(message), data, header);
+
+	if (result.isError())
 	{
-		return status;
+		throw Exception(result);
 	}
 
 	const char* topic = message.getSubject();
@@ -338,8 +338,6 @@ Status BoltConnection::makePacket(const Message& message, SharedPacket& packet, 
 		GMSEC_DEBUG << "BoltConnection.makePacket:";
 		packet->put(std::cout);
 	}
-
-	return status;
 }
 
 
@@ -444,10 +442,8 @@ static Message* parseProperties(const Meta& meta, Message::MessageKind kind)
 }
 
 
-Status BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
+void BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
 {
-	Status status;
-
 	if (DEBUG_UNLOAD)
 	{
 		GMSEC_INFO << "BoltConnection.fromPacket:";
@@ -474,7 +470,16 @@ Status BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
 		{
 			// ick, can bolt::ByteBuffer be changed to DataBuffer?
 			DataBuffer data((DataBuffer::data_t*) body->raw(), body->size(), false);
-			status = getExternal().getPolicy().unpackage(*message, data, details);
+
+			Status result = getExternal().getPolicy().unpackage(*message, data, details);
+
+			if (result.isError())
+			{
+				delete message;
+				message = 0;
+
+				throw Exception(result);
+			}
 		}
 
 		if (kind == Message::REPLY)
@@ -494,8 +499,6 @@ Status BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
 			message->clearField(REPLY_UNIQUE_ID_FIELD);
 		}
 	}
-
-	return status;
 }
 
 
@@ -503,9 +506,9 @@ void BoltConnection::handleReply(SharedPacket& packet)
 {
 	Message* message = 0;
 
-	Status status = fromPacket(packet, message);
+	fromPacket(packet, message);
 
-	if (status.isError() || !message)
+	if (!message)
 	{
 		GMSEC_WARNING << "BoltConnection.handleReply: bad packet";
 		return;
@@ -522,10 +525,8 @@ void BoltConnection::handlePacket(SharedPacket &packet)
 }
 
 
-Status BoltConnection::mwPublishAux(const Message& message, SharedPacket& packet)
+void BoltConnection::mwPublishAux(const Message& message, SharedPacket& packet)
 {
-	Status status;
-
 	Message::MessageKind kind = message.getKind();
 
 	if (kind == Message::REPLY)
@@ -535,11 +536,11 @@ Status BoltConnection::mwPublishAux(const Message& message, SharedPacket& packet
 		if (specs.useSubjectMapping)
 		{
 			// For backward compatibility.
-			status = makePacket(message, packet, PACKET_PUBLISH);
+			makePacket(message, packet, PACKET_PUBLISH);
 		}
 		else
 		{
-			status = makePacket(message, packet, PACKET_REPLY);
+			makePacket(message, packet, PACKET_REPLY);
 
 			InternalMessage& intMsg = MessageBuddy::getInternal(message);
 
@@ -547,7 +548,7 @@ Status BoltConnection::mwPublishAux(const Message& message, SharedPacket& packet
 
 			intMsg.getDetails().getBoolean(OPT_REQ_RESP, reqResp, &reqResp);
 
-			if (!status.isError() && reqResp)
+			if (reqResp)
 			{
 				Meta *meta = packet.get()->getMeta();
 				meta->add(Property::createFlag(OPT_REQ_RESP, true));
@@ -556,17 +557,13 @@ Status BoltConnection::mwPublishAux(const Message& message, SharedPacket& packet
 	}
 	else
 	{
-		status = makePacket(message, packet, PACKET_PUBLISH);
+		makePacket(message, packet, PACKET_PUBLISH);
 	}
-
-	return status;
 }
 
 
-Status BoltConnection::mwRequestAux(Message& message, SharedPacket& packet, std::string& uniqueID)
+void BoltConnection::mwRequestAux(Message& message, SharedPacket& packet, std::string& uniqueID)
 {
-	Status status;
-
 	uniqueID = generateID();
 
 	message.addField(REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
@@ -578,34 +575,26 @@ Status BoltConnection::mwRequestAux(Message& message, SharedPacket& packet, std:
 		MessageBuddy::getInternal(message).getDetails().setBoolean(OPT_REQ_RESP, true);
 	}
 
-	status = makePacket(message, packet, PACKET_REQUEST, &uniqueID);
+	makePacket(message, packet, PACKET_REQUEST, &uniqueID);
 
-	if (!status.isError())
+	Meta *meta = packet->getMeta();
+	meta->add(Property::createCorrID(uniqueID));
+
+	if (specs.useSubjectMapping)
 	{
-		Meta *meta = packet->getMeta();
-		meta->add(Property::createCorrID(uniqueID));
-
-		if (specs.useSubjectMapping)
-		{
-			meta->add(Property::createReplyTo(myReplyTo));
-		}
+		meta->add(Property::createReplyTo(myReplyTo));
 	}
-
-	return status;
 }
 
 
-Status BoltConnection::mwReplyAux(Message& request, Message& reply, SharedPacket& packet)
+void BoltConnection::mwReplyAux(Message& request, Message& reply, SharedPacket& packet)
 {
-	Status status;
-
 	// Get the Request's Unique ID, and put it into a field in the Reply
 	const StringField* idField = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
 
 	if (!idField)
 	{
-		status.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
-		return status;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
 
 	std::string corrID(idField->getValue());
@@ -622,16 +611,11 @@ Status BoltConnection::mwReplyAux(Message& request, Message& reply, SharedPacket
 
 	reply.addField(*idField);
 
-	status = makePacket(reply, packet, PACKET_REPLY);
+	makePacket(reply, packet, PACKET_REPLY);
 
-	if (!status.isError())
-	{
-		Meta* meta = packet->getMeta();
-		meta->add(Property::createTopic(reqReplyTo));
-		meta->add(Property::createCorrID(corrID));
-	}
-
-	return status;
+	Meta* meta = packet->getMeta();
+	meta->add(Property::createTopic(reqReplyTo));
+	meta->add(Property::createCorrID(corrID));
 }
 
 
@@ -648,25 +632,21 @@ SingleConnection::~SingleConnection()
 }
 
 
-Status SingleConnection::setServers(const list<Server> &in)
+void SingleConnection::setServers(const list<Server> &in)
 {
-	Status status;
 	if (in.size() == 1)
 	{
 		server = in.front();
 	}
 	else
 	{
-		status.set(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Expecting single server");
+		throw Exception(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Expecting single server");
 	}
-	return status;
 }
 
 
-Status SingleConnection::mwConnect()
+void SingleConnection::mwConnect()
 {
-	Status status;
-
 	RequestSpecs specs = getExternal().getRequestSpecs();
 
 	if (!connection.get())
@@ -691,107 +671,101 @@ Status SingleConnection::mwConnect()
 	}
 
 	Result result = connection->connect();
-	applyResult("connect", status, result);
 
-	if (specs.requestReplyEnabled && result.isValid())
+	if (!result.isValid())
+	{
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
+	}
+
+	if (specs.requestReplyEnabled)
 	{
 		connection->setReplyHandler(myReplyHandler);
 	}
-
-	return status;
 }
 
 
-Status SingleConnection::mwDisconnect()
+void SingleConnection::mwDisconnect()
 {
-	Status status;
-
 	connection->setReplyHandler(0);
 
 	Result result = connection->disconnect();
-	applyResult("disconnect", status, result);
 
-	return status;
+	if (!result.isValid())
+	{
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
+	}
 }
 
 
-Status SingleConnection::mwSubscribe(const char* subject, const Config& config)
+void SingleConnection::mwSubscribe(const char* subject, const Config& config)
 {
-	Status status;
-
 	Result result = connection->subscribe(subject);
-	applyResult("subscribe", status, result);
 
-	return status;
+	if (!result.isValid())
+	{
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
+	}
 }
 
 
-Status SingleConnection::mwUnsubscribe(const char* subject)
+void SingleConnection::mwUnsubscribe(const char* subject)
 {
-	Status status;
-
 	Result result = connection->unsubscribe(subject);
-	applyResult("unsubscribe", status, result);
 
-	return status;
-}
-
-
-Status SingleConnection::mwPublish(const Message& message, const Config& config)
-{
-	Status status;
-
-	SharedPacket packet;
-	status = mwPublishAux(const_cast<Message&>(message), packet);
-
-	if (!status.isError())
+	if (!result.isValid())
 	{
-		Result result = connection->put(packet);
-		applyResult("put", status, result);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
 	}
-
-	return status;
 }
 
 
-Status SingleConnection::mwRequest(const Message& message, std::string& id)
+void SingleConnection::mwPublish(const Message& message, const Config& config)
 {
-	Status status;
-
 	SharedPacket packet;
-	status = mwRequestAux(const_cast<Message&>(message), packet, id);
 
-	if (!status.isError())
+	mwPublishAux(const_cast<Message&>(message), packet);
+
+	Result result = connection->put(packet);
+
+	if (!result.isValid())
 	{
-		Result result = connection->put(packet);
-		applyResult("put", status, result);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
 	}
-
-	return status;
 }
 
 
-Status SingleConnection::mwReply(const Message& request, const Message& reply)
+void SingleConnection::mwRequest(const Message& message, std::string& id)
 {
-	Status status;
-
 	SharedPacket packet;
-	status = mwReplyAux(const_cast<Message&>(request), const_cast<Message&>(reply), packet);
 
-	if (!status.isError())
+	mwRequestAux(const_cast<Message&>(message), packet, id);
+
+	Result result = connection->put(packet);
+
+	if (!result.isValid())
 	{
-		Result result = connection->put(packet);
-		applyResult("put", status, result);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
 	}
-
-	return status;
 }
 
 
-Status SingleConnection::mwReceive(Message*& message, GMSEC_I32 timeout_ms)
+void SingleConnection::mwReply(const Message& request, const Message& reply)
 {
-	Status status;
+	SharedPacket packet;
 
+	mwReplyAux(const_cast<Message&>(request), const_cast<Message&>(reply), packet);
+
+	Result result = connection->put(packet);
+
+	if (!result.isValid())
+	{
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
+	}
+}
+
+
+void SingleConnection::mwReceive(Message*& message, GMSEC_I32 timeout_ms)
+{
 	message = 0;
 
 	if (timeout_ms < 0)
@@ -800,24 +774,18 @@ Status SingleConnection::mwReceive(Message*& message, GMSEC_I32 timeout_ms)
 	}
 
 	SharedPacket packet;
+
 	Result result = connection->get(packet, timeout_ms);
 
-	if (result.getCode() != CODE_TIMEOUT)
+	if (result.isError() && result.getCode() != CODE_TIMEOUT)
 	{
-		applyResult("get", status, result, logInfo.mwGet);
-	}
-
-	if (status.isError())
-	{
-		return status;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
 	}
 
 	if (result.getCode() != CODE_TIMEOUT)
 	{
-		status = fromPacket(packet, message);
+		fromPacket(packet, message);
 	}
-
-	return status;
 }
 
 
@@ -859,27 +827,21 @@ MultipleConnection::~MultipleConnection()
 }
 
 
-Status MultipleConnection::setServers(const list<Server>& in)
+void MultipleConnection::setServers(const list<Server>& in)
 {
-	Status status;
-
 	if (in.size() > 1)
 	{
 		servers = in;
 	}
 	else
 	{
-		status.set(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Expecting at least two servers");
+		throw Exception(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Expecting at least two servers");
 	}
-
-	return status;
 }
 
 
-Status MultipleConnection::mwConnect()
+void MultipleConnection::mwConnect()
 {
-	Status status;
-
 	MultiStatus multi("connect");
 
 	if (connections.size() == 0)
@@ -921,23 +883,19 @@ Status MultipleConnection::mwConnect()
 		multi.update(result);
 	}
 
-	status = multi.get();
+	Status status = multi.get();
 
 	// if we were unable to connect to any server, should we reset
 	// all of the connections?
 	if (status.isError()) // unable to connect to any server
 	{
-		return status;
+		throw Exception(status);
 	}
-
-	return status;
 }
 
 
-Status MultipleConnection::mwDisconnect()
+void MultipleConnection::mwDisconnect()
 {
-	Status status;
-
 	MultiStatus multi("disconnect");
 
 	for (ConnIt i = connections.begin(); i != connections.end(); ++i)
@@ -950,16 +908,17 @@ Status MultipleConnection::mwDisconnect()
 		multi.update(result);
 	}
 
-	status = multi.get();
+	Status status = multi.get();
 
-	return status;
+	if (status.isError())
+	{
+		throw Exception(status);
+	}
 }
 
 
-Status MultipleConnection::mwSubscribe(const char* subject, const Config& config)
+void MultipleConnection::mwSubscribe(const char* subject, const Config& config)
 {
-	Status status;
-
 	MultiStatus multi("subscribe");
 
 	for (ConnIt i = connections.begin(); i != connections.end(); ++i)
@@ -969,16 +928,17 @@ Status MultipleConnection::mwSubscribe(const char* subject, const Config& config
 		multi.update(result);
 	}
 
-	status = multi.get();
+	Status status = multi.get();
 
-	return status;
+	if (status.isError())
+	{
+		throw Exception(status);
+	}
 }
 
 
-Status MultipleConnection::mwUnsubscribe(const char* subject)
+void MultipleConnection::mwUnsubscribe(const char* subject)
 {
-	Status status;
-
 	MultiStatus multi("unsubscribe");
 
 	for (ConnIt i = connections.begin(); i != connections.end(); ++i)
@@ -988,24 +948,21 @@ Status MultipleConnection::mwUnsubscribe(const char* subject)
 		multi.update(result);
 	}
 
-	status = multi.get();
+	Status status = multi.get();
 
-	return status;
+	if (status.isError())
+	{
+		throw Exception(status);
+	}
 }
 
 
 
-Status MultipleConnection::mwPublish(const Message& message, const Config& config)
+void MultipleConnection::mwPublish(const Message& message, const Config& config)
 {
-	Status status;
-
 	SharedPacket packet;
-	status = mwPublishAux(message, packet);
 
-	if (status.isError())
-	{
-		return status;
-	}
+	mwPublishAux(message, packet);
 
 	MultiStatus multi("put/publish");
 
@@ -1016,23 +973,20 @@ Status MultipleConnection::mwPublish(const Message& message, const Config& confi
 		multi.update(result);
 	}
 
-	status = multi.get();
-
-	return status;
-}
-
-
-Status MultipleConnection::mwRequest(const Message& message, std::string& id)
-{
-	Status status;
-
-	SharedPacket packet;
-	status = mwRequestAux(const_cast<Message&>(message), packet, id);
+	Status status = multi.get();
 
 	if (status.isError())
 	{
-		return status;
+		throw Exception(status);
 	}
+}
+
+
+void MultipleConnection::mwRequest(const Message& message, std::string& id)
+{
+	SharedPacket packet;
+
+	mwRequestAux(const_cast<Message&>(message), packet, id);
 
 	MultiStatus multi("put/request");
 
@@ -1043,23 +997,20 @@ Status MultipleConnection::mwRequest(const Message& message, std::string& id)
 		multi.update(result);
 	}
 
-	status = multi.get();
-
-	return status;
-}
-
-
-Status MultipleConnection::mwReply(const Message& request, const Message& reply)
-{
-	Status status;
-
-	SharedPacket packet;
-	status = mwReplyAux(const_cast<Message&>(request), const_cast<Message&>(reply), packet);
+	Status status = multi.get();
 
 	if (status.isError())
 	{
-		return status;
+		throw Exception(status);
 	}
+}
+
+
+void MultipleConnection::mwReply(const Message& request, const Message& reply)
+{
+	SharedPacket packet;
+
+	mwReplyAux(const_cast<Message&>(request), const_cast<Message&>(reply), packet);
 
 	MultiStatus multi("put/reply");
 
@@ -1070,17 +1021,24 @@ Status MultipleConnection::mwReply(const Message& request, const Message& reply)
 		multi.update(result);
 	}
 
-	status = multi.get();
+	Status status = multi.get();
 
-	return status;
+	if (status.isError())
+	{
+		throw Exception(status);
+	}
 }
 
 
 const char* MultipleConnection::getMWInfo()
 {
-	std::ostringstream strm;
-	strm << getLibraryRootName();
-	mwInfo = strm.str();
+	if (mwInfo.empty())
+	{
+		std::ostringstream strm;
+		strm << getLibraryRootName();
+		mwInfo = strm.str();
+	}
+
 	return mwInfo.c_str();
 }
 
@@ -1106,10 +1064,8 @@ private:
 };
 
 
-Status MultipleConnection::mwReceive(Message*& message, GMSEC_I32 timeout_ms)
+void MultipleConnection::mwReceive(Message*& message, GMSEC_I32 timeout_ms)
 {
-	Status status;
-
 	if (timeout_ms < 0)
 	{
 		timeout_ms = 24 * 3600 * 1000;
@@ -1117,18 +1073,20 @@ Status MultipleConnection::mwReceive(Message*& message, GMSEC_I32 timeout_ms)
 
 	SharedPacket packet;
 	TestGetPacket task(incoming, packet);
+
 	task.describe(myTag + task.info());
+
 	Result result = bolt::util::await(task, condvar, timeout_ms);
 
-	applyResult("get", status, result, logInfo.mwGet);
-	if (status.isError())
+	if (result.isError() && result.getCode() != CODE_TIMEOUT)
 	{
-		return status;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, (GMSEC_I32) result.getCode(), result.getText().c_str());
 	}
 
-	status = fromPacket(packet, message);
-
-	return status;
+	if (result.getCode() != CODE_TIMEOUT)
+	{
+		fromPacket(packet, message);
+	}
 }
 
 
@@ -1163,19 +1121,12 @@ void MultipleConnection::handlePacket(SharedPacket &packet)
 	}
 
 	Message* message = 0;
-	Status status = fromPacket(packet, message);
+	fromPacket(packet, message);
 
-	if (status.isError())
-	{
-		GMSEC_WARNING << "BoltConnection.handlePacket: bad packet: " << status.get();
-	}
-	else
-	{
-		delete message;
+	delete message;
 
-		incoming.push_back(packet);
-		condvar.broadcast(Condition::USER);
-	}
+	incoming.push_back(packet);
+	condvar.broadcast(Condition::USER);
 }
 
 

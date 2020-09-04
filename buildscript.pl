@@ -28,6 +28,7 @@ eval
 	my $cxx_file     = 'framework/include/gmsec_version.h';
 	my $java_file    = 'java/gov/nasa/gsfc/gmsecapi/ApiVersion.java';
 	my $java_file_4x = 'java/gov/nasa/gsfc/gmsec/api/ApiVersion.java';
+	my $bolt_file    = 'wrapper/bolt/java/bolt/Version.java';
 
 	my %info;
 
@@ -43,8 +44,9 @@ eval
 	writeCxx($cxx_file, \%info);
 	writeJava($java_file, "gmsecapi", \%info);
 	writeJava($java_file_4x, "gmsec.api", \%info);
+	writeBolt($bolt_file, "bolt", \%info);
 
-	updateDoxygen(\%info, glob('doxygen/*.html'));
+	updateDoxygen(\%info, glob('doxygen/*_4x_*.html'));
 
 	print "done\n";
 };
@@ -216,7 +218,7 @@ sub getCxx
 
 			foreach (@in) {
 				# Take the string if the word 'version' is in it...
-				if (/\version/g or m/\CC/g) {
+				if (/version/g) {
 					$cxx = $_;
 				}
 			} # while(<FH>)
@@ -339,7 +341,7 @@ public class ApiVersion {
 	public final static String CXX = "$ref->{CXX}";
 	public final static String MB = "$ref->{API} [$ref->{DATESTAMP}]";
 
-	public final static String GMSEC_VERSION = "$ref->{VERSION} [$ref->{DATESTAMP}]";
+	public final static String GMSEC_VERSION = "$ref->{API} [$ref->{DATESTAMP}]";
 	public final static String JAVA_VERSION = "$ref->{JAVA}";
 	public final static String C_PLUS_PLUS_VERSION = "$ref->{CXX}";
 	public final static String GMSEC_MB_VERSION = "MB v$ref->{API} [$ref->{DATESTAMP}]";
@@ -350,6 +352,33 @@ public class ApiVersion {
 
 	close(FH);
 } # end of writeJava
+
+
+sub writeBolt
+{
+	my ($path, $pkgname, $ref) = @_;
+
+	open(FH, '>' . $path)
+		or die("unable to open $path [$!]");
+
+print FH qq(
+package $pkgname;
+
+public class Version {
+
+	public final static String GMSEC = "$ref->{API} [$ref->{DATESTAMP}]";
+	public final static String OS = "$ref->{OS}";
+	public final static String JAVA = "$ref->{JAVA}";
+
+	public final static String GMSEC_VERSION = "$ref->{API} [$ref->{DATESTAMP}]";
+	public final static String JAVA_VERSION = "$ref->{JAVA}";
+	public final static String GMSEC_BOLT_VERSION = "Bolt v$ref->{API} [$ref->{DATESTAMP}]";
+}
+
+);
+
+	close(FH);
+} # end of writeBolt
 
 
 sub updateDoxygen

@@ -101,6 +101,7 @@ public class gmmist_services implements Example
 			Log.info("Adding general heartbeat fields");
 
 			hbDefinedFields.add( new I16Field("PUB-RATE", (short) 1) );
+			hbDefinedFields.add( new I16Field("COUNTER", (short) 0) );
 			hbDefinedFields.add( new StringField("MSG-ID", "My heartbeat identifier") );
 
 			Log.info("Starting heartbeat service");

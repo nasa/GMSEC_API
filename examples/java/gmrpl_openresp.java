@@ -25,11 +25,14 @@
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.*;
 
+import java.util.ArrayList;
+
 
 public class gmrpl_openresp implements Example
 {
 	private Config      m_config;
 	private Connection  m_conn;
+	private ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 
 	public gmrpl_openresp(Config config) throws ExampleException
@@ -95,7 +98,7 @@ public class gmrpl_openresp implements Example
 		m_conn.connect();
 
 		// Subscribe to receive request directive messages.
-		m_conn.subscribe("GMSEC.SYSTEST.TEST1.REQ.DIR.>");
+		info.add(m_conn.subscribe("GMSEC.SYSTEST.TEST1.REQ.DIR.>"));
 	}
 
 
@@ -112,11 +115,18 @@ public class gmrpl_openresp implements Example
 	}
 
 
-	public boolean cleanup()
+	public boolean cleanup() throws GMSEC_Exception
 	{
 		if (m_conn!= null)
+		{
+			for(int i = info.size()-1; i >= 0; i-- )
+			{
+				Log.info("Unsubscribing from " + info.get(i).getSubject());
+				m_conn.unsubscribe(info.get(i));
+				info.remove(i);
+			}
 			Util.closeConnection(m_conn);
-
+		}
 		return true;
 	}
 

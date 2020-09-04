@@ -22,6 +22,7 @@ typedef struct
 	GMSEC_Config     config;
 	GMSEC_Connection connection;
 	GMSEC_Message    message;
+	GMSEC_SubscriptionInfo* info;
 } gmsub_cb_t;
 
 
@@ -119,14 +120,15 @@ GMSEC_BOOL gmsub_cb_Run(gmsub_cb_t* this)
 	}
 
 	/* Subscribe */
+	this->info = (GMSEC_SubscriptionInfo*)malloc(2 * sizeof(GMSEC_SubscriptionInfo));
 	GMSEC_INFO("Subscribing to %s", subject);
-	connectionSubscribeWithCallback(this->connection, subject, publish_Callback, this->status);
+	this->info[0] = connectionSubscribeWithCallback(this->connection, subject, publish_Callback, this->status);
 	if (!example_check("Subscribing...", this->status)) return GMSEC_FALSE;
 
 	subject = "GMSEC.TERMINATE"; 
 
 	GMSEC_INFO("Subscribing to %s", subject);
-	connectionSubscribeWithCallback(this->connection, subject, publish_Callback, this->status);
+	this->info[1] = connectionSubscribeWithCallback(this->connection, subject, publish_Callback, this->status);
 	if (!example_check("Subscribing...", this->status)) return GMSEC_FALSE;
 
 	/* Listen */
@@ -187,11 +189,24 @@ GMSEC_BOOL gmsub_cb_Run(gmsub_cb_t* this)
 
 void gmsub_cb_Cleanup(gmsub_cb_t* this)
 {
+	int i;
+
 	/* Destroy the message */
 	if (this->message != NULL)
 	{
 		messageDestroy(&this->message);
 	}
+
+	for(i = 1; i >= 0; i--)
+	{
+		GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info[i]));
+		connectionUnsubscribe(this->connection, &(this->info[i]), this->status);
+		if (!example_check("Unsubscribing...", this->status))
+		{
+			GMSEC_ERROR("Problem with Unsubscribing...");
+		}
+	}
+	free(this->info);
 
 	/* Destroy connection */
 	if (this->connection != NULL)

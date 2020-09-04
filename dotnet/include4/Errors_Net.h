@@ -213,6 +213,9 @@ public enum class StatusCode
 	/// <summary>An error occurred when attempting to parse a string (i.e. XML, JSON, etc.)</summary>
     PARSE_ERROR = 43,
 
+	/// <summary>Invalid string parameter</summary>
+	INVALID_STRING_PARAM = 44,
+
 	
 	/// <summary>The ConnectionManager has not been initialized</summary>
 	CONNECTION_NOT_INITIALIZED = 100,
@@ -282,6 +285,21 @@ public enum class StatusCode
 
 	/// <summary>Error prevented field from being added to message</summary>
     FIELD_NOT_ADDED = 122,
+
+	/// <summary>Could not find a field template with the name provided</summary>
+	FIELD_TEMPLATE_NOT_FOUND = 123,
+
+	/// <summary>Error converting data type: incompatible data types</summary>
+	INVALID_TYPE_CONVERSION = 124,
+
+	/// <summary>Error converting data type: value overflows container</summary>
+	VALUE_OUT_OF_RANGE = 125,
+
+	/// <summary>The message failed to pass validation due to one or more errors</summary>
+	MESSAGE_FAILED_VALIDATION = 126,
+
+	/// <summary>The field failed to pass validation due to one or more errors</summary>
+	FIELD_FAILED_VALIDATION = 127,
 
 
     /// <summary> A non specific Error occurred in the GMSEC API.</summary>

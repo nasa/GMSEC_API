@@ -12,15 +12,19 @@
 #include "gmsecJNI.h"
 #include "gmsecJNI_Jenv.h"
 
-#include <gmsec4/Exception.h>
+#include <gmsec4/Config.h>
+
 #include <gmsec4/mist/Mnemonic.h>
 #include <gmsec4/mist/MnemonicIterator.h>
-#include <gmsec4/mist/MnemonicMessage.h>
+#include <gmsec4/mist/Specification.h>
+
+#include <gmsec4/mist/message/MnemonicMessage.h>
 
 
 using namespace gmsec::api;
 using namespace gmsec::api::jni;
 using namespace gmsec::api::mist;
+using namespace gmsec::api::mist::message;
 
 
 #ifdef __cplusplus
@@ -28,26 +32,29 @@ extern "C" {
 #endif
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicMessage__Ljava_lang_String_2I
-  (JNIEnv *jenv, jclass jcls, jstring jSubject, jint jVersion)
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicMessage__Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2
+  (JNIEnv *jenv, jclass jcls, jstring jSubject, jstring jSchemaID, jlong jSpecPtr, jobject jSpec)
 {
 	jlong jCreated = 0;
 
 	try
 	{
-		JStringManager subject(jenv, jSubject);
+		Specification* spec = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
 
-		if (jvmOk(jenv, "MnemonicMessage"))
+		if (!spec)
 		{
-			try
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else
+		{
+			JStringManager subject(jenv, jSubject);
+			JStringManager schemaID(jenv, jSchemaID);
+
+			if (jvmOk(jenv, "MnemonicMessage"))
 			{
-				MnemonicMessage* mnemMsg = new MnemonicMessage(subject.c_str(), (unsigned int) jVersion);
+				MnemonicMessage* mnemMsg = new MnemonicMessage(subject.c_str(), schemaID.c_str(), *spec);
 
 				jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
 			}
 		}
 	}
@@ -57,35 +64,34 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicM
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicMessage__Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2I
-  (JNIEnv *jenv, jclass jcls, jstring jSubject, jlong jConfigPtr, jobject jConfig, jint jVersion)
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicMessage__Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2
+  (JNIEnv *jenv, jclass jcls, jstring jSubject, jstring jSchemaID, jlong jConfigPtr, jobject jConfig, jlong jSpecPtr, jobject jSpec)
 {
 	jlong jCreated = 0;
 
 	try
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		Config*        config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		Specification* spec   = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
 
 		if (!config)
 		{
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
 		}
+		else if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
 		else
 		{
 			JStringManager subject(jenv, jSubject);
+			JStringManager schemaID(jenv, jSchemaID);
 
 			if (jvmOk(jenv, "MnemonicMessage"))
 			{
-				try
-				{
-					MnemonicMessage* mnemMsg = new MnemonicMessage(subject.c_str(), *config, (unsigned int) jVersion);
+				MnemonicMessage* mnemMsg = new MnemonicMessage(subject.c_str(), schemaID.c_str(), *config, *spec);
 
-					jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
-				}
-				catch (Exception& e)
-				{
-					ThrowGmsecException(jenv, e.what());
-				}
+				jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
 			}
 		}
 	}
@@ -106,16 +112,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicM
 
 		if (jvmOk(jenv, "MnemonicMessage"))
 		{
-			try
-			{
-				MnemonicMessage* mnemMsg = new MnemonicMessage(data.c_str());
+			MnemonicMessage* mnemMsg = new MnemonicMessage(data.c_str());
 
-				jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
+			jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
 		}
 	}
 	JNI_CATCH
@@ -125,13 +124,13 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicM
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicMessage_1Copy
-  (JNIEnv *jenv, jclass jcls, jlong jMnemMsgPtr, jobject jMnemMsg)
+  (JNIEnv *jenv, jclass jcls, jlong jOtherPtr, jobject jOther)
 {
 	jlong jCreated = 0;
 
 	try
 	{
-		MnemonicMessage* other = JNI_JLONG_TO_MNEMONIC_MSG(jMnemMsgPtr);
+		MnemonicMessage* other = JNI_JLONG_TO_MNEMONIC_MSG(jOtherPtr);
 
 		if (!other)
 		{
@@ -139,16 +138,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicM
 		}
 		else
 		{
-			try
-			{
-				MnemonicMessage* mnemMsg = new MnemonicMessage(*other);
+			MnemonicMessage* mnemMsg = new MnemonicMessage(*other);
 
-				jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
+			jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
 		}
 	}
 	JNI_CATCH
@@ -157,33 +149,13 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicM
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_delete_1MnemonicMessage
-  (JNIEnv *jenv, jclass jcls, jlong jMnemMsgPtr, jobject jMnemMsg)
-{
-	try
-	{
-		MnemonicMessage* mnemMsg = JNI_JLONG_TO_MNEMONIC_MSG(jMnemMsgPtr);
-
-		if (!mnemMsg)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MnemonicMessage reference is null");
-		}
-		else
-		{
-			delete mnemMsg;
-		}
-	}
-	JNI_CATCH
-}
-
-
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessage_1AddMnemonic
-  (JNIEnv *jenv, jclass jcls, jlong jMnemMsgPtr, jobject jMnemMsg, jlong jMnemonicPtr, jobject jMnemonic)
+  (JNIEnv *jenv, jclass jcls, jlong jMnemMsgPtr, jobject jMnemMsg, jlong jMnemPtr, jobject jMnem)
 {
 	try
 	{
 		MnemonicMessage* mnemMsg  = JNI_JLONG_TO_MNEMONIC_MSG(jMnemMsgPtr);
-		Mnemonic*        mnemonic = JNI_JLONG_TO_MNEMONIC(jMnemonicPtr);
+		Mnemonic*        mnemonic = JNI_JLONG_TO_MNEMONIC(jMnemPtr);
 
 		if (!mnemMsg)
 		{
@@ -241,16 +213,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessag
 		}
 		else
 		{
-			try
-			{
-				const Mnemonic& mnemonic = mnemMsg->getMnemonic((size_t) jIndex);
+			const Mnemonic& mnemonic = mnemMsg->getMnemonic((size_t) jIndex);
 
-				jMnemonic = JNI_POINTER_TO_JLONG(new Mnemonic(mnemonic));
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
+			jMnemonic = JNI_POINTER_TO_JLONG(new Mnemonic(mnemonic));
 		}
 	}
 	JNI_CATCH
@@ -300,16 +265,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessag
 		}
 		else
 		{
-			try
-			{
-				MnemonicMessage mnemMsg = MnemonicMessage::convertMessage(*msg);
+			MnemonicMessage mnemMsg = MnemonicMessage::convertMessage(*msg);
 
-				jCreated = JNI_POINTER_TO_JLONG(new MnemonicMessage(mnemMsg));
-			}
-			catch (Exception& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
+			jCreated = JNI_POINTER_TO_JLONG(new MnemonicMessage(mnemMsg));
 		}
 	}
 	JNI_CATCH

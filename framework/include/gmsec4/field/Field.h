@@ -15,6 +15,8 @@
 #ifndef GMSEC_API_FIELD_H
 #define GMSEC_API_FIELD_H
 
+#include <gmsec4_defs.h>
+
 #include <gmsec4/util/wdllexp.h>
 
 
@@ -114,6 +116,42 @@ public:
 	 * @return Returns an JSON string.
 	 */
 	virtual const char* CALL_TYPE toJSON() const = 0;
+
+
+	/**
+	 * @fn GMSEC_I64 getIntegerValue() const
+	 * @brief Attempts to convert the field value into a signed 64-bit integer number representation.
+	 * @return Returns the field value as an integer.
+	 * @throws An Exception is thrown if the field cannot be successfully converted to an integer.
+	 */
+	GMSEC_I64 CALL_TYPE getIntegerValue() const;
+
+
+	/**
+	 * @fn GMSEC_U64 getUnsignedIntegerValue() const
+	 * @brief Attempts to convert the field value into an unsigned 64-bit integer number representation.
+	 * @return Returns the field value as an unsigned integer.
+	 * @throws An Exception is thrown if the field cannot be successfully converted to an unsigned integer.
+	 */
+	GMSEC_U64 CALL_TYPE getUnsignedIntegerValue() const;
+
+
+	/**
+	 * @fn GMSEC_F64 getDoubleValue() const
+	 * @brief Attempts to convert the field value into a 64-bit floating point number representation.
+	 * @return Returns the field value as a floating point number.
+	 * @throws An Exception is thrown if the field cannot be successfully converted to a double.
+	 */
+	GMSEC_F64 CALL_TYPE getDoubleValue() const;
+
+
+	/**
+	 * @fn const char* getStringValue() const
+	 * @brief Attempts to convert the field value into string representation.
+	 * @return Returns the field value as a string.
+	 * @throws An Exception is thrown if the field cannot be successfully converted to a string.
+	 */
+	const char* CALL_TYPE getStringValue() const;
 
 
 protected:

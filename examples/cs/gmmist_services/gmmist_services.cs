@@ -97,11 +97,12 @@ namespace gmmist_services
                 Log.Info("Sending log message regarding imminent start of heartbeat service");
                 connManager.PublishLog("About to start heartbeat service", fieldLogSeverity);
 
-                I16Field fieldPubRate = new I16Field("PUB-RATE", 1);
+                I16Field fieldPubRate  = new I16Field("PUB-RATE", 1);
+                I16Field fieldCounter  = new I16Field("COUNTER", 0);
                 StringField fieldMsgId = new StringField("MSG-ID", "My heartbeat identifier");
 
                 System.Collections.Generic.List<Field> hbDefinedFields = new System.Collections.Generic.List<Field>
-                { fieldPubRate, fieldMsgId};
+                { fieldPubRate, fieldCounter, fieldMsgId};
                 
                 Log.Info("No need to add MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE for a heartbeat, we do that for you!");
                 Log.Info("Adding general heartbeat fields");

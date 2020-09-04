@@ -111,12 +111,14 @@ public:
 
 	/// <summary>Associatates a configuration object with the message</summary>
 	/// <param name="config">The configuration object</param>
+	/// <exception cref="GMSEC_Exception">If the Config object is null</exception>
 	void AddConfig(Config^ config);
 
 
 	/// <summary>Adds a copy of the field object to the message</summary>
 	/// <param name="field">The field object</param>
 	/// <returns>True if a new field was added; false if an existing field was replaced.</returns>
+	/// <exception cref="GMSEC_Exception">If the Field object is null</exception>
 	bool AddField(Field^ field);
 
 
@@ -129,6 +131,34 @@ public:
 	/// <returns>True if the operation was a success; false otherwise.</returns>
 	/// <exception cref="GMSEC_Exception">If the subject is null or contains an empty-string.</exception>
 	bool ClearField(System::String^ name);
+
+
+	/// <summary>Attempts to convert the field value into a signed 64-bit integer number representation.</summary>
+	/// <param name="fieldName">The name of the field to access</param>
+	/// <returns>Returns the field value as a signed integer.</returns>
+	/// <exception cref="GMSEC_Exception">An Exception is thrown if the field cannot be found, or if it cannot successfully be converted to an integer.</exception>
+	System::Int64 GetIntegerValue(System::String^ fieldName);
+
+
+	/// <summary>Attempts to convert the field value into an unsigned 64-bit integer number representation.</summary>
+	/// <param name="fieldName">The name of the field to access</param>
+	/// <returns>Returns the field value as an unsigned integer.</returns>
+	/// <exception cref="GMSEC_Exception">An Exception is thrown if the field cannot be found, or if it cannot successfully be converted to an integer.</exception>
+	System::UInt64 GetUnsignedIntegerValue(System::String^ fieldName);
+
+
+	/// <summary>Attempts to convert the field value into a 64-bit floating point number representation.</summary>
+	/// <param name="fieldName">The name of the field to access</param>
+	/// <returns>Returns the field value as a floating point number.</returns>
+	/// <exception cref="GMSEC_Exception">An Exception is thrown if the field cannot be found, or if it cannot successfully be converted to a double.</exception>
+	double GetDoubleValue(System::String^ fieldName);
+
+
+	/// <summary>Attempts to convert the field value into string representation.</summary>
+	/// <param name="fieldName">The name of the field to access</param>
+	/// <returns>Returns the field value as a string.</returns>
+	/// <exception cref="GMSEC_Exception">An Exception is thrown if the field cannot be found, or if it cannot successfully be converted to a string.</exception>
+	System::String^ GetStringValue(System::String^ fieldName);
 
 
 	/// <summary>Returns the field, identified by name, that is associated with the message</summary>
@@ -327,7 +357,6 @@ internal:
 	void SetUnmanagedImplementation(gmsec::api::Message* msg, bool owned);
 
 
-//DMW private:
 protected:
 	gmsec::api::Message* m_impl;
 	bool                 m_owned;

@@ -37,6 +37,7 @@ ref class ConnectionManagerCallback;
 ref class ConnectionManagerEventCallback;
 ref class ConnectionManagerReplyCallback;
 ref class ServiceParam;
+ref class Specification;
 ref class SubscriptionInfo;
 
 
@@ -53,8 +54,15 @@ public ref class ConnectionManager
 public:
 	/// <summary>
 	/// Creates a new ConnectionManager object with the given configuration.
-	/// Note that the ConnectionManager will perform message validation against the default GMSEC Interface Specification Document (ISD).
 	/// </summary>
+	///
+	/// <note>
+	/// Message validation will be disabled, unless the configuration option GMSEC-MSG-CONTENT-VALIDATE
+	/// is set to true.  If GMSEC-MSG-CONTENT-VALIDATE is set to true, then messages will be validated
+	/// against the default version of the GMSEC Interface Specification Document (ISD).  The version
+	/// of the ISD can be changed by specifying the configuration option GMSEC-SPECIFICATION-VERSION to
+	/// a valid value (e.g. 201400).
+	/// </note>
 	///
 	/// <param name="config">The configuration object that specifies the type of connection object to create</param>
 	ConnectionManager(Config^ config);
@@ -63,6 +71,12 @@ public:
 	/// <summary>
 	/// Creates a new ConnectionManager object with the given configuration.
 	/// </summary>
+	///
+	/// <note>
+	/// If message validation is enabled, then messages will be validated against the default version of
+	/// the GMSEC Interface Specification Document (ISD).  The version of the ISD can be changed by
+	/// specifying the configuration option GMSEC-SPECIFICATION-VERSION to a valid value (e.g. 201400).
+	/// </note>
 	///
 	/// <param name="config">The configuration object that specifies the type of connection object to create</param>
 	/// <param name="validate">Used to indicate whether ConnectionManager should validate messages that are produced</param>
@@ -105,6 +119,14 @@ public:
 
 	/// <summary>Identifies the version information for this connection's associated middleware.</summary>
 	System::String^ GetLibraryVersion();
+
+
+	/// <summary>Returns the Specification object associated with the Connection Manager.</summary>
+	///
+	/// <exception cref="GMSEC_Exception">
+	/// A an exception is thrown if the Connection Manager has not been initialized.
+	/// </exception>
+	Specification^ GetSpecification();
 
 
 	/// <summary>

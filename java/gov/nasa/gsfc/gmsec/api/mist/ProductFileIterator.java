@@ -15,7 +15,7 @@
 package gov.nasa.gsfc.gmsec.api.mist;
 
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
-import gov.nasa.gsfc.gmsec.api.jni.JNIProductFileIterator;
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIProductFileIterator;
 
 
 /**

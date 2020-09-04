@@ -89,12 +89,14 @@ void AsyncPublisher::run()
 				const Message* message = mpt.msg;
 				const Config*  config  = mpt.config;
 
-				Status result = m_connIf->mwPublish(*message, *config);
-
-				if (result.isError())
+				try
+				{
+					m_connIf->mwPublish(*message, *config);
+				}
+				catch (Exception& e)
 				{
 					GMSEC_ERROR << "Asynchronous Publisher could not publish message. Error status: "
-					            << result.get();
+					            << e.what();
 				}
 
 				delete mpt.msg;

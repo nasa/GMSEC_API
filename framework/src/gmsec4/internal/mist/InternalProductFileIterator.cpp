@@ -5,13 +5,14 @@
  * All Rights Reserved.
  */
 
+#include <gmsec4/internal/mist/message/InternalProductFileMessage.h>
 
 #include <gmsec4/internal/mist/InternalProductFileIterator.h>
-#include <gmsec4/internal/mist/InternalProductFileMessage.h>
 
 
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::mist::message::internal;
 
 
 InternalProductFileIterator::InternalProductFileIterator(InternalProductFileMessage& msg)

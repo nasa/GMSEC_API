@@ -138,6 +138,58 @@ extern "C"
 
 
 	/**
+	 * @fn GMSEC_I64 fieldGetIntegerValue(const GMSEC_Field field, GMSEC_Status status)
+	 *
+	 * @brief Attempts to convert the field value into a signed 64-bit integer number representation.
+	 *
+	 * @param[in]  field  - handle to the field.
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return Returns the field value as an integer.
+	 */
+    GMSEC_API GMSEC_I64 fieldGetIntegerValue(const GMSEC_Field field, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_U64 fieldGetUnsignedIntegerValue(const GMSEC_Field field, GMSEC_Status status)
+	 *
+	 * @brief Attempts to convert the field value into an unsigned 64-bit integer number representation.
+	 *
+	 * @param[in]  field  - handle to the field.
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return Returns the field value as an unsigned integer.
+	 */
+    GMSEC_API GMSEC_U64 fieldGetUnsignedIntegerValue(const GMSEC_Field field, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_F64 fieldGetDoubleValue(const GMSEC_Field field, GMSEC_Status status)
+	 *
+	 * @brief Attempts to convert the field value into a 64-bit floating point number representation.
+	 *
+	 * @param[in]  field  - handle to the field.
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return Returns the field value as a floating point number.
+	 */
+	GMSEC_API GMSEC_F64 fieldGetDoubleValue(const GMSEC_Field field, GMSEC_Status status);
+
+
+	/**
+	 * @fn const char* fieldGetStringValue(const GMSEC_Field field, GMSEC_Status status)
+	 *
+	 * @brief Attempts to convert the field value into string representation.
+	 *
+	 * @param[in]  field  - handle to the field.
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return The string value of the field, or NULL if the field object is invalid.
+	 */
+	GMSEC_API const char* fieldGetStringValue(const GMSEC_Field field, GMSEC_Status status);
+
+
+	/**
 	 * @fn void fieldDestroy(GMSEC_Field* field)
 	 *
 	 * @brief This function will destroy the field object.

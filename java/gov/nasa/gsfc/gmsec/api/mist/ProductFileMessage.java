@@ -11,6 +11,8 @@
  *
  * @brief The ProductFileMessage object is an extension of Message, and serves as a
  * container for a GMSEC C2CX %ProductFile %Message.
+ *
+ * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist;
@@ -21,7 +23,10 @@ import gov.nasa.gsfc.gmsec.api.StatusCode;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 import gov.nasa.gsfc.gmsec.api.Message;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIProductFileMessage;
+import gov.nasa.gsfc.gmsec.api.util.Log;
+
+import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMistMessage;
+import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIProductFileMessage;
 
 
 /**
@@ -29,26 +34,11 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIProductFileMessage;
  *
  * @brief The ProductFileMessage object is an extension of Message, and serves as a container for a GMSEC C2CX %ProductFile %Message.
  * The methods of this class allow for the construction and manipulation of the data within the message.
+ *
+ * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
  */
 public class ProductFileMessage extends Message
 {
-	private JNIProductFileMessage m_jniProductFileMessage = null;
-
-
-	public static JNIProductFileMessage getInternal(ProductFileMessage msg)
-	{
-		return (msg == null ? null : msg.m_jniProductFileMessage);
-	}
-
-
-	public ProductFileMessage(JNIProductFileMessage jProdFileMsg)
-	{
-		super(jProdFileMsg);
-
-		m_jniProductFileMessage = jProdFileMsg;
-	}
-
-
 	/**
 	 * @fn ProductFileMessage(String subject, gmsecMIST.ResponseStatus status, String productType, String productSubtype, int version)
 	 *
@@ -63,24 +53,30 @@ public class ProductFileMessage extends Message
 	 * @throws An IllegalArgumentException is thrown if the given subject string is null, or contains an empty string.
 	 * @throws An IllegalArgumentException is thrown if the given product type string is null, or contains an empty string.
 	 * @throws An IllegalArgumentException is thrown if the given product subtype string is null, or contains an empty string.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
 	 */
 	public ProductFileMessage(String subject, gmsecMIST.ResponseStatus status, String productType, String productSubtype, int version)
 		throws IllegalArgumentException
 	{
-		super(subject, Message.MessageKind.PUBLISH);
+		super((JNIProductFileMessage) null);
 
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.");
+
+		if (subject == null || subject.isEmpty())
+		{
+			throw new IllegalArgumentException("Subject cannot be null, nor contain an empty string");
+		}
 		if (productType == null || productType.isEmpty())
 		{
-			throw new IllegalArgumentException("Product type is null or contains an empty string");
+			throw new IllegalArgumentException("Product Type cannot be null, nor contain an empty string");
 		}
 		if (productSubtype == null || productSubtype.isEmpty())
 		{
-			throw new IllegalArgumentException("Product subtype is null or contains an empty string");
+			throw new IllegalArgumentException("Product Subtype cannot be null, nor contain an empty string");
 		}
 
-		m_jniProductFileMessage = new JNIProductFileMessage(subject, status, productType, productSubtype, version);
-
-		registerChild(m_jniProductFileMessage);
+		registerChild(new JNIProductFileMessage(subject, status, Message.MessageKind.PUBLISH, productType, productSubtype, JNIMistMessage.buildSpecification(version)));
 	}
 
 
@@ -101,28 +97,34 @@ public class ProductFileMessage extends Message
 	 * @throws An IllegalArgumentException is thrown if the given Config is null.
 	 * @throws An IllegalArgumentException is thrown if the given product type string is null, or contains an empty string.
 	 * @throws An IllegalArgumentException is thrown if the given product subtype string is null, or contains an empty string.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
 	 */
 	public ProductFileMessage(String subject, Config config, gmsecMIST.ResponseStatus status, String productType, String productSubtype, int version)
 		throws IllegalArgumentException
 	{
-		super(subject, Message.MessageKind.PUBLISH);
+		super((JNIProductFileMessage) null);
 
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.");
+
+		if (subject == null || subject.isEmpty())
+		{
+			throw new IllegalArgumentException("Subject cannot be null, nor contain an empty string");
+		}
 		if (config == null)
 		{
-			throw new IllegalArgumentException("Config is null");
+			throw new IllegalArgumentException("Config cannot be null");
 		}
 		if (productType == null || productType.isEmpty())
 		{
-			throw new IllegalArgumentException("Product type is null or contains an empty string");
+			throw new IllegalArgumentException("Product Type cannot be null, nor contain an empty string");
 		}
 		if (productSubtype == null || productSubtype.isEmpty())
 		{
-			throw new IllegalArgumentException("Product subtype is null or contains an empty string");
+			throw new IllegalArgumentException("Product Subtype cannot be null, nor contain an empty string");
 		}
 
-		m_jniProductFileMessage = new JNIProductFileMessage(subject, Config.getInternal(config), status, productType, productSubtype, version);
-
-		registerChild(m_jniProductFileMessage);
+		registerChild(new JNIProductFileMessage(subject, status, Message.MessageKind.PUBLISH, productType, productSubtype, config, JNIMistMessage.buildSpecification(version)));
 	}
 
 
@@ -135,14 +137,21 @@ public class ProductFileMessage extends Message
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given data string is null or contains an empty string.
 	 * @throws A GMSEC_Exception is thrown if the data string cannot be parsed.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
 	 */
 	public ProductFileMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
-		super(data);
+		super((JNIProductFileMessage) null);
 
-		m_jniProductFileMessage = new JNIProductFileMessage(data);
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.");
 
-		registerChild(m_jniProductFileMessage);
+		if (data == null || data.isEmpty())
+		{
+			throw new IllegalArgumentException("Data cannot be null, nor contain an empty string");
+		}
+
+		registerChild(new JNIProductFileMessage(data));
 	}
 
 
@@ -154,14 +163,21 @@ public class ProductFileMessage extends Message
 	 * @param other - the other ProductFileMessage object to copy.
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given ProductFileMessage is null.
+	 *
+	 * @note This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.
 	 */
 	public ProductFileMessage(ProductFileMessage other) throws IllegalArgumentException
 	{
-		super(other);
+		super((JNIProductFileMessage) null);
 
-		m_jniProductFileMessage = new JNIProductFileMessage(ProductFileMessage.getInternal(other));
+		Log.warning("This class has been deprecated; use gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage instead.");
 
-		registerChild(m_jniProductFileMessage);
+		if (other == null)
+		{
+			throw new IllegalArgumentException("ProductFileMessage cannot be null");
+		}
+
+		registerChild(new JNIProductFileMessage((JNIProductFileMessage) getInternal(other)));
 	}
 
 
@@ -181,7 +197,7 @@ public class ProductFileMessage extends Message
 			throw new IllegalArgumentException("ProductFile is null");
 		}
 
-		m_jniProductFileMessage.addProductFile(ProductFile.getInternal(productFile));
+		((JNIProductFileMessage) getInternal(this)).addProductFile(ProductFile.getInternal(productFile));
 	}
 
 
@@ -198,7 +214,7 @@ public class ProductFileMessage extends Message
 	 */
 	public ProductFile getProductFile(int index) throws GMSEC_Exception
 	{
-		return m_jniProductFileMessage.getProductFile(index);
+		return ((JNIProductFileMessage) getInternal(this)).getProductFile(index);
 	}
 
 
@@ -213,7 +229,7 @@ public class ProductFileMessage extends Message
 	 */
 	public int getNumProductFiles()
 	{
-		return m_jniProductFileMessage.getNumProductFiles();
+		return ((JNIProductFileMessage) getInternal(this)).getNumProductFiles();
 	}
 
 
@@ -224,7 +240,7 @@ public class ProductFileMessage extends Message
 	 */
 	public gmsecMIST.ResponseStatus getResponseStatus()
 	{
-		return m_jniProductFileMessage.getResponseStatus();
+		return ((JNIProductFileMessage) getInternal(this)).getResponseStatus();
 	}
 
 
@@ -235,7 +251,7 @@ public class ProductFileMessage extends Message
 	 */
 	public String getProductType()
 	{
-		return m_jniProductFileMessage.getProductType();
+		return ((JNIProductFileMessage) getInternal(this)).getProductType();
 	}
 
 
@@ -246,7 +262,7 @@ public class ProductFileMessage extends Message
 	 */
 	public String getProductSubtype()
 	{
-		return m_jniProductFileMessage.getProductSubtype();
+		return ((JNIProductFileMessage) getInternal(this)).getProductSubtype();
 	}
 
 
@@ -265,7 +281,7 @@ public class ProductFileMessage extends Message
 	 */
 	public ProductFileIterator getProductFileIterator()
 	{
-		return m_jniProductFileMessage.getProductFileIterator();
+		return ((JNIProductFileMessage) getInternal(this)).getProductFileIterator();
 	}
 
 
@@ -285,6 +301,17 @@ public class ProductFileMessage extends Message
 			throw new IllegalArgumentException("Message is null");
 		}
 
-		return JNIProductFileMessage.convertMessage(Message.getInternal(msg));
+        ProductFileMessage prodFileMsg = null;
+
+        try
+        {
+            prodFileMsg = new ProductFileMessage(msg.toXML());
+        }
+        catch (GMSEC_Exception e)
+        {
+            throw new IllegalArgumentException(e.toString());
+        }
+
+        return prodFileMsg;
 	}
 }

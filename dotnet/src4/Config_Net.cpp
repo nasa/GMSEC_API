@@ -219,15 +219,22 @@ String^ Config::GetValue(String^ name)
 
 String^ Config::GetValue(String^ name, String^ defaultValue)
 {
-	char* nameStr = nullptr;
+	char* nameStr         = nullptr;
 	char* defaultValueStr = nullptr;
 
 	try
 	{
-		nameStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(name).ToPointer());
+		nameStr         = static_cast<char*>(Marshal::StringToHGlobalAnsi(name).ToPointer());
 		defaultValueStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(defaultValue).ToPointer());
+
 		const char* value = m_impl->getValue(nameStr, defaultValueStr);
-		return gcnew String(value);
+
+		if (value != nullptr)
+		{
+			return gcnew String(value);
+		}
+
+		return nullptr;
 	}
 	catch (gmsec::api::Exception& e)
 	{

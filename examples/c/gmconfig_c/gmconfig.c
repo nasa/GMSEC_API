@@ -25,6 +25,7 @@ typedef struct
   GMSEC_ConfigFile config_file;
   GMSEC_Connection connection;
   GMSEC_Message    message;
+  GMSEC_SubscriptionInfo info;
 } gmconfig_t;
 
 
@@ -87,7 +88,7 @@ int gmconfig_Run(gmconfig_t *this)
 	GMSEC_INFO("Subscribing to: %s", pattern);
 
 	/* Subscribe on the connection */
-	connectionSubscribe(this->connection, pattern, this->status);
+	this->info = connectionSubscribe(this->connection, pattern, this->status);
 	if (!example_check("connectionSubscribe", this->status)) return GMSEC_FALSE;
 
 	/* Get Message from the configuration file */
@@ -128,6 +129,13 @@ void gmconfig_Cleanup(gmconfig_t *this)
 	if (this->message != NULL)
 	{
 		messageDestroy(&(this->message));
+	}
+
+	GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info));
+	connectionUnsubscribe(this->connection, &(this->info), this->status);
+	if (!example_check("Unsubscribing...", this->status))
+	{
+		GMSEC_ERROR("Problem with Unsubscribing...");
 	}
 
 	/* Destroy the connection */

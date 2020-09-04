@@ -83,56 +83,56 @@ public:
 	 * @fn mwConnect()
 	 * Establish connection with the mb server
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwConnect();
+	virtual void CALL_TYPE mwConnect();
 
 
 	/**
 	 * @fn Disconnect()
 	 * End connection with the mb server
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwDisconnect();
+	virtual void CALL_TYPE mwDisconnect();
 
 
 	/**
 	 * @fn mwSubscribe(const char* subject, const gmsec::Config &config)
 	 * Subscribe to a subject without a callback
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
 
 
 	/**
 	 * @fn UnSubscribe(const char *subject)
 	 * Unsubscribe from a subject
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwUnsubscribe(const char* subject);
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject);
 
 
 	/**
 	 * @fn mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config)
 	 * publish a message
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
 
 
 	/**
 	 * @fn mwRequest(const gmsec::api::Message& request, std::string& id)
 	 * send a request message
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string& id);
+	virtual void CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string& id);
 
 
 	/**
 	 * @fn mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply)
 	 * send a reply to a request message
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
+	virtual void CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
 
 
 	/**
 	 * @fn mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout)
 	 * pull the next message off the inbound queue
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
+	virtual void CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
 
 
 	void handleReply(gmsec::api::Message* reply);

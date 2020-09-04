@@ -20,12 +20,13 @@ namespace gmconfig
 	using GMSEC.API.UTIL;
 	using GMSEC.API.Example.Common;
 	using System;
+    using System.Collections.Generic;
 
 	class gmconfig : GmsecExample
 	{
 		private ConfigFile cfgFile;
 		private Connection conn;
-
+	    private List<SubscriptionInfo> info = new List<SubscriptionInfo>();
 
 		public gmconfig()
 		{
@@ -77,10 +78,10 @@ namespace gmconfig
 				string pattern2 = cfgFile.LookupSubscription("custom1");
 
 				Log.Info("Subscribing to " + pattern1);
-				conn.Subscribe(pattern1);
+                info.Add(conn.Subscribe(pattern1));
 
 				Log.Info("Subscribing to " + pattern2);
-				conn.Subscribe(pattern2);
+                info.Add(conn.Subscribe(pattern2));
 
 				// Lookup Message from config file
 				Message msg = cfgFile.LookupMessage("msg1");
@@ -99,7 +100,15 @@ namespace gmconfig
 			{
 				if (conn != null)
 				{
-					// Disconnect connection
+                    for (int i = info.Count - 1; i >= 0; i--)
+                    {
+                        Log.Info("Unsubscribing to " + info[i].GetSubject());
+                        var temp = info[i];
+                        conn.Unsubscribe(ref temp);
+                        info.RemoveAt(i);
+                    }
+                    
+                    // Disconnect connection
 					conn.Disconnect();
 
 					// Destroy connection

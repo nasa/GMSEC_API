@@ -783,6 +783,134 @@ GMSEC_BOOL CALL_TYPE messageClearField(GMSEC_Message msg, const char* name, GMSE
 }
 
 
+GMSEC_I64 CALL_TYPE messageGetIntegerValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status)
+{
+	GMSEC_I64 value = 0;
+	Status    result;
+
+	Message* m = reinterpret_cast<Message*>(msg);
+
+	if (!m)
+	{
+		result = Status(MSG_ERROR, UNINITIALIZED_OBJECT, "Message handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			value = m->getIntegerValue(fieldName);
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return value;
+}
+
+
+GMSEC_U64 CALL_TYPE messageGetUnsignedIntegerValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status)
+{
+	GMSEC_U64 value = 0;
+	Status    result;
+
+	Message* m = reinterpret_cast<Message*>(msg);
+
+	if (!m)
+	{
+		result = Status(MSG_ERROR, UNINITIALIZED_OBJECT, "Message handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			value = m->getUnsignedIntegerValue(fieldName);
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return value;
+}
+
+
+GMSEC_F64 CALL_TYPE messageGetDoubleValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status)
+{
+	GMSEC_F64 value = 0;
+	Status    result;
+
+	Message* m = reinterpret_cast<Message*>(msg);
+
+	if (!m)
+	{
+		result = Status(MSG_ERROR, UNINITIALIZED_OBJECT, "Message handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			value = m->getDoubleValue(fieldName);
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return value;
+}
+
+
+const char* CALL_TYPE messageGetStringValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status)
+{
+	const char* value = 0;
+	Status      result;
+
+	Message* m = reinterpret_cast<Message*>(msg);
+
+	if (!m)
+	{
+		result = Status(MSG_ERROR, UNINITIALIZED_OBJECT, "Message handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			value = m->getStringValue(fieldName);
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return value;
+}
+
+
 const GMSEC_Field CALL_TYPE messageGetField(const GMSEC_Message msg, const char* name, GMSEC_Status status)
 {
 	GMSEC_Field field = NULL;

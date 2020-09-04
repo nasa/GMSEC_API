@@ -19,6 +19,8 @@
 #include <gmsec4/util/Log.h>
 #include <gmsec4/util/Mutex.h>
 
+#include <cstring>  // for memcpy
+
 
 using namespace gmsec::api;
 using namespace gmsec::api::internal;
@@ -30,7 +32,13 @@ namespace api {
 namespace internal {
 
 
-Encoder *Encoder::getEncoder()
+static void setError(const char* text)
+{
+	throw Exception(MSG_ERROR, ENCODING_ERROR, text);
+}
+
+
+Encoder* Encoder::getEncoder()
 {
 	static Encoder* encoder = 0;
 	if (!encoder)
@@ -45,13 +53,7 @@ Encoder *Encoder::getEncoder()
 }
 
 
-const char * Encoder::getProblem() const
-{
-	return problem;
-}
-
-
-Decoder *Decoder::getDecoder()
+Decoder* Decoder::getDecoder()
 {
 	static Decoder* decoder = 0;
 	if (!decoder)
@@ -63,42 +65,6 @@ Decoder *Decoder::getDecoder()
 		}
 	}
 	return decoder;
-}
-
-
-
-const char * Decoder::getProblem() const
-{
-	return problem;
-}
-
-
-
-MessageEncoder::MessageEncoder()
-	:
-	buffer(0),
-	current(0),
-	length(0),
-	encoder(Encoder::getEncoder()),
-	selector(MessageFieldIterator::ALL_FIELDS),
-	altSelector(0)
-{
-	if (encoder->getProblem())
-		setError(encoder->getProblem());
-}
-
-
-MessageEncoder::~MessageEncoder()
-{
-}
-
-
-void MessageEncoder::setError(const char *text)
-{
-	if (!status.isError())
-	{
-		status = Status(MSG_ERROR, ENCODING_ERROR, text);
-	}
 }
 
 
@@ -359,43 +325,53 @@ static void put8ByteF64LittleEndian(const GMSEC_F64 * pi, char *&po)
 }
 
 
-Status MessageEncoder::encode(const Message &message,
-                              GMSEC_U64 &count, char *&data)
+MessageEncoder::MessageEncoder()
+	:
+	buffer(0),
+	current(0),
+	encoder(Encoder::getEncoder()),
+	selector(MessageFieldIterator::ALL_FIELDS),
+	altSelector(0)
 {
-	count = 0;
-	data = 0;
-
-	DataBuffer tmp;
-	status = encode(message, tmp);
-
-	if (!status.isError())
+	if (encoder->getProblem())
 	{
-		// increase the scope of the data from the method to the object
-		buffer.swap(tmp);
-		count = buffer.size();
-		data = reinterpret_cast<char*>(buffer.raw());
+		setError(encoder->getProblem());
 	}
-
-	return status;
 }
 
 
-Status MessageEncoder::encode(const Message &message, DataBuffer &out)
+MessageEncoder::~MessageEncoder()
 {
-	if (status.isError())
-		return status;
+}
 
+
+void MessageEncoder::encode(const Message& message, GMSEC_U64& count, char*& data)
+{
+	count = 0;
+	data  = 0;
+
+	DataBuffer tmp;
+	encode(message, tmp);
+
+	// increase the scope of the data from the method to the object
+	buffer.swap(tmp);
+
+	count = buffer.size();
+
+	data = reinterpret_cast<char*>(buffer.raw());
+}
+
+
+void MessageEncoder::encode(const Message &message, DataBuffer &out)
+{
 	// ick- two pass approach
 	GMSEC_I32 fieldCount = 0;
-	status = findLength(message, fieldCount);
-	if (status.isError())
-		return status;
 
-	size_t ilen = length;
-	if (out.size() < ilen && !out.resize(ilen))
+	size_t length = findLength(message, fieldCount);
+
+	if (out.size() < length && !out.resize(length))
 	{
-		setError("memory allocation failed");
-		GMSEC_ERROR << "MessageEncoder::encode : Memory allocation failed.";
+		setError("MessageEncoder::encode : Memory allocation failed.");
 	}
 	else
 	{
@@ -403,7 +379,9 @@ Status MessageEncoder::encode(const Message &message, DataBuffer &out)
 
 		// accept the passed in buffer
 		buffer.swap(out);
-		status = encode(message, fieldCount);
+
+		encode(message, fieldCount);
+
 		// replace- ought to use RAII
 		buffer.swap(out);
 	}
@@ -411,8 +389,6 @@ Status MessageEncoder::encode(const Message &message, DataBuffer &out)
 	// even if there was an error, do not out.resize(0) since they may want the space.
 
 	// compression / encryption is external
-
-	return status;
 }
 
 
@@ -428,9 +404,9 @@ void MessageEncoder::setSelector(FieldSelector s)
 }
 
 
-Status MessageEncoder::findLength(const Message &message, GMSEC_I32 &fieldCount)
+size_t MessageEncoder::findLength(const Message &message, GMSEC_I32 &fieldCount)
 {
-	length = GMSEC_ENCODING_BYTES;
+	size_t length = GMSEC_ENCODING_BYTES;
 
 #ifdef GMSEC_ENCODE_HEADER
 	/* the message type */
@@ -452,20 +428,19 @@ Status MessageEncoder::findLength(const Message &message, GMSEC_I32 &fieldCount)
 
 		++fieldCount;
 
-		updateLength(field);
+		length += updateLength(field);
 	}
 
 	if (length > size_t(GMSEC_ENCODED_LIMIT))
 	{
-		status.set(MSG_ERROR, ENCODING_ERROR, "Encoded content too large");
-		GMSEC_WARNING << "MessageEncoder::findLength : " << status.get();
+		setError("MessageEncoder::findLength : Encoded content too large");
 	}
 
-	return status;
+	return length;
 }
 
 
-Status MessageEncoder::encode(const Message &message, GMSEC_I32 fieldCount)
+void MessageEncoder::encode(const Message &message, GMSEC_I32 fieldCount)
 {
 	current = reinterpret_cast<char*>(buffer.raw());
 
@@ -508,8 +483,6 @@ Status MessageEncoder::encode(const Message &message, GMSEC_I32 fieldCount)
 			encode(field);
 		}
 	}
-
-	return status;
 }
 
 
@@ -518,7 +491,7 @@ that the compression could be improved by storing all of the field names
 together... */
 
 
-bool MessageEncoder::encode(const Field &field)
+void MessageEncoder::encode(const Field &field)
 {
 	Field::FieldType type = field.getType();
 
@@ -624,17 +597,16 @@ bool MessageEncoder::encode(const Field &field)
 		break;
 	}
 	default:
-		setError("Unexpected field type");
-		GMSEC_WARNING << "MessageEncoder::encode : Unexpected field type. ";
+		setError("MessageEncoder::encode : Unexpected field type");
 		break;
 	}
-
-	return !status.isError();
 }
 
 
-bool MessageEncoder::updateLength(const Field& field)
+size_t MessageEncoder::updateLength(const Field& field)
 {
+	size_t length = 0;
+
 	length += GMSEC_TYPE_BYTES;
 	length += GMSEC_LENGTH_BYTES + StringUtil::stringLength(field.getName()) + 1;
 
@@ -669,8 +641,7 @@ bool MessageEncoder::updateLength(const Field& field)
 
 		if (count > size_t(GMSEC_STRING_LIMIT))
 		{
-			setError("excessive string length");
-			GMSEC_WARNING << "MessageEncoder::updateLength : Excessive string length ";
+			setError("MessageEncoder::updateLength : Excessive string length");
 		}
 		else
 		{
@@ -683,24 +654,22 @@ bool MessageEncoder::updateLength(const Field& field)
 		const BinaryField& binField = dynamic_cast<const BinaryField&>(field);
 		const GMSEC_U64    count    = binField.getLength();
 
-		if (count > size_t(GMSEC_BIN_LIMIT))
+		if (count > GMSEC_U64(GMSEC_BIN_LIMIT))
 		{
-			setError("excessive binary data");
-			GMSEC_WARNING << "MessageEncoder::updateLength : Excessive binary data";
+			setError("MessageEncoder::updateLength : Excessive binary data");
 		}
 		else
 		{
-			length += GMSEC_LENGTH_BYTES + count;
+			length += GMSEC_LENGTH_BYTES + size_t(count);
 		}
 		break;
 	}
 	default:
-		setError("Unable to encode field into message");
-		GMSEC_WARNING << "MessageEncoder::updateLength : Unable to encode field into message.";
+		setError("MessageEncoder::updateLength : Unable to encode field into message");
 		break;
 	}
 
-	return !status.isError();
+	return length;
 }
 
 
@@ -716,7 +685,9 @@ static bool isBigEndian()
 static void setError(const char *& problem, const char * text)
 {
 	if (!problem)
+	{
 		problem = text;
+	}
 }
 
 
@@ -917,6 +888,12 @@ Encoder::Encoder()
 }
 
 
+const char* Encoder::getProblem() const
+{
+	return problem;
+}
+
+
 void Encoder::putRawBytes(const char *pi, GMSEC_U32 count, char *&po)
 {
 	memcpy(po, pi, count);
@@ -944,6 +921,15 @@ GMSEC_U32 Encoder::encodeU32(GMSEC_U32 in)
 	GMSEC_U32 out = 0;
 	char* p = (char*) &out;
 	getEncoder()->putU32(&in, p);
+	return out;
+}
+
+
+GMSEC_U64 Encoder::encodeU64(GMSEC_U64 in)
+{
+	GMSEC_U64 out = 0;
+	char* p = (char*) &out;
+	getEncoder()->putU64(&in, p);
 	return out;
 }
 
@@ -1279,6 +1265,15 @@ GMSEC_U32 Decoder::decodeU32(GMSEC_U32 in)
 }
 
 
+GMSEC_U64 Decoder::decodeU64(GMSEC_U64 in)
+{
+	GMSEC_U64 out = 0;
+	const char* p = (const char*) &in;
+	getDecoder()->getU64(p, &out);
+	return out;
+}
+
+
 static void (*selectGetI16(const char *& error))(const char *&, GMSEC_I16 *)
 {
 	if (sizeof(GMSEC_U16) == 2)
@@ -1491,119 +1486,80 @@ MessageDecoder::~MessageDecoder()
 }
 
 
-bool MessageDecoder::checkAvailable(int count)
+void MessageDecoder::decode(Message &message, GMSEC_U64 count, const char *data)
 {
-	if (GMSEC_U64(current - buffer + count) <= length)
-		return true;
-	setError("Out of data");
-	return false;
-}
-
-
-void MessageDecoder::setError(const char *text)
-{
-	status = Status(MSG_ERROR, ENCODING_ERROR, text);
-}
-
-
-Status MessageDecoder::decode(Message &message, GMSEC_U64 count, const char *data)
-{
-	Status result;
-
 	if (data == NULL)
+	{
 		setError("Null pointer to data to decode");
+	}
 	else if (count >= GMSEC_U32(GMSEC_ENCODED_LIMIT))
+	{
 		setError("Data length exceeded limit");
+	}
 	else
 	{
 		DataBuffer tmp(reinterpret_cast<const DataBuffer::data_t*>(data), int(count), false);
-		result = decode(message, tmp);
+
+		decode(message, tmp);
 	}
-
-	if (!result.isError() && status.isError())
-		result = status;
-
-	if (result.isError())
-	{
-		GMSEC_WARNING << "MessageDecoder::decode: " << result.get();
-	}
-
-	return result;
 }
 
 
-Status MessageDecoder::decode(Message &message, const DataBuffer &in)
-{
-	Status result = decodeAux(message, in);
-
-	if (!result.isError() && status.isError())
-		result = status;
-
-	if (result.isError())
-	{
-		GMSEC_WARNING << "MessageDecoder::decode: " << result.get();
-	}
-
-	return result;
-}
-
-
-Status MessageDecoder::decodeAux(Message &message, const DataBuffer &in)
+void MessageDecoder::decode(Message &message, const DataBuffer &in)
 {
 	length = in.size();
 	buffer = current = reinterpret_cast<const char *>(in.get());
 
 	/* determine the encoding version */
-	GMSEC_I16 encoding;
 	if (checkAvailable(GMSEC_ENCODING_BYTES))
+	{
+		GMSEC_I16 encoding = 0;
+
 		decoder->getI16(current, &encoding);
+
+		/* determine the number of fields in the message */
+		if (checkAvailable(GMSEC_FIELD_COUNT_BYTES))
+		{
+			GMSEC_I32 count = 0;
+
+			decoder->getI32(current, &count);
+
+			GMSEC_I32 i = 0;
+			while (i < count)
+			{
+				++i;
+
+				Field* field = decodeField();
+
+				if (field)
+				{
+					message.addField(*field);
+
+					delete field;
+				}
+			}
+		}
+		else
+		{
+			setError("Not enough data for field count");
+		}
+	}
 	else
 	{
 		setError("Not enough data for encoding");
-		return status;
 	}
-
-	/* determine the number of fields in the message */
-	GMSEC_I32 count;
-	if (checkAvailable(GMSEC_FIELD_COUNT_BYTES))
-		decoder->getI32(current, &count);
-	else
-	{
-		setError("Not enough data for field count");
-		return status;
-	}
-
-	GMSEC_I32 i = 0;
-	while (!status.isError() && i < count)
-	{
-		++i;
-
-		try
-		{
-			Field* field = NULL;
-
-			if (decode(field))
-			{
-				message.addField(*field);
-				delete field;
-			}
-		}
-		catch (Exception& e)
-		{
-			setError(e.what());
-		}
-	}
-
-	return status;
 }
 
 
-bool MessageDecoder::decode(Field*& field)
+bool MessageDecoder::checkAvailable(int count)
 {
-	field = NULL;
+	return GMSEC_U64(current - buffer + count) <= length;
+}
 
-	if (status.isError())
-		return false;
+
+Field* MessageDecoder::decodeField()
+{
+	Field* field = NULL;
 
 	Field::FieldType type;
 	const char*      name = 0;
@@ -1633,9 +1589,6 @@ bool MessageDecoder::decode(Field*& field)
 		setError("Invalid field name");
 	}
 
-	if (status.isError())
-		return false;
-
 	switch (type)
 	{
 	case Field::CHAR_TYPE:
@@ -1648,7 +1601,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for CHAR_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for CHAR_TYPE.");
 		}
 		break;
 	}
@@ -1662,7 +1615,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for BOOL_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for BOOL_TYPE.");
 		}
 		break;
 	}
@@ -1676,7 +1629,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for I8_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for I8_TYPE.");
 		}
 		break;
 	}
@@ -1690,7 +1643,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for U8_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for U8_TYPE.");
 		}
 		break;
 	}
@@ -1704,7 +1657,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for I16_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for I16_TYPE.");
 		}
 
 		break;
@@ -1719,7 +1672,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for U16_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for U16_TYPE.");
 		}
 		break;
 	}
@@ -1733,7 +1686,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for I32_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for I32_TYPE.");
 		}
 		break;
 	}
@@ -1747,7 +1700,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for U32_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for U32_TYPE.");
 		}
 		break;
 	}
@@ -1761,7 +1714,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for I64_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for I64_TYPE.");
 		}
 		break;
 	}
@@ -1775,7 +1728,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for U64_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for U64_TYPE.");
 		}
 		break;
 	}
@@ -1789,7 +1742,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for F32_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for F32_TYPE.");
 		}
 		break;
 	}
@@ -1803,7 +1756,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			GMSEC_WARNING << "MessageEncoder::decode : Not enough data for F64_TYPE.";
+			setError("MessageEncoder::decode : Not enough data for F64_TYPE.");
 		}
 		break;
 	}
@@ -1817,8 +1770,7 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			setError("Bad string");
-			GMSEC_WARNING << "MessageEncoder::decode : Bad string for STRING_TYPE.";
+			setError("MessageEncoder::decode : Bad string for STRING_TYPE.");
 		}
 		break;
 	}
@@ -1832,15 +1784,12 @@ bool MessageDecoder::decode(Field*& field)
 		}
 		else
 		{
-			setError("Bad blob");
-			GMSEC_WARNING << "MessageEncoder::decode : Bad blob for BIN_TYPE.";
+			setError("MessageEncoder::decode : Bad blob for BIN_TYPE.");
 		}
 		break;
 	}
 	default:
-		setError("Unexpected field type calculating field size");
-		GMSEC_WARNING << "MessageEncoder::decode : Unexpected field type decoding field.";
-		break;
+		setError("MessageEncoder::decode : Unexpected field type decoding field.");
 	}
 
 	if (field)
@@ -1848,7 +1797,7 @@ bool MessageDecoder::decode(Field*& field)
 		field->isHeader(isHeader);
 	}
 
-	return !status.isError();
+	return field;
 }
 
 

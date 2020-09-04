@@ -35,6 +35,7 @@ namespace api
 // Forward declaration(s)
 class Config;
 class Field;
+class MessageFieldIterator;
 
 namespace internal
 {
@@ -344,8 +345,6 @@ public:
 	 *
 	 * @brief This function get the subject this message will be/was published upon.
 	 *
-	 * @param subject - out parameter, 
-	 *
 	 * @return The subject assigned to the Message.
 	 */
 	const char* CALL_TYPE getSubject() const;
@@ -354,7 +353,7 @@ public:
 	/**
 	 * @fn MessageKind getKind() const
 	 *
-	 * @brief This function get the 'kind' of this message.
+	 * @brief This function gets the 'kind' of this message.
 	 *
 	 * @return The MessageKind assigned to the Message.
 	 *
@@ -577,6 +576,66 @@ public:
 
 
 	/**
+	 * @fn GMSEC_I64 getIntegerValue(const char* fieldName) const
+	 *
+	 * @brief Attempts to convert the field value into a signed 64-bit integer number representation.
+	 *
+	 * @param fieldName - the name of the field from which to reference the value.
+	 *
+	 * @return Returns the field value as an integer value.
+	 *
+	 * @throws An Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * be converted to an integer.
+	 */
+	GMSEC_I64 CALL_TYPE getIntegerValue(const char* fieldName) const;
+
+
+	/**
+	 * @fn GMSEC_U64 getUnsignedIntegerValue(const char* fieldName) const
+	 *
+	 * @brief Attempts to convert the field value into an unsigned 64-bit integer number representation.
+	 *
+	 * @param fieldName - the name of the field from which to reference the value.
+	 *
+	 * @return Returns the field value as an unsigned 64-bit integer value.
+	 *
+	 * @throws An Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * be converted to an unsigned 64-bit integer.
+	 */
+	GMSEC_U64 CALL_TYPE getUnsignedIntegerValue(const char* fieldName) const;
+
+
+	/**
+	 * @fn GMSEC_F64 getDoubleValue(const char* fieldName) const
+	 *
+	 * @brief Attempts to convert the field value into an 64-bit floating-point number representation.
+	 *
+	 * @param fieldName - the name of the field from which to reference the value.
+	 *
+	 * @return Returns the field value as a floating-point value.
+	 *
+	 * @throws An Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * be converted to a float-point value.
+	 */
+	GMSEC_F64 CALL_TYPE getDoubleValue(const char* fieldName) const;
+
+
+	/**
+	 * @fn const char* getStringValue(const char* fieldName) const
+	 *
+	 * @brief Attempts to convert the field value into string representation.
+	 *
+	 * @param fieldName - the name of the field from which to reference the value.
+	 *
+	 * @return Returns the field value as a string value.
+	 *
+	 * @throws An Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * be converted to a string value.
+	 */
+	const char* CALL_TYPE getStringValue(const char* fieldName) const;
+
+
+	/**
 	 * @fn const Field* getField(const char* name) const
 	 *
 	 * @brief This function will return the named Field object contained within the Message object,
@@ -616,6 +675,8 @@ public:
 	 * @fn Field::FieldType getFieldType(const char* name) const
 	 *
 	 * @brief Returns the FieldType associated with the named field.
+	 *
+	 * @param name - name of field to get the type for
 	 *
 	 * @return FieldType as defined in Field.
 	 *
@@ -811,8 +872,6 @@ public:
 	 * deleted or modified after it has been copied to the new message.
 	 *
 	 * @param toMsg - the message to copy fields into
-	 *
-	 * @return status - result of the operation
 	 */
 	void CALL_TYPE copyFields(Message& toMsg) const;
 
@@ -947,13 +1006,24 @@ public:
 
 protected:
 	/** @cond
-	 *  Suppress generation of dixygen comments.
+	 *  Constructor to be used by sub-classes of Message
 	 */
+	Message(gmsec::api::internal::InternalMessage* internal);
+	/** @endcond */
 
-	void CALL_TYPE registerChild(gmsec::api::internal::InternalMessage* child);
 
-	gmsec::api::internal::InternalMessage* m_iMessage;
+	/** @cond
+	 *  Used by sub-classes to register internal message object outside of a constructor
+	 *  (e.g. within assignment operator method)
+	 */
+	void CALL_TYPE registerInternal(gmsec::api::internal::InternalMessage* internal);
+	/** @endcond */
 
+
+	/** @cond
+	 *  Used by sub-classes to get a reference to the internal message object.
+	 */
+	gmsec::api::internal::InternalMessage& CALL_TYPE getInternal() const;
 	/** @endcond */
 
 
@@ -966,6 +1036,7 @@ private:
 	Message();
 
 
+	gmsec::api::internal::InternalMessage* m_iMessage;
 };
 
 } // namespace api

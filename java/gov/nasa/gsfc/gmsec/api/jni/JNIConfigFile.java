@@ -112,7 +112,7 @@ public class JNIConfigFile
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;

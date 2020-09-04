@@ -9,8 +9,14 @@
 package gov.nasa.gsfc.gmsec.api.jni;
 
 import gov.nasa.gsfc.gmsec.api.*;
+
 import gov.nasa.gsfc.gmsec.api.mist.*;
+import gov.nasa.gsfc.gmsec.api.mist.message.*;
+
 import gov.nasa.gsfc.gmsec.api.util.*;
+
+import gov.nasa.gsfc.gmsec.api.jni.mist.*;
+import gov.nasa.gsfc.gmsec.api.jni.mist.message.*;
 
 
 /** @class gmsecJNI
@@ -19,7 +25,7 @@ import gov.nasa.gsfc.gmsec.api.util.*;
  * functions in the GMSEC API library.
  *
  */
-class gmsecJNI
+public class gmsecJNI
 {
 	// This loads the jni library
 	static
@@ -187,12 +193,6 @@ class gmsecJNI
 	public final static native void Log_RegisterHandler(int level, long logHandlerPtr);
 	public final static native String Log_LogLevelToString(int jLevel);
 	public final static native int Log_LogLevelFromString(String level);
-	public final static native void Log_LogError(String message);
-	public final static native void Log_LogSecure(String message);
-	public final static native void Log_LogWarning(String message);
-	public final static native void Log_LogInfo(String message);
-	public final static native void Log_LogVerbose(String message);
-	public final static native void Log_LogDebug(String message);
 
 
 	// LogHandler native class functions
@@ -215,6 +215,10 @@ class gmsecJNI
 	public final static native boolean Message_AddField(long jarg1, JNIMessage msg, long fieldPtr, JNIField field);
 	public final static native void Message_ClearFields(long jarg1, JNIMessage msg);
 	public final static native boolean Message_ClearField(long jarg1, JNIMessage msg, String name);
+	public final static native long Message_GetIntegerValue(long jarg1, JNIMessage msg, String fieldName);
+	public final static native U64 Message_GetUnsignedIntegerValue(long jarg1, JNIMessage msg, String fieldName);
+	public final static native double Message_GetDoubleValue(long jarg1, JNIMessage msg, String fieldName);
+	public final static native String Message_GetStringValue(long jarg1, JNIMessage msg, String fieldName);
 	public final static native long Message_GetField(long jarg1, JNIMessage msg, String name);
 	public final static native int Message_GetFieldType(long jarg1, JNIMessage msg, String name);
 	public final static native long Message_GetBinaryField(long jarg1, JNIMessage msg, String name);
@@ -291,6 +295,10 @@ class gmsecJNI
 	public final static native String Field_GetName(long fieldPtr, JNIField field);
 	public final static native String Field_ToXML(long fieldPtr, JNIField field);
 	public final static native String Field_ToJSON(long fieldPtr, JNIField field);
+	public final static native long Field_GetIntegerValue(long fieldPtr, JNIField field);
+	public final static native U64 Field_GetUnsignedIntegerValue(long fieldPtr, JNIField field);
+	public final static native double Field_GetDoubleValue(long fieldPtr, JNIField field);
+	public final static native String Field_GetStringValue(long fieldPtr, JNIField field);
 	public final static native void Field_IsHeader(long fieldPtr, JNIField field, boolean header);
 	public final static native boolean Field_IsHeader(long fieldPtr, JNIField field);
 	public final static native void delete_Field(long fieldPtr, JNIField field);
@@ -403,6 +411,7 @@ class gmsecJNI
 	public final static native void ConnectionManager_Initialize(long jarg1, JNIConnectionManager connMgr);
 	public final static native void ConnectionManager_Cleanup(long jarg1, JNIConnectionManager connMgr);
 	public final static native String ConnectionManager_GetLibraryVersion(long jarg1, JNIConnectionManager connMgr);
+	public final static native long ConnectionManager_GetSpecification(long jarg1, JNIConnectionManager connMgr);
 	public final static native void ConnectionManager_SetStandardFields(long jarg1, JNIConnectionManager connMgr, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_AddStandardFields(long jarg1, JNIConnectionManager connMgr, long msgPtr, JNIMessage msg);
 	public final static native void ConnectionManager_RegisterEventCallback(long jarg1, JNIConnectionManager connMgr, int event, long cbPtr);
@@ -509,11 +518,10 @@ class gmsecJNI
 
 	// MIST DeviceMessage native class functions
 	//
-	public final static native long new_DeviceMessage(String subject, int version);
-	public final static native long new_DeviceMessage(String subject, long jarg1, JNIConfig jConfig, int version);
+	public final static native long new_DeviceMessage(String subject, long jarg1, JNISpecification jSpec);
+	public final static native long new_DeviceMessage(String subject, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
 	public final static native long new_DeviceMessage(String data);
 	public final static native long new_DeviceMessage_Copy(long jarg1, JNIDeviceMessage jDevMsg);
-	public final static native void delete_DeviceMessage(long jarg1, JNIDeviceMessage jDevMsg);
 	public final static native void DeviceMessage_AddDevice(long jarg1, JNIDeviceMessage jDevMsg, long jarg2, JNIDevice jDevice);
 	public final static native int DeviceMessage_GetNumDevices(long jarg1, JNIDeviceMessage jDevMsg);
 	public final static native long DeviceMessage_GetDevice(long jarg1, JNIDeviceMessage jDevMsg, int index);
@@ -531,9 +539,21 @@ class gmsecJNI
 	public final static native long DeviceParam_GetValue(long jarg1, JNIDeviceParam jParam);
 
 
+	// MIST MistMessage native class functions
+	//
+	public final static native long new_MistMessage(String subject, String schemaID, long jarg1, JNISpecification jSpec);
+	public final static native long new_MistMessageWithConfig(String subject, String schemaID, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
+	public final static native long new_MistMessageWithData(String data);
+	public final static native long new_MistMessageCopy(long jarg1, JNIMistMessage jOther);
+	public final static native void delete_MistMessage(long jarg1, JNIMistMessage jMistMsg);
+	public final static native String MistMessageGetSchemaID(long jarg1, JNIMistMessage jMistMsg);
+	public final static native void MistMessageSetValueString(long jarg1, JNIMistMessage jMistMsg, String fieldName, String value);
+	public final static native void MistMessageSetValueLong(long jarg1, JNIMistMessage jMistMsg, String fieldName, long value);
+	public final static native void MistMessageSetValueDouble(long jarg1, JNIMistMessage jMistMsg, String fieldName, double value);
+
+
 	// MIST Mnemonic native class functions
 	//
-	public final static native long new_Mnemonic(String name);
 	public final static native long new_Mnemonic(String name, long[] samplePtrs, JNIMnemonicSample[] samples, int numSamples);
 	public final static native long new_Mnemonic_Copy(long jarg1, JNIMnemonic mnemonic);
 	public final static native void delete_Mnemonic(long jarg1, JNIMnemonic mnemonic);
@@ -558,12 +578,11 @@ class gmsecJNI
 
 	// MIST MnemonicMessage native class functions
 	//
-	public final static native long new_MnemonicMessage(String subject, int version);
-	public final static native long new_MnemonicMessage(String subject, long jarg1, JNIConfig jConfig, int version);
+	public final static native long new_MnemonicMessage(String subject, String schemaID, long jarg1, JNISpecification jSpec);
+	public final static native long new_MnemonicMessage(String subject, String schemaID, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
 	public final static native long new_MnemonicMessage(String data);
 	public final static native long new_MnemonicMessage_Copy(long jarg1, JNIMnemonicMessage jMnemMsg);
-	public final static native void delete_MnemonicMessage(long jarg1, JNIMnemonicMessage jMnemMsg);
-	public final static native void MnemonicMessage_AddMnemonic(long jarg1, JNIMnemonicMessage jMnemMsg, long jarg2, JNIMnemonic jMnemonic);
+	public final static native void MnemonicMessage_AddMnemonic(long jarg1, JNIMnemonicMessage jMnemMsg, long jarg2, JNIMnemonic jMnem);
 	public final static native int MnemonicMessage_GetNumMnemonics(long jarg1, JNIMnemonicMessage jMnemMsg);
 	public final static native long MnemonicMessage_GetMnemonic(long jarg1, JNIMnemonicMessage jMnemMsg, int index);
 	public final static native long MnemonicMessage_GetMnemonicIterator(long jarg1, JNIMnemonicMessage jMnemMsg);
@@ -625,11 +644,12 @@ class gmsecJNI
 
 	// MIST ProductFileMessage native class functions
 	//
-	public final static native long new_ProductFileMessage(String subject, int status, String productType, String productSubtype, int version);
-	public final static native long new_ProductFileMessage(String subject, long jarg1, JNIConfig jConfig, int status, String productType, String productSubtype, int version);
+	public final static native long new_ProductFileMessage(String subject, int status, int kind, String productType, String productSubtype, long jarg1, JNISpecification jSpec);
+	public final static native long new_ProductFileMessage(String subject, int status, int kind, String productType, String productSubtype, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
+	public final static native long new_ProductFileMessage(String subject, int status, String schemaID, long jarg1, JNISpecification jSpec);
+	public final static native long new_ProductFileMessage(String subject, int status, String schemaID, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
 	public final static native long new_ProductFileMessage(String data);
 	public final static native long new_ProductFileMessage_Copy(long jarg1, JNIProductFileMessage jProductFileMsg);
-	public final static native void delete_ProductFileMessage(long jarg1, JNIProductFileMessage jProductFileMsg);
 	public final static native void ProductFileMessage_AddProductFile(long jarg1, JNIProductFileMessage jProductFileMsg, long jarg2, JNIProductFile jProductFile);
 	public final static native int ProductFileMessage_GetNumProductFiles(long jarg1, JNIProductFileMessage jProductFileMsg);
 	public final static native long ProductFileMessage_GetProductFile(long jarg1, JNIProductFileMessage jProductFileMsg, int index);
@@ -647,4 +667,22 @@ class gmsecJNI
 	public final static native void delete_ServiceParam(long jarg1, JNIServiceParam jParam);
 	public final static native String ServiceParam_GetName(long jarg1, JNIServiceParam jParam);
 	public final static native long ServiceParam_GetValue(long jarg1, JNIServiceParam jParam);
+
+
+	// MIST SchemaIDIterator
+	//
+	public final static native boolean SchemaIDIterator_HasNext(long jarg1, JNISchemaIDIterator jIter);
+	public final static native String SchemaIDIterator_Next(long jarg1, JNISchemaIDIterator jIter);
+	public final static native void SchemaIDIterator_Reset(long jarg1, JNISchemaIDIterator jIter);
+
+
+	// MIST Specification
+	//
+	public final static native long new_Specification(long jarg1, JNIConfig jConfig);
+	public final static native long new_Specification_Copy(long jarg1, JNISpecification jSpec);
+	public final static native void delete_Specification(long jarg1, JNISpecification jSpec);
+	public final static native void Specification_ValidateMessage(long jarg1, JNISpecification jSpec, long jarg2, JNIMessage msg);
+	public final static native long Specification_GetSchemaIDIterator(long jarg1, JNISpecification jSpec);
+	public final static native int Specification_GetVersion(long jarg1, JNISpecification jSpec);
+	public final static native String Specification_GetTemplateXML(long jarg1, JNISpecification jSpec, String subject, String schemaID);
 }

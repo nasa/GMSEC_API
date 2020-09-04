@@ -25,7 +25,6 @@
 #include <gmsec4/secure/Policy.h>
 
 #include <gmsec4/Connection.h>
-#include <gmsec4/Status.h>
 
 #include <string>
 
@@ -57,7 +56,12 @@ const char OPT_CONN_RETRY_INTERVAL[]           = "MW-CONN-RETRY-INTERVAL";
 const char GMSEC_ASYNC_PUBLISH[]               = "GMSEC-ASYNC-PUBLISH";
 const char GMSEC_ASYNC_PUBLISH_QUEUE_DEPTH[]   = "GMSEC-ASYNC-PUBLISH-QUEUE-DEPTH";
 const char GMSEC_ASYNC_PUBLISH_TEARDOWN_WAIT[] = "GMSEC-ASYNC-PUBLISH-TEARDOWN-WAIT";
+
 const char GMSEC_DISABLE_RR[]                  = "GMSEC-DISABLE-RR";
+
+const char GMSEC_USE_MSG_BINS[]                = "GMSEC-USE-MSG-BINS";
+const char GMSEC_MSG_BIN_SIZE[]                = "GMSEC-MSG-BIN-SIZE";
+const char GMSEC_MSG_BIN_TIMEOUT[]             = "GMSEC-MSG-BIN-TIMEOUT";
 
 const char REPLY_UNIQUE_ID_FIELD[]             = "REPLY-UNIQUE-ID";
 
@@ -142,23 +146,23 @@ public:
 
 
 	/**
-	 * @fn Status mwConnect()
+	 * @fn mwConnect()
 	 *
 	 * @brief Establishes a connection to the middleware.
 	 */
-	virtual Status CALL_TYPE mwConnect() = 0;
+	virtual void CALL_TYPE mwConnect() = 0;
 
 
 	/**
-	 * @fn Status mwDisconnect()
+	 * @fn mwDisconnect()
 	 *
 	 * @brief Terminates the connection to the middleware.
 	 */
-	virtual Status CALL_TYPE mwDisconnect() = 0;
+	virtual void CALL_TYPE mwDisconnect() = 0;
 
 
 	/**
-	 * @fn Status mwSubscribe(const char* subject, const Config& config)
+	 * @fn mwSubscribe(const char* subject, const Config& config)
 	 *
 	 * @brief Subscribe to a particular subject or pattern and uses the provided
 	 * configuration object to enable/disable special middleware-level subscription
@@ -167,22 +171,22 @@ public:
 	 * @param subject - subject pattern to match received messages
 	 * @param config  - configuration object
 	 */
-	virtual Status CALL_TYPE mwSubscribe(const char* subject, const Config& config) = 0;
+	virtual void CALL_TYPE mwSubscribe(const char* subject, const Config& config) = 0;
 
 
 	/**
-	 * @fn Status mwUnsubscribe(const char* subject)
+	 * @fn mwUnsubscribe(const char* subject)
 	 *
 	 * @brief Unsubscribes to a particular subject or pattern, thus stopping the
 	 * reception of messages that match the pattern.
 	 *
 	 * @param subject - subject pattern that is currently in use to receive messages
 	 */
-	virtual Status CALL_TYPE mwUnsubscribe(const char* subject) = 0;
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject) = 0;
 
 
 	/**
-	 * @fn Status mwPublish(const Message& msg, const Config& config)
+	 * @fn mwPublish(const Message& msg, const Config& config)
 	 *
 	 * @brief Publishes the given message to the middleware using the provided
 	 * configuration object.  The configuration object can be used to enable/disable
@@ -191,11 +195,11 @@ public:
 	 * @param msg    - message to publish
 	 * @param config - configuration object
 	 */
-	virtual Status CALL_TYPE mwPublish(const Message& msg, const Config& config) = 0;
+	virtual void CALL_TYPE mwPublish(const Message& msg, const Config& config) = 0;
 
 
 	/**
-	 * @fn Status mwRequest(const Message& request, std::string& uniqueID)
+	 * @fn mwRequest(const Message& request, std::string& uniqueID)
 	 *
 	 * @brief Issues the request message with a unique ID.  The unique ID must be stored
 	 * within the GMSEC_REPLY_UNIQUE_ID field within the sent message and returned.
@@ -203,22 +207,22 @@ public:
 	 * @param request  - the request message to issue to the middleware
 	 * @param uniqueID - string containing unique ID associated with the sent message.
 	 */
-	virtual Status CALL_TYPE mwRequest(const Message& request, std::string& uniqueID) = 0;
+	virtual void CALL_TYPE mwRequest(const Message& request, std::string& uniqueID) = 0;
 
 
 	/**
-	 * @fn Status mwReply(const Message& request, const Message& reply)
+	 * @fn mwReply(const Message& request, const Message& reply)
 	 *
 	 * @brief Issues a reply message in response to the given request message.
 	 *
 	 * @param request - the request message
 	 * @param reply   - the response (reply) message
 	 */
-	virtual Status CALL_TYPE mwReply(const Message& request, const Message& reply) = 0;
+	virtual void CALL_TYPE mwReply(const Message& request, const Message& reply) = 0;
 
 
 	/**
-	 * @fn Status mwReceive(Message*& msg, GMSEC_I32 timeout)
+	 * @fn mwReceive(Message*& msg, GMSEC_I32 timeout)
 	 *
 	 * @brief Returns the next message received within the specified timeout.
 	 * The received messages are determined by the existing subject pattern subscriptions.
@@ -228,7 +232,7 @@ public:
 	 *                  If the timeout is -1, the function will block indefinely until a
 	 *                  message is received.
 	 */
-	virtual Status CALL_TYPE mwReceive(Message*& msg, GMSEC_I32 timeout) = 0;
+	virtual void CALL_TYPE mwReceive(Message*& msg, GMSEC_I32 timeout) = 0;
 
 
 private:

@@ -18,17 +18,23 @@ namespace api
 {
 namespace mist
 {
-class Mnemonic;
+	class Mnemonic;
+
+	namespace message
+	{
+		namespace internal
+		{
+			class InternalMnemonicMessage;
+		}
+	}
 
 namespace internal
 {
-class InternalMnemonicMessage;
-
 
 class GMSEC_API InternalMnemonicIterator
 {
 public:
-	InternalMnemonicIterator(InternalMnemonicMessage& msg);
+	InternalMnemonicIterator(gmsec::api::mist::message::internal::InternalMnemonicMessage& msg);
 
 
     ~InternalMnemonicIterator();
@@ -42,7 +48,6 @@ public:
 
 	void CALL_TYPE reset();
 
-
 private:
 	// Declared, but not implemented
 	InternalMnemonicIterator(const InternalMnemonicIterator&);
@@ -52,9 +57,9 @@ private:
 	bool CALL_TYPE makeReady();
 
 
-	InternalMnemonicMessage& m_msg;
-	bool                     m_ready;
-	const Mnemonic*          m_nextMnemonic;
+	gmsec::api::mist::message::internal::InternalMnemonicMessage& m_msg;
+	bool                                                          m_ready;
+	const Mnemonic*                                               m_nextMnemonic;
 };
 
 } // namespace internal

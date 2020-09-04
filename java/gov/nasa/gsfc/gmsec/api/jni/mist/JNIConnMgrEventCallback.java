@@ -6,9 +6,11 @@
  */
 
 
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerEventCallback;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
 
 
 public class JNIConnMgrEventCallback

@@ -9,8 +9,15 @@
 package gov.nasa.gsfc.gmsec.api.jni;
 
 import gov.nasa.gsfc.gmsec.api.util.Log;
+import gov.nasa.gsfc.gmsec.api.util.LogEntry;
 import gov.nasa.gsfc.gmsec.api.util.LogLevel;
 import gov.nasa.gsfc.gmsec.api.util.LogHandler;
+import gov.nasa.gsfc.gmsec.api.util.TimeUtil;
+
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,9 +28,101 @@ public class JNILog
 	private static Map<LogLevel, LogHandler> logHandlers = new HashMap<LogLevel, LogHandler>();
 
 
+	public static class DefaultLogHandler extends LogHandler
+	{
+		private Writer writer = null;
+
+		public DefaultLogHandler()
+		{
+			writer = new PrintWriter(System.err);
+		}
+
+		public void onMessage(LogEntry entry)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(TimeUtil.formatTime(entry.time)).append(" [").append(entry.level.toString()).append("] ");
+			sb.append("[").append(entry.fileName).append(":").append(entry.lineNumber).append("] ");
+			sb.append(entry.message).append("\n");
+
+			String output = sb.toString().replace("\n", "\n\t");
+
+			try
+			{
+				writer.write(output + "\n");
+				writer.flush();
+			}
+			catch (IOException e)
+			{
+				System.err.println("*** Error writing log ***\n");
+				System.err.println(output);
+			}
+		}
+
+		public void setStream(String stream)
+		{
+			if (stream.equalsIgnoreCase("stderr"))
+			{
+				if (writer instanceof FileWriter)
+				{
+					try{ writer.close(); } catch (IOException e) { System.err.println("ERROR: Unable to close file."); }
+				}
+
+				writer = new PrintWriter(System.err);
+			}
+			else if (stream.equalsIgnoreCase("stdout"))
+			{
+				if (writer instanceof FileWriter)
+				{
+					try{ writer.close(); } catch (IOException e) { System.err.println("ERROR: Unable to close file."); }
+				}
+
+				writer = new PrintWriter(System.out);
+			}
+			else
+			{
+				if (writer instanceof FileWriter)
+				{
+					try{ writer.close(); } catch (IOException e) { System.err.println("ERROR: Unable to close file."); }
+
+					writer = new PrintWriter(System.err);
+				}
+
+				try
+				{
+					Writer tmp = new FileWriter(stream, true);
+
+					writer = tmp;
+				}
+				catch (IOException e)
+				{
+					System.err.println("ERROR: Unable to open and/or append to log file\n");
+				}
+			}
+		}
+	}
+
+
+	private static final DefaultLogHandler defaultLogHandler = new DefaultLogHandler();
+
+	static
+	{
+		for (int i = 0; i < 7; ++i)
+		{
+			Log.registerHandler(LogLevel.getUsingValue(i), defaultLogHandler);
+		}
+	}
+
+
 	private static void storeLogHandler(LogLevel level, LogHandler handler)
 	{
 		logHandlers.put(level, handler);
+	}
+
+
+	public static DefaultLogHandler getDefaultLogHandler()
+	{
+		return defaultLogHandler;
 	}
 
 
@@ -86,36 +185,62 @@ public class JNILog
 
 	public static void logError(String message)
 	{
-		gmsecJNI.Log_LogError(message);
+		doLog(LogLevel.ERROR, message);
 	}
 
 
 	public static void logSecure(String message)
 	{
-		gmsecJNI.Log_LogSecure(message);
+		doLog(LogLevel.SECURE, message);
 	}
 
 
 	public static void logWarning(String message)
 	{
-		gmsecJNI.Log_LogWarning(message);
+		doLog(LogLevel.WARNING, message);
 	}
 
 
 	public static void logInfo(String message)
 	{
-		gmsecJNI.Log_LogInfo(message);
+		doLog(LogLevel.INFO, message);
 	}
 
 
 	public static void logVerbose(String message)
 	{
-		gmsecJNI.Log_LogVerbose(message);
+		doLog(LogLevel.VERBOSE, message);
 	}
 
 
 	public static void logDebug(String message)
 	{
-		gmsecJNI.Log_LogDebug(message);
+		doLog(LogLevel.DEBUG, message);
+	}
+
+
+	private static void doLog(LogLevel level, String message)
+	{
+		if (Log.getReportingLevel().getValue() >= level.getValue())
+		{
+			LogHandler handler = logHandlers.get(level);
+
+			if (handler != null)
+			{
+				handler.onMessage(generateEntry(level, message));
+			}
+		}
+	}
+
+
+	private static LogEntry generateEntry(LogLevel level, String message)
+	{
+		LogEntry entry   = new LogEntry();
+		entry.time       = TimeUtil.getCurrentTime();
+		entry.level      = level;
+		entry.fileName   = Thread.currentThread().getStackTrace()[5].getFileName();
+		entry.lineNumber = Thread.currentThread().getStackTrace()[5].getLineNumber();
+		entry.message    = message;
+		return entry;
 	}
 }

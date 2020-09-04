@@ -16,6 +16,8 @@
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.*;
 
+import java.util.ArrayList;
+
 
 class MyReqReplyCallback extends Callback
 {
@@ -69,6 +71,7 @@ public class gmrpl_cb implements Example
 
 	Config     config;
 	Connection connection;
+	ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 	gmrpl_cb(Config config) throws ExampleException
 	{
@@ -123,10 +126,10 @@ public class gmrpl_cb implements Example
 
 		// Subscribe
 		Log.info("Subscribing to " + subject);
-		connection.subscribe(subject, new MyReqReplyCallback());
+		info.add(connection.subscribe(subject, new MyReqReplyCallback()));
 
 		Log.info("Subscribing to GMSEC.TERMINATE");
-		connection.subscribe("GMSEC.TERMINATE", new MyReqReplyCallback());
+		info.add(connection.subscribe("GMSEC.TERMINATE", new MyReqReplyCallback()));
 
 
 		// Listen
@@ -169,10 +172,16 @@ public class gmrpl_cb implements Example
 	}
 
 
-	public boolean cleanup()
+	public boolean cleanup() throws GMSEC_Exception
 	{
 		if (connection != null)
 		{
+			for(int i = info.size()-1; i >= 0; i-- )
+			{
+				Log.info("Unsubscribing from " + info.get(i).getSubject());
+				connection.unsubscribe(info.get(i));
+				info.remove(i);
+			}
 			Util.closeConnection(connection);
 		}
 

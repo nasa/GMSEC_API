@@ -128,7 +128,8 @@ public class Connection
 		CONNECTION_EXCEPTION_EVENT,       ///< An error, possibly fatal, has occurred with the connection to the middleware.
 		GMD_ERROR_EVENT,                  ///< SmartSockets Guaranteed Message Delivery (GMD) error.
 		WSMQ_ASYNC_STATUS_CHECK_EVENT,    ///< WebSphere MQ Asynchronous Put Status reporting event.
-		ALL_EVENTS                        ///< Monitor all events
+		ALL_EVENTS,                       ///< Monitor all events
+		MSG_PUBLISH_FAILURE_EVENT         ///< Failure occurred while attempting to asynchronously publish a message.
 	}
 
 

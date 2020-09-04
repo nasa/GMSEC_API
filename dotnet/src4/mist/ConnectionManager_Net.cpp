@@ -12,6 +12,7 @@
 #include <mist/ConnectionManagerEventCallback_Net.h>
 #include <mist/ConnectionManagerReplyCallback_Net.h>
 #include <mist/ServiceParam_Net.h>
+#include <mist/Specification_Net.h>
 #include <mist/SubscriptionInfo_Net.h>
 
 #include <field/Field_Net.h>
@@ -43,7 +44,7 @@ ConnectionManager::ConnectionManager(Config^ config)
 	{
 		gmsec::api::Config* nativeConfig = ((Config^) config)->GetUnmanagedImplementation();
 
-		m_impl  = new gmsec::api::mist::ConnectionManager(*nativeConfig, true);
+		m_impl  = new gmsec::api::mist::ConnectionManager(*nativeConfig);
 		m_owned = true;
 	}
 	catch (gmsec::api::Exception& e)
@@ -130,6 +131,23 @@ String^ ConnectionManager::GetLibraryVersion()
 	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
 
 	return gcnew String(m_impl->getLibraryVersion());
+}
+
+
+Specification^ ConnectionManager::GetSpecification()
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::MIST_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConnectionManager is null");
+
+	try
+	{
+		gmsec::api::mist::Specification& nativeSpec = m_impl->getSpecification();
+
+		return gcnew Specification(&nativeSpec, false);
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
 }
 
 

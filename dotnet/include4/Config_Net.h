@@ -99,7 +99,17 @@ public:
 	/// <exception cref="GMSEC_Exception">Null or empty name string given.</exception>
 	System::String^ GetValue(System::String^ name);
 	
-	
+	/// <summary>This function gets a value by name and value or will return a default 
+	/// value if key does not exist. The scope of the value is the life of the Config
+	/// object, or until the next %GetValue() call.</summary>
+	///
+	/// <param name="name">name of value to get</param>
+	/// <param name="defaultValue">return value if value does not exist</param>
+	/// <param name="value">output parameter value</param>
+	///
+	/// <returns>The value associated with the name, or defaultValue if name key does not exist.</returns>
+	///
+	/// <exception cref="GMSEC_Exception">Null or empty name string given.</exception>
 	System::String^ GetValue(System::String^ name,System::String^ defaultValue);
 
 

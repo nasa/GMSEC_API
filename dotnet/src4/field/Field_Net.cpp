@@ -10,6 +10,12 @@
 // Managed
 #include <field\Field_Net.h>
 
+#include <GMSEC_Exception_Net.h>
+
+
+// Native
+#include <gmsec4/Exception.h>
+
 
 using namespace GMSEC::API;
 using namespace System;
@@ -48,6 +54,58 @@ String^ Field::ToXML()
 String^ Field::ToJSON()
 {
 	return gcnew String(m_child->toJSON());
+}
+
+
+Int64 Field::GetIntegerValue()
+{
+	try
+	{
+		return m_child->getIntegerValue();
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+}
+
+
+UInt64 Field::GetUnsignedIntegerValue()
+{
+	try
+	{
+		return m_child->getUnsignedIntegerValue();
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+}
+
+
+double Field::GetDoubleValue()
+{
+	try
+	{
+		return m_child->getDoubleValue();
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+}
+
+
+String^ Field::GetStringValue()
+{
+	try
+	{
+		return gcnew String(m_child->getStringValue());
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
 }
 
 

@@ -72,8 +72,6 @@ void RequestShared::run()
 
 	while (running)
 	{
-		sendRequests();
-
 		int wait_ms = waitLimit_ms();
 
 		GMSEC_DEBUG << "RequestShared::run waiting " << wait_ms;
@@ -89,10 +87,6 @@ void RequestShared::run()
 		{
 			GMSEC_DEBUG << "RequestShared::run reason QUIT";
 			running = false;
-		}
-		else if (!m_connection)
-		{
-			GMSEC_DEBUG << "RequestShared::run null connection";
 		}
 		else if (reason == RECEIVE_REPLY)
 		{
@@ -112,6 +106,12 @@ void RequestShared::run()
 		else
 		{
 			GMSEC_DEBUG << "RequestShared::run unexpected reason " << reason;
+		}
+
+		if (running && m_connection != NULL)
+		{
+			GMSEC_DEBUG << "RequestShared::run calling sendRequests()";
+			sendRequests();
 		}
 	}
 }
@@ -141,11 +141,14 @@ static void incrementIfTrue(std::list<StdSharedPtr<PendingRequest> >::iterator& 
 
 void RequestShared::sendRequests()
 {
-	Status status;
-
 	double time_s = TimeUtil::getCurrentTime_s();
 
 	bool inc;
+
+	// Lock the mutex to prevent the shutdown of RequestShared thread and the addition
+	// of new requests while we are here in the middle of processing existing pending
+	// requests.
+	AutoMutex hold(m_condition.getMutex());
 
 	for (std::list<StdSharedPtr<PendingRequest> >::iterator i = m_pending.begin();
 		i != m_pending.end();
@@ -202,11 +205,13 @@ void RequestShared::sendRequests()
 
 		// need to send it
 		std::string id;
-		status = m_connection->issueRequestToMW(*(pending->request), id);
-
-		if (status.isError())
+		try
 		{
-			GMSEC_WARNING << "RequestShared::sendRequests(): Unable to issue Request message: " << status.get();
+			m_connection->issueRequestToMW(*(pending->request), id);
+		}
+		catch (Exception& e)
+		{
+			GMSEC_WARNING << "RequestShared::sendRequests(): Unable to issue Request message: " << e.what();
 			// Remove the invalid pending Request
 			i = m_pending.erase(i);
 			continue;

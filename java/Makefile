@@ -34,9 +34,11 @@ JAVA_SOURCES_3x = gov/nasa/gsfc/gmsecapi/*.java \
 JAVA_SOURCES_4x = gov/nasa/gsfc/gmsec/api/*.java \
                   gov/nasa/gsfc/gmsec/api/field/*.java \
                   gov/nasa/gsfc/gmsec/api/mist/*.java \
+                  gov/nasa/gsfc/gmsec/api/mist/message/*.java \
                   gov/nasa/gsfc/gmsec/api/jni/*.java \
                   gov/nasa/gsfc/gmsec/api/jni/field/*.java \
                   gov/nasa/gsfc/gmsec/api/jni/mist/*.java \
+                  gov/nasa/gsfc/gmsec/api/jni/mist/message/*.java \
                   gov/nasa/gsfc/gmsec/api/jni/util/*.java \
                   gov/nasa/gsfc/gmsec/api/util/*.java
 
@@ -105,6 +107,7 @@ OBJECTS_4x = \
              $(OBJDIR_4x)/gmsecJNI_DeviceIterator.o \
              $(OBJDIR_4x)/gmsecJNI_DeviceMessage.o \
              $(OBJDIR_4x)/gmsecJNI_DeviceParam.o \
+             $(OBJDIR_4x)/gmsecJNI_MistMessage.o \
              $(OBJDIR_4x)/gmsecJNI_Mnemonic.o \
              $(OBJDIR_4x)/gmsecJNI_MnemonicIterator.o \
              $(OBJDIR_4x)/gmsecJNI_MnemonicMessage.o \
@@ -114,6 +117,8 @@ OBJECTS_4x = \
              $(OBJDIR_4x)/gmsecJNI_ProductFileMessage.o \
              $(OBJDIR_4x)/gmsecJNI_ReplyCallback.o \
              $(OBJDIR_4x)/gmsecJNI_ServiceParam.o \
+             $(OBJDIR_4x)/gmsecJNI_SchemaIDIterator.o \
+             $(OBJDIR_4x)/gmsecJNI_Specification.o \
              $(OBJDIR_4x)/gmsecJNI_TimeSpec.o \
              $(OBJDIR_4x)/gmsecJNI_TimeUtil.o \
 

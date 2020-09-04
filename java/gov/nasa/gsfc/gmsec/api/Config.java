@@ -291,8 +291,6 @@ public class Config
      * @return If the key entry is found, then the associated value is returned; otherwise defaultValue is returned.
      *
      * @throws An IllegalArgumentException is thrown if the key string is null, or contains an empty string.
-     *
-     * @throws An IllegalArgumentException is thrown if the defaultValue string is null, or contains an empty string.
      */
 	public String getValue(String key, String defaultValue) throws IllegalArgumentException
 	{
@@ -300,10 +298,6 @@ public class Config
 		{
 			throw new IllegalArgumentException("Key is null or contains an empty string");
 		}
-		if (defaultValue == null || defaultValue.isEmpty())
-		{
-			throw new IllegalArgumentException("DefaultValue is null or contains an empty string");
-		}		
 
 		return m_jniConfig.getValue(key, defaultValue);
 	}	

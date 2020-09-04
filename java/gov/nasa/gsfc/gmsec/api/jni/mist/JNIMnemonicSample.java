@@ -6,17 +6,20 @@
  */
 
 
-
-package gov.nasa.gsfc.gmsec.api.jni;
-
-import gov.nasa.gsfc.gmsec.api.mist.MnemonicSample;
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 
 import gov.nasa.gsfc.gmsec.api.field.Field;
 
+import gov.nasa.gsfc.gmsec.api.mist.MnemonicSample;
 
-public class JNIMnemonicSample extends MnemonicSample
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
+import gov.nasa.gsfc.gmsec.api.jni.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.JNIFieldConverter;
+
+
+public class JNIMnemonicSample
 {
 	private long      swigCPtr;
 	protected boolean swigCMemOwn;
@@ -172,7 +175,7 @@ public class JNIMnemonicSample extends MnemonicSample
 	}
 
 
-	public void setLimit(LimitFlag flag)
+	public void setLimit(MnemonicSample.LimitFlag flag)
 	{
 		gmsecJNI.MnemonicSample_SetLimit(swigCPtr, this, flag.ordinal());
 	}

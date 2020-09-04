@@ -49,6 +49,7 @@ private:
 	std::string cfgFilename;
 	ConfigFile  cfgFile;
 	Connection* connection;
+	SubscriptionInfo** info;
 };
 
 
@@ -66,6 +67,12 @@ Recorder::~Recorder()
 {
 	if (connection)
 	{
+		for (size_t i = 0; i < 2; ++i)
+		{
+			GMSEC_INFO << "Unsubscribing from " << info[i]->getSubject();
+			connection->unsubscribe(info[i]);
+		}
+		delete[] info;
 		connection->disconnect();
 		Connection::destroy(connection);
 	}
@@ -130,8 +137,9 @@ bool Recorder::run()
 
 		//o Create subscriptions from subscription templates in the config file using callback
 		LogCallback cb;
-		connection->subscribe(rcvLogSubject, &cb);
-		connection->subscribe(sndLogSubject, &cb);
+		info  = new SubscriptionInfo*[2];
+		info[0] = connection->subscribe(rcvLogSubject, &cb);
+		info[1] = connection->subscribe(sndLogSubject, &cb);
 
 		//o Output some general program information
 		GMSEC_INFO << "Publishing for " << loopCountdown << " seconds.";

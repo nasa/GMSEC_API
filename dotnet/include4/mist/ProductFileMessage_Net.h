@@ -39,6 +39,8 @@ ref class ProductFileIterator;
 /// <summary>
 /// The class defines a GMSEC MSG PROD (Product File) message.
 /// </summary>
+///
+/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.ProductFileMessage instead.
 
 
 public ref class ProductFileMessage : public Message
@@ -54,6 +56,8 @@ public:
 	/// validating the message.</param>
 	///
 	/// <seealso cref="MIST_Defs_Net.h"/>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.ProductFileMessage instead.
 	ProductFileMessage(System::String^ subject, ResponseStatus status, System::String^ productType,
 		               System::String^ productSubtype, unsigned int version);
 
@@ -69,6 +73,8 @@ public:
 	/// validating the message.</param>
 	///
 	/// <seealso cref="MIST_Defs_Net.h"/>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.ProductFileMessage instead.
 	ProductFileMessage(System::String^ subject, Config^ config, ResponseStatus status,
 		               System::String^ productType, System::String^ productSubtype, unsigned int version);
 
@@ -78,12 +84,16 @@ public:
 	/// <param name="data">XML or JSON string used to initialize the contents of the message</param>
 	///
 	/// <exception cref="GMSEC_Exception">An exception is thrown if the data cannot be parsed</exception>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.ProductFileMessage instead.
 	ProductFileMessage(System::String^ data);
 
 
 	/// <summary>Copy-constructor</summary>
 	///
 	/// <param name="other">The ProductFileMessage object to copy</param>
+	///
+	/// Note: This class has been deprecated; use GMSEC.API.MIST.MESSAGE.ProductFileMessage instead.
 	ProductFileMessage(ProductFileMessage^ other);
 
 

@@ -138,7 +138,14 @@ bool gmmist_validation::run()
 		connManager.addStandardFields(prodMsg);
 		prodMsg.addField("MESSAGE-TYPE", "MSG");
 		prodMsg.addField("MESSAGE-SUBTYPE", "PROD");
-		prodMsg.addField("CONTENT-VERSION", (GMSEC_F32) 2013.0);
+		if(mist::GMSEC_ISD_CURRENT == mist::GMSEC_ISD_2014_00)
+		{
+			prodMsg.addField("CONTENT-VERSION", (GMSEC_F32) 2013.0);
+		}
+		else if(mist::GMSEC_ISD_CURRENT == mist::GMSEC_ISD_2016_00)
+		{
+			prodMsg.addField("CONTENT-VERSION", (GMSEC_F32) 2016.0);
+		}
 		prodMsg.addField("RESPONSE-STATUS", (GMSEC_I16) 6);
 		prodMsg.addField("PROD-TYPE", "AUTO");
 		prodMsg.addField("PROD-SUBTYPE", "DM");

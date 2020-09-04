@@ -152,13 +152,13 @@ InternalMessage::InternalMessage(const InternalMessage& other)
 	  m_fieldIterator(*this),
 	  m_xml()
 {
+	processConfig(m_config);
+
 	// copy standard fields (if any)
 	other.copyFields(*this);
 
 	// copy meta-data (if any)
 	this->getDetails().cloneValues(const_cast<InternalMessage&>(other).getDetails());
-
-	processConfig(m_config);
 }
 
 
@@ -323,6 +323,58 @@ bool InternalMessage::clearField(const char* name)
 	validateFieldName(name);
 
 	return m_fields.clearField(name);
+}
+
+
+GMSEC_I64 InternalMessage::getIntegerValue(const char* fieldName) const
+{
+	const Field* field = getField(fieldName);
+
+	if (field)
+	{
+		return field->getIntegerValue();
+	}
+
+	throw Exception(MSG_ERROR, INVALID_FIELD, "Field not found");
+}
+
+
+GMSEC_U64 InternalMessage::getUnsignedIntegerValue(const char* fieldName) const
+{
+	const Field* field = getField(fieldName);
+
+	if (field)
+	{
+		return field->getUnsignedIntegerValue();
+	}
+
+	throw Exception(MSG_ERROR, INVALID_FIELD, "Field not found");
+}
+
+
+GMSEC_F64 InternalMessage::getDoubleValue(const char* fieldName) const
+{
+	const Field* field = getField(fieldName);
+
+	if (field)
+	{
+		return field->getDoubleValue();
+	}
+
+	throw Exception(MSG_ERROR, INVALID_FIELD, "Field not found");
+}
+
+
+const char* InternalMessage::getStringValue(const char* fieldName) const
+{
+	const Field* field = getField(fieldName);
+
+	if (field)
+	{
+		return field->getStringValue();
+	}
+
+	throw Exception(MSG_ERROR, INVALID_FIELD, "Field not found");
 }
 
 
@@ -945,13 +997,13 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 		else
 		{
 			throw Exception(MSG_ERROR, XML_PARSE_ERROR,
-					"Invalid XML -- MESSAGE element contains invalid KIND definition");
+					"Invalid XML -- MESSAGE element contains invalid KIND/TYPE definition");
 		}
 	}
 	else
 	{
 		throw Exception(MSG_ERROR, XML_PARSE_ERROR,
-				"Invalid XML -- MESSAGE element does not contain KIND definition");
+				"Invalid XML -- MESSAGE element does not contain KIND/TYPE definition");
 	}
 
 	// fields (child nodes)

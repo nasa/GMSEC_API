@@ -71,7 +71,12 @@ namespace mist
 namespace internal
 {
 
-ResourceService::ResourceService(const Config& config, std::string subject, size_t pubInterval, size_t sampleInterval, size_t averageInterval)
+ResourceService::ResourceService(const Config& config, 
+								 const gmsec::api::util::DataList<Field*>& standardFields,
+								 std::string subject, 
+								 size_t pubInterval, 
+								 size_t sampleInterval, 
+								 size_t averageInterval)
 	: m_config(config),
 	  m_connMann(new ConnectionManager(config)),
 	  m_subject(subject),
@@ -81,10 +86,9 @@ ResourceService::ResourceService(const Config& config, std::string subject, size
 	  m_startupLatch(1),
 	  m_shutdownLatch(1)
 {
-	
 	m_alive.set(false);
+	m_connMann->setStandardFields(standardFields);
 }
-
 
 ResourceService::~ResourceService()
 {
@@ -104,7 +108,7 @@ bool ResourceService::stop(unsigned int timeout_ms)
 {
 	if (!m_alive.get())
 	{
-		GMSEC_WARNING << "HeartbeatService::stop: not running";
+		GMSEC_WARNING << "ResourceService is not, or is no longer, running";
 		return false;
 	}
 
@@ -139,9 +143,8 @@ void ResourceService::run()
 		m_alive.set(true);
 
 		m_startupLatch.countDown();
-
+		
 		ActionInfo publish((double) m_pubInterval);
-
 		ActionInfo sample((double) m_sampleInterval);
 
 		// Flag that will be used to indicate that we should publish

@@ -8,6 +8,24 @@
 
 #include <gmsec4/internal/field/InternalField.h>
 
+#include <gmsec4/internal/field/InternalBinaryField.h>
+#include <gmsec4/internal/field/InternalBooleanField.h>
+#include <gmsec4/internal/field/InternalCharField.h>
+#include <gmsec4/internal/field/InternalF32Field.h>
+#include <gmsec4/internal/field/InternalF64Field.h>
+#include <gmsec4/internal/field/InternalI16Field.h>
+#include <gmsec4/internal/field/InternalI32Field.h>
+#include <gmsec4/internal/field/InternalI64Field.h>
+#include <gmsec4/internal/field/InternalI8Field.h>
+#include <gmsec4/internal/field/InternalStringField.h>
+#include <gmsec4/internal/field/InternalU16Field.h>
+#include <gmsec4/internal/field/InternalU32Field.h>
+#include <gmsec4/internal/field/InternalU64Field.h>
+#include <gmsec4/internal/field/InternalU8Field.h>
+
+#include <gmsec4/internal/MathUtil.h>
+#include <gmsec4/internal/StringUtil.h>
+
 #include <gmsec4/field/BinaryField.h>
 #include <gmsec4/field/BooleanField.h>
 #include <gmsec4/field/CharField.h>
@@ -25,14 +43,14 @@
 
 #include <gmsec4/Exception.h>
 
-#include <gmsec4/internal/MathUtil.h>
-#include <gmsec4/internal/StringUtil.h>
+#include <gmsec4/util/Log.h>
 
 #include <tinyxml2.h>
 #include <json.h>
 
 #include <algorithm>
 #include <iterator>
+#include <limits>
 #include <cstring>  // for strlen
 #include <cctype>   // for toupper
 #include <sstream>  // for ostringstream
@@ -208,8 +226,15 @@ Field* InternalField::fromJSON(const Json::Value& root)
 	}
 	else
 	{
-		throw Exception(FIELD_ERROR, JSON_PARSE_ERROR,
-			"Invalid JSON Field format - no VALUE provided");
+		if (lookupType(type) == Field::STRING_TYPE)
+		{
+			value = "";
+		}
+		else
+		{
+			throw Exception(FIELD_ERROR, JSON_PARSE_ERROR,
+				"Invalid JSON Field format - no VALUE provided");
+		}
 	}
 
 	if (root.isMember(std::string("HEAD")))
@@ -226,6 +251,187 @@ Field* InternalField::fromJSON(const Json::Value& root)
 }
 
 
+GMSEC_I64 InternalField::getIntegerValue() const
+{
+	const GMSEC_F64 dbl = getDoubleValue();
+
+	if ((dbl < GMSEC_F64(std::numeric_limits<GMSEC_I64>::min())) || (dbl > GMSEC_F64(std::numeric_limits<GMSEC_I64>::max())))
+	{
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an integer");
+	}
+
+	return (GMSEC_I64) dbl;
+}
+
+
+GMSEC_U64 InternalField::getUnsignedIntegerValue() const
+{
+	const GMSEC_F64 dbl = getDoubleValue();
+
+	if ((dbl < GMSEC_F64(std::numeric_limits<GMSEC_U64>::min())) || (dbl > GMSEC_F64(std::numeric_limits<GMSEC_U64>::max())))
+	{
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an unsigned integer");
+	}
+
+	return (GMSEC_U64) dbl;
+}
+
+
+GMSEC_F64 InternalField::getDoubleValue() const
+{
+	GMSEC_F64 value     = 0;
+	bool      converted = true;
+
+	switch (getType())
+	{
+		case Field::CHAR_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalCharField*>(this)->getValue();
+			break;
+
+		case Field::BOOL_TYPE:
+			value = (GMSEC_F64) (dynamic_cast<const InternalBooleanField*>(this)->getValue() ? 1 : 0);
+			break;
+
+		case Field::I16_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalI16Field*>(this)->getValue();
+			break;
+
+		case Field::I32_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalI32Field*>(this)->getValue();
+			break;
+
+		case Field::I64_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalI64Field*>(this)->getValue();
+			break;
+
+		case Field::I8_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalI8Field*>(this)->getValue();
+			break;
+
+		case Field::U16_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalU16Field*>(this)->getValue();
+			break;
+
+		case Field::U32_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalU32Field*>(this)->getValue();
+			break;
+
+		case Field::U64_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalU64Field*>(this)->getValue();
+			break;
+
+		case Field::U8_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalU8Field*>(this)->getValue();
+			break;
+
+		case Field::F32_TYPE:
+			value = (GMSEC_F64) dynamic_cast<const InternalF32Field*>(this)->getValue();
+			break;
+
+		case Field::F64_TYPE:
+			value = dynamic_cast<const InternalF64Field*>(this)->getValue();
+			break;
+
+		case Field::STRING_TYPE:
+			{
+				std::stringstream oss(dynamic_cast<const InternalStringField*>(this)->getValue());
+				oss >> value;
+				if (oss.fail() || !oss.eof())
+				{
+					converted = false;
+				}
+			}
+			break;
+
+		default:
+			converted = false;
+			break;
+	}
+
+	if (!converted)
+	{
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to double");
+	}
+
+	return value;
+}
+
+
+const char* InternalField::getStringValue() const
+{
+	bool converted = true;
+	std::ostringstream oss;
+
+	switch (getType())
+	{
+		case Field::CHAR_TYPE:
+			oss << dynamic_cast<const InternalCharField*>(this)->getValue();
+			break;
+
+		case Field::BOOL_TYPE:
+			oss << (dynamic_cast<const InternalBooleanField*>(this)->getValue() ? "true" : "false");
+			break;
+
+		case Field::I16_TYPE:
+			oss << dynamic_cast<const InternalI16Field*>(this)->getValue();
+			break;
+
+		case Field::I32_TYPE:
+			oss << dynamic_cast<const InternalI32Field*>(this)->getValue();
+			break;
+
+		case Field::I64_TYPE:
+			oss << dynamic_cast<const InternalI64Field*>(this)->getValue();
+			break;
+
+		case Field::I8_TYPE:
+			oss << dynamic_cast<const InternalI8Field*>(this)->getValue();
+			break;
+
+		case Field::U16_TYPE:
+			oss << dynamic_cast<const InternalU16Field*>(this)->getValue();
+			break;
+
+		case Field::U32_TYPE:
+			oss << dynamic_cast<const InternalU32Field*>(this)->getValue();
+			break;
+
+		case Field::U64_TYPE:
+			oss << dynamic_cast<const InternalU64Field*>(this)->getValue();
+			break;
+
+		case Field::U8_TYPE:
+			oss << dynamic_cast<const InternalU8Field*>(this)->getValue();
+			break;
+
+		case Field::F32_TYPE:
+			oss << dynamic_cast<const InternalF32Field*>(this)->getValue();
+			break;
+
+		case Field::F64_TYPE:
+			oss << dynamic_cast<const InternalF64Field*>(this)->getValue();
+			break;
+
+		case Field::STRING_TYPE:
+			oss << dynamic_cast<const InternalStringField*>(this)->getValue();
+			break;
+
+		default:
+			converted = false;
+			break;
+	}
+
+	if (!converted)
+	{
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to string");
+	}
+
+	m_string = oss.str();
+
+	return m_string.c_str();
+}
+
+
 Field* InternalField::createField(const char* name, const char* type, const char* value, const char* bits, const char* head)
 {
 	if (!name)
@@ -238,7 +444,7 @@ Field* InternalField::createField(const char* name, const char* type, const char
 	}
 	if (!value)
 	{
-		throw Exception(FIELD_ERROR, INVALID_FIELD_VALUE, "Field value was not specified");
+		value = "";
 	}
 
 	Field* field = NULL;

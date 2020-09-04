@@ -114,8 +114,6 @@ void MessagePullState::run()
 	}
 	isRunning = true;
 
-	Status result;
-
 	while (!shouldStop.get())
 	{
 		try
@@ -158,11 +156,9 @@ void MessagePullState::run()
 	
 			TimeUtil::millisleep(1);
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
-			result.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), e.getCustomCode());
-
-			GMSEC_ERROR << "In MessagePullState::run(), exception - " << result.get();
+			GMSEC_ERROR << "In MessagePullState::run(), exception - " << e.what();
 		}
 	}
 
@@ -436,8 +432,6 @@ JMSConnection::JMSConnection(const Config& config)
 		return;
 	}
 
-	Status result;
-
 	try
 	{
 		//
@@ -479,10 +473,9 @@ JMSConnection::JMSConnection(const Config& config)
 		GMSEC_VERBOSE << "masterDestination[lookup=" << lookupTopic.c_str() << "] => " << tmp;
 		masterDestination = makeGlobalRef(env, tmp);
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
-		result.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), JMS_122);
-		GMSEC_ERROR << "In JMSConnection Constructor, exception [ " << result.get() << " ]";
+		GMSEC_ERROR << "In JMSConnection Constructor, exception [ " << e.what() << " ]";
 	}
 	JNI_CATCH(env)
 
@@ -553,22 +546,18 @@ const char* JMSConnection::getMWInfo()
 
 
 
-Status JMSConnection::mwConnect()
+void JMSConnection::mwConnect()
 {
-	Status result;
-
 	if (!connectionFactory)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "ConnectionFactory not available", JMS_111);
-		return result;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_111, "ConnectionFactory not available");
 	}
 
 	JNIEnv* envLocal = attachMe(jvm);
 
 	if (!envLocal)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Unable to attach to the JVM", JMS_122);
-		return result;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_122, "Unable to attach to the JVM");
 	}
 
 	// initialize request specs
@@ -583,32 +572,28 @@ Status JMSConnection::mwConnect()
 		if (connection == NULL)
 		{
 			GMSEC_ERROR << "Error establishing JMS connection";
-			result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Error establishing JMS connection", JMS_111);
-			return result;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_111, "Error establishing JMS connection");
 		}
 
 		tmp = envLocal->CallObjectMethod(connection, cache->methodCreateSession, false, 1);//Session.AUTO_ACKNOWLEDGE=1
 		inputSession = makeGlobalRef(envLocal, tmp);
 		if (inputSession == NULL)
 		{
-			result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Error establishing JMS input session", JMS_194);
-			return result;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_194, "Error establishing JMS input session");
 		}
 
 		tmp = envLocal->CallObjectMethod(connection, cache->methodCreateSession, false, 1);//Session.AUTO_ACKNOWLEDGE=1
 		outputSession = makeGlobalRef(envLocal, tmp);
 		if (outputSession == NULL)
 		{
-			result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Error establishing JMS output session", JMS_194);
-			return result;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_194, "Error establishing JMS output session");
 		}
 
 		tmp = envLocal->CallObjectMethod(outputSession, cache->methodCreateProducer, masterDestination);
 		masterProducer = makeGlobalRef(envLocal, tmp);
 		if (masterProducer == NULL)
 		{
-			result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Error establishing JMS masterProducer", JMS_122);
-			return result;
+			throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_122, "Error establishing JMS masterProducer");
 		}
 
 		envLocal->CallVoidMethod(connection, cache->methodConnectionStart);
@@ -623,23 +608,21 @@ Status JMSConnection::mwConnect()
 		std::string selector;
 		makeSelectorForTopic(requestSpecs.replySubject, selector);
 		namesToSelector[requestSpecs.replySubject] = selector;
-		result = resetConsumer();
+		resetConsumer();
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
-		result.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), JMS_122);
+		detachMe(jvm);
+		throw e;
 	}
 	JNI_CATCH(envLocal)
 
 	detachMe(jvm);
-
-	return result;
 }
 
 
-Status JMSConnection::mwDisconnect()
+void JMSConnection::mwDisconnect()
 {
-	Status result;
 	namesToSelector.clear();
 	pullState.setMasterConsumer(NULL);
 
@@ -660,54 +643,40 @@ Status JMSConnection::mwDisconnect()
 	}
 
 	detachMe(jvm);
-
-	return result;
 }
 
 
-Status JMSConnection::mwSubscribe(const char* topic, const Config& config)
+void JMSConnection::mwSubscribe(const char* topic, const Config& config)
 {
-	Status result;
-
 	std::string selector;
 	makeSelectorForTopic(topic, selector);
 
 	namesToSelector[topic] = selector;
 
-	result = resetConsumer();
-
-	return result;
+	resetConsumer();
 }
 
 
-Status JMSConnection::mwUnsubscribe(const char* subject)
+void JMSConnection::mwUnsubscribe(const char* subject)
 {
-	Status result;
-
 	if (namesToSelector.find(subject) == namesToSelector.end())
 	{
-		result.set(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject");
 	}
 
 	namesToSelector.erase(subject);
 
-	result = resetConsumer();
-
-	return result;
+	resetConsumer();
 }
 
 
-Status JMSConnection::mwPublish(const Message& msg, const Config& config)
+void JMSConnection::mwPublish(const Message& msg, const Config& config)
 {
-	Status result;
-
 	JNIEnv* envLocal = attachMe(jvm);
 
 	if (!envLocal)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "Unable to attach to the JVM", JMS_122);
-		return result;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, JMS_122, "Unable to attach to the JVM");
 	}
 	
 	std::string          subject = msg.getSubject();
@@ -723,8 +692,7 @@ Status JMSConnection::mwPublish(const Message& msg, const Config& config)
 		jobject bytesMsg = envLocal->CallObjectMethod(outputSession, cache->methodCreateBytesMessage);
 		if (bytesMsg == NULL)
 		{
-			result.set(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Error creating JMS Bytes Message");
-			return result;
+			throw Exception(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Error creating JMS Bytes Message");
 		}
 
 		DataBuffer buffer;
@@ -750,21 +718,19 @@ Status JMSConnection::mwPublish(const Message& msg, const Config& config)
 		checkJVM(envLocal, "JMSProducer.send");
 		envLocal->DeleteLocalRef(bytesMsg);
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
-		result.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), JMS_122);
+		detachMe(jvm);
+		throw e;
 	}
 	JNI_CATCH(envLocal)
 
 	detachMe(jvm);
-
-	return result;
 }
 
 
-Status JMSConnection::mwRequest(const Message& request, std::string& id)
+void JMSConnection::mwRequest(const Message& request, std::string& id)
 {
-	Status result;
 	std::string RequestID;
 
 	++requestCounter;
@@ -774,21 +740,14 @@ Status JMSConnection::mwRequest(const Message& request, std::string& id)
 	MessageBuddy::getInternal(request).addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
 	MessageBuddy::getInternal(request).addField(GENERIC_JMS_REPLY, requestSpecs.replySubject.c_str());
 
-	result = mwPublish(request, getExternal().getConfig());
+	mwPublish(request, getExternal().getConfig());
 
-	if (!result.isError())
-	{
-		GMSEC_DEBUG << "[Request sent successfully: " << request.getSubject() << ']';
-	}
-
-	return result;
+	GMSEC_DEBUG << "[Request sent successfully: " << request.getSubject() << ']';
 }
 
 
-Status JMSConnection::mwReply(const Message& request, const Message& reply)
+void JMSConnection::mwReply(const Message& request, const Message& reply)
 {
-	Status result;
-
 	// Get the Request's Unique ID, and put it into a field in the Reply
 	try {
 		const StringField& uniqueID = request.getStringField(REPLY_UNIQUE_ID_FIELD);
@@ -796,8 +755,7 @@ Status JMSConnection::mwReply(const Message& request, const Message& reply)
 		MessageBuddy::getInternal(reply).addField(uniqueID);
 	}
 	catch (...) {
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Unique ID field");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Unique ID field");
 	}
 
 	try {
@@ -806,25 +764,17 @@ Status JMSConnection::mwReply(const Message& request, const Message& reply)
 		MessageBuddy::getInternal(reply).setSubject(replyAddr.getValue());
 	}
 	catch (...) {
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Reply Address field");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Reply Address field");
 	}
 
-	result = mwPublish(reply, getExternal().getConfig());
+	mwPublish(reply, getExternal().getConfig());
 
-	if (!result.isError())
-	{
-		GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() << ']';
-	}
-
-	return result;
+	GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() << ']';
 }
 
 
-Status JMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
+void JMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 {
-	Status result;
-
 	double start_s;
 	bool   first = true;
 	bool   done  = false;
@@ -836,7 +786,7 @@ Status JMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 		start_s = TimeUtil::getCurrentTime_s();
 	}
 
-	while (!result.isError() && !done)
+	while (!done)
 	{
 		AutoMutex inner(queueCondition.getMutex());
 		int reason = 0;
@@ -881,17 +831,6 @@ Status JMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 			}
 		}
 	}
-
-	if (result.isError())
-	{
-		// error already assigned
-	}
-	else if (msg != NULL)
-	{
-		GMSEC_DEBUG << "[Received published message: " << msg->getSubject() << "]";
-	}
-
-	return result;
 }
 
 
@@ -941,13 +880,7 @@ bool JMSConnection::handle(JNIEnv* envPoint, jobject msg)
 	Message*    gmsecMsg = 0;
 	std::string inSubject;
 
-	Status tmp = unloadBytes(buffer, kind, gmsecMsg, inSubject);
-
-	if (tmp.isError())
-	{
-		GMSEC_WARNING << "Received invalid message " << tmp.get();
-		return false;
-	}
+	unloadBytes(buffer, kind, gmsecMsg, inSubject);
 
 	bool enqueue = false;
 
@@ -1002,39 +935,32 @@ void JMSConnection::handleReply(Message* gmsecMessage)
 }
 
 
-Status JMSConnection::prepareBytes(const Message& msg, DataBuffer& buffer)
+void JMSConnection::prepareBytes(const Message& msg, DataBuffer& buffer)
 {
-	Status result;
-
 	MessageBuddy::getInternal(msg).addField(GENERIC_JMS_SUBJECT, msg.getSubject());
 
-	result = getExternal().getPolicy().encode(const_cast<Message&>(msg), buffer);
+	getExternal().getPolicy().encode(const_cast<Message&>(msg), buffer);
 
 	MessageBuddy::getInternal(msg).clearField(GENERIC_JMS_SUBJECT);
-
-	return result;
 }
 
 
-Status JMSConnection::unloadBytes(const DataBuffer& buffer, Message::MessageKind kind, Message*& gmsecMessage, std::string& rawSubject)
+void JMSConnection::unloadBytes(const DataBuffer& buffer, Message::MessageKind kind, Message*& gmsecMessage, std::string& rawSubject)
 {
-	Status result;
-
 	std::auto_ptr<Message> msg(new Message(GENERIC_TMP_SUBJECT, kind));
 	ValueMap               meta;
 
-#if 1
+#if 0
 	MessageDecoder decoder;
-	result = decoder.decode(*msg.get(), buffer);
+	decoder.decode(*msg.get(), buffer);
 #else
-	result = getExternal().getPolicy().unpackage(*msg.get(), buffer, meta);
-#endif
+	Status status = getExternal().getPolicy().unpackage(*msg.get(), buffer, meta);
 
-	if (result.isError())
+	if (status.isError())
 	{
-		GMSEC_WARNING << "Unable to unpackage message";
-		return result;
+		throw Exception(status);
 	}
+#endif
 
 	try {
 		const StringField& jmsSubject = msg->getStringField(GENERIC_JMS_SUBJECT);
@@ -1046,13 +972,10 @@ Status JMSConnection::unloadBytes(const DataBuffer& buffer, Message::MessageKind
 		msg->clearField(GENERIC_JMS_SUBJECT);
 	}
 	catch (...) {
-		result.set(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Unpackaged message is missing Generic JMS Subject");
-		return result;
+		throw Exception(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Unpackaged message is missing Generic JMS Subject");
 	}
 
 	gmsecMessage = msg.release();
-
-	return result;
 }
 
 
@@ -1072,16 +995,13 @@ std::string JMSConnection::generateUniqueId(long id)
 }
 
 
-Status JMSConnection::resetConsumer()
+void JMSConnection::resetConsumer()
 {
-	Status result;
-
 	if (namesToSelector.size() == 0)
 	{
 		// since the reply topic is included, this is not expected...
 		pullState.setMasterConsumer(NULL);
-		result.set(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "namesToSelector.size() == 0", JMS_122);
-		return result;
+		throw Exception(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, JMS_122, "namesToSelector.size() == 0");
 	}
 
 	try
@@ -1093,8 +1013,7 @@ Status JMSConnection::resetConsumer()
 
 		if (!envLocal)
 		{
-			result.set(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Unable to attach to the JVM", JMS_122);
-			return result;
+			throw Exception(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, JMS_122, "Unable to attach to the JVM");
 		}
 	
 		jobject tmp = envLocal->CallObjectMethod(inputSession,
@@ -1106,19 +1025,18 @@ Status JMSConnection::resetConsumer()
 		jobject consumer = makeGlobalRef(envLocal, tmp);
 		if (consumer == NULL)
 		{
-			result.set(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Error establishing JMS consumer");
-			return result;
+			throw Exception(MIDDLEWARE_ERROR, OTHER_ERROR_CODE, "Error establishing JMS consumer");
 		}
 	
 		pullState.setMasterConsumer(consumer, subscribeStr);
-		detachMe(jvm);
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
-		result.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), JMS_122);
+		detachMe(jvm);
+		throw e;
 	}
 
-	return result;
+	detachMe(jvm);
 }
 
 

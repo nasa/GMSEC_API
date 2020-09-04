@@ -29,7 +29,7 @@ public class Message
 	private JNIMessage m_jniMessage = null;
 
 
-	protected void registerChild(JNIMessage child)
+	public Message(JNIMessage child)
 	{
 		m_jniMessage = child;
 	}
@@ -38,6 +38,12 @@ public class Message
 	public static JNIMessage getInternal(Message msg)
 	{
 		return (msg == null ? null : msg.m_jniMessage);
+	}
+
+
+	protected void registerChild(JNIMessage jMsg)
+	{
+		m_jniMessage = jMsg;
 	}
 
 
@@ -54,41 +60,36 @@ public class Message
 	}
 
 
-	protected Message(JNIMessage child)
-	{
-		m_jniMessage = child;
-	}
-
-
 	/**
 	 * @fn Message(String subject, MessageKind kind)
 	 *
 	 * @brief Default constructor.
 	 *
-     * Example creation & use:
-     * @code
-     * // create message with subject and kind
-     * //
-     * Config config = new Config(args);
-     * Message message = new Message("GMSEC.TEST.JAVA.PUBLISH", Message.MessageKind.PUBLISH);
-     *
-     * // create field
-     * //
-     * message.addField("EXAMPLE-STRING-NAME", "Example String");
-     * message.addField("EXAMPLE-BOOL-FIELD", true);
-     *
-     * // do something with message (i.e. publish using connection object)
-     *
-     * Connection conn = Connection.create(config);
-     * conn.connect();
-     * ...
-     *
-     * conn.publish(message);
-     *
-     * ...
-     *
-     * Connection.destroy(conn);
-     * @endcode
+	 * Example creation and use:
+	 * @code
+	 * // create message with subject and kind
+	 * //
+	 * Config config = new Config(args);
+	 * Message message = new Message("GMSEC.TEST.JAVA.PUBLISH", Message.MessageKind.PUBLISH);
+	 *
+	 * // create field
+	 * //
+	 * message.addField("EXAMPLE-STRING-NAME", "Example String");
+	 * message.addField("EXAMPLE-BOOL-FIELD", true);
+	 *
+	 * // do something with message (i.e. publish using connection object)
+	 *
+	 * Connection conn = Connection.create(config);
+	 * conn.connect();
+	 * ...
+	 *
+	 * conn.publish(message);
+	 *
+	 * ...
+	 *
+	 * Connection.destroy(conn);
+	 * @endcode
+	 *
 	 * @param subject - the GMSEC subject to associate with the message.
 	 * @param kind - the kind of message to create.
 	 *
@@ -659,6 +660,102 @@ public class Message
 		}
 
 		return m_jniMessage.clearField(name);
+	}
+
+
+	/**
+	 * @fn long getIntegerValue(String fieldName)
+	 *
+	 * @brief Attempts to convert the field value into an 64-bit integer number representation.
+	 *
+	 * @param fieldName - the name of the field from which to reference the value.
+	 *
+	 * @return Returns the field value as an integer value.
+	 *
+	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws A GMSEC_Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * be converted to an integer.
+	 */
+	public long getIntegerValue(String fieldName) throws GMSEC_Exception
+	{
+		if (fieldName == null || fieldName.isEmpty())
+		{
+			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+
+		return m_jniMessage.getIntegerValue(fieldName);
+	}
+
+
+	/**
+	 * @fn U64 getUnsignedIntegerValue(String fieldName)
+	 *
+	 * @brief Attempts to convert the field value into a U64 number representation.
+	 *
+	 * @param fieldName - the name of the field from which to reference the value.
+	 *
+	 * @return Returns the field value as a U64 value.
+	 *
+	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws A GMSEC_Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * be converted to a U64.
+	 */
+	public U64 getUnsignedIntegerValue(String fieldName) throws GMSEC_Exception
+	{
+		if (fieldName == null || fieldName.isEmpty())
+		{
+			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+
+		return m_jniMessage.getUnsignedIntegerValue(fieldName);
+	}
+
+
+	/**
+	 * @fn double getDoubleValue(String fieldName)
+	 *
+	 * @brief Attempts to convert the field value into an 64-bit floating-point number representation.
+	 *
+	 * @param fieldName - the name of the field from which to reference the value.
+	 *
+	 * @return Returns the field value as a floating-point value.
+	 *
+	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws A GMSEC_Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * be converted to a floating-point value.
+	 */
+	public double getDoubleValue(String fieldName) throws GMSEC_Exception
+	{
+		if (fieldName == null || fieldName.isEmpty())
+		{
+			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+
+		return m_jniMessage.getDoubleValue(fieldName);
+	}
+
+
+	/**
+	 * @fn String getStringValue(String fieldName)
+	 *
+	 * @brief Attempts to convert the field value into string representation.
+	 *
+	 * @param fieldName - the name of the field from which to reference the value.
+	 *
+	 * @return Returns the field value as a string value.
+	 *
+	 * @throws An IllegalArgumentException is thrown if the given field name is null or contains an empty string.
+	 * @throws A GMSEC_Exception is thrown if the field cannot be found, or if it cannot successfully
+	 * be converted to a string value.
+	 */
+	public String getStringValue(String fieldName) throws GMSEC_Exception
+	{
+		if (fieldName == null || fieldName.isEmpty())
+		{
+			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+
+		return m_jniMessage.getStringValue(fieldName);
 	}
 
 

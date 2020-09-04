@@ -117,7 +117,7 @@ private:
 		const char* subject = "GMSEC.SYSTEST.TEST1.REQ.DIR.>";
 
 		// Subscribe to receive request directive messages.
-		m_conn->subscribe(subject);
+		info = m_conn->subscribe(subject);
 
 		GMSEC_INFO << "Subscribing to " << subject;
 	}
@@ -127,6 +127,8 @@ private:
 	{
 		if (m_conn)
 		{
+			GMSEC_INFO << "Unsubscribing from " << info->getSubject();
+			m_conn->unsubscribe(info);
 			// Disconnect from middleware server.
 			m_conn->disconnect();
 
@@ -149,6 +151,7 @@ private:
 	// Class members
 	Config      m_config;
 	Connection* m_conn;
+	SubscriptionInfo* info;
 };
 
 

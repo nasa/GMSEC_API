@@ -59,6 +59,7 @@ public class Server
 
 			channel.socket().bind(address, options.backlogSize);
 
+			Log.info(source, Version.GMSEC_BOLT_VERSION);
 			Log.info(source, "waiting for connections on " + address);
 
 			while (true)

@@ -37,26 +37,30 @@
 
 namespace gmsec
 {
+	class Connection;
+	class Field;
+	class Message;
+	class Callback;
+	class ErrorCallback;
+	class ReplyCallback;
 
-class Connection;
-class Field;
-class Message;
-class Callback;
-class ErrorCallback;
-class ReplyCallback;
+	namespace api
+	{
+		namespace mist
+		{
+			class Specification;
+		}
+	}
 
 namespace mist
 {
-
-class ConnectionManagerCallback;
-class ConnectionManagerErrorCallback;
-class ConnectionManagerReplyCallback;
+	class ConnectionManagerCallback;
+	class ConnectionManagerErrorCallback;
+	class ConnectionManagerReplyCallback;
 
 namespace internal
 {
-
-class HeartbeatService;
-class Specification;
+	class HeartbeatService;
 
 class GMSEC_API BaseConnectionManager
 {
@@ -154,7 +158,7 @@ class GMSEC_API BaseConnectionManager
 		Status LookupAndValidate(Message *message);
 
 		unsigned int specVersion;
-		Specification *specification;
+		gmsec::api::mist::Specification* specification;
 		Config config;
 
 		bool validateMessages;

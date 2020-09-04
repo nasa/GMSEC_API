@@ -96,11 +96,13 @@ void MBWire::serialize(const Message& message, char*& data, size_t& size)
 	GMSEC_U64      contentSize;
 	MessageEncoder encoder;
 
-	Status status = encoder.encode(message, contentSize, content);
-
-	if (status.isError())
+	try
 	{
-		GMSEC_WARNING << "MBWire::Serialize: content encoding error " << status.get();
+		encoder.encode(message, contentSize, content);
+	}
+	catch (Exception& e)
+	{
+		GMSEC_WARNING << "MBWire::Serialize: content encoding error " << e.what();
 		return;
 	}
 
@@ -212,11 +214,14 @@ bool MBWire::deserialize(const char* data, int size, gmsec::api::Message*& messa
 		std::auto_ptr<Message> gmsecMessage(new Message(tmpSubject, static_cast<Message::MessageKind>(msgKind)));
 
 		MessageDecoder decoder;
-		Status         status = decoder.decode(*gmsecMessage.get(), size - index, &data[index]);
 
-		if (status.isError())
+		try
 		{
-			GMSEC_WARNING << "MBWire::deserialize: decode error " << status.get();
+			decoder.decode(*gmsecMessage.get(), size - index, &data[index]);
+		}
+		catch (Exception& e)
+		{
+			GMSEC_WARNING << "MBWire::deserialize: decode error " << e.what();
 			result = false;
 		}
 

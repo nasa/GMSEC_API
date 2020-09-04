@@ -79,7 +79,7 @@ enum StatusCode
 	TRACKING_FAILURE = 21,			///< Tracking failure
 	UNUSED_CONFIG_ITEM = 22,		///< Configuration element not used in operation
 	INVALID_FIELD = 23,				///< Invalid field
-	XML_PARSE_ERROR = 24,			///< No message available
+	XML_PARSE_ERROR = 24,			///< Error parsing XML
 	INVALID_CONFIG = 25,			///< Invalid configuration supplied
 	ENCODING_ERROR = 26,			///< Error encoding GMSEC message
 	OUT_OF_MEMORY = 27,				///< No more memory can be allocated
@@ -88,7 +88,7 @@ enum StatusCode
 	USER_ACCESS_INVALID = 30,		///< User does not have access
 	PUBLISH_NOT_AUTHORIZED = 31,	///< Publish operation was not authorized
 	SUBSCRIBE_NOT_AUTHORIZED = 32,	///< Subscribe operation was not authorized
-	BAD_MSG_FORMAT = 33,			///< Message supplied in improper fromat
+	BAD_MSG_FORMAT = 33,			///< Message supplied in improper format
 	INVALID_SIGNATURE = 34,			///< Message supplied with invalid signature
 	UNINITIALIZED_OBJECT = 35,		///< Object not initialized
 	CUSTOM_ERROR_CODE = 36,			///< Custom error code supplied
@@ -99,6 +99,7 @@ enum StatusCode
 	CONNECTION_RECONNECT = 41,		///< Connection reconnect 
 	JSON_PARSE_ERROR = 42,			///< Error parsing JSON
 	PARSE_ERROR = 43,				///< General error parsing
+	INVALID_STRING_PARAM = 44,		///< Invalid string parameter
 
 
 	// MIST-related Status Codes
@@ -126,6 +127,11 @@ enum StatusCode
 	RESOURCE_INFO_NET_ERROR = 120,			///< Error accessing network information by resource information system
 	RESOURCE_INFO_SAMPLING_ERROR = 121,		///< Error sampling system resources by resource information system
 	FIELD_NOT_ADDED = 122,					///< Error prevented field from being added to message
+	FIELD_TEMPLATE_NOT_FOUND = 123,			///< Could not find a field template with the name provided
+	INVALID_TYPE_CONVERSION = 124,			///< Error converting data type: incompatible data types
+	VALUE_OUT_OF_RANGE = 125,				///< Error converting data type: value overflows container
+	MESSAGE_FAILED_VALIDATION = 126,		///< The message failed to pass validation due to one or more errors
+	FIELD_FAILED_VALIDATION = 127,			///< The field failed to pass validation due to one or more errors
 
 	OTHER_ERROR_CODE = 500					///< Other error
 };

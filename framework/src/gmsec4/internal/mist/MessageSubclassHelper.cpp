@@ -124,7 +124,7 @@ void MessageSubclassHelper::checkStringField(const char* fieldName,
 
 			oss << loggableInvocationPoint << ":  Error while fetching "
 			    << fieldName << " from message; value should be "
-			    << expectedValue << "and instead it is " << message_type;
+			    << expectedValue << " and instead it is " << message_type;
 
 			throw Exception(MIST_ERROR, FIELD_NOT_SET, oss.str().c_str());
 		}

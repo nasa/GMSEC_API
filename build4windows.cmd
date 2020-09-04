@@ -8,12 +8,11 @@ rem All Rights Reserved.
 
 
 
-
 rem This batch file builds everything for Microsoft Windows
 
 rem Build the main part of the API
 
-set BUILD=gmsecapi gmsec_java gmsec_jni generic_jms bolt mb MBServer dotnet gmhelp
+set BUILD=gmsecapi gmsec_java gmsec_jni generic_jms bolt mb MBServer dotnet libgmsec_perl gmhelp
 
 IF DEFINED WRAPPERS (
 	set BUILD=%BUILD% %WRAPPERS%
@@ -67,12 +66,12 @@ FOR %%i IN (%BUILD%) DO (
 )
 
 :Perl
-cd perl
+cd perl\gmsec
 rem Build the Perl part of the API
-perl -Iextra Makefile.PL PREFIX=../bin
+perl -Iextra Makefile.PL PREFIX=../../bin
 nmake
 nmake install
-cd ..
+cd ..\..
 
 
 rem Build the C++ examples

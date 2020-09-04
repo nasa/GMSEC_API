@@ -20,7 +20,7 @@ import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 
 import gov.nasa.gsfc.gmsec.api.field.Field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIDeviceParam;
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIDeviceParam;
 
 
 /**

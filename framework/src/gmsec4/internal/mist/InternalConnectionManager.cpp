@@ -19,13 +19,13 @@
 
 #include <gmsec4/internal/mist/InternalConnectionManager.h>
 #include <gmsec4/internal/mist/ResourceInfoGenerator.h>
+#include <gmsec4/internal/mist/SpecificationBuddy.h>
 
 #include <gmsec4/internal/field/InternalField.h>
 
 #include <gmsec4/internal/mist/ConnMgrCallbacks.h>
 #include <gmsec4/internal/mist/ConnMgrCallbackCache.h>
-#include <gmsec4/internal/mist/Context.h>
-#include <gmsec4/internal/mist/Specification.h>
+#include <gmsec4/mist/Specification.h>
 
 #include <gmsec4/mist/ConnectionManager.h>
 #include <gmsec4/mist/ConnectionManagerCallback.h>
@@ -64,12 +64,10 @@ namespace internal
 {
 
 
-InternalConnectionManager::InternalConnectionManager(ConnectionManager* parent, const Config& cfg, bool validate, unsigned int version)
+InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::ConnectionManager* parent, const Config& cfg, bool validate, unsigned int version)
 	: m_config(cfg),
 	  m_connection(0),
-	  m_validate(validate),
-	  m_specVersion(version),
-	  m_specification(),
+	  m_specification(0),
 	  m_standardHeartbeatFields(),
 	  m_standardLogFields(),
 	  m_heartbeatSubject(),
@@ -80,26 +78,6 @@ InternalConnectionManager::InternalConnectionManager(ConnectionManager* parent, 
 	  m_callbackAdapter(new MistCallbackAdapter),
 	  m_messagePopulator(NULL)
 {
-	// Determine if the spec version is defined within the Config object
-	const char* specVersionValue = m_config.getValue("GMSEC-SPECIFICATION-VERSION");
-
-	if (specVersionValue)
-	{
-		// Get the configured value
-		int specVersionInt = 0;
-		StringUtil::str2int(specVersionInt, specVersionValue);
-		m_specVersion = (unsigned int) specVersionInt;
-	}
-
-	// Verify specification version is valid; if not, default to current version.
-	if (!checkValidSpec(m_specVersion))
-	{
-		GMSEC_WARNING << "Invalid message specification version supplied, defaulting to GMSEC_ISD_CURRENT";
-		m_specVersion = GMSEC_ISD_CURRENT;
-	}
-
-	m_messagePopulator = new MessagePopulator(m_specVersion);
-
 	// Determine whether or not to validate messages from the Config object
 	const char* validateValue = m_config.getValue("GMSEC-MSG-CONTENT-VALIDATE");
 
@@ -107,6 +85,47 @@ InternalConnectionManager::InternalConnectionManager(ConnectionManager* parent, 
 	{
 		m_validate = StringUtil::stringEqualsIgnoreCase(validateValue, "true");
 	}
+	else
+	{
+		//if a config value was never supplied default to programmatic definition (which defaults to true)
+		m_validate = validate;
+	}
+
+	// Check if the specification version is provided within the supplied configuration
+	if (m_config.getValue("GMSEC-SPECIFICATION-VERSION", NULL))
+	{
+		// Yep, found it!
+
+		m_specification = new Specification(m_config);
+	}
+	else
+	{
+		// Nope, not found.  Let's try to use the given version number; if that fails, then default to using GMSEC_ISD_CURRENT
+		try
+		{
+			std::ostringstream oss;
+			oss << version;
+
+			Config tmpConfig = m_config;
+			tmpConfig.addValue("GMSEC-SPECIFICATION-VERSION", oss.str().c_str());
+
+			m_specification = new Specification(tmpConfig);
+		}
+		catch (...)
+		{
+			GMSEC_WARNING << "Invalid specification version supplied to ConnectionManager, defaulting to GMSEC_ISD_CURRENT";
+
+			std::ostringstream oss;
+			oss << GMSEC_ISD_CURRENT;
+
+			Config tmpConfig = m_config;
+			tmpConfig.addValue("GMSEC-SPECIFICATION-VERSION", oss.str().c_str());
+
+			m_specification = new Specification(tmpConfig);
+		}
+	}
+
+	m_messagePopulator = new MessagePopulator(m_specification->getVersion());
 
 	m_resourceMessageCounter = 0;
 }
@@ -121,6 +140,8 @@ InternalConnectionManager::~InternalConnectionManager()
 		// we could end up here if the HBS is not running; no big deal.
 	}
 
+	stopResourceMessageService();
+
 	MessagePopulator::destroyFields(m_standardHeartbeatFields);
 	MessagePopulator::destroyFields(m_standardLogFields);
 
@@ -133,33 +154,21 @@ InternalConnectionManager::~InternalConnectionManager()
 	}
 
 	delete m_messagePopulator;
+	delete m_specification;
 }
 
 
 void InternalConnectionManager::initialize()
 {
-	if (m_connection == NULL)
-	{
-		m_connection = Connection::create(m_config);
-
-		m_connection->connect();
-
-		// Future consideration: Allow users to specify a templates base directory via either:
-		// a) Users construct a Specification to pass to the ConnectionManager
-		// b) Users pass a base directory via const char * to ConnectionManager
-
-		Status status = m_specification.load(NULL, m_specVersion);
-
-		if (status.isError())
-		{
-			Connection::destroy(m_connection);
-			throw Exception(status.getClass(), status.getCode(), status.getReason());
-		}
-	}
-	else
+	if (m_connection)
 	{
 		GMSEC_WARNING << "The ConnectionManager has already been initialized!";
+		return;
 	}
+
+	m_connection = Connection::create(m_config);
+
+	m_connection->connect();
 }
 
 
@@ -194,7 +203,18 @@ const char* InternalConnectionManager::getLibraryVersion() const
 		throw Exception(MIST_ERROR, CONNECTION_NOT_INITIALIZED, "The ConnectionManager has not been initialized!");
 	}
  
-	return ( m_connection->getLibraryVersion()); 
+	return m_connection->getLibraryVersion(); 
+}
+
+
+Specification& InternalConnectionManager::getSpecification() const
+{
+	if (!m_connection)
+	{
+		throw Exception(MIST_ERROR, CONNECTION_NOT_INITIALIZED, "The ConnectionManager has not been initialized!");
+	}
+
+	return *m_specification;
 }
 
 
@@ -343,13 +363,7 @@ void InternalConnectionManager::publish(const Message& msg, const Config& config
 	// If validation is enabled, check the message before it is sent out
 	if (m_validate)
 	{
-		Status result = lookupAndValidate(const_cast<Message&>(msg));
-
-		if (result.isError())
-		{
-			GMSEC_ERROR << "Unable to publish invalid message:\n" << msg.toXML();
-			throw Exception(result.getClass(), result.getCode(), result.getReason());
-		}
+		m_specification->validateMessage(const_cast<Message&>(msg));
 	}
 
 	m_connection->publish(msg, config);
@@ -376,14 +390,7 @@ void InternalConnectionManager::request(const Message& request, GMSEC_I32 timeou
 	// Validate the message before it is sent out
 	if (m_validate)
 	{
-		Status result = lookupAndValidate(const_cast<Message&>(request));
-
-		if (result.isError())
-		{
-			GMSEC_ERROR << "Unable to publish request message:\n" << request.toXML();
-
-			throw Exception(result.getClass(), result.getCode(), result.getReason());
-		}
+		m_specification->validateMessage(const_cast<Message&>(request));
 	}
 
 	CMReplyCallback* callback = new CMReplyCallback(m_parent, cb);
@@ -533,7 +540,7 @@ Message InternalConnectionManager::createHeartbeatMessage(const char* subject, c
 	}
 
 	// Create message with the standard heartbeat message fields
-	Message msg = createMessage(subject, Message::PUBLISH, m_standardHeartbeatFields);
+	Message msg(subject, Message::PUBLISH);
 
 	m_messagePopulator->addStandardFields(msg);
 	m_messagePopulator->populateHeartbeatMessage(msg, heartbeatFields, m_standardHeartbeatFields);
@@ -558,12 +565,7 @@ void InternalConnectionManager::startHeartbeatService(const char* subject, const
 
 	if (m_validate)
 	{
-		Status result = lookupAndValidate(msg);
-
-		if (result.isError())
-		{
-			throw Exception(result.getClass(), result.getCode(), result.getReason());
-		}
+		m_specification->validateMessage(msg);
 	}
 
 	// Set the standard fields for a heartbeat message
@@ -649,11 +651,18 @@ Status InternalConnectionManager::changeComponentStatus(const Field& componentSt
 	{
 		if (m_validate)
 		{
-			Message msg = createMessage(m_heartbeatSubject.c_str(), Message::PUBLISH, m_standardHeartbeatFields);
+			Message msg = createHeartbeatMessage(m_heartbeatSubject.c_str(), m_standardHeartbeatFields);
 
 			msg.addField(componentStatus);
 
-			result = lookupAndValidate(msg);
+			try
+			{
+				m_specification->validateMessage(msg);
+			}
+			catch(Exception &e)
+			{
+				result = e;
+			}
 
 			if (!result.isError())
 			{
@@ -678,11 +687,19 @@ Status InternalConnectionManager::changeComponentInfo(const Field& componentInfo
 	{
 		if (m_validate)
 		{
-			Message msg = createMessage(m_heartbeatSubject.c_str(), Message::PUBLISH, m_standardHeartbeatFields);
-
+			
+			Message msg = createHeartbeatMessage(m_heartbeatSubject.c_str(), m_standardHeartbeatFields);
+			
 			msg.addField(componentInfo);
 
-			result = lookupAndValidate(msg);
+			try
+			{
+				m_specification->validateMessage(msg);
+			}
+			catch(Exception &e)
+			{
+				result = e;
+			}
 
 			if (!result.isError())
 			{
@@ -707,11 +724,19 @@ Status InternalConnectionManager::changeCPUMemory(const Field& cpuMemory)
 	{
 		if (m_validate)
 		{
-			Message msg = createMessage(m_heartbeatSubject.c_str(), Message::PUBLISH, m_standardHeartbeatFields);
+
+			Message msg = createHeartbeatMessage(m_heartbeatSubject.c_str(), m_standardHeartbeatFields);
 
 			msg.addField(cpuMemory);
 
-			result = lookupAndValidate(msg);
+			try
+			{
+				m_specification->validateMessage(msg);
+			}
+			catch(Exception &e)
+			{
+				result = e;
+			}
 
 			if (!result.isError())
 			{
@@ -736,11 +761,19 @@ Status InternalConnectionManager::changeCPUUtil(const Field& cpuUtil)
 	{
 		if (m_validate)
 		{
-			Message msg = createMessage(m_heartbeatSubject.c_str(), Message::PUBLISH, m_standardHeartbeatFields);
+
+			Message msg = createHeartbeatMessage(m_heartbeatSubject.c_str(), m_standardHeartbeatFields);
 
 			msg.addField(cpuUtil);
 
-			result = lookupAndValidate(msg);
+			try
+			{
+				m_specification->validateMessage(msg);
+			}
+			catch(Exception &e)
+			{
+				result = e;
+			}
 
 			if (!result.isError())
 			{
@@ -765,7 +798,8 @@ Message InternalConnectionManager::createLogMessage(const char* subject, const D
 	}
 
 	// Create message with the standard heartbeat message fields
-	Message msg = createMessage(subject, Message::PUBLISH, m_standardLogFields);
+
+	Message msg(subject, Message::PUBLISH);
 
 	m_messagePopulator->addStandardFields(msg);
 	m_messagePopulator->populateLogMessage(msg, logFields, m_standardLogFields);
@@ -820,91 +854,6 @@ void InternalConnectionManager::publishLog(const char* logMessage, const Field& 
 
 	publish(msg);
 }
-
-
-//TODO: MEH - I don't think this is necessary, since we have add fields
-Message InternalConnectionManager::createMessage(const char* subject, Message::MessageKind kind, const FieldList& fields)
-{
-	if (!subject || std::string(subject).empty())
-	{
-		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "InternalConnectionManager::createMessage():  The subject string is null, or is empty.");
-	}
-
-	Message msg(subject, kind);
-
-	for (FieldList::const_iterator it = fields.begin(); it != fields.end(); ++it)
-	{
-		const Field* field = *it;
-
-		msg.addField(*field);
-	}
-
-	return msg;
-}
-
-
-//TODO: MEH - I don't think this is necessary, since we have add fields
-bool InternalConnectionManager::checkValidSpec(unsigned int specVersionInt)
-{
-	switch(specVersionInt)
-	{
-		case GMSEC_ISD_2014_00:
-		case GMSEC_ISD_2016_00:
-			return true;
-		default:
-			return false;
-	}
-}
-
-
-Status InternalConnectionManager::lookupAndValidate(Message& msg)
-{
-	Status result;
-	Status tmp_result;
-
-	// Lookup the message template
-	std::string msgId;
-
-	result = m_specification.lookupTemplate(msg, msgId);
-
-	if (result.isError() && result.getCode() == INCORRECT_FIELD_TYPE)
-	{
-		return result;
-	}
-	else if (result.isError() && result.getCode() == TEMPLATE_ID_DOES_NOT_EXIST)
-	{
-		// NOTE: THIS IS NOT AN ERROR CASE!
-		// If no template exists, print a debug message and return a NOMINAL status
-		GMSEC_DEBUG << "Unable to locate template for message:\n" << msg.toXML();
-		result = Status();
-		return result;
-	}
-
-	// Validate the message against its corresponding template
-	Context context(msgId.c_str(), true);
-
-	result = m_specification.validate(msg, context);
-
-	if (result.isError())
-	{
-		size_t      numErrors = context.getStatusCount();
-		const char* subject   = msg.getSubject();
-
-		GMSEC_ERROR << "Listing " << numErrors << " validation error for message " << subject;
-
-		for (size_t i = 0; i < numErrors; ++i)
-		{
-			ContextStatus contextStatus = context.getStatus(i);
-
-			GMSEC_ERROR << "Name: " << contextStatus.fieldName.c_str()
-			          << ", Description: " << contextStatus.description.c_str()
-			          << ", Code: " << contextStatus.errorLevel;
-		}
-	}
-
-	return result;
-}
-
 
 void InternalConnectionManager::destroyFields(FieldList& flist)
 {
@@ -1004,9 +953,9 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 	std::string osVersion = ResourceInfoGenerator::getOSVersion();
 	msg.addField("OPER-SYS", osVersion.c_str());
 
-	if(GMSEC_ISD_2014_00 == m_specVersion)
+	if(GMSEC_ISD_2014_00 == m_specification->getVersion())
 	{
-		msg.addField("MSG-ID", "GMSEC-RESOURCE-MESSAGE"); //Pre-2016 ICDs required this version
+		msg.addField("MSG-ID", "GMSEC-RESOURCE-MESSAGE"); //Pre-2016 ISDs required this version
 	}
 
 	if (sampleInterval == 0)
@@ -1024,7 +973,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{ 
-		ResourceInfoGenerator::addCPUStats(msg, m_specVersion, averageInterval/sampleInterval);
+		ResourceInfoGenerator::addCPUStats(msg, m_specification->getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& excep)
 	{
@@ -1033,7 +982,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{
-		ResourceInfoGenerator::addMainMemoryStats(msg, m_specVersion, averageInterval/sampleInterval);
+		ResourceInfoGenerator::addMainMemoryStats(msg, m_specification->getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& excep)
 	{
@@ -1042,7 +991,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{
-		ResourceInfoGenerator::addDiskStats(msg, m_specVersion, averageInterval/sampleInterval);
+		ResourceInfoGenerator::addDiskStats(msg, m_specification->getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& excep)
 	{
@@ -1051,7 +1000,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{
-		ResourceInfoGenerator::addNetworkStats(msg, m_specVersion, averageInterval/sampleInterval);
+		ResourceInfoGenerator::addNetworkStats(msg, m_specification->getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& excep)
 	{
@@ -1085,7 +1034,7 @@ void InternalConnectionManager::startResourceMessageService(const char* subject,
 	}
 
 	// Start the Resource Service
-	m_rsrcService.reset(new ResourceService(m_config, subject, intervalSeconds, sampleInterval, averageInterval));
+	m_rsrcService.reset(new ResourceService(m_config, m_messagePopulator->getStandardFields(), subject, intervalSeconds, sampleInterval, averageInterval));
 	m_rsrcThread.reset(new StdThread(&ResourceService::start, m_rsrcService));
 	m_rsrcThread->start();
 
@@ -1113,12 +1062,11 @@ bool InternalConnectionManager::stopResourceMessageService()
 			m_rsrcThread->join();
 			m_rsrcThread.reset();
 		}
+
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 
@@ -1126,7 +1074,7 @@ void InternalConnectionManager::requestDirective(const char * subject, const Fie
 {
 	Message msg(subject, gmsec::api::Message::PUBLISH);
 
-	msg.addField("RESPONSE", false);
+	msg.addField("RESPONSE", false);   // No response is being requested, nor expected.
 
 	m_messagePopulator->addStandardFields(msg);
 	m_messagePopulator->populateDirective(msg, directiveString, fields);
@@ -1233,7 +1181,7 @@ void InternalConnectionManager::requestSimpleService(const char * subject, const
 		const gmsec::api::util::DataList<ServiceParam*>& params,
 		GMSEC_I32 timeout,
 		GMSEC_ConnectionMgrReplyCallback* rcb,
-		GMSEC_ConnectionMgrEventCallback*ecb,
+		GMSEC_ConnectionMgrEventCallback* ecb,
 		GMSEC_I32 republish_ms)
 {
 	ConnectionManagerReplyCallback* callback = m_callbackAdapter->createReplyCallback(rcb, ecb);

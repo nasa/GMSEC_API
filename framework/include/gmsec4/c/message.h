@@ -580,6 +580,62 @@ extern "C"
 
 
 	/**
+	 * @fn GMSEC_I64 messageGetIntegerValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status)
+	 *
+	 * @brief Attempts to convert the field value into a signed 64-bit integer number representation.
+	 *
+	 * @param[in]  msg       - the handle to the Message object.
+	 * @param[in]  fieldName - the name of the field from which to reference the value.
+	 * @param[out] status    - status of the operation, which will always be nominal if a valid Message handle is provided.
+	 *
+	 * @return Returns the field value as a signed integer value.
+	 */
+	GMSEC_API GMSEC_I64 messageGetIntegerValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_U64 messageGetUnsignedIntegerValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status)
+	 *
+	 * @brief Attempts to convert the field value into an unsigned 64-bit integer number representation.
+	 *
+	 * @param[in]  msg       - the handle to the Message object.
+	 * @param[in]  fieldName - the name of the field from which to reference the value.
+	 * @param[out] status    - status of the operation, which will always be nominal if a valid Message handle is provided.
+	 *
+	 * @return Returns the field value as an unsigned integer value.
+	 */
+	GMSEC_API GMSEC_U64 messageGetUnsignedIntegerValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_F64 messageGetDoubleValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status)
+	 *
+	 * @brief Attempts to convert the field value into an 64-bit floating-point number representation.
+	 *
+	 * @param[in]  msg       - the handle to the Message object.
+	 * @param[in]  fieldName - the name of the field from which to reference the value.
+	 * @param[out] status    - status of the operation, which will always be nominal if a valid Message handle is provided.
+	 *
+	 * @return Returns the field value as a floating-point value.
+	 */
+	GMSEC_API GMSEC_F64 messageGetDoubleValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status);
+
+
+	/**
+	 * @fn const char* messageGetStringValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status)
+	 *
+	 * @brief Attempts to convert the field value into string representation.
+	 *
+	 * @param[in]  msg       - the handle to the Message object.
+	 * @param[in]  fieldName - the name of the field from which to reference the value.
+	 * @param[out] status    - status of the operation, which will always be nominal if a valid Message handle is provided.
+	 *
+	 * @return Returns the field value as a string value.
+	 */
+	GMSEC_API const char* messageGetStringValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status);
+
+
+	/**
 	 * @fn const GMSEC_Field messageGetField(const GMSEC_Message msg, const char* name, GMSEC_Status status)
 	 *
 	 * @brief This function will return the named Field object contained within the Message object, if it exists. Otherwise a NULL pointer is returned. 
