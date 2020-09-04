@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -182,6 +182,23 @@ public class Field
 	 * @return Returns the field value as a string.
 	 *
 	 * @throws An Exception is thrown if the field cannot be successfully converted to a string.
+	 */
+	public String getStringValue()
+	{
+		return m_jniField.getStringValue();
+	}
+
+
+	/**
+	 * @fn String getString()
+	 *
+	 * @brief Attempts to convert the field value into string representation.
+	 *
+	 * @return Returns the field value as a string.
+	 *
+	 * @throws An Exception is thrown if the field cannot be successfully converted to a string.
+	 *
+	 * @deprecated As of release 4.3, replaced by getStringValue()
 	 */
 	public String getString()
 	{

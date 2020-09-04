@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -140,30 +140,35 @@ public class Message
 	 *
 	 * An XML string should have a format similar to the following:
 	 * @code
-	 * <MESSAGE SUBJECT="GMSEC.TEST.SUBJECT" KIND="PUBLISH">
-	 *     <FIELD TYPE="STRING" NAME="FACILITY">GMSEC LAB</FIELD>
-	 *     <FIELD TYPE="I32" NAME="COUNT">10</FIELD>
-	 * </MESSAGE>
+	 * final String XML = "<MESSAGE SUBJECT=\"GMSEC.TEST.XML.SUBJECT\" KIND=\"PUBLISH\">" +
+	 *		      "    <CONFIG>" +
+	 *	     	      "        <PARAMETER NAME=\"FOO\">BAR</PARAMETER>" +
+	 *	     	      "        <PARAMETER NAME=\"DONE\">DEAL</PARAMETER>" +
+	 *	     	      "    </CONFIG>" +
+	 *	     	      "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>" +
+	 *	     	      "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>" +
+	 *	     	      "</MESSAGE>";
 	 * @endcode
 	 *
 	 * A JSON string should have a format similar to the following:
 	 * @code
-	 *    "MESSAGE":{
-	 *        "KIND":"PUBLISH",
-	 *        "SUBJECT":"GMSEC.MISSION.CONST.SAT.EVT.MSG",
-	 *        "FIELD":[
-	 *            {
-	 *                "NAME":"FACILITY",
-	 *                "TYPE":"STRING",
-	 *                "VALUE":"GMSEC LAB"
-	 *            },
-	 *            {
-	 *                "NAME":"COUNT",
-	 *                "TYPE":"I32",
-	 *                "VALUE":"10"
-	 *            },
-	 *        ]
-	 *    }
+	 * final String JSON = "{\"MESSAGE\":{" +
+	 *	               "  \"KIND\":\"PUBLISH\"," +
+	 *	               "  \"SUBJECT\":\"GMSEC.TEST.JSON.SUBJECT\"," +
+	 *	               "  \"FIELD\":[" +
+	 *		       "    {" +
+	 *	               "      \"NAME\":\"CHAR-FIELD\"," +
+	 *	               "      \"TYPE\":\"CHAR\"" +
+	 *	               "      \"VALUE\":\"c\"" +
+	 *	               "    }," +
+	 *		       "    {" +
+	 *	               "      \"NAME\":\"BOOL-FIELD\"," +
+	 *	               "      \"TYPE\":\"BOOL\"" +
+	 *	               "      \"VALUE\":\"TRUE\"" +
+	 *	               "    }" +
+	 *		       "  ]" +
+	 *		       "  }" +
+	 *			"}";
 	 * @endcode
 	 *
 	 * @param data - the XML or JSON string that represents a GMSEC message.
@@ -244,6 +249,27 @@ public class Message
 	public String getSubject()
 	{
 		return m_jniMessage.getSubject();
+	}
+
+
+	/**
+	 * @fn void setSubject(String subject)
+	 *
+	 * @brief Allows for the setting/changing of the message subject.
+	 *
+	 * @param subject - the subject/topic to associate with the message
+	 *
+	 * @throws An IllegalArgumentException is thrown if the subject is null or contains
+	 * an empty string.
+	 */
+	public void setSubject(String subject)
+	{
+		if (subject == null || subject.isEmpty())
+		{
+			throw new IllegalArgumentException("Subject is null or contains an empty string");
+		}
+
+		m_jniMessage.setSubject(subject);
 	}
 
 

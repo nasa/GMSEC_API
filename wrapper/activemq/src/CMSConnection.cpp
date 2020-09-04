@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -634,14 +634,7 @@ CMSConnection::CMSConnection(const Config& config)
 		m_reportFailoverEvent = (pos != std::string::npos);
 	}
 
-	if (filterToggle.empty() || filterToggle.compare("yes") == 0)
-	{
-		m_useFilter = true;
-	}
-	else
-	{
-		m_useFilter = false;
-	}
+	m_useFilter = filterToggle.empty() || StringUtil::stringEqualsIgnoreCase(filterToggle.c_str(), "yes");
 
 #if ACTIVEMQ_CMS_V3
 	// Only available in ActiveMQ CMS 3
@@ -687,14 +680,18 @@ void CMSConnection::cleanup()
 //       C  [libactivemq-cpp.so.18+0xb463af]  activemq::transport::TransportFilter::onCommand(decaf::lang::Pointer<activemq::commands::Command, decaf::util::concurrent::atomic::AtomicRefCounter>)+0xf
 //
 #if 0
-	if (transportListener)
+	if (m_transportListener)
 	{
 		activemq::core::ActiveMQConnection* amqConnection = dynamic_cast<activemq::core::ActiveMQConnection*>(m_connection.get());
 
 		if (amqConnection)
 		{
-			amqConnection->removeTransportListener(transportListener);
+			amqConnection->removeTransportListener(m_transportListener);
 		}
+	}
+	if (m_exceptionListener)
+	{
+		m_connection->setExceptionListener(NULL);
 	}
 #endif
 
@@ -828,23 +825,12 @@ void CMSConnection::mwConnect()
 		m_exceptionListener = new CMSExceptionListener(this);
 		m_connection->setExceptionListener(m_exceptionListener);
 
-		//TODO
-#if 0
-		// There is an issue with the CMSTransportListener callbacks using the GMSEC logger when Java LogHandler(s) are
-		// registered via the GMSEC API Java Binding.  Apparently the JVM environment handle can be NULL when the Log
-		// Handler callback is called.
-		//
-		// The Java Unit Test T_0106 is helpful for replicating this issue.
-		//
-		// Until this issue is resolved, this code is to remain commented out.
-		//
 		activemq::core::ActiveMQConnection* amqConnection = dynamic_cast<activemq::core::ActiveMQConnection*>(m_connection.get());
 		if (amqConnection)
 		{
 			m_transportListener = new CMSTransportListener(this, m_reportFailoverEvent);
 			amqConnection->addTransportListener(m_transportListener);
 		}
-#endif
 
 		m_connection->start();
 

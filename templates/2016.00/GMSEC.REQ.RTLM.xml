@@ -16,13 +16,13 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="F32"
-	        DESCRIPTION="Speed of playback as a ratio of playback rate to real-time rate.  This is the default method; default = 1.  > 0 and < 1 is slower than real-time rate = 1 is equal to the real-time rate > 1 is faster than real-time rate"/>
+	        DESCRIPTION="Speed of playback as a ratio of playback rate to real-time rate.  This is the default method; default = 1.  &gt; 0 and &lt; 1 is slower than real-time rate = 1 is equal to the real-time rate &gt; 1 is faster than real-time rate"/>
 	<FIELD  NAME="DATA-RATE"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="U16"
-	        DESCRIPTION="Data rate in Kilobits per second.  Value in the range of > 0."/>
+	        DESCRIPTION="Data rate in Kilobits per second.  Value in the range of &gt; 0."/>
 	<FIELD  NAME="START-TIME"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
@@ -84,11 +84,11 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="Virtual Channel IDs: comma delimited channel IDs with ‘-‘ for channel ID ranges. Example: 1,2,6-9,10"/>
+	        DESCRIPTION="Virtual Channel IDs: comma delimited channel IDs with &apos;-&apos; for channel ID ranges. Example: 1,2,6-9,10"/>
 	<FIELD  NAME="APID"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="AP IDs: comma delimited AP IDs with ‘-‘ for channel ID ranges. Example: 1,2,6-9,10"/>
+	        DESCRIPTION="AP IDs: comma delimited AP IDs with &apos;-&apos; for channel ID ranges. Example: 1,2,6-9,10"/>
 </SCHEMA>

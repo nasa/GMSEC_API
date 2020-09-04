@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -141,7 +141,7 @@ public class JNIConnectionManager
 	}
 
 
-	public Specification getSpecification() throws GMSEC_Exception
+	public Specification getSpecification()
 	{
 		long cPtr = gmsecJNI.ConnectionManager_GetSpecification(swigCPtr, this);
 
@@ -151,6 +151,14 @@ public class JNIConnectionManager
 		}
 
 		return null;
+	}
+
+
+	public void setSpecification(Specification spec)
+	{
+		JNISpecification jSpec = Specification.getInternal(spec);
+
+		gmsecJNI.ConnectionManager_SetSpecification(swigCPtr, this, JNISpecification.getCPtr(jSpec), jSpec, spec);
 	}
 
 
@@ -427,47 +435,14 @@ public class JNIConnectionManager
 	}
 
 
-	public Status changeComponentStatus(Field componentStatus)
+	public Status setHeartbeatServiceField(Field field)
 	{
-		JNIField jFld = Field.getInternal(componentStatus);
+		JNIField jFld = Field.getInternal(field);
 
-		long cPtr = gmsecJNI.ConnectionManager_ChangeComponentStatus(swigCPtr, this, JNIField.getCPtr(jFld), jFld);
+		long cPtr = gmsecJNI.ConnectionManager_SetHeartbeatServiceField(swigCPtr, this, JNIField.getCPtr(jFld), jFld);
 
 		return new JNIStatus(cPtr, true);
 	}
-
-
-	public Status changeComponentInfo(Field componentInfo)
-	{
-		JNIField jFld = Field.getInternal(componentInfo);
-
-		long cPtr = gmsecJNI.ConnectionManager_ChangeComponentInfo(swigCPtr, this, JNIField.getCPtr(jFld), jFld);
-
-		return new JNIStatus(cPtr, true);
-	}
-
-
-	public Status changeCPUMemory(Field cpuMemory)
-	{
-		JNIField jFld = Field.getInternal(cpuMemory);
-
-		long cPtr = gmsecJNI.ConnectionManager_ChangeCPUMemory(swigCPtr, this, JNIField.getCPtr(jFld), jFld);
-
-		return new JNIStatus(cPtr, true);
-	}
-
-
-	public Status changeCPUUtil(Field cpuUtil)
-	{
-		JNIField jFld = Field.getInternal(cpuUtil);
-
-		long cPtr = gmsecJNI.ConnectionManager_ChangeCPUUtil(swigCPtr, this, JNIField.getCPtr(jFld), jFld);
-
-		return new JNIStatus(cPtr, true);
-	}
-
-
-	/***************Start Log Section*****************************************************/
 
 
 	public Message createLogMessage(String subject, java.util.List<Field> logFields) throws GMSEC_Exception

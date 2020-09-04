@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,15 +16,73 @@
 #include <GMSEC_Exception_Net.h>
 #include <GMSEC_Net.h>
 
+#include <vcclr.h>
+
 
 // C++ API native
 #include <gmsec4/Exception.h>
+#include <iostream>
 
 
 using namespace GMSEC::API;
 using namespace GMSEC::API::MIST;
 using namespace System;
 using namespace System::Runtime::InteropServices;
+
+
+namespace GMSEC
+{
+namespace API
+{
+namespace MIST
+{
+
+// delegate for the callback
+delegate void ValidateMessageDelegate(const gmsec::api::Message& msg);
+
+
+/// <summary>
+/// Native Specification that is passed to the GMSEC API.
+/// </summary>
+class NativeSpecification : public gmsec::api::mist::Specification
+{
+private:
+    typedef void (__stdcall *ValidateMessageDelegateNative)(const gmsec::api::Message& msg);
+
+
+public:
+    explicit NativeSpecification(const gmsec::api::Config& config, ValidateMessageDelegate^ delegate)
+        : Specification(config),
+		  validateMsgDelegate(delegate)
+    {
+        nativeValidateMsg = (ValidateMessageDelegateNative) Marshal::GetFunctionPointerForDelegate(delegate).ToPointer();
+    }
+
+
+    explicit NativeSpecification(const gmsec::api::mist::Specification& other, ValidateMessageDelegate^ delegate)
+        : Specification(other),
+		  validateMsgDelegate(delegate)
+    {
+        nativeValidateMsg = (ValidateMessageDelegateNative) Marshal::GetFunctionPointerForDelegate(delegate).ToPointer();
+    }
+
+	virtual ~NativeSpecification()
+	{
+	}
+
+    virtual void CALL_TYPE validateMessage(const gmsec::api::Message& msg)
+    {
+        nativeValidateMsg(msg);
+    }
+
+    // Set the number handles up by one to avoid garbage collection
+    gcroot<ValidateMessageDelegate^> validateMsgDelegate;
+    ValidateMessageDelegateNative    nativeValidateMsg;
+};
+
+}
+}
+}
 
 
 Specification::Specification(Config^ config)
@@ -35,7 +93,7 @@ Specification::Specification(Config^ config)
 	{
 		gmsec::api::Config* nativeConfig = config->GetUnmanagedImplementation();
 
-		m_impl  = new gmsec::api::mist::Specification(*nativeConfig);
+		m_impl  = new NativeSpecification(*nativeConfig, gcnew ValidateMessageDelegate(this, &Specification::ValidateMessageNative));
 		m_owned = true;
 	}
 	catch (gmsec::api::Exception& e)
@@ -53,7 +111,7 @@ Specification::Specification(Specification^ other)
 	{
 		gmsec::api::mist::Specification* nativeSpec = other->GetUnmanagedImplementation();
 
-		m_impl  = new gmsec::api::mist::Specification(*nativeSpec);
+		m_impl  = new NativeSpecification(*nativeSpec, gcnew ValidateMessageDelegate(this, &Specification::ValidateMessageNative));
 		m_owned = true;
 	}
 	catch (gmsec::api::Exception& e)
@@ -69,6 +127,14 @@ Specification::~Specification()
 }
 
 
+void Specification::ValidateMessageNative(const gmsec::api::Message& msg)
+{
+    Message^ msgWrapped  = gcnew Message(const_cast<gmsec::api::Message*>(&msg), false);
+
+    ValidateMessage(msgWrapped);
+}
+
+
 void Specification::ValidateMessage(Message^ msg)
 {
 	THROW_EXCEPTION_IF_NULLPTR(msg, StatusClass::MIST_ERROR, StatusCode::INVALID_MESSAGE, "Message is null");
@@ -77,7 +143,7 @@ void Specification::ValidateMessage(Message^ msg)
 	{
 		gmsec::api::Message* nativeMsg = msg->GetUnmanagedImplementation();
 
-		m_impl->validateMessage(*nativeMsg);
+		m_impl->Specification::validateMessage(*nativeMsg);
 	}
 	catch (gmsec::api::Exception& e)
 	{

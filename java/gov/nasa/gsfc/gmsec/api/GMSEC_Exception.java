@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -34,6 +34,8 @@ public class GMSEC_Exception extends Exception
 
 	public GMSEC_Exception(String errorMsg)
 	{
+		super(errorMsg);
+
 		String[] tmp = errorMsg.split(":");
 
 		if (tmp.length >= 2)
@@ -83,6 +85,8 @@ public class GMSEC_Exception extends Exception
 	 */
 	public GMSEC_Exception(StatusClassification errorClass, StatusCode errorCode, String errorMsg)
 	{
+		super(generateDetails(errorClass, errorCode, 0, errorMsg));
+
 		m_errorClass = errorClass;
 		m_errorCode  = errorCode;
 		m_customCode = 0;
@@ -105,6 +109,8 @@ public class GMSEC_Exception extends Exception
 	 */
 	public GMSEC_Exception(StatusClassification errorClass, StatusCode errorCode, int customCode, String errorMsg)
 	{
+		super(generateDetails(errorClass, errorCode, customCode, errorMsg));
+
 		m_errorClass = errorClass;
 		m_errorCode  = errorCode;
 		m_customCode = customCode;
@@ -128,7 +134,7 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
-	 * @fn StatusCode getCode()
+	 * @fn StatusCode getErrorCode()
 	 *
 	 * @brief Returns the error code associated with the exception.
 	 *
@@ -177,10 +183,16 @@ public class GMSEC_Exception extends Exception
 	 */
 	public String toString()
 	{
+		return getMessage();
+	}
+
+
+	private static String generateDetails(StatusClassification errorClass, StatusCode errorCode, int customCode, String errorMsg)
+	{
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("[").append(m_errorClass.getValue()).append(",").append(m_errorCode.getValue()).append(",")
-			.append(m_customCode).append("] : ").append(m_errorMsg);
+		sb.append("[").append(errorClass.getValue()).append(",").append(errorCode.getValue()).append(",")
+			.append(customCode).append("]: ").append(errorMsg);
 
 		return sb.toString();
 	}

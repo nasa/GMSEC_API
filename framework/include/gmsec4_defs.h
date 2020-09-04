@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -296,7 +296,10 @@ typedef enum
 	GMSEC_GMD_ERROR_EVENT = 6,               /**< SmartSockets Guaranteed Message Delivery (GMD) error. */
 	GMSEC_WSMQ_ASYNC_STATUS_CHECK_EVENT = 7, /**< WebSphere MQ Asynchronous Put Status reporting event. */
 	GMSEC_ALL_EVENTS = 8,                    /**< Monitor all events. */
-	MSG_PUBLISH_FAILURE_EVENT = 9            /**< Failure occurred while attempting to asynchronously publish a message. */
+	// @cond
+	MSG_PUBLISH_FAILURE_EVENT = 9,           /* Deprecated; use GMSEC_MSG_PUBLISH_FAILURE_EVENT instead */
+	// @endcond
+	GMSEC_MSG_PUBLISH_FAILURE_EVENT = 9      /**< Failure occurred while attempting to asynchronously publish a message. */
 } GMSEC_ConnectionEvent;
 
 
@@ -364,6 +367,14 @@ typedef void* GMSEC_Device;
 
 
 /**
+ * @typedef GMSEC_DeviceIterator
+ *
+ * @sa deviceMessageGetIterator
+ */
+typedef void* GMSEC_DeviceIterator;
+
+
+/**
  * @typedef GMSEC_DeviceParam
  *
  * @desc A handle to a MIST DeviceParam object.
@@ -424,6 +435,14 @@ typedef void* GMSEC_Mnemonic;
 
 
 /**
+ * @typedef GMSEC_MnemonicIterator
+ *
+ * @sa mnemonicMessageGetIterator
+ */
+typedef void* GMSEC_MnemonicIterator;
+
+
+/**
  * @typedef GMSEC_MnemonicSample
  *
  * @desc A handle to a MIST MnemonicSample object.
@@ -453,6 +472,14 @@ typedef void* GMSEC_MessageFieldIterator;
  * @sa productFileDestroy
  */
 typedef void* GMSEC_ProductFile;
+
+
+/**
+ * @typedef GMSEC_ProductFileIterator
+ *
+ * @sa productFileMessageGetIterator
+ */
+typedef void* GMSEC_ProductFileIterator;
 
 
 /**
@@ -657,6 +684,24 @@ typedef void GMSEC_ConnectionMgrEventCallback(GMSEC_ConnectionMgr connMgr, const
  * @sa connectionManagerRequestWithCallback
  */
 typedef void GMSEC_ConnectionMgrReplyCallback(GMSEC_ConnectionMgr connMgr, const GMSEC_Message request, const GMSEC_Message reply);
+
+
+/**
+ * @typedef GMSEC_SpecificationValidateMessage
+ *
+ * @brief Typedef for GMSEC_SpecificationValidateMessage
+ *
+ * @code
+ * void GMSEC_SpecificationValidateMessage(GMSEC_Specification customSpec, const GMSEC_Message msg, GMSEC_Status status)
+ * @endcode
+ *
+ * @param[in]  customSpec - handle to the custom Specification object
+ * @param[in]  msg        - the message to validate
+ * @param[out] status     - the status of the operation, should one need to be returned
+ *
+ * @sa connectionManagerSetSpecification
+ */
+typedef void GMSEC_SpecificationValidateMessage(GMSEC_Specification customSpec, const GMSEC_Message msg, GMSEC_Status status);
 
 
 /**

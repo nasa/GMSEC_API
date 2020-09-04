@@ -1,9 +1,8 @@
 
-# Copyright 2007-2016 United States Government as represented by the
+# Copyright 2007-2017 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
-#
 
 
 
@@ -31,18 +30,16 @@ use libgmsec_perl;
 *isa = \&UNIVERSAL::isa;
 
 
-# Requester ReplyCallback
 {
 	package Requester;
-	use base 'libgmsec_perl::ReplyCallback';
 
 	*isa = \&UNIVERSAL::isa;
 
 	sub new
 	{
-		# Initialize the base Package (libgmsec_perl::Callback)
 		my $class = shift;
-		my $self = $class->SUPER::new();
+		my $self = {};
+		bless $self;
 
 		($self->{CONFIG}) = @_;
 
@@ -67,7 +64,7 @@ use libgmsec_perl;
 			# Display request message.
 			libgmsec_perl::LogInfo("Issuing Request Message:\n" . $request->toXML());
 
-			# Using Request(Message* request, GMSEC_I32 timeout, Message* reply)
+			# Issuing synchronous request
 			my $reply = $connection->request($request, $timeout);
 
 			if ($reply)
@@ -83,35 +80,20 @@ use libgmsec_perl;
 			}
 
 
-			# Using Request(Message* request, GMSEC_I32 timeout, ReplyCallback* cb)
-			$connection->request($request, $timeout, $self);
-
-			# Display request message.
-			libgmsec_perl::LogInfo("Issued Request Message:\n" . $request->toXML());
-
-			# Allow some time for the ReplyCallback to receive the reply.
-			Util::millisleep($timeout);
-
 			# Reply messages are exposed.
-			# Using receive() to receive replies.
-			#
-			# Note: Two replies are expected, one for each of the requests performed
-			#       above.
-			for (my $i = 0; $i < 2; ++$i)
+			# Using receive() to receive reply message.
+			$reply = $connection->receive($timeout);
+
+			if ($reply)
 			{
-				$reply = $connection->receive($timeout);
+				# Display reply message.
+				libgmsec_perl::LogInfo("Received exposed Reply Message using receive():\n" . $reply->toXML());
 
-				if ($reply)
-				{
-					# Display reply message.
-					libgmsec_perl::LogInfo("Received exposed Reply Message using receive():\n" . $reply->toXML());
-
-					$connection->release($reply);
-				}
-				else
-				{
-					libgmsec_perl::LogInfo("Failed to receive exposed reply message after a timeout of " . $timeout . " msec.");
-				}
+				$connection->release($reply);
+			}
+			else
+			{
+				libgmsec_perl::LogInfo("Failed to receive exposed reply message after a timeout of " . $timeout . " msec.");
 			}
 		};
 		if (isa($@, 'libgmsec_perl::Exception'))
@@ -126,24 +108,6 @@ use libgmsec_perl;
 		$self->cleanup();
 	}
 
-
-	sub onReply
-	{
-		my ($self, $connection, $message, $reply) = @_;
-
-		libgmsec_perl::LogInfo("[Requester::onReply] Received Reply:\n" . $reply->toXML());
-	}
-
-
-	sub onEvent
-	{
-		my ($self, $connection, $status, $event) = @_;
-
-		if ($status->isError())
-		{
-			libgmsec_perl::LogWarning("[Requester::onEvent] " . $status->get() . ", event=" . $event);
-		}
-	}
 
 	sub setup
 	{
@@ -210,6 +174,15 @@ use libgmsec_perl;
 			elsif($@)
 			{
 				libgmsec_perl::LogError($@);
+			}
+
+			eval
+			{
+				$connection->disconnect();
+			};
+			if (isa($@, 'libgmsec_perl::Exception'))
+			{
+				libgmsec_perl::LogError($@->what());
 			}
 
 			libgmsec_perl::Connection::destroy($connection);

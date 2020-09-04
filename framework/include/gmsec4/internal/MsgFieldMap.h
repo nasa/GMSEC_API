@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -33,10 +33,15 @@
 	#else
 		#include <hash_map>
 	#endif
+
 #elif defined(__sun)
 	#if !defined (__sparc)
 		#include <hash_map>
 	#endif
+
+#elif defined(__APPLE__)
+        #include <unordered_map>
+
 #else 
 	#include <tr1/unordered_map>
 #endif
@@ -135,13 +140,16 @@ public:
 
 
 	/*
-	 * @fn addField(const Field& value)
-	 * @brief Adds the field to the internal storage map.
+	 * @fn addField(const Field& field, bool makeCopy = true)
 	 *
-	 * @param field - the Field value.
+	 * @brief Adds the field object to the internal storage map.
+	 *
+	 * @param field    - the field object.
+	 * @param makeCopy - flag to indicate whether to make a copy of the field.
+	 *
 	 * @returns True if the Field was replaced; false otherwise.
 	 */
-	bool CALL_TYPE addField(const Field& field);
+	bool CALL_TYPE addField(const Field& field, bool makeCopy = true);
 
 
 	/*
@@ -245,6 +253,9 @@ private:
 	#else
 	typedef std::hash_map<std::string, gmsec::api::Field*> HashMap;
 	#endif
+
+#elif defined(__APPLE__)
+        typedef std::unordered_map<std::string, gmsec::api::Field*> HashMap;
 
 #else 
 	typedef std::tr1::unordered_map<std::string, gmsec::api::Field*> HashMap;

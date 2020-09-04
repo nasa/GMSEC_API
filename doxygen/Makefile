@@ -17,7 +17,14 @@ PERL_4X_INTERFACES   = $(PERL_4X)/interfaces
 PERL_4X_DOCS         = manual/perl_4x
 
 PERL_3X_API_CLASSES = Callback Config ConfigFile Connection ConnectionFactory Field Message Status Util
-PERL_4X_API_CLASSES = Callback EventCallback ReplyCallback Config ConfigFile ConfigFileIterator Connection Errors Exception Message MessageFieldIterator Status SubscriptionInfo field/Field field/BinaryField field/BooleanField field/CharField field/F32Field field/F64Field field/I16Field field/I32Field field/I64Field field/I8Field field/StringField field/U16Field field/U32Field field/U64Field field/U8Field util/Condition util/Log util/LogHandler util/Mutex util/TimeUtil
+
+PERL_4X_API_CLASSES = Config ConfigFile ConfigFileIterator Connection \
+                      Errors Exception Message MessageFieldIterator Status SubscriptionInfo \
+                      field/Field field/BinaryField field/BooleanField field/CharField field/F32Field field/F64Field \
+                      field/I16Field field/I32Field field/I64Field field/I8Field field/StringField field/U16Field \
+                      field/U32Field field/U64Field field/U8Field \
+                      util/Condition util/Log util/Mutex util/TimeUtil \
+                      mist/ConnectionManager
 
 
 all: doxygen perl_4x_docs perl_3x_docs
@@ -42,6 +49,7 @@ perl_4x_docs:
 	mkdir -p $(PERL_4X_DOCS)
 	mkdir -p $(PERL_4X_DOCS)/util
 	mkdir -p $(PERL_4X_DOCS)/field
+	mkdir -p $(PERL_4X_DOCS)/mist
 	cp gmsec_logo.png $(PERL_4X_DOCS)
 	pod2html --infile=$(PERL_4X_INTERFACES)/libgmsec_perl.i --outfile=$(PERL_4X_DOCS)/index.html --htmlroot=. --title="GMSEC Perl API"
 	for class in $(PERL_4X_API_CLASSES); do \
@@ -50,7 +58,7 @@ perl_4x_docs:
 
 
 install:
-	if [ ! -d $(DOCS) ] ; then mkdir $(DOCS) ; fi
+	mkdir -p $(DOCS)/manual
 	cp -r $(GMSEC_HOME)/doxygen/manual/* $(DOCS)/manual
 	cp  $(GMSEC_HOME)/doxygen/gmsec_logo.png $(DOCS)
 

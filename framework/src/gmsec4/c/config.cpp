@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -73,12 +73,20 @@ GMSEC_Config CALL_TYPE configCreateWithArgs(int argc, char* argv[])
 
 GMSEC_Config CALL_TYPE configCreateUsingXML(const char* xml, GMSEC_Status status)
 {
+	// Deprecated!
+
+	return configCreateUsingData(xml, status);
+}
+
+
+GMSEC_Config CALL_TYPE configCreateUsingData(const char* data, GMSEC_Status status)
+{
 	GMSEC_Config config = NULL;
 	Status       result;
 
 	try
 	{
-		config = reinterpret_cast<GMSEC_Config>(new Config(xml));
+		config = reinterpret_cast<GMSEC_Config>(new Config(data));
 	}
 	catch (Exception& e)
 	{
@@ -411,4 +419,17 @@ void CALL_TYPE configFromXML(GMSEC_Config cfg, const char* xml, GMSEC_Status sta
 			setStatus(status, e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), e.getCustomCode());
 		}
 	}
+}
+
+
+const char* CALL_TYPE configToJSON(const GMSEC_Config cfg, GMSEC_Status status)
+{
+	const char* json = NULL;
+
+	if (isGoodConfig(cfg, status))
+	{
+		json = reinterpret_cast<const Config*>(cfg)->toJSON();
+	}
+
+	return json;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -232,6 +232,21 @@ private:
 	bool fEncodeJson;
 	bool fCompress;
 
+};
+
+
+class GMSEC_API API4Policy : public API3Policy
+{
+public:
+
+	API4Policy ();
+
+	virtual Status initialize (const Config &localConfig);
+
+private:
+	// Declared, but not implemented.
+	API4Policy(const API4Policy&);
+	API4Policy& operator=(const API4Policy&);
 };
 
 

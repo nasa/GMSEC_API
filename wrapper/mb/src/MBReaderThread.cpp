@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -70,6 +70,8 @@ void MBReaderThread::run()
 	char* buffer = 0;
 	int   bufferSize = 0;
 
+	bool hadConnError = false;
+
 	// run until told to stop by calling prepare disconnect
 	while (!m_stopRunning.get())
 	{
@@ -84,10 +86,26 @@ void MBReaderThread::run()
 		{
 			if (!m_stopRunning.get())
 			{
-				GMSEC_WARNING << "Read error.  ReaderThread stopped.";
-				m_connWasDropped.set(true);
+				if (!hadConnError)
+				{
+					GMSEC_WARNING << "Read error; has the server died?";
+				}
+
+				hadConnError = true;
+
+				//DMW GMSEC_WARNING << "Read error.  ReaderThread stopped.";
+				//DMW m_connWasDropped.set(true);
+				TimeUtil::millisleep(1000);
 			}
-			break;
+			//DMW break;
+			continue;
+		}
+
+		if (hadConnError)
+		{
+			hadConnError = false;
+
+			GMSEC_INFO << "Connection to server has resumed";
 		}
 
 		if (bufferSize == 2 && buffer[0] == CMD_ACKSUB)

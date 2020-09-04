@@ -34,6 +34,6 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="BINARY"
+	        TYPE="BIN"
 	        DESCRIPTION="For application use.  Any additional information can be provided here."/>
 </SCHEMA>

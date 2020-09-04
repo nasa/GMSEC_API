@@ -1,9 +1,7 @@
-#
-# Copyright 2007-2016 United States Government as represented by the
+# Copyright 2007-2017 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
-#
 
 # 
 # gmpub.pl
@@ -182,6 +180,15 @@ sub cleanup
 
 	if ($connection)
 	{
+		eval
+		{
+			$connection->disconnect();
+		};
+		if (isa($@, 'libgmsec_perl::Exception'))
+		{
+			libgmsec_perl::LogError($@->what());
+		}
+
 		libgmsec_perl::Connection::destroy($connection);
 	}
 

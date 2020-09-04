@@ -517,6 +517,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src_4x\gmsecJNI_CustomSpecification.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src_4x\gmsecJNI_EventCallback.h"
 				>
 			</File>
@@ -1066,6 +1070,50 @@
 			</File>
 			<File
 				RelativePath=".\src_4x\gmsecJNI_ConnectionManagerReplyCallback.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\..\objects\Debug/api4/"
+						ObjectFile=".\..\objects\Debug/api4/"
+						ProgramDataBaseFileName=".\..\objects\Debug/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\..\objects\Debug/api4/"
+						ObjectFile=".\..\objects\Debug/api4/"
+						ProgramDataBaseFileName=".\..\objects\Debug/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\objects/Release/api4/"
+						ObjectFile=".\objects/Release/api4/"
+						ProgramDataBaseFileName=".\objects/Release/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\objects/Release/api4/"
+						ObjectFile=".\objects/Release/api4/"
+						ProgramDataBaseFileName=".\objects/Release/api4/"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src_4x\gmsecJNI_CustomSpecification.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

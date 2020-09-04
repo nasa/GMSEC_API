@@ -1,12 +1,12 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-/** @file gmsec/secure/Random.h
+/** @file gmsec4/secure/Random.h
  *	Interface to random number generation.
  */
 
@@ -18,8 +18,6 @@
 
 #include <gmsec4/util/Buffer.h>
 #include <gmsec4/util/wdllexp.h>
-
-#include <gmsec/util/sysutil.h>
 
 
 /*

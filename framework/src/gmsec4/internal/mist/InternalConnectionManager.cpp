@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,6 +18,8 @@
 **/
 
 #include <gmsec4/internal/mist/InternalConnectionManager.h>
+#include <gmsec4/internal/mist/CustomSpecification.h>
+#include <gmsec4/internal/mist/InternalSpecification.h>
 #include <gmsec4/internal/mist/ResourceInfoGenerator.h>
 #include <gmsec4/internal/mist/SpecificationBuddy.h>
 
@@ -25,12 +27,12 @@
 
 #include <gmsec4/internal/mist/ConnMgrCallbacks.h>
 #include <gmsec4/internal/mist/ConnMgrCallbackCache.h>
-#include <gmsec4/mist/Specification.h>
 
 #include <gmsec4/mist/ConnectionManager.h>
 #include <gmsec4/mist/ConnectionManagerCallback.h>
 #include <gmsec4/mist/ConnectionManagerEventCallback.h>
 #include <gmsec4/mist/ConnectionManagerReplyCallback.h>
+#include <gmsec4/mist/Specification.h>
 #include <gmsec4/mist/SubscriptionInfo.h>
 #include <gmsec4/mist/mist_defs.h>
 
@@ -52,7 +54,7 @@ using namespace gmsec::api::util;
 using gmsec::api::Field;
 using gmsec::api::util::DataList;
 
-//static const char* LIBRARY_VERSION_STRING   = "LIBRARY-VERSION";
+
 
 namespace gmsec
 {
@@ -67,16 +69,20 @@ namespace internal
 InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::ConnectionManager* parent, const Config& cfg, bool validate, unsigned int version)
 	: m_config(cfg),
 	  m_connection(0),
+	  m_validate(validate),
 	  m_specification(0),
+	  m_customSpecification(0),
 	  m_standardHeartbeatFields(),
 	  m_standardLogFields(),
 	  m_heartbeatSubject(),
 	  m_logSubject(),
 	  m_subscriptions(),
-	  m_hbService(0),
+	  m_messagePopulator(0),
 	  m_parent(parent),
 	  m_callbackAdapter(new MistCallbackAdapter),
-	  m_messagePopulator(NULL)
+	  m_hbService(0),
+	  m_rsrcService(0),
+	  m_ceeCustomSpec(0)
 {
 	// Determine whether or not to validate messages from the Config object
 	const char* validateValue = m_config.getValue("GMSEC-MSG-CONTENT-VALIDATE");
@@ -84,11 +90,6 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 	if (validateValue)
 	{
 		m_validate = StringUtil::stringEqualsIgnoreCase(validateValue, "true");
-	}
-	else
-	{
-		//if a config value was never supplied default to programmatic definition (which defaults to true)
-		m_validate = validate;
 	}
 
 	// Check if the specification version is provided within the supplied configuration
@@ -155,6 +156,7 @@ InternalConnectionManager::~InternalConnectionManager()
 
 	delete m_messagePopulator;
 	delete m_specification;
+	delete m_ceeCustomSpec;
 }
 
 
@@ -181,7 +183,16 @@ void InternalConnectionManager::cleanup()
 		// that no more messages are dispatched to our callbacks.
 		// Unfortunately, we have no guarantee that the auto-dispatcher will
 		// stop 'immediately', thus we may still be at risk destroying our callbacks.
-		m_connection->disconnect();
+		// Gracefully handle any Exceptions thrown by the call to disconnect()
+		Exception error(NO_ERROR_CLASS, NO_ERROR_CODE, "");
+		try
+		{
+			m_connection->disconnect();
+		}
+		catch (const Exception& e)
+		{
+			error = e;
+		}
 
 		ConnMgrCallbackCache::getCache().destroyConnMgrCallbacks(m_parent);
 
@@ -192,6 +203,11 @@ void InternalConnectionManager::cleanup()
 		m_subscriptions.clear();
 
 		Connection::destroy(m_connection);
+
+		if (error.getErrorClass() != NO_ERROR_CLASS)
+		{
+			throw error;
+		}
 	}
 }
 
@@ -209,12 +225,24 @@ const char* InternalConnectionManager::getLibraryVersion() const
 
 Specification& InternalConnectionManager::getSpecification() const
 {
-	if (!m_connection)
+	Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
+
+	return *spec;
+}
+
+
+void InternalConnectionManager::setSpecification(Specification* spec)
+{
+	if (!spec)
 	{
-		throw Exception(MIST_ERROR, CONNECTION_NOT_INITIALIZED, "The ConnectionManager has not been initialized!");
+		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "Specification object is NULL");
 	}
 
-	return *m_specification;
+	m_customSpecification = spec;
+
+	delete m_messagePopulator;
+
+	m_messagePopulator = new MessagePopulator(m_customSpecification->getVersion());
 }
 
 
@@ -358,12 +386,12 @@ void InternalConnectionManager::publish(const Message& msg, const Config& config
 		throw Exception(MIST_ERROR, INVALID_MSG, "Cannot issue request with non-PUBLISH kind message.");
 	}
 
-	AutoMutex hold(m_cmLock);
-
 	// If validation is enabled, check the message before it is sent out
 	if (m_validate)
 	{
-		m_specification->validateMessage(const_cast<Message&>(msg));
+		Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
+
+		spec->validateMessage(const_cast<Message&>(msg));
 	}
 
 	m_connection->publish(msg, config);
@@ -385,12 +413,12 @@ void InternalConnectionManager::request(const Message& request, GMSEC_I32 timeou
 		throw Exception(MIST_ERROR, INVALID_CALLBACK, "The ConnectionManagerReplyCallback is null.");
 	}
 
-	AutoMutex hold(m_cmLock);
-
 	// Validate the message before it is sent out
 	if (m_validate)
 	{
-		m_specification->validateMessage(const_cast<Message&>(request));
+		Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
+
+		spec->validateMessage(const_cast<Message&>(request));
 	}
 
 	CMReplyCallback* callback = new CMReplyCallback(m_parent, cb);
@@ -565,7 +593,9 @@ void InternalConnectionManager::startHeartbeatService(const char* subject, const
 
 	if (m_validate)
 	{
-		m_specification->validateMessage(msg);
+		Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
+
+		spec->validateMessage(msg);
 	}
 
 	// Set the standard fields for a heartbeat message
@@ -589,6 +619,10 @@ void InternalConnectionManager::startHeartbeatService(const char* subject, const
 		throw Exception(MIST_ERROR, HEARTBEAT_SERVICE_NOT_RUNNING,
 			"Heartbeat Service timed-out when attempting to start.");
 	}
+	else
+	{
+		GMSEC_INFO << "Heartbeat Service started.";
+	}
 }
 
 
@@ -607,6 +641,7 @@ void InternalConnectionManager::stopHeartbeatService()
 			m_hbService.reset();
 			m_hbThread->join();
 			m_hbThread.reset();
+			GMSEC_INFO << "Hearbeat Service stopped by user.";
 		}
 	}
 	else
@@ -643,7 +678,7 @@ void InternalConnectionManager::setHeartbeatDefaults(const char* subject, const 
 }
 
 
-Status InternalConnectionManager::changeComponentStatus(const Field& componentStatus)
+Status InternalConnectionManager::setHeartbeatServiceField(const Field& field)
 {
 	Status result;
 
@@ -651,134 +686,26 @@ Status InternalConnectionManager::changeComponentStatus(const Field& componentSt
 	{
 		if (m_validate)
 		{
+
 			Message msg = createHeartbeatMessage(m_heartbeatSubject.c_str(), m_standardHeartbeatFields);
 
-			msg.addField(componentStatus);
+			msg.addField(field);
 
 			try
 			{
-				m_specification->validateMessage(msg);
+				Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
+
+				spec->validateMessage(msg);
 			}
 			catch(Exception &e)
 			{
 				result = e;
-			}
-
-			if (!result.isError())
-			{
-				result = m_hbService->changeComponentStatus(componentStatus);
 			}
 		}
-	}
-	else
-	{
-		result.set(MIST_ERROR, HEARTBEAT_SERVICE_NOT_RUNNING, "HeartbeatService is not running.");
-	}
 
-	return result;
-}
-
-
-Status InternalConnectionManager::changeComponentInfo(const Field& componentInfo)
-{
-	Status result;
-
-	if (m_hbService.get() != NULL)
-	{
-		if (m_validate)
+		if (!result.isError())
 		{
-			
-			Message msg = createHeartbeatMessage(m_heartbeatSubject.c_str(), m_standardHeartbeatFields);
-			
-			msg.addField(componentInfo);
-
-			try
-			{
-				m_specification->validateMessage(msg);
-			}
-			catch(Exception &e)
-			{
-				result = e;
-			}
-
-			if (!result.isError())
-			{
-				result = m_hbService->changeComponentInfo(componentInfo);
-			}
-		}
-	}
-	else
-	{
-		result.set(MIST_ERROR, HEARTBEAT_SERVICE_NOT_RUNNING, "HeartbeatService is not running.");
-	}
-
-	return result;
-}
-
-
-Status InternalConnectionManager::changeCPUMemory(const Field& cpuMemory)
-{
-	Status result;
-
-	if (m_hbService.get() != NULL)
-	{
-		if (m_validate)
-		{
-
-			Message msg = createHeartbeatMessage(m_heartbeatSubject.c_str(), m_standardHeartbeatFields);
-
-			msg.addField(cpuMemory);
-
-			try
-			{
-				m_specification->validateMessage(msg);
-			}
-			catch(Exception &e)
-			{
-				result = e;
-			}
-
-			if (!result.isError())
-			{
-				result = m_hbService->changeCPUMemory(cpuMemory);
-			}
-		}
-	}
-	else
-	{
-		result.set(MIST_ERROR, HEARTBEAT_SERVICE_NOT_RUNNING, "HeartbeatService is not running.");
-	}
-
-	return result;
-}
-
-
-Status InternalConnectionManager::changeCPUUtil(const Field& cpuUtil)
-{
-	Status result;
-
-	if (m_hbService.get() != NULL)
-	{
-		if (m_validate)
-		{
-
-			Message msg = createHeartbeatMessage(m_heartbeatSubject.c_str(), m_standardHeartbeatFields);
-
-			msg.addField(cpuUtil);
-
-			try
-			{
-				m_specification->validateMessage(msg);
-			}
-			catch(Exception &e)
-			{
-				result = e;
-			}
-
-			if (!result.isError())
-			{
-				result = m_hbService->changeCPUUtil(cpuUtil);
-			}
+			m_hbService->setField(field);
 		}
 	}
 	else
@@ -850,7 +777,7 @@ void InternalConnectionManager::publishLog(const char* logMessage, const Field& 
 	//TODO (MEH): use schema to figure out what this field should be instead of
 	//hardcoding - ditto for the EVENT-TIME
 	msg.addField(severity);
-	msg.addField(StringField("MSG-TEXT", logMessage));
+	msg.addField("MSG-TEXT", logMessage);
 
 	publish(msg);
 }
@@ -953,7 +880,9 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 	std::string osVersion = ResourceInfoGenerator::getOSVersion();
 	msg.addField("OPER-SYS", osVersion.c_str());
 
-	if(GMSEC_ISD_2014_00 == m_specification->getVersion())
+	Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
+
+	if(GMSEC_ISD_2014_00 == spec->getVersion())
 	{
 		msg.addField("MSG-ID", "GMSEC-RESOURCE-MESSAGE"); //Pre-2016 ISDs required this version
 	}
@@ -973,7 +902,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{ 
-		ResourceInfoGenerator::addCPUStats(msg, m_specification->getVersion(), averageInterval/sampleInterval);
+		ResourceInfoGenerator::addCPUStats(msg, spec->getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& excep)
 	{
@@ -982,7 +911,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{
-		ResourceInfoGenerator::addMainMemoryStats(msg, m_specification->getVersion(), averageInterval/sampleInterval);
+		ResourceInfoGenerator::addMainMemoryStats(msg, spec->getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& excep)
 	{
@@ -991,7 +920,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{
-		ResourceInfoGenerator::addDiskStats(msg, m_specification->getVersion(), averageInterval/sampleInterval);
+		ResourceInfoGenerator::addDiskStats(msg, spec->getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& excep)
 	{
@@ -1000,7 +929,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{
-		ResourceInfoGenerator::addNetworkStats(msg, m_specification->getVersion(), averageInterval/sampleInterval);
+		ResourceInfoGenerator::addNetworkStats(msg, spec->getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& excep)
 	{
@@ -1043,6 +972,10 @@ void InternalConnectionManager::startResourceMessageService(const char* subject,
 		throw Exception(MIST_ERROR, RESOURCE_SERVICE_NOT_RUNNING,
 			"Resource Service timed-out when attempting to start.");
 	}
+	else
+	{
+		GMSEC_INFO << "Resource Service started.";
+	}
 }
 
 
@@ -1061,6 +994,7 @@ bool InternalConnectionManager::stopResourceMessageService()
 			m_rsrcService.reset();
 			m_rsrcThread->join();
 			m_rsrcThread.reset();
+			GMSEC_INFO << "Resource Service stopped by user.";
 		}
 
 		return true;
@@ -1072,14 +1006,21 @@ bool InternalConnectionManager::stopResourceMessageService()
 
 void InternalConnectionManager::requestDirective(const char * subject, const Field& directiveString, const gmsec::api::util::DataList<Field*>& fields)
 {
-	Message msg(subject, gmsec::api::Message::PUBLISH);
+	Message msg(subject, gmsec::api::Message::REQUEST);
 
 	msg.addField("RESPONSE", false);   // No response is being requested, nor expected.
 
 	m_messagePopulator->addStandardFields(msg);
 	m_messagePopulator->populateDirective(msg, directiveString, fields);
 
-	publish(msg);
+	Message* reply = request(msg, 10, -1);
+
+	if (reply)
+	{
+		GMSEC_WARNING << "An unexpected response was received request directive: " << subject;
+
+		release(reply);
+	}
 }
 
 
@@ -1122,6 +1063,19 @@ void InternalConnectionManager::acknowledgeDirectiveRequest(const char * subject
 	m_messagePopulator->populateDirectiveAck(msg, ssResponse, fields);
 
 	reply(request, msg);
+}
+
+
+void InternalConnectionManager::setSpecification(Specification* spec, GMSEC_SpecificationValidateMessage* validateMsg)
+{
+	if (m_ceeCustomSpec != NULL)
+	{
+		delete m_ceeCustomSpec;
+	}
+
+	m_ceeCustomSpec = new CustomSpecification(spec, validateMsg);
+
+	setSpecification(m_ceeCustomSpec);
 }
 
 

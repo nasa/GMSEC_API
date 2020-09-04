@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -40,7 +40,7 @@ std::string MessageSubclassHelper::extractStringField(const char* fieldName,
 
 		oss << loggableInvocationPoint << ":  "
 		    << fieldName
-		    << " StringField could not be fetched from ";
+		    << " StringField could not be fetched from message";
 
 		throw Exception(MIST_ERROR, FIELD_NOT_SET, oss.str().c_str());
 	}
@@ -61,7 +61,7 @@ GMSEC_I16 MessageSubclassHelper::extractI16Field(const char* fieldName,
 		std::ostringstream oss;
 
 		oss << loggableInvocationPoint << ":  Error while fetching "
-		    << fieldName << " from message; field not fetched.";
+		    << fieldName << " from message; required field is missing";
 
 		throw Exception(MIST_ERROR, MISSING_REQUIRED_FIELD, oss.str().c_str());
 	}
@@ -82,7 +82,7 @@ GMSEC_U16 MessageSubclassHelper::extractU16Field(const char* fieldName,
 		std::ostringstream oss;
 
 		oss << loggableInvocationPoint << ":  Error while fetching "
-		    << fieldName << " from message; field not fetched.";
+		    << fieldName << " from message; required field is missing";
 
 		throw Exception(MIST_ERROR, MISSING_REQUIRED_FIELD, oss.str().c_str());
 	}
@@ -100,7 +100,7 @@ const Field* MessageSubclassHelper::extractField(const char* fieldName,
 		std::ostringstream oss;
 
 		oss << loggableInvocationPoint << ":  Error while fetching "
-			<< fieldName << " from message; field not fetched.";
+			<< fieldName << " from message; required field is missing";
 
 		throw Exception(MIST_ERROR, MISSING_REQUIRED_FIELD, oss.str().c_str());
 	}
@@ -140,7 +140,7 @@ void MessageSubclassHelper::checkStringField(const char* fieldName,
 			std::ostringstream oss;
 
 			oss << loggableInvocationPoint << ":  Error while fetching "
-			    << fieldName << " from message; field not fetched.";
+			    << fieldName << " from message; required field is missing";
 
 			throw Exception(MIST_ERROR, MISSING_REQUIRED_FIELD, oss.str().c_str());
 		}
@@ -179,7 +179,7 @@ void MessageSubclassHelper::checkFloatField(const char* fieldName,
 			std::ostringstream oss;
 
 			oss << loggableInvocationPoint << ":  Error while fetching "
-			    << fieldName << " from message; field not fetched.";
+			    << fieldName << " from message; required field is missing";
 
 			throw Exception(MIST_ERROR, MISSING_REQUIRED_FIELD, oss.str().c_str());
 		}

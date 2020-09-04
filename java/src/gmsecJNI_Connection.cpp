@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -858,7 +858,7 @@ extern "C"
 			else
 			{
 				tmp = connection->GetLibraryRootName();
-				s = jenv->NewStringUTF(tmp);
+				s = makeJavaString(jenv, tmp);
 				jvmOk(jenv, "Connection.GetLibraryRootName");
 			}
 		}
@@ -887,7 +887,7 @@ extern "C"
 			else
 			{
 				tmp = connection->GetLibraryVersion();
-				s = jenv->NewStringUTF(tmp);
+				s = makeJavaString(jenv, tmp);
 				jvmOk(jenv, "Connection.GetLibraryVersion");
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -61,9 +61,11 @@ bool TCPSocketClientReconnector::isConnected()
 
 Status TCPSocketClientReconnector::connect(int port, const char * server)
 {
-	m_port = port;
+	m_port   = port;
 	m_server = server;
+
 	Status result = TCPSocketClient::connect(port, server);
+
 	m_isConnected.set(!result.isError());
 
 // HP-UX and Solaris will block, others won't
@@ -93,7 +95,7 @@ Status TCPSocketClientReconnector::read(char * &buffer, int &len)
 	else
 	{
 		Status result;
-		result.set(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to host lost");
+		result.set(CONNECTION_ERROR, CONNECTION_LOST, "Connection to the server was lost");
 		return result;
 	}
 }
@@ -108,7 +110,7 @@ Status TCPSocketClientReconnector::write(const char *buffer, int len)
 	else
 	{
 		Status result;
-		result.set(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to host lost");
+		result.set(CONNECTION_ERROR, CONNECTION_LOST, "Connection to the server was lost");
 		return result;
 	}
 }
@@ -200,6 +202,8 @@ void TCPReconnector::run(void)
 		return;
 	}
 
+	bool haveError = false;
+
 	while (!reconnector->m_isShuttingDown.get())
 	{
 		if (reconnector->m_shouldBeConnected.get())
@@ -209,11 +213,25 @@ void TCPReconnector::run(void)
 				Status result = reconnector->write("O", 1); // Check that server is okay
 				if (result.isError())
 				{
+					if (!haveError)
+					{
+						GMSEC_INFO << "Attempting to reconnect...";
+						haveError = true;
+					}
 					reconnector->internalReconnect();
+				}
+				else
+				{
+					haveError = false;
 				}
 			}
 			else
 			{
+				if (!haveError)
+				{
+					GMSEC_INFO << "Attempting to reconnect...";
+					haveError = true;
+				}
 				reconnector->internalReconnect();
 			}
 		}

@@ -4,6 +4,7 @@
 
 //TODO: Replace with consolidated configuration file
 #include <gmsec4/internal/ConnectionInterface.h>
+#include <gmsec4/internal/Subject.h>
 
 #include <gmsec4/field/BinaryField.h>
 
@@ -30,28 +31,91 @@ using namespace gmsec::api::util;
 static const char* AGGREGATED_MSG_FIELD_NAME = "GMSEC-AGGREGATED-MSG";
 
 
-MessageAggregationToolkit::MessageAggregationToolkit(InternalConnection* conn)
+MessageAggregationToolkit::MessageAggregationToolkit(InternalConnection* conn, const Config& config)
 	: m_connection(conn),
 	  m_maxMsgsPerBin(100),
 	  m_flushPeriod(30000),
-	  m_messageBins(),
 	  m_aggregateAllMsgs(true),
+	  m_messageBins(),
 	  m_messageQ(),
+	  m_messageFilter(),
 	  m_condition(),
 	  m_encoder(),
 	  m_decoder()
 {
+	configure(config);
 }
 
 
 MessageAggregationToolkit::~MessageAggregationToolkit()
 {
+	destroyBins();
 }
 
 
-Condition& MessageAggregationToolkit::getCondition()
+bool MessageAggregationToolkit::addMessage(const Message& msg, const Config& config)
 {
-	return m_condition;
+	if (msg.getField(AGGREGATED_MSG_FIELD_NAME) != NULL)
+	{
+		return false;
+	}
+
+	AutoMutex lock(m_condition.getMutex());
+
+	const char* subject = msg.getSubject();
+	MessageBin* bin     = NULL;
+
+	if (m_aggregateAllMsgs)
+	{
+		MessageBins::iterator it = m_messageBins.find(subject);
+
+		if (it != m_messageBins.end())
+		{
+			bin = it->second;
+		}
+	}
+	else
+	{
+		for (MessageBins::iterator it = m_messageBins.begin(); it != m_messageBins.end() && bin == NULL; ++it)
+		{
+			if (Subject::doesSubjectMatchPattern(subject, it->first))
+			{
+				bin = it->second;
+			}
+		}
+	}
+
+	if (bin == NULL)
+	{
+		// Message bin not found; if we are aggregating all messages and the current one in question
+		// is not defined within the excluded list, then create a new bin for it.
+		if (m_aggregateAllMsgs && !m_messageFilter.isSubjectExcluded(subject))
+		{
+			bin = new MessageBin();
+			m_messageBins[subject] = bin;
+		}
+	}
+
+	if (bin != NULL)
+	{
+		bin->m_messages.push_back(new Message(msg));
+		bin->m_config = config;   // TODO: Ideally, it would be better to associate the config with the message, not the bin.
+
+		if (bin->m_messages.size() == 1)
+		{
+			bin->m_flushTime = getExpirationTime();
+		}
+
+		if (bin->m_messages.size() >= m_maxMsgsPerBin)
+		{
+			bin->m_readyToProcess = true;
+			m_condition.broadcast(FLUSH_BIN);
+		}
+	}
+
+	// Return true if we found/created a bin for the message, or false if not. In case of the latter,
+	// the message should be published without delay.
+	return (bin != NULL);
 }
 
 
@@ -140,6 +204,50 @@ Message* MessageAggregationToolkit::nextMsg()
 }
 
 
+void MessageAggregationToolkit::runThread(StdSharedPtr<MessageAggregationToolkit> shared)
+{
+	shared->run();
+}
+
+
+void MessageAggregationToolkit::shutdown()
+{
+	AutoMutex lock(m_condition.getMutex());
+
+	destroyBins();
+
+	m_condition.broadcast(QUIT);
+
+	bool threadDone = false;
+	int  tries = 3;
+
+	while (!threadDone && tries-- > 0)
+	{
+		int reason = m_condition.wait(1000);
+
+		threadDone = (reason == UNMANAGED);
+	}
+}
+
+
+Condition& MessageAggregationToolkit::getCondition()
+{
+	return m_condition;
+}
+
+
+size_t MessageAggregationToolkit::getMaxMsgsPerBin() const
+{
+	return m_maxMsgsPerBin;
+}
+
+
+int MessageAggregationToolkit::getFlushPeriod() const
+{
+	return m_flushPeriod;
+}
+
+
 void MessageAggregationToolkit::configure(const Config& config)
 {
 	AutoMutex lock(m_condition.getMutex());
@@ -154,6 +262,25 @@ void MessageAggregationToolkit::configure(const Config& config)
 		if (subject && !std::string(subject).empty())
 		{
 			createMsgBin(subject);
+
+			m_aggregateAllMsgs = false;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	for (int N = 1; true; ++N)
+	{
+		std::ostringstream key;
+		key << "GMSEC-MSG-BIN-EXCLUDE-SUBJECT-" << N;
+
+		const char* subject = config.getValue(key.str().c_str());
+
+		if (subject && !std::string(subject).empty())
+		{
+			m_messageFilter.excludeSubject(subject);
 		}
 		else
 		{
@@ -175,66 +302,12 @@ void MessageAggregationToolkit::createMsgBin(const char* subject)
 		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Subject cannot be NULL nor an empty string");
 	}
 
-	MessageBin* bin = m_messageBins[subject];
+	MessageBins::iterator it = m_messageBins.find(subject);
 
-	if (!bin)
+	if (it == m_messageBins.end())
 	{
 		m_messageBins[subject] = new MessageBin();
 	}
-
-	m_aggregateAllMsgs = false;
-}
-
-
-bool MessageAggregationToolkit::addMessage(const Message& msg, const Config& config)
-{
-	if (msg.getField(AGGREGATED_MSG_FIELD_NAME) != NULL)
-	{
-		return false;
-	}
-
-	AutoMutex lock(m_condition.getMutex());
-
-	MessageBin* bin = m_messageBins[msg.getSubject()];
-
-	if (!bin)
-	{
-		if (m_aggregateAllMsgs)
-		{
-			// No bin exists for message, and since we are caching
-			// all messages we need to create it.
-			bin = new MessageBin();
-			m_messageBins[msg.getSubject()] = bin;
-		}
-		else
-		{
-			// No bin exists for message, and since we are NOT caching
-			// just any ol' message, we return immediately.
-			return false;
-		}
-	}
-
-	bin->m_messages.push_back(new Message(msg));
-	bin->m_config = config;
-
-	if (bin->m_messages.size() == 1)
-	{
-		bin->m_flushTime = getExpirationTime();
-	}
-
-	if (bin->m_messages.size() >= m_maxMsgsPerBin)
-	{
-		bin->m_readyToProcess = true;
-		m_condition.broadcast(FLUSH_BIN);
-	}
-
-	return true;
-}
-
-
-void MessageAggregationToolkit::runThread(StdSharedPtr<MessageAggregationToolkit> shared)
-{
-	shared->run();
 }
 
 
@@ -280,38 +353,6 @@ void MessageAggregationToolkit::run()
 }
 
 
-void MessageAggregationToolkit::shutdown()
-{
-	AutoMutex lock(m_condition.getMutex());
-
-	destroyBins();
-
-	m_condition.broadcast(QUIT);
-
-	bool threadDone = false;
-	int  tries = 3;
-
-	while (!threadDone && tries-- > 0)
-	{
-		int reason = m_condition.wait(1000);
-
-		threadDone = (reason == UNMANAGED);
-	}
-}
-
-
-size_t MessageAggregationToolkit::getMaxMsgsPerBin() const
-{
-	return m_maxMsgsPerBin;
-}
-
-
-int MessageAggregationToolkit::getFlushPeriod() const
-{
-	return m_flushPeriod;
-}
-
-
 bool MessageAggregationToolkit::checkForExpiredBins()
 {
 	bool haveExpiredBins = false;
@@ -350,15 +391,45 @@ void MessageAggregationToolkit::processBins()
 }
 
 
+struct AggregatedMessage
+{
+	AggregatedMessage(const char* subject, Message::MessageKind kind)
+		: msg(new Message(subject, kind)),
+		  numAggregated(0),
+		  data()
+	{
+	}
+
+	~AggregatedMessage()
+	{
+		delete msg;
+	}
+
+	Message*              msg;
+	GMSEC_U32             numAggregated;
+	std::vector<GMSEC_U8> data;
+};
+
+
 void MessageAggregationToolkit::processBin(MessageBin* bin)
 {
 	AutoMutex lock(m_condition.getMutex());
 
 	if (bin && bin->m_messages.size() > 0)
 	{
-		std::auto_ptr<Message> aggMsg;
+		typedef std::map<std::string, AggregatedMessage*> AggregatedMessages;
 
-		std::vector<GMSEC_U8> aggregatedData;
+		// The Message Bin may contain a heterogeneous collection of messages with somewhat similar
+		// subjects (undoubtedly matching the pattern of a configured wilcard subject).
+		//
+		// To assist with the aggregation of messages bearing the same subject, we rely on keeping
+		// an individual 'bucket' for each unique subject.  Each bucket will contain a Message object,
+		// that in turn contains the aggregated encoded message data, and the number of messages
+		// included in the aggregated data.
+		//
+		// When the bucket(s) have been prepared, the message contained within will be published.
+
+		AggregatedMessages aggregatedMessages;
 
 		for (MessageBin::MessageList::iterator it = bin->m_messages.begin(); it != bin->m_messages.end(); ++it)
 		{
@@ -366,13 +437,24 @@ void MessageAggregationToolkit::processBin(MessageBin* bin)
 			std::ostringstream fieldName;
 			DataBuffer         buffer;
 
-			// use first cached message to create framework for aggregated message
-			if (it == bin->m_messages.begin())
-			{
-				aggMsg.reset(new Message(cachedMsg->getSubject(), cachedMsg->getKind()));
+			AggregatedMessage* aggMsg = NULL;
 
-				aggMsg.get()->addField(AGGREGATED_MSG_FIELD_NAME, true);
-				aggMsg.get()->addField("NUM-MESSAGES", GMSEC_U32(bin->m_messages.size()));
+			AggregatedMessages::iterator it2 = aggregatedMessages.find(cachedMsg->getSubject());
+
+			if (it2 == aggregatedMessages.end())
+			{
+				// create new aggregated message bucket
+				aggMsg = new AggregatedMessage(cachedMsg->getSubject(), cachedMsg->getKind());
+
+				aggMsg->msg->addField(AGGREGATED_MSG_FIELD_NAME, true);
+				aggMsg->msg->addField("NUM-MESSAGES", aggMsg->numAggregated);
+
+				aggregatedMessages[cachedMsg->getSubject()] = aggMsg;
+			}
+			else
+			{
+				// use existing aggregated message bucket
+				aggMsg = it2->second;
 			}
 
 			// encode message into data buffer
@@ -382,36 +464,41 @@ void MessageAggregationToolkit::processBin(MessageBin* bin)
 			GMSEC_U8* dataSize = reinterpret_cast<GMSEC_U8*>(&bufSize);
 			GMSEC_U8* data     = reinterpret_cast<GMSEC_U8*>(buffer.raw());
 
-			// aggregate encoded data into data buffer
-			aggregatedData.reserve(aggregatedData.size() + sizeof(bufSize) + buffer.size());
-			aggregatedData.insert(aggregatedData.end(), dataSize, dataSize + sizeof(bufSize));
-			aggregatedData.insert(aggregatedData.end(), data, data + buffer.size());
+			// add encoded data into aggregate data buffer
+			aggMsg->data.reserve(aggMsg->data.size() + sizeof(bufSize) + buffer.size());
+			aggMsg->data.insert(aggMsg->data.end(), dataSize, dataSize + sizeof(bufSize));
+			aggMsg->data.insert(aggMsg->data.end(), data, data + buffer.size());
+
+			// increment message count and add aggregated data buffer as BinaryField in message
+			aggMsg->msg->addField("NUM-MESSAGES", ++aggMsg->numAggregated);
+			aggMsg->msg->addField("MSG-DATA", &aggMsg->data[0], aggMsg->data.size());
 
 			delete cachedMsg;
 		}
 
-		// add aggregated data as BinaryField in message
-		aggMsg.get()->addField("MSG-DATA", &aggregatedData[0], aggregatedData.size());
-
-		try
+		// Publish message contained within each aggregated message bucket
+		for (AggregatedMessages::iterator it = aggregatedMessages.begin(); it != aggregatedMessages.end(); ++it)
 		{
-			// publish message containing aggregated data
-			m_connection->publish(*(aggMsg.get()), bin->m_config);
+			try
+			{
+				m_connection->publish(*(it->second->msg), bin->m_config);
 
-			m_publishStatus.reset();
-		}
-		catch (Exception& e)
-		{
-			GMSEC_ERROR << "Failed to send aggregated message with topic " << aggMsg.get()->getSubject()
-			            << " due to: " << e.what();
+				m_publishStatus.reset();
+			}
+			catch (Exception& e)
+			{
+				GMSEC_ERROR << "Failed to send aggregated message with topic " << it->second->msg->getSubject()
+				            << " due to: " << e.what();
 
-			m_publishStatus = Status(e);
+				m_publishStatus = Status(e);
 
-			m_connection->dispatchEvent(Connection::MSG_PUBLISH_FAILURE_EVENT, m_publishStatus);
+				m_connection->dispatchEvent(Connection::MSG_PUBLISH_FAILURE_EVENT, m_publishStatus);
+			}
+
+			delete it->second;
 		}
 
 		bin->m_messages.clear();
-
 		bin->m_readyToProcess = false;
 	}
 }

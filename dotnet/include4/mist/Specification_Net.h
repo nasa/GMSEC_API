@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -61,7 +61,7 @@ public:
 
 
 	/// <summary>Destructor</summary>
-	~Specification();
+	virtual ~Specification();
 
 
 	/// <summary>
@@ -78,7 +78,7 @@ public:
 	/// An exception is thrown if the message fails to pass validation.  
 	/// A list of errors will be given of any issues found with the message.
 	/// </exception>
-	void ValidateMessage(Message^ msg);
+	virtual void ValidateMessage(Message^ msg);
 
 
 	/// <summary>
@@ -123,6 +123,12 @@ protected:
 	!Specification();
 
 
+	/// <summary>Pass through to Specification managed class</summary>
+	///
+	/// <param name="msg">the message</param>
+	void ValidateMessageNative(const gmsec::api::Message& msg);
+
+
 internal:
 	/// <summary>
 	/// Constructor that creates the association of this object with an existing unmanaged object
@@ -144,7 +150,7 @@ internal:
 
 private:
 	gmsec::api::mist::Specification* m_impl;
-	bool                             m_owned;
+	bool m_owned;
 };
 
 } // end namespace MIST

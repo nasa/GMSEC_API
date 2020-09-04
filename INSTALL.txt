@@ -1,5 +1,5 @@
  
-# Copyright 2007-2016 United States Government as represented by the
+# Copyright 2007-2017 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -122,7 +122,7 @@ Preliminary Step for Perl API:
 (Note: This step can be skipped if you do not intend to build the Perl API)
 In order to build the 4.X Perl API on Windows, a file named perl.lib must
 be created in the %PERL5_HOME%/lib/CORE directory.  To do so, either create
-a hard link or a copy of the perlXYZ.lib file, where XYZ refers to the version
+a hard link or create a copy of the perlXYZ.lib file, where XYZ refers to the version
 of perl, and name the link or file copy perl.lib.
 
 e.g. mklink /H perl.lib perl514.lib
@@ -264,13 +264,13 @@ in the GMSEC_API/bin directory after a successful builld.
 
 PERL5 INCLUDE PATH :
 --------------------
-Set the PERL5_LIB environment variable to the location of your Perl5
-lib directory.
+Set the PERL5_LIB environment variable to the directory containing the library
+files for your installation of Perl 5.
 
-(Note: This direcotry path may vary between different versions of Perl.  The
+(Note: This directory path may vary between different versions of Perl.  The
 directory in question contains a subdirectory named "CORE")
 
-e.g.  export PERL5_HOME=/usr/lib64/perl5
+e.g.  export PERL5_LIB=/usr/lib64/perl5
 
 SWIG PATH :
 -----------

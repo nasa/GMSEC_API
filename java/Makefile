@@ -1,4 +1,4 @@
-# Copyright 2007-2016 United States Government as represented by the
+# Copyright 2007-2017 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -84,6 +84,7 @@ OBJECTS_4x = \
              $(OBJDIR_4x)/gmsecJNI_ConnectionManagerCallback.o \
              $(OBJDIR_4x)/gmsecJNI_ConnectionManagerEventCallback.o \
              $(OBJDIR_4x)/gmsecJNI_ConnectionManagerReplyCallback.o \
+             $(OBJDIR_4x)/gmsecJNI_CustomSpecification.o \
              $(OBJDIR_4x)/gmsecJNI_EventCallback.o \
              $(OBJDIR_4x)/gmsecJNI_F32Field.o \
              $(OBJDIR_4x)/gmsecJNI_F64Field.o \

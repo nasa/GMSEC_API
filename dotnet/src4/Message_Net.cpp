@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -134,6 +134,31 @@ Message::MessageKind Message::GetKind()
 String^ Message::GetSubject()
 {
 	return gcnew String(m_impl->getSubject());
+}
+
+
+void Message::SetSubject(String^ subject)
+{
+	char* subjectStr = nullptr;
+
+	try
+	{
+		subjectStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(subject).ToPointer());
+
+		m_impl->setSubject(subjectStr);
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+	catch (...)
+	{
+		throw gcnew GMSEC_Exception(StatusClass::MSG_ERROR, StatusCode::OUT_OF_MEMORY, "Unable to process subject string");
+	}
+	finally
+	{
+		FREE_HGLOBAL_IF_NOT_NULLPTR(subjectStr);
+	}
 }
 
 

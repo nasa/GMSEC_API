@@ -140,7 +140,14 @@ public class Util
 
 	static void closeConnection(Connection conn)
 	{
-		conn.disconnect();
+		try
+		{
+			conn.disconnect();
+		}
+		catch (GMSEC_Exception e)
+		{
+			Log.error(e.toString());
+		}
 
 		Connection.destroy(conn);
 	}
