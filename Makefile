@@ -1,5 +1,5 @@
  
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -22,16 +22,17 @@ GMSEC_HOME = .
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
-.PHONY: check_support build library perl_api perl_api_3x perl_api_4x python_api python_api_4x python3_api python3_api_4x env_val api_docs mw_wrapper clean install tools
+.PHONY: check_support build library perl_api perl_api_3x perl_api_4x python3_api python3_api_4x env_val api_docs mw_wrapper clean install tools
 
 
-default: check_support build library xslt mw_wrappers java_api perl_api python_api python3_api csharp_api env_val tools patch-mac
+default: check_support build library mw_wrappers java_api perl_api python3_api csharp_api env_val tools patch-mac
 
 
 check_support:
-	@ if [ -d ../SUPPORT ]; then \
-		echo "Found SUPPORT directory..." ; \
+	@ if [ -d $$SUPPORT ]; then \
+		echo "Found $$SUPPORT directory..." ; \
 	fi
+	mkdir -p $(BINDIR)
 
 
 build:
@@ -131,33 +132,6 @@ else
 endif
 
 
-python_api:
-# Note: Python binding for API 4.x is currently only supported on RHEL7 64-bit and MacOSX distros.
-ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
-ifneq ($(findstring linux.x86_64-32bit,$(GMSEC_PLATFORM)), linux.x86_64-32bit)
-	$(MAKE) python_api_4x
-endif
-endif
-ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
-	$(MAKE) python_api_4x
-endif
-
-
-python_api_4x:
-ifdef SWIG_HOME
-	$(MAKE) -C python/gmsec4
-else
-	@echo
-	@echo
-	@echo "###########################################################"
-	@echo "#"
-	@echo "#  SWIG_HOME is not defined"
-	@echo "#  Skipping build of Python binding of the GMSEC API 4.x"
-	@echo "#"
-	@echo "###########################################################"
-endif
-
-
 python3_api:
 # Note: Python3 binding for API 4.x is currently only supported on RHEL7 64-bit and MacOSX distros.
 ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
@@ -248,22 +222,6 @@ env_val:
 	cp validator/*.env ./bin/validator
 
 
-xslt:
-	@echo
-	@echo
-	@echo "###########################################################"
-	@echo "#"
-	@echo "#  Setting up XSLT-related runtime libraries"
-	@echo "#"
-	@echo "###########################################################"
-ifeq ($(findstring SUPPORT,$(LIBXML2_LIB)), SUPPORT)
-	cp -av $(LIBXML2_LIB)/lib*$(SHLIB_EXT)* $(BINDIR)
-endif
-ifeq ($(findstring SUPPORT,$(LIBXSLT_LIB)), SUPPORT)
-	cp -av $(LIBXSLT_LIB)/lib*$(SHLIB_EXT)* $(BINDIR)
-endif
-
-
 tools:
 	$(MAKE) -C tools
 
@@ -293,7 +251,6 @@ clean: clean-gcov
 	done
 	- @ [ -f perl/gmsec/Makefile ] && $(MAKE) -C perl/gmsec veryclean
 	- @ $(MAKE) -C perl/gmsec4 clean
-	- @ $(MAKE) -C python/gmsec4 clean
 	- @ $(MAKE) -C python3/gmsec4 clean
 	- @ $(MAKE) -C csharp/gmsec4 clean
 	$(RM) $(BINDIR)/*

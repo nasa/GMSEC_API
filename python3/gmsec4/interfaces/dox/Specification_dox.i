@@ -14,9 +14,18 @@
 
     CONSTRUCTOR:
 
+    Specification()
+
+    Initializes the Specification with the default message specification (NASA/GMSEC Addendum).
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if, for whatever reason, the Specification cannot load message templates.
+
+
     Specification(config: Config)
 
-    Initializes the Specification instance.
+    Initializes the Specification instance using the given configuration.
 
     Parameters
     ----------
@@ -72,6 +81,13 @@
     Returns the version of the ISD being used as an unsigned integer.
 ";
 
+%feature("docstring") gmsec::api::mist::Specification::getSchemaLevel"
+
+    get_schema_level(self) -> SchemaLevel
+
+    Returns the schema level of the message specification in use.
+";
+
 %feature("docstring") gmsec::api::mist::Specification::getSchemaIDIterator "
 
     get_schema_id_iterator(self) -> SchemaIDIterator
@@ -112,4 +128,31 @@
     Returns
     -------
     A MessageSpecificationList associated with the Specification
+";
+
+%feature("docstring") gmsec::api::mist::Specification::registerMessageValidator"
+
+    registerMessageValidator(self, validator: MessageValidator) -> void
+
+    Registers the give message validator to be used when message validation takes place.
+
+    Example usage:
+
+    class CustomMessageValidator(libgmsec_python3.MessageValidator):
+        def __init__(self):
+            libgmsec_python3.MessageValidator.__init__(self)
+
+        def validate_message(self, message):
+            status = libgmsec_python3.Status()
+            # validate message
+            if error:
+                status.set(...)
+            return status
+
+
+    ...
+    validator = CustomMessageValidator()
+    ...
+    specification.registerMessageValidator(validator)
+
 ";

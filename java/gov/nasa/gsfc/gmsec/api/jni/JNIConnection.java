@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -294,10 +294,10 @@ public class JNIConnection
 	}
 
 
-	public void publish(Message msg, Config config)
+	public void publish(Message msg, Config mwConfig)
 	{
 		JNIMessage jMsg = Message.getInternal(msg);
-		JNIConfig  jCfg = Config.getInternal(config);
+		JNIConfig  jCfg = Config.getInternal(mwConfig);
 
 		gmsecJNI.Connection_Publish(swigCPtr, this, JNIMessage.getCPtr(jMsg), jMsg, JNIConfig.getCPtr(jCfg), jCfg);
 	}

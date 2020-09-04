@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -7,8 +7,8 @@
 
 
 /**
- * \file StringUtil.cpp
- * \brief Provide string utility functions.
+ * @file StringUtil.cpp
+ * @brief Provide string utility functions.
  */
 
 
@@ -134,6 +134,15 @@ std::string StringConverter::convertString(const char* str)
 
 // BEGIN StringUtil
 //
+
+static const char GMSEC_HYPHEN     = '-';
+static const char GMSEC_UNDERSCORE = '_';
+static const char GMSEC_PERIOD     = '.';
+static const char GMSEC_DOT        = GMSEC_PERIOD;
+static const char GMSEC_COLON      = ':';
+static const char GMSEC_PLUS       = '+';
+static const char GMSEC_MINUS      = GMSEC_HYPHEN;
+
 
 size_t StringUtil::stringLength(const char * s)
 {
@@ -314,6 +323,7 @@ void StringUtil::stringFormat(char * dest, int space, const char *format, ...)
 	va_end(args);
 }
 
+
 //pulled from glibc and renamed to GMSEC namespace for portability
 int gmsec_mon_yday[2][13] =
 {
@@ -322,13 +332,7 @@ int gmsec_mon_yday[2][13] =
     /* Leap years.  */
     { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366 }
 };
-static inline int gmsec_leapyear (int year)
-{
-  return
-    ((year & 3) == 0
-     && (year % 100 != 0
-         || ((year / 100) & 3) == (- (1900 / 100) & 3)));
-}
+
 
 double StringUtil::getTimeFromString(const std::string& timeString)
 {
@@ -394,7 +398,7 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 				time_t local = mktime(&locTime);
 				time_t localTimeOffsetSeconds = local - utcTime;
 
-				int leapYearIndex = gmsec_leapyear(year) ? 1 : 0;
+				int leapYearIndex = (isLeapYear((unsigned int) year) ? 1 : 0);
 				int month = 0;
 				int dayOfMonth = 0;
 				for (int mon = 0; mon < 12; mon++) { //12 months in year
@@ -425,6 +429,7 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 
 	return 0;
 }
+
 
 bool StringUtil::stringIsTrue(const char * s)
 {
@@ -881,6 +886,183 @@ std::string StringUtil::toJSON(const char* data)
 	}
 
 	return Json::valueToQuotedString(data);
+}
+
+
+bool StringUtil::isLeapYear(unsigned int year)
+{
+	return (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0));
+}
+
+
+bool StringUtil::isValidHeaderString(const std::string& fieldValue)
+{
+	if (fieldValue.empty())
+	{
+		return false;
+	}
+
+	char junk;
+	int ret = sscanf(fieldValue.c_str(), "%*[A-Z0-9_-]%c", &junk);
+	return (ret <= 0);  // success if no conversion made or EOF reached
+}
+
+
+bool isValidTime(const std::string& time, unsigned int& hour, unsigned int& min, unsigned int& sec, unsigned int& frac, bool mustHaveAllFields = false)
+{
+	bool valid = true;
+
+	hour = min = sec = frac = 0;
+
+	int result1 = 0, result2 = 0, result3 = 0;
+	std::vector<std::string> elems = StringUtil::split(time, ':');
+	std::string secs;
+
+	if (mustHaveAllFields && elems.size() != 3)
+	{
+		valid = false;
+	}
+
+	if (valid)
+	{
+		switch (elems.size())
+		{
+		case 1:
+			secs    = elems[0];
+			result1 = sscanf(secs.c_str(), "%02u.%06u", &sec, &frac);
+			valid   = (result1 >= 1);
+			break;
+		case 2:
+			secs    = elems[1];
+			result1 = sscanf(elems[0].c_str(), "%02u", &min);
+			result2 = sscanf(secs.c_str(), "%02u.%06u", &sec, &frac);
+			valid  = (result1 == 1 && result2 >= 1);
+			break;
+		case 3:
+			secs    = elems[2];
+			result1 = sscanf(elems[0].c_str(), "%02u", &hour);
+			result2 = sscanf(elems[1].c_str(), "%02u", &min);
+			result3 = sscanf(secs.c_str(), "%02u.%06u", &sec, &frac);
+			valid  = (result1 == 1 && result2 == 1 && result3 >= 1);
+			break;
+		default:
+			valid = false;
+		}
+	}
+
+	if (valid && secs[ secs.length() - 1 ] == GMSEC_DOT)
+	{
+		valid = false;
+	}
+
+	return valid;
+}
+
+
+bool StringUtil::isValidTimestamp(const std::string& fieldValue)
+{
+	bool valid = true;
+
+	std::string fldValue = fieldValue;
+	unsigned int year = 0, day = 0, hour = 0, min = 0, sec = 0, frac = 0;
+	bool isRelativeTime = false;
+
+	if (!isdigit(fldValue[0]))
+	{
+		valid = (fldValue[0] == GMSEC_PLUS || fldValue[0] == GMSEC_MINUS);
+		isRelativeTime = valid;
+
+		fldValue = fieldValue.substr(1);
+	}
+
+	std::vector<std::string> elems = StringUtil::split(fldValue, '-');
+
+	if (elems.size() == 1 && isRelativeTime)
+	{
+		// only time given
+		valid = isValidTime(fldValue, hour, min, sec, frac);
+	}
+	else if (elems.size() == 2 && isRelativeTime)
+	{
+		// only day and time given
+		int result = sscanf(elems[0].c_str(), "%03u", &day);
+		valid = ((result == 1) && isValidTime(elems[1], hour, min, sec, frac, true));
+	}
+	else if (elems.size() == 3)
+	{
+		// year, day and time given
+		int result1 = sscanf(elems[0].c_str(), "%04u", &year);
+		int result2 = sscanf(elems[1].c_str(), "%03u", &day);
+
+		if (result1 != 1 || elems[0].length() != 4)
+		{
+			valid = false;
+		}
+		else if (result2 != 1 || elems[1].length() != 3)
+		{
+			valid = false;
+		}
+		else if (!isValidTime(elems[2], hour, min, sec, frac, true))
+		{
+			valid = false;
+		}
+	}
+	else
+	{
+		valid = false;
+	}
+
+	unsigned int dayMin = (isRelativeTime ? 0 : 1);
+	unsigned int dayMax = (StringUtil::isLeapYear(year) ? 366 : 365);
+
+	if (valid && (year > 9999)) valid = false;
+	if (valid && ((day < dayMin) || (day > dayMax))) valid = false;
+	if (valid && (hour > 23)) valid = false;
+	if (valid && (min > 59)) valid = false;
+	if (valid && (sec > 60)) valid = false;  // 60 is to allow for leap-seconds
+
+	return valid;
+}
+
+
+bool StringUtil::isValidIpAddress(const std::string& address)
+{
+	bool valid = false;
+
+	if (address.find('.') != std::string::npos)
+	{
+		// IPv4 style address
+		unsigned int quad1, quad2, quad3, quad4;
+
+		int result = sscanf(address.c_str(), "%03u.%03u.%03u.%03u", &quad1, &quad2, &quad3, &quad4);
+
+		valid = (result == 4);
+		valid = (valid && quad1 < 256);
+		valid = (valid && quad2 < 256);
+		valid = (valid && quad3 < 256);
+		valid = (valid && quad4 < 256);
+	}
+	else if (address.find(':') != std::string::npos)
+	{
+		// IPv6 style address
+		std::vector<std::string> quads = StringUtil::split(address, ':');
+
+		valid = (quads.size() == 8);
+
+		for (size_t i = 0; i < quads.size() && valid; ++i)
+		{
+			valid = !(quads[i].empty());
+
+			if (valid)
+			{
+				char junk;
+				int ret = sscanf(quads[i].c_str(), "%*[A-F0-9]%c", &junk);
+				valid = (ret == -1);
+			}
+		}
+	}
+
+	return valid;
 }
 
 

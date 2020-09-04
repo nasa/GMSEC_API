@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,6 +14,8 @@
 
 #include <gmsec4/internal/InternalAtomics.h>
 #include <gmsec4/util/Mutex.h>
+
+#include <stddef.h>   // for size_t
 
 #if defined (WIN32)
 #include <windows.h>

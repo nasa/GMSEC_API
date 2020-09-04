@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -34,7 +34,8 @@ class OpenDDSMessageListener : public virtual OpenDDS::DCPS::LocalObject<DDS::Da
 {
 public:
 	// Constructor
-	OpenDDSMessageListener(OpenDDSConnection* conn,
+	OpenDDSMessageListener(const char* subjectPattern,
+	                       OpenDDSConnection* conn,
 	                       Queue &queue,
 	                       const gmsec::api::internal::RequestSpecs& specs,
 	                       bool isReplyListener = false,
@@ -58,11 +59,12 @@ public:
 	virtual void on_sample_lost(DDS::DataReader_ptr reader, const DDS::SampleLostStatus& status);
 
 private:
-	OpenDDSConnection*                       connection;
-	Queue                                    &queue;
-	const gmsec::api::internal::RequestSpecs &requestSpecs;
-	bool                                     isReplyListener;
-	bool                                     dropMessages;
+	std::string                               subjectPattern;
+	OpenDDSConnection*                        connection;
+	Queue&                                    queue;
+	const gmsec::api::internal::RequestSpecs& requestSpecs;
+	bool                                      isReplyListener;
+	bool                                      dropMessages;
 
 	// Decode the meta data associated with the message
 	gmsec::api::Status parseProperties(gmsec::api::internal::ValueMap& meta, const gmsec::api::util::DataBuffer& out, gmsec::api::Message& message);

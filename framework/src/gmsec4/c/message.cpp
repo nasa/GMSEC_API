@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -972,6 +972,38 @@ const char* CALL_TYPE messageGetStringValue(GMSEC_Message msg, const char* field
 	}
 
 	return value;
+}
+
+
+GMSEC_BOOL CALL_TYPE messageHasField(GMSEC_Message msg, const char* name, GMSEC_Status status)
+{
+	GMSEC_BOOL  found = GMSEC_FALSE;
+	Status      result;
+
+	const Message* m = reinterpret_cast<const Message*>(msg);
+
+	if (!m)
+	{
+		result = Status(MSG_ERROR, UNINITIALIZED_OBJECT, "Message handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			found = (m->hasField(name) ? GMSEC_TRUE : GMSEC_FALSE);
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return found;
 }
 
 

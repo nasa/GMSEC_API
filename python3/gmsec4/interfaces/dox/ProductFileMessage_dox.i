@@ -4,27 +4,8 @@
     A specialized MistMessage that is capable of storing ProductFiles.
 
     The following message schema IDs and their templates are supported:
-    MSG.PROD.AAA
-    MSG.PROD.AUTO
-    MSG.PROD.FD
-    MSG.PROD.MAS
-    MSG.PROD.PAS
-    MSG.PROD.SC
-    MSG.PROD.TAC
-    REQ.PROD.AAA
-    REQ.PROD.AUTO
-    REQ.PROD.FD
-    REQ.PROD.MAS
-    REQ.PROD.PAS
-    REQ.PROD.SC
-    REQ.PROD.TAC
-    RESP.PROD.AAA
-    RESP.PROD.AUTO
-    RESP.PROD.FD
-    RESP.PROD.MAS
-    RESP.PROD.PAS
-    RESP.PROD.SC
-    RESP.PROD.TAC
+    2019.00.C2MS.MSG.PROD
+    MSG.PROD
 
     See Also
     --------
@@ -89,8 +70,8 @@
     ----------
     subject        : The subject string for the message.
     responseStatus : The RESPONSE-STATUS field to indert into a MSG PROD message.
-    schemaID       : The string used to identify the message schema in the GMSEC ISD.
-                     The schema ID has the MessageKind.MessageType.MessageSubtype (e.g. MSG.PROD.AUTO).
+    schemaID       : The string used to identify the message schema in C2MS or other message specification.
+                     The schema ID has the MessageKind.MessageType.MessageSubtype (e.g. MSG.PROD).
     spec           : The Specification this message's schema will adhere to.
 
     Exceptions
@@ -109,8 +90,8 @@
     ----------
     subject        : The subject string for the message.
     responseStatus : The RESPONSE-STATUS field to indert into a MSG PROD message.
-    schemaID       : The string used to identify the message schema in the GMSEC ISD.
-                     The schema ID has the MessageKind.MessageType.MessageSubtype (e.g. MSG.PROD.AUTO).
+    schemaID       : The string used to identify the message schema in C2MS or other message specification.
+                     The schema ID has the MessageKind.MessageType.MessageSubtype (e.g. MSG.PROD).
     config         : A Config to associate with the message.
     spec           : The Specification this message's schema will adhere to.
 

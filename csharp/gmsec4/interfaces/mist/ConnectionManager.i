@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -59,6 +59,16 @@ using namespace gmsec::api::mist;
 %ignore gmsec::api::mist::ConnectionManager::changeCPUMemory(const Field&);
 %ignore gmsec::api::mist::ConnectionManager::changeCPUUtil(const Field&);
 
+/* Ignore C-related methods */
+%ignore gmsec::api::mist::ConnectionManager::registerMessageValidator(GMSEC_MessageValidator*);
+%ignore gmsec::api::mist::ConnectionManager::registerEventCallback(Connection::ConnectionEvent, GMSEC_ConnectionMgrEventCallback*);
+%ignore gmsec::api::mist::ConnectionManager::subscribe(const char*, const Config&, GMSEC_ConnectionMgrCallback*);
+%ignore gmsec::api::mist::ConnectionManager::request(const Message&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
+%ignore gmsec::api::mist::ConnectionManager::cancelRequest(GMSEC_ConnectionMgrReplyCallback*);
+%ignore gmsec::api::mist::ConnectionManager::requestDirective(const char*, const Field&, const gmsec::api::util::DataList<Field*>&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
+%ignore gmsec::api::mist::ConnectionManager::requestSimpleService(const char*, const char*, const Field&, const gmsec::api::util::DataList<Field*>&, const gmsec::api::util::DataList<ServiceParam*>&, GMSEC_I32, GMSEC_ConnectionMgrReplyCallback*, GMSEC_ConnectionMgrEventCallback*, GMSEC_I32);
+
+/* Ignore malfunctioning methods */
 %ignore gmsec::api::mist::ConnectionManager::shutdownAllMiddlewares();
 
 %rename("GetAPIVersion") getAPIVersion;
@@ -71,6 +81,7 @@ using namespace gmsec::api::mist;
 %rename("SetStandardFields") setStandardFields;
 %rename("GetStandardFields") getStandardFields;
 %rename("AddStandardFields") addStandardFields;
+%rename("RegisterMessageValidator") registerMessageValidator;
 %rename("RegisterEventCallback") registerEventCallback;
 %rename("Subscribe") subscribe;
 %rename("Unsubscribe") unsubscribe;

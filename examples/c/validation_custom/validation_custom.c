@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,15 +10,10 @@
  *
  * This file contains an example demonstrating how to implement additional
  * Message validation logic in addition to that which the GMSEC API provides.
- *
- * Note: This example focuses on adding additional validation upon the receipt
- * of a message.  It almost goes without saying that additional logic can be
- * added to a program prior to invoking the publish() function without having
- * to do anything special.
  */
 
 #include <gmsec4_c.h>
-#include <gmsec4/c/mist/product_file_iterator.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,90 +24,64 @@
 	#define snprintf sprintf_s
 #endif
 
-const char* PROD_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.PROD.PRODUCT_MESSAGE";
+
+const char* HB_MSG_SUBJECT     = "GMSEC.MISSION.SATELLITE.MSG.HB.VALIDATION-CUSTOM";
+const char* ALT_HB_MSG_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.VALIDATION-CUSTOM.HB";
+
 
 //o Helper functions
-void initializeLogging(GMSEC_Config config, GMSEC_Status status);
 void checkStatus(GMSEC_Status status);
-void setupStandardFields(GMSEC_ConnectionMgr connMgr, int specVersion, GMSEC_Status status);
-GMSEC_Message createProductFileMessage(const GMSEC_ConnectionMgr connMgr, const char* filePath, GMSEC_Status status);
-GMSEC_BOOL isProdMsg(GMSEC_Message message, GMSEC_Status status);
+
+void initializeLogging(GMSEC_Config config, GMSEC_Status status);
+void setupStandardFields(unsigned int specVersion);
+void clearStandardFields();
 
 
-void validationCallback(GMSEC_ConnectionMgr connMgr, const GMSEC_Message message)
+void customMessageValidator(const GMSEC_Message msg, GMSEC_Status status)
 {
-	GMSEC_Status status = statusCreate();
-	GMSEC_Specification spec = connectionManagerGetSpecification(connMgr, NULL);
+	//o Get message type and subtype
+	const char* type;
+	const char* subtype;
 
-	//o Run the message through the GMSEC API-supplied validation
-	specificationValidateMessage(spec, message, status);
-	checkStatus(status);
-
-	//o In this example scenario, we are expecting to receive a
-	// GMSEC PROD message containing a URI to a location on the disk
-	// where a product file has been placed for retrieval.  In this
-	// case, we want to validate that the location on the disk is
-	// in an area which we would expect (i.e. Something that the
-	// team has agreed upon prior to operational deployment).
-	//
-	// By validating this URI, we ensure that no malicious users
-	// have infiltrated the system and somehow modified the messages
-	// to cause us to retrieve a file from an unknown location.
-
-	//o Start by checking to ensure that this is a PROD message
-	if(isProdMsg(message, status))
+	if (messageHasField(msg, "MESSAGE-TYPE", NULL) == GMSEC_TRUE)
 	{
-		GMSEC_ProductFileIterator prodIter;
-		GMSEC_Message prodMessage = productFileMessageCreateUsingSpecAndData(spec, messageToXML(message, NULL), status);
-		checkStatus(status);
-
-		//o Extract the Product File URI location(s) from the
-		// message using a ProductFileIterator
-		prodIter = productFileMessageGetIterator(prodMessage, status);
-		checkStatus(status);
-
-		while(productFileIteratorHasNext(prodIter, status))
-		{
-			const char* prodUri;
-			GMSEC_ProductFile prodFile = productFileIteratorNext(prodIter, status);
-			checkStatus(status);
-
-			//o Check to ensure that the URI contains "//hostname/dir"
-			prodUri = productFileGetURI(prodFile, status);
-			checkStatus(status);
-			if(strstr(prodUri, "//hostname/dir") == NULL)
-			{
-				const char* msgXML = messageToXML(message, NULL);
-				size_t buff_size = strlen(msgXML) + 50;
-				char* errorMsg = malloc(buff_size);
-				snprintf(errorMsg, buff_size, "Received an invalid PROD Message (bad URI):\n%s", msgXML);
-				statusSet(status, GMSEC_API_MIST_ERROR, GMSEC_API_MESSAGE_FAILED_VALIDATION, errorMsg, 0);
-				GMSEC_ERROR(statusGet(status));
-				statusReset(status);
-				free(errorMsg);
-			}
-		}
-
-		messageDestroy(&prodMessage);
-
-		if (statusIsError(status) == GMSEC_FALSE)
-		{
-			GMSEC_INFO("Received a valid message:\n%s", messageToXML(message, NULL));
-		}
+		type = messageGetStringValue(msg, "MESSAGE-TYPE", NULL);
+	}
+	if (messageHasField(msg, "C2CX-SUBTYPE", NULL) == GMSEC_TRUE)
+	{
+		subtype = messageGetStringValue(msg, "C2CX-SUBTYPE", NULL);
+	}
+	else if (messageHasField(msg, "MESSAGE-SUBTYPE", NULL) == GMSEC_TRUE)
+	{
+		subtype = messageGetStringValue(msg, "MESSAGE-SUBTYPE", NULL);
 	}
 
-	statusDestroy(&status);
-}
+	//o Ensure we have a Heartbeat message and it contains the PUB-RATE field
+	if ((strncmp(type, "MSG", strlen("MSG")) == 0) &&
+	    (strncmp(subtype, "HB", strlen("HB")) == 0) &&
+	    (messageHasField(msg, "PUB-RATE", NULL) == GMSEC_TRUE))
+	{
+		GMSEC_I64 pubRate = messageGetIntegerValue(msg, "PUB-RATE", status);
 
+		if (statusIsError(status) == GMSEC_FALSE && ((pubRate < 10) || (pubRate > 60)))
+		{
+			statusSet(status, GMSEC_API_MSG_ERROR, GMSEC_API_VALUE_OUT_OF_RANGE, "PUB-RATE field does not have a valid value", 0);
+		}
+	}
+	else
+	{
+		statusSet(status, GMSEC_API_MSG_ERROR, GMSEC_API_INVALID_MSG, "Non-Heartbeat message received", 0);
+	}
+}
 
 
 int main(int argc, char* argv[])
 {
-	GMSEC_Status status = statusCreate();
-	GMSEC_Config config;
-	GMSEC_ConnectionMgr connMgr;
-	GMSEC_Message productMessage;
-    int specVersion;
+	GMSEC_Status        status  = NULL;
+	GMSEC_Config        config  = NULL;
+	GMSEC_ConnectionMgr connMgr = NULL;
+	GMSEC_Message       msg     = NULL;
+	unsigned int        specVersion;
 
 	if (argc <= 1)
 	{
@@ -120,61 +89,90 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-
+	status = statusCreate();
 	config = configCreateWithArgs(argc, argv);
 
 	initializeLogging(config, status);
 
-	//o Enable Message validation.  This parameter is "false" by default.
-	configAddValue(config, "GMSEC-MSG-CONTENT-VALIDATE", "true", status);
+	//o Enable Message validation via connection configuration
+	configAddValue(config, "gmsec-msg-content-validate-send", "true", NULL);
 
-	GMSEC_INFO(connectionManagerGetAPIVersion());
+	GMSEC_INFO("API version: %s", connectionManagerGetAPIVersion());
 
 	connMgr = connectionManagerCreate(config, status);
 	checkStatus(status);
 
-	GMSEC_INFO("Opening the connection to the middleware server");
 	connectionManagerInitialize(connMgr, status);
 	checkStatus(status);
 
-	GMSEC_INFO(connectionManagerGetLibraryVersion(connMgr, status));
+	GMSEC_INFO("Middleware version: %s", connectionManagerGetLibraryVersion(connMgr, NULL));
 
-	//o Set up the ValidationCallback and subscribe
-	connectionManagerSubscribeWithCallback(connMgr, PROD_MESSAGE_SUBJECT, validationCallback, status);
+	//o Register custom message validator
+	connectionManagerRegisterMessageValidator(connMgr, customMessageValidator, NULL);
+
+	//o Get the version of the message specification we are using
+	specVersion = specificationGetVersion(connectionManagerGetSpecification(connMgr, NULL), NULL);
+
+	//o Set up standard/common fields used with all messages
+	setupStandardFields(specVersion);
+
+	//o Create Heartbeat Message
+	//o Note: Message subject and schema ID vary depending on the specification in use
+	const char* subject  = (specVersion > C_GMSEC_ISD_2018_00 ? HB_MSG_SUBJECT : ALT_HB_MSG_SUBJECT);
+	const char* schemaID = (specVersion > C_GMSEC_ISD_2018_00 ? "MSG.HB" : "MSG.C2CX.HB");
+
+	msg = mistMessageCreate(subject, schemaID, connectionManagerGetSpecification(connMgr, NULL), status);
 	checkStatus(status);
 
-	//o Start the AutoDispatcher
-	connectionManagerStartAutoDispatch(connMgr, status);
+	//o Add PUB-RATE field with illegal value
+	mistMessageSetValue(msg, "PUB-RATE", "5", status);
 	checkStatus(status);
 
-    //o Determine the specification we are using
-    specVersion = specificationGetVersion(connectionManagerGetSpecification(connMgr, status), status);
+	//o For very old specifications, we need to add a MSG-ID field
+	if (specVersion <= C_GMSEC_ISD_2014_00)
+	{
+		messageAddStringField(msg, "MSG-ID", "12345", status);
+		checkStatus(status);
+	}
+
+	//o Attempt to publish malformed message
+	GMSEC_INFO("Attempting to publish malformed message...");
+	connectionManagerPublish(connMgr, msg, status);
+
+	if (statusIsError(status) == GMSEC_TRUE)
+	{
+		GMSEC_INFO("This is an expected error:\n%s", statusGet(status));
+	}
+	else
+	{
+		GMSEC_WARNING("Was expecting an error");
+	}
+
+	//o Fix PUB-RATE field with legal value
+	mistMessageSetValue(msg, "PUB-RATE", "15", status);
 	checkStatus(status);
 
-	//o Create and publish a simple Product File Message
-	setupStandardFields(connMgr, specVersion, status);
+	//o Publish a good message
+	GMSEC_INFO("Attempting to publish a good message...");
+	connectionManagerPublish(connMgr, msg, status);
 
-	productMessage = createProductFileMessage(connMgr, "//hostname/dir/filename", status);
+	if (statusIsError(status) == GMSEC_TRUE)
+	{
+		GMSEC_WARNING("Unexpected error:\n%s", statusGet(status));
+	}
+	else
+	{
+		GMSEC_INFO("Message published!");
+	}
 
-	//o Publish the message to the middleware bus
-	connectionManagerPublish(connMgr, productMessage, status);
-	checkStatus(status);
-
-	messageDestroy(&productMessage);
-
-	productMessage = createProductFileMessage(connMgr, "//badhost/dir/filename", status);
-
-	connectionManagerPublish(connMgr, productMessage, status);
-	checkStatus(status);
-
-	messageDestroy(&productMessage);
-
-	connectionManagerStopAutoDispatch(connMgr, status);
-	checkStatus(status);
-
+	//o Disconnect from the middleware and clean up the Connection
 	connectionManagerCleanup(connMgr, status);
 	checkStatus(status);
 
+	//o Clear standard/common fields used with all messages
+	clearStandardFields();
+
+	messageDestroy(&msg);
 	connectionManagerDestroy(&connMgr);
 	configDestroy(&config);
 	statusDestroy(&status);
@@ -183,63 +181,53 @@ int main(int argc, char* argv[])
 }
 
 
+void checkStatus(GMSEC_Status status)
+{
+	if (statusIsError(status) == GMSEC_TRUE)
+	{
+		GMSEC_ERROR("Fatal Error: %s", statusGet(status));
+		exit(-1);
+	}
+}
 
 
 void initializeLogging(GMSEC_Config config, GMSEC_Status status)
 {
 	const char* logLevel = configGetValue(config, "LOGLEVEL", status);
-	const char* logFile = configGetValue(config, "LOGFILE", status);
+	const char* logFile  = configGetValue(config, "LOGFILE", status);
 
-	if(!logLevel)
+	if (!logLevel)
 	{
 		configAddValue(config, "LOGLEVEL", "INFO", status);
 	}
-	if(!logFile)
+	if (!logFile)
 	{
 		configAddValue(config, "LOGFILE", "STDOUT", status);
 	}
 }
 
-void checkStatus(GMSEC_Status status)
-{
-	if(!statusIsError(status))
-	{
-		return;
-	}
 
-	GMSEC_ERROR(statusGet(status));
-	exit(-1);
-}
-
-void setupStandardFields(GMSEC_ConnectionMgr connMgr, int specVersion, GMSEC_Status status)
+void setupStandardFields(unsigned int specVersion)
 {
-	size_t numFields = (specVersion <= C_GMSEC_ISD_2016_00 ? 4 : 6);
+	size_t numFields = (specVersion <= C_GMSEC_ISD_2016_00 ? 6 : 8);
 	size_t i;
 
 	GMSEC_Field* definedFields = malloc(sizeof(GMSEC_Field) * numFields);
 
-	definedFields[0] = stringFieldCreate("MISSION-ID", "MISSION", status);
-	checkStatus(status);
-
-	// Note: SAT-ID-PHYSICAL is an optional header Field, according
-	// to the GMSEC ISD.
-	definedFields[1] = stringFieldCreate("SAT-ID-PHYSICAL", "SPACECRAFT", status);
-	checkStatus(status);
-	definedFields[2] = stringFieldCreate("FACILITY", "GMSEC Lab", status);
-	checkStatus(status);
-	definedFields[3] = stringFieldCreate("COMPONENT", "log_message", status);
-	checkStatus(status);
+	definedFields[0] = stringFieldCreate("MISSION-ID", "MISSION", NULL);
+	definedFields[1] = stringFieldCreate("CONSTELLATION-ID", "CONSTELLATION", NULL);
+	definedFields[2] = stringFieldCreate("SAT-ID-PHYSICAL", "SATELLITE", NULL);
+	definedFields[3] = stringFieldCreate("SAT-ID-LOGICAL", "SATELLITE", NULL);
+	definedFields[4] = stringFieldCreate("FACILITY", "GMSEC-LAB", NULL);
+	definedFields[5] = stringFieldCreate("COMPONENT", "VALIDATION-CUSTOM", NULL);
 
 	if (specVersion >= C_GMSEC_ISD_2018_00)
 	{
-		definedFields[4] = stringFieldCreate("DOMAIN1", "MY-DOMAIN-1", status);
-		checkStatus(status);
-		definedFields[5] = stringFieldCreate("DOMAIN2", "MY-DOMAIN-2", status);
-		checkStatus(status);
+		definedFields[6] = stringFieldCreate("DOMAIN1", "DOMAIN1", NULL);
+		definedFields[7] = stringFieldCreate("DOMAIN2", "DOMAIN2", NULL);
 	}
 
-	connectionManagerSetStandardFields(connMgr, definedFields, numFields, status);
-	checkStatus(status);
+	mistMessageSetStandardFields(definedFields, numFields, NULL);
 
 	for (i = 0; i < numFields; ++i)
 	{
@@ -249,29 +237,8 @@ void setupStandardFields(GMSEC_ConnectionMgr connMgr, int specVersion, GMSEC_Sta
 	free(definedFields);
 }
 
-GMSEC_Message createProductFileMessage(const GMSEC_ConnectionMgr connMgr, const char* filePath, GMSEC_Status status)
+
+void clearStandardFields()
 {
-	GMSEC_Message productMessage;
-	GMSEC_ProductFile externalFile = productFileCreate("External File", "External File Description", "1.0.0", "TXT", filePath, status);
-	checkStatus(status);
-
-	productMessage = productFileMessageCreateWithSpec(PROD_MESSAGE_SUBJECT, GMSEC_SUCCESSFUL_COMPLETION, GMSEC_PUBLISH, "AUTO", "DM", connectionManagerGetSpecification(connMgr, status), status);
-	checkStatus(status);
-	productFileMessageAddProductFile(productMessage, externalFile, status);
-	productFileDestroy(&externalFile);
-	checkStatus(status);
-
-	connectionManagerAddStandardFields(connMgr, productMessage, status);
-	checkStatus(status);
-
-	return productMessage;
-}
-
-GMSEC_BOOL isProdMsg(const GMSEC_Message message, GMSEC_Status status)
-{
-	GMSEC_BOOL result =
-		strcmp(messageGetStringValue(message, "MESSAGE-TYPE", status), "MSG") == 0
-		&& strcmp(messageGetStringValue(message, "MESSAGE-SUBTYPE", status), "PROD") == 0;
-
-	return result;
+	mistMessageClearStandardFields();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,6 +30,7 @@ using namespace gmsec::api;
 %rename("get_unsigned_integer_value") getUnsignedIntegerValue;
 %rename("get_double_value") getDoubleValue;
 %rename("get_string_value") getStringValue;
+%rename("has_field") hasField;
 %rename("get_field") getField;
 %rename("get_field_type") getFieldType;
 %rename("get_binary_field") getBinaryField;

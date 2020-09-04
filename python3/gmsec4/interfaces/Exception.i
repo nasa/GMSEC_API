@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,6 +30,41 @@ using namespace gmsec::api;
 
 %exceptionclass gmsec::api::Exception;
 
+%feature("director:except") {
+    if ($error != NULL) {
+        PyObject *ptype, *pvalue, *ptraceback;
+        PyErr_Fetch(&ptype, &pvalue, &ptraceback);
+
+        gmsec::api::Exception e(NO_ERROR_CLASS, NO_ERROR_CODE, 0, "");
+
+        void* argp1 = 0;
+        int   res1  = SWIG_ConvertPtr(pvalue, &argp1, SWIGTYPE_p_gmsec__api__Exception, 0);
+
+        if (SWIG_IsOK(res1)) {
+            gmsec::api::Exception* tmp = reinterpret_cast<gmsec::api::Exception*>(argp1);
+            e = *tmp;
+        }
+        else {
+            PyObject*   str_pvalue = PyObject_Repr(pvalue);
+            PyObject*   pyStr      = PyUnicode_AsEncodedString(str_pvalue, "utf-8", "Error");
+            const char* str        = PyBytes_AS_STRING(pyStr);
+
+            if (str != NULL) {
+                e = gmsec::api::Exception(OTHER_ERROR, OTHER_ERROR_CODE, str);
+            }
+            else {
+                e = gmsec::api::Exception(OTHER_ERROR, OTHER_ERROR_CODE, "Unknown error");
+            }
+
+            Py_XDECREF(str_pvalue);
+            Py_XDECREF(pyStr);
+        }
+
+        PyErr_Restore(ptype, pvalue, ptraceback);
+
+        throw e;
+    }
+}
 
 %exception {
     try
@@ -39,12 +74,11 @@ using namespace gmsec::api;
     catch (const gmsec::api::Exception& e)
     {
         gmsec::api::Exception *ecopy = new gmsec::api::Exception(e);
-        PyObject *err = SWIG_NewPointerObj(ecopy, SWIGTYPE_p_gmsec__api__Exception, 1);
+        PyObject *err = SWIG_NewPointerObj(ecopy, SWIGTYPE_p_gmsec__api__Exception, SWIG_POINTER_NEW | 0);
         PyErr_SetObject(SWIG_Python_ExceptionType(SWIGTYPE_p_gmsec__api__Exception), err);
         SWIG_fail;
     } 
 }
-
 
 %extend gmsec::api::Exception
 {

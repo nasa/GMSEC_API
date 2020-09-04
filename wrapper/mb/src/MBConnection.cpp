@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -250,7 +250,10 @@ void MBConnection::mwConnect()
 	// connection.
 	if (m_reqSpecs.requestReplyEnabled)
 	{
-		mwSubscribe(m_reqSpecs.replySubject.c_str(), getExternal().getConfig());
+		std::ostringstream oss;
+		oss << m_reqSpecs.replySubject << ".>";
+
+		mwSubscribe(oss.str().c_str(), getExternal().getConfig());
 	}
 
 cleanup:
@@ -387,9 +390,6 @@ void MBConnection::mwRequest(const Message& request, std::string& id)
 	// Add an id for identifying the reply
 	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 
-	// Add a field with the subject to publish the reply to
-	MessageBuddy::getInternal(request).addField(MB_MY_SUBJECT_FIELD_NAME, m_reqSpecs.replySubject.c_str());
-
 	mwPublish(request, getExternal().getConfig());
 }
 
@@ -397,20 +397,15 @@ void MBConnection::mwRequest(const Message& request, std::string& id)
 void MBConnection::mwReply(const Message& request, const Message& reply)
 {
 	std::string uniqueID = getExternal().getReplyUniqueID(request);
-	const StringField* mySubject = dynamic_cast<const StringField*>(request.getField(MB_MY_SUBJECT_FIELD_NAME));
 
 	if (uniqueID.empty())
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
-	if (!mySubject)
-	{
-		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique subject field");
-	}
 
 	// set the UNIQUE ID and the ROUTING SUBJECT within the reply message
 	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
-	MessageBuddy::getInternal(reply).setSubject(mySubject->getValue());
+	MessageBuddy::getInternal(reply).setSubject(uniqueID.c_str());
 
 	mwPublish(reply, getExternal().getConfig());
 
@@ -462,6 +457,19 @@ void MBConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 		{
 			getExternal().updateReplySubject(msg);
 		}
+		else if (msg->getKind() == Message::REQUEST)
+		{
+			try
+			{
+				getExternal().setReplyUniqueID(*msg, msg->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
+
+				msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+			}
+			catch (...)
+			{
+				GMSEC_WARNING << "GMSEC_REPLY_UNIQUE_ID_FIELD field is missing!";
+			}
+		}
 	}
 }
 
@@ -497,6 +505,6 @@ std::string MBConnection::generateUniqueId()
 	GMSEC_U32 counter = ++m_messageCounter;
 
 	std::ostringstream uniqueId;
-	uniqueId << getExternal().getID() << "_" << SystemUtil::getProcessID() << "_" << counter;
+	uniqueId << getExternal().getID() << "." << counter;
 	return uniqueId.str();
 }

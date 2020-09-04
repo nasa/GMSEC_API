@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,7 +42,7 @@ using namespace gmsec::api::util;
 InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, const char* hbMsgSubject, const GMSEC_U16 hbPubRate)
 	: m_config(config),
 	  m_connMgr(config),
-	  m_hbMsg(hbMsgSubject, "MSG.C2CX.HB", m_connMgr.getSpecification()),
+	  m_hbMsg(0),
 	  m_pubRate(hbPubRate),
 	  m_counter(1),
 	  m_publishAction(0),
@@ -51,18 +51,27 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 	  m_shutdownLatch(0),
 	  m_service(0)
 {
-	m_hbMsg.setValue("PUB-RATE", (GMSEC_I64) m_pubRate);
+	if (m_connMgr.getSpecification().getVersion() >= GMSEC_ISD_2019_00)
+	{
+		m_hbMsg.reset(new MistMessage(hbMsgSubject, "MSG.HB", m_connMgr.getSpecification()));
+	}
+	else
+	{
+		m_hbMsg.reset(new MistMessage(hbMsgSubject, "MSG.C2CX.HB", m_connMgr.getSpecification()));
+	}
+
+	m_hbMsg->setValue("PUB-RATE", (GMSEC_I64) m_pubRate);
 
 	if (m_connMgr.getSpecification().getVersion() == GMSEC_ISD_2014_00)
 	{
 		std::ostringstream oss;
-		oss << "GMSEC-C2CX-HB-" << m_counter;
-		m_hbMsg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
+		oss << "GMSEC-HB-MSG-" << m_counter;
+		m_hbMsg->addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
 	}
 
 	if (validateMessage())
 	{
-		m_connMgr.getSpecification().validateMessage(m_hbMsg);
+		m_connMgr.getSpecification().validateMessage(*m_hbMsg.get());
 	}
 
 	setupService();
@@ -72,7 +81,7 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, const char* hbMsgSubject, const GMSEC_U16 hbPubRate, const DataList<Field*>& fields)
 	: m_config(config),
 	  m_connMgr(config),
-	  m_hbMsg(hbMsgSubject, "MSG.C2CX.HB", m_connMgr.getSpecification()),
+	  m_hbMsg(0),
 	  m_pubRate(hbPubRate),
 	  m_counter(1),
 	  m_publishAction(0),
@@ -81,7 +90,16 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 	  m_shutdownLatch(0),
 	  m_service(0)
 {
-	m_hbMsg.setValue("PUB-RATE", (GMSEC_I64) m_pubRate);
+	if (m_connMgr.getSpecification().getVersion() >= GMSEC_ISD_2019_00)
+	{
+		m_hbMsg.reset(new MistMessage(hbMsgSubject, "MSG.HB", m_connMgr.getSpecification()));
+	}
+	else
+	{
+		m_hbMsg.reset(new MistMessage(hbMsgSubject, "MSG.C2CX.HB", m_connMgr.getSpecification()));
+	}
+
+	m_hbMsg->setValue("PUB-RATE", (GMSEC_I64) m_pubRate);
 
 	for (DataList<Field*>::const_iterator it = fields.begin(); it != fields.end(); ++it)
 	{
@@ -89,20 +107,20 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 
 		if (field != NULL)
 		{
-			m_hbMsg.setValue(field->getName(), field->getStringValue());
+			m_hbMsg->setValue(field->getName(), field->getStringValue());
 		}
 	}
 
 	if (m_connMgr.getSpecification().getVersion() == GMSEC_ISD_2014_00)
 	{
 		std::ostringstream oss;
-		oss << "GMSEC-C2CX-HB-" << m_counter;
-		m_hbMsg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
+		oss << "GMSEC-HB-MSG-" << m_counter;
+		m_hbMsg->addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
 	}
 
 	if (validateMessage())
 	{
-		m_connMgr.getSpecification().validateMessage(m_hbMsg);
+		m_connMgr.getSpecification().validateMessage(*m_hbMsg.get());
 	}
 
 	setupService();
@@ -181,7 +199,7 @@ bool InternalHeartbeatGenerator::setField(const Field& field)
 {
 	AutoMutex lock(m_msgMutex);
 
-	bool fieldOverwritten = (m_hbMsg.getField(field.getName()) != NULL);
+	bool fieldOverwritten = (m_hbMsg->getField(field.getName()) != NULL);
 
 	if (StringUtil::stringEquals(field.getName(), "PUB-RATE") ||
 	    StringUtil::stringEquals(field.getName(), "COUNTER"))
@@ -190,7 +208,7 @@ bool InternalHeartbeatGenerator::setField(const Field& field)
 
 		if (value >= 0)
 		{
-			m_hbMsg.setValue(field.getName(), value);
+			m_hbMsg->setValue(field.getName(), value);
 
 			if (StringUtil::stringEquals(field.getName(), "PUB-RATE"))
 			{
@@ -216,14 +234,14 @@ bool InternalHeartbeatGenerator::setField(const Field& field)
 		{
 			if (validateMessage())
 			{
-				MistMessage tmp = m_hbMsg;
+				MistMessage tmp = *m_hbMsg.get();
 
 				tmp.setValue(field.getName(), field.getStringValue());
 
 				m_connMgr.getSpecification().validateMessage(tmp);
 			}
 
-			m_hbMsg.setValue(field.getName(), field.getStringValue());
+			m_hbMsg->setValue(field.getName(), field.getStringValue());
 		}
 		catch (const Exception& e)
 		{
@@ -245,20 +263,20 @@ bool InternalHeartbeatGenerator::setField(const char* fieldName, GMSEC_I64 field
 
 	AutoMutex lock(m_msgMutex);
 
-	bool fieldOverwritten = (m_hbMsg.getField(fieldName) != NULL);
+	bool fieldOverwritten = (m_hbMsg->getField(fieldName) != NULL);
 
 	try
 	{
 		if (validateMessage())
 		{
-			MistMessage tmp = m_hbMsg;
+			MistMessage tmp = *m_hbMsg.get();
 
 			tmp.setValue(fieldName, fieldValue);
 
 			m_connMgr.getSpecification().validateMessage(tmp);
 		}
 
-		m_hbMsg.setValue(fieldName, fieldValue);
+		m_hbMsg->setValue(fieldName, fieldValue);
 	}
 	catch (const Exception& e)
 	{
@@ -279,20 +297,20 @@ bool InternalHeartbeatGenerator::setField(const char* fieldName, GMSEC_F64 field
 
 	AutoMutex lock(m_msgMutex);
 
-	bool fieldOverwritten = (m_hbMsg.getField(fieldName) != NULL);
+	bool fieldOverwritten = (m_hbMsg->getField(fieldName) != NULL);
 
 	try
 	{
 		if (validateMessage())
 		{
-			MistMessage tmp = m_hbMsg;
+			MistMessage tmp = *m_hbMsg.get();
 
 			tmp.setValue(fieldName, fieldValue);
 
 			m_connMgr.getSpecification().validateMessage(tmp);
 		}
 
-		m_hbMsg.setValue(fieldName, fieldValue);
+		m_hbMsg->setValue(fieldName, fieldValue);
 	}
 	catch (const Exception& e)
 	{
@@ -313,20 +331,20 @@ bool InternalHeartbeatGenerator::setField(const char* fieldName, const char* fie
 
 	AutoMutex lock(m_msgMutex);
 
-	bool fieldOverwritten = (m_hbMsg.getField(fieldName) != NULL);
+	bool fieldOverwritten = (m_hbMsg->getField(fieldName) != NULL);
 
 	try
 	{
 		if (validateMessage())
 		{
-			MistMessage tmp = m_hbMsg;
+			MistMessage tmp = *m_hbMsg.get();
 
 			tmp.setValue(fieldName, fieldValue);
 
 			m_connMgr.getSpecification().validateMessage(tmp);
 		}
 
-		m_hbMsg.setValue(fieldName, fieldValue);
+		m_hbMsg->setValue(fieldName, fieldValue);
 	}
 	catch (const Exception& e)
 	{
@@ -379,18 +397,18 @@ void InternalHeartbeatGenerator::run()
 
 				if (m_counter == 0) ++m_counter;
 
-				m_hbMsg.setValue("COUNTER", (GMSEC_I64) m_counter);
+				m_hbMsg->setValue("COUNTER", (GMSEC_I64) m_counter);
 
 				if (m_connMgr.getSpecification().getVersion() == GMSEC_ISD_2014_00)
 				{
 					std::ostringstream oss;
-					oss << "GMSEC-C2CX-HB-" << m_counter;
-					m_hbMsg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
+					oss << "GMSEC-HB-MSG-" << m_counter;
+					m_hbMsg->addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
 				}
 
 				++m_counter;
 
-				m_connMgr.publish(m_hbMsg);
+				m_connMgr.publish(*m_hbMsg.get());
 
 				GMSEC_VERBOSE << "Heartbeat Generator published C2CX HB message";
 			}

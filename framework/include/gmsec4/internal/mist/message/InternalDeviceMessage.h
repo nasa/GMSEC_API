@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -171,7 +171,7 @@ class GMSEC_API InternalDeviceMessage : public InternalMistMessage
 
 
 	//helper function, determines message kind and builds appropriate SchemaID
-	static std::string buildSchemaID();
+	static std::string buildSchemaID(const Specification& spec);
 
 
 private:

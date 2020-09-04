@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,7 +21,6 @@
 
 #include <gmsec4/internal/mist/ConnMgrCallbacks.h>
 #include <gmsec4/internal/mist/ConnMgrCallbackCache.h>
-#include <gmsec4/internal/mist/CustomSpecification.h>
 #include <gmsec4/internal/mist/InternalSpecification.h>
 #include <gmsec4/internal/mist/ResourceInfoGenerator.h>
 #include <gmsec4/internal/mist/SpecificationBuddy.h>
@@ -86,11 +85,12 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 	  m_connection(0),
 	  m_validate((validate ? VALIDATE_SEND : VALIDATE_NONE)),
 	  m_specification(0),
-	  m_customSpecification(0),
 	  m_heartbeatServiceSubject(),
 	  m_heartbeatServiceFields(),
 	  m_logSubject(),
 	  m_standardLogFields(),
+	  m_msgIdCounter(0),
+	  m_requestIdCounter(0),
 	  m_resourceMessageCounter(0),
 	  m_subscriptions(),
 	  m_messagePopulator(0),
@@ -98,7 +98,7 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 	  m_callbackAdapter(new MistCallbackAdapter),
 	  m_hbService(0),
 	  m_rsrcService(0),
-	  m_ceeCustomSpec(0)
+	  m_ceeMessageValidator(0)
 {
 	// Determine whether or not to validate messages from the Config object
 	const char* value = m_config.getValue(GMSEC_MSG_CONTENT_VALIDATE);
@@ -188,13 +188,7 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 
 InternalConnectionManager::~InternalConnectionManager()
 {
-	try {
-		stopHeartbeatService();
-	}
-	catch (...) {
-		// we could end up here if the HBS is not running; no big deal.
-	}
-
+	stopHeartbeatService(false);
 	stopResourceMessageService();
 
 	MessagePopulator::destroyFields(m_heartbeatServiceFields);
@@ -212,7 +206,7 @@ InternalConnectionManager::~InternalConnectionManager()
 	delete m_callbackAdapter;
 	delete m_messagePopulator;
 	delete m_specification;
-	delete m_ceeCustomSpec;
+	delete m_ceeMessageValidator;
 }
 
 
@@ -300,24 +294,7 @@ const char* InternalConnectionManager::getLibraryVersion() const
 
 Specification& InternalConnectionManager::getSpecification() const
 {
-	Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
-
-	return *spec;
-}
-
-
-void InternalConnectionManager::setSpecification(Specification* spec)
-{
-	if (!spec)
-	{
-		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "Specification object is NULL");
-	}
-
-	m_customSpecification = spec;
-
-	delete m_messagePopulator;
-
-	m_messagePopulator = new MessagePopulator(m_customSpecification->getVersion());
+	return *m_specification;
 }
 
 
@@ -336,6 +313,17 @@ const DataList<Field*>& InternalConnectionManager::getStandardFields() const
 void InternalConnectionManager::addStandardFields(Message& msg) const
 {
 	m_messagePopulator->addStandardFields(msg);
+}
+
+
+void InternalConnectionManager::registerMessageValidator(MessageValidator* validator)
+{
+	if (!validator)
+	{
+		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "MessageValidator cannot be null.");
+	}
+
+	getSpecification().registerMessageValidator(validator);
 }
 
 
@@ -452,7 +440,7 @@ void InternalConnectionManager::publish(const Message& msg)
 }
 
 
-void InternalConnectionManager::publish(const Message& msg, const Config& config)
+void InternalConnectionManager::publish(const Message& msg, const Config& mwConfig)
 {
 	if (m_connection->getState() != Connection::CONNECTED)
 	{
@@ -460,7 +448,7 @@ void InternalConnectionManager::publish(const Message& msg, const Config& config
 	}
 	if (msg.getKind() != Message::PUBLISH)
 	{
-		throw Exception(MIST_ERROR, INVALID_MSG, "Cannot issue request with non-PUBLISH kind message.");
+		throw Exception(MIST_ERROR, INVALID_MSG, "Cannot publish message with non-PUBLISH message kind.");
 	}
 
 	// If validation is enabled, check the message before it is sent out
@@ -470,7 +458,7 @@ void InternalConnectionManager::publish(const Message& msg, const Config& config
 		getSpecification().validateMessage(const_cast<Message&>(msg));
 	}
 
-	m_connection->publish(msg, config);
+	m_connection->publish(msg, mwConfig);
 }
 
 
@@ -705,7 +693,7 @@ Message InternalConnectionManager::createHeartbeatMessage(const char* subject, c
 	}
 
 	// Create message with the standard heartbeat message fields
-	message::MistMessage msg(subject, "MSG.C2CX.HB", getSpecification());
+	message::MistMessage msg(subject, "HB", getSpecification());
 
 	for (DataList<Field*>::const_iterator it = heartbeatFields.begin(); it != heartbeatFields.end(); ++it)
 	{
@@ -722,7 +710,7 @@ Message InternalConnectionManager::createHeartbeatMessage(const char* subject, c
 	if (msg.getField("MSG-ID") == NULL && getSpecification().getVersion() <= GMSEC_ISD_2014_00)
 	{
 		std::ostringstream oss;
-		oss << "GMSEC-C2CX-HB-1";
+		oss << "GMSEC-HB-" << m_msgIdCounter.incrementAndGet();
 		msg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
 	}
 
@@ -778,7 +766,7 @@ void InternalConnectionManager::startHeartbeatService(const char* subject, const
 }
 
 
-void InternalConnectionManager::stopHeartbeatService()
+void InternalConnectionManager::stopHeartbeatService(bool throwExceptionOnError)
 {
 	if (m_hbService.get() && m_hbService.get()->isRunning())
 	{
@@ -796,7 +784,7 @@ void InternalConnectionManager::stopHeartbeatService()
 			GMSEC_INFO << "Heartbeat Service has been stopped";
 		}
 	}
-	else
+	else if (throwExceptionOnError)
 	{
 		throw Exception(MIST_ERROR, HEARTBEAT_SERVICE_NOT_RUNNING, "Heartbeat Service is not running!");
 	}
@@ -880,8 +868,8 @@ Message InternalConnectionManager::createLogMessage(const char* subject, const D
 		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "The subject string is null, or is empty.");
 	}
 
-	// Create message with the standard heartbeat message fields
-	message::MistMessage msg(subject, "MSG.LOG", getSpecification());
+	// Create message with the standard log message fields
+	message::MistMessage msg(subject, "LOG", getSpecification());
 
 	// Add user provided fields specific to this message
 	for (DataList<Field*>::const_iterator it = logFields.begin(); it != logFields.end(); ++it)
@@ -910,7 +898,7 @@ Message InternalConnectionManager::createLogMessage(const char* subject, const D
 
 	// If the message already contains the EVENT-TIME field, then do NOT overwrite it;
 	// otherwise add the EVENT-TIME field with the current time.
-	if (msg.getField("EVENT-TIME") == NULL)
+	if (!msg.hasField("EVENT-TIME"))
 	{
 		char eventTime[GMSEC_TIME_BUFSIZE] = {0};
 		GMSEC_TimeSpec theTime = TimeUtil::getCurrentTime();
@@ -961,9 +949,31 @@ void InternalConnectionManager::publishLog(const char* logMessage, const Field& 
 	DataList<Field*> emptyList;
 	Message msg = createLogMessage(m_logSubject.c_str(), emptyList);
 
-	// Set the MSG-TEXT field and verify it against the template
-	//TODO (MEH): use schema to figure out what this field should be instead of
-	//hardcoding - ditto for the EVENT-TIME
+	std::string tmpSubject = msg.getSubject();
+	std::ostringstream oss;
+	oss << tmpSubject;
+	if (msg.hasField("SUBCLASS"))
+	{
+		oss << "." << msg.getStringValue("SUBCLASS");
+	}
+	else
+	{
+		oss << ".FILL";
+	}
+	if (msg.hasField("OCCURRENCE-TYPE"))
+	{
+		oss << "." << msg.getStringValue("OCCURRENCE-TYPE");
+	}
+	else
+	{
+		oss << ".FILL";
+	}
+	oss << "." << severity.getStringValue();
+
+	tmpSubject = StringConverter::instance().convertString(oss.str());
+
+	msg.setSubject(tmpSubject.c_str());
+
 	msg.addField(severity);
 	msg.addField("MSG-TEXT", logMessage);
 
@@ -1053,7 +1063,7 @@ void InternalConnectionManager::acknowledgeSimpleService(const char * subject, c
 }
 
 
-message::MistMessage InternalConnectionManager::createResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval)
+Message InternalConnectionManager::createResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval)
 {
 	if (!subject || std::string(subject).empty())
 	{
@@ -1072,16 +1082,16 @@ message::MistMessage InternalConnectionManager::createResourceMessage(const char
 		                "InternalConnectionManager::createResourceMessage():  A moving average interval less than the sampling interval was used.");
 	}
 
-	message::MistMessage msg(subject, "MSG.C2CX.RSRC", getSpecification());
+	// Create message with the standard resource message fields
+	message::MistMessage msg(subject, "RSRC", getSpecification());
 
-	unsigned int specVersion = getSpecification().getVersion();
 
 	std::string osVersion = ResourceInfoGenerator::getOSVersion();
 	msg.addField("OPER-SYS", osVersion.c_str());
 
 	try
 	{ 
-		ResourceInfoGenerator::addCPUStats(msg, specVersion, averageInterval/sampleInterval);
+		ResourceInfoGenerator::addCPUStats(msg, getSpecification().getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& e)
 	{
@@ -1090,7 +1100,7 @@ message::MistMessage InternalConnectionManager::createResourceMessage(const char
 
 	try
 	{
-		ResourceInfoGenerator::addMainMemoryStats(msg, specVersion, averageInterval/sampleInterval);
+		ResourceInfoGenerator::addMainMemoryStats(msg, getSpecification().getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& e)
 	{
@@ -1099,7 +1109,7 @@ message::MistMessage InternalConnectionManager::createResourceMessage(const char
 
 	try
 	{
-		ResourceInfoGenerator::addDiskStats(msg, specVersion, averageInterval/sampleInterval);
+		ResourceInfoGenerator::addDiskStats(msg, getSpecification().getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& e)
 	{
@@ -1108,7 +1118,7 @@ message::MistMessage InternalConnectionManager::createResourceMessage(const char
 
 	try
 	{
-		ResourceInfoGenerator::addNetworkStats(msg, specVersion, averageInterval/sampleInterval);
+		ResourceInfoGenerator::addNetworkStats(msg, getSpecification().getVersion(), averageInterval/sampleInterval);
 	}
 	catch (const Exception& e)
 	{
@@ -1136,28 +1146,30 @@ void InternalConnectionManager::publishResourceMessage(const char* subject, size
 		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "publishResourceMessage():  The subject string is null, or is empty.");
 	}
 
-	message::MistMessage rsrcMsg = createResourceMessage(subject, sampleInterval, averageInterval);
+	Message rsrcMsg = createResourceMessage(subject, sampleInterval, averageInterval);
 
-	++m_resourceMessageCounter;
-
-	if (getSpecification().getVersion() == GMSEC_ISD_2014_00)
+	if (getSpecification().getVersion() < GMSEC_ISD_2016_00)
 	{
-		m_resourceMessageCounter %= GMSEC_U16(std::numeric_limits<GMSEC_I16>::max() + 1);
+		rsrcMsg.addField("COUNTER", (GMSEC_I16) m_resourceMessageCounter.incrementAndGet());
+
+		if (pubRate > 0)
+		{
+			rsrcMsg.addField("PUB-RATE", (GMSEC_I16) pubRate);
+		}
 	}
-
-	if (m_resourceMessageCounter == 0) ++m_resourceMessageCounter;
-
-	rsrcMsg.setValue("COUNTER", (GMSEC_I64) m_resourceMessageCounter);
-
-	if (pubRate > 0)
+	else
 	{
-		rsrcMsg.setValue("PUB-RATE", (GMSEC_I64) pubRate);
+		rsrcMsg.addField("COUNTER", (GMSEC_U16) m_resourceMessageCounter.incrementAndGet());
+		if (pubRate > 0)
+		{
+			rsrcMsg.addField("PUB-RATE", (GMSEC_U16) pubRate);
+		}
 	}
 
 	if (getSpecification().getVersion() <= GMSEC_ISD_2014_00)
 	{
 		std::ostringstream oss;
-		oss << "GMSEC-RESOURCE-MESSAGE-" << m_resourceMessageCounter;
+		oss << "GMSEC-RESOURCE-MESSAGE-" << m_msgIdCounter.get();
 		rsrcMsg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
 	}
 
@@ -1239,6 +1251,17 @@ void InternalConnectionManager::requestDirective(const char * subject, const Fie
 
 	m_messagePopulator->addStandardFields(msg);
 
+	if (getSpecification().getVersion() == GMSEC_ISD_2014_00 && !msg.hasField("MSG-ID"))
+	{
+		std::ostringstream oss;
+		oss << "GMSEC-REQUEST-MESSAGE-" << m_msgIdCounter.get();
+		msg.addField("MSG-ID", oss.str().c_str());
+	}
+	else if (getSpecification().getVersion() >= GMSEC_ISD_2019_00 && !msg.hasField("REQUEST-ID"))
+	{
+		msg.setValue("REQUEST-ID", (GMSEC_I64) m_requestIdCounter.incrementAndGet());
+	}
+
 	Message* reply = request(msg, 10, -1);
 
 	if (reply)
@@ -1270,6 +1293,17 @@ void InternalConnectionManager::requestDirective(const char * subject, const Fie
 
 	m_messagePopulator->addStandardFields(msg);
 
+	if (getSpecification().getVersion() == GMSEC_ISD_2014_00 && !msg.hasField("MSG-ID"))
+	{
+		std::ostringstream oss;
+		oss << "GMSEC-REQUEST-MESSAGE-" << m_msgIdCounter.get();
+		msg.addField("MSG-ID", oss.str().c_str());
+	}
+	else if (getSpecification().getVersion() >= GMSEC_ISD_2019_00 && !msg.hasField("REQUEST-ID"))
+	{
+		msg.setValue("REQUEST-ID", (GMSEC_I64) m_requestIdCounter.incrementAndGet());
+	}
+
 	request(msg, timeout, cb, republish_ms);
 }
 
@@ -1293,6 +1327,17 @@ Message* InternalConnectionManager::requestDirective(const char * subject, const
 	}
 
 	m_messagePopulator->addStandardFields(msg);
+
+	if (getSpecification().getVersion() == GMSEC_ISD_2014_00 && !msg.hasField("MSG-ID"))
+	{
+		std::ostringstream oss;
+		oss << "GMSEC-REQUEST-MESSAGE-" << m_msgIdCounter.get();
+		msg.addField("MSG-ID", oss.str().c_str());
+	}
+	else if (getSpecification().getVersion() >= GMSEC_ISD_2019_00 && !msg.hasField("REQUEST-ID"))
+	{
+		msg.setValue("REQUEST-ID", (GMSEC_I64) m_requestIdCounter.incrementAndGet());
+	}
 
 	return request(msg, timeout, republish_ms);
 }
@@ -1321,6 +1366,15 @@ void InternalConnectionManager::acknowledgeDirectiveRequest(const char * subject
 
 	m_messagePopulator->addStandardFields(msg);
 
+	if (getSpecification().getVersion() == GMSEC_ISD_2014_00 && request.hasField("MSG-ID"))
+	{
+		msg.addField(*(request.getField("MSG-ID")));
+	}
+	else if (getSpecification().getVersion() >= GMSEC_ISD_2019_00 && request.hasField("REQUEST-ID"))
+	{
+		msg.addField(*(request.getField("REQUEST-ID")));
+	}
+
 	reply(request, msg);
 }
 
@@ -1331,16 +1385,18 @@ void InternalConnectionManager::shutdownAllMiddlewares()
 }
 
 
-void InternalConnectionManager::setSpecification(Specification* spec, GMSEC_SpecificationValidateMessage* validateMsg)
+void InternalConnectionManager::registerMessageValidator(GMSEC_MessageValidator* validator)
 {
-	if (m_ceeCustomSpec != NULL)
+	if (validator == NULL || *validator == NULL)
 	{
-		delete m_ceeCustomSpec;
+		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "MessageValidator cannot be null.");
 	}
 
-	m_ceeCustomSpec = new CustomSpecification(spec, validateMsg);
+	delete m_ceeMessageValidator;
 
-	setSpecification(m_ceeCustomSpec);
+	m_ceeMessageValidator = new CustomMessageValidator(validator);
+
+	getSpecification().registerMessageValidator(m_ceeMessageValidator);
 }
 
 

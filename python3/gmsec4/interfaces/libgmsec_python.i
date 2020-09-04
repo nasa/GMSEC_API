@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -125,6 +125,7 @@
 %include mist/DeviceParam.i
 %include mist/FieldSpecification.i
 %include mist/MessageSpecification.i
+%include mist/MessageValidator.i
 %include mist/mist_defs.i
 %include mist/Mnemonic.i
 %include mist/MnemonicIterator.i

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -316,11 +316,16 @@ bool InternalConfig::getBooleanValue(const char* name, bool defaultValue) const
 
 	bool value = defaultValue;
 
-	try {
-		value = getBooleanValue(name);
-	}
-	catch (Exception& e) {
-		GMSEC_VERBOSE << e.what() << "; returning given default value [" << (value ? "true" : "false") << "]";
+	ConfigMapIter it = m_configs.find(name);
+
+	if (it != m_configs.end())
+	{
+		const char* cfgValue = it->second.c_str();
+
+		if (StringUtil::stringEqualsIgnoreCase(cfgValue, "true") || StringUtil::stringEqualsIgnoreCase(cfgValue, "false"))
+		{
+			value = StringUtil::stringEqualsIgnoreCase(cfgValue, "true");
+		}
 	}
 
 	return value;
@@ -340,13 +345,13 @@ int InternalConfig::getIntegerValue(const char* name) const
 		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, oss.str().c_str());
 	}
 
-	std::istringstream iss(it->second.c_str());
-
 	int value;
 
-	iss >> value;
-
-	if (iss.fail())
+	try
+	{
+		value = StringUtil::getValue<int>(it->second.c_str());
+	}
+	catch (...)
 	{
 		std::ostringstream oss;
 		oss << "Config entry '" << name << "' does not represent an integer value";
@@ -363,11 +368,18 @@ int InternalConfig::getIntegerValue(const char* name, int defaultValue) const
 
 	int value = defaultValue;
 
-	try {
-		value = getIntegerValue(name);
-	}
-	catch (Exception& e) {
-		GMSEC_VERBOSE << e.what() << "; returning given default value [" << value << "]";
+	ConfigMapIter it = m_configs.find(name);
+
+	if (it != m_configs.end())
+	{
+		try
+		{
+			value = StringUtil::getValue<int>(it->second.c_str());
+		}
+		catch (...)
+		{
+			GMSEC_WARNING << "Config entry '" << name << "' does not represent an integer value; returning default value";
+		}
 	}
 
 	return value;
@@ -387,13 +399,13 @@ double InternalConfig::getDoubleValue(const char* name) const
 		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, oss.str().c_str());
 	}
 
-	std::istringstream iss(it->second.c_str());
-
 	double value;
 
-	iss >> value;
-
-	if (iss.fail())
+	try
+	{
+		value = StringUtil::getValue<double>(it->second.c_str());
+	}
+	catch (...)
 	{
 		std::ostringstream oss;
 		oss << "Config entry '" << name << "' does not represent a double value";
@@ -410,11 +422,18 @@ double InternalConfig::getDoubleValue(const char* name, double defaultValue) con
 
 	double value = defaultValue;
 
-	try {
-		value = getDoubleValue(name);
-	}
-	catch (Exception& e) {
-		GMSEC_VERBOSE << e.what() << "; returning given default value [" << value << "]";
+	ConfigMapIter it = m_configs.find(name);
+
+	if (it != m_configs.end())
+	{
+		try
+		{
+			value = StringUtil::getValue<double>(it->second.c_str());
+		}
+		catch (...)
+		{
+			GMSEC_WARNING << "Config entry '" << name << "' does not represent a double value; returning default value";
+		}
 	}
 
 	return value;

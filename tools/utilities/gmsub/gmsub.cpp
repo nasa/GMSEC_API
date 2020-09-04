@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -124,18 +124,21 @@ bool GMSEC_Subscriber::run()
 		//o Connect
 		connMgr->initialize();
 
-		//o Determine the subjects to listen to
-		determineSubjects(subjects);
-
 		//o Determine runtime settings
-		int iterations     = get("ITERATIONS", 0);
-		int msg_timeout_ms = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
-		int prog_timeout_s = get("PROG-TIMEOUT-S", GMSEC_WAIT_FOREVER);
+		GMSEC_I32 iterations     = get("ITERATIONS", 0);
+		GMSEC_I32 msg_timeout_ms = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
+		GMSEC_I32 prog_timeout_s = get("PROG-TIMEOUT-S", GMSEC_WAIT_FOREVER);
 
 		if (iterations > 0)
 		{
 			GMSEC_INFO << "Waiting for up to " << iterations << " messages";
 		}
+
+		unsigned int specVersion = connMgr->getSpecification().getVersion();
+		gmsec::api::mist::Specification::SchemaLevel schemaLevel = connMgr->getSpecification().getSchemaLevel();
+
+		//o Determine the subjects to listen to
+		determineSubjects(specVersion, schemaLevel, subjects);
 
 		//o Output the middleware information
 		GMSEC_INFO << "Middleware version = " << connMgr->getLibraryVersion();

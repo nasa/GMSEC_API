@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,6 +14,7 @@
  */
 
 #include <gmsec4/internal/CallbackLookup.h>
+#include <gmsec4/internal/StringUtil.h>
 
 #include <gmsec4/Callback.h>
 #include <gmsec4/Exception.h>
@@ -21,134 +22,74 @@
 
 #include <gmsec4/util/Log.h>
 
-#include <iostream>
 
 using namespace gmsec::api;
 using namespace gmsec::api::internal;
+using namespace gmsec::api::util;
 
 
 CallbackLookup::CallbackLookup()
+	: m_callbackRegister(new CallbackRegister())
 {
 }
 
 
 CallbackLookup::~CallbackLookup()
 {
-	/* delete iterators */
-	callbackLkpItr itr = fCallbackLkps.begin();
-	while (itr != fCallbackLkps.end())
+}
+
+
+void CallbackLookup::addCallback(const char* topic, Callback* cb)
+{
+	Elements topicElements = StringUtil::split(topic, ".");
+
+	if (topicElements.size() >= 1)
 	{
-		CallbackLookup *lkp = (*itr).second;
-		delete lkp;
-		++itr;
+		m_callbackRegister->insert(std::pair<Callback*, Elements>(cb, topicElements));
 	}
 }
 
 
-void CallbackLookup::addCallback(const char* subject0, Callback* cb)
+void CallbackLookup::removeCallback(const char* topic)
 {
-	if (!cb)
-	{
-		throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "Attempt to register a NULL Callback");
-	}
+	// Use-Case: A subscription topic may have been registered with more than one callback
 
-	/* 1) if subject = "" then we store the cb here */
-	if (subject0 == NULL || std::string(subject0).empty())
+	if (topic == NULL || *topic == '\0')
 	{
-		/* search for existing cb */
+		// Clear all subscriptions
+
+		m_callbackRegister->clear();
+	}
+	else
+	{
+		// Remove all subscriptions for the given topic
+
 		bool found = false;
 
-		for (callbackItr it = fCallbacks.begin(); it != fCallbacks.end(); ++it)
-		{
-			Callback* ocb = *it;
+		Elements topicElements = StringUtil::split(topic, ".");
 
-			if (ocb == cb)
+		for (CallbackRegister::iterator it = m_callbackRegister->begin(); it != m_callbackRegister->end(); ++it)
+		{
+			bool match = false;
+
+			if (it->second.size() == topicElements.size())
+			{
+				Elements::const_iterator it3 = topicElements.begin();
+
+				for (Elements::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2, ++it3)
+				{
+					match = (*it2 == *it3);
+				}
+			}
+
+			if (match)
 			{
 				found = true;
+				m_callbackRegister->erase(it);
 			}
 		}
+
 		if (!found)
-		{
-			fCallbacks.push_back(cb);
-		}
-		else
-		{
-			throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "Callback has already been registered");
-		}
-	}
-	else
-	{
-		/* 2) get first level item "first.*" to save callback */
-		std::string subject = subject0;
-		std::string first   = subject;
-		std::string last    = "";
-
-		size_t t = subject.find(".");
-
-		if (t != std::string::npos)
-		{
-			first = subject.substr(0,t);
-			last  = subject.substr(t+1);
-		}
-
-		/* 3) lookup existing CallbackLookup for first level */
-		callbackLkpItr iter = fCallbackLkps.find(first);
-		CallbackLookup *lkp = NULL;
-		if (iter == fCallbackLkps.end())
-		{
-			/* not found - create new */
-			lkp = new CallbackLookup();
-			fCallbackLkps.insert(callbackLkp::value_type(first, lkp));
-		}
-		else
-		{
-			lkp = iter->second;
-		}
-		if (!first.empty())
-		{
-			lkp->addCallback(last.c_str(), cb);
-		}
-	}
-}
-
-
-void CallbackLookup::removeCallback(const char* subject0)
-{
-	/* 1) if subject = "" then we clear cb's here */
-	if (subject0 == NULL || std::string(subject0).empty())
-	{
-		fCallbacks.clear();
-	}
-	else
-	{
-		/* 2) get first level item "first.*" to save callback */
-		std::string subject = subject0;
-		std::string first   = subject;
-		std::string last    = "";
-
-		size_t t = subject.find(".");
-
-		if (t != std::string::npos)
-		{
-			first = subject.substr(0,t);
-			last  = subject.substr(t+1);
-		}
-
-		/* 3) lookup existing CallbackLookup for first level */
-		callbackLkpItrNC iter = fCallbackLkps.find(first);
-		if (iter!=fCallbackLkps.end())
-		{
-			CallbackLookup* lkp = iter->second;
-
-			lkp->removeCallback(last.c_str());
-
-			if (lkp->fCallbacks.size() && !lkp->fCallbackLkps.size())
-			{
-				fCallbackLkps.erase(iter);
-				delete lkp;
-			}
-		}
-		else
 		{
 			throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "No callback registered for subject pattern");
 		}
@@ -156,22 +97,25 @@ void CallbackLookup::removeCallback(const char* subject0)
 }
 
 
-void CallbackLookup::removeCallback(const char* subject0, Callback* cb)
+void CallbackLookup::removeCallback(const char* topic, Callback* cb)
 {
-	/* 1) if subject = "" then we clear cb's here */
-	if (subject0 == NULL || std::string(subject0).empty())
-	{
-		// remove this particular callback
-		bool found = false;
-		for (callbackList::iterator it = fCallbacks.begin(); it != fCallbacks.end(); ++it)
-		{
-			Callback* ocb = *it;
+	// Use-Case: A callback may be shared by multiple subscription topics
 
-			if (ocb == cb)
+	if (topic == NULL || *topic == '\0')
+	{
+		// Remove all subscriptions with the given callback
+
+		bool found = false;
+
+		CallbackRegister::iterator it  = m_callbackRegister->lower_bound(cb);
+		CallbackRegister::iterator end = m_callbackRegister->upper_bound(cb);
+
+		for (; it != end; ++it)
+		{
+			if (it->first == cb)
 			{
 				found = true;
-				fCallbacks.erase(it);
-				break;
+				m_callbackRegister->erase(it);
 			}
 		}
 
@@ -182,34 +126,38 @@ void CallbackLookup::removeCallback(const char* subject0, Callback* cb)
 	}
 	else
 	{
-		/* 2) get first level item "first.*" to save callback */
-		std::string subject = subject0;
-		std::string first   = subject;
-		std::string last    = "";
+		// Remove the subscription for the given topic/callback
 
-		size_t t = subject.find(".");
+		bool found = false;
 
-		if (t != std::string::npos)
+		Elements topicElements = StringUtil::split(topic, ".");
+
+		CallbackRegister::iterator it  = m_callbackRegister->lower_bound(cb);
+		CallbackRegister::iterator end = m_callbackRegister->upper_bound(cb);
+
+		for (; it != end; ++it)
 		{
-			first = subject.substr(0,t);
-			last  = subject.substr(t+1);
-		}
+			bool match = false;
 
-		/* 3) lookup existing CallbackLookup for first level */
-		callbackLkpItrNC iter = fCallbackLkps.find(first);
-		if (iter != fCallbackLkps.end())
-		{
-			CallbackLookup* lkp = iter->second;
-
-			lkp->removeCallback(last.c_str(), cb);
-
-			if (!lkp->fCallbacks.size() && !lkp->fCallbackLkps.size())
+			if (it->second.size() == topicElements.size())
 			{
-				fCallbackLkps.erase(iter);
-				delete lkp;
+				Elements::const_iterator it3 = topicElements.begin();
+
+				for (Elements::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2, ++it3)
+				{
+					match = (*it2 == *it3);
+				}
+			}
+
+			if (match)
+			{
+				found = true;
+				m_callbackRegister->erase(it);
+				break;
 			}
 		}
-		else
+
+		if (!found)
 		{
 			throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "No callback registered for subject pattern");
 		}
@@ -217,68 +165,96 @@ void CallbackLookup::removeCallback(const char* subject0, Callback* cb)
 }
 
 
-void CallbackLookup::collectCallbacks(const char* subject0, callbackList& callbacks)
+void CallbackLookup::collectCallbacks(const char* msgSubject, CallbackList& callbacks)
 {
-	/* if subject == "" then we dispatch */
-	if (subject0 == NULL || std::string(subject0).empty())
+	Elements msgElements = StringUtil::split(msgSubject, ".");
+
+	for (CallbackRegister::const_iterator it = m_callbackRegister.get()->begin(); it != m_callbackRegister.get()->end(); ++it)
 	{
-		collectCallbacksFinalStep(callbacks, fCallbacks);
-	}
-	else
-	{
-		/* 2) get first level item "first.*" to save callback */
-		std::string subject = subject0;
-		std::string first   = subject;
-		std::string last    = "";
+		const Elements& elements = it->second;
 
-		size_t t = subject.find(".");
+		bool match = false;
+		bool done  = false;
 
-		if (t != std::string::npos)
+		Elements::const_iterator it2 = elements.begin();
+		Elements::const_iterator it3 = msgElements.begin();
+
+		std::string lastTopicElement;
+
+		//o Phase 1: Check each element of the msg subject with those of the subscription topic
+		for (; it2 != elements.end() && it3 != msgElements.end() && !done; ++it2, ++it3)
 		{
-			first = subject.substr(0,t);
-			last  = subject.substr(t+1);
-		}
-
-		/* 3) lookup "*" entries and lookup existing CallbackLookup for first level */
-		callbackLkpItr end = fCallbackLkps.end();
-		callbackLkpItr iter;
-		callbackLkpItr nextIter;
-
-		if ((iter = fCallbackLkps.find("*")) != end || (iter = fCallbackLkps.find(first)) != end)
-		{
-			/* 4) lookup "+" entries, look ahead to the next level */
-			if ((nextIter = iter->second->fCallbackLkps.find("+")) != iter->second->fCallbackLkps.end())
+			if (*it2 == *it3)
 			{
-				iter->second->collectCallbacksFinalStep(callbacks, nextIter->second->fCallbacks);
+				match = true;
+			}
+			else if (*it2 == "*")
+			{
+				match = true;
+			}
+			else if (*it2 == ">")
+			{
+				match = true;
+				done  = true;
+			}
+			else if (*it2 == "+")
+			{
+				match = true;
+				done  = true;
 			}
 			else
 			{
-				iter->second->collectCallbacks(last.c_str(), callbacks);	
+				match = false;
+				done  = true;
+			}
+
+			lastTopicElement = *it2;
+		}
+
+		GMSEC_VERBOSE << "Phase 1: subject: " << msgSubject << " , match is: " << (match ? "true" : "false");
+
+		//o Phase 2: If we have a preliminary match, check whether all elements of the msg subject and that
+		//           of the subscription topic were analysed.
+		if (match)
+		{
+			if ((it2 == elements.end()) && (it3 != msgElements.end()))
+			{
+				// Finished subscription topic elements, but not msg elements
+
+				switch (lastTopicElement[0])
+				{
+				case '+':
+				case '>':
+					match = true;
+					break;
+				default:
+					match = false;
+				}
+			}
+			else if ((it2 != elements.end()) && (it3 == msgElements.end()))
+			{
+				// Finished msg elements, but not subscription topic elements
+
+				match = (*it2 == "+");
 			}
 		}
 
-		/* 5) lookup ">" entries */
-		if ((iter = fCallbackLkps.find(">")) != end)
-		{
-			iter->second->collectCallbacksFinalStep(callbacks, iter->second->fCallbacks);
-		}
+		GMSEC_VERBOSE << "Phase 2: subject: " << msgSubject << " , match is: " << (match ? "true" : "false");
 
-		/* 6) lookup existing CallbackLookup for first level */
-		if ((iter = fCallbackLkps.find(first)) != end)
+		if (match)
 		{
-			iter->second->collectCallbacks(last.c_str(), callbacks);
+			callbacks.push_back(it->first);
 		}
 	}
 }
 
 
-void CallbackLookup::dispatchMsg(const char* subject, const Message& msg)
+void CallbackLookup::dispatchMsg(const Message& msg)
 {
-	callbackList tmpCB;
+	CallbackList tmpCB;
+	collectCallbacks(msg.getSubject(), tmpCB);
 
-	collectCallbacks(subject, tmpCB);
-
-	for (callbackItr it = tmpCB.begin(); it != tmpCB.end(); ++it)
+	for (CallbackItr it = tmpCB.begin(); it != tmpCB.end(); ++it)
 	{
 		MBCallback* cb = dynamic_cast<MBCallback*>(*it);
 
@@ -290,29 +266,11 @@ void CallbackLookup::dispatchMsg(const char* subject, const Message& msg)
 }
 
 
-size_t CallbackLookup::getCallbackCount(const char* subject)
+size_t CallbackLookup::getCallbackCount(const char* msgSubject)
 {
-	callbackList tmpCB;
+	CallbackList tmpCB;
 
-	collectCallbacks(subject, tmpCB);
+	collectCallbacks(msgSubject, tmpCB);
 
 	return tmpCB.size();
-}
-
-
-void CallbackLookup::collectCallbacksFinalStep(callbackList& callbacks, callbackList& fCallbacks)
-{
-	callbackItr itr = fCallbacks.begin();
-
-	while (itr != fCallbacks.end())
-	{
-		Callback* cb = *itr;
-
-		if (find(callbacks.begin(), callbacks.end(), cb) == callbacks.end())
-		{
-			callbacks.push_back(cb);
-		}
-
-		++itr;
-	}
 }

@@ -1,10 +1,10 @@
 
 %feature("docstring") gmsec::api::mist::message::DeviceMessage "
 
-    A Message that contains/defines a GMSEC MSG C2CX DEV message.
+    A Message that contains/defines a C2CX Device Message.
 
     The following message schema IDs and their templates are supported:
-    GMSEC.MSG.C2CX.DEV
+    MSG.DEV
 
     CONSTRUCTORS:
 

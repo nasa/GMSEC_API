@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -134,9 +134,9 @@ void MBService::removeCallback(const char* subject, Callback* cb)
 }
 
 
-void MBService::dispatchMsg(const char* subject, const Message& msg)
+void MBService::dispatchMsg(const Message& msg)
 {
-	m_callbackLookup->dispatchMsg(subject, msg);
+	m_callbackLookup->dispatchMsg(msg);
 }
 
 

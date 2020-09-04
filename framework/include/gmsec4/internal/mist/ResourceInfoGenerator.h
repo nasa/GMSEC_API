@@ -12,26 +12,24 @@ namespace gmsec
 {
 namespace api
 {
+	// Forward declaration(s)
+	class Message;
+
 namespace mist
 {
-	// Forward declaration(s)
-	namespace message
-	{
-		class MistMessage;
-	}
 namespace internal
 {
 
 class ResourceInfoGenerator
 {
 public:
-	static void addMainMemoryStats(message::MistMessage& msg, unsigned int version, size_t movingAverageSamples = 1);
+	static void addMainMemoryStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
 
-	static void addDiskStats(message::MistMessage& msg, unsigned int version, size_t movingAverageSamples = 1);
+	static void addDiskStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
 
-	static void addCPUStats(message::MistMessage& msg, unsigned int version, size_t movingAverageSamples = 1);
+	static void addCPUStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
 
-	static void addNetworkStats(message::MistMessage& msg, unsigned int version, size_t movingAverageSamples = 1);
+	static void addNetworkStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
 
 	static std::string getOSVersion();
 

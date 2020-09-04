@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -671,6 +671,20 @@ extern "C"
 	 * @return Returns the field value as a string value.
 	 */
 	GMSEC_API const char* messageGetStringValue(GMSEC_Message msg, const char* fieldName, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_BOOL messageHasField(GMSEC_Message msg, const char* name, GMSEC_Status status)
+	 *
+	 * @brief Reports whether the field, identified by name, is present in the Message.
+	 *
+	 * @param[in]  msg    - the handle to the Message object.
+	 * @param[in]  name   - the name of the field from which to reference the value.
+	 * @param[out] status - status of the operation, which will always be nominal if a valid Message handle is provided.
+	 *
+	 * @return GMSEC_TRUE if the field is found; GMSEC_FALSE otherwise.
+	 */
+	GMSEC_API GMSEC_BOOL messageHasField(GMSEC_Message msg, const char* name, GMSEC_Status status);
 
 
 	/**

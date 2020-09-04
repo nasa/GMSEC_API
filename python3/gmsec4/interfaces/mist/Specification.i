@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,25 +20,15 @@ using namespace gmsec::api::mist;
 /* Ignore deprecated methods */
 %ignore gmsec::api::mist::Specification::getTemplateXML(const char*, const char*);
 
+/* Ignore C methods */
+%ignore gmsec::api::mist::Specification::registerMessageValidator(GMSEC_MessageValidator*);
+
 %rename("validate_message") validateMessage;
 %rename("get_schema_id_iterator") getSchemaIDIterator;
 %rename("get_version") getVersion;
+%rename("get_schema_level") getSchemaLevel;
 %rename("get_message_specifications") getMessageSpecifications;
-
-/*
-%feature("director:except") {
-    if ($error != NULL) {
-        throw gmsec::api::Exception(gmsec::api::OTHER_ERROR, gmsec::api::OTHER_ERROR_CODE, SvPV_nolen($error));
-    }
-}
-
-%exception {
-    try { $action }
-    catch (const gmsec::api::Exception& e) { SWIG_croak(e.what()); }
-}
-
-%apply SWIGTYPE *DISOWN { Specification *spec };
-*/
+%rename("register_message_validator") registerMessageValidator;
 
 %include "dox/Specification_dox.i"
 %include "dox/MessageSpecificationList_dox.i"

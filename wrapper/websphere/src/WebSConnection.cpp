@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -48,6 +48,16 @@ static int MQINQMP_SPACE               = 1000;
 static int MIN_MQINQMP_SPACE           = sizeof(GMSEC_F64);
 
 static int DEBUG_PROP                  = 0;
+
+const char* const DEFAULT_CHANNEL      = "SYSTEM.DEF.SVRCONN";
+const char* const WEBSPHERE_SUBJECT    = "GMSEC_SUBJECT_WEBSPHERE";
+const char* const WEBSPHERE_KIND       = "GMSEC_KIND_WEBSPHERE";
+const char* const DEFAULT_SUBJECT      = "BOGUS.TOPIC";
+
+const char* const MW_PROP_PATTERN      = "gmsec.%";
+const char* const MW_PROP_PREFIX       = "gmsec.";
+const char* const MW_PROP_SUBJECT      = "SUBJECT";
+const char* const MW_PROP_KIND         = "KIND";
 
 
 // Function prototypes for locally defined helper functions
@@ -1090,18 +1100,11 @@ void WebSConnection::mwRequest(const Message& request, std::string& id)
 {
 	std::string RequestID;
 
-	++requestCounter;
-
-	id = generateUniqueId(requestCounter);
+	id = generateUniqueId(++requestCounter);
 
 	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 
-	if (requestSpecs.useSubjectMapping)
-	{
-		const char* rAddr = requestSpecs.replySubject.c_str();
-		MessageBuddy::getInternal(request).addField(WEBSPHERE_REPLY, rAddr);
-	}
-	else
+	if (!requestSpecs.useSubjectMapping)
 	{
 		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
@@ -1114,20 +1117,15 @@ void WebSConnection::mwRequest(const Message& request, std::string& id)
 
 void WebSConnection::mwReply(const Message& request, const Message& reply)
 {
-	std::string        uniqueID  = getExternal().getReplyUniqueID(request);
-	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(WEBSPHERE_REPLY));
+	std::string uniqueID  = getExternal().getReplyUniqueID(request);
 
 	if (uniqueID.empty())
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Unique ID field");
 	}
-	if (!replyAddr)
-	{
-		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain WebSphere Reply field");
-	}
 
 	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
-	MessageBuddy::getInternal(reply).setSubject(replyAddr->getValue());
+	MessageBuddy::getInternal(reply).setSubject(uniqueID.substr(0, uniqueID.rfind("_")).c_str());
 
 	mwPublish(reply, getExternal().getConfig());
 
@@ -1238,25 +1236,29 @@ void WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 						done = true; 
 					}
 
+//DMW
+#if 0
 					if (!requestSpecs.useSubjectMapping)
 					{
 						ValueMap& meta = MessageBuddy::getInternal(*msg).getDetails();
 
 						meta.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
+					}
 
-						if (msg->getKind() == Message::REQUEST)
+					if (msg->getKind() == Message::REQUEST)
+					{
+						try
 						{
-							const StringField* idField = dynamic_cast<const StringField*>(msg->getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
+							getExternal().setReplyUniqueID(*msg, msg->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
 
-							if (idField)
-							{
-								meta.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, idField->getValue());
-
-								// Remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message
-								msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
-							}
+							msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+						}
+						catch (...)
+						{
+							GMSEC_WARNING << "GMSEC_REPLY_UNIQUE_ID_FIELD field is missing!";
 						}
 					}
+#endif
 				}
 			}
 		}
@@ -1342,6 +1344,28 @@ bool WebSConnection::fromMW(const DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg,
 			{
 				getExternal().onReply(reply);
 			}
+		}
+	}
+	else if (kind == Message::REQUEST)
+	{
+		if (requestSpecs.useSubjectMapping)
+		{
+			try
+			{
+				getExternal().setReplyUniqueID(*msg, msg->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
+
+				msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+			}
+			catch (...)
+			{
+				GMSEC_WARNING << "GMSEC_REPLY_UNIQUE_ID_FIELD field is missing!";
+			}
+		}
+		else
+		{
+			ValueMap& meta = MessageBuddy::getInternal(*msg.get()).getDetails();
+
+			meta.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 		}
 	}
 
@@ -1447,23 +1471,11 @@ void WebSConnection::runSubscriptionThread(SharedSubscriptionInfo shared)
 }
 
 
-std::string WebSConnection::generateUniqueId()
-{
-	std::ostringstream strm;
-	strm << getExternal().getID() << "_" << SystemUtil::getProcessID() << "_"<< ++uniquecounter;
-	std::string topic = TOPIC_PREFIX;
-	topic.append(strm.str());
-	return topic;
-}
-
-
 std::string WebSConnection::generateUniqueId(long id)
 {
 	std::ostringstream strm;
-	strm << getExternal().getID() << "_" << SystemUtil::getProcessID() << "_"<< ++uniquecounter << "_" << id;
-	std::string topic = TOPIC_PREFIX;
-	topic.append(strm.str());
-	return topic;
+	strm << getExternal().getID() << "_" << id;
+	return strm.str();
 }
 
 

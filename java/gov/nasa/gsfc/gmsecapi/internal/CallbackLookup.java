@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -29,8 +29,8 @@ import java.util.Iterator;
  */
 public class CallbackLookup
 {
-	private ArrayList m_callbacks = new ArrayList();
-	private HashMap m_callbackLookups = new HashMap();
+	private ArrayList<Callback> m_callbacks = new ArrayList<Callback>();
+	private HashMap<String, CallbackLookup> m_callbackLookups = new HashMap<String, CallbackLookup>();
 
 	private static final String PREFIX_SYMBOL = ".";
 

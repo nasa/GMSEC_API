@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -62,7 +62,14 @@ GMSEC_ConnectionMgr CALL_TYPE connectionManagerCreate(const GMSEC_Config config,
 	}
 	else
 	{
-		connMgr = reinterpret_cast<GMSEC_ConnectionMgr>(new ConnectionManager(*cfg));
+		try
+		{
+			connMgr = reinterpret_cast<GMSEC_ConnectionMgr>(new ConnectionManager(*cfg));
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
 	}
 
 	if (status)
@@ -87,7 +94,14 @@ GMSEC_ConnectionMgr CALL_TYPE connectionManagerCreateUsingValidation(const GMSEC
 	}
 	else
 	{
-		connMgr = reinterpret_cast<GMSEC_ConnectionMgr>(new ConnectionManager(*cfg, validate == GMSEC_TRUE));
+		try
+		{
+			connMgr = reinterpret_cast<GMSEC_ConnectionMgr>(new ConnectionManager(*cfg, validate == GMSEC_TRUE));
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
 	}
 
 	if (status)
@@ -112,7 +126,14 @@ GMSEC_ConnectionMgr CALL_TYPE connectionManagerCreateUsingISD(const GMSEC_Config
 	}
 	else
 	{
-		connMgr = reinterpret_cast<GMSEC_ConnectionMgr>(new ConnectionManager(*cfg, validate == GMSEC_TRUE, version));
+		try
+		{
+			connMgr = reinterpret_cast<GMSEC_ConnectionMgr>(new ConnectionManager(*cfg, validate == GMSEC_TRUE, version));
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
 	}
 
 	if (status)
@@ -303,6 +324,34 @@ GMSEC_Specification CALL_TYPE connectionManagerGetSpecification(GMSEC_Connection
 	}
 
 	return spec;
+}
+
+
+void CALL_TYPE connectionManagerRegisterMessageValidator(GMSEC_ConnectionMgr connMgr,
+                                                         GMSEC_MessageValidator* validator,
+                                                         GMSEC_Status status)
+{
+	Status result;
+
+	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (mgr == NULL)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else if (validator == NULL || *validator == NULL)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "MessageValidator function is NULL");
+	}
+	else
+	{
+		mgr->registerMessageValidator(validator);
+	}
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
 }
 
 
@@ -735,13 +784,13 @@ void CALL_TYPE connectionManagerPublish(GMSEC_ConnectionMgr connMgr, const GMSEC
 }
 
 
-void CALL_TYPE connectionManagerPublishWithConfig(GMSEC_ConnectionMgr connMgr, const GMSEC_Message msg, const GMSEC_Config config, GMSEC_Status status)
+void CALL_TYPE connectionManagerPublishWithConfig(GMSEC_ConnectionMgr connMgr, const GMSEC_Message msg, const GMSEC_Config mwConfig, GMSEC_Status status)
 {
 	Status result;
 
 	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
 	const Message*     m   = reinterpret_cast<const Message*>(msg);
-	const Config*      cfg = reinterpret_cast<const Config*>(config);
+	const Config*      cfg = reinterpret_cast<const Config*>(mwConfig);
 
 	if (!mgr)
 	{

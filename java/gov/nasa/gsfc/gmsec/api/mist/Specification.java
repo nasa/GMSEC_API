@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,6 +22,8 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIMessage;
 import gov.nasa.gsfc.gmsec.api.jni.mist.JNISpecification;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.HashMap;
 
 
 /**
@@ -59,7 +61,70 @@ public class Specification
 
 
 	/**
-	 * Default constructor - initializes the %Specification instance.
+	 * Schema Levels for representing message specification.
+	 */
+	public enum SchemaLevel
+	{
+		/** C2MS */
+		LEVEL_0(0),
+
+		/** C2MS Extensions, or optionally user-defined */
+		LEVEL_1(1),
+
+		/** NASA/GMSEC Addendum, or optionally user-defined */
+		LEVEL_2(2),
+
+		/** User-defined */
+		LEVEL_3(3),
+
+		/** User-defined */
+		LEVEL_4(4),
+
+		/** User-defined */
+		LEVEL_5(5),
+
+		/** User-defined */
+		LEVEL_6(6);
+
+		private int level;
+		private static Map<Integer, SchemaLevel> map = new HashMap<>();
+
+		private SchemaLevel(int level) {
+			this.level = level;
+		}
+
+		static {
+			for (SchemaLevel schemaLevel : SchemaLevel.values()) {
+				map.put(schemaLevel.level, schemaLevel);
+			}
+		}
+
+		public static SchemaLevel valueOf(int level) {
+			return (SchemaLevel) map.get(level);
+		}
+
+		public int getValue() {
+			return level;
+		}
+	}
+
+
+	/**
+	 * Basic constructor that initializes the %Specification instance with the
+	 * default message specification (NASA/GMSEC Addendum)
+	 *
+	 * @throws GMSEC_Exception Thrown if schemas (templates) cannot be loaded.
+	 */
+	public Specification() throws GMSEC_Exception
+	{
+		Config config = new Config();
+
+		m_jniSpecification = new JNISpecification(Config.getInternal(config));
+	}
+
+
+	/**
+	 * Initializes the %Specification instance with the given configuration.
 	 *
 	 * @param config The configuration for the Specification object.
 	 *
@@ -145,6 +210,17 @@ public class Specification
 
 
 	/**
+	 * Returns the operating schema level for the specification.
+	 *
+	 * @return A SchemaLevel enumerated value.
+	 */
+	public SchemaLevel getSchemaLevel()
+	{
+		return m_jniSpecification.getSchemaLevel();
+	}
+
+
+	/**
 	 * Returns a collection of Message Specification objects associated with the Specification.
 	 *
 	 * @return A collection of MessageSpecifications.
@@ -152,6 +228,24 @@ public class Specification
 	public Collection<MessageSpecification> getMessageSpecifications()
 	{
 		return m_jniSpecification.getMessageSpecifications();
+	}
+
+
+	/**
+	 * Registers the given message validator to be used when message validation takes place.
+	 *
+	 * @param validator The custom message validator
+	 *
+	 * @throws IllegalArgumentException Thrown if the given validator object is null.
+	 */
+	public void registerMessageValidator(MessageValidator validator)
+	{
+		if (validator == null)
+		{
+			throw new IllegalArgumentException("MessageValidator is null");
+		}
+
+		m_jniSpecification.registerMessageValidator(validator);
 	}
 
 

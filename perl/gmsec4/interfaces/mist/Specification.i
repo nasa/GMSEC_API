@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,19 +17,11 @@ using namespace gmsec::api::mist;
 
 %ignore gmsec::api::mist::Specification::getTemplateXML(const char*, const char*);
 
+/* Ignore C methods */
+%ignore gmsec::api::mist::Specification::registerMessageValidator(GMSEC_MessageValidator*);
+
 // Turn on director mapping for the Specification package
 %feature("director") Specification;
-
-%feature("director:except") {
-    if ($error != NULL) {
-        throw gmsec::api::Exception(gmsec::api::OTHER_ERROR, gmsec::api::OTHER_ERROR_CODE, SvPV_nolen($error));
-    }
-}
-
-%exception {
-    try { $action }
-    catch (const gmsec::api::Exception& e) { SWIG_croak(e.what()); }
-}
 
 %apply SWIGTYPE *DISOWN { Specification *spec };
 
@@ -73,7 +65,17 @@ libgmsec_perl::Specification
 
 =head2 Public Member Subroutines
 
+
 =head3 new
+
+C<libgmsec_perl::Specification-E<gt>new()>
+
+	Initializes the Specification with the default message specification (NASA/GMSEC Addendum)
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+	Exception is thrown if an error occurs loading the message specification
+
 
 C<libgmsec_perl::Specification-E<gt>new($config)>
 
@@ -85,13 +87,16 @@ C<libgmsec_perl::Specification-E<gt>new($config)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-	Exception if Specification cannot deduce the values passed to it by the Configuration
+	Exception is thrown if Specification cannot deduce the values passed to it by the Configuration
+	Exception is thrown if an error occurs loading the message specification
+
 
 =head3 DESTROY
 
 C<libgmsec_perl::Specification-E<gt>DESTROY()>
 
     Destructor
+
 
 =head3 validateMessage
 
@@ -107,6 +112,7 @@ C<libgmsec_perl::Specification-E<gt>validateMessage($message)>
 
 	Exception if the message fails to pass validation.
 
+
 =head3 getSchemaIDIterator
 
 C<libgmsec_perl::Specification-E<gt>getSchemaIDIterator()>
@@ -121,6 +127,7 @@ C<libgmsec_perl::Specification-E<gt>getSchemaIDIterator()>
 
 	a reference to a schemaIDIterator object
 
+
 =head3 getVersion
 
 C<libgmsec_perl::Specification-E<gt>getVersion()>
@@ -132,6 +139,17 @@ C<libgmsec_perl::Specification-E<gt>getVersion()>
 	The version number of the ISD being used
 
 
+=head3 getSchemaLevel
+
+C<libgmsec_perl::Specification-E<gt>getSchemaLevel()>
+
+	Returns the schema level of the message specification in use
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+	An enumerated value for the Schema Level
+
+
 =head3 getMessageSpecifications
 
 C<libgmsec_perl::Specification-E<gt>getMessageSpecifications()>
@@ -139,6 +157,17 @@ C<libgmsec_perl::Specification-E<gt>getMessageSpecifications()>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
     A vector of MessageSpecification objects(s)
+
+
+=head3 registerMessageTemplate
+
+C<libgmsec_perl::Specification-E<gt>registerMessageTemplate()>
+
+    Registers the give MessageValidator to be used when message validation takes place.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+	$validator The custom MessageValidator to perform message validation
 
 =cut
 %}

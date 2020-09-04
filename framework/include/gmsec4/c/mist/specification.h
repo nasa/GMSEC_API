@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,6 +39,7 @@
 #define GMSEC_API_C_SPECIFICATION_H
 
 #include <gmsec4/c/mist/message_specification.h>
+#include <gmsec4/c/mist/mist_defs.h>
 
 #include <gmsec4_defs.h>
 
@@ -135,6 +136,19 @@ extern "C"
 
 
 	/**
+	 * @fn GMSEC_SchemaLevel specificationGetSchemaLevel(GMSEC_Specification spec, GMSEC_Status status)
+	 *
+	 * @brief Returns the operating schema level for the given Specification.
+	 *
+	 * @param[in]  spec   - the handle to the Specification object.
+	 * @param[out] status - out parameter operation result status.
+	 *
+	 * @return Enumerated value from GMSEC_SchemaLevel.
+	 */
+	GMSEC_API GMSEC_SchemaLevel specificationGetSchemaLevel(GMSEC_Specification spec, GMSEC_Status status);
+
+
+	/**
 	 * @fn void specificationGetMessageSpecifications(GMSEC_Specification spec, GMSEC_MessageSpecification* msgSpecs, int* numMsgSpecs, GMSEC_Status status)
 	 *
 	 * @brief Returns the list of Message Specifications, each of which includes a schema ID and a list of Field Specifications. The user is responsible for
@@ -160,6 +174,20 @@ extern "C"
 	 * @param[out] status      - out parameter operation result status.
 	 */
 	GMSEC_API void specificationDestroyMessageSpecifications(GMSEC_MessageSpecification* msgSpecs, int numMsgSpecs, GMSEC_Status status);
+
+
+	/**
+	 * @fn void specificatonRegisterMessageValidator(GMSEC_Specification spec, GMSEC_MessageValidator* validator, GMSEC_Status status);
+	 *
+	 * @brief This method will allow for a user to register their custom message validator
+	 * function with the Specification. This custom message validator can be used to
+	 * to perform validation of messages in addition to what is performed by the GMSEC API.
+	 *
+	 * @param[in]  spec      - the handle to the Specification object.
+	 * @param[in]  validator - the address of custom function used to validate a GMSEC message.
+	 * @param[out] status    - the status of the operation.
+	 */
+	GMSEC_API void specificationRegisterMessageValidator(GMSEC_Specification spec, GMSEC_MessageValidator* validator, GMSEC_Status status);
 
 
 	/**

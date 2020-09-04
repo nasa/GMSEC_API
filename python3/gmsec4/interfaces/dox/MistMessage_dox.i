@@ -22,9 +22,8 @@
     Parameters
     ----------
     subject  : The subject string for the message.
-    schemaID : The string used to identify the message schema in the GMSEC ISD.
-               The schema ID has the format of: MessageKind.MessageType.MessageSubtype
-               (e.g. MSG.C2CX.HB). Not all schemaIDs contain a MessageSubtype.
+    schemaID : The string used to identify the message schema in C2MS or other message specification
+               (e.g. MSG.HB).
     spec     : A reference to the specification this message's schema will adhere to.
 
     Exceptions
@@ -41,9 +40,8 @@
     Parameters
     ----------
     subject  : The subject string for the message.
-    schemaID : The string used to identify the message schema in the GMSEC ISD.
-               The schema ID has the format of: MessageKind.MessageType.MessageSubtype
-               (e.g. MSG.C2CX.HB). Not all schemaIDs contain a MessageSubtype.
+    schemaID : The string used to identify the message schema in C2MS or other message specification
+               (e.g. MSG.HB).
     config   : Config to associate with the message.
     spec     : A reference to the specification this message's schema will adhere to.
 
