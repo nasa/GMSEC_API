@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright 2007-2016 United States Government as represented by the
+   Administrator of The National Aeronautics and Space Administration.
+   No copyright is claimed in the United States under Title 17, U.S. Code.
+   All Rights Reserved.
+-->
+
+
+
+
+
+
+
+<DEFINITIONS>
+	<SUBSCRIPTION NAME="SUB1" PATTERN="GMSEC.MISSION.>"/>
+	<CONFIG NAME="default2">
+		<PARAMETER NAME="connectionType">gmsec_ss</PARAMETER>
+		<PARAMETER NAME="server">tcp:localhost:5101,tcp:localhost:5102</PARAMETER>
+		<PARAMETER NAME="Server_Max_Reconnect_Delay">0</PARAMETER>
+		<PARAMETER NAME="Server_Read_Timeout">5</PARAMETER>
+	</CONFIG>
+	<CONFIG NAME="default1">
+		<PARAMETER NAME="connectionType">java_gmsec_ss</PARAMETER>
+		<PARAMETER NAME="server">tcp:localhost:5101,tcp:localhost:5102</PARAMETER>
+		<PARAMETER NAME="ss.server_max_reconnect_delay">0</PARAMETER>
+		<PARAMETER NAME="ss.server_read_timeout">5</PARAMETER>
+	</CONFIG>
+	<CONFIG NAME="default">
+		<PARAMETER NAME="connectionType">gmsec_bolt</PARAMETER>
+		<PARAMETER NAME="loglevel">Info</PARAMETER>
+	</CONFIG>
+    <MESSAGE NAME="MSG1" SUBJECT="GMSEC.MISSION.CONST.SAT.EVT.MSG" KIND="PUBLISH">
+		<CONFIG NAME="msg_config">
+			<PARAMETER NAME="KIND">GMSEC_MSG_PUBLISH</PARAMETER>
+		</CONFIG>		
+		<FIELD TYPE="CHAR" NAME="char_field">c</FIELD>
+		<FIELD TYPE="BOOL" NAME="bool_field">TRUE</FIELD>
+		<FIELD TYPE="SHORT" NAME="short_field">123</FIELD>
+		<FIELD TYPE="USHORT" NAME="ushort_field">123</FIELD>
+		<FIELD TYPE="LONG" NAME="long_field">123</FIELD>
+		<FIELD TYPE="ULONG" NAME="ulong_field">123</FIELD>
+		<FIELD TYPE="STRING" NAME="string_field">This is a test</FIELD>
+		<FIELD TYPE="FLOAT" NAME="float_field">123</FIELD>
+		<FIELD TYPE="DOUBLE" NAME="double_field">123</FIELD>
+		<FIELD TYPE="BIN" NAME="bin_field">4a4c4d4e4f5051</FIELD>
+	</MESSAGE>
+</DEFINITIONS>

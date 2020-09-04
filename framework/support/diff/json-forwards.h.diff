@@ -1,0 +1,24 @@
+--- jsoncpp-0.y.z/dist/json/json-forwards.h	2015-09-22 15:46:27.204708956 -0400
++++ GMSEC_API/framework/include/gmsec/internal/json-forwards.h	2015-09-15 12:33:45.580847918 -0400
+@@ -63,6 +63,11 @@
+ Public Domain "license" you can re-license your copy using whatever
+ license you like.
+ 
++-------------------------------------------------------------
++GMSEC API has a copy of JsonCpp in the gmsec namespace to
++avoid conflicts
++-------------------------------------------------------------
++
+ */
+ 
+ // //////////////////////////////////////////////////////////////////////
+@@ -169,6 +174,9 @@
+ #define JSONCPP_DEPRECATED(message)
+ #endif // if !defined(JSONCPP_DEPRECATED)
+ 
++/* The GMSEC API tweak to JsonCpp changes the Json namespace */
++#define Json gmsec_json
++
+ namespace Json {
+ typedef int Int;
+ typedef unsigned int UInt;

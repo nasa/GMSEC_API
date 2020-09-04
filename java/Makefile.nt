@@ -1,0 +1,83 @@
+# Copyright 2007-2016 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
+
+JAVA_SOURCES_3x = gov\nasa\gsfc\gmsecapi\*.java	\
+                  gov\nasa\gsfc\gmsecapi\internal\*.java \
+                  gov\nasa\gsfc\gmsecapi\jni\*.java \
+                  gov\nasa\gsfc\gmsecapi\mist\*.java \
+                  gov\nasa\gsfc\gmsecapi\util\*.java \
+
+JAVA_SOURCES_4x = gov\nasa\gsfc\gmsec\api\*.java	\
+                  gov\nasa\gsfc\gmsec\api\field\*.java \
+                  gov\nasa\gsfc\gmsec\api\jni\*.java \
+                  gov\nasa\gsfc\gmsec\api\jni\field\*.java \
+                  gov\nasa\gsfc\gmsec\api\jni\mist\*.java \
+                  gov\nasa\gsfc\gmsec\api\jni\util\*.java \
+                  gov\nasa\gsfc\gmsec\api\mist\*.java \
+                  gov\nasa\gsfc\gmsec\api\util\*.java
+
+SRCDIR_3x       = src
+SRCDIR_4x       = src_4x
+
+JAVA_CLASS_PATH = classes
+OUTPUT_DIR_JAR  = classes
+ 
+JDK_JAVA_JAVAC  = javac
+JDK_JAVA_JAR    = jar
+JDK_JAVA_JAVAH  = javah
+JDK_JAVA_RMIC   = rmic
+JDK_JAVA        = java
+JDK_JAVA_DOC    = javadoc
+JDK_OPTS        = -deprecation
+
+  
+default: version javac_3x javac_4x jar jni
+
+
+debug: default
+
+
+version: 
+	-$(JDK_JAVA_JAVAC) -version
+ 
+
+javac_3x: $(JAVA_SOURCES_3x) 
+	$(JDK_JAVA_JAVAC) $(JDK_OPTS) -d $(OUTPUT_DIR_JAR) -classpath $(JAVA_CLASS_PATH)  $? 
+
+
+javac_4x: $(JAVA_SOURCES_4x) 
+	$(JDK_JAVA_JAVAC) $(JDK_OPTS) -d $(OUTPUT_DIR_JAR) -classpath $(JAVA_CLASS_PATH)  $? 
+
+
+jar:
+	$(JDK_JAVA_JAR) cvf ..\bin\gmsecapi.jar -C $(OUTPUT_DIR_JAR) gov
+
+
+jni:
+	$(JDK_JAVA_JAVAH) -force -classpath $(JAVA_CLASS_PATH) -o $(SRCDIR_3x)\gmsecJNI.h gov.nasa.gsfc.gmsecapi.jni.gmsecJNI
+	$(JDK_JAVA_JAVAH) -force -classpath $(JAVA_CLASS_PATH) -o $(SRCDIR_4x)\gmsecJNI.h gov.nasa.gsfc.gmsec.api.jni.gmsecJNI
+ 
+
+clean:
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsecapi\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsecapi\jni\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsecapi\mist\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsecapi\util\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\field\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\jni\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\jni\field\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\jni\mist\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\jni\util\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\mist\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\util\*.class
+	del /Q $(SRC_3x)\gmsecJNI.h
+	del /Q $(SRC_4x)\gmsecJNI.h
+	del /Q ..\bin\gmsecapi.jar
+
+
+doc:
+	$(JDK_JAVA_DOC) -d docs -classpath $(JAVA_CLASS_PATH) $(JAVA_SOURCES)

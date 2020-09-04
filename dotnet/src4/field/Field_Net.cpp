@@ -1,0 +1,63 @@
+/*
+ * Copyright 2007-2016 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
+ * No copyright is claimed in the United States under Title 17, U.S. Code.
+ * All Rights Reserved.
+ */
+
+
+
+// Managed
+#include <field\Field_Net.h>
+
+
+using namespace GMSEC::API;
+using namespace System;
+
+
+Field::~Field()
+{
+	m_child = nullptr;
+}
+
+
+String^ Field::GetName()
+{
+	return gcnew String(m_child->getName());
+}
+
+
+Field::FieldType Field::GetType()
+{
+	return static_cast<FieldType>(m_child->getType());
+}
+
+
+bool Field::IsHeader()
+{
+	return m_child->isHeader();
+}
+
+
+String^ Field::ToXML()
+{
+	return gcnew String(m_child->toXML());
+}
+
+
+String^ Field::ToJSON()
+{
+	return gcnew String(m_child->toJSON());
+}
+
+
+void Field::RegisterChild(gmsec::api::Field* child)
+{
+	m_child = child;
+}
+
+
+gmsec::api::Field* Field::GetChild()
+{
+	return m_child;
+}
