@@ -1,5 +1,5 @@
-rem    @echo OFF
-rem Copyright 2007-2016 United States Government as represented by the
+rem     @echo OFF
+rem Copyright 2007-2017 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -69,6 +69,7 @@ FOR %%i IN (%BUILD%) DO (
 cd perl\gmsec
 rem Build the Perl part of the API
 perl -Iextra Makefile.PL PREFIX=../../bin
+rem perl -Iextra Makefile.PL PREFIX=../../bin MAKE=dmake
 nmake
 nmake install
 cd ..\..

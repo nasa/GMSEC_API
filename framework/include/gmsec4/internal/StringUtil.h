@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,16 +10,21 @@
 #define GMSEC_API_INTERNAL_STRING_UTIL_H
 
 #include <gmsec4_defs.h>
+#include <gmsec4/Exception.h>
 #include <gmsec4/Status.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4/util/Mutex.h>
 #include <gmsec4/util/Buffer.h>
 
-#include <string.h>
 #include <string>
+#include <sstream>
+#include <typeinfo>
 #include <vector>
+
 #include <cstdarg>
+#include <cstdio>
+#include <string.h>
 
 
 namespace gmsec
@@ -184,8 +189,16 @@ public:
 
 
 	/**
-	 * \fn stringParseI32(const char* in, GMSEC_I32& out)
-	 * \brief Parses an I32 from the input.
+	 * \fn stringParseF32(const char* in, GMSEC_F32& out)
+	 * \brief Parses an F32 from the input.
+	 * Returns true if successful.
+	 */
+	static bool CALL_TYPE stringParseF32(const char* in, GMSEC_F32& out);
+
+
+	/**
+	 * \fn stringParseF64(const char* in, GMSEC_F64& out)
+	 * \brief Parses an F64 from the input.
 	 * Returns true if successful.
 	 */
 	static bool CALL_TYPE stringParseF64(const char* in, GMSEC_F64& out);
@@ -266,6 +279,45 @@ public:
 	 * @brief Uncompress the data in the given input buffer and place the result in the output buffer.
 	 */
 	static Status gmsec_uncompress(const gmsec::api::util::DataBuffer& in, gmsec::api::util::DataBuffer& out);
+
+
+	/**
+	 * @fn getValue(const char* value)
+	 * @brief Converts the given value, if possible, into the desired type T.
+	 * @throws An Exception is thrown if the data value cannot be converted.
+	 */
+	template<typename T>
+	static T getValue(const char* value)
+	{
+		if (value == NULL)
+		{
+			throw Exception(OTHER_ERROR, PARSE_ERROR, "Value cannot be NULL");
+		}
+		else
+		{
+			T result = T();
+
+			std::istringstream iss(trim(value));
+
+			iss >> result;    // attempt to convert string to desired type T
+
+			if (iss.peek() != EOF)
+			{
+				// Failed to convert; check if we are dealing with a bool type,
+				// and if so, handle as a special case.
+				if (typeid(T) == typeid(bool))
+				{
+					result = stringIsTrue(iss.str().c_str());
+				}
+				else
+				{
+					throw Exception(OTHER_ERROR, PARSE_ERROR, "Unable to convert value");
+				}
+			}
+
+			return result;
+		}
+	}
 };
 
 

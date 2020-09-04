@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -183,6 +183,46 @@ void InternalLog::setDefaultStream(std::ostream* s)
 }
 
 
+std::string InternalLog::prepareLogMessage(const LogEntry& entry)
+{
+	char timeBuffer[GMSEC_TIME_BUFSIZE];
+	gmsec::api::util::TimeUtil::formatTime(entry.time, timeBuffer);
+
+	std::string file = (entry.file ? entry.file : "unknown");
+	std::string msg  = (entry.message ? entry.message : "");
+
+	// The constant 128 has been arbitrarily chosen; it should (hopefully) be sufficient to
+	// store the ancillary data associated with a log message that has not already been
+	// accounted for using the sizes of known strings or buffers.
+	const size_t bufSize = sizeof(timeBuffer) + file.length() + msg.length() + 128;
+
+	char* buffer = new char[bufSize];
+
+	rawbuf x(buffer, bufSize);
+
+	std::ostream os(&x);
+
+	size_t pos = msg.find("\n");
+	while (pos != std::string::npos)
+	{
+		msg.replace(pos, 1, "\n\t");
+
+		pos = msg.find("\n", pos+2);
+	}
+
+	os << timeBuffer
+	   << " [" << Log::toString(entry.level) << "]"
+	   << " [" << file << ":" << entry.line << "] "
+	   << msg << "\n" << std::ends;
+
+	std::string logMsg = buffer;
+
+	delete [] buffer;
+
+	return logMsg;
+}
+
+
 gmsec::api::internal::DefaultHandler& getDefaultHandler()
 {
 	static gmsec::api::internal::DefaultHandler handler(&std::cerr);
@@ -220,41 +260,11 @@ void DefaultHandler::setStream(std::ostream* ostr)
 void DefaultHandler::onMessage(const gmsec::api::util::LogEntry& entry)
 {
 	if (!out)
-		return;
-
-	char timeBuffer[GMSEC_TIME_BUFSIZE];
-	gmsec::api::util::TimeUtil::formatTime(entry.time, timeBuffer);
-
-	std::string file = (entry.file ? entry.file : "unknown");
-	std::string msg  = (entry.message ? entry.message : "");
-
-	// The constant 128 has been arbitrarily chosen; it should (hopefully) be sufficient to
-	// store the ancillary data associated with a log message that has not already been
-	// accounted for using the sizes of known strings or buffers.
-	const size_t bufSize = sizeof(timeBuffer) + file.length() + msg.length() + 128;
-
-	char* buffer = new char[bufSize];
-
-	rawbuf x(buffer, bufSize);
-
-	std::ostream os(&x);
-
-	size_t pos = msg.find("\n");
-	while (pos != std::string::npos)
 	{
-		msg.replace(pos, 1, "\n\t");
-
-		pos = msg.find("\n", pos+2);
+		return;
 	}
 
-	os << timeBuffer
-	   << " [" << Log::toString(entry.level) << "]"
-	   << " [" << file << ":" << entry.line << "] "
-	   << msg << "\n" << std::ends;
-
-	(*out) << buffer << std::endl;
-
-	delete [] buffer;
+	(*out) << InternalLog::prepareLogMessage(entry) << std::endl;
 }
 
 

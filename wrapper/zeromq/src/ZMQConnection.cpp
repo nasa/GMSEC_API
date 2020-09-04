@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -101,8 +101,8 @@ ZMQConnection::ZMQConnection(const Config& config)
 		}
 	}
 
-	m_threadSafe      = (threadSafeToggle.compare("yes") == 0);
-	m_useUniqueFilter = (filterToggle.empty() || filterToggle.compare("yes") == 0);
+	m_threadSafe      = StringUtil::stringEqualsIgnoreCase(threadSafeToggle.c_str(), "yes");
+	m_useUniqueFilter = filterToggle.empty() || StringUtil::stringEqualsIgnoreCase(filterToggle.c_str(), "yes");
 
 	// Ensure that the Reply Listener endpoint does not have a connect: or bind: option
 	m_repListenEndpoint = getUrl(m_repListenEndpoint);

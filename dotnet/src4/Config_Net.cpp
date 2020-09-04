@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -74,15 +74,15 @@ Config::Config(array<String^>^ argv)
 }
 
 
-Config::Config(String^ xml)
+Config::Config(String^ data)
 {
-	char* xmlStr = nullptr;
+	char* dataStr = nullptr;
 
 	try
 	{
-		xmlStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(xml).ToPointer());
+		dataStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(data).ToPointer());
 
-		m_impl  = new gmsec::api::Config(xmlStr);
+		m_impl  = new gmsec::api::Config(dataStr);
 		m_owned = true;
 	}
 	catch (gmsec::api::Exception& e)
@@ -91,11 +91,11 @@ Config::Config(String^ xml)
 	}
 	catch (...)
 	{
-		throw gcnew GMSEC_Exception(StatusClass::CONFIG_ERROR, StatusCode::OUT_OF_MEMORY, "Config constructor is unable to process XML string");
+		throw gcnew GMSEC_Exception(StatusClass::CONFIG_ERROR, StatusCode::OUT_OF_MEMORY, "Config constructor is unable to process data string");
 	}
 	finally
 	{
-		FREE_HGLOBAL_IF_NOT_NULLPTR(xmlStr);
+		FREE_HGLOBAL_IF_NOT_NULLPTR(dataStr);
 	}
 }
 
@@ -500,6 +500,21 @@ void Config::FromXML(String^ xml)
 	finally
 	{
 		FREE_HGLOBAL_IF_NOT_NULLPTR(xmlStr);
+	}
+}
+
+
+String^ Config::ToJSON()
+{
+	try
+	{
+		const char* jsonStr = m_impl->toJSON();
+
+		return gcnew String(jsonStr);
+	}
+	catch (...)
+	{
+		throw gcnew GMSEC_Exception(StatusClass::CONFIG_ERROR, StatusCode::OUT_OF_MEMORY, "Config::toXML is unable to create JSON string");
 	}
 }
 

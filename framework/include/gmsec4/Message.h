@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -109,7 +109,7 @@ public:
 	 * try {
 	 *     // Create the Connection
 	 *     Connection* conn = Connection::create(cfg);
-     *
+         *
 	 *     // Establish the connection
 	 *     conn->connect();
 	 *
@@ -131,8 +131,11 @@ public:
 	 * }
 	 *
 	 * @endcode
+	 *
 	 * @param subject - the subject string for the message.
 	 * @param kind - the kind of message to instantiate.
+	 *
+	 * @throw An Exception is thrown if the subject is NULL or contains an empty-string.
 	 */
 	Message(const char* subject, MessageKind kind);
 
@@ -173,7 +176,7 @@ public:
 	 * try {
 	 *     // Create the Connection
 	 *     Connection* conn = Connection::create(config);
-     *
+         *
 	 *     // Establish the connection
 	 *     conn->connect();
 	 *
@@ -199,6 +202,8 @@ public:
 	 * @param subject - the subject string for the message.
 	 * @param kind - the kind of message to instantiate.
 	 * @param config - a configuration to associate with the message.
+	 *
+	 * @throw An Exception is thrown if the subject is NULL or contains an empty-string.
 	 */
 	Message(const char* subject, MessageKind kind, const Config& config);
 
@@ -210,71 +215,71 @@ public:
 	 *
 	 * Example:
 	 * @code
-     * // To publish a message with XML text or JSON
-     * // Create a Message object with XML text
+	 * // To publish a message with XML text or JSON
+	 * // Create a Message object with XML text
 	 * 
-     * const char* XML = "<MESSAGE SUBJECT=\"GMSEC.TEST.XML.SUBJECT\" KIND=\"PUBLISH\">"
-     *               "    <CONFIG>"
-     *               "        <PARAMETER NAME=\"FOO\">BAR</PARAMETER>"
-     *               "        <PARAMETER NAME=\"DONE\">DEAL</PARAMETER>"
-     *               "    </CONFIG>"
-     *               "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>"
-     *               "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>"
-     *                 "</MESSAGE>";
-     *
-     * Message msgXML(XML);
-     * 
-     * // Create a Message object with JOSN text 
-     * 
-     * const char* JSON = "{\"MESSAGE\":{ \
-     *                    \"KIND\":\"PUBLISH\", \
-     *                    \"SUBJECT\":\"GMSEC.TEST.JSON.SUBJECT\", \
-     *                    \"FIELD\":[ \
-     *                       { \
-     *                           \"NAME\":\"CHAR-FIELD\", \
-     *                           \"TYPE\":\"CHAR\", \
-     *                           \"VALUE\":\"c\" \
-     *                       }, \
-     *                       { \
-     *                           \"NAME\":\"BOOL-FIELD\", \
-     *                           \"TYPE\":\"BOOL\", \
-     *                           \"VALUE\":\"TRUE\" \
-     *                       } \
-     *                   ] \
-     *               } \
-     *              }";
-     *              
-     * Message msgJSON(JSON);
-     * 
-     * //Create a connection with Connection::create()
-     * Config cfg(argc,argv);
+	 * const char* XML = "<MESSAGE SUBJECT=\"GMSEC.TEST.XML.SUBJECT\" KIND=\"PUBLISH\">"
+	 *               "    <CONFIG>"
+	 *               "        <PARAMETER NAME=\"FOO\">BAR</PARAMETER>"
+	 *               "        <PARAMETER NAME=\"DONE\">DEAL</PARAMETER>"
+	 *               "    </CONFIG>"
+	 *               "    <FIELD TYPE=\"STRING\" NAME=\"EXAMPLE-STRING-NAME\">EXAMPLE TEXT</FIELD>"
+	 *               "    <FIELD TYPE=\"BOOL\" NAME=\"EXAMPLE-BOOL-FIELD-NAME\">TRUE</FIELD>"
+	 *                 "</MESSAGE>";
+	 *
+	 * Message msgXML(XML);
 	 * 
-     * try {
-     *     // Create the Connection
-     *     Connection* conn = Connection::create(cfg);
-     * 
-     *     // Establish the connection
-     *     conn->connect();
-     * 
-     *     ...
-     * 
-     *     // Publish message
-     *     conn->publish(msgXML);
-     *     conn->publish(msgJSON);
-     * 
-     *     ...
-     * 
-     *     // Disconnect from middleware server
-     *     conn->disconnect();
-     * 
-     *     // Destroy the Connection object
-     *     Connection::destroy(conn);
-     * }
-     * catch (Exception& e) {
-     *     //handle error
-     * }
-     *
-     * @endcode
+	 * // Create a Message object with JSON text 
+	 * 
+ 	 * const char* JSON = "{\"MESSAGE\":{ \
+	 *                       \"KIND\":\"PUBLISH\", \
+	 *                       \"SUBJECT\":\"GMSEC.TEST.JSON.SUBJECT\", \
+	 *                       \"FIELD\":[ \
+	 *                         { \
+	 *                            \"NAME\":\"CHAR-FIELD\", \
+	 *                            \"TYPE\":\"CHAR\", \
+	 *                            \"VALUE\":\"c\" \
+	 *                         }, \
+	 *                         { \
+	 *                            \"NAME\":\"BOOL-FIELD\", \
+	 *                            \"TYPE\":\"BOOL\", \
+	 *                            \"VALUE\":\"TRUE\" \
+	 *                         } \
+	 *                         ] \
+	 *                       } \
+	 *                     }";
+	 *              
+	 * Message msgJSON(JSON);
+	 * 
+	 * //Create a connection with Connection::create()
+	 * Config cfg(argc,argv);
+	 * 
+	 * try {
+	 *     // Create the Connection
+	 *     Connection* conn = Connection::create(cfg);
+	 * 
+	 *     // Establish the connection
+	 *     conn->connect();
+	 * 
+	 *     ...
+	 * 
+	 *     // Publish message
+	 *     conn->publish(msgXML);
+	 *     conn->publish(msgJSON);
+	 * 
+	 *     ...
+	 * 
+	 *     // Disconnect from middleware server
+	 *     conn->disconnect();
+	 * 
+	 *     // Destroy the Connection object
+	 *     Connection::destroy(conn);
+	 * }
+	 * catch (Exception& e) {
+	 *     //handle error
+	 * }
+	 *
+	 * @endcode
 	 * @param data - an XML or JSON string
 	 *
 	 * @throw Exception is thrown if the XML or JSON string cannot be parsed.
@@ -348,6 +353,18 @@ public:
 	 * @return The subject assigned to the Message.
 	 */
 	const char* CALL_TYPE getSubject() const;
+
+
+	/**
+	 * @fn void setSubject(const char* subject) const
+	 *
+	 * @brief Allows for the setting/changing of the message subject.
+	 *
+	 * @param subject - the subject/topic to associate with the message.
+	 *
+	 * @throw An Exception is thrown if the subject is NULL or contains an empty-string.
+	 */
+	void CALL_TYPE setSubject(const char* subject);
 
 
 	/**

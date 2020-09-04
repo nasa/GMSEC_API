@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -40,7 +40,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1I32Field
 
 		if (jvmOk(jenv, "I32Field") && name.c_str())
 		{
-			created = new I32Field(name.c_str(), (int) jData);
+			created = new I32Field(name.c_str(), (GMSEC_I32) jData);
 		}
 	}
 	JNI_CATCH

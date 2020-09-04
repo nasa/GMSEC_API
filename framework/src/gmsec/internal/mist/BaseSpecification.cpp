@@ -1,6 +1,6 @@
 
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -229,11 +229,16 @@ Status BaseSpecification::LoadTemplate(const char* id, const char * path)
 				// Note:  A copy of a MessageTemplate is *not*
 				//        made in the Register() function.
 				//
+				m_idFieldNames.insert(std::pair<std::string, std::string>(id_string, id_field_names));
+
 				MessageTemplate* mt = new MessageTemplate(schema_fields, true);
 
-				m_idFieldNames.insert(std::pair<std::string, std::string>(id_string.c_str(), id_field_names.c_str()));
+				status = Register(id_string.c_str(), mt);
 
-				status = Register(id_string.c_str(), *mt);
+				if (status.IsError())
+				{
+					delete mt;
+				}
 			}
 
 			xml_doc.Clear();
@@ -371,16 +376,19 @@ Status BaseSpecification::Validate(Message *message, Context &context) const
 
 
 // programmatic definition
-Status BaseSpecification::Register(const char * id, MessageTemplate &newTemplate)
+Status BaseSpecification::Register(const char* id, MessageTemplate* newTemplate)
 {
 	Status status;
-	if(!id)
+
+	if (id != NULL)
+	{
+		templates.insert(std::pair<std::string, MessageTemplate*>(id, newTemplate));
+	}
+	else
 	{
 		status.Set(GMSEC_GENERAL_MIST_ERROR, GMSEC_INVALID_VALUE, "Template ID is invalid.");
-		return status;
 	}
-	std::string newId = std::string(id);
-	templates.insert(std::pair<std::string, MessageTemplate*>(newId,&newTemplate));
+
 	return status;
 }
 
@@ -905,15 +913,13 @@ Status BaseSpecification::parser(tinyxml2::XMLElement* xmlSchema, std::string& i
 		}
 		else
 		{
-			String err_msg =
-			  "Could not parse XML schema successfully:  ";
+			delete field_ptr;
 
-			LOG_WARNING << err_msg.c_str() << id.c_str() << ", "
-			            << field_name.c_str();
+			const char* err_msg = "Could not parse XML schema successfully:  ";
 
-			status.Set(GMSEC_GENERAL_MIST_ERROR,
-			           GMSEC_SCHEMA_FAILED_TO_PARSE,
-			           err_msg.c_str());
+			LOG_WARNING << err_msg << id.c_str() << ", " << field_name.c_str();
+
+			status.Set(GMSEC_GENERAL_MIST_ERROR, GMSEC_SCHEMA_FAILED_TO_PARSE, err_msg);
 		}
 	}
 
@@ -951,11 +957,16 @@ Status BaseSpecification::loadDefaultTemplatesFromMemory()
 					// Note:  A copy of a MessageTemplate is *not*
 					//        made in the Register() function.
 					//
+					m_idFieldNames.insert(std::pair<std::string, std::string>(id, id_field_names));
+
 					MessageTemplate* mt = new MessageTemplate(schema_fields, true);
 
-					m_idFieldNames.insert(std::pair<std::string, std::string>(id.c_str(), id_field_names.c_str()));
+					status = Register(id.c_str(), mt);
 
-					status = Register(id.c_str(), *mt);
+					if (status.IsError())
+					{
+						delete mt;
+					}
 				}
 
 				xml_doc.Clear();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -240,7 +240,7 @@ extern "C"
 
 				jstring s = 0;
 				if (!status.isError() && subject)
-					s = jenv->NewStringUTF(subject);
+					s = makeJavaString(jenv, subject);
 
 				if (jvmOk(jenv, "Message.GetSubject"))
 				{
@@ -485,13 +485,15 @@ extern "C"
 				const char *xml = NULL;
 				status = message->ToXML(xml);
 
-				jstring s = 0;
 				if (!status.isError())
 				{
-					s = jenv->NewStringUTF(xml);
 					if (jvmOk(jenv, "Message.ToXML"))
 					{
+						jstring s = makeJavaString(jenv, xml);
+
+						// Convert the Java String into the Java GMSEC_String object
 						jenv->SetObjectField(jGxml, Cache::getCache().fieldString_value, s);
+
 						jvmOk(jenv, "Message.ToXML");
 						created = new Status(status);
 					}
@@ -554,8 +556,7 @@ extern "C"
 			else
 			{
 				const char* json = message->ToJSON();
-
-				s = jenv->NewStringUTF(json);
+				s = makeJavaString(jenv, json);
 				jvmOk(jenv, "Message.ToJSON");
 			}
 		}
@@ -615,7 +616,7 @@ extern "C"
 			else
 			{
 				tmp = message->GetTime();
-				s = jenv->NewStringUTF(tmp);
+				s = makeJavaString(jenv, tmp);
 				jvmOk(jenv, "Message.GetTime");
 			}
 		}

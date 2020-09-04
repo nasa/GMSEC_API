@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -75,7 +75,14 @@ inline void printUsage(const std::string &programName)
 			std::cout << "\n\tinterval_ms=<interval (milliseconds)>";
 		}
 	}
-
+	if (programName.find("throughput_pub") != std::string::npos)
+	{
+		std::cout << "\n\tdata-size=<number of bytes to package into messages>";
+	}
+	if (programName.find("throughput") != std::string::npos)
+	{
+		std::cout << "\n\tmonitor-rate=<period of time (ms) to report monitored throughput>";
+	}
 	if (programName.find("gmreq") != std::string::npos)
 	{
 		std::cout << "\n\tmsg_timeout_ms=<timeout period (milliseconds)>"; 

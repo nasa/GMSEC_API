@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -222,93 +222,107 @@ void InternalMessage::setKind(Message::MessageKind kind)
 }
 
 
-bool InternalMessage::addField(const Field& field)
+bool InternalMessage::addField(const Field& field, bool makeCopy)
 {
-	return m_fields.addField(field);
+	return m_fields.addField(field, makeCopy);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_BIN bin, size_t len)
 {
-	return addField(BinaryField(name, bin, len));
+	Field* field = new BinaryField(name, bin, len);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, bool value)
 {
-	return addField(BooleanField(name, value));
+	Field* field = new BooleanField(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_CHAR value)
 {
-	return addField(CharField(name, value));
+	Field* field = new CharField(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_I8 value)
 {
-	return addField(I8Field(name, value));
+	Field* field = new I8Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_I16 value)
 {
-	return addField(I16Field(name, value));
+	Field* field = new I16Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_I32 value)
 {
-	return addField(I32Field(name, value));
+	Field* field = new I32Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_I64 value)
 {
-	return addField(I64Field(name, value));
+	Field* field = new I64Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_F32 value)
 {
-	return addField(F32Field(name, value));
+	Field* field = new F32Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_F64 value)
 {
-	return addField(F64Field(name, value));
+	Field* field = new F64Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, const char* value)
 {
-	return addField(StringField(name, value));
+	Field* field = new StringField(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_U8 value)
 {
-	return addField(U8Field(name, value));
+	Field* field = new U8Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_U16 value)
 {
-	return addField(U16Field(name, value));
+	Field* field = new U16Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_U32 value)
 {
-	return addField(U32Field(name, value));
+	Field* field = new U32Field(name, value);
+	return addField(*field, false);
 }
 
 
 bool InternalMessage::addField(const char* name, GMSEC_U64 value)
 {
-	return addField(U64Field(name, value));
+	Field* field = new U64Field(name, value);
+	return addField(*field, false);
 }
 
 
@@ -335,7 +349,9 @@ GMSEC_I64 InternalMessage::getIntegerValue(const char* fieldName) const
 		return field->getIntegerValue();
 	}
 
-	throw Exception(MSG_ERROR, INVALID_FIELD, "Field not found");
+	std::string errmsg = "Message does not contain field with name: ";
+	errmsg += fieldName;
+	throw Exception(MSG_ERROR, INVALID_FIELD, errmsg.c_str());
 }
 
 
@@ -348,7 +364,9 @@ GMSEC_U64 InternalMessage::getUnsignedIntegerValue(const char* fieldName) const
 		return field->getUnsignedIntegerValue();
 	}
 
-	throw Exception(MSG_ERROR, INVALID_FIELD, "Field not found");
+	std::string errmsg = "Message does not contain field with name: ";
+	errmsg += fieldName;
+	throw Exception(MSG_ERROR, INVALID_FIELD, errmsg.c_str());
 }
 
 
@@ -361,7 +379,9 @@ GMSEC_F64 InternalMessage::getDoubleValue(const char* fieldName) const
 		return field->getDoubleValue();
 	}
 
-	throw Exception(MSG_ERROR, INVALID_FIELD, "Field not found");
+	std::string errmsg = "Message does not contain field with name: ";
+	errmsg += fieldName;
+	throw Exception(MSG_ERROR, INVALID_FIELD, errmsg.c_str());
 }
 
 
@@ -374,7 +394,9 @@ const char* InternalMessage::getStringValue(const char* fieldName) const
 		return field->getStringValue();
 	}
 
-	throw Exception(MSG_ERROR, INVALID_FIELD, "Field not found");
+	std::string errmsg = "Message does not contain field with name: ";
+	errmsg += fieldName;
+	throw Exception(MSG_ERROR, INVALID_FIELD, errmsg.c_str());
 }
 
 
@@ -740,6 +762,25 @@ const char* InternalMessage::toJSON() const
 			break;
 	}
 
+	std::string configJSON = m_config.toJSON();
+
+	if (!configJSON.empty())
+	{
+		InternalConfig internalConfig(configJSON.c_str());
+
+		configJSON = internalConfig.toJSON(false);
+
+		if (!configJSON.empty())
+		{
+			jsonStream << configJSON;
+
+			if (m_fields.getFieldCount() > 0)
+			{
+				jsonStream << ",";
+			}
+		}
+	}
+
 	if (m_fields.getFieldCount() > 0)
 	{
 		jsonStream << "\"FIELD\":[";
@@ -1027,23 +1068,11 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 			try
 			{
 				// only the InternalConfig has the means to ingest an XML document node
-				InternalConfig config;
-				config.fromXML(node);
+				InternalConfig internalConfig;
 
-				// cannot construct Config using InternalConfig, thus we need to iterate
-				// manually over each name/value pair in the InternalConfig, and then
-				// add pair to our InternalMessage's config object.
-				const char* name  = 0;
-				const char* value = 0;
+				internalConfig.fromXML(node);
 
-				bool result = config.getFirst(name, value);
-
-				while (result)
-				{
-					m_config.addValue(name, value);
-
-					result = config.getNext(name, value);
-				}
+				m_config = Config(internalConfig.toXML());
 
 				// apply the config to our message
 				processConfig(m_config);
@@ -1135,6 +1164,19 @@ void InternalMessage::fromJSON(const Json::Value& origRoot)
 				delete field;
 			}
 		}
+	}
+
+	if (root.isMember("CONFIG"))
+	{
+		// only the InternalConfig has the means to ingest a JSON Value object
+		InternalConfig internalConfig;
+
+		internalConfig.fromJSON(root);
+
+		m_config = Config(internalConfig.toJSON());
+
+		// apply the config to our message
+		processConfig(m_config);
 	}
 }
 

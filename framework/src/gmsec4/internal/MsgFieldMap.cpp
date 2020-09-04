@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -102,7 +102,7 @@ size_t MsgFieldMap::getRolloverLimit() const
 }
 
 
-bool MsgFieldMap::addField(const Field& field)
+bool MsgFieldMap::addField(const Field& field, bool makeCopy)
 {
 	const std::string name = field.getName();
 
@@ -113,40 +113,44 @@ bool MsgFieldMap::addField(const Field& field)
 		if (m_rolloverLimit > 0 && (m_binTreeMap.size() + 1) > m_rolloverLimit)
 		{
 			rollover();
-			return addField(field);   // re-call by recursion.
+			return addField(field, makeCopy);   // re-call by recursion.
 		}
 		else
 		{
+			Field* fieldToStore = (makeCopy ? InternalField::makeFieldCopy(field) : const_cast<Field*>(&field));
+
 			BinaryTreeMap::iterator it = m_binTreeMap.lower_bound(name);
 
 			if (it == m_binTreeMap.end() || m_binTreeMap.key_comp()(name, it->first))
 			{
 				// insert new entry.
-				m_binTreeMap.insert(it, BinaryTreeMap::value_type(name, InternalField::makeFieldCopy(field)));
+				m_binTreeMap.insert(it, BinaryTreeMap::value_type(name, fieldToStore));
 			}
 			else
 			{
 				// existing entry; replace value.
 				delete it->second;
-				it->second = InternalField::makeFieldCopy(field);
+				it->second = fieldToStore;
 				replaced = true;
 			}
 		}
 	}
 	else
 	{
+		Field* fieldToStore = (makeCopy ? InternalField::makeFieldCopy(field) : const_cast<Field*>(&field));
+
 		HashMap::iterator it = m_hashMap.find(name);
 
 		if (it == m_hashMap.end())
 		{
 			// insert new entry.
-			m_hashMap.insert(HashMap::value_type(name, InternalField::makeFieldCopy(field)));
+			m_hashMap.insert(HashMap::value_type(name, fieldToStore));
 		}
 		else
 		{
 			// existing entry; replace value.
 			delete it->second;
-			it->second = InternalField::makeFieldCopy(field);
+			it->second = fieldToStore;
 			replaced = true;
 		}
 	}

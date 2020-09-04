@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -140,6 +140,13 @@ void SWIG_JavaThrowException(JNIEnv* jenv, SWIG_JavaExceptionCodes code, const c
  * @brief Checks for pending exceptions from the JVM.
  */
 bool jvmOk(JNIEnv* jenv, const char* context = 0);
+
+
+/** @fn makeJavaString
+ * @brief Helper function to convert a const char* to a Java GMSEC_String
+ * while properly handling String encoding issues.
+ */
+jstring makeJavaString(JNIEnv *jenv, const char* cStr);
 
 
 /**

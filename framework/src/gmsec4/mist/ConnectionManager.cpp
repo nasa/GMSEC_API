@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -220,27 +220,37 @@ void ConnectionManager::stopHeartbeatService()
 }
 
 
+// deprecated
 Status ConnectionManager::changeComponentStatus(const Field& componentStatus)
 {
-	return m_internal->changeComponentStatus(componentStatus);
+	return m_internal->setHeartbeatServiceField(componentStatus);
 }
 
 
+// deprecated
 Status ConnectionManager::changeComponentInfo(const Field& componentInfo)
 {
-	return m_internal->changeComponentInfo(componentInfo);
+	return m_internal->setHeartbeatServiceField(componentInfo);
 }
 
 
+// deprecated
 Status ConnectionManager::changeCPUMemory(const Field& cpuMemory)
 {
-	return m_internal->changeCPUMemory(cpuMemory);
+	return m_internal->setHeartbeatServiceField(cpuMemory);
 }
 
 
+// deprecated
 Status ConnectionManager::changeCPUUtil(const Field& cpuUtil)
 {
-	return m_internal->changeCPUUtil(cpuUtil);
+	return m_internal->setHeartbeatServiceField(cpuUtil);
+}
+
+
+Status ConnectionManager::setHeartbeatServiceField(const Field& field)
+{
+	return m_internal->setHeartbeatServiceField(field);
 }
 
 

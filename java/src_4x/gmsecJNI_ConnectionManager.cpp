@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,6 +12,7 @@
 #include "gmsecJNI.h"
 #include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
+#include "gmsecJNI_CustomSpecification.h"
 
 #include <gmsec4/Config.h>
 #include <gmsec4/Exception.h>
@@ -211,7 +212,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMa
 			{
 				const char* version = connMgr->getLibraryVersion();
 
-				jVersion = jenv->NewStringUTF(version);
+				jVersion = makeJavaString(jenv, version);
 
 				jvmOk(jenv, "ConnectionManager.getLibraryVersion");
 			}
@@ -251,6 +252,31 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMana
 
 	return jSpec;
 }
+
+
+#if 0
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1SetSpecification
+  (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jSpecPtr, jobject jjSpec, jobject jSpec)
+{
+	ConnectionManager*   connMgr = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
+	CustomSpecification* spec    = reinterpret_cast<CustomSpecification*>(jSpecPtr);
+
+	if (!connMgr)
+	{
+		SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
+	}
+	else if (!spec)
+	{
+		SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+	}
+	else
+	{
+		spec->registerObserver(jenv, jSpec);
+
+		connMgr->setSpecification(spec);
+	}
+}
+#endif
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1SetStandardFields
@@ -1060,7 +1086,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1ChangeComponentStatus
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1SetHeartbeatServiceField
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jFieldPtr, jobject jField)
 {
 	jlong jStatus = 0;
@@ -1080,100 +1106,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMana
 		}
 		else
 		{
-			Status status = connMgr->changeComponentStatus(*field);
-
-			jStatus = JNI_POINTER_TO_JLONG(new Status(status));
-		}
-	}
-	JNI_CATCH
-
-	return jStatus;
-}
-
-
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1ChangeComponentInfo
-  (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jFieldPtr, jobject jField)
-{
-	jlong jStatus = 0;
-
-	try
-	{
-		ConnectionManager* connMgr = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
-		Field*             field   = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!connMgr)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
-		}
-		else if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			Status status = connMgr->changeComponentInfo(*field);
-
-			jStatus = JNI_POINTER_TO_JLONG(new Status(status));
-		}
-	}
-	JNI_CATCH
-
-	return jStatus;
-}
-
-
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1ChangeCPUMemory
-  (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jFieldPtr, jobject jField)
-{
-	jlong jStatus = 0;
-
-	try
-	{
-		ConnectionManager* connMgr = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
-		Field*             field   = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!connMgr)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
-		}
-		else if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			Status status = connMgr->changeCPUMemory(*field);
-
-			jStatus = JNI_POINTER_TO_JLONG(new Status(status));
-		}
-	}
-	JNI_CATCH
-
-	return jStatus;
-}
-
-
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1ChangeCPUUtil
-  (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jFieldPtr, jobject jField)
-{
-	jlong jStatus = 0;
-
-	try
-	{
-		ConnectionManager* connMgr = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
-		Field*             field   = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!connMgr)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
-		}
-		else if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			Status status = connMgr->changeCPUUtil(*field);
+			Status status = connMgr->setHeartbeatServiceField(*field);
 
 			jStatus = JNI_POINTER_TO_JLONG(new Status(status));
 		}

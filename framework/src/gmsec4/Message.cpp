@@ -83,6 +83,12 @@ const char* Message::getSubject() const
 }
 
 
+void Message::setSubject(const char* subject)
+{
+	m_iMessage->setSubject(subject);
+}
+
+
 Message::MessageKind Message::getKind() const
 {
 	return m_iMessage->getKind();

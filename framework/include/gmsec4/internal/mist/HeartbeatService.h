@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -52,28 +52,9 @@ public:
 	~HeartbeatService();
 
 
-	// This function changes the status being published. Under the current spec,
-	// values are a short between 0 and 4. An error status is returned if the supplied
-	// value falls out of specification.
-	Status changeComponentStatus(const Field& componentStatus);
-
-
-	// This function changes the component info field, which is  a short type containing
-	// component specific and user defined information about the component. An error status 
-	// is returned if the supplied value falls out of specification.
-	Status changeComponentInfo(const Field& componentStatus);
-
-
-	// This function changes the current CPU utilization field, which is a float
-	// containing the current percentage utilization. An error status 
-	// is returned if the supplied value falls out of specification.
-	Status changeCPUUtil(const Field& cpuUtil);
-
-
-	// This function changes the current RAM utilization field, which is a float
-	// containing the current percentage utilization. An error status 
-	// is returned if the supplied value falls out of specification.
-	Status changeCPUMemory(const Field& cpuMemory);
+	// This function adds or changes the given field within the C2CX HB
+	// message that is published by the Heartbeat Service.
+	void setField(const Field& field);
 
 
 	// This function starts the HeartbeatService thread; the thread

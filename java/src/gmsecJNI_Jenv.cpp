@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -78,6 +78,31 @@ bool jvmOk(JNIEnv* jenv, const char* context)
         jenv->ExceptionDescribe();
     }
     return ok;
+}
+
+
+/** @fn makeJavaString
+ * @brief Helper function to convert a const char* to a Java GMSEC_String
+ * while properly handling String encoding issues.
+ */
+jstring makeJavaString(JNIEnv *jenv, const char* cStr)
+{
+	if (cStr == NULL)
+	{
+		throw std::invalid_argument("cannot construct a Java String with a NULL C-style string");
+	}
+
+	// Convert the C-style string into a Java binary array
+	std::string str(cStr);
+	int byteCount = str.length();
+	const jbyte* pNativeMessage = reinterpret_cast<const jbyte*>(str.c_str());
+	jbyteArray bytes = jenv->NewByteArray(byteCount);
+	jenv->SetByteArrayRegion(bytes, 0, byteCount, pNativeMessage);
+	jclass stringClass = jenv->FindClass("java/lang/String");
+	jmethodID ctor = jenv->GetMethodID(stringClass, "<init>", "([B)V");
+
+	// Convert the Java binary array into the platform default Charset
+	return reinterpret_cast<jstring>(jenv->NewObject(stringClass, ctor, bytes));
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,9 +14,21 @@
         }
 %}
 
+/*
+ * This allows SWIG to handle Perl Strings for things such as BinaryField's
+ * constructor
+ */
+%apply char* {unsigned char*};
+
 %module libgmsec_perl
 
+%include gmsec_version.i
+
 %include gmsec4_defs.i
+
+%include Errors.i
+%include Exception.i
+%include Status.i
 
 %include field/Field.i
 %include field/BinaryField.i
@@ -35,24 +47,52 @@
 %include field/U64Field.i
 
 %include util/TimeUtil.i
+/*
+Not current supported due to instability issues
 %include util/LogHandler.i
+*/
 %include util/Log.i
 %include util/Mutex.i
 %include util/Condition.i
 
-%include Errors.i
-%include Exception.i
-%include Status.i
 %include Message.i
 %include SubscriptionInfo.i
+/*
+Not current supported due to instability issues
 %include Callback.i
 %include EventCallback.i
 %include ReplyCallback.i
+*/
 %include Connection.i
 %include Config.i
 %include ConfigFile.i
 %include ConfigFileIterator.i
 %include MessageFieldIterator.i
+
+%include mist/ConnectionManager.i
+/*
+Not current supported due to instability issues
+%include ConnectionManagerCallback.i
+%include ConnectionManagerEventCallback.i
+%include ConnectionManagerReplyCallback.i
+*/
+%include mist/Device.i
+%include mist/DeviceIterator.i
+%include mist/DeviceParam.i
+%include mist/mist_defs.i
+%include mist/Mnemonic.i
+%include mist/MnemonicIterator.i
+%include mist/MnemonicSample.i
+%include mist/ProductFile.i
+%include mist/ProductFileIterator.i
+%include mist/SchemaIDIterator.i
+%include mist/ServiceParam.i
+%include mist/Specification.i
+%include mist/SubscriptionInfo.i
+%include mist/message/MistMessage.i
+%include mist/message/MnemonicMessage.i
+%include mist/message/DeviceMessage.i
+%include mist/message/ProductFileMessage.i
 
 %perlcode%{
         libgmsec_perl::initPerlInterpreter();
@@ -77,8 +117,6 @@ Customers are welcome to contact the GMSEC Team at L<mailto:gmsec-support@lists.
 
 =head1 SEE ALSO
 
-=for html <a href="Callback.html">Callback</a><br><br>
-
 =for html <a href="Config.html">Config</a><br><br>
 
 =for html <a href="ConfigFile.html">ConfigFile</a><br><br>
@@ -89,15 +127,11 @@ Customers are welcome to contact the GMSEC Team at L<mailto:gmsec-support@lists.
 
 =for html <a href="Errors.html">Errors</a><br><br>
 
-=for html <a href="EventCallback.html">EventCallback</a><br><br>
-
 =for html <a href="Exception.html">Exception</a><br><br>
 
 =for html <a href="Message.html">Message</a><br><br>
 
 =for html <a href="MessageFieldIterator.html">MessageFieldIterator</a><br><br>
-
-=for html <a href="ReplyCallback.html">ReplyCallback</a><br><br>
 
 =for html <a href="Status.html">Status</a><br><br>
 
@@ -137,11 +171,45 @@ Customers are welcome to contact the GMSEC Team at L<mailto:gmsec-support@lists.
 
 =for html <a href="util/Log.html">Log</a><br><br>
 
-=for html <a href="util/LogHandler.html">LogHandler</a><br><br>
-
 =for html <a href="util/Mutex.html">Mutex</a><br><br>
 
 =for html <a href="util/TimeUtil.html">TimeUtil</a><br><br>
+
+=for html <a href="mist/ConnectionManager.html">ConnectionManager</a><br><br>
+
+=for html <a href="mist/Device.html">Device</a><br><br>
+
+=for html <a href="mist/DeviceIterator.html">DeviceIterator</a><br><br>
+
+=for html <a href="mist/DeviceParam.html">DeviceParam</a><br><br>
+
+=for html <a href="mist/mist_defs.html">MIST Definitions</a><br><br>
+
+=for html <a href="mist/Mnemonic.html">Mnemonic</a><br><br>
+
+=for html <a href="mist/MnemonicIterator.html">MnemonicIterator</a><br><br>
+
+=for html <a href="mist/MnemonicSample.html">MnemonicSample></a><br><br>
+
+=for html <a href="mist/ProductFile.html">ProductFile></a><br><br>
+
+=for html <a href="mist/ProductFileIterator.html">ProductFileIterator></a><br><br>
+
+=for html <a href="mist/SchemaIDIterator.html">SchemaIDIterator></a><br><br>
+
+=for html <a href="mist/ServiceParam.html">ServiceParam></a><br><br>
+
+=for html <a href="mist/Specification.html">Specification></a><br><br>
+
+=for html <a href="mist/SubscriptionInfo.html">SubscriptionInfo></a><br><br>
+
+=for html <a href="mist/message/DeviceMessage.html">DeviceMessage></a><br><br>
+
+=for html <a href="mist/message/MistMessage.html">MistMessage></a><br><br>
+
+=for html <a href="mist/message/MnemonicMessage.html">MnemonicMessage></a><br><br>
+
+=for html <a href="mist/message/Devicemessage.html">DeviceMessage></a><br><br>
 
 =cut
 %}

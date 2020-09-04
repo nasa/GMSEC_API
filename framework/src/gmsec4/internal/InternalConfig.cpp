@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,6 +18,7 @@
 #include <gmsec4/internal/StringUtil.h>
 
 #include <tinyxml2.h>
+#include <json.h>
 
 #include <algorithm>
 #include <cctype>
@@ -68,18 +69,91 @@ InternalConfig::InternalConfig(int argc, char* argv[])
 }
 
 
-InternalConfig::InternalConfig(const char* xml)
+InternalConfig::InternalConfig(const char* data)
 	: m_configs(),
 	  m_configIter(),
 	  m_xml()
 {
-	if (!xml || std::string(xml).empty())
+	if (!data || std::string(data).empty())
 	{
 		throw Exception(CONFIG_ERROR, XML_PARSE_ERROR, "XML string cannot be NULL, nor an empty string");
 	}
 
-	fromXML(xml);
-	m_configIter = m_configs.begin();
+	bool dataParsed = false;
+
+	if (!dataParsed)
+	{
+		// Determine if we have an XML data string
+
+		tinyxml2::XMLDocument doc;
+		tinyxml2::XMLError code = doc.Parse(data);
+
+		if (code == tinyxml2::XML_NO_ERROR)
+		{
+			tinyxml2::XMLElement* element = doc.RootElement();
+
+			if (!element)
+			{
+				throw Exception(CONFIG_ERROR, XML_PARSE_ERROR,
+					"Invalid XML format -- no root element");
+			}
+
+			fromXML(element);
+
+			dataParsed = true;
+		}
+	}
+
+	if (!dataParsed)
+	{
+		// If here, determine if we have a JSON data string
+
+		Json::Reader reader;
+		Json::Value  root;
+		bool         success = reader.parse(data, root);
+
+		if (success)
+		{
+			if (!root)
+			{
+				throw Exception(MSG_ERROR, JSON_PARSE_ERROR,
+					"Invalid JSON message format -- invalid JSON string data");
+			}
+
+			fromJSON(root);
+
+			dataParsed = true;
+		}
+	}
+
+	if (!dataParsed)
+	{
+		// If here, determine if we have raw string containing key=value pairs
+
+		std::vector<std::string> pairs;
+
+		getKeyValuePairs(data, pairs);
+
+		for (std::vector<std::string>::iterator it = pairs.begin(); it != pairs.end(); ++it)
+		{
+			std::string pair  = *it;
+			size_t      equal = pair.find("=");
+
+			addValue(pair.substr(0, equal).c_str(), pair.substr(equal + 1).c_str());
+		}
+
+		dataParsed = (pairs.size() > 0);
+	}
+
+	if (dataParsed)
+	{
+		m_configIter = m_configs.begin();
+	}
+	else
+	{
+		throw Exception(CONFIG_ERROR, PARSE_ERROR,
+			"Unable to parse configuration data string; it must contain valid XML data, JSON data, or key=pair values");
+	}
 }
 
 
@@ -420,10 +494,10 @@ void InternalConfig::fromXML(const char* xml)
 		throw Exception(CONFIG_ERROR, XML_PARSE_ERROR,
 			"XML string cannot be NULL, nor empty");
 	}
-
+ 
 	tinyxml2::XMLDocument doc;
 	tinyxml2::XMLError code = doc.Parse(xml);
-
+ 
 	if (code != tinyxml2::XML_NO_ERROR)
 	{
 		throw Exception(CONFIG_ERROR, XML_PARSE_ERROR, code,
@@ -480,6 +554,115 @@ void InternalConfig::fromXML(tinyxml2::XMLElement* element)
 }
 
 
+const char* InternalConfig::toJSON(bool standalone) const
+{
+	std::ostringstream oss;
+
+	const char* name  = NULL;
+	const char* value = NULL;
+
+	bool hasConfig = getFirst(name, value);
+
+	if (hasConfig)
+	{
+		if (standalone)
+		{
+			oss << "{";
+		}
+
+		oss << "\"CONFIG\":{\"PARAMETER\":[";
+
+		while (hasConfig)
+		{
+			oss << "{\"NAME\":\"" << name << "\",\"VALUE\":\"" << value << "\"}";
+
+			hasConfig = getNext(name, value);
+
+			if (hasConfig)
+			{
+				oss << ",";
+			}
+		}
+
+		oss << "]}";
+
+		if (standalone)
+		{
+			oss << "}";
+		}
+
+	}
+
+	m_json = oss.str();
+
+	return m_json.c_str();
+}
+
+
+void InternalConfig::fromJSON(const Json::Value& origRoot)
+{
+	Json::Value root;
+
+	if (origRoot.isMember("CONFIG"))
+	{
+		root = origRoot["CONFIG"];
+	}
+	else
+	{
+		throw Exception(MSG_ERROR, JSON_PARSE_ERROR,
+			"Invalid JSON Config format -- no root element");
+	}
+
+	if (root.isMember("PARAMETER"))
+	{
+		const Json::Value params = root["PARAMETER"];
+
+		for (unsigned int i = 0; i < params.size(); ++i)
+		{
+			const Json::Value& param = params[i];
+
+			std::string name;
+			std::string value;
+
+			if (param.isMember("NAME"))
+			{
+				try
+				{
+					name = param["NAME"].asCString();
+				}
+				catch (...)
+				{
+					double tmpName = param["NAME"].asDouble();
+					std::ostringstream oss;
+					oss << tmpName;
+					name = oss.str();
+				}
+			}
+
+			if (param.isMember("VALUE"))
+			{
+				try
+				{
+					value = param["VALUE"].asCString();
+				}
+				catch (...)
+				{
+					double tmpValue = param["VALUE"].asDouble();
+					std::ostringstream oss;
+					oss << tmpValue;
+					value = oss.str();
+				}
+			}
+
+			if (!name.empty() && !value.empty())
+			{
+				addValue(name.c_str(), value.c_str());
+			}
+		}
+	}
+}
+
+
 void InternalConfig::validateConfigName(const char* name) const
 {
     if (!name || std::string(name).empty())
@@ -487,4 +670,42 @@ void InternalConfig::validateConfigName(const char* name) const
         throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME,
                 "Config name cannot be NULL, nor an empty string");
     }
+}
+
+
+void InternalConfig::getKeyValuePairs(const std::string& data, std::vector<std::string>& pairs)
+{
+	std::string token;
+	int         foundQuote = 0;
+
+	for (std::string::const_iterator it = data.begin(); it != data.end(); ++it)
+	{
+		const char ch = *it;
+
+		if (ch == '"')
+		{
+			foundQuote ^= 1;
+		}
+		else if (!foundQuote && isspace(ch))
+		{
+			// Found end of token
+
+			if (!token.empty() && token.find("=") != std::string::npos)
+			{
+				pairs.push_back(token);
+			}
+
+			token.clear();
+		}
+		else
+		{
+			token += ch;
+		}
+	}
+
+	// Capture last token, if any
+	if (!token.empty() && token.find("=") != std::string::npos)
+	{
+		pairs.push_back(token);
+	}
 }

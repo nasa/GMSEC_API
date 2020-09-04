@@ -57,7 +57,7 @@
 	<FIELD  NAME="NUM-OF-PROD-SUBTYPES"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
-	        VALUE="DATA"
+	        VALUE=""
 	        TYPE="I16"
 	        DESCRIPTION="Number of further delineations / categories beyond the product subtype.  Also, used as msg subject elements ME5, ME6, etc. in Product Message."/>
 	<FIELD 	NAME="ARRAY-START"

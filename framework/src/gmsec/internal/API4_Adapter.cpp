@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -525,7 +525,7 @@ Status API4_Adapter::API4ExceptionToAPI3(gmsec::api::Exception& e4)
 	GMSEC_U32          code3  = API4StatusCodeToAPI3(e4.getErrorCode());
 	GMSEC_I32          custom = e4.getCustomCode();
 
-	Status status(class3, code3, e4.what());
+	Status status(class3, code3, e4.getErrorMessage());
 	status.SetCustomCode(custom);
 	return status;
 }

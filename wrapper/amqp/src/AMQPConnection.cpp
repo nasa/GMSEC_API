@@ -433,8 +433,8 @@ AMQPConnection::AMQPConnection(const Config& cfg)
 
 	mwConfig(cfg, "filter-dups", filterToggle, true);
 	
-	threadSafe = (threadSafeToggle.compare("yes") == 0);
-	useFilter  = (filterToggle.empty() || filterToggle.compare("yes") == 0);
+	threadSafe = StringUtil::stringEqualsIgnoreCase(threadSafeToggle.c_str(), "yes");
+	useFilter = filterToggle.empty() || StringUtil::stringEqualsIgnoreCase(filterToggle.c_str(), "yes");
 }
 
 

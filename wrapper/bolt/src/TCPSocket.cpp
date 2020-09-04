@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -275,9 +275,14 @@ Result TCPSocket::connect (const char *host, int port)
 			int localError = 0;
 			socklen_t len = sizeof(localError);
 			q = getsockopt(handle, SOL_SOCKET, SO_ERROR, &localError, &len);
+			std::string localErrorString = "socket error: ";
 			if (localError)
 			{
-				result.set(ERR_CONNECT, "socket error: " + util::toString(i32(localError)));
+				localErrorString += util::toString(i32(localError));
+				
+				localErrorString.append(", ").append(strerror(localError));
+				
+				result.set(ERR_CONNECT, localErrorString);
 				goto cleanup;
 			}
 			else

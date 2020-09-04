@@ -105,7 +105,7 @@
 	<FIELD  NAME="FILE.n.URI"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
-	        VALUE="NUM-OF-FILES"
+	        VALUE=""
 	        TYPE="STRING"
 	        DESCRIPTION="URI specifying the location where the file of the product is stored"/>
 	<FIELD  NAME="FILE.n.NAME-PATTERN"

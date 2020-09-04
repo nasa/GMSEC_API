@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -68,7 +68,7 @@ GMSEC_I32 syncAddAndFetch(volatile GMSEC_I32* p, GMSEC_I32 n)
 
 #if defined(__APPLE__)
 
-	o = OSAtomicAdd32(n, p);
+	o = __atomic_add_fetch(p, n, __ATOMIC_SEQ_CST);
 
 #elif GCC_VERSION >= 40100 && !defined(__hppa)
 

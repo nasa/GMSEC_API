@@ -2298,6 +2298,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\framework\include\gmsec4\internal\mist\CustomSpecification.h"
+						>
+					</File>
+					<File
 						RelativePath=".\framework\include\gmsec4\internal\mist\FieldTemplate.h"
 						>
 					</File>
@@ -2622,6 +2626,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\framework\include\gmsec4\c\mist\device_iterator.h"
+						>
+					</File>
+					<File
 						RelativePath=".\framework\include\gmsec4\c\mist\device_message.h"
 						>
 					</File>
@@ -2638,6 +2646,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\framework\include\gmsec4\c\mist\mnemonic_iterator.h"
+						>
+					</File>
+					<File
 						RelativePath=".\framework\include\gmsec4\c\mist\mnemonic_message.h"
 						>
 					</File>
@@ -2647,6 +2659,10 @@
 					</File>
 					<File
 						RelativePath=".\framework\include\gmsec4\c\mist\product_file.h"
+						>
+					</File>
+					<File
+						RelativePath=".\framework\include\gmsec4\c\mist\product_file_iterator.h"
 						>
 					</File>
 					<File
@@ -2739,8 +2755,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2749,8 +2765,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2783,8 +2799,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2793,8 +2809,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2827,8 +2843,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2837,8 +2853,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2871,8 +2887,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2881,8 +2897,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2915,8 +2931,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2925,8 +2941,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2959,8 +2975,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -2969,8 +2985,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3047,8 +3063,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3057,8 +3073,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3091,8 +3107,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3101,8 +3117,8 @@
 						<Tool
 							Name="VCCLCompilerTool"
 							AssemblerListingLocation=".\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -3137,9 +3153,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3147,9 +3163,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3181,9 +3197,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3191,9 +3207,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3225,9 +3241,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3235,9 +3251,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3269,9 +3285,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3279,9 +3295,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3313,9 +3329,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3323,9 +3339,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3357,9 +3373,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3367,9 +3383,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3401,9 +3417,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3411,9 +3427,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3445,9 +3461,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3455,9 +3471,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3489,9 +3505,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3499,9 +3515,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3533,9 +3549,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3543,9 +3559,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3577,9 +3593,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3587,9 +3603,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3621,9 +3637,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3631,9 +3647,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3665,9 +3681,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3675,9 +3691,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3709,9 +3725,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3719,9 +3735,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3753,9 +3769,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3763,9 +3779,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3797,9 +3813,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3807,9 +3823,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -3840,6 +3856,36 @@
 							RelativePath=".\framework\src\gmsec4\mist\message\DeviceMessage.cpp"
 							>
 							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
 								Name="Release|x64"
 								>
 								<Tool
@@ -3853,10 +3899,80 @@
 						<File
 							RelativePath=".\framework\src\gmsec4\mist\message\MistMessage.cpp"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
 						</File>
 						<File
 							RelativePath=".\framework\src\gmsec4\mist\message\MnemonicMessage.cpp"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
 							<FileConfiguration
 								Name="Release|x64"
 								>
@@ -3871,6 +3987,36 @@
 						<File
 							RelativePath=".\framework\src\gmsec4\mist\message\ProductFileMessage.cpp"
 							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
 							<FileConfiguration
 								Name="Release|x64"
 								>
@@ -4560,9 +4706,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4570,9 +4716,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4580,9 +4726,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4590,9 +4736,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4604,9 +4750,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4614,9 +4760,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4624,9 +4770,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4634,9 +4780,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4648,9 +4794,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4658,9 +4804,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4668,9 +4814,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4678,9 +4824,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4692,9 +4838,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4702,9 +4848,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4712,9 +4858,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4722,9 +4868,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4736,9 +4882,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4746,9 +4892,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4756,9 +4902,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4766,9 +4912,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4780,9 +4926,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4790,9 +4936,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4800,9 +4946,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4810,9 +4956,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4824,9 +4970,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4834,9 +4980,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4844,9 +4990,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4854,9 +5000,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4868,9 +5014,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4878,9 +5024,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4888,9 +5034,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4898,9 +5044,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4912,9 +5058,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4922,9 +5068,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4932,9 +5078,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4942,9 +5088,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -4956,9 +5102,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4966,9 +5112,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4976,9 +5122,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -4986,9 +5132,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5000,9 +5146,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5010,9 +5156,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5020,9 +5166,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5030,9 +5176,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5044,9 +5190,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5054,9 +5200,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5064,9 +5210,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5074,9 +5220,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5088,9 +5234,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5098,9 +5244,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5108,9 +5254,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5118,9 +5264,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5132,9 +5278,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5142,9 +5288,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5152,9 +5298,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5162,9 +5308,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5176,9 +5322,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5186,9 +5332,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5196,9 +5342,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5206,9 +5352,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5220,9 +5366,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5230,9 +5376,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5240,9 +5386,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5250,9 +5396,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5264,9 +5410,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5274,9 +5420,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5284,9 +5430,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5294,9 +5440,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5308,9 +5454,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5318,9 +5464,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5328,9 +5474,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5338,9 +5484,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5352,9 +5498,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5362,9 +5508,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5372,9 +5518,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5382,9 +5528,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5396,9 +5542,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5406,9 +5552,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5416,9 +5562,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5426,9 +5572,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5440,9 +5586,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5450,9 +5596,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5460,9 +5606,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5470,9 +5616,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5484,9 +5630,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5494,9 +5640,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5504,9 +5650,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5514,9 +5660,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5528,9 +5674,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5538,9 +5684,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5548,9 +5694,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5558,9 +5704,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5572,9 +5718,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5582,9 +5728,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5592,9 +5738,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5602,9 +5748,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5616,9 +5762,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5626,9 +5772,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5636,9 +5782,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5646,9 +5792,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5660,9 +5806,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5670,9 +5816,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5680,9 +5826,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5690,9 +5836,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5704,9 +5850,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5714,9 +5860,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5724,9 +5870,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5734,9 +5880,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5748,9 +5894,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5758,9 +5904,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5768,9 +5914,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5778,9 +5924,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5792,9 +5938,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5802,9 +5948,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5812,9 +5958,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5822,9 +5968,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5836,9 +5982,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5846,9 +5992,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5856,9 +6002,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5866,9 +6012,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5880,9 +6026,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5890,9 +6036,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5900,9 +6046,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5910,9 +6056,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5924,9 +6070,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5934,9 +6080,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5944,9 +6090,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5954,9 +6100,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -5968,9 +6114,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5978,9 +6124,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5988,9 +6134,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -5998,9 +6144,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -6015,9 +6161,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6025,9 +6171,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6059,9 +6205,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6069,9 +6215,53 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects/Release/api4/mist/"
+								ObjectFile=".\objects/Release/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects/Release/api4/mist/"
+								ObjectFile=".\objects/Release/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\framework\src\gmsec4\internal\mist\CustomSpecification.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6103,9 +6293,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6113,9 +6303,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6147,9 +6337,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6157,9 +6347,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6191,9 +6381,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6201,9 +6391,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6235,9 +6425,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6245,9 +6435,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6279,9 +6469,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6289,9 +6479,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6323,9 +6513,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6333,9 +6523,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6367,9 +6557,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6377,9 +6567,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6411,9 +6601,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6421,9 +6611,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6455,9 +6645,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6465,9 +6655,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6499,9 +6689,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6509,9 +6699,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6543,9 +6733,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6553,9 +6743,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6587,9 +6777,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6597,9 +6787,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6631,9 +6821,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6641,9 +6831,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6675,9 +6865,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6685,9 +6875,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6719,9 +6909,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6729,9 +6919,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6763,9 +6953,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6773,9 +6963,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6807,9 +6997,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6817,9 +7007,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6851,9 +7041,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6861,9 +7051,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6895,9 +7085,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6905,9 +7095,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6939,9 +7129,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6949,9 +7139,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6983,9 +7173,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -6993,9 +7183,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -7027,9 +7217,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -7037,9 +7227,9 @@
 							>
 							<Tool
 								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+								AssemblerListingLocation=".\objects/Debug/api4/mist/"
+								ObjectFile=".\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Debug/api4/mist/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -8104,9 +8294,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8114,9 +8304,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8124,9 +8314,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8134,9 +8324,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -8148,9 +8338,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8158,9 +8348,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8168,9 +8358,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8178,9 +8368,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -8192,9 +8382,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8202,9 +8392,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8212,9 +8402,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8222,9 +8412,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -8236,9 +8426,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8246,9 +8436,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8256,9 +8446,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8266,9 +8456,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -8280,9 +8470,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8290,9 +8480,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8300,9 +8490,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8310,9 +8500,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -8324,9 +8514,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8334,9 +8524,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8344,9 +8534,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8354,9 +8544,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -8368,9 +8558,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8378,9 +8568,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8388,9 +8578,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8398,9 +8588,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -8412,9 +8602,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8422,9 +8612,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8432,9 +8622,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8442,9 +8632,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -8456,9 +8646,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8466,9 +8656,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8476,9 +8666,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -8486,9 +8676,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -9604,6 +9794,50 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\framework\src\gmsec4\c\mist\device_iterator.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Debug\api4\c\"
+								ObjectFile=".\objects\Debug\api4\c\"
+								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Debug\api4\c\"
+								ObjectFile=".\objects\Debug\api4\c\"
+								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Release\api4\c\"
+								ObjectFile=".\objects\Release\api4\c\"
+								ProgramDataBaseFileName=".\objects\Release\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Release\api4\c\"
+								ObjectFile=".\objects\Release\api4\c\"
+								ProgramDataBaseFileName=".\objects\Release\api4\c\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
 						RelativePath=".\framework\src\gmsec4\c\mist\device_param.cpp"
 						>
 						<FileConfiguration
@@ -9692,6 +9926,50 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\framework\src\gmsec4\c\mist\mnemonic_iterator.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Debug\api4\c\"
+								ObjectFile=".\objects\Debug\api4\c\"
+								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Debug\api4\c\"
+								ObjectFile=".\objects\Debug\api4\c\"
+								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Release\api4\c\"
+								ObjectFile=".\objects\Release\api4\c\"
+								ProgramDataBaseFileName=".\objects\Release\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Release\api4\c\"
+								ObjectFile=".\objects\Release\api4\c\"
+								ProgramDataBaseFileName=".\objects\Release\api4\c\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
 						RelativePath=".\framework\src\gmsec4\c\mist\mnemonic_sample.cpp"
 						>
 						<FileConfiguration
@@ -9737,6 +10015,50 @@
 					</File>
 					<File
 						RelativePath=".\framework\src\gmsec4\c\mist\product_file.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Debug\api4\c\"
+								ObjectFile=".\objects\Debug\api4\c\"
+								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Debug\api4\c\"
+								ObjectFile=".\objects\Debug\api4\c\"
+								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Release\api4\c\"
+								ObjectFile=".\objects\Release\api4\c\"
+								ProgramDataBaseFileName=".\objects\Release\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Release\api4\c\"
+								ObjectFile=".\objects\Release\api4\c\"
+								ProgramDataBaseFileName=".\objects\Release\api4\c\"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\framework\src\gmsec4\c\mist\product_file_iterator.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -9922,9 +10244,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Debug\api4\c\"
-									ObjectFile=".\objects\Debug\api4\c\"
-									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+									AssemblerListingLocation=".\objects\Debug\api4\c\message\"
+									ObjectFile=".\objects\Debug\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -9932,9 +10254,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Debug\api4\c\"
-									ObjectFile=".\objects\Debug\api4\c\"
-									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+									AssemblerListingLocation=".\objects\Debug\api4\c\message\"
+									ObjectFile=".\objects\Debug\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -9942,9 +10264,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Release\api4\c\"
-									ObjectFile=".\objects\Release\api4\c\"
-									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+									AssemblerListingLocation=".\objects\Release\api4\c\message\"
+									ObjectFile=".\objects\Release\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -9952,9 +10274,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Release\api4\c\"
-									ObjectFile=".\objects\Release\api4\c\"
-									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+									AssemblerListingLocation=".\objects\Release\api4\c\message\"
+									ObjectFile=".\objects\Release\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\message\"
 								/>
 							</FileConfiguration>
 						</File>
@@ -9966,9 +10288,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Debug\api4\c\"
-									ObjectFile=".\objects\Debug\api4\c\"
-									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+									AssemblerListingLocation=".\objects\Debug\api4\c\message\"
+									ObjectFile=".\objects\Debug\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -9976,9 +10298,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Debug\api4\c\"
-									ObjectFile=".\objects\Debug\api4\c\"
-									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+									AssemblerListingLocation=".\objects\Debug\api4\c\message\"
+									ObjectFile=".\objects\Debug\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -9986,9 +10308,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Release\api4\c\"
-									ObjectFile=".\objects\Release\api4\c\"
-									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+									AssemblerListingLocation=".\objects\Release\api4\c\message\"
+									ObjectFile=".\objects\Release\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -9996,9 +10318,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Release\api4\c\"
-									ObjectFile=".\objects\Release\api4\c\"
-									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+									AssemblerListingLocation=".\objects\Release\api4\c\message\"
+									ObjectFile=".\objects\Release\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\message\"
 								/>
 							</FileConfiguration>
 						</File>
@@ -10010,9 +10332,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Debug\api4\c\"
-									ObjectFile=".\objects\Debug\api4\c\"
-									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+									AssemblerListingLocation=".\objects\Debug\api4\c\message\"
+									ObjectFile=".\objects\Debug\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -10020,9 +10342,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Debug\api4\c\"
-									ObjectFile=".\objects\Debug\api4\c\"
-									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+									AssemblerListingLocation=".\objects\Debug\api4\c\message\"
+									ObjectFile=".\objects\Debug\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -10030,9 +10352,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Release\api4\c\"
-									ObjectFile=".\objects\Release\api4\c\"
-									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+									AssemblerListingLocation=".\objects\Release\api4\c\message\"
+									ObjectFile=".\objects\Release\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -10040,9 +10362,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Release\api4\c\"
-									ObjectFile=".\objects\Release\api4\c\"
-									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+									AssemblerListingLocation=".\objects\Release\api4\c\message\"
+									ObjectFile=".\objects\Release\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\message\"
 								/>
 							</FileConfiguration>
 						</File>
@@ -10054,9 +10376,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Debug\api4\c\"
-									ObjectFile=".\objects\Debug\api4\c\"
-									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+									AssemblerListingLocation=".\objects\Debug\api4\c\message\"
+									ObjectFile=".\objects\Debug\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -10064,9 +10386,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Debug\api4\c\"
-									ObjectFile=".\objects\Debug\api4\c\"
-									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+									AssemblerListingLocation=".\objects\Debug\api4\c\message\"
+									ObjectFile=".\objects\Debug\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -10074,9 +10396,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Release\api4\c\"
-									ObjectFile=".\objects\Release\api4\c\"
-									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+									AssemblerListingLocation=".\objects\Release\api4\c\message\"
+									ObjectFile=".\objects\Release\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\message\"
 								/>
 							</FileConfiguration>
 							<FileConfiguration
@@ -10084,9 +10406,9 @@
 								>
 								<Tool
 									Name="VCCLCompilerTool"
-									AssemblerListingLocation=".\objects\Release\api4\c\"
-									ObjectFile=".\objects\Release\api4\c\"
-									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+									AssemblerListingLocation=".\objects\Release\api4\c\message\"
+									ObjectFile=".\objects\Release\api4\c\message\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\message\"
 								/>
 							</FileConfiguration>
 						</File>
@@ -10196,9 +10518,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10206,9 +10528,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10216,9 +10538,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10226,9 +10548,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -10240,9 +10562,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10250,9 +10572,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10260,9 +10582,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10270,9 +10592,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -10284,9 +10606,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10294,9 +10616,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10304,9 +10626,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10314,9 +10636,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -10328,9 +10650,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10338,9 +10660,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10348,9 +10670,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10358,9 +10680,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -10372,9 +10694,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10382,9 +10704,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10392,9 +10714,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10402,9 +10724,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>
@@ -10416,9 +10738,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10426,9 +10748,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Debug/api4/"
-							ObjectFile="\objects/Debug/api4/"
-							ProgramDataBaseFileName="\objects/Debug/api4/"
+							AssemblerListingLocation=".\objects/Debug/api4/"
+							ObjectFile=".\objects/Debug/api4/"
+							ProgramDataBaseFileName=".\objects/Debug/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10436,9 +10758,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 					<FileConfiguration
@@ -10446,9 +10768,9 @@
 						>
 						<Tool
 							Name="VCCLCompilerTool"
-							AssemblerListingLocation="\objects/Release/api4/"
-							ObjectFile="\objects/Release/api4/"
-							ProgramDataBaseFileName="\objects/Release/api4/"
+							AssemblerListingLocation=".\objects/Release/api4/"
+							ObjectFile=".\objects/Release/api4/"
+							ProgramDataBaseFileName=".\objects/Release/api4/"
 						/>
 					</FileConfiguration>
 				</File>

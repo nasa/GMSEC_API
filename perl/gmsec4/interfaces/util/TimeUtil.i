@@ -4,10 +4,6 @@
 using namespace gmsec::api;
 %}
 
-//%ignore gmsec::api::util::TimeUtil::formatTime(const GMSEC_TimeSpec&, char*);
-//%ignore gmsec::api::util::TimeUtil::formatTime(const GMSEC_TimeSpec&, int, char*);
-//%ignore gmsec::api::util::TimeUtil::formatTime(const GMSEC_TimeSpec&, char*, int);
-
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/util/TimeUtil.h>
 

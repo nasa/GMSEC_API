@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -85,7 +85,12 @@ private:
 	std::string m_name;
 	std::string m_mode;
 	std::string m_class; //corresponds to bool header in standard fields
+
+	//TODO MAV
+	//std::list<std::string> m_values (also add accessor/mutators)
 	std::string m_value;
+	
+	
 	std::string m_type;
 	std::string m_description;
 	std::string m_size; //used only by ARRAY-START control fields

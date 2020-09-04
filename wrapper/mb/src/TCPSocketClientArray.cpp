@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -141,19 +141,22 @@ Status TCPSocketClientArray::connect(int port, const char* servers)
 		m_sock[i] = new TCPSocketClientReconnector(m_nsocks, &m_config_data, &m_config_data_mutex);
 	}
 
-	bool is_good_result = false;
+	int failures = 0;
 	Status result;
 
 	for (int i = 0; i < m_nsocks; ++i)
 	{
 		result = m_sock[i]->connect(ports[i], serverNames[i].c_str());
 		m_sock[i]->setDebug(m_isDebug);
-		is_good_result |= (!result.isError());
+		if (result.isError())
+		{
+			++failures;
+		}
 	}
 
 	m_shouldBeConnected.set(true);
 
-	if (is_good_result)
+	if (failures < m_nsocks)
 	{
 		Status good_result;
 		return good_result;
@@ -199,7 +202,7 @@ Status TCPSocketClientArray::read(char*& buffer, int& len)
 
 		if (!has_highest_socket)
 		{
-			result.set(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to host lost");
+			result.set(CONNECTION_ERROR, CONNECTION_LOST, "Connection to the server was lost [1]");
 			return result;
 		}
 
@@ -210,7 +213,7 @@ Status TCPSocketClientArray::read(char*& buffer, int& len)
 		{
 			if (!m_shouldBeConnected.get())
 			{
-				result.set(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to host lost");
+				result.set(CONNECTION_ERROR, CONNECTION_LOST, "Connection to the server was lost [2]");
 				return result;
 			}
 			continue;
@@ -230,7 +233,7 @@ Status TCPSocketClientArray::read(char*& buffer, int& len)
 		{
 			if (!m_shouldBeConnected.get())
 			{
-				result.set(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to host lost");
+				result.set(CONNECTION_ERROR, CONNECTION_LOST, "Connection to the server was lost [3]");
 				return result;
 			}
 			m_sock[isock]->reconnect();
@@ -251,7 +254,7 @@ Status TCPSocketClientArray::read(char*& buffer, int& len)
 		{
 			if (!m_shouldBeConnected.get())
 			{
-				result.set(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to host lost");
+				result.set(CONNECTION_ERROR, CONNECTION_LOST, "Connection to the server was lost [4]");
 				return result;
 			}
 			m_sock[isock]->reconnect();
@@ -451,6 +454,11 @@ Status TCPSocketClientArray::write(const char *buffer, int len, const char *uniq
 	// if (unique_id != NULL) printf("Wrote unique_id = '%s'\n", buf2 + len + 1);
 	for (int i = 0; i < m_nsocks; i++)
 	{
+		if (!m_sock[i]->isConnected())
+		{
+			continue;
+		}
+
 		result = m_sock[i]->write(buf2, len2);
 
 		if (result.isError())

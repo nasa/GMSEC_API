@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -979,6 +979,8 @@ tinyxml2::XMLElement* InternalConfigFile::getCustomXMLElement(const char* xml) c
 
 	if (tmpDoc->Parse(xmlStr.c_str()) != tinyxml2::XML_NO_ERROR)
 	{
+		delete tmpDoc;
+
 		throw Exception(CONFIGFILE_ERROR, XML_PARSE_ERROR,
 			"Invalid XML format - unable to parse");
 	}

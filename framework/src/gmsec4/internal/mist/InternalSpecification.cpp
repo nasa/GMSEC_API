@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -161,6 +161,7 @@ InternalSpecification::InternalSpecification(const Config& config)
 
 	// Finally, attempt to load the schemas
 	load();
+	m_schemaIndex = m_templates.begin();
 }
 
 
@@ -174,6 +175,7 @@ InternalSpecification::InternalSpecification(const InternalSpecification& other)
 {
 	// Finally, attempt to load the schemas
 	load();
+	m_schemaIndex = m_templates.begin();
 }
 
 
@@ -201,7 +203,7 @@ Status InternalSpecification::loadTemplate(const char* path)
 			std::string id;
 			std::string specID = m_specificationId;
 			specID.insert(4, ".");
-			gmsec::api::util::DataList<FieldTemplate> fields;
+			std::list<FieldTemplate> fields;
 			status = parser(schema, id, fields);
 
 			if(!status.isError())
@@ -212,7 +214,7 @@ Status InternalSpecification::loadTemplate(const char* path)
 				}
 				else if(id != specID)
 				{
-					m_templates.add(new MessageTemplate(id.c_str(), fields));
+					m_templates.push_back(new MessageTemplate(id.c_str(), fields));
 				}
 			}
 			xml.Clear();
@@ -265,20 +267,22 @@ void InternalSpecification::validateMessage(const Message& msg)
 
 	//now grab the message template with the matching schemaID
 	bool foundSchema = false;
-	for(size_t i=0; i<m_templates.size(); i++)
+	for(MessageTemplateList::const_iterator it = m_templates.begin(); it != m_templates.end(); ++it)
 	{
-		if(m_templates.get(i)->getID() == schemaID)
+		MessageTemplate temp = **it;
+		if(StringUtil::stringEquals(temp.getID(), schemaID.c_str()))
 		{
 			foundSchema = true;
 			//this list of fields will contain the combined header and contents
-			gmsec::api::util::DataList<FieldTemplate> fields;
+			std::list<FieldTemplate> fields;
 
 			//first prepare the header fields with the values we need to validate
 			fields = prepHeaders(schemaID.c_str());
 
-			for(size_t j=0; j<m_templates.get(i)->listFieldTemplates().size(); j++)
+			//for(size_t j=0; j<temp.listFieldTemplates().size(); j++)
+			for(FieldTemplateList::const_iterator it = temp.listFieldTemplates().begin(); it != temp.listFieldTemplates().end(); ++it)
 			{//add content fields
-				fields.add(m_templates.get(i)->listFieldTemplates().get(j));
+				fields.push_back(*it);
 			}
 
 			//compare the field list to the fields in the message
@@ -306,7 +310,7 @@ void InternalSpecification::validateMessage(const Message& msg)
 }
 
 
-Status InternalSpecification::compare(const Message& msg, const gmsec::api::util::DataList<FieldTemplate>& fields)
+Status InternalSpecification::compare(const Message& msg, const std::list<FieldTemplate>& fields)
 {
 	//current status
 	Status status;
@@ -316,342 +320,183 @@ Status InternalSpecification::compare(const Message& msg, const gmsec::api::util
 	//The accumulated error messages as a string
 	std::string errorList = "";
 
-	for(size_t fieldIndex=0; fieldIndex<fields.size(); fieldIndex++)
+	//flag that indicates how many array controls we are currently inside of
+	size_t arrayLevel = 0;
+
+	//flag that determines whether the optional array control we are in should be skipped or not
+	bool skipArray = false;
+
+	//If we are to skip an array of values, this will tell us at what level of the array control we are skipping
+	//skipping an array control at a specified level means skipping all the levels above it
+	size_t skipArrayLevel = 0;
+
+	//list of placeholder strings that are to be replaced by index numbers in the field's name
+	//push a placeholder at the end of the list as an array control is opened
+	//pop a placeholder at the end of the list as an array control is closed
+	//always grab the value from the end of the list
+	std::list<std::string> arrayCharList;
+
+	//list of the sizes of the currently open array controls
+	std::list<size_t> arraySizeList;
+
+	//list of the current index in the currently open array controls
+	//this number will replace the string being held in arrayCharList
+	//Index starts at 1 per GMSEC ISD
+	std::list<size_t> arrayIndexList;
+
+	//list of the start position of each open array control in the list of field templates
+	std::list<FieldTemplateList::const_iterator> arrayStartList;
+
+	for(FieldTemplateList::const_iterator fieldIndex = fields.begin(); fieldIndex != fields.end(); ++fieldIndex)
 	{//iterating through all the fields to make sure they are all in the message and correct
 
-		std::string mode = fields.get(fieldIndex).getMode();
-		std::string name = fields.get(fieldIndex).getName();
-		if(mode == "REQUIRED" && 
-		   m_validationLevel > 0)
-		{//Required fields must be validated if m_validation is set at all
+		//the current iteration's field template we will be validating against
+		FieldTemplate temp = *fieldIndex;
 
-			status = validate(msg, fields.get(fieldIndex));
+		//check to see if the current field template is a control field
+		if(StringUtil::stringEquals(temp.getMode(), "CONTROL") &&
+		   StringUtil::stringEquals(temp.getName(), "ARRAY-START"))
+		{
+			arrayLevel++;
+			skipArrayLevel = arrayLevel;
 
-			if(status.isError())
-			{
-				lastError = status;
-				errorList.append("\n   ").append(lastError.get());
-			}
-		}
-		else if(mode == "OPTIONAL" && 
-			    m_validationLevel > 1)
-		{//Optional fields must be validated if m_validation is set greater than 1
-
-			status = validate(msg, fields.get(fieldIndex));
-
-			if(status.isError())
-			{
-				lastError = status;
-				errorList.append("\n   ").append(lastError.get());
-			}
-		}
-
-		//TODO (MAV): Array control logic found below can be simplified into a single recursive call
-
-		else if(mode == "CONTROL" && 
-			    name == "ARRAY-START")
-		{//we have found a control field indicating we have encountered fields 
-		 //that may be used multiple times in a series
-
-			bool skipArray = false;
-
-			//this is the field template whose name will be modified by the array control(s)
-			FieldTemplate f = fields.get(fieldIndex);
-			std::ostringstream oss;
-
-			//this is the character(s) we will replace with the arrayIndex
-			std::string arrayChar = fields.get(fieldIndex).getValue();
-
-			//the index for objects in messages start at 1, not 0
-			//don't ask why, that's just how it is per GMSEC ISD
-			size_t arrayIndex = 1;
-
-			//now we need to figure out what the size of the array is
-			size_t arraySize;
+			//now we need to figure out details of the array
 			try
 			{
-				arraySize = getIntValue(msg, fields.get(fieldIndex).getSize());
+				//index for objects in messages start at 1 per GMSEC ISD
+				arrayIndexList.push_back(1);
+
+				//push the value of the control field (which is the index placeholder) onto the list
+				arrayCharList.push_back(temp.getValue());
+
+				//determine the size of the array
+				if(arrayLevel>1)
+				{//array is nested, the field name that contains the size of the nested array has an index placeholder
+				 //index placeholder needs to be replaced with the index of the object in the array
+					std::string name = prepFieldName(temp.getSize(),arrayCharList, arrayIndexList);
+					size_t size = msg.getIntegerValue(name.c_str());
+					arraySizeList.push_back(size);
+				}
+				else
+				{
+					size_t size = msg.getIntegerValue(temp.getSize());
+					arraySizeList.push_back(size);
+				}
+
+
+				//starting index for this array control, bookmarked so we can loop back to it later
+				arrayStartList.push_back(fieldIndex);
+				continue;
 			}
 			catch(Exception &e)
-			{//we failed to determine the size of the array
-				std::string name = fields.get(fieldIndex).getSize();
-				if(e.getErrorClass() == MSG_ERROR && e.getErrorCode() == INVALID_FIELD_NAME)
-				{//this catch occurred because size of the array is undefined due to the field being missing
+			{
+				if(e.getErrorClass() == MSG_ERROR && e.getErrorCode() == INVALID_FIELD)
+				{//this catch occurred because the size of the array is undefined due to the field being missing
 				 //if that field is optional, then it means the array is optional, so we skip the array entirely
-				 //if the array is required, we throw the error.
-					for(size_t i=0; i<fields.size(); i++)
+				 //if the array is required, we throw the error
+					for(FieldTemplateList::const_iterator it2 = fields.begin(); it2 != fields.end(); ++it2)
 					{
-						std::string fieldName = fields.get(i).getName();
-						std::string fieldMode = fields.get(i).getMode();
-						if(fieldName == name && fieldMode == "OPTIONAL")
+						if(StringUtil::stringEquals(it2->getName(), temp.getSize()) &&
+						   StringUtil::stringEquals(it2->getMode(), "OPTIONAL"))
 						{//we have determined the array is optional and we will be skipping it
 							skipArray = true;
-							fieldIndex++;
-							std::string skipName = fields.get(fieldIndex).getName();
-							std::string skipMode = fields.get(fieldIndex).getMode();
-							while(!(skipMode == "CONTROL" && skipName == "ARRAY-END"))
-							{//skipping the index to the end of the array
-								fieldIndex++;
-								skipName = fields.get(fieldIndex).getName();
-								skipMode = fields.get(fieldIndex).getMode();
-							}
 							break;
 						}
 					}
+
 					if(!skipArray)
 					{//This array is required and we couldn't determine the size, throw error
-						throw Exception(e);
+						status.set(MIST_ERROR, MISSING_REQUIRED_FIELD, "Message contains array of objects whose size is undefined: ");
+						std::ostringstream err;
+						err << msg.getSubject() << " : Validation Failed." << "\n   " 
+							<< status.get() << e.what();
+						throw Exception(MIST_ERROR, MESSAGE_FAILED_VALIDATION, err.str().c_str());
+					}
+					else
+					{
+						continue;
 					}
 				}
 				else
 				{//it's some other weird error, throw it
-					throw Exception(e);
+					throw e;
 				}
 			}
-
-			if(!skipArray)
-			{
-				//move the field index up to get the next field
-				fieldIndex++;
-				
-				//start of the array of fields 
-				//we roll back to this index for each object we need to verify
-				size_t arrayStartIndex = fieldIndex;
-				size_t arrayEndIndex;
-
-				for(; arrayIndex<=arraySize; arrayIndex++)
-				{//the array of fields is repeated for each object the message has
-					std::string controlMode = fields.get(fieldIndex).getMode();
-					std::string controlName = fields.get(fieldIndex).getName();
-					while(!(controlMode == "CONTROL" && 
-						    controlName == "ARRAY-END"))
-					{//we execute this logic until we encounter the end of the array
-
-						controlMode = fields.get(fieldIndex).getMode();
-						controlName = fields.get(fieldIndex).getName();
-						if(controlMode == "CONTROL" && 
-						   controlName == "ARRAY-START")
-						{//we have found a nested array control field
-
-							bool skipNestedArray = false;
-
-							//this is the character(s) we will replace with the nested arrayIndex
-							std::string nestedArrayChar = fields.get(fieldIndex).getValue();
-
-							//the index for objects in messages start at 1, not 0
-							size_t nestedArrayIndex = 1;
-
-							//set up the field name with the current arrayIndex to get the nestedArraySize
-							std::string nestedName = fields.get(fieldIndex).getSize();
-							oss.clear();
-							oss.str("");
-							oss << arrayIndex;
-							nestedName = nestedName.replace(nestedName.find(arrayChar),arrayChar.length(), oss.str());
-
-							//now we need to figure out what the size of the nested array is
-							size_t nestedArraySize;
-							try
-							{
-								nestedArraySize = getIntValue(msg, nestedName.c_str());
-							}
-							catch(Exception &e)
-							{//we failed to determine the size of the array
-								if(e.getErrorClass() == MSG_ERROR && e.getErrorCode() == INVALID_FIELD_NAME)
-								{//this catch occurred because size of the array is undefined due to the field being missing
-								 //if that field is optional, then it means the array is optional, so we skip the array entirely
-								 //if the array is required, we throw the error.
-									for(size_t i=0; i<fields.size(); i++)
-									{
-										std::string fieldName = fields.get(i).getName();
-										std::string fieldMode = fields.get(i).getMode();
-										if(fieldName == nestedName && fieldMode == "OPTIONAL")
-										{//we have determined the array is optional and we will be skipping it
-											skipNestedArray = true;
-											fieldIndex++;
-											std::string skipName = fields.get(fieldIndex).getName();
-											std::string skipMode = fields.get(fieldIndex).getMode();
-											while(!(skipMode == "CONTROL" && skipName == "ARRAY-END"))
-											{//skipping the index to the end of the array
-												fieldIndex++;
-												skipName = fields.get(fieldIndex).getName();
-												skipMode = fields.get(fieldIndex).getMode();
-											}
-											break;
-										}
-									}
-									if(!skipNestedArray)
-									{//This array is required and we couldn't determine the size, throw error
-										throw Exception(e);
-									}
-								}
-								else
-								{//it's some other weird error, throw it
-									throw Exception(e);
-								}
-							}
-							
-							if(!skipNestedArray)
-							{
-								//move the field index up to get the next field
-								fieldIndex++;
-								controlMode = fields.get(fieldIndex).getMode();
-								controlName = fields.get(fieldIndex).getName();
-
-								//start of the array of nested fields 
-								//we roll back to this index for each nested object we need to verify
-								size_t nestedArrayStartIndex = fieldIndex;
-								size_t nestedArrayEndIndex;
-
-								for(; nestedArrayIndex<=nestedArraySize; nestedArrayIndex++)
-								{//the array of fields is repeated for each nested object
-
-									controlMode = fields.get(fieldIndex).getMode();
-									controlName = fields.get(fieldIndex).getName();
-									while(!(controlMode == "CONTROL" && 
-										  controlName == "ARRAY-END"))
-									{//we execute this logic until we encounter the end of the array
-
-										//set up FieldTemplate that we will be validating against
-										f = fields.get(fieldIndex);
-
-										//set up the name for the FieldTemplate
-										std::string str = f.getName();
-										oss.clear();
-										oss.str("");
-										oss << arrayIndex;
-										str.replace(str.find(arrayChar), arrayChar.length(), oss.str());
-										oss.clear();
-										oss.str("");
-										oss << nestedArrayIndex;
-										str.replace(str.find(nestedArrayChar), nestedArrayChar.length(), oss.str());
-
-										//now insert the modified name back into the field template
-										f.setName(str.c_str());
-
-										if(controlMode == "REQUIRED" && 
-										   m_validationLevel > 0)
-										{//Required fields must be validated if m_validation is set at all
-
-											status = validate(msg, f);
-
-											if(status.isError())
-											{
-												lastError = status;
-												errorList.append("\n   ").append(lastError.get());
-											}
-										}
-										else if(controlMode == "OPTIONAL" && 
-												m_validationLevel > 1)
-										{//Optional fields must be validated if m_validation is set greater than 1
-
-											status = validate(msg, f);
-
-											if(status.isError())
-											{
-												lastError = status;
-												errorList.append("\n   ").append(lastError.get());
-											}
-										}
-
-										//moving on the the next field
-										fieldIndex++;
-										controlMode = fields.get(fieldIndex).getMode();
-										controlName = fields.get(fieldIndex).getName();
-										if(controlMode == "CONTROL" && controlName == "ARRAY-END")
-										{
-											nestedArrayEndIndex = fieldIndex;
-										}
-
-									}//finished with the nested array control loop
-
-									//moving on the the next nested object, resetting field index
-									if(nestedArrayIndex<nestedArraySize)
-									{//there are still more objects, reset the field index to the start of the array
-										fieldIndex = nestedArrayStartIndex;
-										controlMode = fields.get(fieldIndex).getMode();
-										controlName = fields.get(fieldIndex).getName();
-									}
-									else
-									{//no more objects, reset the field index to the end of the array
-										fieldIndex = nestedArrayEndIndex;
-										controlMode = fields.get(fieldIndex).getMode();
-										controlName = fields.get(fieldIndex).getName();
-									}
-
-								}//done with the nested objects in the current object of the message
-							}
-
-						}
-						else
-						{//normal field template within array, continue as normal
-
-							//set up FieldTemplate that we will be validating against
-							f = fields.get(fieldIndex);
-
-							//set up the name for the FieldTemplate
-							std::string str = f.getName();
-							oss.clear();
-							oss.str("");
-							oss << arrayIndex;
-							str.replace(str.find(arrayChar), arrayChar.length(), oss.str());
-
-							//now insert the modified name back into the field template
-							f.setName(str.c_str());
-						}
-
-						if(controlMode == "REQUIRED" && 
-						   m_validationLevel > 0)
-						{//Required fields must be validated if m_validation is set at all
-
-							status = validate(msg, f);
-
-							if(status.isError())
-							{
-								lastError = status;
-								errorList.append("\n   ").append(lastError.get());
-							}
-						}
-						else if(controlMode == "OPTIONAL" && 
-								m_validationLevel > 1)
-						{//Optional fields must be validated if m_validation is set greater than 1
-
-							status = validate(msg, f);
-
-							if(status.isError())
-							{
-								lastError = status;
-								errorList.append("\n   ").append(lastError.get());
-							}
-						}
-						
-						//moving on the the next field
-						fieldIndex++;
-						controlMode = fields.get(fieldIndex).getMode();
-						controlName = fields.get(fieldIndex).getName();
-						if(controlMode == "CONTROL" && controlName == "ARRAY-END")
-						{
-							arrayEndIndex = fieldIndex ;
-						}
-					}//finished with the array control loop
-
-					//moving on the the next object, resetting field index
-					if(arrayIndex < arraySize)
-					{//there are still more objects, reset the field index to the start of the array
-						fieldIndex = arrayStartIndex;
-						controlMode = fields.get(fieldIndex).getMode();
-						controlName = fields.get(fieldIndex).getName();
-					}
-					else
-					{//no more objects, reset the field index to the end of the array
-						fieldIndex = arrayEndIndex;
-						controlMode = fields.get(fieldIndex).getMode();
-						controlName = fields.get(fieldIndex).getName();
-					}
-				}//done with all of the objects in the message
+		}
+		else if(StringUtil::stringEquals(temp.getMode(), "CONTROL") &&
+				StringUtil::stringEquals(temp.getName(), "ARRAY-END"))
+		{
+			if(skipArray && skipArrayLevel == arrayLevel)
+			{//we've reached the end of the array that is being skipped
+				skipArray = false;
+				skipArrayLevel = 0;
+				arrayIndexList.pop_back();
+				arrayCharList.pop_back();
+				arrayLevel--;
+				continue;
 			}
 
-		}//done validating the current field template
-	}//done running through all of the field templates
+			if(arrayIndexList.back() < arraySizeList.back())
+			{//there are still more objects in the array to validate
+			 //reset fieldIndex to the beginning of the array control
+			 //increase the listed index by 1
+				fieldIndex = arrayStartList.back();
+				size_t index = arrayIndexList.back();
+				index++;
+				arrayIndexList.pop_back();
+				arrayIndexList.push_back(index);
+				continue;
+			}
+			else
+			{//all objects have been processed, close the array control
+				arraySizeList.pop_back();
+				arrayCharList.pop_back();
+				arrayStartList.pop_back();
+				arrayIndexList.pop_back();
+				arrayLevel--;
+				continue;
+			}
+		}
+		else if(skipArray)
+		{
+			continue;
+		}
+		
+
+		//modify the name of the field template as necessary
+		if(arrayLevel > 0)
+		{
+			std::string name = prepFieldName(temp.getName(), arrayCharList, arrayIndexList);
+			temp.setName(name.c_str());
+		}
+
+		//begin validation process for the field
+		if(StringUtil::stringEquals(temp.getMode(), "REQUIRED") && 
+		   m_validationLevel > 0)
+		{//Required fields must be validated if m_validation is set at all
+
+			status = validate(msg, temp);
+
+			if(status.isError())
+			{
+				lastError = status;
+				errorList.append("\n   ").append(lastError.get());
+			}
+		}
+		else if(StringUtil::stringEquals(temp.getMode(), "OPTIONAL") && 
+			    m_validationLevel > 1)
+		{//Optional fields must be validated if m_validation is set greater than 1
+
+			status = validate(msg, temp);
+
+			if(status.isError())
+			{
+				lastError = status;
+				errorList.append("\n   ").append(lastError.get());
+			}
+		}
+
+	}//loop until we're done running through all the field templates
 
 	if(m_validationLevel > 2)
 	{//No junk fields if validation is set to strict
@@ -660,11 +505,9 @@ Status InternalSpecification::compare(const Message& msg, const gmsec::api::util
 		{//iterating through all the fields in the message
 			const Field& field = iter.next();
 			bool found = false;
-			for(size_t i=0; i<fields.size(); i++)
+			for(FieldTemplateList::const_iterator it = fields.begin(); it != fields.end(); ++it)
 			{//now look for a matching field in the template fields
-				std::string fieldName = field.getName();
-				std::string templateName = fields.get(i).getName();
-				if(fieldName == templateName)
+				if(StringUtil::stringEquals(field.getName(), it->getName()))
 				{
 					found = true;
 					break;
@@ -673,7 +516,8 @@ Status InternalSpecification::compare(const Message& msg, const gmsec::api::util
 			if(!found)
 			{
 				std::ostringstream err;
-				err << "Message contains user-defined field " << field.getName() << ", which is disallowed under the current validation settings";
+				err << "Message contains user-defined field " << field.getName() 
+					<< ", which is disallowed under the current validation settings";
 				GMSEC_ERROR << err.str().c_str();
 				status.set(MIST_ERROR, NON_ALLOWED_FIELD, err.str().c_str());
 				lastError = status;
@@ -685,23 +529,44 @@ Status InternalSpecification::compare(const Message& msg, const gmsec::api::util
 	{
 		std::string err = msg.getSubject();
 		err.append(": Validation Failed.");
-		err.append("\n   ").append(lastError.get());
+		err.append("\n   ").append(errorList.c_str());
 		return Status(MIST_ERROR, MESSAGE_FAILED_VALIDATION, err.c_str());
 	}
 	else if(lastError.isError())
 	{
 		std::string err = msg.getSubject();
 		err.append(": Validation Failed.");
-		err.append("\n   ").append(lastError.get());
+		err.append("\n   ").append(errorList.c_str());
 		return Status(MIST_ERROR, MESSAGE_FAILED_VALIDATION, err.c_str());
 	}
-	else
-	{
-		GMSEC_INFO << msg.getSubject() << ": Validation Passed.";
-		return status;
-	}
+
+	GMSEC_VERBOSE << msg.getSubject() << ": Validation Passed.";
+	return status;
 }
 
+std::string InternalSpecification::prepFieldName(const char* name, const std::list<std::string>& charList, const std::list<size_t>& indexList)
+{
+	std::string newName = name;
+
+	std::list<std::string>::const_iterator arrayChar = charList.begin();
+
+	for(std::list<size_t>::const_iterator arrayIndex = indexList.begin();
+		arrayIndex != indexList.end(); ++arrayIndex)
+	{//iterating through arrayCharList and arrayIndexList concurrently
+		std::ostringstream oss;
+
+		oss << *arrayIndex;
+
+		if(newName.find(*arrayChar) != std::string::npos)
+		{
+			newName.replace(newName.find(*arrayChar), arrayChar->length(), oss.str());
+		}
+
+		++arrayChar;
+	}
+
+	return newName;
+}
 
 Status InternalSpecification::validate(const Message& msg, const FieldTemplate& ftmp)
 {
@@ -716,7 +581,7 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 
 	std::string cumulativeError;
 
-	if(type=="UNSET")
+	if(StringUtil::stringEquals(type.c_str(), "UNSET"))
 	{
 		unset = true;
 	}
@@ -728,7 +593,6 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 		
 		if(msgField)
 		{//we found a matching field!
-
 			if(!unset)
 			{
 				if(msgField->getType() != tmpField->getType())
@@ -736,14 +600,15 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 					std::stringstream err;
 					err << msgField->getName()
 						<< " has incorrect field type of " << getTypeStr(msgField->getType())
-						<< ", expected type " << getTypeStr(tmpField->getType())
-						<< ".  Field Description: " << ftmp.getDescription();
+						<< ", expected type " << getTypeStr(tmpField->getType());
 					//GMSEC_ERROR << err.str().c_str();
 					status.set(MIST_ERROR, INCORRECT_FIELD_TYPE, err.str().c_str());
 					cumulativeError.append("\n      ").append(status.get());
 				}
 			}
-
+			
+			//TODO MAV:
+			//EXPAND THIS BLOCK FOR MULTIPLE VALUES
 			std::string testValue = ftmp.getValue();
 			if(testValue != "")
 			{//if the template's value isn't blank, the message field's value needs to be validated as well
@@ -756,8 +621,7 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 					std::stringstream err;
 					err << msgField->getName()
 						<< " has incorrect value of " << msgValue
-						<< ", expected a value of " << testValue
-						<< ".  Field Description: " << ftmp.getDescription();
+						<< ", expected a value of " << testValue;
 					//GMSEC_ERROR << err.str().c_str();
 					status.set(MIST_ERROR, FIELD_NOT_SET, err.str().c_str());
 					cumulativeError.append("\n      ").append(status.get());
@@ -771,8 +635,7 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 			{//validation fails at this point if the field is required
 				std::stringstream err;
 				err << tmpField->getName() 
-					<< " is a required field, but is missing from message.  "
-					<< "Field Description: " << ftmp.getDescription();
+					<< " is a required field, but is missing from message.  ";
 				//GMSEC_ERROR << err.str().c_str();
 				status.set(MIST_ERROR, MISSING_REQUIRED_FIELD, err.str().c_str());
 				cumulativeError.append("\n      ").append(status.get());
@@ -785,8 +648,7 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 		{//validation fails at this point if the field is required
 			std::stringstream err;
 			err << tmpField->getName() 
-				<< " is a required field, but is missing from message.  "
-				<< "Field Description: " << ftmp.getDescription();
+				<< " is a required field, but is missing from message.  ";
 			//GMSEC_ERROR << err.str().c_str();
 			status.set(MIST_ERROR, MISSING_REQUIRED_FIELD, err.str().c_str());
 			cumulativeError.append("\n      ").append(status.get());
@@ -822,20 +684,19 @@ std::string InternalSpecification::registerTemplate(const Message& msg)
 
 	while(!found && schemaLevel>=0)
 	{
-		for(size_t i=0; i<m_directory.size(); i++)
+		for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
 		{//now searching through the directory for the proper header definition
-			std::string def = m_directory.get(i).getID();
-			if(def == "HEADER" && m_directory.get(i).getLevel() == schemaLevel)
+			SchemaTemplate temp = *it;
+			if(StringUtil::stringEquals(temp.getID(), "HEADER") && temp.getLevel() == schemaLevel)
 			{//found a matching header, now grab the default definition from it
-				levelName = m_directory.get(i).getLevelName();
-				typeDef = m_directory.get(i).getFirstDefinition();
-				subTypeDef = m_directory.get(i).getNextDefinition();
+				levelName = temp.getLevelName();
+				typeDef = temp.getFirstDefinition();
+				subTypeDef = temp.getNextDefinition();
 			
 				try
 				{//add type and subtype to name
-					name = msg.getStringField(typeDef.c_str()).getValue();
-					name.append(".");
-					name.append(msg.getStringField(subTypeDef.c_str()).getValue());
+					name = msg.getStringValue(typeDef.c_str());
+					name.append(".").append(msg.getStringValue(subTypeDef.c_str()));
 				}
 				catch(Exception &e)
 				{//MESSAGE-TYPE or MESSAGE-SUBTYPE field was not found in message, validation automatically fails (not good)
@@ -865,12 +726,12 @@ std::string InternalSpecification::registerTemplate(const Message& msg)
 	//Now look for matching schemaID in list of templates
 	while(schemaLevel >=0)
 	{//searching on the highest layer first, as defined by the user
-		for(size_t i=0; i<m_templates.size(); i++)
+		for(MessageTemplateList::const_iterator it = m_templates.begin(); it != m_templates.end(); ++it)
 		{//now searching through list of schemas
-			std::string id = m_templates.get(i)->getID();
-			if(id == schemaID)
+			MessageTemplate temp = **it;
+			if(StringUtil::stringEquals(temp.getID(), schemaID.c_str()))
 			{//found it!
-				GMSEC_INFO << "Subject " << msg.getSubject() << " registered with Schema ID " << schemaID.c_str();
+				GMSEC_VERBOSE << "Subject " << msg.getSubject() << " registered with Schema ID " << schemaID.c_str();
 				m_registry.insert(std::pair<std::string, std::string>(msg.getSubject(), schemaID));
 				return schemaID;
 			}
@@ -897,20 +758,20 @@ bool InternalSpecification::findDefinition(size_t schemaLevel, std::string& name
 	while(oldName != name)
 	{//so long as the name is updated it means there may be a more specific definition available
 		oldName = name;
-		for(size_t i=0;i<m_directory.size(); i++)
+		for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
 		{//now looking through directory
-			std::string def = m_directory.get(i).getID();
-			if(def == name && m_directory.get(i).getLevel() == (size_t) schemaLevel)
+			SchemaTemplate temp = *it;
+			if(StringUtil::stringEquals(temp.getID(), name.c_str()) && temp.getLevel() == (size_t) schemaLevel)
 			{//looks like a more specific definition exists
 			 //rebuild the name with the new definition
 				found = true;
 				try
 				{
-					std::string newName = msg.getStringField(m_directory.get(i).getFirstDefinition()).getValue();
-					while(m_directory.get(i).hasNextDefinition())
+					std::string newName = msg.getStringField(temp.getFirstDefinition()).getValue();
+					while(temp.hasNextDefinition())
 					{
 						newName.append(".");
-						newName.append(msg.getStringField(m_directory.get(i).getNextDefinition()).getValue());
+						newName.append(msg.getStringField(temp.getNextDefinition()).getValue());
 					}
 					//if we've gotten this far then it means we haven't thrown a field not found exception
 					//that means we have ourselves a new definition that matches up with our message
@@ -1100,7 +961,7 @@ void InternalSpecification::load()
 
 Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
                                      std::string& schemaID,
-                                     gmsec::api::util::DataList<FieldTemplate>& schemaFields)
+                                     std::list<FieldTemplate>& schemaFields)
 {
 	Status status;
 	std::ostringstream oss;
@@ -1209,18 +1070,18 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			}
 
 			//now we load the schema into the directory
-			m_directory.add(schema);
+			m_directory.push_back(schema);
 
 		}//done running through the child elements
 
 		//the directory must have at minimum a definition for a Level-0 HEADER
 		bool found = false;
-		for(size_t i=0; i<m_directory.size(); i++)
+		for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
 		{
-			std::string name = m_directory.get(i).getID();
-			if(name == "HEADER" && m_directory.get(i).getLevel() == 0)
+			if(StringUtil::stringEquals(it->getID(), "HEADER") && it->getLevel() == 0)
 			{
 				found = true;
+				break;
 			}
 		}
 
@@ -1279,11 +1140,64 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 				fieldTemplate.setClass(attribute->Value());
 			}
 			else if(StringUtil::stringEquals(attribute->Name(), "VALUE"))
-			{
+			{//TODO: MOVE VALUE PARSING BELOW TYPE PARSING
 				fieldTemplate.setValue(attribute->Value());
+	
+				//TODO MAV:
+				//EXPANDED VALUE PARSING
+				
+				//take attribute->value into temp variable
+				//split variable into list (comma delimiter)
+
+				//if only one item exists in the list then the field template has an immutable value (CONTENT-VERSION)
+				//we should make note of this in the field template
+				//auto-population should be able to automatically set this value when adding the field
+
+				//now iterate through the list and for each value:
+				
+					//if the type is a string:
+						
+						//the first char may be a !, which indicates a NOT operator
+						//save the value as string in list m_values (fieldTemplate.addValue?)
+						//"VALUE" - valid field value
+						//"!VALUE" - field must NOT have this value
+
+					//if the type is a number:
+
+						//the first char may be a !, which indicates a NOT operator
+						//if value is a range (contains "..")
+
+							//split value into list with ".." delimiter
+
+							//values in this list should be able to parse into numbers
+
+							//first value in list is stored as lower limit, second as upper limit
+							//"firstValue.SecondValue.INCLUDE"
+						
+						//if item starts with "<" or ">":
+
+							//check if it is preceded by a "="
+
+							//for "<", lower bound is lowest possible value for given type
+							//"MIN_VALUE.value.EXCLUDE"
+							//if "=" is present, "min.value.INCLUDE"
+
+							//for ">", upper bound is highest possible value for given type
+							//"value.MAX_VALUE.EXCLUDE"
+							//if "=" is present, "value.max.INCLUDE"
+							
+					//if type is a char:
+						//make sure only one character is in each string value read in
+						//..throw warning when truncating string?
+
+					//if type is boolean:
+						//no action needed?  the values the field accepts is already pretty strict
+
+					//if type is binary blob:
+						//PANIC
 			}
 			else if(StringUtil::stringEquals(attribute->Name(), "TYPE"))
-			{
+			{//TODO: MOVE TYPE PARSING ABOVE VALUE PARSING
 				fieldTemplate.setType(attribute->Value());
 			}
 			else if(StringUtil::stringEquals(attribute->Name(), "DESCRIPTION"))
@@ -1322,9 +1236,6 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			GMSEC_ERROR << status.get();
 		}
 
-		//TODO(MAV): Make parser check to make sure f_type is one of the following:
-		//CHAR, BIN, BOOL, I8, I16, I32, I64, U8, U16, U32, U64, F32, F64, STRING
-
 		//check to make sure all attributes are accounted for
 		if(StringUtil::stringEquals(fieldTemplate.getMode(), "REQUIRED") || 
 		   StringUtil::stringEquals(fieldTemplate.getMode(), "OPTIONAL"))
@@ -1337,11 +1248,33 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 				GMSEC_ERROR << status.get();
 			}
-			if(StringUtil::stringEquals(fieldTemplate.getType(), ""))
+			if(!(StringUtil::stringEquals(fieldTemplate.getType(), "CHAR")	  || 
+				 StringUtil::stringEquals(fieldTemplate.getType(), "BIN")	  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "BLOB")	  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "BOOL")	  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "BOOLEAN") ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "I8")	  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "I16")     ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "SHORT")	  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "I32")     ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "LONG")	  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "I64")     ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "U8")      ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "U16")     ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "USHORT")  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "U32")     ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "ULONG")	  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "U64")     ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "F32")     ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "FLOAT")	  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "F64")     ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "DOUBLE")  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "STRING")  ||
+				 StringUtil::stringEquals(fieldTemplate.getType(), "UNSET")))
 			{
 				oss.clear();
 				oss.str("");
-				oss << schemaID << ": the field template " << fieldTemplate.getName() << " is missing TYPE attribute";
+				oss << schemaID << ": the field template " << fieldTemplate.getName() << " contains unrecognized type \"" << fieldTemplate.getType() << "\"";
 				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 				GMSEC_ERROR << status.get();
 			}
@@ -1371,7 +1304,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 		}//done checking CONTROL fields
 
 		//And finally, load the FieldTemplate into schemaFields
-		schemaFields.add(fieldTemplate);
+		schemaFields.push_back(fieldTemplate);
 	}//finished running through all child elements
 
 
@@ -1388,72 +1321,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 }
 
 
-size_t InternalSpecification::getIntValue(const Message& msg, const char* name) const
-{
-	size_t value;
-	Field::FieldType type;
-	
-	try
-	{
-		type = msg.getFieldType(name);
-	}
-	catch(Exception &e)
-	{
-		throw Exception(e);
-	}
-
-	//determine what type of value the field has, then grab the value
-	if(type == Field::I16_TYPE)
-	{
-		I16Field field = msg.getI16Field(name);
-		value = field.getValue();
-	}
-	else if(type == Field::I32_TYPE)
-	{
-		I32Field field = msg.getI32Field(name);
-		value = field.getValue();
-	}
-	else if(type == Field::I64_TYPE)
-	{
-		I64Field field = msg.getI64Field(name);
-		value = field.getValue();
-	}
-	else if(type == Field::I8_TYPE)
-	{
-		I8Field field = msg.getI8Field(name);
-		value = field.getValue();
-	}
-	else if(type == Field::U16_TYPE)
-	{
-		U16Field field = msg.getU16Field(name);
-		value = field.getValue();
-	}
-	else if(type == Field::U32_TYPE)
-	{
-		U32Field field = msg.getU32Field(name);
-		value = field.getValue();
-	}
-	else if(type == Field::U64_TYPE)
-	{
-		U64Field field = msg.getU64Field(name);
-		value = field.getValue();
-	}
-	else if(type == Field::U8_TYPE)
-	{
-		U8Field field = msg.getU8Field(name);
-		value = field.getValue();
-	}
-	else
-	{
-		GMSEC_ERROR << "Size of array control returned an unrecognized type.";
-		return 0;
-	}
-
-	return value;
-}
-
-
-gmsec::api::util::DataList<FieldTemplate> InternalSpecification::prepHeaders(const char* schemaID)
+std::list<FieldTemplate> InternalSpecification::prepHeaders(const char* schemaID)
 {
 	std::string id = schemaID;
 	std::string typeDef;
@@ -1463,14 +1331,15 @@ gmsec::api::util::DataList<FieldTemplate> InternalSpecification::prepHeaders(con
 	//so we need to trim these two parts off first
 	id = id.substr(8,id.length()-8);
 
-	for(size_t i=0; i<m_directory.size(); i++)
+	for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
 	{//look up schemaID in the directory
-		std::string def = m_directory.get(i).getID();
+		SchemaTemplate temp = *it;
+		std::string def = temp.getID();
 		if(def.find(id) != std::string::npos)
 		{//found it
 			//the common headers only contain the first two definitions, so we only need the first two
-			typeDef = m_directory.get(i).getFirstDefinition();
-			subTypeDef = m_directory.get(i).getNextDefinition();
+			typeDef = temp.getFirstDefinition();
+			subTypeDef = temp.getNextDefinition();
 			break;
 		}
 	}
@@ -1480,13 +1349,13 @@ gmsec::api::util::DataList<FieldTemplate> InternalSpecification::prepHeaders(con
 	 //we'll instead search for a more generic definition for the schema
 		std::string genID = id.substr(0, id.find_last_of("."));
 		GMSEC_DEBUG << id.c_str() << " is not explicitly defined in directory, using definition " << genID.c_str();
-		for(size_t i=0; i<m_directory.size(); i++)
+		for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
 		{
-			std::string def = m_directory.get(i).getID();
-			if(def == genID)
+			SchemaTemplate temp = *it;
+			if(StringUtil::stringEquals(temp.getID(), genID.c_str()))
 			{
-				typeDef = m_directory.get(i).getFirstDefinition();
-				subTypeDef = m_directory.get(i).getNextDefinition();
+				typeDef = temp.getFirstDefinition();
+				subTypeDef = temp.getNextDefinition();
 				break;
 			}
 		}
@@ -1497,19 +1366,17 @@ gmsec::api::util::DataList<FieldTemplate> InternalSpecification::prepHeaders(con
 	 //that's ok, we'll just default to the generic one defined by HEADER
 		std::string genID = id.substr(0, id.find_last_of("."));
 		GMSEC_DEBUG << genID.c_str() << " is not explicitly defined in the directory, defaulting to generic schema definition";
-		for(size_t i=0; i<m_directory.size(); i++)
+		for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end() ; ++it)
 		{
-			std::string def = m_directory.get(i).getID();
-			if(def == "HEADER")
+			SchemaTemplate temp = *it;
+			if(StringUtil::stringEquals(temp.getID(), "HEADER"))
 			{
-				typeDef = m_directory.get(i).getFirstDefinition();
-				subTypeDef = m_directory.get(i).getNextDefinition();
+				typeDef = temp.getFirstDefinition();
+				subTypeDef = temp.getNextDefinition();
 				break;
 			}
 		}
 	}
-
-	gmsec::api::util::DataList<FieldTemplate> fields;
 
 	//schema ID layout:
 	//Major-Version.Minor-Version.Message-Type.Message-SubType.Additional-Types...
@@ -1535,19 +1402,21 @@ gmsec::api::util::DataList<FieldTemplate> InternalSpecification::prepHeaders(con
 		subType = id.substr(index2+1, index3-index2-1);
 	}
 
-	for(size_t i=0; i<m_headers.size(); i++)
-	{
-		fields.add(m_headers.get(i));
-		std::string name = fields.get(i).getName();
+	FieldTemplateList fields;
 
-		if(name == typeDef)
+	for(FieldTemplateList::const_iterator it = m_headers.begin(); it != m_headers.end(); ++it)
+	{
+		FieldTemplate temp = *it;
+		if(StringUtil::stringEquals(temp.getName(), typeDef.c_str()))
 		{
-			fields.get(i).setValue(type.c_str());
+			temp.setValue(type.c_str());
 		}
-		else if(name == subTypeDef)
+		else if(StringUtil::stringEquals(temp.getName(), subTypeDef.c_str()))
 		{
-			fields.get(i).setValue(subType.c_str());
+			temp.setValue(subType.c_str());
 		}
+
+		fields.push_back(temp);
 	}
 
 	return fields;
@@ -1556,17 +1425,17 @@ gmsec::api::util::DataList<FieldTemplate> InternalSpecification::prepHeaders(con
 
 void InternalSpecification::resetSchemaIndex()
 {	
-	m_schemaIndex = 0;
+	m_schemaIndex = m_templates.begin();
 }
 
 
 const char* InternalSpecification::nextID()
 {
-	if(m_schemaIndex < m_templates.size())
+	if(hasNextID())
 	{
-		size_t i = m_schemaIndex;
+		const MessageTemplate& temp = **m_schemaIndex;
 		m_schemaIndex++;
-		return m_templates.get(i)->getID();
+		return temp.getID();
 	}
 	else
 	{
@@ -1577,7 +1446,7 @@ const char* InternalSpecification::nextID()
 
 bool InternalSpecification::hasNextID() const
 {
-	if(m_schemaIndex < m_templates.size())
+	if(m_schemaIndex != m_templates.end())
 	{
 		return true;
 	}
@@ -1592,22 +1461,6 @@ SchemaIDIterator& InternalSpecification::getSchemaIDIterator()
 {
 	m_iterator.m_iter->reset();
 	return m_iterator;
-}
-
-
-gmsec::api::util::DataList<std::string> InternalSpecification::splitString(const char* str)
-{
-	gmsec::api::util::DataList<std::string> list;
-	size_t startIndex = 0;
-	size_t endIndex;
-	std::string s = str;
-	while(s.find(".", startIndex) != std::string::npos)
-	{
-		endIndex = s.find(".", startIndex);
-		list.add(s.substr(startIndex, endIndex));
-		startIndex = endIndex + 1;
-	}
-	return list;
 }
 
 
@@ -1821,7 +1674,7 @@ bool InternalSpecification::checkValidSpec(unsigned int specVersionInt)
 }
 
 
-const gmsec::api::util::DataList<SchemaTemplate>& InternalSpecification::getDirectory() const
+const std::list<SchemaTemplate>& InternalSpecification::getDirectory() const
 {
 	return m_directory;
 }

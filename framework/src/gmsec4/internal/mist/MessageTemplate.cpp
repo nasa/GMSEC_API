@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,7 +39,7 @@ MessageTemplate::MessageTemplate()
 {
 }
 
-MessageTemplate::MessageTemplate(const char* schemaID, const gmsec::api::util::DataList<FieldTemplate>& inputFields)
+MessageTemplate::MessageTemplate(const char* schemaID, const std::list<FieldTemplate>& inputFields)
 	: m_fieldTemplates(inputFields),
 	  m_id(schemaID)
 {
@@ -55,7 +55,7 @@ MessageTemplate::~MessageTemplate()
 {
 }
 
-void MessageTemplate::setFieldTemplates(const char* schemaID, const gmsec::api::util::DataList<FieldTemplate>& inputFields)
+void MessageTemplate::setFieldTemplates(const char* schemaID, const std::list<FieldTemplate>& inputFields)
 {
 	m_id = schemaID;
 	m_fieldTemplates.clear();
@@ -66,11 +66,12 @@ Field* MessageTemplate::getField(const char* name)
 {
 	Field* field = NULL;
 
-	for(size_t i=0; i<m_fieldTemplates.size(); i++)
+	for(std::list<FieldTemplate>::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
 	{
-		if(m_fieldTemplates.get(i).getName() == name)
+		FieldTemplate temp = *it;
+		if(StringUtil::stringEquals(temp.getName(), name))
 		{
-			field = m_fieldTemplates.get(i).toField();
+			field = temp.toField();
 			break;
 		}
 	}
@@ -101,24 +102,12 @@ const FieldTemplate& MessageTemplate::getFieldTemplate(const char* name)
 	throw Exception(MIST_ERROR, FIELD_TEMPLATE_NOT_FOUND, err.str().c_str());
 }
 
-const FieldTemplate& MessageTemplate::getFieldTemplate(size_t index)
-{
-	if(index < m_fieldTemplates.size())
-	{
-		return m_fieldTemplates.get(index);
-	}
-	else
-	{
-		throw Exception(MIST_ERROR, INDEX_OUT_OF_RANGE, "Index is out of range");
-	}
-}
-
 const char* MessageTemplate::getID() const
 {
 	return m_id.c_str();
 }
 
-const gmsec::api::util::DataList<FieldTemplate>& MessageTemplate::listFieldTemplates() const
+const std::list<FieldTemplate>& MessageTemplate::listFieldTemplates() const
 {
 	return m_fieldTemplates;
 }

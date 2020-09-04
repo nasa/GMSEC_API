@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -90,7 +90,7 @@ private:
 
 	//helper function, returns index of fieldTemplate in m_template with the given fieldName
 	//returns -1 if the fieldTemplate does not exist
-	size_t findFieldTemplateIndex(const char* fieldName);
+	//size_t findFieldTemplateIndex(const char* fieldName);
 	const gmsec::api::mist::internal::FieldTemplate& findFieldTemplate(const char* fieldName);
 
 	//flag determining whether the message has passed validation (may not be needed)

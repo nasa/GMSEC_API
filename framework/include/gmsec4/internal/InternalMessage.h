@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
+ * Copyright 2007-2017 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -56,7 +56,6 @@ public:
 
 	const char* CALL_TYPE getSubject() const;
 
-	// Only for use by middleware wrappers!
 	void CALL_TYPE setSubject(const char* subject);
 
 	Message::MessageKind CALL_TYPE getKind() const;
@@ -64,7 +63,7 @@ public:
 	// Only for use by middleware wrappers!
 	void CALL_TYPE setKind(Message::MessageKind kind);
 
-	bool CALL_TYPE addField(const Field& field);
+	bool CALL_TYPE addField(const Field& field, bool makeCopy = true);
 	bool CALL_TYPE addField(const char* name, GMSEC_BIN bin, size_t len);
 	bool CALL_TYPE addField(const char* name, bool value);
 	bool CALL_TYPE addField(const char* name, GMSEC_CHAR value);
