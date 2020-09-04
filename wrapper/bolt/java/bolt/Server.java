@@ -1,14 +1,10 @@
 
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
-
-
-
 
 
 /**
@@ -22,8 +18,13 @@ package bolt;
 import bolt.Client.Shared;
 
 import java.net.*;
+
 import java.nio.channels.*;
+
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.LogManager;
 
 public class Server
 {
@@ -127,9 +128,19 @@ public class Server
 	public static void main (String[] args) {
 		Options options = new Options();
 		if (options.parse(args)) {
+			configureLogging(options.logLevel);
 			Server server = new Server();
 			server.options = options;
 			server.execute();
+		}
+	}
+
+
+	private static void configureLogging(Level level) {
+		Logger rootLogger = LogManager.getLogManager().getLogger("");
+		rootLogger.setLevel(level);
+		for (Handler h : rootLogger.getHandlers()) {
+			h.setLevel(level);
 		}
 	}
 }

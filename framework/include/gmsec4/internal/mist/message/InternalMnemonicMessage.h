@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -55,6 +55,9 @@ public:
 	InternalMnemonicMessage(const char* data);
 
 
+	InternalMnemonicMessage(const Specification& spec, const char* data);
+
+
 	virtual ~InternalMnemonicMessage();
 
 
@@ -86,13 +89,12 @@ private:
 	Mnemonic extractMessageMnemonic(size_t index) const;
 
 
-	void init(unsigned int version);
+	void init();
 
 
 	std::vector<Mnemonic>              m_list;
 	std::vector<Mnemonic>::iterator    m_listIter;
 	gmsec::api::mist::MnemonicIterator m_mnemonicIterator;
-	unsigned int                       m_specVersion;
 };
 
 } // namespace internal

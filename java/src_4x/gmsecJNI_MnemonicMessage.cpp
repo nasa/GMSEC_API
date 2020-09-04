@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -74,8 +74,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicM
 	try
 	{
 		Config*        config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-		Specification* spec   = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
-
+		Specification* spec   = JNI_JLONG_TO_SPECIFICATION(jSpecPtr); 
 		if (!config)
 		{
 			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
@@ -103,6 +102,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicM
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicMessage__Ljava_lang_String_2
   (JNIEnv *jenv, jclass jcls, jstring jData)
 {
@@ -117,6 +117,38 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicM
 			MnemonicMessage* mnemMsg = new MnemonicMessage(data.c_str());
 
 			jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
+		}
+	}
+	JNI_CATCH
+
+	return jCreated;
+}
+GMSEC_ENABLE_DEPRECATED_WARNINGS
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MnemonicMessage__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2Ljava_lang_String_2
+  (JNIEnv *jenv, jclass jcls, jlong jSpecPtr, jobject jSpec, jstring jData)
+{
+	jlong jCreated = 0;
+
+	try
+	{
+		Specification* spec = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+
+		if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else
+		{
+			JStringManager data(jenv, jData);
+
+			if (jvmOk(jenv, "MnemonicMessage"))
+			{
+				MnemonicMessage* mnemMsg = new MnemonicMessage(*spec, data.c_str());
+
+				jCreated = JNI_POINTER_TO_JLONG(mnemMsg);
+			}
 		}
 	}
 	JNI_CATCH
@@ -254,6 +286,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessag
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessage_1ConvertMessage
   (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg)
 {
@@ -278,6 +311,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessag
 
 	return jCreated;
 }
+GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 
 #ifdef __cplusplus

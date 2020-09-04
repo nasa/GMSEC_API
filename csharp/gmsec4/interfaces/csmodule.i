@@ -1,17 +1,15 @@
 
 %{
-#ifdef __cplusplus
-extern "C" {
-#endif
+class GMSEC_BinaryData
+{
+public:
+    GMSEC_BinaryData() : data(0), size(0) {}
 
-typedef struct {
+    GMSEC_BinaryData(unsigned char* d, int s) : data(d), size(s) {}
+
     unsigned char* data;
     int size;
-} GMSEC_BinaryData;
-
-#ifdef __cplusplus
-}
-#endif
+};
 %}
 
 
@@ -32,6 +30,7 @@ typedef struct {
         public static extern void SWIGRegisterByteArrayCallback_Gmsec(SWIGByteArrayDelegate bytearrayDelegate);
 
         static void CreateByteArray(global::System.IntPtr data, int size) {
+            if (size == 0) return;
             arraybuffer = new byte [size];
             global::System.Runtime.InteropServices.Marshal.Copy(data, arraybuffer, 0, size);
         }

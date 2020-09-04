@@ -8,12 +8,12 @@
 
     See Also
     --------
-    Message::getFieldIterator()
+    Message::get_field_iterator()
 ";
 
 %feature("docstring") gmsec::api::MessageFieldIterator::hasNext "
 
-    hasNext(self) -> bool
+    has_next(self) -> bool
 
     Provides information as to whether there are additional fields that
     can be referenced using next().
@@ -27,11 +27,11 @@
 
     next(self) -> Field
 
-    Returns a reference to the next available Field object.
+    Returns a reference to the next available Field.
 
     Returns
     -------
-    A reference to a Field object.
+    A reference to a Field.
 
     Exceptions
     ----------

@@ -4,57 +4,31 @@
     Specialized Field class that can be used to store a 64-bit floating
     point value.
 
-
     CONSTRUCTOR:
 
-    F64Field(self, name, value)
+    F64Field(self, name: str, value: double)
 
-    Constructor for creating a specialized Field object containing a
+    Constructor for creating a specialized Field containing a
     64-bit floating point value
 
     Parameters
     ----------
-    name: the name of the Field
-    value: the floating point value to store
+    name  : The name of the Field
+    value : The floating point value to store
 
     Exceptions
     ----------
     A GmsecError is thrown if the name is NULL, or is an empty string.
 ";
 
-%feature("docstring") gmsec::api::F64Field::toXML "
-
-    toXML(self) -> char const *
-
-    Convenience method that returns the XML string representation of
-    this object.
-
-    Returns
-    -------
-    An XML string.
-";
-
 
 %feature("docstring") gmsec::api::F64Field::getValue "
 
-    getValue(self) -> GMSEC_F64
+    get_value(self) -> double
 
-    Exposes the underlying value held by the object.
-
-    Returns
-    -------
-    Returns the value associated with the object.
-";
-
-
-%feature("docstring") gmsec::api::F64Field::toJSON "
-
-    toJSON(self) -> char const *
-
-    Convenience method that returns the JSON string representation of
-    this object.
+    Exposes the underlying value held by the field.
 
     Returns
     -------
-    A JSON string.
+    Returns the value associated with the field.
 ";

@@ -1,4 +1,4 @@
-# Copyright 2007-2015 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -27,16 +27,27 @@ PERL_4X_DOCS        = manual/perl_4x
 
 PERL_3X_API_CLASSES = Callback Config ConfigFile Connection ConnectionFactory Field Message Status Util
 
-PERL_4X_API_CLASSES = Config ConfigFile ConfigFileIterator Connection \
-                      Errors Exception Message MessageFieldIterator Status SubscriptionInfo \
-                      field/Field field/BinaryField field/BooleanField field/CharField field/F32Field field/F64Field \
-                      field/I16Field field/I32Field field/I64Field field/I8Field field/StringField field/U16Field \
-                      field/U32Field field/U64Field field/U8Field \
+PERL_4X_API_CLASSES = Config ConfigFile ConfigFileIterator Connection Errors Exception \
+                      HeartbeatGenerator Message MessageFieldIterator Status SubscriptionInfo \
+                      field/Field field/BinaryField field/BooleanField field/CharField \
+                      field/F32Field field/F64Field field/I16Field field/I32Field field/I64Field \
+                      field/I8Field field/StringField field/U16Field field/U32Field \
+                      field/U64Field field/U8Field \
                       util/Condition util/Log util/Mutex util/TimeUtil \
-                      mist/ConnectionManager
+                      mist/ConnectionManager mist/Device mist/DeviceIterator mist/DeviceParam \
+                      mist/FieldSpecification mist/MessageSpecification mist/mist_defs \
+                      mist/Mnemonic mist/MnemonicIterator mist/MnemonicSample mist/ProductFile \
+                      mist/ProductFileIterator mist/SchemaIDIterator mist/ServiceParam \
+                      mist/Specification mist/SubscriptionInfo \
+                      mist/message/DeviceMessage mist/message/MistMessage \
+                      mist/message/MnemonicMessage mist/message/ProductFileMessage
 
 
-all: doxygen perl_4x_docs perl_3x_docs
+all: py3_doc doxygen perl_4x_docs perl_3x_docs
+
+
+py3_doc:
+	@ ./gen_py3_doc.sh
 
 
 doxygen:
@@ -58,7 +69,7 @@ perl_4x_docs:
 	mkdir -p $(PERL_4X_DOCS)
 	mkdir -p $(PERL_4X_DOCS)/util
 	mkdir -p $(PERL_4X_DOCS)/field
-	mkdir -p $(PERL_4X_DOCS)/mist
+	mkdir -p $(PERL_4X_DOCS)/mist/message
 	cp gmsec_logo.png $(PERL_4X_DOCS)
 	pod2html --infile=$(PERL_4X_INTERFACES)/libgmsec_perl.i --outfile=$(PERL_4X_DOCS)/index.html --htmlroot=. --title="GMSEC Perl API"
 	for class in $(PERL_4X_API_CLASSES); do \
@@ -74,5 +85,6 @@ install:
 
 clean:
 	$(RM) -r manual
-	$(RM) log.txt *.err *.out
+	$(RM) *log.txt *.err *.out
 	$(RM) pod2htmd.tmp pod2htmi.tmp
+	$(RM) libgmsec_python3.html

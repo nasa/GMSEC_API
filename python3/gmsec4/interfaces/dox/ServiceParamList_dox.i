@@ -5,16 +5,16 @@
     MnemonicSample objects.
 
     Example usage:
-    myparams= ServiceParamList()
-
     param1 = ServiceParam(\"param1\", I32Field(\"param1\", 1))
     param2 = ServiceParam(\"param2\", I32Field(\"param2\", 2))
     param3 = ServiceParam(\"param3\", I32Field(\"param3\", 3))
+
+    myparams= ServiceParamList()
 
     myparams.push_back(param1)
     myparams.push_back(param2)
     myparams.push_back(param3)
 
     for sample in myparams:
-        print(sample.getValue().toXML())
+        print(sample.get_value().to_XML())
 ";

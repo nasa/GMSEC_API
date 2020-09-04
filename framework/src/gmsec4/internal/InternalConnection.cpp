@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -58,7 +58,6 @@
 #include <set>
 #include <string>
 #include <sstream>
-
 
 using namespace gmsec::api;
 using namespace gmsec::api::internal;
@@ -166,7 +165,8 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 		GMSEC_WARNING << status.get();
 	}
 
-	initializeTracking();
+	m_tracking = TrackingDetails::initialize(m_config);
+
 	initializeRequest();
 
 
@@ -654,7 +654,7 @@ void InternalConnection::publish(const Message& msg, const Config& config)
 		throw Exception(CONNECTION_ERROR, INVALID_CONNECTION, "Connection has not been established");
 	}
 
-	if (msg.getKind() != Message::PUBLISH)
+	if ((m_usingAPI3x == false) && (msg.getKind() != Message::PUBLISH))
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Cannot publish non-PUBLISH kind message.");
 	}
@@ -717,7 +717,7 @@ void InternalConnection::request(const Message& request, GMSEC_I32 timeout, Repl
 		throw Exception(CONNECTION_ERROR, INVALID_CONNECTION, "Connection has not been established");
 	}
 
-	if (request.getKind() != Message::REQUEST)
+	if ((m_usingAPI3x == false) && (request.getKind() != Message::REQUEST))
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Cannot issue request with non-REQUEST kind message.");
 	}
@@ -775,7 +775,7 @@ Message* InternalConnection::request(const Message& request, GMSEC_I32 timeout, 
 		throw Exception(CONNECTION_ERROR, INVALID_CONNECTION, "Connection has not been established");
 	}
 
-	if (request.getKind() != Message::REQUEST)
+	if ((m_usingAPI3x == false) && (request.getKind() != Message::REQUEST))
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Cannot issue request with non-REQUEST kind message.");
 	}
@@ -917,12 +917,12 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 		throw Exception(CONNECTION_ERROR, INVALID_CONNECTION, "Connection has not been established");
 	}
 
-	if (request.getKind() != Message::REQUEST)
+	if ((m_usingAPI3x == false) && (request.getKind() != Message::REQUEST))
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Cannot issue reply with non-REQUEST kind message.");
 	}
 
-	if (reply.getKind() != Message::REPLY)
+	if ((m_usingAPI3x == false) && (reply.getKind() != Message::REPLY))
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Cannot issue reply with non-REPLY kind message.");
 	}
@@ -1576,50 +1576,6 @@ void InternalConnection::unsubscribeAux(SubscriptionInfo*& info)
 }
 
 
-void InternalConnection::initializeTracking()
-{
-	// boolean config values for tracking fields
-	m_tracking.set(m_config.getBooleanValue(GMSEC_TRACKING, true));
-
-	if (m_config.getValue(GMSEC_TRACKING_NODE))
-	{
-		m_tracking.setNode(m_config.getBooleanValue(GMSEC_TRACKING_NODE, true));
-	}
-	if (m_config.getValue(GMSEC_TRACKING_PROCESS_ID))
-	{
-		m_tracking.setProcessId(m_config.getBooleanValue(GMSEC_TRACKING_PROCESS_ID, true));
-	}
-	if (m_config.getValue(GMSEC_TRACKING_USERNAME))
-	{
-		m_tracking.setUserName(m_config.getBooleanValue(GMSEC_TRACKING_USERNAME, true));
-	}
-	if (m_config.getValue(GMSEC_TRACKING_CONNECTION_ID))
-	{
-		m_tracking.setConnectionId(m_config.getBooleanValue(GMSEC_TRACKING_CONNECTION_ID, true));
-	}
-	if (m_config.getValue(GMSEC_TRACKING_PUBLISH_TIME))
-	{
-		m_tracking.setPublishTime(m_config.getBooleanValue(GMSEC_TRACKING_PUBLISH_TIME, true));
-	}
-	if (m_config.getValue(GMSEC_TRACKING_UNIQUE_ID))
-	{
-		m_tracking.setUniqueId(m_config.getBooleanValue(GMSEC_TRACKING_UNIQUE_ID, true));
-	}
-	if (m_config.getValue(GMSEC_TRACKING_MW_INFO))
-	{
-		m_tracking.setMwInfo(m_config.getBooleanValue(GMSEC_TRACKING_MW_INFO, true));
-	}
-	if (m_config.getValue(GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS))
-	{
-		m_tracking.setActiveSubscriptions(m_config.getBooleanValue(GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS, true));
-	}
-	if (m_config.getValue(GMSEC_TRACKING_CONNECTION_ENDPOINT))
-	{
-		m_tracking.setConnectionEndpoint(m_config.getBooleanValue(GMSEC_TRACKING_CONNECTION_ENDPOINT, true));
-	}
-}
-
-
 void InternalConnection::initializeRequest()
 {
 	const char* value = NULL;
@@ -1717,15 +1673,6 @@ void InternalConnection::initializeRequest()
 
 void InternalConnection::insertTrackingFields(Message& msg)
 {
-	// Check if tracking fields were already inserted (e.g. by API 3.x)
-	bool trackingInserted = false;
-	MessageBuddy::getInternal(msg).getDetails().getBoolean("TRACKING-FIELDS-INSERTED-BY-API3", trackingInserted, &trackingInserted);
-
-	if (trackingInserted)
-	{
-		return;
-	}
-
 	const TrackingDetails& connTracking = getTracking();
 	const TrackingDetails& msgTracking  = MessageBuddy::getInternal(msg).getTracking();
 
@@ -1874,97 +1821,91 @@ void InternalConnection::insertTrackingFields(Message& msg)
 
 void InternalConnection::removeTrackingFields(Message& msg)
 {
-	// We do NOT remove tracking fields when using API 3.x
-	bool trackingInserted = false;
-	MessageBuddy::getInternal(msg).getDetails().getBoolean("TRACKING-FIELDS-INSERTED-BY-API3", trackingInserted, &trackingInserted);
-
-	if (trackingInserted)
+	// We do NOT remove tracking fields when dealing with API 3.x interface
+	if (m_usingAPI3x)
 	{
-		// Reset meta-details field so that the message will have new tracking fields inserted should the message be used again.
-		MessageBuddy::getInternal(msg).getDetails().setBoolean("TRACKING-FIELDS-INSERTED-BY-API3", false);
+		return;
 	}
-	else
+
+	const TrackingDetails& connTracking = getTracking();
+	const TrackingDetails& msgTracking  = MessageBuddy::getInternal(msg).getTracking();
+
+	const int ON    = MESSAGE_TRACKINGFIELDS_ON;
+	const int OFF   = MESSAGE_TRACKINGFIELDS_OFF;
+	const int UNSET = MESSAGE_TRACKINGFIELDS_UNSET;
+
+	// Remove the Tracking Fields, if they have been added by the API
+	bool addTracking = (connTracking.get() == ON && (msgTracking.get() == ON || msgTracking.get() == UNSET));
+
+	if ((addTracking || connTracking.getNode() == ON || msgTracking.getNode() == ON) &&
+	    (connTracking.getNode() != OFF && msgTracking.getNode() != OFF))
 	{
-		const TrackingDetails& connTracking = getTracking();
-		const TrackingDetails& msgTracking  = MessageBuddy::getInternal(msg).getTracking();
+		msg.clearField("NODE");
+	}
+	if ((addTracking || connTracking.getProcessId() == ON || msgTracking.getProcessId() == ON) &&
+	    (connTracking.getProcessId() != OFF && msgTracking.getProcessId() != OFF))
+	{
+		msg.clearField("PROCESS-ID");
+	}
+	if ((addTracking || connTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
+	    (connTracking.getUserName() != OFF && msgTracking.getUserName() != OFF))
+	{
+		msg.clearField("USER-NAME");
+	}
+	if ((addTracking || connTracking.getConnectionId() == ON || msgTracking.getConnectionId() == ON) &&
+	    (connTracking.getConnectionId() != OFF && msgTracking.getConnectionId() != OFF))
+	{
+		msg.clearField("CONNECTION-ID");
+	}
+	if ((addTracking || connTracking.getPublishTime() == ON || msgTracking.getPublishTime() == ON) &&
+	    (connTracking.getPublishTime() != OFF && msgTracking.getPublishTime() != OFF))
+	{
+		msg.clearField("PUBLISH-TIME");
+	}
+	if ((addTracking || connTracking.getUniqueId() == ON || msgTracking.getUniqueId() == ON) &&
+	    (connTracking.getUniqueId() != OFF && msgTracking.getUniqueId() != OFF))
+	{
+		msg.clearField("UNIQUE-ID");
+	}
+	if ((addTracking || connTracking.getMwInfo() == ON || msgTracking.getMwInfo() == ON) &&
+	    (connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
+	{
+		msg.clearField("MW-INFO");
+	}
 
-		const int ON    = MESSAGE_TRACKINGFIELDS_ON;
-		const int OFF   = MESSAGE_TRACKINGFIELDS_OFF;
-		const int UNSET = MESSAGE_TRACKINGFIELDS_UNSET;
+	if (getSpecVersion() == 0 || getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
+	{
+		try
+		{
+			const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
 
-		// Remove the Tracking Fields, if they have been added by the API
-		bool addTracking = (connTracking.get() == ON && (msgTracking.get() == ON || msgTracking.get() == UNSET));
-
-		if ((addTracking || connTracking.getNode() == ON || msgTracking.getNode() == ON) &&
-		    (connTracking.getNode() != OFF && msgTracking.getNode() != OFF))
-		{
-			msg.clearField("NODE");
-		}
-		if ((addTracking || connTracking.getProcessId() == ON || msgTracking.getProcessId() == ON) &&
-		    (connTracking.getProcessId() != OFF && msgTracking.getProcessId() != OFF))
-		{
-			msg.clearField("PROCESS-ID");
-		}
-		if ((addTracking || connTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
-		    (connTracking.getUserName() != OFF && msgTracking.getUserName() != OFF))
-		{
-			msg.clearField("USER-NAME");
-		}
-		if ((addTracking || connTracking.getConnectionId() == ON || msgTracking.getConnectionId() == ON) &&
-		    (connTracking.getConnectionId() != OFF && msgTracking.getConnectionId() != OFF))
-		{
-			msg.clearField("CONNECTION-ID");
-		}
-		if ((addTracking || connTracking.getPublishTime() == ON || msgTracking.getPublishTime() == ON) &&
-		    (connTracking.getPublishTime() != OFF && msgTracking.getPublishTime() != OFF))
-		{
-			msg.clearField("PUBLISH-TIME");
-		}
-		if ((addTracking || connTracking.getUniqueId() == ON || msgTracking.getUniqueId() == ON) &&
-		    (connTracking.getUniqueId() != OFF && msgTracking.getUniqueId() != OFF))
-		{
-			msg.clearField("UNIQUE-ID");
-		}
-		if ((addTracking || connTracking.getMwInfo() == ON || msgTracking.getMwInfo() == ON) &&
-		    (connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
-		{
-			msg.clearField("MW-INFO");
-		}
-
-		if (getSpecVersion() == 0 || getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
-		{
-			try
+			if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
 			{
-				const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
-		
-				if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
+				if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
+				    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
 				{
-					if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
-					    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+					GMSEC_I64 numSubscriptions = msg.getIntegerValue("NUM-OF-SUBSCRIPTIONS");
+
+					for (GMSEC_I64 n = 1; n <= numSubscriptions; ++n)
 					{
-						GMSEC_I64 numSubscriptions = msg.getIntegerValue("NUM-OF-SUBSCRIPTIONS");
-		
-						for (GMSEC_I64 n = 1; n <= numSubscriptions; ++n)
-						{
-							std::ostringstream fieldName;
-							fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
-		
-							msg.clearField(fieldName.str().c_str());
-						}
-		
-						msg.clearField("NUM-OF-SUBSCRIPTIONS");
+						std::ostringstream fieldName;
+						fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+
+						msg.clearField(fieldName.str().c_str());
 					}
-				}
-				if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
-				    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
-				{
-					msg.clearField("MW-CONNECTION-ENDPOINT");
+
+					msg.clearField("NUM-OF-SUBSCRIPTIONS");
 				}
 			}
-			catch (...)
+			if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
+			    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
 			{
-				// Ignore exception; message is not a C2CX HB message.
+				msg.clearField("MW-CONNECTION-ENDPOINT");
 			}
+		}
+		catch (...)
+		{
+			// Ignore exception; message is not a C2CX HB message.
 		}
 	}
 }

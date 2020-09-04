@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -29,7 +29,9 @@ using namespace gmsec::api;
 using namespace gmsec::api::util;
 using namespace gmsec::api::mist;
 
-const char* HB_MESSAGE_SUBJECT = "GMSEC.MISSION.SPACECRAFT.MSG.C2CX.HB";
+const char* HB_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.HEARTBEAT-SERVICE.HB";
+const int   HB_PUBLISH_RATE    = 5;  // in seconds
+
 
 //o Helper functions
 void initializeLogging(Config& config);
@@ -62,13 +64,30 @@ int main(int argc, char* argv[])
 		// be used by all GMSEC Messages
 		DataList<Field*> headerFields;
 
-		StringField missionField("MISSION-ID", "GMSEC");
-		StringField facilityField("FACILITY", "GMSEC Lab");
-		StringField componentField("COMPONENT", "heartbeat_service");
+		int version = connManager.getSpecification().getVersion();
+
+		StringField missionField("MISSION-ID", "MY-MISSION");
+		StringField satIDField("SAT-ID-PHYSICAL", "MY-SAT-ID");
+		StringField facilityField("FACILITY", "MY-FACILITY");
+		StringField componentField("COMPONENT", "HEARTBEAT-SERVICE");
+		StringField domain1Field("DOMAIN1", "MY-DOMAIN-1");
+		StringField domain2Field("DOMAIN2", "MY-DOMAIN-2");
+		StringField msgID("MSG-ID", "MY-MSG-ID");
 
 		headerFields.push_back(&missionField);
+		headerFields.push_back(&satIDField);
 		headerFields.push_back(&facilityField);
 		headerFields.push_back(&componentField);
+
+		if (version == 201400)
+		{
+			headerFields.push_back(&msgID);
+		}
+		else if (version >= 201800)
+		{
+			headerFields.push_back(&domain1Field);
+			headerFields.push_back(&domain2Field);
+		}
 
 		//o Use setStandardFields to define a set of header fields for
 		// all messages which are created or published on the
@@ -88,16 +107,15 @@ int main(int argc, char* argv[])
 			//o Determine which version of the GMSEC message specification
 			// the ConnectionManager was initialized with and add
 			// the correctly typed Fields to the Message
-			int version = connManager.getSpecification().getVersion();
-			if (version == 201600)
+			if (version == 201400)
 			{
-				hbStandardFields.push_back(new U16Field("PUB-RATE", (GMSEC_U16) 30));
-				hbStandardFields.push_back(new U16Field("COUNTER",  (GMSEC_U16) 1));
-			}
-			else if (version == 201400)
-			{
-				hbStandardFields.push_back(new I16Field("PUB-RATE", (GMSEC_I16) 30));
+				hbStandardFields.push_back(new I16Field("PUB-RATE", (GMSEC_I16) HB_PUBLISH_RATE));
 				hbStandardFields.push_back(new I16Field("COUNTER",  (GMSEC_I16) 1));
+			}
+			else if (version >= 201600)
+			{
+				hbStandardFields.push_back(new U16Field("PUB-RATE", (GMSEC_U16) HB_PUBLISH_RATE));
+				hbStandardFields.push_back(new U16Field("COUNTER",  (GMSEC_U16) 1));
 			}
 			//o Note: COMPONENT-STATUS is an optional field used to
 			// denote the operating status of the component, the

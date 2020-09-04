@@ -12,19 +12,19 @@
 
 %feature("docstring") gmsec::api::SubscriptionInfo::getCallback "
 
-    getCallback(self) -> Callback
+    get_callback(self) -> Callback
 
-    Returns the Callback object, if any, used when setting up the
+    Returns the Callback, if any, used when setting up the
     subscription.
 
     Returns
     -------
-    Pointer to Callback object.
+    Reference to Callback.
 ";
 
 %feature("docstring") gmsec::api::SubscriptionInfo::getSubject "
 
-    getSubject(self) -> char const *
+    get_subject(self) -> str
 
     Returns the subject string used when setting up the subscription.
 

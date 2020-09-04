@@ -7,7 +7,7 @@
 
 %feature("docstring") SubscriptionEntry::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
     Returns the name associated with the Subscription entry
 
@@ -15,14 +15,14 @@
 
 %feature("docstring") SubscriptionEntry::getPattern "
 
-    getPattern(self) -> char const *
+    get_pattern(self) -> str
 
     Returns the subscription subject pattern
 ";
 
 %feature("docstring") SubscriptionEntry::hasNextExcludedPattern "
 
-    hasNextExcludedPattern(self) -> bool
+    has_next_excluded_pattern(self) -> bool
 
     Returns whether there is a next excluded pattern associated with
     the Subscription entry
@@ -30,7 +30,7 @@
 
 %feature("docstring") SubscriptionEntry::nextExcludedPattern "
 
-    nextExcludedPattern(self) -> char const *
+    next_excluded_pattern(self) -> str
 
     Returns the next excluded pattern associated with the Subscription
     entry

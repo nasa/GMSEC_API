@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,6 +19,7 @@
 #include <gmsec4/internal/mist/SchemaTemplate.h>
 
 #include <gmsec4/internal/tinyxml2.h>
+#include <gmsec4/internal/TrackingDetails.h>
 
 #include <gmsec4/field/Field.h>
 
@@ -128,7 +129,7 @@ private:
 
 	//helper function, checks a given value against the types defined in the field template
 	//to make sure that the value is valid for all types given
-	bool checkValue(std::list<Field::FieldType> types, std::string value);
+	bool checkValue(const std::list<Field::FieldType>& types, const std::string& value) const;
 
 	//helper function, get the string value from a field in a given message
 	std::string CALL_TYPE getValue(const Message& msg, const char* name) const;
@@ -157,6 +158,10 @@ private:
 	FieldTemplateList cloneFieldTemplates(const FieldTemplateList& fields) const;
 
 
+	bool isReservedField(const char* fieldName);
+	Status checkTrackingField(const char* fieldName, const gmsec::api::internal::TrackingDetails& configTracking, const gmsec::api::internal::TrackingDetails& msgTracking);
+
+
 	typedef std::map<std::string, std::string>       SchemaRegistry;       // message subject, schema ID
 	typedef std::map<std::string, MessageTemplate*>  MessageTemplates;     // schema ID, MessageTemplate
 	typedef std::map<std::string, FieldTemplateList> HeaderFieldTemplates; // header ID, FieldTemplateList
@@ -175,6 +180,8 @@ private:
 	SchemaIDIterator					m_iterator;
 	std::string							m_basePath;
 	std::string							m_lastHeaderName;
+
+	gmsec::api::internal::TrackingDetails m_configTracking;
 
 	MessageSpecifications               m_msgSpecs;
 

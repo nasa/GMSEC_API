@@ -6,13 +6,14 @@
 
     See Also
     --------
+    FieldSpecificationList
     FieldSpecification
     Specification
 ";
 
 %feature("docstring") gmsec::api::mist::MessageSpecification::getSchemaID "
 
-    getSchemaID(self) -> string
+    get_schema_id(self) -> str
 
     Accessor for the MessageSpecification schema ID
 
@@ -23,12 +24,12 @@
 
 %feature("docstring") gmsec::api::mist::MessageSpecification::getFieldSpecifications "
 
-    getFieldSpecifications(self) -> list
+    get_field_specifications(self) -> FieldSpecificationList
 
     Accessor for acquiring the list of FieldSpecification objects
-    associated with the MessageSpecification
+    associated with the MessageSpecification.
 
     Returns
     -------
-    A list of FieldSpecification(s)
+    A FieldSpecificationList
 ";

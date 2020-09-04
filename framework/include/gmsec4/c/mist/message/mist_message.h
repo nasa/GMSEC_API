@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,6 +19,7 @@
 #include <gmsec4_defs.h>
 
 #include <gmsec4/util/wdllexp.h>
+#include <gmsec4/util/Deprecated.h>
 
 #include <stddef.h>
 
@@ -96,8 +97,27 @@ extern "C"
 	 * @return A handle to a Message object, or NULL if an error occurs.  If the latter occurs, check the status.
 	 *
 	 * @sa messageDestroy
+	 *
+	 * @note This method has been deprecated. Use mistMessageCreateUsingSpec() instead.
 	 */
-	GMSEC_API GMSEC_Message mistMessageCreateUsingData(const char* data, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_Message mistMessageCreateUsingData(const char* data, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_Message mistMessageCreateUsingSpecAndData(const GMSEC_Specification spec, const char* data, GMSEC_Status status)
+	 *
+	 * @brief Creates a MIST %Message instance using the given XML or JSON data representation of the message, and ensures
+	 * the message adheres to the provided specification.
+	 *
+	 * @param[in]  spec   - A reference to the specification this message's schema will adhere to.
+	 * @param[in]  data   - the XML or JSON string representation of a message.
+	 * @param[out] status - the result of the operation.
+	 *
+	 * @return A handle to a Message object, or NULL if an error occurs.  If the latter occurs, check the status.
+	 *
+	 * @sa messageDestroy
+	 */
+	GMSEC_API GMSEC_Message mistMessageCreateUsingSpecAndData(const GMSEC_Specification spec, const char* data, GMSEC_Status status);
 
 
 	/**

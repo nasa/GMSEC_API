@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,6 +14,8 @@ using namespace gmsec::api::mist;
 
 %ignore gmsec::api::mist::Device::Device(const char*, gmsec::api::mist::Device::DeviceStatus, const gmsec::api::util::DataList<gmsec::api::mist::DeviceParam*>&);
 %ignore gmsec::api::mist::Device::addParam(const DeviceParam&);
+
+%ignore gmsec::api::mist::Device::operator=(const Device&);
 
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/Device.h>

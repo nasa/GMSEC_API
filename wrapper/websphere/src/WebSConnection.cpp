@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,10 +22,11 @@
 #include <gmsec4/internal/ConnectionInterface.h>
 #include <gmsec4/internal/InternalConnection.h>
 #include <gmsec4/internal/MessageBuddy.h>
-#include <gmsec4/internal/SystemUtil.h>
 #include <gmsec4/internal/StringUtil.h>
+#include <gmsec4/internal/SystemUtil.h>
 
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <sstream>
 
@@ -1028,6 +1029,8 @@ void WebSConnection::mwPublish(const Message& msg, const Config& config)
 			if (reason == MQRC_CONNECTION_BROKEN ||        // 2009
 			    reason == MQRC_HCONN_ERROR ||              // 2018
 			    reason == MQRC_Q_MGR_NOT_AVAILABLE ||      // 2059
+			    reason == MQRC_Q_MGR_QUIESCING ||          // 2161
+			    reason == MQRC_HOST_NOT_AVAILABLE ||       // 2538
 			    reason == MQRC_RECONNECT_FAILED)           // 2548
 			{
 				TimeUtil::millisleep(connectionRetryInterval);
@@ -1268,8 +1271,8 @@ void WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 
 bool WebSConnection::fromMW(const DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg, bool forReplies)
 {
-	std::auto_ptr<Message> msg;
-	ValueMap               meta;
+	StdUniquePtr<Message> msg;
+	ValueMap              meta;
 
 	try
 	{
@@ -1781,7 +1784,7 @@ Message* parseProperties(ValueMap& meta, MQHCONN hcon, MQHMSG hmsg, const Config
 
 	toMQString(iname, MW_PROP_PATTERN);
 
-	std::auto_ptr<Message> msg(new Message(DEFAULT_SUBJECT, Message::PUBLISH, msgConfig));
+	StdUniquePtr<Message> msg(new Message(DEFAULT_SUBJECT, Message::PUBLISH, msgConfig));
 
 	for (bool first = true; true; first = false)
 	{

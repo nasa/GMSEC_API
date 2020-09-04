@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -26,6 +26,7 @@
 #include <gmsec4/EventCallback.h>
 #include <gmsec4/Exception.h>
 #include <gmsec4/Fields.h>
+#include <gmsec4/HeartbeatGenerator.h>
 #include <gmsec4/Message.h>
 #include <gmsec4/MessageFieldIterator.h>
 #include <gmsec4/ReplyCallback.h>
@@ -50,6 +51,7 @@
 #include <gmsec4/mist/SchemaIDIterator.h>
 #include <gmsec4/mist/ServiceParam.h>
 #include <gmsec4/mist/Specification.h>
+#include <gmsec4/mist/SubscriptionInfo.h>
 
 #include <gmsec4/mist/message/DeviceMessage.h>
 #include <gmsec4/mist/message/MistMessage.h>
@@ -68,6 +70,7 @@
 #include <gmsec4/util/LogStream.h>
 #include <gmsec4/util/Mutex.h>
 #include <gmsec4/util/StdSharedPtr.h>
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/StdThread.h>
 #include <gmsec4/util/TimeUtil.h>
 

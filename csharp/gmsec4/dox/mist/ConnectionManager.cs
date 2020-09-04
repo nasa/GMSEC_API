@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -314,7 +314,7 @@ public class ConnectionManager : global::System.IDisposable {
   /// Otherwise the request message will be validated before it is issued.
   /// </summary>
   ///
-  /// <param name="msg">The request message to issue</param>
+  /// <param name="request">The request message to issue</param>
   /// <param name="timeout">maximum time (in milliseconds) to wait for reply</param>
   /// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
   ///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
@@ -336,7 +336,7 @@ public class ConnectionManager : global::System.IDisposable {
   /// Otherwise the request message will be validated before it is issued.
   /// </summary>
   ///
-  /// <param name="msg">The request message to issue</param>
+  /// <param name="request">The request message to issue</param>
   /// <param name="timeout">maximum time (in milliseconds) to wait for reply</param>
   ///
   /// <returns>A reply message, or null if a timeout occurs.</returns>
@@ -594,7 +594,7 @@ public class ConnectionManager : global::System.IDisposable {
   /// to the time of function invocation.
   /// </summary>
   ///
-  /// <param name="subject">The topic (subject) to apply to the log message</param>
+  /// <param name="logMessage">The message to apply to the log message</param>
   /// <param name="severity">The Field object defining the severity of the log message</param>
   ///
   /// <exception cref="GmsecException">Thrown if the logMessage is null.</exception>
@@ -665,7 +665,7 @@ public class ConnectionManager : global::System.IDisposable {
   ///
   /// <param name="subject">subject which to include with the request directive</param>
   /// <param name="directiveString">a field containing the string directive that this message is intended to convey</param>
-  /// <param name="fields">list of supplemental fields that the user wishes to include with the directive message</param>
+  /// <param name="sFields">list of supplemental fields that the user wishes to include with the directive message</param>
   /// <param name="timeout">time (in milliseconds) to wait for a response message</param>
   /// <param name="cb">the callback to be invoked upon reception of a response message</param>
   /// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
@@ -677,7 +677,7 @@ public class ConnectionManager : global::System.IDisposable {
   /// <exception cref="GmsecException">Thrown if the callback is null</exception>
   /// <exception cref="GmsecException">Thrown if the request Message cannot be validated</exception>
   /// <exception cref="GmsecException">Thrown if a middleware error occurs.</exception>
-  public void RequestDirective(string subject, Field directiveString, FieldList dFields, int timeout, ConnectionManagerReplyCallback cb, int republish_ms) {
+  public void RequestDirective(string subject, Field directiveString, FieldList sFields, int timeout, ConnectionManagerReplyCallback cb, int republish_ms) {
   }
 
   /// <summary>
@@ -692,14 +692,14 @@ public class ConnectionManager : global::System.IDisposable {
   ///
   /// <param name="subject">subject which to include with the request directive</param>
   /// <param name="directiveString">a field containing the string directive that this message is intended to convey</param>
-  /// <param name="fields">list of supplemental fields that the user wishes to include with the directive message</param>
+  /// <param name="sFields">list of supplemental fields that the user wishes to include with the directive message</param>
   /// <param name="timeout">time (in milliseconds) to wait for a response message</param>
   /// <param name="cb">the callback to be invoked upon reception of a response message</param>
   ///
   /// <exception cref="GmsecException">Thrown if a the given subject is null or is an empty-string.</exception>
   /// <exception cref="GmsecException">Thrown if the request Message cannot be validated</exception>
   /// <exception cref="GmsecException">Thrown if a middleware error occurs.</exception>
-  public void RequestDirective(string subject, Field directiveString, FieldList dFields, int timeout, ConnectionManagerReplyCallback cb) {
+  public void RequestDirective(string subject, Field directiveString, FieldList sFields, int timeout, ConnectionManagerReplyCallback cb) {
   }
 
   /// <summary>
@@ -922,8 +922,8 @@ public class ConnectionManager : global::System.IDisposable {
   /// <param name="subject">subject which to include with the request directive</param>
   /// <param name="opName">the name of the operation of the service</param>
   /// <param name="opNumber">the operation number for the service message is intended to convey</param>
-  /// <param name="fields">list of supplemental fields that the user wishes to include with the directive message</param>
-  /// <param name="params">a list of the ServiceParam objects providing meta data for this service invocation</param>
+  /// <param name="sFields">list of supplemental fields that the user wishes to include with the directive message</param>
+  /// <param name="sParams">a list of the ServiceParam objects providing meta data for this service invocation</param>
   /// <param name="timeout">the maximum time period (in milliseconds) to wait for a response</param>
   /// <param name="cb">the callback to be invoked upon reception of a response message</param>
   /// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
@@ -951,8 +951,8 @@ public class ConnectionManager : global::System.IDisposable {
   /// <param name="subject">subject which to include with the request directive</param>
   /// <param name="opName">the name of the operation of the service</param>
   /// <param name="opNumber">the operation number for the service message is intended to convey</param>
-  /// <param name="fields">list of supplemental fields that the user wishes to include with the directive message</param>
-  /// <param name="params">a list of the ServiceParam objects providing meta data for this service invocation</param>
+  /// <param name="sFields">list of supplemental fields that the user wishes to include with the directive message</param>
+  /// <param name="sParams">a list of the ServiceParam objects providing meta data for this service invocation</param>
   /// <param name="timeout">the maximum time period (in milliseconds) to wait for a response</param>
   /// <param name="cb">the callback to be invoked upon reception of a response message</param>
   ///

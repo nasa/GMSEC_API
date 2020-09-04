@@ -5,50 +5,51 @@
 
     CONSTRUCTORS:
 
-    GmsecError(self, errorClass, errorCode, errorMsg)
+    GmsecError(self, errorClass: int, errorCode: int, errorMsg: str)
 
     Parameters
     ----------
-    errorClass: Enumerated value indicating source of the error.
-    errorCode: Enumerated value indicating reason for the error.
-    errorMsg: Explanation for the error.
+    errorClass : Enumerated value indicating source of the error.
+    errorCode  : Enumerated value indicating reason for the error.
+    errorMsg   : Explanation for the error.
 
-    See Also
-    --------
-    Errors.h
 
-    GmsecError(self, errorClass, errorCode, customCode, errorMsg)
+
+    GmsecError(self, errorClass: int, errorCode: int, customCode: int, errorMsg: str)
 
     Special constructor that can be used to set a custom error code.
 
     Parameters
     ----------
-    errorClass: Enumerated value indicating source of the error.
-    errorCode: Enumerated value indicating reason for the error.
-    customCode: Custom error code (typically middleware specific) on
-        the root cause of the error.
-    errorMsg: Explanation for the error.
+    errorClass : Enumerated value indicating source of the error.
+    errorCode  : Enumerated value indicating reason for the error.
+    customCode : Custom error code (typically middleware specific) on the root cause of the error.
+    errorMsg   : Explanation for the error.
 
-    GmsecError(self, status)
+
+
+    GmsecError(self, status: Status)
 
     Special constructor that uses information from a Status object. 
 
     Parameters
     ----------
-    status: A Status object
+    status : A Status object
 
-    GmsecError(self, other)
+
+
+    GmsecError(self, other: GmsecError)
 
     Copy constructor
 
     Parameters
     ----------
-    other: The other GmsecError object to copy.
+    other : The other GmsecError object to copy.
 ";
 
 %feature("docstring") gmsec::api::Exception::getErrorCode "
 
-    getErrorCode(self) -> StatusCode
+    getErrorCode(self) -> int
 
     Returns the error code associated with the exception.
 
@@ -59,10 +60,10 @@
 
 %feature("docstring") gmsec::api::Exception::what "
 
-    what(self) -> char const *
+    what(self) -> str
 
     Returns string with the format of:
-        [errorClass,errorCode,customCode] : message
+        [errorClass, errorCode, customCode] : message
 
     Returns
     -------
@@ -71,7 +72,7 @@
 
 %feature("docstring") gmsec::api::Exception::getCustomCode "
 
-    getCustomCode(self) -> GMSEC_I32
+    getCustomCode(self) -> int
 
     An error code originating from a third party library (middleware
     or otherwise) related to the error that occurred.
@@ -83,7 +84,7 @@
 
 %feature("docstring") gmsec::api::Exception::getErrorClass "
 
-    getErrorClass(self) -> StatusClass
+    getErrorClass(self) -> int
 
     Returns the error class associated with the exception.
 
@@ -94,7 +95,7 @@
 
 %feature("docstring") gmsec::api::Exception::getErrorMessage "
 
-    getErrorMessage(self) -> char const *
+    getErrorMessage(self) -> str
 
     Returns the error message associated with the exception.
 

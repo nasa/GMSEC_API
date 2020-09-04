@@ -7,53 +7,28 @@
 
     CONSTRUCTOR:
 
-    U32Field(self, name, value)
+    U32Field(self, name: str, value: uint)
 
-    Constructor for creating a specialized Field object containing an
+    Constructor for creating a specialized Field containing an
     unsigned 32-bit value
 
     Parameters
     ----------
-    name: the name of the Field
-    value: the value to store
+    name  : The name of the Field
+    value : The value to store
 
     Exceptions
     ----------
-    A GmsecError is thrown if the name is NULL, or is an empty string.
-";
-
-%feature("docstring") gmsec::api::U32Field::toXML "
-
-    toXML(self) -> char const *
-
-    Convenience method that returns the XML string representation of
-    this object.
-
-    Returns
-    -------
-    An XML string.
-";
-
-%feature("docstring") gmsec::api::U32Field::toJSON "
-
-    toJSON(self) -> char const *
-
-    Convenience method that returns the JSON string representation of
-    this object.
-
-    Returns
-    -------
-    A JSON string.
+    A GmsecError is thrown if the name is None, or is an empty string.
 ";
 
 %feature("docstring") gmsec::api::U32Field::getValue "
 
-    getValue(self) -> GMSEC_U32
+    get_value(self) -> uint
 
-    Exposes the underlying value held by the object.
+    Exposes the underlying value held by the field.
 
     Returns
     -------
-    Returns the value associated with the object.
+    Returns the value associated with the field.
 ";
-

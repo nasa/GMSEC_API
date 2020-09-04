@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,6 +19,8 @@ using namespace gmsec::api;
 %ignore gmsec::api::Connection::unsubscribe(SubscriptionInfo*&);
 %ignore gmsec::api::Connection::release(Message*&);
 %ignore gmsec::api::Connection::destroy(Connection*&);
+%ignore gmsec::api::Connection::shutdownAllMiddlewares();
+%ignore gmsec::api::Connection::shutdownMiddleware(const char*);
 
 /* Ignore C-binding methods */
 %ignore gmsec::api::Connection::registerEventCallback(ConnectionEvent, GMSEC_EventCallback*);
@@ -41,8 +43,6 @@ using namespace gmsec::api;
 %rename("get_id") getID;
 %rename("get_MW_info") getMWInfo;
 %rename("get_publish_queue_message_count") getPublishQueueMessageCount;
-%rename("shutdown_all_middlewares") shutdownAllMiddlewares;
-%rename("shutdown_middleware") shutdownMiddleware;
 
 
 %include "dox/Connection_dox.i"
@@ -62,9 +62,19 @@ using namespace gmsec::api;
                 self->release(message);
         }
 
-        static void CALL_TYPE destroy(Connection* conn)
+        static void destroy(Connection* conn)
         {
                 Connection::destroy(conn);
         }
-};
 
+%pythoncode %{
+    @staticmethod
+    def shutdown_all_middlewares():
+        pass
+
+    @staticmethod
+    def shutdown_middleware(name):
+        pass
+%}
+
+};

@@ -4,67 +4,116 @@
 
 %feature("docstring") gmsec::api::mist::message::ProductFileMessage "
 
-    A MistMessage object that is capable of storing ProductFile objects
-    The following message schema IDs and their templates are supported:
-    MSG.PROD.AAA
-    MSG.PROD.AUTO
-    MSG.PROD.FD
-    MSG.PROD.MAS
-    MSG.PROD.PAS
-    MSG.PROD.SC
-    MSG.PROD.TAC
-    REQ.PROD.AAA
-    REQ.PROD.AUTO
-    REQ.PROD.FD
-    REQ.PROD.MAS
-    REQ.PROD.PAS
-    REQ.PROD.SC
-    REQ.PROD.TAC
-    RESP.PROD.AAA
-    RESP.PROD.AUTO
-    RESP.PROD.FD
-    RESP.PROD.MAS
-    RESP.PROD.PAS
-    RESP.PROD.SC
-    RESP.PROD.TAC
+A MistMessage object that is capable of storing ProductFile objects
+The following message schema IDs and their templates are supported:
+MSG.PROD.AAA
+MSG.PROD.AUTO
+MSG.PROD.FD
+MSG.PROD.MAS
+MSG.PROD.PAS
+MSG.PROD.SC
+MSG.PROD.TAC
+REQ.PROD.AAA
+REQ.PROD.AUTO
+REQ.PROD.FD
+REQ.PROD.MAS
+REQ.PROD.PAS
+REQ.PROD.SC
+REQ.PROD.TAC
+RESP.PROD.AAA
+RESP.PROD.AUTO
+RESP.PROD.FD
+RESP.PROD.MAS
+RESP.PROD.PAS
+RESP.PROD.SC
+RESP.PROD.TAC
 
-    See Also
-    --------
-    Message
-    MistMessage
-    Config
-    Specification
-    Field
-    MsgFieldIterator
+See Also
+--------
+Message
+MistMessage
+Config
+Specification
+Field
+MsgFieldIterator
 
-    CONSTRUCTORS:
+CONSTRUCTORS:
 
-    ProductFileMessage(self, subject, responseStatus, productType, productSubtype, version)
+>>> ProductFileMessage(self, subject, responseStatus, msgKind, productType, productSubtype, spec)
 
-    Initializes the message instance.
+    Initializes the message instance and automatically builds a schema ID based on params given.
 
     Parameters
     ----------
     subject: The subject string for the message.
     responseStatus: RESPONSE-STATUS field to indert into a MSG PROD message.
+    msgKind: The kind of message to instantiate.
     productType: PROD-TYPE field to insert into a MSG PROD message.
     productSubtype: PROD-SUBTYPE field to indert into a MSG PROD message.
-    version: The version of the GMSEC message specification to be used.
+    spec: The specification this message's schema will adhere to.
 
-    ProductFileMessage(self, config, subject, responseStatus, productType, productSubtype, version)
+    Exceptions
+    ----------
+    An Exception is thrown if Specification fails to load the template directory or if a valid schemaID cannot be created from the given params.
 
-    Initializes the message instance.
+
+
+>>> ProductFileMessage(self, subject, responseStatus, msgKind, productType, productSubtype, config, spec)
+
+    Initializes the message instance and associates a Configuration object and automatically builds a schema ID based on params given.
 
     Parameters
     ----------
+    subject: The subject string for the message.
+    responseStatus: RESPONSE-STATUS field to indert into a MSG PROD message.
+    msgKind: The kind of message to instantiate.
+    productType: PROD-TYPE field to insert into a MSG PROD message.
+    productSubtype: PROD-SUBTYPE field to indert into a MSG PROD message.
     config: A configuration to associate with the message.
+    spec: The specification this message's schema will adhere to.
+
+    Exceptions
+    ----------
+    An Exception is thrown if Specification fails to load the template directory or if a valid schemaID cannot be created from the given params.
+
+
+
+>>> ProductFileMessage(self, subject, responseStatus, schemaID, spec)
+
+    Initializes the message with a given schema ID
+
+    Parameters
+    ----------
     subject: The subject string for the message.
     responseStatus: RESPONSE-STATUS field to indert into a MSG PROD message.
-    productType: PROD-TYPE field to insert into a MSG PROD message.
-    productSubtype: PROD-SUBTYPE field to indert into a MSG PROD message.
-    version: The version of the GMSEC message specification to be used.
+    schemaID: The string used to identify the message schema in the GMSEC ISD. The schema ID has the messageKind.messageType.messageSubtype (e.g. MSG.PROD.AUTO).
+    spec: The specification this message's schema will adhere to.
 
-    ProductFileMessage(self, other)
+    Exceptions
+    ----------
+    An Exception is thrown if Specification fails to load the template directory or if schemaID is not a valid ID.
+
+
+
+>>> ProductFileMessage(self, subject, responseStatus, schemaID, config, spec)
+
+    Initializes the message with a given schema ID
+
+    Parameters
+    ----------
+    subject: The subject string for the message.
+    responseStatus: RESPONSE-STATUS field to indert into a MSG PROD message.
+    schemaID: The string used to identify the message schema in the GMSEC ISD. The schema ID has the messageKind.messageType.messageSubtype (e.g. MSG.PROD.AUTO).
+    config: A configuration to associate with the message.
+    spec: The specification this message's schema will adhere to.
+
+    Exceptions
+    ----------
+    An Exception is thrown if Specification fails to load the template directory or if schemaID is not a valid ID.
+
+
+
+>>> ProductFileMessage(self, other)
 
     Copy constructor - initializes the message instance using the other given ProductFileMessage.
 
@@ -72,13 +121,39 @@
     ----------
     other: The other ProductFileMessage object to copy.
 
-    ProductFileMessage(self, data)
+
+
+>>> ProductFileMessage(self, data)
 
     Initializes a ProductFileMessage using an XML or JSON string.
 
     Parameters
     ----------
     data: XML or JSON string used to initialize the ProductFileMessage.
+
+    Exceptions
+    ----------
+    An Exception is thrown if the given data does not represent a valid XML or JSON statement.
+
+    Note
+    ----------
+    This constructor has been deprecated. Use ProductFileMessage(self, spec, data) instead.
+
+
+
+>>> ProductFileMessage(self, spec, data)
+
+    Initializes a ProductFileMessage using an XML or JSON string.
+
+    Parameters
+    ----------
+    spec: The specification this message's schema will adhere to.
+    data: XML or JSON string used to initialize the ProductFileMessage.
+
+    Exceptions
+    ----------
+    An Exception is thrown if the given data does not represent a valid XML or JSON statement.
+    An Exception is thrown if the given data does not represent a Product File Message.
 ";
 
 

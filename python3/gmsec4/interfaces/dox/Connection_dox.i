@@ -8,14 +8,14 @@
     through the Connection \"interface\".
 
     The connection class provides services available on an implemented
-    GMSEC connection. An application can create multiple connection
-    objects with different parameters and different middleware.
+    GMSEC connection. An application can create multiple Connections
+    with different parameters and different middleware.
     Creating multiple connections to the same middleware is not
     prevented but may not be supported by all middleware
     implementations.
 
-    Connection objects make use of a AutoMutex by default and are
-    therefore considered thread-safe.
+    Connections make use of a Mutex by default and are therefore
+    considered thread-safe.
 
     Example creation and use:
 
@@ -34,7 +34,7 @@
         # Disconnect from middleware server
         conn.disconnect()
 
-        # Destroy the Connection object
+        # Destroy the Connection
         Connection.destroy(conn)
 
     except GmsecError as e:
@@ -47,9 +47,9 @@
 
 %feature("docstring") gmsec::api::Connection::getLibraryRootName "
 
-    getLibraryRootName(self) -> char const *
+    get_library_root_name(self) -> str
 
-    This function identifies the root library name and therefore the
+    This method identifies the root library name and therefore the
     connection type that this connection is associated with.
 
     Returns
@@ -59,15 +59,14 @@
 
 %feature("docstring") gmsec::api::Connection::shutdownAllMiddlewares "
 
-    shutdownAllMiddlewares()
+    shutdown_all_middlewares()
 
-    Calls shutdown routines for each middleware that has a shutdown
-    routine registered.
+    Calls shutdown routines for each middleware that has a shutdown routine registered.
 ";
 
 %feature("docstring") gmsec::api::Connection::excludeSubject "
 
-    excludeSubject(self, subject)
+    exclude_subject(self, subject: str)
 
     Exclude any incoming messages with the specified subject.
 
@@ -78,21 +77,20 @@
 
 %feature("docstring") gmsec::api::Connection::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
-    Returns the name of the connection, automatically generated or user
-    specified.
+    Returns the name of the connection, automatically generated or user specified.
 
     Returns
     -------
-    A string
+    The connection name.
 ";
 
 %feature("docstring") gmsec::api::Connection::connect "
 
     connect(self)
 
-    This function establishes this connection to the middleware
+    This method establishes this connection to the middleware
 
     Exceptions
     ----------
@@ -103,15 +101,15 @@
 
     destroy(conn)
 
-    This static method is used to destroy the Connection object.
+    This static method is used to destroy the Connection.
 
     Parameters
     ----------
-    conn: the Connection object to destroy
+    conn: the Connection to destroy
 
     Exceptions
     ----------
-    A GmsecError is thrown if connection object is NULL.
+    A GmsecError is thrown if Connection is NULL.
 
     See Also
     --------
@@ -120,82 +118,81 @@
 
 %feature("docstring") gmsec::api::Connection::request "
 
-    request(self, request, timeout, cb, republish_ms=0)
+    request(self, request: Message, timeout: int, cb: ReplyCallback, republish_ms=0: int)
 
-    This function will send a request asyncronously. The callback will
+    This method will send a request asyncronously. The callback will
     be called for the reply if it is received within the specified
-    timeout. This function will not block. The timeout value is
+    timeout. This method will not block. The timeout value is
     expressed in milliseconds.
 
     Note: The actual Message that is sent to the middleware will
     contain tracking fields; to disable this feature, create a
-    Connection object with the tracking=off configuration option.
+    Connection with the tracking=off configuration option.
 
     Parameters
     ----------
-    request: request message to be sent
-    timeout: maximum time to wait for reply (in milliseconds)
-    cb: Callback to call when reply is received
-    republish_ms - request message resubmission interval (in
-    milliseconds). If set to a negative value (eg.
-    GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request
-    message.  If set to 0, the period will default to 60000ms, unless
-    the user has provided an alternate time period via the Config
-    object used to create the Connection object. The minimum republish
-    period allowed is 100ms.
+    request      : Request message to be sent
+    timeout      : Maximum time to wait for reply (in milliseconds)
+    cb           : User-defined ReplyCallback to call when reply is received
+    republish_ms : Request message resubmission interval (in milliseconds).
+                   If set to a negative value (eg. GMSEC_REQUEST_REPUBLISH_NEVER)
+                   it will never republish a request message. If set to 0, the period
+                   will default to 60000ms, unless the user has provided an alternate
+                   time period via the Config used to create the Connection. The
+                   minimum republish period allowed is 100ms.
 
     Exceptions
     ----------
-    A GmsecError is thrown on error with generating async request, or
-    if ReplyCallback is NULL.
+    A GmsecError is thrown on error with generating async request, or if ReplyCallback is NULL.
 
     See Also
     --------
-    cancelRequest()
+    ReplyCallback
+    cancel_request()
 
-    request(self, request, timeout, republish_ms=0) -> Message
 
-    This function will send a request, wait for the specified timeout,
+
+    request(self, request: Message, timeout: int, republish_ms=0: int) -> Message
+
+    This method will send a request, wait for the specified timeout,
     and return the received reply.
-    This function will block until the reply is received or the timeout
+    This method will block until the reply is received or the timeout
     is reached.
     The timeout value is expressed in milliseconds.
 
     Note: The actual Message that is sent to the middleware will
-    contain tracking fields; to disable this feature, create a
-    Connection object with the tracking=off configuration option.
+          contain tracking fields; to disable this feature, create a
+          Connection with the tracking=off configuration option.
 
     Parameters
     ----------
-    request: request message to be sent
-    timeout:  maximum time to wait for reply (in milliseconds)
-    republish_ms - request message resubmission interval (in
-    milliseconds). If set to a negative value (eg.
-    GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request
-    message.  If set to 0, the period will default to 60000ms, unless
-    the user has provided an alternate time period via the Config
-    object used to create the Connection object.  The minimum republish
-    period allowed is 100ms.
+    request      : Request message to be sent
+    timeout      : Maximum time to wait for reply (in milliseconds)
+    republish_ms : Request message resubmission interval (in milliseconds).
+                   If set to a negative value (eg. GMSEC_REQUEST_REPUBLISH_NEVER)
+                   it will never republish a request message. If set to 0, the period
+                   will default to 60000ms, unless the user has provided an alternate
+                   time period via the Config used to create the Connection. The
+                   minimum republish period allowed is 100ms.
 
     Returns
     -------
-    Reply Message, or null if no reply received in time
+    Reply Message, or None if no reply received in time.
 
     Exceptions
     ----------
-    A GmsecError is thrown on error transmitting request message
+    A GmsecError is thrown on error transmitting request message.
 
     See Also
     --------
     release()
-
 ";
 
 %feature("docstring") gmsec::api::Connection::getLibraryVersion "
 
-    getLibraryVersion(self) -> char const *
+    get_library_version(self) -> str
 
-    This function returns a string containing the version information
+    This method returns a string containing the version information
     for this connection's associated middleware.
 
     Returns
@@ -205,19 +202,19 @@
 
 %feature("docstring") gmsec::api::Connection::release "
 
-    release(self, message)
+    release(self, message: Message)
 
-    This function will destroy a Message object that has been returned
+    This method will destroy a Message that has been returned
     by receive(). This method should NOT be used to destroy any other
-    Message object.
+    Message.
 
     Parameters
     ----------
-    message: message to be released/destroyed
+    message : Message to be released/destroyed
 
     Exceptions
     ----------
-    A GmsecError is thrown on error
+    A GmsecError is thrown on error.
 
     See Also
     --------
@@ -227,30 +224,28 @@
 
 %feature("docstring") gmsec::api::Connection::getPublishQueueMessageCount "
 
-    getPublishQueueMessageCount(self) -> GMSEC_U64
+    get_publish_queue_message_count(self) -> GMSEC_U64
 
-    Retrieves the number of messages queued for asynchronous publish
-    operations
+    Retrieves the number of messages queued for asynchronous publish operations
 
     Returns
     -------
-    The number of messages in the publish queue
+    The number of messages in the publish queue.
 ";
 
 %feature("docstring") gmsec::api::Connection::create "
 
-    create(cfg) -> Connection
+    create(config: Config) -> Connection
 
-    This static method can be used to create a Connection object.
+    This static method can be used to create a Connection.
 
     Parameters
     ----------
-    cfg: the Config object that specifies the type of Connection object
-    to create.
+    config : The Config that specifies the type of Connection to create.
 
     Returns
     -------
-    Pointer to Connection object.
+    A handle to a Connection.
 
     Exceptions
     ----------
@@ -264,9 +259,9 @@
 
 %feature("docstring") gmsec::api::Connection::getAPIVersion "
 
-    getAPIVersion() -> char const *
+    get_API_version() -> str
 
-    This function identifies the version of the API.
+    This method identifies the version of the API.
 
     Returns
     -------
@@ -275,16 +270,14 @@
 
 %feature("docstring") gmsec::api::Connection::registerEventCallback "
 
-    registerEventCallback(self, event, cb)
+    register_event_callback(self, event: Connection.ConnectionEvent, cb: EventCallback)
 
-    This function allows the registration of a callback for a
-    particular error event.
+    This method allows the registration of a callback for a particular error event.
 
     Parameters
     ----------
-    event: type of event to register
-    cb: object derived from EventCallback to register for this error
-    event
+    event : Type of event to register
+    cb    : User-defined EventCallback to register for this error event.
 
     Exceptions
     ----------
@@ -293,121 +286,122 @@
     See Also
     --------
     EventCallback
-
 ";
 
 %feature("docstring") gmsec::api::Connection::unsubscribe "
 
-    unsubscribe(self, info)
+    unsubscribe(self, info: SubscriptionInfo)
 
-    This function unsubscribes to a particular subject pattern, and
+    This method unsubscribes to a particular subject pattern, and
     will stop the reception of messages that match this pattern. It
     will also remove the registration of any callbacks with this
     subject pattern.
 
     Parameters
     ----------
-    info: SubscriptionInfo handle from subscription.
+    info : SubscriptionInfo handle from subscription.
 
     See Also
     --------
     subscribe()
     receive()
     dispatch()
-    startAutoDispatch()
-    stopAutoDispatch()
-
+    start_auto_dispatch()
+    stop_auto_dispatch()
 ";
 
 %feature("docstring") gmsec::api::Connection::publish "
 
-    publish(self, msg)
+    publish(self, msg: Message)
 
-    This function will publish a message to the middleware.
+    This method will publish a message to the middleware.
 
     Note: The actual Message published to the middleware will contain
     tracking fields; to disable this feature, create a Connection
-    object with the tracking=off configuration option.
+    with the tracking=off configuration option.
 
     Parameters
     ----------
-    msg: message to be published
+    msg : Message to be published
 
     Exceptions
     ----------
-    A GmsecError is thrown if error occurs while attempting to publish
-    the message
+    A GmsecError is thrown if error occurs while attempting to publish the message
 
     See Also
     --------
     subscribe()
     receive()
-    startAutoDispatch()
-    stopAutoDispatch()
+    start_auto_dispatch()
+    stop_auto_dispatch()
 
-    publish(self, msg, config)
 
-    This function will publish a message to the middleware
-    using the config object provided to toggle between special
+
+    publish(self, msg: Message, config: Config)
+
+    This method will publish a message to the middleware
+    using the Config provided to toggle between special
     middleware-level publish functionalities. (eg. ActiveMQ - Durable
     Producer)
 
     Note: The actual Message published to the middleware will contain
     tracking fields; to disable this feature, create a Connection
-    object with the tracking=off configuration option.
+    with the tracking=off configuration option.
 
     Parameters
     ----------
-    msg: message to be published
-    config: config object to be used by the publish operation
+    msg    : Message to be published
+    config : Config to be used by the publish operation
 
     Exceptions
     ----------
-    A GmsecError is thrown if error occurs while attempting to publish
-    the message
+    A GmsecError is thrown if error occurs while attempting to publish the message
 
     See Also
     --------
     subscribe()
     receive()
-    startAutoDispatch()
-    stopAutoDispatch()
+    start_auto_dispatch()
+    stop_auto_dispatch()
 ";
 
 %feature("docstring") gmsec::api::Connection::shutdownMiddleware "
 
-    shutdownMiddleware(name)
+    shutdown_middleware(name: str)
 
     Calls the shutdown routine for the middleware with the given name.
 
     Parameters
     ----------
-    name: A string representing the library name of the GMSEC wrapper
-    for the middleware to shutdown; e.g., \"gmsec_mb\".
+    name : A string representing the library name of the GMSEC wrapper
+           for the middleware to shutdown; e.g., \"gmsec_mb\".
 ";
 
 %feature("docstring") gmsec::api::Connection::cancelRequest "
 
-    cancelRequest(self, cb)
+    cancel_request(self, cb: ReplyCallback)
 
-    This function can be used to cancel a pending request that may be
+    This method can be used to cancel a pending request that may be
     associated with the given ReplyCallback.
 
     Parameters
     ----------
-    cb: The ReplyCallback to disassociate from any pending requests.
+    cb : ReplyCallback to disassociate from any pending requests.
 
     See Also
     --------
-    request(request, timeout, cb, republish_ms = 0)
+    request(request, timeout, cb, republish_ms)
 
+    Note
+    --------
+    This method is NOT functional. 
 ";
 
 %feature("docstring") gmsec::api::Connection::startAutoDispatch "
 
-    startAutoDispatch(self) -> bool
+    start_auto_dispatch(self) -> bool
 
-    This function will start a thread that will dispatch messages
+    This method will start a thread that will dispatch messages
     asynchronously when they are received. If this is used, all
     subscriptions must be made with callbacks or the messages with be
     dropped. If receive() is called while the auto-dispatcher is used,
@@ -415,43 +409,41 @@
 
     Returns
     -------
-    A value of true is returned if the auto-dispatcher has been
-    started; false otherwise.
+    True if the auto-dispatcher has been started; False otherwise.
 ";
 
 %feature("docstring") gmsec::api::Connection::stopAutoDispatch "
 
-    stopAutoDispatch(self, waitForCompletion=True) -> bool
+    stop_auto_dispatch(self, waitForCompletion=True: bool) -> bool
 
-    This function will stop the auto dispatch thread.
+    This method will stop the auto dispatch thread.
 
     Parameters
     ----------
-    [optional] waitForCompletion: if set to false, this method will not
-    block; otherwise the method will block until the auto-dispatch
-    thread has completed running.
+    waitForCompletion : If set to false, this method will not
+                        block; otherwise the method will block until the auto-dispatch
+                        thread has completed running.
 
     Returns
     -------
-    A value of true is returned if the auto-dispatcher was running and
-    has been stopped; false otherwise. If the waitForCompletion flag is
-    set to false, then users can expect a return value of false.
+    True if the auto-dispatcher was running and has been stopped; False otherwise.
+    If the waitForCompletion flag is set to False, then users can expect a return value of False.
 
     See Also
     --------
-    Connection::startAutoDispatch()
+    Connection.start_auto_dispatch()
 ";
 
 %feature("docstring") gmsec::api::Connection::dispatch "
 
-    dispatch(self, msg)
+    dispatch(self, msg: Message)
 
-    This function will cause the any callbacks that are registered with
+    This method will cause the any callbacks that are registered with
     matching message subject patterns to be called.
 
     Parameters
     ----------
-    msg: message to be dispatched
+    msg : Message to be dispatched
 
     Exceptions
     ----------
@@ -465,7 +457,7 @@
 
 %feature("docstring") gmsec::api::Connection::setName "
 
-    setName(self, name)
+    set_name(self, name: str)
 
     Set the logical name of this connection. This can be used for
     identifying connections withing a client program. If a name is not
@@ -473,38 +465,41 @@
 
     Parameters
     ----------
-    name: name of this connection
+    name : Name of this connection
 ";
 
 %feature("docstring") gmsec::api::Connection::getMWInfo "
 
-    getMWInfo(self) -> char const *
+    get_MW_info(self) -> str
 
     Returns a string containing middleware information.
 ";
 
 %feature("docstring") gmsec::api::Connection::receive "
 
-    receive(self, timeout=-1) -> Message
+    receive(self, timeout=-1: int) -> Message
 
-    This function returns the next message received within the
+    This method returns the next message received within the
     specified timeout.
     The received messages are determined by the message subscriptions
-    set up with the subscribe() function(s).
+    set up with the subscribe() method(s).
 
-    Note: This function MUST NOT BE USED if the auto-dispatcher is
+    Note: This method MUST NOT BE USED if the auto-dispatcher is
     being used.
 
     Parameters
     ----------
-    timeout: the maximum time (in milliseconds) to block waiting for a
-    message; if -1 is specified for the timeout, then the call will
-    block indefinitely.
+    timeout : The maximum time (in milliseconds) to block waiting for a
+              message; if -1 is specified for the timeout, then the call will
+              block indefinitely.
 
     Returns
     -------
-    A pointer to the next available Message, or NULL if a timeout
-    occurs. All received messages should be destroyed using release().
+    The next available Message, or None if a timeout occurs.
+
+    Note
+    -------
+    All received messages should be destroyed using release().
 
     Exceptions
     ----------
@@ -515,17 +510,16 @@
     subscribe()
     dispatch()
     release()
-
 ";
 
 %feature("docstring") gmsec::api::Connection::subscribe "
 
-    subscribe(self, subject, cb=None) -> SubscriptionInfo
+    subscribe(self, subject: str, cb=None: Callback) -> SubscriptionInfo
 
-    This function subscribes to a particular subject or pattern and
+    This method subscribes to a particular subject or pattern and
     associates a callback to be called when messages matching the
     subject or pattern are received. If all subscriptions are performed
-    using this function then the auto-dispatcher can be used to
+    using this method then the auto-dispatcher can be used to
     asynchronously receive messages. If receive() is used to pull
     messages then dispatch() will need to be called to ensure
     registered Callbacks are called.
@@ -560,31 +554,37 @@
 
     Parameters
     ----------
-    subject: subject pattern to match received messages
-    cb: callback to be called when message is received
+    subject : Subject pattern to match received messages
+    cb      : User-defined Callback to be called when message is received
 
     Returns
     -------
-    handle used to cancel or modify subscription.
+    SubscriptionInfo used to cancel or modify subscription.
+
+    Note
+    -------
     Connection maintains ownership of SubscriptionInfo; user should
-    not delete but instead call unsubscribe() to free resource.
+    not delete but instead call unsubscribe() to free resource. Only
+    under rare circumstances should user retain handle to SubscriptionInfo.
 
     Exceptions
     ----------
-    A GmsecError is thrown on error establishing subscription
+    A GmsecError is thrown on error establishing subscription.
 
     See Also
     --------
     unsubscribe()
     receive()
     dispatch()
-    startAutoDispatch()
-    stopAutoDispatch()
+    start_auto_dispatch()
+    stop_auto_dispatch()
 
-    subscribe(self, subject, config, cb=None) -> SubscriptionInfo
 
-    This function subscribes to a particular subject or pattern and
-    uses the provided config object to enable or disable middleware-
+
+    subscribe(self, subject:str, config: Config, cb=None: Callback) -> SubscriptionInfo
+
+    This method subscribes to a particular subject or pattern and
+    uses the provided Config to enable or disable middleware-
     level subscription functionalities (e.g. ActiveMQ Durable Consumer).
     If a callback is specified, then the auto-dispatcher can be used to
     deliver messages to the callback. If receive() is used to pull
@@ -596,15 +596,19 @@
 
     Parameters
     ----------
-    subject: subject pattern to match received messages
-    config: config object to be used for subscription operation
-    cb: callback to be called when message is received
+    subject : Subject pattern to match received messages
+    config  : Config to be used for subscription operation
+    cb      : User-defined Callback to be called when message is received
 
     Returns
     -------
-    handle used to cancel or modify subscription.
+    SubscriptionInfo used to cancel or modify subscription.
+
+    Note
+    -------
     Connection maintains ownership of SubscriptionInfo; user should
-    not delete but instead call unsubscribe() to free resource.
+    not delete but instead call unsubscribe() to free resource. Only
+    under rare circumstances should user retain handle to SubscriptionInfo.
 
     Exceptions
     ----------
@@ -614,14 +618,13 @@
     --------
     unsubscribe()
     receive()
-
 ";
 
 %feature("docstring") gmsec::api::Connection::disconnect "
 
     disconnect(self)
 
-    This function terminates this connection to the middleware.
+    This method terminates this connection to the middleware.
     It is automatically called by the destructor if necessary
 
     Exceptions
@@ -631,19 +634,18 @@
 
 %feature("docstring") gmsec::api::Connection::reply "
 
-    reply(self, request, reply)
+    reply(self, request: Message, reply: Message)
 
-    This function will send a reply in response to a given request.
+    This method will send a reply in response to a given request.
 
     Note: The actual Message that is sent to the middleware will
     contain tracking fields; to disable this feature, create a
-    Connection object with the tracking=off configuration option.
+    Connection with the tracking=off configuration option.
 
     Parameters
     ----------
-    request: the request message that was received, and to which we
-    are responding to
-    reply: the reply message to be sent
+    request : The request Message that was received, and to which we are responding to
+    reply   : The reply Message to be sent
 
     Exceptions
     ----------
@@ -652,33 +654,30 @@
 
 %feature("docstring") gmsec::api::Connection::removeExcludedSubject "
 
-    removeExcludedSubject(self, subject)
+    remove_excluded_subject(self, subject: str)
 
     Remove an excluded subject, allowing incoming messages with the
     matching subject to once again be received.
 
     Parameters
     ----------
-    subject: The subject pattern to remove.
+    subject : The subject pattern to remove.
 ";
 
 %feature("docstring") gmsec::api::Connection::getID "
 
-    getID(self) -> char const *
+    get_id(self) -> str
 
     Get the string ID for this connection.
-
 ";
 
 %feature("docstring") gmsec::api::Connection::getState "
 
-    getState(self) -> gmsec::api::Connection::ConnectionState
+    get_state(self) -> Connection::ConnectionState
 
-    This function returns the current state of the connection to the
-    middleware.
+    This method returns the current state of the connection to the middleware.
 
     Returns
     -------
     Enumerated ConnectionState value.
 ";
-

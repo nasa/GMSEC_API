@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -67,7 +67,7 @@ public class Status : global::System.IDisposable {
   ///
   /// <param name="eclass">Status class</param>
   /// <param name="code">Status code</param>
-  /// <param name="test">Status reason</param>
+  /// <param name="text">Status reason</param>
   /// <param name="custom">Custom error code</param>
   public void Set(StatusClass eclass, StatusCode code, string text, int custom) {
   }

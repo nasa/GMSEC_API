@@ -7,52 +7,28 @@
 
     CONSTRUCTOR:
 
-    U8Field(self, name, value)
+    U8Field(self, name: str, value: ubyte)
 
-    Constructor for creating a specialized Field object containing an
+    Constructor for creating a specialized Field containing an
     unsigned 8-bit value
 
     Parameters
     ----------
-    name: the name of the Field
-    value: the value to store
+    name  : The name of the Field
+    value : The value to store
 
     Exceptions
     ----------
-    A GmsecError is thrown if the name is NULL, or is an empty string.
+    A GmsecError is thrown if the name is None, or is an empty string.
 ";
 
 %feature("docstring") gmsec::api::U8Field::getValue "
 
-    getValue(self) -> GMSEC_U8
+    get_value(self) -> ubyte
 
-    Exposes the underlying value held by the object.
-
-    Returns
-    -------
-    Returns the value associated with the object.
-";
-
-%feature("docstring") gmsec::api::U8Field::toJSON "
-
-    toJSON(self) -> char const *
-
-    Convenience method that returns the JSON string representation of
-    this object.
+    Exposes the underlying value held by the field.
 
     Returns
     -------
-    A JSON string.
-";
-
-%feature("docstring") gmsec::api::U8Field::toXML "
-
-    toXML(self) -> char const *
-
-    Convenience method that returns the XML string representation of
-    this object.
-
-    Returns
-    -------
-    An XML string.
+    Returns the value associated with the field.
 ";

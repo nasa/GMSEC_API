@@ -1,4 +1,4 @@
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -19,11 +19,8 @@ FRAMEWORK_DIR   = ../../framework
 
 GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include/c++/$(shell $(CXX) -dumpversion)
 
-PYTHON          = $(PYTHON3_HOME)/bin/python3
-PYTHON_VERSION  = $(shell LD_LIBRARY_PATH=$(PYTHON3_HOME)/lib $(PYTHON) --version 2>&1 | cut -d' ' -f2 | awk 'BEGIN{FS="."}{print $$1"."$$2}')
-
-API_CXXFLAGS   += -I$(PYTHON3_HOME)/include/python$(PYTHON_VERSION)m
-LDFLAGS        += -L$(PYTHON3_HOME)/lib -lpython$(PYTHON_VERSION)m
+API_CXXFLAGS   += $(shell $(PYTHON3_HOME)/bin/python3-config --includes)
+LDFLAGS        += $(shell $(PYTHON3_HOME)/bin/python3-config --ldflags)
 
 COREOBJDIR      = $(FRAMEWORK_DIR)/src/gmsec4
 INTERNALOBJDIR  = $(FRAMEWORK_DIR)/src/gmsec4/internal

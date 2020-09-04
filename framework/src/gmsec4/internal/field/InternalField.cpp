@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -97,7 +97,16 @@ const char* InternalField::getName() const
 
 void InternalField::setName(const char* name)
 {
-	m_name = name;
+	if (!name || StringUtil::stringLength(name) == 0)
+	{
+		throw Exception(FIELD_ERROR, INVALID_FIELD_NAME,
+			"Field name cannot be NULL, nor an empty string");
+	}
+
+	m_name = StringConverter::instance().convertString(name);
+
+	m_xml  = "";
+	m_json = "";
 }
 
 

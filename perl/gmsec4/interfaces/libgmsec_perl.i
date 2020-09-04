@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,6 +21,8 @@
 %apply char* {unsigned char*};
 
 %module libgmsec_perl
+
+#pragma SWIG nowarn=314,451
 
 %include gmsec_version.i
 
@@ -68,6 +70,7 @@ Not current supported due to instability issues
 %include ConfigFile.i
 %include ConfigFileIterator.i
 %include MessageFieldIterator.i
+%include HeartbeatGenerator.i
 
 %include mist/ConnectionManager.i
 /*
@@ -131,6 +134,8 @@ Customers are welcome to contact the GMSEC Team at L<mailto:gmsec-support@lists.
 
 =for html <a href="Exception.html">Exception</a><br><br>
 
+=for html <a href="HeartbeatGenerator.html">HeartbeatGenerator</a><br><br>
+
 =for html <a href="Message.html">Message</a><br><br>
 
 =for html <a href="MessageFieldIterator.html">MessageFieldIterator</a><br><br>
@@ -185,33 +190,37 @@ Customers are welcome to contact the GMSEC Team at L<mailto:gmsec-support@lists.
 
 =for html <a href="mist/DeviceParam.html">DeviceParam</a><br><br>
 
+=for html <a href="mist/FieldSpecification.html">FieldSpecification</a><br><br>
+
+=for html <a href="mist/MessageSpecification.html">MessageSpecification</a><br><br>
+
 =for html <a href="mist/mist_defs.html">MIST Definitions</a><br><br>
 
 =for html <a href="mist/Mnemonic.html">Mnemonic</a><br><br>
 
 =for html <a href="mist/MnemonicIterator.html">MnemonicIterator</a><br><br>
 
-=for html <a href="mist/MnemonicSample.html">MnemonicSample></a><br><br>
+=for html <a href="mist/MnemonicSample.html">MnemonicSample</a><br><br>
 
-=for html <a href="mist/ProductFile.html">ProductFile></a><br><br>
+=for html <a href="mist/ProductFile.html">ProductFile</a><br><br>
 
-=for html <a href="mist/ProductFileIterator.html">ProductFileIterator></a><br><br>
+=for html <a href="mist/ProductFileIterator.html">ProductFileIterator</a><br><br>
 
-=for html <a href="mist/SchemaIDIterator.html">SchemaIDIterator></a><br><br>
+=for html <a href="mist/SchemaIDIterator.html">SchemaIDIterator</a><br><br>
 
-=for html <a href="mist/ServiceParam.html">ServiceParam></a><br><br>
+=for html <a href="mist/ServiceParam.html">ServiceParam</a><br><br>
 
-=for html <a href="mist/Specification.html">Specification></a><br><br>
+=for html <a href="mist/Specification.html">Specification</a><br><br>
 
-=for html <a href="mist/SubscriptionInfo.html">SubscriptionInfo></a><br><br>
+=for html <a href="mist/SubscriptionInfo.html">SubscriptionInfo</a><br><br>
 
-=for html <a href="mist/message/DeviceMessage.html">DeviceMessage></a><br><br>
+=for html <a href="mist/message/DeviceMessage.html">DeviceMessage</a><br><br>
 
-=for html <a href="mist/message/MistMessage.html">MistMessage></a><br><br>
+=for html <a href="mist/message/MistMessage.html">MistMessage</a><br><br>
 
-=for html <a href="mist/message/MnemonicMessage.html">MnemonicMessage></a><br><br>
+=for html <a href="mist/message/MnemonicMessage.html">MnemonicMessage</a><br><br>
 
-=for html <a href="mist/message/Devicemessage.html">DeviceMessage></a><br><br>
+=for html <a href="mist/message/ProductFileMessage.html">ProductFileMessage</a><br><br>
 
 =cut
 %}

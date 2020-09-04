@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Copyright 2007-2019 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
 # This script is used to export generated Doxygen files to the
 # GMSEC_API_DOCS/docs/manual folder.
 #

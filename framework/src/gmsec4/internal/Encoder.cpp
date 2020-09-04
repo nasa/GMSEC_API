@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -365,10 +365,7 @@ void MessageEncoder::encode(const Message& message, GMSEC_U64& count, char*& dat
 
 void MessageEncoder::encode(const Message &message, DataBuffer &out)
 {
-	// ick- two pass approach
-	GMSEC_I32 fieldCount = 0;
-
-	size_t length = findLength(message, fieldCount);
+	size_t length = findLength(message);
 
 	if (out.size() < length && !out.resize(length))
 	{
@@ -381,7 +378,7 @@ void MessageEncoder::encode(const Message &message, DataBuffer &out)
 		// accept the passed in buffer
 		buffer.swap(out);
 
-		encode(message, fieldCount);
+		encode(message, (GMSEC_I32) message.getFieldCount());
 
 		// replace- ought to use RAII
 		buffer.swap(out);
@@ -405,7 +402,7 @@ void MessageEncoder::setSelector(FieldSelector s)
 }
 
 
-size_t MessageEncoder::findLength(const Message &message, GMSEC_I32 &fieldCount)
+size_t MessageEncoder::findLength(const Message &message)
 {
 	size_t length = GMSEC_ENCODING_BYTES;
 
@@ -421,13 +418,9 @@ size_t MessageEncoder::findLength(const Message &message, GMSEC_I32 &fieldCount)
 
 	MessageFieldIterator& iter = message.getFieldIterator(selector);
 
-	fieldCount = 0;
-
 	while (iter.hasNext())
 	{
 		const Field& field = iter.next();
-
-		++fieldCount;
 
 		length += updateLength(field);
 	}
@@ -1525,11 +1518,8 @@ void MessageDecoder::decode(Message &message, const DataBuffer &in)
 
 			decoder->getI32(current, &count);
 
-			GMSEC_I32 i = 0;
-			while (i < count)
+			for (GMSEC_I32 i = 0; i < count; ++i)
 			{
-				++i;
-
 				Field* field = decodeField();
 
 				if (field)

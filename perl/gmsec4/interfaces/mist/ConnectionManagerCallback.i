@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,7 +30,7 @@ libgmsec_perl::ConnectionmanagerCallback
 
 This class is the abstract base class for received message callbacks.  A user created class, derived from this class, can be passed into Subscribe() to have user code executed asynchronously when a message is received.
 Please note that because users are able to create their own Callback class, reentrancy is not guaranteed unless if reentrancy rules are specified.
-Also note that because a ConnectionManagerCallback can be registered to multiple ConnectionManagers, it can be run concurrently amongst those ConnectionManagers.  Because of this, the use of libgmsec_perl::AutoMutex is suggested to enforce thread safety.
+Also note that because a ConnectionManagerCallback can be registered to multiple ConnectionManagers, it can be run concurrently amongst those ConnectionManagers.  Because of this, the use of libgmsec_perl::Mutex is suggested to enforce thread safety.
 
 Example ConnectionManagerCallback class:
 

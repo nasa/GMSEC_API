@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -100,6 +100,9 @@ sub main
 		if ($message != undef)
 		{
 			libgmsec_perl::LogInfo("Received message:\n" . $message->toXML());
+
+			# Dispose of received message
+			$connMgr->release($message);
 		}
 
 		#o Disconnect from the middleware and clean up the Connection

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,15 +22,15 @@
 #include <gmsec4/mist/mist_defs.h>
 
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <limits>
-#include <memory>
 #include <sstream>
 
 using namespace gmsec::api::internal;
-using namespace gmsec::api::util;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::util;
 
 
 namespace gmsec
@@ -57,7 +57,7 @@ InternalMistMessage::InternalMistMessage(const char* subject,
 	  m_spec(0),
 	  m_template()
 {
-	std::auto_ptr<Specification> managedSpec(new Specification(spec));
+	StdUniquePtr<Specification> managedSpec(new Specification(spec));
 
 	m_spec = managedSpec.get();
 
@@ -80,7 +80,7 @@ InternalMistMessage::InternalMistMessage(const char* subject,
 	  m_spec(0),
 	  m_template()
 {
-	std::auto_ptr<Specification> managedSpec(new Specification(spec));
+	StdUniquePtr<Specification> managedSpec(new Specification(spec));
 
 	m_spec = managedSpec.get();
 
@@ -99,7 +99,7 @@ InternalMistMessage::InternalMistMessage(const InternalMistMessage& other)
 	  m_spec(0),
 	  m_template()
 {
-	std::auto_ptr<Specification> managedSpec(new Specification(*other.m_spec));
+	StdUniquePtr<Specification> managedSpec(new Specification(*other.m_spec));
 
 	m_spec = managedSpec.get();
 
@@ -202,8 +202,8 @@ InternalMistMessage::InternalMistMessage(const char* data)
 	}
 	
 	// If we have made it here, then we can finally instantiate our Specification object
-	// but we guard it using an std::auto_ptr in case other anomalies occur.
-	std::auto_ptr<Specification> managedSpec(new Specification(specCfg));
+	// but we guard it using a StdUniquePtr in case other anomalies occur.
+	StdUniquePtr<Specification> managedSpec(new Specification(specCfg));
 
 	m_spec = managedSpec.get();
 
@@ -214,6 +214,46 @@ InternalMistMessage::InternalMistMessage(const char* data)
 	managedSpec.release();
 
 	init();
+}
+
+
+InternalMistMessage::InternalMistMessage(const Specification& spec, const char* data)
+	: InternalMessage(data),
+	  m_valid(false),
+	  m_valueBuffer(),
+	  m_spec(0),
+	  m_template()
+{
+	StdUniquePtr<Specification> managedSpec(new Specification(spec));
+
+	m_spec = managedSpec.get();
+
+	std::string schemaID = deduceSchemaID(*this);
+
+	registerTemplate(schemaID.c_str());
+
+	managedSpec.release();
+
+	init();
+
+	const MessageFieldIterator& iter = getFieldIterator();
+
+	while (iter.hasNext())
+	{
+		const Field& field = iter.next();
+
+		try {
+			const FieldTemplate& fieldTemp = findFieldTemplate(field.getName());
+
+			if (fieldTemp.hasExplicitType()) {
+				// Convert field, if necessary, for the given Specification.
+				setValue(field.getName(), field.getStringValue());
+			}
+		}
+		catch (...) {
+			// Ignore error
+		}
+	}
 }
 
 
@@ -338,22 +378,22 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		throw Exception(MSG_ERROR, INVALID_FIELD_VALUE, "Field value cannot be NULL");
 	}
 
-	const FieldTemplate* temp = NULL;
+	const FieldTemplate* fieldTemp = NULL;
 
 	try
 	{//first find the template and see if it works
-		temp = &(findFieldTemplate(fieldName));
+		fieldTemp = &(findFieldTemplate(fieldName));
 	}
 	catch (...)
-	{//if fieldTemplate does not exist, add StringField to the message
+	{//if fieldTemplate does not exist, default to type given
 		addField(fieldName, value);
 		return;
 	}
 
-	const FieldTemplate fieldTemplate = *temp;
+	//found the template, get the type
+	const std::string& type = fieldTemp->getType();
 
-	//found the template, now determine the type
-	std::string type = fieldTemplate.getType();
+	StdUniquePtr<Field> field;
 
 	if(type == "CHAR")
 	{//we can convert string to char, but we'll only accept it if it's one character long
@@ -361,7 +401,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		{
 			GMSEC_CHAR chrValue = StringUtil::getValue<GMSEC_CHAR>(value);
 
-			addField(fieldName, chrValue);
+			field.reset(new CharField(fieldName, chrValue));
 		}
 		catch(...)
 		{
@@ -376,11 +416,11 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		{
 			if(StringUtil::stringEqualsIgnoreCase(value, "true"))
 			{//the value is not a number, so we check to see if it is "true"
-				addField(fieldName, true);
+				field.reset(new BooleanField(fieldName, true));
 			}
 			else if(StringUtil::stringEqualsIgnoreCase(value, "false"))
 			{//not "true", check if it is "false"
-				addField(fieldName, false);
+				field.reset(new BooleanField(fieldName, false));
 			}
 			else
 			{
@@ -388,7 +428,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 
 				if (numValue <= 1)
 				{
-					addField(fieldName, numValue == 1);
+					field.reset(new BooleanField(fieldName, numValue == 1));
 				}
 				else
 				{//it is not 0 or 1
@@ -414,7 +454,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if (numValue >= GMSEC_I64(std::numeric_limits<GMSEC_I8>::min()) &&
 			    numValue <= GMSEC_I64(std::numeric_limits<GMSEC_I8>::max()))
 			{
-				addField(fieldName, (GMSEC_I8) numValue);
+				field.reset(new I8Field(fieldName, (GMSEC_I8) numValue));
 			}
 			else
 			{//int is too big to fit into I8, which can lead to undefined behavior
@@ -446,7 +486,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if (numValue >= GMSEC_I64(std::numeric_limits<GMSEC_I16>::min()) &&
 			    numValue <= GMSEC_I64(std::numeric_limits<GMSEC_I16>::max()))
 			{
-				addField(fieldName, (GMSEC_I16) numValue);
+				field.reset(new I16Field(fieldName, (GMSEC_I16) numValue));
 			}
 			else
 			{//int is too big to fit into I16, which can lead to undefined behavior
@@ -471,7 +511,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if (numValue >= GMSEC_I64(std::numeric_limits<GMSEC_I32>::min()) &&
 			    numValue <= GMSEC_I64(std::numeric_limits<GMSEC_I32>::max()))
 			{
-				addField(fieldName, (GMSEC_I32) numValue);
+				field.reset(new I32Field(fieldName, (GMSEC_I32) numValue));
 			}
 			else
 			{//int is too big to fit into I32, which can lead to undefined behavior
@@ -493,7 +533,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		{
 			GMSEC_I64 numValue = (GMSEC_I64) StringUtil::getValue<GMSEC_I64>(value);
 		
-			addField(fieldName, numValue);
+			field.reset(new I64Field(fieldName, numValue));
 		}
 		catch (...)
 		{
@@ -518,7 +558,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if (numValue >= GMSEC_I64(std::numeric_limits<GMSEC_U8>::min()) &&
 			    numValue <= GMSEC_I64(std::numeric_limits<GMSEC_U8>::max()))
 			{
-				addField(fieldName, (GMSEC_U8) numValue);
+				field.reset(new U8Field(fieldName, (GMSEC_U8) numValue));
 			}
 			else
 			{//int is too big to fit into U8, which can lead to undefined behavior
@@ -550,7 +590,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			if (numValue >= GMSEC_I64(std::numeric_limits<GMSEC_U16>::min()) &&
 			    numValue <= GMSEC_I64(std::numeric_limits<GMSEC_U16>::max()))
 			{
-				addField(fieldName, (GMSEC_U16) numValue);
+				field.reset(new U16Field(fieldName, (GMSEC_U16) numValue));
 			}
 			else
 			{//int is too big to fit into U16, which can lead to undefined behavior
@@ -589,7 +629,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 
 			if (numValue <= GMSEC_I64(std::numeric_limits<GMSEC_U32>::max()))
 			{
-				addField(fieldName, (GMSEC_U32) numValue);
+				field.reset(new U32Field(fieldName, (GMSEC_U32) numValue));
 			}
 			else
 			{
@@ -619,7 +659,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		{
 			GMSEC_U64 numValue = StringUtil::getValue<GMSEC_U64>(value);
 	
-			addField(fieldName, numValue);
+			field.reset(new U64Field(fieldName, (GMSEC_U64) numValue));
 		}
 		catch (...)
 		{
@@ -634,7 +674,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		{
 			GMSEC_F32 fValue = StringUtil::getValue<GMSEC_F32>(value);
 		
-			addField(fieldName, fValue);
+			field.reset(new F32Field(fieldName, fValue));
 		}
 		catch (...)
 		{
@@ -649,7 +689,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		{
 			GMSEC_F64 fValue = StringUtil::getValue<GMSEC_F64>(value);
 
-			addField(fieldName, fValue);
+			field.reset(new F64Field(fieldName, fValue));
 		}
 		catch (...)
 		{
@@ -660,12 +700,12 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 	}
 	else if(type == "STRING")
 	{//a string value can very easily be converted to a string value
-		addField(fieldName, value);
+		field.reset(new StringField(fieldName, value));
 	}
-	else if(type == "UNSET")
-	{//field template has a variable data type, meaning it can be whatever it wants
-	 //today, it's a StringField
-		addField(fieldName, value);
+	else if(type.empty() || type == "UNSET" || type == "VARIABLE")
+	{
+		GMSEC_WARNING << "setValue() is setting variable type field '" << fieldName << "' as a string field within the message";
+		field.reset(new StringField(fieldName, value));
 	}
 	else
 	{//any types not listed can't be converted
@@ -673,6 +713,10 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 		err << "Field template \"" << fieldName << "\" calls for field type " << type.c_str() << ", but value \"" << value << "\" cannot be converted to " << type.c_str();
 		throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 	}
+
+	field->isHeader(fieldTemp->isHeader());
+
+	this->addField(*(field.release()), false);
 }
 
 
@@ -683,32 +727,32 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		throw Exception(MSG_ERROR, INVALID_FIELD_NAME, "Field name cannot be NULL or empty string");
 	}
 
-	const FieldTemplate* temp = NULL;
+	const FieldTemplate* fieldTemp = NULL;
 
 	try
 	{//first find the template and see if it works
-		temp = &(findFieldTemplate(fieldName));
+		fieldTemp = &(findFieldTemplate(fieldName));
 	}
 	catch (...)
-	{//if fieldTemplate does not exist, add StringField to the message
+	{//if fieldTemplate does not exist, default to type given
 		addField(fieldName, value);
 		return;
 	}
 
-	const FieldTemplate fieldTemplate = *temp;
+	//found the template, get the type
+	const std::string& type = fieldTemp->getType();
 
-	//field template found, now determine the type
-	std::string type = fieldTemplate.getType();
-	
+	StdUniquePtr<Field> field;
+
 	if(type == "BOOLEAN" || type == "BOOL")
 	{//we'll only accept 0 or 1 as values
 		if(value == 0)
 		{
-			addField(fieldName, false);
+			field.reset(new BooleanField(fieldName, false));
 		}
 		else if(value == 1)
 		{
-			addField(fieldName, true);
+			field.reset(new BooleanField(fieldName, true));
 		}
 		else
 		{
@@ -722,7 +766,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_I8>::min()) && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_I8>::max()))
 		{
-			addField(fieldName, (GMSEC_I8) value);
+			field.reset(new I8Field(fieldName, (GMSEC_I8) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -743,7 +787,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_I16>::min()) && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_I16>::max()))
 		{
-			addField(fieldName, (GMSEC_I16) value);
+			field.reset(new I16Field(fieldName, (GMSEC_I16) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -757,7 +801,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_I32>::min()) && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_I32>::max()))
 		{
-			addField(fieldName, (GMSEC_I32) value);
+			field.reset(new I32Field(fieldName, (GMSEC_I32) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -768,14 +812,14 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 	}
 	else if(type == "I64")
 	{
-		addField(fieldName, (GMSEC_I64) value);
+		field.reset(new I64Field(fieldName, value));
 	}
 	else if(type == "U8")
 	{
 		if(value >= 0 && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_U8>::max()))
 		{
-			addField(fieldName, (GMSEC_U8) value);
+			field.reset(new U8Field(fieldName, (GMSEC_U8) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -789,7 +833,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if(value >= 0 && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_U16>::max()))
 		{
-			addField(fieldName, (GMSEC_U16) value);
+			field.reset(new U16Field(fieldName, (GMSEC_U16) value));
 		}
 		else
 		{//Tharr value be overflowin', Captain!
@@ -810,7 +854,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 		if (value >= 0 &&
 		    value <= GMSEC_I64(std::numeric_limits<GMSEC_U32>::max()))
 		{
-			addField(fieldName, (GMSEC_U32) value);
+			field.reset(new U32Field(fieldName, (GMSEC_U32) value));
 		}
 		else
 		{
@@ -824,7 +868,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 	{
 		if(value >= 0)
 		{
-			addField(fieldName, (GMSEC_U64) value);
+			field.reset(new U64Field(fieldName, (GMSEC_U64) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -835,22 +879,22 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 	}
 	else if(type == "F32")
 	{
-		addField(fieldName, (GMSEC_F32) value);
+		field.reset(new F32Field(fieldName, (GMSEC_F32) value));
 	}
 	else if(type == "F64")
 	{
-		addField(fieldName, (GMSEC_F64) value);
+		field.reset(new F64Field(fieldName, (GMSEC_F64) value));
 	}
 	else if(type == "STRING")
 	{
 		std::ostringstream oss;
 		oss << value;
-		addField(fieldName, oss.str().c_str());
+		field.reset(new StringField(fieldName, oss.str().c_str()));
 	}
-	else if(type == "UNSET")
-	{//field template has a variable data type, meaning it can be whatever it wants
-	 //today, it's an I64Field
-		addField(fieldName, (GMSEC_I64) value);
+	else if(type.empty() || type == "UNSET" || type == "VARIABLE")
+	{
+		GMSEC_WARNING << "setValue() is setting variable type field '" << fieldName << "' as an I64 field within the message";
+		field.reset(new I64Field(fieldName, value));
 	}
 	else
 	{//any types not listed can't be converted
@@ -858,6 +902,10 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 			err << "Field template \"" << fieldName << "\" calls for field type " << type.c_str() << ", but value " << value << " cannot be converted to " << type.c_str();
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 	}
+
+	field->isHeader(fieldTemp->isHeader());
+
+	this->addField(*(field.release()), false);
 }
 
 
@@ -868,32 +916,33 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		throw Exception(MSG_ERROR, INVALID_FIELD_NAME, "Field name cannot be NULL or empty string");
 	}
 
-	const FieldTemplate* temp = NULL;
+	const FieldTemplate* fieldTemp = NULL;
 
 	try
 	{//first find the template and see if it works
-		temp = &(findFieldTemplate(fieldName));
+		fieldTemp = &(findFieldTemplate(fieldName));
 	}
 	catch (...)
-	{//if fieldTemplate does not exist, add StringField to the message
+	{//if fieldTemplate does not exist, default to type given
 		addField(fieldName, value);
 		return;
 	}
 
-	const FieldTemplate fieldTemplate = *temp;
+	//found the template, get the type
+	const std::string& type = fieldTemp->getType();
 
-	std::string type = fieldTemplate.getType();
-	
+	StdUniquePtr<Field> field;
+
 	if(type == "BOOLEAN" || type == "BOOL")
 	{//we'll only accept 0 or 1 as values
 		//TODO: Fix this. Comparing F64 to an integer!
 		if(value == 0)
 		{
-			addField(fieldName, false);
+			field.reset(new BooleanField(fieldName, false));
 		}
 		else if(value == 1)
 		{
-			addField(fieldName, true);
+			field.reset(new BooleanField(fieldName, true));
 		}
 		else
 		{
@@ -908,7 +957,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I8>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_I8', possible loss of data";
-			addField(fieldName, (GMSEC_I8) value);
+			field.reset(new I8Field(fieldName, (GMSEC_I8) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -930,7 +979,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I16>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_I16', possible loss of data";
-			addField(fieldName, (GMSEC_I16) value);
+			field.reset(new I16Field(fieldName, (GMSEC_I16) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -945,7 +994,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I32>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_I32', possible loss of data";
-			addField(fieldName, (GMSEC_I32) value);
+			field.reset(new I32Field(fieldName, (GMSEC_I32) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -960,7 +1009,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I64>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_I64', possible loss of data";
-			addField(fieldName, (GMSEC_I64) value);
+			field.reset(new I64Field(fieldName, (GMSEC_I64) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -975,7 +1024,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U8>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_U8', possible loss of data";
-			addField(fieldName, (GMSEC_U8) value);
+			field.reset(new U8Field(fieldName, (GMSEC_U8) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -990,7 +1039,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U16>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_U16', possible loss of data";
-			addField(fieldName, (GMSEC_U16) value);
+			field.reset(new U16Field(fieldName, (GMSEC_U16) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -1012,7 +1061,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		    value <= GMSEC_F64(std::numeric_limits<GMSEC_U32>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_U32', possible loss of data";
-			addField(fieldName, (GMSEC_U32) value);
+			field.reset(new U32Field(fieldName, (GMSEC_U32) value));
 		}
 		else
 		{
@@ -1028,7 +1077,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U64>::max()))
 		{
 			GMSEC_WARNING << "conversion from 'GMSEC_F64' to 'GMSEC_U64', possible loss of data";
-			addField(fieldName, (GMSEC_U64) value);
+			field.reset(new U64Field(fieldName, (GMSEC_U64) value));
 		}
 		else
 		{//can't cast because it's outside the limits
@@ -1039,22 +1088,22 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 	}
 	else if(type == "F32")
 	{
-		addField(fieldName, (GMSEC_F32) value);
+		field.reset(new F32Field(fieldName, (GMSEC_F32) value));
 	}
 	else if(type == "F64")
 	{
-		addField(fieldName, (GMSEC_F64) value);
+		field.reset(new F64Field(fieldName, value));
 	}
 	else if(type == "STRING")
 	{
 		std::ostringstream oss;
 		oss << value;
-		addField(fieldName, oss.str().c_str());
+		field.reset(new StringField(fieldName, oss.str().c_str()));
 	}
-	else if(type == "UNSET")
-	{//field template has a variable data type, meaning it can be whatever it wants
-	 //today, it's an F64Field
-		addField(fieldName, value);
+	else if(type.empty() || type == "UNSET" || type == "VARIABLE")
+	{
+		GMSEC_WARNING << "setValue() is setting variable type field '" << fieldName << "' as an F64 field within the message";
+		field.reset(new F64Field(fieldName, value));
 	}
 	else
 	{//any types not listed can't be converted
@@ -1062,6 +1111,10 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 		err << "Field template \"" << fieldName << "\" calls for field type " << type.c_str() << ", but value " << value << " cannot be converted to " << type.c_str();
 		throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 	}
+
+	field->isHeader(fieldTemp->isHeader());
+
+	this->addField(*(field.release()), false);
 }
 
 
@@ -1270,7 +1323,7 @@ void InternalMistMessage::init()
 			//the field template has an explicitly defined type and value, so we'll add the field to the message
 			try
 			{
-				std::auto_ptr<Field> field(temp->toField(temp->getType()));
+				StdUniquePtr<Field> field(temp->toField(temp->getType()));
 
 				addField(*(field.get()));
 			}
@@ -1287,7 +1340,22 @@ void InternalMistMessage::init()
 	{
 		const Field* field = *it;
 
-		addField(*field);
+		try
+		{
+			const FieldTemplate& fieldTemp = findFieldTemplate(field->getName());
+
+			// Make copy of the field, and identify whether it is a header field.
+			Field* copy = InternalField::makeFieldCopy(*field);
+			copy->isHeader(fieldTemp.isHeader());
+
+			// Add standard field to this message, and ensure another copy is not made.
+			this->addField(*copy, false);
+		}
+		catch (...)
+		{
+			// Standard field not in the templates; just add it as is to this message.
+			this->addField(*field);
+		}
 	}
 }
 
@@ -1349,7 +1417,7 @@ std::string InternalMistMessage::deduceSchemaID(const InternalMessage& msg)
 
 void InternalMistMessage::convertMessage(const Message& msg, const Config& specConfig)
 {
-	std::auto_ptr<Specification> managedSpec(new Specification(specConfig));
+	StdUniquePtr<Specification> managedSpec(new Specification(specConfig));
 
 	m_spec = managedSpec.get();
 

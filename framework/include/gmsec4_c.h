@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -23,6 +23,7 @@
 #include <gmsec4/c/connection.h>
 #include <gmsec4/c/errors.h>
 #include <gmsec4/c/fields.h>
+#include <gmsec4/c/heartbeat_generator.h>
 #include <gmsec4/c/message.h>
 #include <gmsec4/c/message_field_iterator.h>
 #include <gmsec4/c/status.h>

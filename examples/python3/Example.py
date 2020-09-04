@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
- Copyright 2007-2018 United States Government as represented by the
+ Copyright 2007-2019 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -15,10 +15,7 @@ class Example(object):
 
 	@staticmethod
 	def initialize(args):
-		config = libgmsec_python3.Config()
-		for arg in args[1:]:
-			value = arg.split('=')
-			config.add_value(value[0], value[1])
+		config = libgmsec_python3.Config(args)
 		config.add_value("loglevel", config.get_value("loglevel", "info"))
 		config.add_value("logfile", config.get_value("logfile", "stderr"))
 		return config

@@ -4,43 +4,49 @@
 
 %feature("docstring") gmsec::api::mist::message::MnemonicMessage "
 
-    A MistMessage object that is capable of storing Mnemonic objects
-    The following message schema IDs and their templates are supported: @n
-    MSG.MVAL @n
-    REQ.MVAL @n
-    RESP.MVAL
+A MistMessage object that is capable of storing Mnemonic objects
+The following message schema IDs and their templates are supported: @n
+MSG.MVAL @n
+REQ.MVAL @n
+RESP.MVAL
 
-    See Also
-    --------
-    Message
-    MistMessage
-    Config
-    Specification
-    Field
-    MsgFieldIterator
+See Also
+--------
+Message
+MistMessage
+Config
+Specification
+Field
+MsgFieldIterator
 
-    CONSTRUCTORS:
+CONSTRUCTORS:
 
-    MnemonicMessage(self, subject, version)
-
-    Initializes the message instance.
-
-    Parameters
-    ----------
-    subject: The subject string for the message.
-    version: The version of the GMSEC message specification to be used.
-
-    MnemonicMessage(self, subject, config, version)
+>>> MnemonicMessage(self, subject, schemaID, spec)
 
     Initializes the message instance.
 
     Parameters
     ----------
     subject: The subject string for the message.
+    schemaID: The string used to identify the message schema in the GMSEC ISD. The schema ID has the format of: messageKind.messageType (e.g. MSG.MVAL).
+    spec: The specification this message's schema will adhere to.
+
+
+
+>>> MnemonicMessage(self, subject, schemaID, config, spec)
+
+    Initializes the message instance.
+
+    Parameters
+    ----------
+    subject: The subject string for the message.
+    schemaID: The string used to identify the message schema in the GMSEC ISD. The schema ID has the format of: messageKind.messageType (e.g. MSG.MVAL).
     config: A configuration to associate with the message.
-    version: The version of the GMSEC message specification to be used.
+    spec: The specification this message's schema will adhere to.
 
-    MnemonicMessage(self, other)
+
+
+>>> MnemonicMessage(self, other)
 
     Copy constructor - initializes the message instance using the other given MnemonicMessage.
 
@@ -48,13 +54,39 @@
     ----------
     other: The other MnemonicMessage object to copy.
 
-    MnemonicMessage(self, data)
+
+
+>>> MnemonicMessage(self, data)
 
     Initializes a MnemonicMessage from an XML or JSON string.
 
     Parameters
     ----------
     data: XML or JSON string used to initialize MnemonicMessage.
+
+    Exceptions
+    ----------
+    An Exception is thrown if the given data does not represent a valid XML or JSON statement.
+
+    Note
+    ----------
+    This constructor has been deprecated. Use MnemonicMessage(self, spec, data) instead.
+
+
+
+>>> MnemonicMessage(self, spec, data)
+
+    Initializes a MnemonicMessage using the given XML or JSON data representation of the message, and ensures the message adheres to the provided specification.
+
+    Parameters
+    ----------
+    spec: The specification this message's schema will adhere to.
+    data: XML of JSON string used to initialize the message.
+
+    Exceptions
+    ----------
+    An Exception is thrown if the given data does not represent a valid XML or JSON statement.
+    An Exception is thrown if the given data does not represent a Mnemonic Message.
 ";
 
 

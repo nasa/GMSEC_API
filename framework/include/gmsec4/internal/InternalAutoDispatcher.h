@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,9 +17,8 @@
 
 #include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/StdThread.h>
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/wdllexp.h>
-
-#include <memory>
 
 
 namespace gmsec
@@ -58,8 +57,8 @@ public:
 
 
 private:
-	typedef std::auto_ptr<gmsec::api::util::StdThread>    DispatcherThread;
-	typedef gmsec::api::util::StdSharedPtr<DispatchShared> DispatcherSharedPtr;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> DispatcherThread;
+	typedef gmsec::api::util::StdSharedPtr<DispatchShared>              DispatcherSharedPtr;
 
 
 	InternalConnection*             m_iConn;

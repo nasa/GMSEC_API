@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -282,7 +282,7 @@ public:
 
 			if (msgKind == Message::REPLY && (!requestSpecs.useSubjectMapping && requestSpecs.exposeReplies))
 			{
-				(void) connection->handleCmsReply(message, false);
+				(void) connection->handleCmsReply(message, logStackTrace);
 			}
 
 			if (msgKind == Message::REPLY && requestSpecs.exposeReplies == false)
@@ -944,8 +944,8 @@ gmsec_amqcms::SubscriptionInfo* CMSConnection::makeSubscriptionInfo(const std::s
 {
 	GMSEC_VERBOSE << "makeSubscriptionInfo(" << in.c_str() << ')';
 
-	std::auto_ptr<cms::Topic>           topic(m_publishSession->createTopic(in));
-	std::auto_ptr<cms::MessageConsumer> consumer;
+	StdUniquePtr<cms::Topic>           topic(m_publishSession->createTopic(in));
+	StdUniquePtr<cms::MessageConsumer> consumer;
 
 	if (config.getBooleanValue(AMQ_DURABLE_SUBSCRIBE, false))
 	{
@@ -1089,9 +1089,9 @@ void CMSConnection::mwPublish(const Message& msg, const Config& config)
 	try
 	{
 		// the Destinations/Producers could be cached...
-		std::auto_ptr<cms::Destination>     destination(m_publishSession->createTopic(subject));
-		std::auto_ptr<cms::MessageProducer> producer(m_publishSession->createProducer(destination.get()));
-		std::auto_ptr<cms::Message>         cmsMsg;
+		StdUniquePtr<cms::Destination>     destination(m_publishSession->createTopic(subject));
+		StdUniquePtr<cms::MessageProducer> producer(m_publishSession->createProducer(destination.get()));
+		StdUniquePtr<cms::Message>         cmsMsg;
 
 		prepare(msg, cmsMsg);
 
@@ -1188,7 +1188,7 @@ void CMSConnection::mwRequest(const Message& request, std::string& id)
 
 	id = generateID();
 
-	std::auto_ptr<cms::Message> cmsRequest;
+	StdUniquePtr<cms::Message> cmsRequest;
 
 	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 
@@ -1209,8 +1209,8 @@ void CMSConnection::mwRequest(const Message& request, std::string& id)
 		cmsRequest->setCMSType(CMS_TYPE_REQUEST);
 		cmsRequest->setCMSCorrelationID(id);
 
-		std::auto_ptr<cms::Destination>     destination(m_publishSession->createTopic(subject));
-		std::auto_ptr<cms::MessageProducer> producer(m_publishSession->createProducer(destination.get()));
+		StdUniquePtr<cms::Destination>     destination(m_publishSession->createTopic(subject));
+		StdUniquePtr<cms::MessageProducer> producer(m_publishSession->createProducer(destination.get()));
 
 		producer->send(cmsRequest.get());
 	}
@@ -1236,7 +1236,7 @@ void CMSConnection::mwReply(const Message& request, const Message& reply)
 
 	try
 	{
-		std::auto_ptr<cms::Message> cmsReply;
+		StdUniquePtr<cms::Message> cmsReply;
 
 		prepare(reply, cmsReply);
 
@@ -1247,7 +1247,7 @@ void CMSConnection::mwReply(const Message& request, const Message& reply)
 		CMSDestination*   dest    = dynamic_cast<CMSDestination*>(value);
 		cms::Destination* replyTo = (dest ? dest->getReplyTo() : NULL);
 
-		std::auto_ptr<cms::MessageProducer> replyProducer(m_publishSession->createProducer(replyTo));
+		StdUniquePtr<cms::MessageProducer> replyProducer(m_publishSession->createProducer(replyTo));
 
 		replyProducer->send(cmsReply.get());
 	}
@@ -1354,7 +1354,7 @@ void CMSConnection::mwReceiveAux(Message*& msg, GMSEC_I32 timeout)
 				}
 			}
 
-			std::auto_ptr<cms::Message> popped(m_queue.pop());
+			StdUniquePtr<cms::Message> popped(m_queue.pop());
 			if (popped.get())
 			{
 				done = true;
@@ -1392,7 +1392,7 @@ static const char* kindToCMSType(Message::MessageKind kind)
 
 static Message* parseProperties(const cms::Message& cmsMessage, Message::MessageKind msgKind, const Config& msgConfig, ValueMap& meta)
 {
-	std::auto_ptr<Message> message(new Message("BOGUS.TOPIC", msgKind, msgConfig));
+	StdUniquePtr<Message> message(new Message("BOGUS.TOPIC", msgKind, msgConfig));
 
 	std::string subject;
 
@@ -1555,8 +1555,8 @@ void CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMessag
 {
 	gmsecMessage = 0;
 
-	std::auto_ptr<Message> msgManager;
-	Message::MessageKind   msgKind = lookupMessageKind(cmsMessage->getCMSType().c_str());
+	StdUniquePtr<Message> msgManager;
+	Message::MessageKind  msgKind = lookupMessageKind(cmsMessage->getCMSType().c_str());
 
 	ValueMap meta;
 
@@ -1773,7 +1773,7 @@ static Status storeProperties(ValueMap& header, cms::Message& cmsMessage)
 }
 
 
-void CMSConnection::prepare(const Message& msg, std::auto_ptr<cms::Message>& cmsMessage)
+void CMSConnection::prepare(const Message& msg, StdUniquePtr<cms::Message>& cmsMessage)
 {
 	DataBuffer buffer;
 	ValueMap header;
@@ -1792,7 +1792,7 @@ void CMSConnection::prepare(const Message& msg, std::auto_ptr<cms::Message>& cms
 
 	try
 	{
-		std::auto_ptr<cms::BytesMessage> bytesMessage(m_publishSession->createBytesMessage());
+		StdUniquePtr<cms::BytesMessage> bytesMessage(m_publishSession->createBytesMessage());
 		bytesMessage->setCMSType(kindToCMSType(kind));
 		bytesMessage->setBodyBytes(buffer.get(), buffer.size());
 

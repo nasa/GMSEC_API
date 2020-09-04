@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -117,7 +117,7 @@ public:
 
 
 	/**
-	 * @fn static void fromString(const char* level)
+	 * @fn static LogLevel fromString(const char* level)
 	 *
 	 * @brief This function converts the string value to the log level number
 	 *
@@ -145,8 +145,8 @@ public:
 
 #define GMSEC_LOG(level) \
 	if ((level <= logNONE) && (level >= logNLEVEL)) ; \
-	else if (level > gmsec::api::util::Log::getReportingLevel()) ;  \
-	else gmsec::api::util::LoggerStream(__FILE__ , __LINE__).get(level)
+	else if (level > ::gmsec::api::util::Log::getReportingLevel()) ;  \
+	else ::gmsec::api::util::LoggerStream(__FILE__ , __LINE__).get(level)
 
 
 #define GMSEC_ERROR     GMSEC_LOG(logERROR)

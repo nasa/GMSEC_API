@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,46 +39,132 @@ using namespace gmsec::api::mist::message;
 
 libgmsec_perl::MistMessage
 
-	The Message object shares all the functionality of standard messages, but can also be auto-populated based on how the message schema identifies itself within the given specification.
+    The Message object shares all the functionality of standard messages, but can also be auto-populated based on how the message schema identifies itself within the given specification.
 
 =head2 Public Member Subroutines
+
 
 =head3 new
 
 C<libgmsec_perl::MistMessage-E<gt>new($subject, $schemaID, $spec)>
 
-	Default constructor - Initializes the message instance with a template determined by the ID and spec
+    Default constructor - Initializes the message instance with a template determined by the ID and spec
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
-	$subject - the subject string for the message.
-	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).  You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB) Note that not all schemaIDs contain a messageSubtype
-	$spec - a reference to the specification this message's schema will adhere to.
+    $subject - the subject string for the message.
+    $schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of messageKind.messageType.messageSubtype (e.g. MSG.C2CX.HB). Note that not all schemaIDs contain a messageSubtype
+    $spec - a reference to the specification to which this message schema will adhere.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-	Exception if Specification fails to load the template directory or if schemaID is not a valid ID	
+    Exception if Specification fails to load the template directory or if schemaID is not a valid ID
+
+
 
 C<libgmsec_perl::MistMessage-E<gt>new($subject, $schemaID, $config, $spec)>
 
-	Initializes the message instance with a template determined by the ID and spec and an associated Configuration object
+    Initializes the message instance with a template determined by the ID and spec and an associated Configuration object
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
-	$subject - the subject string for the message.
-	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).  Note that not all schemaIDs contain a messageSubtype
-	$config - A Configuration object to associate with the message
-	$spec - a reference to the specification this message's schema will adhere to.
+    $subject - the subject string for the message.
+    $schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of messageKind.messageType.messageSubtype (e.g. MSG.C2CX.HB). Note that not all schemaIDs contain a messageSubtype
+    $config - A Configuration object to associate with the message
+    $spec - a reference to the specification to which this messages schema will adhere.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-	Exception if Specification fails to load the template directory or if schemaID is not a valid ID
+    Exception if Specification fails to load the template directory or if schemaID is not a valid ID
+
+
+
+C<libgmsec_perl::MistMessage-E<gt>new($other)>
+
+    Copy constructor - initializes the message instance using the other given MistMessage
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $other - The message to be copied
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    Exception if Specification fails to load the template directory or if schemaID is not a valid ID
+
+
+
+C<libgmsec_perl::MistMessage-E<gt>new($msg)>
+
+    Special constructor that construct a MistMessage using a simple Message.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $msg - The simple message to reference while building the MistMessage
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    Exception if the simple Message does not house sufficient information to construct a MistMessage
+
+
+
+C<libgmsec_perl::MistMessage-E<gt>new($msg, $config)>
+
+    Special constructor that construct a MistMessage using a simple Message.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $msg - The simple message to reference while building the MistMessage
+    $config - A Configuration object to associate with the message
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    Exception if the simple Message does not house sufficient information to construct a MistMessage
+
+
+
+C<libgmsec_perl::MistMessage-E<gt>new($data)>
+
+    Initializes a MistMessage using an XML or JSON string.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $data - XML or JSON string used to initialize the message
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    Exception if the given data does not represent a valid XML or JSON statement.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Note:</b><br>
+
+    This method has been deprecated.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;libgmsec_perl::MistMessage->new($spec, $data)
+
+
+
+C<libgmsec_perl::MistMessage-E<gt>new($spec, $data)>
+
+    Initializes a MistMessage using an XML or JSON string.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $spec - A reference to the specification to which this message will adhere
+    $data - XML or JSON string used to initialize the message
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    Exception if the given data does not represent a valid XML or JSON statement.
+
+
 
 =head3 DESTROY
 
 C<libgmsec_perl::MistMessage-E<gt>DESTROY()>
 
     Destructor
+
+
 
 =head3 setStandardFields
 
@@ -90,37 +176,43 @@ C<libgmsec_perl::MistMessage-E<gt>setStandardFields($standardFields)>
 
     $standardFields - A list of fields to be copied to the internal set of fields, which will in turn be included with all MistMessage objects that are created.
 
+
+
 =head3 clearStandardFields
 
 C<libgmsec_perl::MistMessage-E<gt>clearStandardFields()>
 
      Destroys the lists of standard fields that are included with MistMessage objects.
 
+
+
 =head3 getSchemaID
 
 C<libgmsec_perl::MistMessage-E<gt>getSchemaID()>
 
-	Returns a string that identifies the schema that the message is based off of
+    Returns a string that identifies the schema that the message is based off of
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
-	The schema ID string
+    The schema ID string
+
+
 
 =head3 setValue
 
 C<libgmsec_perl::MistMessage-E<gt>setValue($fieldName, $value)>
 
-	Sets the value for the field indicated by the user.  The value's type is automatically determined by the function depending on the message schema being used.  If the field does not have a required type, a new StringField will be created with the specified name and value.
+    Sets the value for the field indicated by the user. The value type is automatically determined by the function depending on the message schema being used. If the field does not have a required type, a new StringField will be created with the specified name and value.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
-	$fieldName - the name of the field to be modified/created
-	$value - the value of the field.  The value's type is automatically determined based on the message schema.
+    $fieldName - the name of the field to be modified/created
+    $value - the value of the field. The values type is automatically determined based on the message schema.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-	Exception if the field name is NULL ot contains an empty string
-	Exception if the input's value cannot be converted into the type required by the field, or if the string is too big when converting to char.
+    Exception if the field name is NULL ot contains an empty string
+    Exception if the inputs value cannot be converted into the type required by the field, or if the string is too big when converting to char.
 
 =cut
 %}

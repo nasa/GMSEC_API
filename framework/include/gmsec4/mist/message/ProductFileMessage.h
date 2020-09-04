@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -105,13 +105,13 @@ public:
 
 
 	/**
-	 * @fn ProductFileMessage(const char* subject, const Config& config, ResponseStatus::Response responseStatus, const char* productType, const char* productSubtype, unsigned int version)
+	 * @fn ProductFileMessage(const char* subject, ResponseStatus::Response responseStatus, Message::MessageKind kind, const char* productType, const char* productSubtype, const Config& config, const Specification& spec)
 	 *
 	 * @brief constructor - Initializes the message instance and associates a Configuration object and automatically builds a schema ID based on params given.
 	 *
 	 * @param subject - The subject string for the message.
-	 * @param kind - the kind of message to instantiate.
 	 * @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
+	 * @param kind - the kind of message to instantiate.
 	 * @param productType - PROD-TYPE field to insert into a MSG PROD message.
 	 * @param productSubtype - PROD-SUBTYPE field to insert into a MSG PROD message.
 	 * @param config  - A configuration to associate with the message.
@@ -184,7 +184,22 @@ public:
 	 *
 	 * @param data - XML or JSON string used to initialize ProductFileMessage.
 	 */
-	ProductFileMessage(const char* data);
+	GMSEC_DEPRECATED ProductFileMessage(const char* data);
+
+
+	/**
+	 * @fn ProductFileMessage(const Specification& spec, const char* data)
+	 *
+	 * @brief Initializes a Product File Message using the given XML or JSON data representation of the message,
+	 * and ensures the message adheres to the provided specification.
+	 *
+	 * @param spec - A reference to the specification this message's schema will adhere to.
+	 * @param data - XML or JSON string used to initialize the message
+	 *
+	 * @throw An Exception is thrown if the given data does not represent a valid XML or JSON statement.
+	 * @throw An Exception is thrown if the given data does not represent a Product File Message.
+	 */
+	ProductFileMessage(const Specification& spec, const char* data);
 
 
 	/**

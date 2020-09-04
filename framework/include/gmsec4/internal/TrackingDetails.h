@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,6 +16,8 @@
 
 #include <gmsec4_defs.h>
 
+#include <gmsec4/Status.h>
+
 #include <gmsec4/util/wdllexp.h>
 
 #include <string>
@@ -28,7 +30,17 @@
 
 namespace gmsec {
 namespace api {
+	// Forward declaration(s)
+	class Config;
+
 namespace internal {
+
+
+// Internal meta-detail field for determining if tracking fields should be validated.
+// Should be set to 'true' when a message is being sent.
+// This definition should not be defined in ConfigOptions.h!
+//
+const char* const GMSEC_MSG_BEING_SENT = "GMSEC-MSG-BEING-SENT";
 
 
 /** @class TrackingDetails
@@ -74,7 +86,7 @@ public:
 	TrackingDetails& operator=(const TrackingDetails& other);
 
 
-	/** @fn GetTracking()
+	/** @fn get<xyz>()
 	 * @brief Get the tracking fields state.
 	 * @return (MESSAGE_TRACKINGFIELDS_UNSET,MESSAGE_TRACKINGFIELDS_ON,MESSAGE_TRACKINGFIELDS_OFF)
 	 */
@@ -90,7 +102,7 @@ public:
 	int getConnectionEndpoint() const;
 
 
-	/** @fn SetTracking( int flag )
+	/** @fn set<xyz>( int flag )
 	 * @brief Turn tracking fields on/off for this Message
 	 */
 	void set(int flag);
@@ -105,10 +117,19 @@ public:
 	void setConnectionEndpoint(int flag);
 
 
+	/** @fn TrackingDetails initialize(const Config& config)
+	 * @brief Read the given Config to produce a TrackingDetails object.
+	 */
+	static TrackingDetails initialize(const Config& config);
+
 	void set(const TrackingDetails &other);
 
-
 	const char* toString() const;
+
+#if 0
+	static bool   isReservedField(const char* fieldName);
+	static Status checkTrackingField(const char* fieldName, const TrackingDetails& configTracking, const TrackingDetails& msgTracking);
+#endif
 };
 
 } //namespace internal

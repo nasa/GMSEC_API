@@ -596,6 +596,7 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="src_4x\gmsecJNI_HeartbeatGenerator.cpp" />
     <ClCompile Include="src_4x\gmsecJNI_I16Field.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\objects\Debug/api4/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\..\objects\Debug/api4/</ObjectFileName>

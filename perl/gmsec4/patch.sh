@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Copyright 2007-2019 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
 
 # There does not appear to be a way within SWIG to add code to the C++ wrapper at the very beginning of a Director function
 # (SwigDirector_Callback_onMessage), so we will have to make do with using sed for now to ensure that threading works for

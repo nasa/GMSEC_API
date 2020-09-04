@@ -185,7 +185,12 @@
 				<!-- type attribute is named with one or more potential types -->
 				<xsl:otherwise>
 					<xsl:variable name="type" select="$extension/xs:attribute/@type"/>
-					<xsl:value-of select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration[last()]/@value"/>
+					<xsl:for-each select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration">
+						<xsl:value-of select="@value"/>
+						<xsl:if test="position() != last()">
+							<xsl:text>,</xsl:text>
+						</xsl:if>
+					</xsl:for-each>
 				</xsl:otherwise>
 				</xsl:choose>
 			</xsl:attribute>
@@ -220,7 +225,12 @@
 
 			<!-- type attribute is named with one or more potential types -->
 			<xsl:otherwise>
-				<xsl:value-of select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration[last()]/@value"/>
+				<xsl:for-each select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration">
+					<xsl:value-of select="@value"/>
+					<xsl:if test="position() != last()">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+				</xsl:for-each>
 			</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
@@ -266,7 +276,12 @@
 
 			<!-- type attribute is named with one or more potential types -->
 			<xsl:otherwise>
-				<xsl:value-of select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration[last()]/@value"/>
+				<xsl:for-each select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration">
+					<xsl:value-of select="@value"/>
+					<xsl:if test="position() != last()">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+				</xsl:for-each>
 			</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
@@ -312,7 +327,12 @@
 			</xsl:when>
 			<!-- type attribute is named with one or more potential types -->
 			<xsl:otherwise>
-				<xsl:value-of select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration[last()]/@value"/>
+				<xsl:for-each select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration">
+					<xsl:value-of select="@value"/>
+					<xsl:if test="position() != last()">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+				</xsl:for-each>
 			</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>
@@ -361,7 +381,12 @@
 			</xsl:when>
 			<!-- type attribute is named with one or more potential types -->
 			<xsl:otherwise>
-				<xsl:value-of select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration[last()]/@value"/>
+				<xsl:for-each select="document('Fields.xsd')/xs:schema/xs:simpleType[@name=$type]/xs:restriction/xs:enumeration">
+					<xsl:value-of select="@value"/>
+					<xsl:if test="position() != last()">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+				</xsl:for-each>
 			</xsl:otherwise>
 			</xsl:choose>
 		</xsl:attribute>

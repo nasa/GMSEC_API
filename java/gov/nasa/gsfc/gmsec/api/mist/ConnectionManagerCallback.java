@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -24,32 +24,37 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIConnMgrCallback;
  * {@link ConnectionManager#subscribe(String, ConnectionManagerCallback)}
  * and to have user code executed asynchronously when a message is received.
  * <p>
- * Example ConnectionManagerCallback class:
- * <pre>{@code
- * class PublishCallback extends ConnectionManagerCallback
- * {
- *     public void onMessage(ConnectionManager connMgr, Message msg)
- *     {
- *         System.out.println("Received Message:\n" + msg.toXML());
+ * Note that because users are able to create their own ConnectionManagerCallback class,
+ * reentrancy is not guaranteed unless if reentrancy rules are specified.
  *
- *         // Do not clean up the Connection Manager or destroy the message here
- *     }
- * }
- * }</pre>
+ * In addition, if a ConnectionManagerCallback is registered to multiple connections,
+ * onMessage() can be invoked concurrently from different connection manager threads.
+ * Users are encouraged to employ the use of synchronization to enforce thread safety.
+ * <p>
+ * Example ConnectionManagerCallback class:
+   <pre>{@code
+   class PublishCallback extends ConnectionManagerCallback
+   {
+       public void onMessage(ConnectionManager connMgr, Message msg)
+       {
+           System.out.println("Received Message:\n" + msg.toXML());
+           // Do not clean up the Connection Manager or store the message
+       }
+   }
+   }</pre>
  * <p>
  * Example ConnectionManagerCallback registration:
- * <pre>{@code
- * try
- * {
- *     SubscriptionInfo info = connMgr.subscribe("GMSEC.TEST.PUBLISH", new PublishCallback());
- *
- *     ...
- * }
- * catch (GMSEC_Exception e)
- * {
- *     // handle error
- * }
- * }</pre>
+   <pre>{@code
+   try
+   {
+       SubscriptionInfo info = connMgr.subscribe("GMSEC.TEST.PUBLISH", new PublishCallback());
+       ...
+   }
+   catch (GMSEC_Exception e)
+   {
+       // handle error
+   }
+   }</pre>
  *
  * @see ConnectionManager#subscribe(String, ConnectionManagerCallback)
  * @see ConnectionManager#unsubscribe(SubscriptionInfo)
@@ -108,8 +113,14 @@ public abstract class ConnectionManagerCallback
 	 * class derived from ConnectionManagerCallback needs to be registered with a ConnectionManager, using
 	 * subscribe() in order to be called for a particular subject registration pattern.
 	 * <p>
-	 * Please note that if a ConnectionManagerCallback is registered to multiple connections, onMessage()
+	 * If a ConnectionManagerCallback is registered to multiple connections, onMessage()
 	 * can be invoked concurrently from different connection threads.
+	 * <p>
+	 * <b>DO NOT STORE or CHANGE STATE</b> of the ConnectionManager object; it should only be used within
+	 * the scope of the callback method.
+	 * <p>
+	 * <b>DO NOT STORE</b> the Message object for use beyond the scope of the callback. Otherwise, make a
+	 * copy of the Message object.
 	 *
 	 * @param connMgr Connection manager on which the message was received.
 	 * @param msg The received message.

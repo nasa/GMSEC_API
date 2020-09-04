@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,12 +13,14 @@
 #ifndef gmsec_BoltConnection_h
 #define gmsec_BoltConnection_h
 
-#include <gmsec4/internal/ConnectionInterface.h>
-#include <gmsec4/internal/UniqueFilter.h>
-
 #include <bolt/Connection.h>
 #include <bolt/EventListener.h>
 #include <bolt/Types.h>
+
+#include <gmsec4/internal/ConnectionInterface.h>
+#include <gmsec4/internal/UniqueFilter.h>
+
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <list>
 
@@ -114,7 +116,7 @@ public:
 private:
 
 	bolt::Server server;
-	std::auto_ptr<bolt::Connection> connection;
+	gmsec::api::util::StdUniquePtr<bolt::Connection> connection;
 
 	std::string mwInfo;
 };

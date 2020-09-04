@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -43,7 +43,7 @@ TCPSocket::TCPSocket()
 	m_eToRead(0),
 	m_isDebug(0),
 	m_pLen(0),
-	m_sock(0),
+	m_sock(-1),
 	m_pAddr(NULL),
 	m_isConnected(false)
 {
@@ -68,11 +68,14 @@ Status TCPSocket::disconnect()
 {
 	Status status;
 
+	if (m_sock != -1)
+	{
 #ifdef WIN32
-	closesocket(m_sock);
+		closesocket(m_sock);
 #else
-	close(m_sock);
+		close(m_sock);
 #endif
+	}
 
 	if (m_isDebug)
 	{

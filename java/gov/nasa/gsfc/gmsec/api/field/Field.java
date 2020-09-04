@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -124,6 +124,24 @@ public class Field
 
 
 	/**
+	 * Sets the field name of the Field object.
+	 *
+	 * @param name The name of the field.
+	 *
+	 * @throws IllegalArgumentException Thrown if the name string is null or is empty.
+	 */
+	public void setName(String name)
+	{
+		if (name == null || name.isEmpty())
+		{
+			throw new IllegalArgumentException("Field name cannot be null or contain empty string");
+		}
+
+		m_jniField.setName(name);
+	}
+
+
+	/**
 	 * Returns the type of this Field object.
 	 *
 	 * @return A field type.
@@ -244,5 +262,16 @@ public class Field
 	public boolean isHeader()
 	{
 		return m_jniField.isHeader();
+	}
+
+
+	/**
+	 * Creates/returns a clone of the Field object.
+	 *
+	 * @return A clone of the Field object.
+	 */
+	public Field clone()
+	{
+		return m_jniField.clone();
 	}
 }

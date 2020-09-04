@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,6 +18,7 @@
 #include <gmsec4/Message.h>
 
 #include <gmsec4/util/DataList.h>
+#include <gmsec4/util/Deprecated.h>
 
 namespace gmsec
 {
@@ -136,9 +137,25 @@ public:
 	*
 	* @param data - XML or JSON string used to initialize the message
 	*
-	* @throw An exception is thrown if Specification fails to load the template directory or if schemaID is not a valid ID.
+	* @throw An exception is thrown if the given data does not represent a valid XML or JSON statement.
+	*
+	* @note This method has been deprecated. Use MistMessage(const Specification&, const char*) instead.
 	*/
-	MistMessage(const char* data);
+	GMSEC_DEPRECATED MistMessage(const char* data);
+
+
+   /**
+	* @fn MistMessage(const Specification& spec, const char* data)
+	*
+	* @brief Initializes a MistMessage using the given XML or JSON data representation of the message, and ensures
+	* the message adheres to the provided specification.
+	*
+	* @param spec - A reference to the specification this message's schema will adhere to.
+	* @param data - XML or JSON string used to initialize the message
+	*
+	* @throw An exception is thrown if the given data does not represent a valid XML or JSON statement.
+	*/
+	MistMessage(const Specification& spec, const char* data);
 
 
    /**

@@ -5,160 +5,165 @@
     on a Device, and used to generate GMSEC Device messages by the
     ConnectionManager class
 
-    See Also
-    --------
-    ConnectionManager
-
     CONSTRUCTORS:
 
-    Device(self, name, status, params)
+    Device(name: str, status: Device.DeviceStatus)
 
-    Initializes the Device object with Device parameter information.
-
-    Parameters
-    ----------
-    name: The name of the Device
-    status: The status of the Device (DeviceStatus object)
-    params: The list of Device parameters (DeviceParamList object)
-
-    Exceptions
-    ----------
-    A GmsecError is thrown if the name parameter is NULL or empty
-
-    Device(self, name, status)
-
-    Initializes the Device object with no Device parameter information.
+    Initializes the Device with no Device parameter information.
 
     Parameters
     ----------
-    name: The name of the Device
-    status: The status of the Device (DeviceStatus object)
+    name   : The name of the Device
+    status : The status of the Device
 
     Exceptions
     ----------
-    A GmsecError is thrown if the name parameter is NULL or empty
+    A GmsecError is thrown if the name parameter is None or is an empty string
+
+
+
+    Device(name: str, status: Device.DeviceStatus, params: DeviceParamList)
+
+    Initializes the Device with DeviceParam information.
+
+    Parameters
+    ----------
+    name   : The name of the Device
+    status : The status of the Device
+    params : The DeviceParamList of one or more DeviceParam objects
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the name parameter is None or is an empty string
+
+
 
     Device(other)
 
-    Initializes the Device object with the information from another
-    device.
+    Creates a copy of the given Device.
 
     Parameters
     ----------
-    other: The other device object
+    other : The Device to copy
 ";
 
 %feature("docstring") gmsec::api::mist::Device::getVersion "
 
-    getVersion(self) -> char const *
+    get_version(self) -> str
 
     Accessor for the Device Version
 
     Returns
     -------
-    A pointer to the Device Version string
+    The Device Version string
 
     Exceptions
     ----------
-    A GmsecError is thrown if the Version field has not been set
-
+    A GmsecError is thrown if the Version field has not been set.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::numberAvailable "
 
-    numberAvailable(self) -> bool
+    number_available(self) -> bool
 
     Returns the availability of a Device Number
 
     Returns
     -------
-    True if a Device Number has been set, false otherwise
-
+    True if a Device Number has been set; False otherwise.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::setVersion "
 
-    setVersion(self, version)
+    set_version(self, version: str)
 
-    Supplies a Version for the Device and makes a copy of the string
+    Associates version information with the Device.
 
+    Parameters
+    ----------
+    version : Version information as a string (e.g. \"v5.0\")
 ";
 
 %feature("docstring") gmsec::api::mist::Device::getRole "
 
-    getRole(self) -> char const *
+    get_role(self) -> str
 
-    Accessor for the Device Role
+    Accessor for the Device role
 
     Returns
     -------
-    A pointer to the Device Role string
+    The Device role string
 
     Exceptions
     ----------
-    A GmsecError is thrown if the Role field has not been set
-
+    A GmsecError is thrown if the role field has not been set.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::groupAvailable "
 
-    groupAvailable(self) -> bool
+    group_available(self) -> bool
 
     Returns the availability of a Device Group
 
     Returns
     -------
-    True if a Device Group has been set, false otherwise
-
+    True if a Device Group has been set, False otherwise.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::setInfo "
 
-    setInfo(self, info)
+    set_info(self, info: Field)
 
-    Supplies a Info for the Device and makes a copy of the field
+    Associates the given informational Field with the Device.
+
+    Parameters
+    ----------
+    info : Field to provide Device information.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::setSerial "
 
-    setSerial(self, serial)
+    set_serial(self, serial: str)
 
-    Supplies a Serial Number for the Device and makes a copy of the
-    string
+    Associates the given serial number string with the Device.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::setStatus "
 
-    setStatus(self, status)
+    set_status(self, status: Device::DeviceStatus)
 
-    Supplies a Status for the Device and makes a copy of the string
+    Associates the given status with the Device.
+
+    Parameters
+    ----------
+    status : Device status
 ";
 
 %feature("docstring") gmsec::api::mist::Device::getStatus "
 
-    getStatus(self) -> gmsec::api::mist::Device::DeviceStatus
+    get_status(self) -> Device::DeviceStatus
 
-    Accessor for the Device Status
+    Accessor for the Device status
 
     Returns
     -------
-    The Device Status enumeration
+    The Device status enumeration
 ";
 
 %feature("docstring") gmsec::api::mist::Device::infoAvailable "
 
-    infoAvailable(self) -> bool
+    info_available(self) -> bool
 
-    Returns the availability of a Device Info field
+    Returns the availability of a Device info field
 
     Returns
     -------
-    True if a Device Info field has been set, false otherwise
+    True if a Device info field has been set, false otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::Device::getNumber "
 
-    getNumber(self) -> Field
+    get_number(self) -> Field
 
     Accessor for the Device Number
 
@@ -173,55 +178,62 @@
 
 %feature("docstring") gmsec::api::mist::Device::setModel "
 
-    setModel(self, model)
+    set_model(self, model: str)
 
-    Supplies a Model for the Device and makes a copy of the string
+    Associates model information for the Device.
+
+    Parameters
+    ----------
+    mode : Model information regarding the Device
 ";
 
 %feature("docstring") gmsec::api::mist::Device::serialAvailable "
 
-    serialAvailable(self) -> bool
+    serial_available(self) -> bool
 
-    Accessor for the Device Serial Number
+    Returns the availability of a Device Serial Number
 
     Returns
     -------
-    A pointer to the Device Serial Number string
-
-    Exceptions
-    ----------
-    A GmsecError is thrown if the Serial Number field has not been set
+    True if a Device Serial Number has been set; False otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::Device::setRole "
 
-    setRole(self, role)
+    set_role(self, role: str)
 
-    Supplies a Role for the Device and makes a copy of the string
+    Associates role information for the Device.
+
+    Parameters
+    ----------
+    role : Role information regarding the Device
 ";
 
 %feature("docstring") gmsec::api::mist::Device::setGroup "
 
-    setGroup(self, group)
+    set_group(self, group: str)
 
-    Supplies a Group for the Device and makes a copy of the string
+    Associates group information for the Device.
+
+    Parameters
+    ----------
+    group : Group information regarding the Device
 ";
 
 %feature("docstring") gmsec::api::mist::Device::addParam "
 
-    addParam(self, param)
+    add_param(self, param: DeviceParam)
 
-    Adds a single DeviceParam to the current list
+    Adds a DeviceParam to the Device
 
     Parameters
     ----------
-    param: the new DeviceParam object
-
+    param : The new DeviceParam
 ";
 
 %feature("docstring") gmsec::api::mist::Device::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
     Retrieves the name of the device
 
@@ -232,13 +244,13 @@
 
 %feature("docstring") gmsec::api::mist::Device::getGroup "
 
-    getGroup(self) -> char const *
+    get_group(self) -> str
 
     Accessor for the Device Group
 
     Returns
     -------
-    A pointer to the Device Group string
+    The Device Group string
 
     Exceptions
     ----------
@@ -247,13 +259,13 @@
 
 %feature("docstring") gmsec::api::mist::Device::getModel "
 
-    getModel(self) -> char const *
+    get_model(self) -> str
 
     Accessor for the Device Model
 
     Returns
     -------
-    A pointer to the Device model string
+    The Device model string
 
     Exceptions
     ----------
@@ -262,74 +274,76 @@
 
 %feature("docstring") gmsec::api::mist::Device::setNumber "
 
-    setNumber(self, number)
+    set_number(self, number: Field)
 
-    Supplies a Number for the Device and makes a copy of the field
+    Associates a number Field with the Device.
 
+    Parameters
+    ----------
+    number : Number Field to associate with the Device.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::roleAvailable "
 
-    roleAvailable(self) -> bool
+    role_available(self) -> bool
 
     Returns the availability of a Device Role
 
     Returns
     -------
-    True if a Device Role has been set, false otherwise
+    True if a Device Role has been set; False otherwise.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::versionAvailable "
 
-    versionAvailable(self) -> bool
+    version_available(self) -> bool
 
     Returns the availability of a Device Version
 
     Returns
     -------
-    True if a Device Version has been set, false otherwise
+    True if a Device Version has been set; False otherwise.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::modelAvailable "
 
-    modelAvailable(self) -> bool
+    model_available(self) -> bool
 
     Returns the availability of a Device Model
 
     Returns
     -------
-    True if a Device Model has been set, false otherwise
+    True if a Device Model has been set; False otherwise.
 ";
 
 %feature("docstring") gmsec::api::mist::Device::getParam "
 
-    getParam(self, idx) -> DeviceParam const &
+    get_param(self, index: int) -> DeviceParam
 
-    Returns a reference to a DeviceParam held in this object
+    Returns a reference to a DeviceParam held in this Device
 
     Parameters
     ----------
-    idx: the zero-based index of the DeviceParam object to access
+    index : The zero-based index of the DeviceParam to access
 
     Returns
     -------
-    A reference to the requested DeviceParam object
+    A reference to the requested DeviceParam
 
     Exceptions
     ----------
     A GmsecError is thrown if the index supplied is out of bounds
-
 ";
 
 %feature("docstring") gmsec::api::mist::Device::getInfo "
 
-    getInfo(self) -> Field
+    get_info(self) -> Field
 
     Accessor for the Device Info
 
     Returns
     -------
-    A reference to the Device Info field
+    The Device Info Field
 
     Exceptions
     ----------
@@ -338,13 +352,13 @@
 
 %feature("docstring") gmsec::api::mist::Device::getSerial "
 
-    getSerial(self) -> char const *
+    get_serial(self) -> str
 
     Accessor for the Device Serial Number
 
     Returns
     -------
-    A pointer to the Device Serial Number string
+    The Device Serial Number string
 
     Exceptions
     ----------
@@ -353,11 +367,11 @@
 
 %feature("docstring") gmsec::api::mist::Device::getParamCount "
 
-    getParamCount(self) -> size_t
+    get_param_count(self) -> int
 
-    Returns the number of parameters for this Device
+    Returns the number of DeviceParam objects associated with the Device
 
     Returns
     -------
-    a size_t representation of the number of parameters
+    The number of DeviceParam objects
 ";

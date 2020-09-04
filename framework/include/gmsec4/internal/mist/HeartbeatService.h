@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -23,10 +23,9 @@
 
 #include <gmsec4/util/Atomics.h>
 #include <gmsec4/util/CountDownLatch.h>
-#include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/Mutex.h>
-
-#include <memory>
+#include <gmsec4/util/StdSharedPtr.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
 
 namespace gmsec
@@ -34,11 +33,13 @@ namespace gmsec
 namespace api
 {
 // Forward declaration(s)
-class Connection;
 class Field;
 
 namespace mist
 {
+// Forward declaration(s)
+class ConnectionManager;
+
 namespace internal
 {
 
@@ -110,13 +111,13 @@ private:
 	HeartbeatService(const HeartbeatService&);
 
 	Config                    m_config;
-	Connection*               m_connection;
+	ConnectionManager*        m_connMgr;
 	Message                   m_msg;
 
 	GMSEC_U16                 m_pubInterval;
 	GMSEC_U16                 m_counter;
 
-	std::auto_ptr<ActionInfo> m_publishAction;
+	gmsec::api::util::StdUniquePtr<ActionInfo> m_publishAction;
 
 	gmsec::api::util::AtomicBoolean m_alive;
 	gmsec::api::util::Mutex         m_msgMutex;

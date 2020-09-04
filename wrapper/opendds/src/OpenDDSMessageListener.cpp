@@ -1,14 +1,16 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-#include <gmsec4/util/Log.h>
 #include <gmsec4/internal/InternalConnection.h>
 #include <gmsec4/internal/MessageBuddy.h>
+
+#include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <ace/Log_Msg.h>
 #include <ace/OS_NS_stdlib.h>
@@ -89,7 +91,7 @@ void OpenDDSMessageListener::on_data_available(DDS::DataReader_ptr reader)
 			// Extract the contents of the encoded meta object from the OpenDDS message
 			DataBuffer metaBuffer((GMSEC_U8*) DDSmessage.meta_data.get_buffer(), DDSmessage.meta_data.length(), false);
 
-			std::auto_ptr<Message> message(new Message(DDSmessage.subject.in(), Message::PUBLISH, connection->getExternal().getMessageConfig()));
+			StdUniquePtr<Message> message(new Message(DDSmessage.subject.in(), Message::PUBLISH, connection->getExternal().getMessageConfig()));
 
 			// Decode the meta object
 			ValueMap meta;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -43,7 +43,8 @@ bool status_reporter::run()
 		int numPublished            = m_publisher->getNumPublished();
 		int publishedDuringInterval = numPublished - lastNumPublished;
 
-		GMSEC_INFO << "Published " << (publishedDuringInterval * m_dataSize) / 1024 << " kb per " << m_monitorRateMs << " ms (" << publishedDuringInterval << " messages)";
+		GMSEC_INFO << "Published " << (publishedDuringInterval * m_dataSize) / 1024 
+		           << " kb per " << m_monitorRateMs << " ms (" << publishedDuringInterval << " messages)";
 
 		lastNumPublished = numPublished;
 	}

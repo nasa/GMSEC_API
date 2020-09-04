@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -82,11 +82,23 @@ extern "C"
 	 * passed in as the status parameter in order to receive any resulting status.
 	 *
 	 * @param[in]  field  - handle to the field.
-	 * @param[out] status - out parameter operation result status
+	 * @param[out] status - operation result status
 	 *
 	 * @return The name of the given field object, or NULL if the field object is invalid.
 	 */
 	GMSEC_API const char* fieldGetName(const GMSEC_Field field, GMSEC_Status status);
+
+
+	/**
+	 * @fn void fieldSetName(GMSEC_Field field, const char* name, GMSEC_Status status)
+	 *
+	 * @brief Sets the field name to the given string.
+	 *
+	 * @param[in]  field  - handle to the field.
+	 * @param[in]  name   - the new field name.
+	 * @param[out] status - operation result status
+	 */
+	GMSEC_API void fieldSetName(GMSEC_Field field, const char* name, GMSEC_Status status);
 
 
 	/**
@@ -98,7 +110,7 @@ extern "C"
 	 * passed in as the status parameter in order to receive any resulting status.
 	 *
 	 * @param[in]  field  - handle to the field.
-	 * @param[out] status - out parameter operation result status
+	 * @param[out] status - operation result status
 	 *
 	 * @return The type of the given field object, or -1 if the field object is invalid.
 	 */
@@ -114,7 +126,7 @@ extern "C"
 	 * passed in as the status parameter in order to receive any resulting status.
 	 *
 	 * @param[in]  field  - handle to the field.
-	 * @param[out] status - out parameter operation result status
+	 * @param[out] status - operation result status
 	 *
 	 * @return An XML string, or NULL if the field object is invalid.
 	 */
@@ -130,7 +142,7 @@ extern "C"
 	 * passed in as the status parameter in order to receive any resulting status.
 	 *
 	 * @param[in]  field  - handle to the field.
-	 * @param[out] status - out parameter operation result status
+	 * @param[out] status - operation result status
 	 *
 	 * @return An JSON string, or NULL if the field object is invalid.
 	 */
@@ -143,7 +155,7 @@ extern "C"
 	 * @brief Attempts to convert the field value into a signed 64-bit integer number representation.
 	 *
 	 * @param[in]  field  - handle to the field.
-	 * @param[out] status - out parameter operation result status
+	 * @param[out] status - operation result status
 	 *
 	 * @return Returns the field value as an integer.
 	 */
@@ -156,7 +168,7 @@ extern "C"
 	 * @brief Attempts to convert the field value into an unsigned 64-bit integer number representation.
 	 *
 	 * @param[in]  field  - handle to the field.
-	 * @param[out] status - out parameter operation result status
+	 * @param[out] status - operation result status
 	 *
 	 * @return Returns the field value as an unsigned integer.
 	 */
@@ -169,7 +181,7 @@ extern "C"
 	 * @brief Attempts to convert the field value into a 64-bit floating point number representation.
 	 *
 	 * @param[in]  field  - handle to the field.
-	 * @param[out] status - out parameter operation result status
+	 * @param[out] status - operation result status
 	 *
 	 * @return Returns the field value as a floating point number.
 	 */
@@ -182,11 +194,26 @@ extern "C"
 	 * @brief Attempts to convert the field value into string representation.
 	 *
 	 * @param[in]  field  - handle to the field.
-	 * @param[out] status - out parameter operation result status
+	 * @param[out] status - operation result status
 	 *
 	 * @return The string value of the field, or NULL if the field object is invalid.
 	 */
 	GMSEC_API const char* fieldGetStringValue(const GMSEC_Field field, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_Field fieldClone(const GMSEC_Field field, GMSEC_Status status)
+	 *
+	 * @brief Creates/returns a clone of the given field object.
+	 *
+	 * @param[in]  field  - handle to the field to clone.
+	 * @param[out] status - operation result status
+	 *
+	 * @return A handle to the cloned field object.
+	 *
+	 * @sa fieldDestroy
+	 */
+	GMSEC_API GMSEC_Field fieldClone(const GMSEC_Field field, GMSEC_Status status);
 
 
 	/**

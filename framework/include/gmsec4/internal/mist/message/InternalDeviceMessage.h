@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -102,6 +102,9 @@ class GMSEC_API InternalDeviceMessage : public InternalMistMessage
 	InternalDeviceMessage(const char* data);
 
 
+	InternalDeviceMessage(const Specification& spec, const char* data);
+
+
 	/**
 	 * @fn ~InternalDeviceMessage()
 	 *
@@ -168,20 +171,19 @@ class GMSEC_API InternalDeviceMessage : public InternalMistMessage
 
 
 	//helper function, determines message kind and builds appropriate SchemaID
-	static std::string buildSchemaID(unsigned int version);
+	static std::string buildSchemaID();
 
 
 private:
 	Device extractMessageDevice(size_t index) const;
 
 
-	void init(unsigned int version);
+	void init();
 
 
 	std::vector<Device>              m_list;
 	std::vector<Device>::iterator    m_listIter;
 	gmsec::api::mist::DeviceIterator m_deviceIterator;
-	unsigned int                     m_specVersion;
 };
 
 } // namespace internal

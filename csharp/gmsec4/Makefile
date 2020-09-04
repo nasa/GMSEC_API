@@ -1,4 +1,4 @@
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -84,6 +84,7 @@ $(INTERFACE_DIR)/%_wrap.cxx: $(INTERFACE_DIR)/%.i
 
 
 $(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.cxx
+	@ ./nowarnings.sh
 	$(CXX) -c $(API_CXXFLAGS) -Wno-maybe-uninitialized $< -o $@
 
 

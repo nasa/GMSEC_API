@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -23,7 +23,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const char* HB_MESSAGE_SUBJECT = "GMSEC.MISSION.SPACECRAFT.MSG.C2CX.HB";
+const char* HB_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.HEARTBEAT-SERVICE.HB";
+const int   HB_PUBLISH_RATE    = 5; // in seconds
 
 //o Helper functions
 void initializeLogging(GMSEC_Config config, GMSEC_Status status);
@@ -32,20 +33,20 @@ void checkStatus(GMSEC_Status status);
 
 int main(int argc, char* argv[])
 {
-	GMSEC_Status status = statusCreate();
-	GMSEC_Config config;
+	GMSEC_Status        status = statusCreate();
+	GMSEC_Config        config;
 	GMSEC_ConnectionMgr connManager;
-	size_t hNumFields = 3;
-	GMSEC_Field* headerFields;
-	size_t hbNumFields;
-	GMSEC_Field* hbStandardFields;
+	unsigned int        version;
+	size_t              numStandardFields;
+	GMSEC_Field*        standardFields;
+	size_t              numHbStandardFields;
+	GMSEC_Field*        hbStandardFields;
 
 	if (argc <= 1)
 	{
 		printf("usage: %s mw-id=<middleware ID>\n", argv[0]);
 		return -1;
 	}
-
 
 	config = configCreateWithArgs(argc, argv);
 
@@ -64,14 +65,30 @@ int main(int argc, char* argv[])
 
 	//o Create all of the GMSEC Message header Fields which will
 	// be used by all GMSEC Messages
-	headerFields = malloc(sizeof(GMSEC_Field) * hNumFields);
+	version = specificationGetVersion(connectionManagerGetSpecification(connManager, NULL), NULL);
 
-	headerFields[0] = stringFieldCreate("MISSION-ID", "GMSEC", status);
-	checkStatus(status);
-	headerFields[1] = stringFieldCreate("FACILITY", "GMSEC Lab", status);
-	checkStatus(status);
-	headerFields[2] = stringFieldCreate("COMPONENT", "heartbeat_service", status);
-	checkStatus(status);
+	switch (version)
+	{
+	case 201400: numStandardFields = 4; break;
+	case 201600: numStandardFields = 3; break;
+	default:     numStandardFields = 5; break;
+	}
+
+	standardFields = malloc(sizeof(GMSEC_Field) * numStandardFields);
+
+	standardFields[0] = stringFieldCreate("MISSION-ID", "MY-MISSION", NULL);
+	standardFields[1] = stringFieldCreate("FACILITY", "MY-FACILITY", NULL);
+	standardFields[2] = stringFieldCreate("COMPONENT", "HEARTBEAT-SERVICE", NULL);
+
+	if (version == 201400)
+	{
+		standardFields[3] = stringFieldCreate("MSG-ID", "MY-MSG-ID", NULL);
+	}
+	else if (version >= 201800)
+	{
+		standardFields[3] = stringFieldCreate("DOMAIN1", "MY-DOMAIN-1", NULL);
+		standardFields[4] = stringFieldCreate("DOMAIN2", "MY-DOMAIN-2", NULL);
+	}
 
 	//o Use setStandardFields to define a set of header fields for
 	// all messages which are created or published on the
@@ -79,36 +96,31 @@ int main(int argc, char* argv[])
 	// createLogMessage, publishLog, createHeartbeatMessage,
 	// startHeartbeatService, createResourceMessage,
 	// publishResourceMessage, or startResourceMessageService
-	connectionManagerSetStandardFields(connManager, headerFields, hNumFields, status);
+	connectionManagerSetStandardFields(connManager, standardFields, numStandardFields, status);
 	checkStatus(status);
 
 	// Note: Fields are immutable, so plan appropriately if you wish
 	// to re-use variable names!
 	{
-		GMSEC_Message hbMsg;
-		int version;
+		GMSEC_Message hbMsg = NULL;
+
 		//o Create all of the GMSEC Message header Fields which
 		// will be used by all GMSEC HB Messages
-		hbNumFields = 3;
-		hbStandardFields = malloc(sizeof(GMSEC_Field) * hbNumFields);
+		numHbStandardFields = 3;
+		hbStandardFields = malloc(sizeof(GMSEC_Field) * numHbStandardFields);
 
 		//o Determine which version of the GMSEC message specification
 		// the ConnectionManager was initialized with and add
 		// the correctly typed Fields to the Message
-		version = specificationGetVersion(connectionManagerGetSpecification(connManager, status), status);
-		if (version == 201600)
+		if (version == 201400)
 		{
-			hbStandardFields[0] = u16FieldCreate("PUB-RATE", (GMSEC_U16) 30, status);
-			checkStatus(status);
-			hbStandardFields[1] = u16FieldCreate("COUNTER",  (GMSEC_U16) 1, status);
-			checkStatus(status);
+			hbStandardFields[0] = i16FieldCreate("PUB-RATE", (GMSEC_U16) HB_PUBLISH_RATE, NULL);
+			hbStandardFields[1] = i16FieldCreate("COUNTER",  (GMSEC_U16) 1, NULL);
 		}
-		else if (version == 201400)
+		else if (version >= 201600)
 		{
-			hbStandardFields[0] = i16FieldCreate("PUB-RATE", (GMSEC_U16) 30, status);
-			checkStatus(status);
-			hbStandardFields[1] = i16FieldCreate("COUNTER",  (GMSEC_U16) 1, status);
-			checkStatus(status);
+			hbStandardFields[0] = u16FieldCreate("PUB-RATE", (GMSEC_U16) HB_PUBLISH_RATE, NULL);
+			hbStandardFields[1] = u16FieldCreate("COUNTER",  (GMSEC_U16) 1, NULL);
 		}
 
 		//o Note: COMPONENT-STATUS is an optional field used to
@@ -119,8 +131,7 @@ int main(int argc, char* argv[])
 		// 2 - Warning / Yellow
 		// 3 - Orange
 		// 4 - Error / Red
-		hbStandardFields[2] = i16FieldCreate("COMPONENT-STATUS", (GMSEC_I16) 0, status);
-		checkStatus(status);
+		hbStandardFields[2] = i16FieldCreate("COMPONENT-STATUS", (GMSEC_I16) 0, NULL);
 
 		//o Create and publish a Heartbeat message using
 		// createLogMessage() and publish()
@@ -131,8 +142,9 @@ int main(int argc, char* argv[])
 		// more memory than necessary.  In this case, extra
 		// logic would need to be added to handle the timing of
 		// the publications.
-		hbMsg = connectionManagerCreateHeartbeatMessage(connManager, HB_MESSAGE_SUBJECT, hbStandardFields, hbNumFields, status);
+		hbMsg = connectionManagerCreateHeartbeatMessage(connManager, HB_MESSAGE_SUBJECT, hbStandardFields, numHbStandardFields, status);
 		checkStatus(status);
+
 		GMSEC_INFO("Publishing the GMSEC C2CX HB message which was just created using createHeartbeatMessage():\n%s", messageToXML(hbMsg, status));
 		connectionManagerPublish(connManager, hbMsg, status);
 		checkStatus(status);
@@ -142,8 +154,8 @@ int main(int argc, char* argv[])
 		// where Xis the value which was provided for PUB-RATE
 		// Note: If PUB-RATE was not provided, it will default
 		// to 30 seconds per automatic Heartbeat publication
-		GMSEC_INFO("Starting the Heartbeat service, a message will be published every %s seconds", fieldGetStringValue(hbStandardFields[0], status));
-		connectionManagerStartHeartbeatService(connManager, HB_MESSAGE_SUBJECT, hbStandardFields, hbNumFields, status);
+		GMSEC_INFO("Starting the Heartbeat service, a message will be published every %d seconds", HB_PUBLISH_RATE, status);
+		connectionManagerStartHeartbeatService(connManager, HB_MESSAGE_SUBJECT, hbStandardFields, numHbStandardFields, status);
 		checkStatus(status);
 
 		messageDestroy(&hbMsg);
@@ -156,8 +168,10 @@ int main(int argc, char* argv[])
 		// state.
 		GMSEC_Field componentStatusField = i16FieldCreate("COMPONENT-STATUS", (GMSEC_I16) 1, status);
 		checkStatus(status);
+
 		connectionManagerSetHeartbeatServiceField(connManager, componentStatusField, status);
 		checkStatus(status);
+
 		fieldDestroy(&componentStatusField);
 	}
 
@@ -174,14 +188,21 @@ int main(int argc, char* argv[])
 	connectionManagerDestroy(&connManager);
 	configDestroy(&config);
 	statusDestroy(&status);
-	fieldDestroy(&(headerFields[0]));
-	fieldDestroy(&(headerFields[1]));
-	fieldDestroy(&(headerFields[2]));
-	free(headerFields);
-	fieldDestroy(&(hbStandardFields[0]));
-	fieldDestroy(&(hbStandardFields[1]));
-	fieldDestroy(&(hbStandardFields[2]));
-	free(hbStandardFields);
+
+	{
+		size_t i;
+		for (i = 0; i < numStandardFields; ++i)
+		{
+			fieldDestroy(&standardFields[i]);
+		}
+		free(standardFields);
+
+		for (i = 0; i < numHbStandardFields; ++i)
+		{
+			fieldDestroy(&(hbStandardFields[i]));
+		}
+		free(hbStandardFields);
+	}
 
 	return 0;
 }

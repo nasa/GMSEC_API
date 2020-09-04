@@ -1,8 +1,7 @@
 
 %feature("docstring") gmsec::api::mist::FieldSpecification "
 
-    This class is a container for holding information
-    on a Field Specification
+    This class is a container for holding information on a Field Specification.
 
     See Also
     --------
@@ -12,9 +11,9 @@
 
 %feature("docstring") gmsec::api::mist::FieldSpecification::getName "
 
-    getName(self) -> string
+    get_name(self) -> str
 
-    Accessor for the FieldSpecification name
+    Accessor for the FieldSpecification name.
 
     Returns
     -------
@@ -23,7 +22,7 @@
 
 %feature("docstring") gmsec::api::mist::FieldSpecification::getType"
 
-    getType(self) -> string
+    get_type(self) -> str
 
     Accessor for the FieldSpecification type (e.g. STRING, I16, etc.)
 
@@ -34,10 +33,9 @@
 
 %feature("docstring") gmsec::api::mist::FieldSpecification::getMode "
 
-    getMode(self) -> string
+    get_mode(self) -> str
 
-    Accessor for the FieldSpecification mode (e.g. REQUIRED, OPTIONAL,
-    etc.)
+    Accessor for the FieldSpecification mode (e.g. REQUIRED, OPTIONAL, etc.)
 
     Returns
     -------
@@ -46,9 +44,9 @@
 
 %feature("docstring") gmsec::api::mist::FieldSpecification::getClassification "
 
-    getClassification(self) -> string
+    get_classification(self) -> str
 
-    Accessor for the FieldSpecification classification
+    Accessor for the FieldSpecification classification.
 
     Returns
     -------
@@ -57,9 +55,9 @@
 
 %feature("docstring") gmsec::api::mist::FieldSpecification::getValue "
 
-    getValue(self) -> string
+    get_value(self) -> str
 
-    Accessor for the FieldSpecification default value, if any
+    Accessor for the FieldSpecification default value, if any.
 
     Returns
     -------
@@ -69,7 +67,7 @@
 
 %feature("docstring") gmsec::api::mist::FieldSpecification::getDescription "
 
-    getDescription(self) -> string
+    get_description(self) -> str
 
     Accessor for the FieldSpecification description
 

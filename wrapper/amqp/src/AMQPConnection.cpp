@@ -1,6 +1,7 @@
 /*
- * Copyright 2007-2015 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
+ * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
@@ -8,9 +9,9 @@
  *  @brief This file provides functionality for implementing an AMQP wrapper.
  */
 
-#include "AMQPConnection.h"
+#include <AMQPConnection.h>
 
-#include "gmsec_amqp.h"
+#include <gmsec_amqp.h>
 
 #include <gmsec4/internal/FileUtil.h>
 #include <gmsec4/internal/InternalConnection.h>
@@ -31,7 +32,7 @@
 #include <sstream>
 #include <string>
 
-#include <string.h>   // for strlen()
+#include <cstring>   // for strlen()
 
 
 using namespace gmsec::api;
@@ -328,7 +329,7 @@ static void parseProperties(Message& message, ValueMap& meta, pn_data_t* propert
 		}
 		else
 		{
-			std::auto_ptr<Field> field;
+			StdUniquePtr<Field> field;
 
 			if (pn_data_type(properties) == PN_STRING)
 			{
@@ -542,6 +543,8 @@ void AMQPConnection::mwConnect()
 
 	if (!confirmed)
 	{
+		pn_messenger_free(pubMessenger);
+
 		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, 1, "Connect: Connection timed out");
 	}
 
@@ -1147,13 +1150,13 @@ std::string AMQPConnection::unfixSubject(const char* str)
 
 void AMQPConnection::handleMessage(pn_message_t* message, bool replies)
 {
-	std::auto_ptr<Message> gmsecMessage;
-	pn_bytes_t             bodyBytes;
-	pn_data_t*             body;
-	pn_data_t*             properties;
-	const char*            subject;
-	bool                   enqueue = true;
-	ValueMap               meta;
+	StdUniquePtr<Message> gmsecMessage;
+	pn_bytes_t            bodyBytes;
+	pn_data_t*            body;
+	pn_data_t*            properties;
+	const char*           subject;
+	bool                  enqueue = true;
+	ValueMap              meta;
 
 	// Get message subject, body and properties
 	subject = pn_message_get_subject(message);
