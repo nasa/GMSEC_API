@@ -16,6 +16,7 @@
 #define gmsec_util_StdThread_h
 
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec/util/Mutex.h>
 #include <gmsec/util/gshared_ptr.h>
@@ -65,7 +66,7 @@ public:
 
 public:
 
-	StdThread();
+	GMSEC_DEPRECATED StdThread();
 
 	template <class Func, class Arg> StdThread(Func f, Arg a)
 		: fInvoker(new FunctionInvoker<Func, Arg>(f, a)) { zero(); }
@@ -102,7 +103,7 @@ public:
 	 *	@brief Returns the ID of the calling thread
 	 *
 	**/
-	static id_t CALL_TYPE getCurrentID();
+	GMSEC_DEPRECATED static id_t CALL_TYPE getCurrentID();
 
 
 	/**	@fn join()
@@ -121,7 +122,7 @@ public:
 	 *	another thread.
 	 *
 	**/
-	static void CALL_TYPE yield();
+	GMSEC_DEPRECATED static void CALL_TYPE yield();
 
 
 	void CALL_TYPE setName(const char * name);

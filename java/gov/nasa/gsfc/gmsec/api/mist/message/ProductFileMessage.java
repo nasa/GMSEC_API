@@ -170,7 +170,9 @@ public class ProductFileMessage extends MistMessage
 	 *
 	 * @param subject        - The subject string for the message.
 	 * @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param schemaID       - the string used to identify the message schema in the GMSEC ISD.
+	 * @param schemaID       - the string used to identify the message schema in the GMSEC ISD. The schema ID has the
+	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
+	 * You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
 	 * @param spec           - A reference to the specification this message's schema will adhere to.
 	 *
 	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
@@ -212,7 +214,9 @@ public class ProductFileMessage extends MistMessage
 	 *
 	 * @param subject        - The subject string for the message.
 	 * @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param schemaID       - the string used to identify the message schema in the GMSEC ISD.
+	 * @param schemaID       - the string used to identify the message schema in the GMSEC ISD.The schema ID has the
+	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
+	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
      * @param config         - A configuration to associate with the message.
 	 * @param spec           - A reference to the specification this message's schema will adhere to.
 	 *
@@ -339,7 +343,10 @@ public class ProductFileMessage extends MistMessage
 	 * @throws A GMSEC_Exception is thrown if the specified index is outside the number of product files in the message.
 	 *
 	 * @sa getNumProductFiles()
+	 *
+	 * @deprecated This method has been deprecated; use ProductFileIterator instead.
 	 */
+	@Deprecated
 	public ProductFile getProductFile(int index) throws GMSEC_Exception
 	{
 		return ((JNIProductFileMessage) MistMessage.getInternal(this)).getProductFile(index);

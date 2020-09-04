@@ -29,6 +29,7 @@
 #ifndef gmsec_c_connection_factory_h
 #define gmsec_c_connection_factory_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -43,7 +44,7 @@ extern "C"
 	 *
 	 * @return the current GMSEC API version string
 	 */
-	GMSEC_API const char * CALL_TYPE gmsec_GetAPIVersion();
+	GMSEC_DEPRECATED GMSEC_API const char * CALL_TYPE gmsec_GetAPIVersion();
 
 	/** @fn gmsec_CreateConnection(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status)
 	 *
@@ -58,7 +59,7 @@ extern "C"
 	 * @param[out] conn - Connection Handle
 	 * @param[out] status - operation status
 	 */
-	GMSEC_API void CALL_TYPE gmsec_CreateConnection(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE gmsec_CreateConnection(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_CreateConnectionForType(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status)
@@ -76,7 +77,7 @@ extern "C"
 	 *
 	 * @sa gmsec_DestroyConnection()
 	 */
-	GMSEC_API void CALL_TYPE gmsec_CreateConnectionForType(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE gmsec_CreateConnectionForType(GMSEC_CONNECTION_TYPE connectionType, GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn gmsec_CreateConnectionForConfig(GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status)
@@ -124,7 +125,7 @@ extern "C"
 	 * @param[out] conn - Connection Handle
 	 * @param[out] status - operation status
 	 */
-	GMSEC_API void CALL_TYPE gmsec_CreateConnectionForConfig(GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE gmsec_CreateConnectionForConfig(GMSEC_CONFIG_OBJECT config, GMSEC_CONNECTION_OBJECT *conn, GMSEC_STATUS_OBJECT status);
 
 
 	/** @fn DestroyConnection(GMSEC_CONNECTION_OBJECT conn, GMSEC_STATUS_OBJECT status)
@@ -139,7 +140,7 @@ extern "C"
 	 *
 	 * @sa gmsec_CreateConnection()
 	 */
-	GMSEC_API void CALL_TYPE gmsec_DestroyConnection(GMSEC_CONNECTION_OBJECT conn, GMSEC_STATUS_OBJECT status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE gmsec_DestroyConnection(GMSEC_CONNECTION_OBJECT conn, GMSEC_STATUS_OBJECT status);
 
 #ifdef __cplusplus
 }	// extern "C"

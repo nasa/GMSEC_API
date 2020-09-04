@@ -1,3 +1,5 @@
+<!-- Orbit Ephemeris Message -->
+<!-- See Table 5-160 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.MSG.NDM.OEM">
 	<FIELD  NAME="NDM-TYPE"
 	        MODE="REQUIRED"
@@ -63,6 +65,6 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="BIN"
+	        TYPE="STRING"
 	        DESCRIPTION="Structured Navigation Data Message"/>
 </SCHEMA>

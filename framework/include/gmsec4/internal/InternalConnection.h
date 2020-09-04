@@ -18,6 +18,7 @@
 
 #include <gmsec4_defs.h>
 
+#include <gmsec4/internal/ActiveSubscriptions.h>
 #include <gmsec4/internal/CallbackAdapter.h>
 #include <gmsec4/internal/InternalAutoDispatcher.h>
 #include <gmsec4/internal/RequestSpecs.h>
@@ -217,6 +218,9 @@ public:
 	Config& CALL_TYPE getConfig();
 
 
+	Config& CALL_TYPE getMessageConfig();
+
+
 	GMSEC_U32 CALL_TYPE getMessageCounter() const;
 
 
@@ -252,6 +256,8 @@ public:
 
 	void insertTrackingFields(Message& msg);
 	void removeTrackingFields(Message& msg);
+
+	void setConnectionEndpoint(const std::string& endpoint);
 
 	void usingAPI3x();
 
@@ -318,6 +324,7 @@ private:
 	TrackingDetails                         m_tracking;
 	gmsec::api::secure::Policy              m_policy;
 	GMSEC_U32                               m_connectionID;
+	Config                                  m_msgConfig;
 	GMSEC_U32                               m_messageCounter;
 	gmsec::api::Connection::ConnectionState m_state;
 	gmsec::api::util::AtomicBoolean         m_connectionAlive;
@@ -358,7 +365,11 @@ private:
 
 	gmsec::api::Connection*                 m_parent;
 
+	std::string                             m_connectionEndpoint;
+
 	bool                                    m_usingAPI3x;
+
+	static ActiveSubscriptions              s_activeSubscriptions;
 
 	friend class InternalAutoDispatcher;
 };

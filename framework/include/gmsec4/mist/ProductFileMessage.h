@@ -21,6 +21,8 @@
 
 #include <gmsec4/Message.h>
 
+#include <gmsec4/util/Deprecated.h>
+
 
 namespace gmsec
 {
@@ -83,7 +85,7 @@ public:
 	 * @param productSubtype - PROD-SUBTYPE field to indert into a MSG PROD message.
 	 * @param version - The version of the GMSEC message specification to be used.
 	 */
-	ProductFileMessage(const char* subject, ResponseStatus::Response responseStatus, const char* productType, const char* productSubtype, unsigned int version);
+	GMSEC_DEPRECATED ProductFileMessage(const char* subject, ResponseStatus::Response responseStatus, const char* productType, const char* productSubtype, unsigned int version);
 
 
 	/**
@@ -98,7 +100,7 @@ public:
 	 * @param productSubtype - PROD-SUBTYPE field to indert into a MSG PROD message.
 	 * @param version - The version of the GMSEC message specification to be used.
 	 */
-	ProductFileMessage(const char* subject, const Config& config, ResponseStatus::Response responseStatus, const char* productType, const char* productSubtype, unsigned int version);
+	GMSEC_DEPRECATED ProductFileMessage(const char* subject, const Config& config, ResponseStatus::Response responseStatus, const char* productType, const char* productSubtype, unsigned int version);
 
 
 	/**
@@ -108,7 +110,7 @@ public:
 	 *
 	 * @param other - the other ProductFileMessage object to copy.
 	 */
-	ProductFileMessage(const ProductFileMessage& other);
+	GMSEC_DEPRECATED ProductFileMessage(const ProductFileMessage& other);
 
 
 	/**
@@ -118,7 +120,7 @@ public:
 	 *
 	 * @param data - XML or JSON string used to initialize ProductFileMessage.
 	 */
-	ProductFileMessage(const char* data);
+	GMSEC_DEPRECATED ProductFileMessage(const char* data);
 
 
 	/**
@@ -217,7 +219,7 @@ public:
 	 *
 	 * @brief Constructs and returns a MnemonicMessage from an an ordinary message.
 	 */
-	static ProductFileMessage CALL_TYPE convertMessage(const Message& message);
+	GMSEC_DEPRECATED static ProductFileMessage CALL_TYPE convertMessage(const Message& message);
 
 
 private:

@@ -15,8 +15,10 @@ package gov.nasa.gsfc.gmsecapi.util;
 
 /** 
  * @class LogEntry
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
  * @brief Log entry definition
  */
+@Deprecated
 public class LogEntry
 {
 	/**

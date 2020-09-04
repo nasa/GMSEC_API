@@ -36,6 +36,8 @@
 
 #include <gmsec4/util/DataList.h>
 
+#include <cstdlib>   // for malloc() and free()
+
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::util;
@@ -54,7 +56,7 @@ GMSEC_ConnectionMgr CALL_TYPE connectionManagerCreate(const GMSEC_Config config,
 	}
 	else
 	{
-		connMgr = reinterpret_cast<GMSEC_ConnectionMgr>(new ConnectionManager(*cfg, true));
+		connMgr = reinterpret_cast<GMSEC_ConnectionMgr>(new ConnectionManager(*cfg));
 	}
 
 	if (status)
@@ -290,6 +292,47 @@ void CALL_TYPE connectionManagerSetStandardFields(GMSEC_ConnectionMgr connMgr, c
 	{
 		*((Status*) status) = result;
 	}
+}
+
+
+GMSEC_Field* CALL_TYPE connectionManagerGetStandardFields(GMSEC_ConnectionMgr connMgr, size_t* numFields, GMSEC_Status status)
+{
+	GMSEC_Field* fields = NULL;
+	Status       result;
+
+	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		const DataList<Field*>& standardFields = mgr->getStandardFields();
+
+		*numFields = standardFields.size();
+		fields     = (void**) std::malloc(*numFields * sizeof(GMSEC_Field));
+
+		if (fields == NULL)
+		{
+			result = Status(MIST_ERROR, OUT_OF_MEMORY, "Unable to allocate memory for GMSEC_Field array");
+		}
+		else
+		{
+			int i = 0;
+			for (DataList<Field*>::iterator it = standardFields.begin(); it != standardFields.end(); ++it, ++i)
+			{
+				fields[i] = *it;
+			}
+		}
+	}
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return fields;
 }
 
 
@@ -1725,4 +1768,10 @@ GMSEC_Message CALL_TYPE connectionManagerRequestSimpleService(GMSEC_ConnectionMg
 	}
 
 	return reply;
+}
+
+
+void CALL_TYPE freeFieldArray(GMSEC_Field* array)
+{
+	std::free(array);
 }

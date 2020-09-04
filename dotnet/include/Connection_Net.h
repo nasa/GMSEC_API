@@ -107,6 +107,7 @@ ref class ConnectionFactory;
 /// </example>
 /// <seealso cref="ConnectionFactory" />
 /// <seealso cref="Config" />
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class Connection
 {
 private:

@@ -36,6 +36,9 @@ class GMSEC_API SubscriptionEntry
 public:
 	const char* CALL_TYPE getName() const;
 	const char* CALL_TYPE getSubject() const;
+        const char* CALL_TYPE getPattern() const;
+        const char* CALL_TYPE nextExcludedPattern() const;
+        bool CALL_TYPE hasNextExcludedPattern();
 private:
 	SubscriptionEntry();
 	~SubscriptionEntry();
@@ -50,6 +53,7 @@ private:
 using namespace gmsec::api;
 %}
 
+%include <gmsec4/util/Deprecated.h>
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/ConfigFile.h>
 
@@ -250,6 +254,8 @@ C<libgmsec_perl::ConfigFile-E<gt>lookupSubscription($name)>
 
         This function will attempt to find and return a named subscription pattern in the config file.  This is useful to allow easy modification of subject names without code changes.
 
+        Note: This function has been deprecated; use lookupSubscriptionEntry instead
+
         Example config file load and get message:
 
         eval
@@ -261,6 +267,46 @@ C<libgmsec_perl::ConfigFile-E<gt>lookupSubscription($name)>
 
             # Attempt to get subscription pattern from ConfigFile
             my $subjectPattern = $configFile->lookupSubscription("MySubscription");
+
+            if ($subjectPattern)
+            {
+                # Success
+            }
+            else
+            {
+                # Handle subscription pattern lookup error
+            }
+        };
+        if($@)
+        {
+                # Handle configuration file parsing error
+        }
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+        $name - value in the name="" attribute of the <SUBSCRIPTION> block containing the subscription pattern
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        subject pattern topic associated with SUBSCRIPTION block, or NULL if not not found
+
+=head3 lookupSubscriptionEntry
+
+C<libgmsec_perl::ConfigFile-E<gt>lookupSubscriptionEntry($name)>
+
+        This function will attempt to find and return a named subscription pattern in the config file.  This is useful to allow easy modification of subject names without code changes.
+
+        Example config file load and get message:
+
+        eval
+        {
+            my $configFile = libgmsec_perl::ConfigFile->new();
+
+            # Load and parse configuration file
+            $configFile->load("/some/path/to/config.xml");
+
+            # Attempt to get subscription pattern from ConfigFile
+            my $subjectPattern = $configFile->lookupSubscriptionEntry("MySubscription");
 
             if ($subjectPattern)
             {
@@ -443,6 +489,56 @@ C<libgmsec_perl::ConfigFile-E<gt>getIterator()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         A reference to a ConfigFileIterator object.
+
+=head1 NAME
+
+libgmsec_perl::SubscriptionEntry
+
+=head1 DESCRIPTION
+
+<Description of the class>
+
+=head2 Public Member Subroutines
+
+=head3 getName
+
+C<libgmsec_perl::SubscriptionEntry-E<gt>getName()>
+
+        This function returns the name associated with a subscription entry 
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+        
+        A name associated with a subscription entry
+
+=head3 getPattern
+
+C<libgmsec_perl::SubscriptionEntry-E<gt>getPattern()>
+
+        This function returns the pattern associated with a subscription entry 
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        A pattern associated with a subscription entry
+
+=head3 hasNextExcludedPattern
+
+C<libgmsec_perl::SubscriptionEntry-E<gt>hasNextExcludedPattern()>
+
+        This functions is used to determine if there is a next excluded pattern in the subscription entry
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        Returns true if there is a next excluded pattern or false if there are no more excluded patterns
+
+=head3 nextExcludedPattern
+
+C<libgmsec_perl::SubscriptionEntry-E<gt>nextExcludedPattern()>
+
+        This function returns the next excluded pattern in a subscription entry
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+       
+        Returns the next excluded pattern in a subscription entry
 
 =cut
 %}

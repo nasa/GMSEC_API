@@ -21,6 +21,7 @@
 #define gmsec_util_CountDownLatch_h
 
 #include <gmsec/util/Condition.h>
+#include <gmsec/util/Deprecated.h>
 
 
 namespace gmsec
@@ -31,7 +32,7 @@ namespace util
 class GMSEC_API CountDownLatch
 {
 public:
-	CountDownLatch(int count);
+	GMSEC_DEPRECATED CountDownLatch(int count);
 	~CountDownLatch();
 	void await();
 	bool await(int milliTimeout);

@@ -19,6 +19,7 @@
 #define gmsec_ConfigFileIterator_h
 
 #include <gmsec/Status.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/String.h>
 
 namespace gmsec
@@ -49,7 +50,7 @@ public:
 	 * @brief Constructs a ConfigFileIterator. Object is not internally 
 	 * 'initialized' until passed into ConfigFile.Reset(ConfigFileIterator) 
 	 */
-	ConfigFileIterator();
+	GMSEC_DEPRECATED ConfigFileIterator();
 
 	/** @fn ~ConfigFileIterator()
 	 * @brief Deconstructor for ConfigFileIterator

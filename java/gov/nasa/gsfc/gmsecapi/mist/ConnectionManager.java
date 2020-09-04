@@ -32,6 +32,9 @@ import gov.nasa.gsfc.gmsecapi.jni.JNIConnectionManager;
 
 
 /** @class ConnectionManager
+ *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This class wraps the GMSEC Connection object, supplying both normal
  * middleware interaction functions and some additional quality of service. 
  * This is accomplished through standard services for producing Log and 
@@ -57,7 +60,8 @@ import gov.nasa.gsfc.gmsecapi.jni.JNIConnectionManager;
  *
  * @sa Connection @n
  *      Config
-*/
+ */
+@Deprecated
 public class ConnectionManager
 {
 	private JNIConnectionManager m_jniConnMgr = null;

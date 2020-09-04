@@ -127,5 +127,7 @@ gmsec::api::mist::ProductFileIterator& ProductFileMessage::getProductFileIterato
 
 ProductFileMessage ProductFileMessage::convertMessage(const Message& message)
 {
+	GMSEC_DISABLE_DEPRECATED_WARNINGS
 	return ProductFileMessage(message.toXML());
+	GMSEC_ENABLE_DEPRECATED_WARNINGS
 }

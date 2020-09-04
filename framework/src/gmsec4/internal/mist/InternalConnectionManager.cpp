@@ -23,6 +23,8 @@
 #include <gmsec4/internal/mist/ResourceInfoGenerator.h>
 #include <gmsec4/internal/mist/SpecificationBuddy.h>
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/field/InternalField.h>
 
 #include <gmsec4/internal/mist/ConnMgrCallbacks.h>
@@ -85,7 +87,7 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 	  m_ceeCustomSpec(0)
 {
 	// Determine whether or not to validate messages from the Config object
-	const char* validateValue = m_config.getValue("GMSEC-MSG-CONTENT-VALIDATE");
+	const char* validateValue = m_config.getValue(GMSEC_TOGGLE_MSG_VALIDATE);
 
 	if (validateValue)
 	{
@@ -93,7 +95,7 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 	}
 
 	// Check if the specification version is provided within the supplied configuration
-	if (m_config.getValue("GMSEC-SPECIFICATION-VERSION", NULL))
+	if (m_config.getValue(GMSEC_MESSAGE_SPEC_VERSION, NULL))
 	{
 		// Yep, found it!
 
@@ -249,6 +251,12 @@ void InternalConnectionManager::setSpecification(Specification* spec)
 void InternalConnectionManager::setStandardFields(const DataList<Field*>& standardFields)
 {
 	m_messagePopulator->setStandardFields(standardFields);
+}
+
+
+const DataList<Field*>& InternalConnectionManager::getStandardFields() const
+{
+	return m_messagePopulator->getStandardFields();
 }
 
 
@@ -442,6 +450,14 @@ Message* InternalConnectionManager::request(const Message& request, GMSEC_I32 ti
 		throw Exception(MIST_ERROR, INVALID_MSG, "Cannot issue request with non-REQUEST kind message.");
 	}
 
+	// Validate the message before it is sent out
+	if (m_validate)
+	{
+		Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
+
+		spec->validateMessage(const_cast<Message&>(request));
+	}
+
 	return m_connection->request(request, timeout, republish_ms);
 }
 
@@ -477,6 +493,14 @@ void InternalConnectionManager::reply(const Message& request, const Message& rep
 	if (reply.getKind() != Message::REPLY)
 	{
 		throw Exception(MIST_ERROR, INVALID_MSG, "Cannot issue reply with non-REPLY kind message.");
+	}
+
+	// Validate the message before it is sent out
+	if (m_validate)
+	{
+		Specification* spec = (m_customSpecification ? m_customSpecification : m_specification);
+
+		spec->validateMessage(const_cast<Message&>(reply));
 	}
 
 	m_connection->reply(request, reply);

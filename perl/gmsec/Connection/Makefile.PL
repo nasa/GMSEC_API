@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker;
 
 use Util;
 
-$opts{CCFLAGS} = "-P $Config{ccflags}" if $Config{cc} eq 'gcc';
+$opts{CCFLAGS} = "-w -P $Config{ccflags}" if $Config{cc} eq 'gcc';
 $opts{CCFLAGS} =~ s/-Wdeclaration-after-statement//ig;
 
 

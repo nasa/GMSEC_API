@@ -1,3 +1,5 @@
+<!-- Planning and Scheduling Data Message -->
+<!-- See Table 5-138 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.MSG.PROD.PAS">
 	<FIELD  NAME="FINAL-MESSAGE"
 	        MODE="OPTIONAL"
@@ -87,7 +89,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="First subcategory of the product subtype.  (Subject elements ME5, ME6, etc.)"/>
+	        DESCRIPTION="Nth subcategory of the product subtype.  (Subject elements ME5, ME6, etc.)"/>
 	<FIELD	NAME="ARRAY-END"
 			MODE="CONTROL"
 			DESCRIPTION="Control field indicating the end of an array of object fields"/>
@@ -95,7 +97,7 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="I16"
+	        TYPE="U16"
 	        DESCRIPTION="Indicates the number of files included in this response message."/>
 	<FIELD 	NAME="ARRAY-START"
 			MODE="CONTROL"

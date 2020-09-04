@@ -8,6 +8,7 @@
 #ifndef GMSEC_API_SECURE_POLICY_H
 #define GMSEC_API_SECURE_POLICY_H
 
+#include <gmsec4/ConfigOptions.h>
 
 #include <gmsec4/Config.h>
 #include <gmsec4/Status.h>
@@ -28,27 +29,6 @@ class Connection;
 class Message;
 
 namespace secure {
-
-const char SEC_POLICY[]		= "SEC-POLICY";
-const char POLICY_ACCESS[]	= "SEC-AUTH";
-const char POLICY_CIPHER[]	= "SEC-CIPHER";
-const char POLICY_SIGNER[]	= "SEC-SIGNER";
-const char POLICY_RANDOM[]	= "SEC-RANDOM";
-
-const char FULLY_QUALIFIED_POLICY[]	= "SEC-POLICY-PATH-QUALIFIED";
-
-const char FIELD_CONTENT[]	= "SEC-CONTENT";
-
-const char VAL_SUB[]			= "SEC-VAL-SUB";	// validate topics?
-const char VAL_SUB_LENIENT[]	= "SEC-VAL-SUB-LENIENT"; // go easy on 'em ?
-const char ENCODE_HEADER[]		= "SEC-ENCODE-HEADER"; // encode header fields?
-const char ENCODE_XML[]			= "SEC-ENCODE-XML"; //MEH - legacy parameter for encode as xml
-
-const char GMSEC_ENCODE_XML[]		= "GMSEC-ENCODE-XML";
-const char GMSEC_ENCODE_JSON[]		= "GMSEC-ENCODE-JSON";
-
-const char POL_COMPRESS[]   = "POL-COMPRESS";   // use data compression?
-
 
 
 class AbstractPolicy;

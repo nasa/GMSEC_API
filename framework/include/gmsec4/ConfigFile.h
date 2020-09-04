@@ -15,6 +15,7 @@
 #ifndef GMSEC_API_CONFIGFILE_H
 #define GMSEC_API_CONFIGFILE_H
 
+#include <gmsec4/util/Deprecated.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <stddef.h>   // for NULL
@@ -40,50 +41,64 @@ namespace api
 	}
 
 
-/** @class ConfigFile
+/**
+ * @class ConfigFile
+ *
  * @brief This class is for the managment of standard configuration files.
  *
- *  Example configuration file format:
- *  @code
+ * Example configuration file format:
+ * @code
  * <?xml version="1.0" encoding="UTF-8"?>
+ *
  * <DEFINITIONS>
- *	<SUBSCRIPTION NAME="events" PATTERN="GMSEC.MISSION.CONST.SAT.EVT.MSG.>"/>
- *	<SUBSCRIPTION NAME="custom1" PATTERN="CUSTOM.MESSAGE.SUBJECTS.*"/>
- * 	<CONFIG NAME="config1">
- * 		<PARAMETER NAME="connectiontype">gmsec_icsswb</PARAMETER>
- * 		<PARAMETER NAME="hostname">localhost</PARAMETER>
- * 		<PARAMETER NAME="port">10005</PARAMETER>
- * 	</CONFIG>
- * 	<CONFIG NAME="config2">
- * 		<PARAMETER NAME="connectiontype">gmsec_ss</PARAMETER>
- * 		<PARAMETER NAME="server">tcp:10.1.2.159</PARAMETER>
- * 		<PARAMETER NAME="tracking">true</PARAMETER>
- * 		<PARAMETER NAME="isthreaded">true</PARAMETER>
- * 		<PARAMETER NAME="compress">true</PARAMETER>
- * 	</CONFIG>
- *	<MESSAGE NAME="msg1" SUBJECT="GMSEC.MISSION.CONST.SAT.EVT.MSG" KIND="PUBLISH">
- * 		<CONFIG NAME="msg_config">
- * 			<PARAMETER NAME="KIND">GMSEC_MSG_PUBLISH</PARAMETER>
- * 		</CONFIG>
- * 		<FIELD TYPE="CHAR" NAME="char_field">c</FIELD>
- * 		<FIELD TYPE="BOOL" NAME="bool_field">TRUE</FIELD>
- * 		<FIELD TYPE="SHORT" NAME="short_field">123</FIELD>
- * 		<FIELD TYPE="USHORT" NAME="ushort_field">123</FIELD>
- * 		<FIELD TYPE="LONG" NAME="long_field">123</FIELD>
- * 		<FIELD TYPE="ULONG" NAME="ulong_field">123</FIELD>
- * 		<FIELD TYPE="STRING" NAME="string_field">This is a test</FIELD>
- * 		<FIELD TYPE="FLOAT" NAME="float_field">123</FIELD>
- * 		<FIELD TYPE="DOUBLE" NAME="double_field">123</FIELD>
- * 		<FIELD TYPE="BIN" NAME="bin_field">4a4c4d4e4f5051</FIELD>
- * 	</MESSAGE>
+ *     <SUBSCRIPTION NAME="all-messages" PATTERN="GMSEC.*.CONST.SAT.>">
+ *         <EXCLUDE PATTERN="GMSEC.*.CONST.SAT.MSG.C2CX.>"/>
+ *         <EXCLUDE PATTERN="GMSEC.*.CONST.SAT.MSG.LOG.*"/>
+ *     </SUBSCRIPTION>
+ *
+ *     <SUBSCRIPTION NAME="custom1" PATTERN="CUSTOM.MESSAGE.SUBJECTS.*"/>
+ *
+ *     <CONFIG NAME="config1">
+ *         <PARAMETER NAME="connectionType">gmsec_activemq394</PARAMETER>
+ *         <PARAMETER NAME="server">tcp://myserver:61616</PARAMETER>
+ *     </CONFIG>
+ *
+ *     <CONFIG NAME="config2">
+ *         <PARAMETER NAME="mw-id">bolt</PARAMETER>
+ *         <PARAMETER NAME="server">10.1.2.159</PARAMETER>
+ *         <PARAMETER NAME="tracking">false</PARAMETER>
+ *         <PARAMETER NAME="compress">true</PARAMETER>
+ *     </CONFIG>
+ *
+ *     <MESSAGE NAME="msg1" SUBJECT="GMSEC.MISSION.CONST.SAT.EVT.MSG" KIND="PUBLISH">
+ *         <CONFIG NAME="msg_config">
+ *             <PARAMETER NAME="GMSEC-MSGFLD-STORE-SIZE">15</PARAMETER>
+ *             <PARAMETER NAME="GMSEC-MSGFLD-STORE-TYPE">tree</PARAMETER>
+ *         </CONFIG>
+ *         <FIELD NAME="BIN-FIELD" TYPE="BIN">4A4C4D4E4F5051</FIELD>
+ *         <FIELD NAME="BOOL-FIELD-FALSE" TYPE="BOOL">FALSE</FIELD>
+ *         <FIELD NAME="CHAR-FIELD" TYPE="CHAR">c</FIELD>
+ *         <FIELD NAME="COUNT" TYPE="I32">0</FIELD>
+ *         <FIELD NAME="F32-FIELD" TYPE="F32" BITS="40000000">2</FIELD>
+ *         <FIELD NAME="F64-FIELD" TYPE="F64" BITS="4000000000000000">2</FIELD>
+ *         <FIELD NAME="I16-FIELD" TYPE="I16">1</FIELD>
+ *         <FIELD NAME="I32-FIELD" TYPE="I32">1</FIELD>
+ *         <FIELD NAME="I64-FIELD" TYPE="I64">1</FIELD>
+ *         <FIELD NAME="I8-FIELD" TYPE="I8">1</FIELD>
+ *         <FIELD NAME="STRING-FIELD" TYPE="STRING">This is a test</FIELD>
+ *         <FIELD NAME="U16-FIELD" TYPE="U16">1</FIELD>
+ *         <FIELD NAME="U32-FIELD" TYPE="U32">1</FIELD>
+ *         <FIELD NAME="U64-FIELD" TYPE="U64">1</FIELD>
+ *         <FIELD NAME="U8-FIELD" TYPE="U8">1</FIELD>
+ *     </MESSAGE>
  * </DEFINITIONS>
- *  @endcode
+ * @endcode
  *
  * A ConfigFile object has a one-to-many mapping to connection configurations.
  * If a user wishes to maintain only one connection per object, the use of a Config
  * object is suggested.
  *
-**/
+ **/
 class GMSEC_API ConfigFile
 {
 public:
@@ -171,6 +186,8 @@ public:
 	class GMSEC_API SubscriptionEntry
 	{
 	public:
+		~SubscriptionEntry();
+
 		/**
 		 * @fn const char* getName() const
 		 *
@@ -182,8 +199,31 @@ public:
 		 * @fn const char* getSubject() const
 		 *
 		 * @desc Returns the subject/topic associated with the Subscription entry.
+		 *
+		 * @note This function has been deprecated; use getPattern() instead.
 		 */
-		const char* CALL_TYPE getSubject() const;
+		GMSEC_DEPRECATED const char* CALL_TYPE getSubject() const;
+
+		/**
+		 * @fn const char* getPattern() const
+		 *
+		 * @desc Returns the pattern associated with the Subscription entry.
+		 */	 
+		const char* CALL_TYPE getPattern() const;
+
+		/**
+		 * @fn bool hasNextExcludedPattern() const
+		 *
+		 * @desc  Returns whether or not there is a next excluded pattern.
+		 */ 
+		bool CALL_TYPE hasNextExcludedPattern() const;
+
+		/**
+		 * @fn const char* nextExcludedPattern() const
+		 *
+		 * @desc Returns next excluded pattern associated with the Subscription entry
+		 */ 
+		const char* CALL_TYPE nextExcludedPattern() const;
 
 	private:
 		friend class internal::InternalConfigFile;
@@ -191,11 +231,13 @@ public:
 
 		SubscriptionEntry();
 		SubscriptionEntry(const SubscriptionEntry& other);
-		~SubscriptionEntry();
 		SubscriptionEntry& operator=(const SubscriptionEntry& other);
 
 		void CALL_TYPE setName(const char* name);
 		void CALL_TYPE setSubject(const char* subject);
+		void CALL_TYPE setPattern(const char* pattern);
+
+		void CALL_TYPE addExcludedPattern(const char* pattern);
 
 		internal::InternalSubscriptionEntry* m_internal;
 	};
@@ -339,10 +381,14 @@ public:
 	Message CALL_TYPE lookupMessage(const char* name) const;
 
 
-	/** @fn lookupSubscription(const char* name) const
+	/**
+	 * @fn lookupSubscription(const char* name) const
+	 *
 	 * @brief This function will look up a subscription pattern defined in
 	 * the config file. This is useful to allow easy modification of subject
 	 * names without code changes.
+	 *
+	 * @note This method has been deprecated; use lookupSubscriptionEntry instead
 	 *
 	 * Example
 	 * @code
@@ -370,7 +416,47 @@ public:
 	 * @param name - value in the name="" attribute of the \<SUBSCRIPTION/\> block containing the subscription pattern
 	 * @return subject pattern topic associated with SUBSCRIPTION block, or NULL if not found
 	 */
-	const char* CALL_TYPE lookupSubscription(const char* name) const;
+	GMSEC_DEPRECATED const char* CALL_TYPE lookupSubscription(const char* name) const;
+
+
+	/**
+	 * @fn lookupSubscriptionEntry(const char* name) const
+	 *
+	 * @brief This function will look up a subscription entry pattern defined in
+	 * the config file. This is useful to allow easy modification of subject
+	 * names without code changes.
+	 *
+	 * Example
+	 * @code
+	 * try {
+	 *     ConfigFile cfgFile;
+	 *
+	 *     // load & parse configuration file
+	 *     cfgFile.load("/some/path/to/config.xml");
+	 *
+	 *     // attempt to acquire Subscription Entry
+	 *     try {
+	 *         const ConfigFile::SubscriptionEntry& entry = cfgFile.lookupSubscriptionEntry("MySubscription");
+	 *
+	 *         // entry found!
+	 *         // ...
+	 *     }
+	 *     catch (const Exception& e) {
+	 *         // handle lookup error for Subscription Entry
+	 *     }
+	 * }
+	 * catch (const Exception& e) {
+	 *     // handle configuration file parsing error
+	 * }
+	 * @endcode
+	 *
+	 * @param name - value in the name="" attribute of the \<SUBSCRIPTION/\> block containing the subscription pattern
+	 *
+	 * @return SubscriptionEntry associated with a given name
+	 *
+	 * @throws An Exception is thrown if the subscription entry cannot be found.
+	 */
+	const ConfigFile::SubscriptionEntry& CALL_TYPE lookupSubscriptionEntry(const char* name);
 
 
 	/** @fn addSubscription(const char* name, const char* subscription)

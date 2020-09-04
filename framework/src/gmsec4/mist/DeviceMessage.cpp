@@ -111,5 +111,7 @@ DeviceIterator& DeviceMessage::getDeviceIterator() const
 
 DeviceMessage DeviceMessage::convertMessage(const Message& message)
 {
+	GMSEC_DISABLE_DEPRECATED_WARNINGS
 	return DeviceMessage(message.toXML());
+	GMSEC_ENABLE_DEPRECATED_WARNINGS
 }

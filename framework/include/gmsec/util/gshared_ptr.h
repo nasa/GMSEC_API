@@ -16,6 +16,7 @@
 
 
 #include <gmsec/util/Atomics.h>
+#include <gmsec/util/Deprecated.h>
 
 
 namespace gmsec
@@ -27,12 +28,12 @@ template <class T> class gshared_ptr
 {
 public:
 
-	gshared_ptr<T> ()
+	GMSEC_DEPRECATED gshared_ptr<T> ()
 			: ptr(0), stash(0)
 	{
 	}
 
-	gshared_ptr<T> (T *t)
+	GMSEC_DEPRECATED gshared_ptr<T> (T *t)
 			: ptr(t), stash(0)
 	{
 		if (ptr)

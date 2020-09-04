@@ -46,14 +46,14 @@ public:
 
 	/// <summary>This method registers a LogHandler that will be called for all logging levels.</summary>
 	///
-	/// <param name="handler">The LogHandler to register</param>
+	/// <param name="handler">The LogHandler to register, or null to deregister an existing LogHandler</param>
 	static void RegisterHandler(LogHandler^ handler);
 
 
 	/// <summary>This method registers a LogHandler that will be called for a specific logging level.</summary>
 	///
 	/// <param name="level">The logging level to associate with the LogHandler</param>
-	/// <param name="handler">The LogHandler to register</param>
+	/// <param name="handler">The LogHandler to register, or null to deregister an existing LogHandler</param>
 	static void RegisterHandler(LoggingLevel level, LogHandler^ handler);
 
 

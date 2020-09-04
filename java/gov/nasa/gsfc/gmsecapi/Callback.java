@@ -16,6 +16,8 @@ package gov.nasa.gsfc.gmsecapi;
 /**
  * @interface Callback
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This interface is for received message callbacks. 
  * A user created class, implemented with this interface, can be passed into 
  * %Subscribe() and %Request() to have user code executed asynchronously
@@ -44,6 +46,7 @@ package gov.nasa.gsfc.gmsecapi;
  * @sa Connection::Subscribe(String subject, Callback cb) @n
  *     Connection::Request(Message request, int timeout, Callback cb)
  */
+@Deprecated
 public interface Callback
 {
 	/**

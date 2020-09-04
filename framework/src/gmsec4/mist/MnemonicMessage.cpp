@@ -110,5 +110,7 @@ gmsec::api::mist::MnemonicIterator& MnemonicMessage::getMnemonicIterator() const
 
 MnemonicMessage MnemonicMessage::convertMessage(const Message& message)
 {
+	GMSEC_DISABLE_DEPRECATED_WARNINGS
 	return MnemonicMessage(message.toXML());
+	GMSEC_ENABLE_DEPRECATED_WARNINGS
 }

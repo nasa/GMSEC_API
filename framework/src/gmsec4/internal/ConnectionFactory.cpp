@@ -20,6 +20,8 @@
 
 #include <gmsec4/internal/InternalConnection.h>
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/Config.h>
 #include <gmsec4/Connection.h>
 #include <gmsec4/Exception.h>
@@ -57,13 +59,13 @@ Connection* ConnectionFactory::create(const Config& config)
 
 	// Check if OPT_REPLY_STRING and GMSEC_DISABLE_RR (set to true) are specified.
 	// If so, throw an exception.
-	if (config.getValue(OPT_REPLY_STRING) != NULL &&
+	if (config.getValue(GMSEC_REPLY_SUBJECT) != NULL &&
 	    (value = config.getValue(GMSEC_DISABLE_RR)) != NULL &&
 	    StringUtil::stringEqualsIgnoreCase(value, "true"))
 	{
 		std::ostringstream oss;
 		oss << "Illegal configuration; cannot specify both "
-		    << OPT_REPLY_STRING << " and " << GMSEC_DISABLE_RR;
+		    << GMSEC_REPLY_SUBJECT << " and " << GMSEC_DISABLE_RR;
 
 		throw Exception(FACTORY_ERROR, INVALID_CONFIG_VALUE, oss.str().c_str());
 	}
@@ -72,7 +74,7 @@ Connection* ConnectionFactory::create(const Config& config)
 	// Deduce the middleware type (connectionType or mw-id)
 	//
 	std::string libname;
-	value = config.getValue("MW-ID");
+	value = config.getValue(GMSEC_MIDDLEWARE_ID);
 	if (value)
 	{
 		libname = std::string("gmsec_") + value;

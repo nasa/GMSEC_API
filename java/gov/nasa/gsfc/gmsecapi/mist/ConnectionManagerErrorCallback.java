@@ -22,6 +22,8 @@ import gov.nasa.gsfc.gmsecapi.Status;
 
 /** @interface ConnectionManagerErrorCallback
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This class is the abstract base class for error callbacks.
  * A user created class, derrived from this class, can be passed into %RegisterErrorCallback() to have
  * user code executed asynchronously when an error occurs in the connection object.
@@ -51,7 +53,8 @@ import gov.nasa.gsfc.gmsecapi.Status;
  * @endcode
  *
  * @sa ConnectionManager.RegisterErrorCallback(String event, ConnectionManagerErrorCallback cb)
-*/
+ */
+@Deprecated
 public interface ConnectionManagerErrorCallback
 {
 	/** @fn OnError(ConnectionManager connMgr, Message msg, Status status)

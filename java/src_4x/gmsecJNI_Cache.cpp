@@ -151,6 +151,12 @@ void Cache::putConnection(Connection* conn, jobject jConnection)
 	AutoJEnv aje;
 	JNIEnv* jenv = aje.getEnv();
 
+	if (!jenv)
+	{
+		GMSEC_ERROR << "Cache::putConnection() -- unable to attach to the current thread";
+		return;
+	}
+
 	jobject o = jenv->NewGlobalRef(jConnection);
 
 	GMSEC_VERBOSE << "JNI.putConnection cxx=" << conn << " java=" << o;
@@ -169,6 +175,12 @@ void Cache::removeConnection(Connection* conn)
 	{
 		AutoJEnv aje;
 		JNIEnv* jenv = aje.getEnv();
+
+		if (!jenv)
+		{
+			GMSEC_ERROR << "Cache::removeConnection() -- unable to attach to the current thread";
+			return;
+		}
 
 		jobject o = it->second;
 

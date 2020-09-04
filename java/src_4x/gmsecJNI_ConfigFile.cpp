@@ -305,9 +305,14 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConfigFile_1
 
 			if (jvmOk(jenv, "ConfigFile.lookupSubscription"))
 			{
-				const char* topic = cfgFile->lookupSubscription(name.c_str());
+				try {
+					const ConfigFile::SubscriptionEntry& entry = cfgFile->lookupSubscriptionEntry(name.c_str());
 
-				jTopic = makeJavaString(jenv, topic);
+					jTopic = makeJavaString(jenv, entry.getPattern());
+				}
+				catch (...) {
+					// desired subscription was not found.
+				}
 
 				jvmOk(jenv, "ConfigFile.lookupSubscription");
 			}
@@ -316,6 +321,44 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConfigFile_1
 	JNI_CATCH
 
 	return jTopic;
+}
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConfigFile_1LookupSubscriptionEntry
+  (JNIEnv *jenv, jclass jcls, jlong jCfgFilePtr, jobject jCfgFile, jstring jName)
+{
+	jlong jSubscriptionEntry = 0;
+
+	try
+	{
+		ConfigFile* cfgFile = JNI_JLONG_TO_CONFIG_FILE(jCfgFilePtr);
+
+		if (!cfgFile)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigFile reference is null");
+		}
+		else
+		{
+			JStringManager name(jenv, jName);
+
+			if (jvmOk(jenv, "ConfigFile.lookupSubscriptionEntry"))
+			{
+				try
+				{
+					const ConfigFile::SubscriptionEntry& entry = cfgFile->lookupSubscriptionEntry(name.c_str());
+ 
+					jSubscriptionEntry = JNI_POINTER_TO_JLONG(&entry);
+				}
+				catch (const Exception& e)
+				{ 
+					ThrowGmsecException(jenv, e.what());
+				}
+			}
+		}
+	}
+	JNI_CATCH
+
+	return jSubscriptionEntry;
 }
 
 

@@ -31,6 +31,7 @@
 #include <gmsec4/mist/mist_defs.h>
 
 #include <gmsec4/util/DataList.h>
+#include <gmsec4/util/Deprecated.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4_defs.h>
@@ -169,16 +170,26 @@ public:
 	/**
 	 * @fn void setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields)
 	 *
-	 * @brief Sets the internal list of fields
-	 * which are to be automatically placed in all messages sent by this ConnectionManager. 
-	 * Internal copies of the Fields are made, ownership is not retained by the 
-	 * ConnectionManager. The supplied set of fields will not be validated here, validation
-	 * occurs at the time a message is to be published. 
+	 * @brief Sets the internal list of fields that are added to all messages that are created
+	 * using the ConnectionManager.  Internal copies of the provided Fields are made, thus
+	 * ownership is not retained by the ConnectionManager. The supplied set of fields will not
+	 * be validated here; validation occurs at the time a message is to be published.
 	 *
-	 * @param standardFields - A list of fields to be copied to the internal set of fields, which
-	 * will in turn be appended to all messages.
+	 * @param standardFields - A list of fields to be copied to the internal set of fields.
 	 */
 	void CALL_TYPE setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields);
+
+
+	/**
+	 * @fn const gmsec::api::util::DataList<Field*>& getStandardFields() const
+	 *
+	 * @brief Returns a reference to the standard fields that have been set within the Connection Manager.
+	 *
+	 * @note Users should not attempt to destroy the fields within the list, for they are owned by the Connection Manager.
+	 *
+	 * @sa setStandardFields()
+	 */
+	const gmsec::api::util::DataList<Field*>& CALL_TYPE getStandardFields() const;
 
 
 	/**
@@ -560,7 +571,7 @@ public:
 	 *
 	 * @note This method has been deprecated.  Use setHeartbeatServiceField() instead.
 	 */
-	Status CALL_TYPE changeComponentStatus(const Field& componentStatus);
+	GMSEC_DEPRECATED Status CALL_TYPE changeComponentStatus(const Field& componentStatus);
 
 
 	/**
@@ -577,7 +588,7 @@ public:
 	 *
 	 * @note This method has been deprecated.  Use setHeartbeatServiceField() instead.
 	 */
-	Status CALL_TYPE changeComponentInfo(const Field& componentInfo);
+	GMSEC_DEPRECATED Status CALL_TYPE changeComponentInfo(const Field& componentInfo);
 
 
 	/**
@@ -594,7 +605,7 @@ public:
 	 *
 	 * @note This method has been deprecated.  Use setHeartbeatServiceField() instead.
 	 */
-	Status CALL_TYPE changeCPUMemory(const Field& cpuMemory);
+	GMSEC_DEPRECATED Status CALL_TYPE changeCPUMemory(const Field& cpuMemory);
 
 
 	/**
@@ -611,7 +622,7 @@ public:
 	 *
 	 * @note This method has been deprecated.  Use setHeartbeatServiceField() instead.
 	 */
-	Status CALL_TYPE changeCPUUtil(const Field& cpuUtil);
+	GMSEC_DEPRECATED Status CALL_TYPE changeCPUUtil(const Field& cpuUtil);
 
 
 	/**
@@ -625,6 +636,10 @@ public:
 	 * @param field - the field containing new or updated information for the Heartbeat Message
 	 *
 	 * @return The status of the operation.
+	 *
+	 * @note If a (valid) PUB-RATE field is passed to this method, and the Heartbeat Service
+	 * is running, then the Heartbeat Service publish rate will be changed to the provided
+	 * rate.  Note that a publish rate of 0 seconds or less will be treated as an error.
 	 */
 	Status CALL_TYPE setHeartbeatServiceField(const Field& field);
 

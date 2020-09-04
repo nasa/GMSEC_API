@@ -31,6 +31,7 @@
 #include <cms/ExceptionListener.h>
 
 #include <activemq/transport/DefaultTransportListener.h>
+#include <decaf/lang/Pointer.h>
 
 #if ACTIVEMQ_CMS_V2
 #include <decaf/util/Queue.h>
@@ -91,6 +92,7 @@ public:
 
 	virtual ~CMSTransportListener();
 
+	virtual void onCommand(const decaf::lang::Pointer<activemq::commands::Command> command AMQCPP_UNUSED);
 	virtual void transportInterrupted();
 	virtual void transportResumed();
 

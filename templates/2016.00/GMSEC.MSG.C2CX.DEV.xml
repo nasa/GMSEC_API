@@ -1,7 +1,9 @@
+<!-- Component-To-Component Transfer Device Message -->
+<!-- See Table 5-44 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.MSG.C2CX.DEV">
 	<FIELD  NAME="C2CX-SUBTYPE"
 	        MODE="REQUIRED"
-	        FIELD_CLASS="HEADER"
+	        FIELD_CLASS="STANDARD"
 	        VALUE="DEV"
 	        TYPE="STRING"
 	        DESCRIPTION="Identifies the type of information being transferred between the Components"/>
@@ -27,7 +29,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="I16"
-	        DESCRIPTION="A number assigned to the device to distinguish it from identical devices."/>
+			DESCRIPTION="A number assigned to the device to distinguish it from identical devices."/>
 	<FIELD  NAME="DEVICE.n.MODEL"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
@@ -97,7 +99,7 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="UNSET"
+	        TYPE="VARIABLE"
 	        DESCRIPTION="Value of the named parameter being reported. Component must ascertain the data type before accessing the value (e.g. with a function call).  Of type 'Variable' in the GMSEC ISD."/>			
 	<FIELD	NAME="ARRAY-END"
 			MODE="CONTROL"

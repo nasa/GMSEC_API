@@ -80,7 +80,7 @@ public:
 	// Helper methods to assist with preserving compatibility between MIST2 messages and those from MIST3
 	static std::string buildSchemaID(Message::MessageKind kind, const char* type, const char* subType, unsigned int version);
 	static Specification buildSpecification(unsigned int version);
-	static Message::MessageKind findKind(const char* schemaID);
+	static Message::MessageKind findKind(const char* schemaID, unsigned int version);
 
 	//helper function for constructer, search spec for appropriate template
 	//given by schema ID, assign to m_template

@@ -153,7 +153,10 @@ public class Specification
 	 *
 	 * @throws An IllegalArgumentException is thrown if either the subject or the schemaID are null, or
 	 * contain empty strings.
+	 *
+	 * @deprecated This method has been deprecated.
 	 */
+	@Deprecated
 	public String getTemplateXML(String subject, String schemaID)
 	{
 		if (subject == null || subject.isEmpty())

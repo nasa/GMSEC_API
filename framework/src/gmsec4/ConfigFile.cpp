@@ -85,6 +85,12 @@ const char* ConfigFile::lookupSubscription(const char* name) const
 }
 
 
+const ConfigFile::SubscriptionEntry& ConfigFile::lookupSubscriptionEntry(const char* name)
+{
+	return m_internal->lookupSubscriptionEntry(name);
+}
+
+
 void ConfigFile::addSubscription(const char* name, const char* subscription)
 {
 	m_internal->addSubscription(name, subscription);
@@ -294,7 +300,13 @@ const char* ConfigFile::SubscriptionEntry::getName() const
 
 const char* ConfigFile::SubscriptionEntry::getSubject() const
 {
-	return m_internal->getSubject();
+	return m_internal->getPattern();
+}
+
+
+const char* ConfigFile::SubscriptionEntry::getPattern() const
+{
+        return m_internal->getPattern();
 }
 
 
@@ -306,5 +318,27 @@ void ConfigFile::SubscriptionEntry::setName(const char* name)
 
 void ConfigFile::SubscriptionEntry::setSubject(const char* subject) 
 {
-	m_internal->setSubject(subject);
+	m_internal->setPattern(subject);
+}
+
+
+void ConfigFile::SubscriptionEntry::setPattern(const char* pattern) 
+{
+        m_internal->setPattern(pattern);
+}
+
+
+void ConfigFile::SubscriptionEntry::addExcludedPattern(const char* pattern)
+{
+	m_internal->addExcludedPattern(pattern);
+}
+
+bool ConfigFile::SubscriptionEntry::hasNextExcludedPattern() const
+{
+	return m_internal->hasNextExcludedPattern();
+}
+
+const char* ConfigFile::SubscriptionEntry::nextExcludedPattern() const
+{
+	return m_internal->nextExcludedPattern();
 }

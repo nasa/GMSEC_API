@@ -17,6 +17,8 @@
 
 #include <gmsec4/internal/InternalConnection.h>
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/AsyncPublisher.h>
 #include <gmsec4/internal/CallbackLookup.h>
 #include <gmsec4/internal/ConnectionInterface.h>
@@ -51,6 +53,8 @@
 #include <gmsec_version.h>
 
 #include <memory>
+#include <set>
+#include <string>
 #include <sstream>
 
 
@@ -61,6 +65,8 @@ using namespace gmsec::api::util;
 
 // Connection instance counter
 static GMSEC_U32 s_instanceCount = 0;
+
+ActiveSubscriptions InternalConnection::s_activeSubscriptions;
 
 
 const char* InternalConnection::getAPIVersion()
@@ -75,6 +81,7 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	  m_requestSpecs(),
 	  m_tracking(),
 	  m_connectionID(0),
+	  m_msgConfig(),
 	  m_messageCounter(0),
 	  m_state(Connection::NOT_CONNECTED),
 	  m_connectionAlive(false),
@@ -98,6 +105,7 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	  m_asyncQueue(0),
 	  m_callbackAdapter(0),
 	  m_parent(0),
+	  m_connectionEndpoint(),
 	  m_usingAPI3x(false)
 {
 	// Establish connection ID
@@ -153,7 +161,7 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 
 
 	// Check if performance logger is being enabled
-	const char* perfLoggerFilename = m_config.getValue(OPT_LOG_PERFORMANCE);
+	const char* perfLoggerFilename = m_config.getValue(GMSEC_LOG_PERFORMANCE);
 
 	if (perfLoggerFilename)
 	{
@@ -203,7 +211,7 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 
 
 	// Check if request/reply functionality is being disabled
-	const char* tmpValue = config.getValue(GMSEC_DISABLE_RR);
+	const char* tmpValue = m_config.getValue(GMSEC_DISABLE_RR);
 	if (!tmpValue)
 	{
 		m_requestSpecs.requestReplyEnabled = true;
@@ -214,12 +222,33 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	}
 
 
-	m_msgAggregationToolkitShared.reset(new MessageAggregationToolkit(this, config));
+	m_msgAggregationToolkitShared.reset(new MessageAggregationToolkit(this, m_config));
 
 	// Check if this Connection object will perform Message aggregation
-	if (config.getBooleanValue(GMSEC_USE_MSG_BINS, false))
+	if (m_config.getBooleanValue(GMSEC_USE_MSG_BINS, false))
 	{
 		startMsgAggregationToolkitThread();
+	}
+
+
+	// Determine message-related configuration options from the given connection config
+	{
+		Message          tmp("TMP.MESSAGE", Message::PUBLISH);
+		InternalMessage& internalMsg = MessageBuddy::getInternal(tmp);
+
+		const char* name    = 0;
+		const char* value   = 0;
+		bool        hasNext = m_config.getFirst(name, value);
+
+		while (hasNext)
+		{
+			if (internalMsg.processConfigValue(name, value))
+			{
+				m_msgConfig.addValue(name, value);
+			}
+
+			hasNext = m_config.getNext(name, value);
+		}
 	}
 
 
@@ -395,11 +424,6 @@ const char* InternalConnection::getLibraryVersion() const
 
 void InternalConnection::registerEventCallback(Connection::ConnectionEvent event, EventCallback* cb)
 {
-	if (m_state != Connection::CONNECTED)
-	{
-		throw Exception(CONNECTION_ERROR, INVALID_CONNECTION, "Connection has not been established");
-	}
-
 	if (!cb)
 	{
 		throw Exception(CONNECTION_ERROR, UNINITIALIZED_OBJECT, "EventCallback cannot be NULL");
@@ -480,7 +504,9 @@ SubscriptionInfo* InternalConnection::subscribe(const char* subject, const Confi
 		it->second->addDetails(cb, config);
 	}
 
-	GMSEC_DEBUG << "Successfully subscribed to " << subject;
+	GMSEC_VERBOSE << "Successfully subscribed to " << subject;
+
+	s_activeSubscriptions.addTopic(subject);
 
 	SubscriptionInfo* info = new SubscriptionInfo(m_parent, subject, cb);
 
@@ -677,7 +703,7 @@ void InternalConnection::request(const Message& request, GMSEC_I32 timeout, Repl
 
 	if (m_requestSpecs.useSubjectMapping == false)
 	{
-		MessageBuddy::getInternal(*requestClone).getDetails().setBoolean(OPT_REQ_RESP, true);
+		MessageBuddy::getInternal(*requestClone).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
 
 	insertTrackingFields(*requestClone);
@@ -732,7 +758,7 @@ Message* InternalConnection::request(const Message& request, GMSEC_I32 timeout, 
 
 	if (m_requestSpecs.useSubjectMapping == false)
 	{
-		MessageBuddy::getInternal(*requestClone).getDetails().setBoolean(OPT_REQ_RESP, true);
+		MessageBuddy::getInternal(*requestClone).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
 
 	insertTrackingFields(*requestClone);
@@ -866,13 +892,13 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 	ValueMap& meta = MessageBuddy::getInternal(request).getDetails();
 
 	std::string id;
-	if (!meta.getString(REPLY_UNIQUE_ID_FIELD, id).isError())
+	if (!meta.getString(GMSEC_REPLY_UNIQUE_ID_FIELD, id).isError())
 	{
-		MessageBuddy::getInternal(reply).addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
+		MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 	}
 
 	bool noSubjectMapping = false;
-	meta.getBoolean(OPT_REQ_RESP, noSubjectMapping, &noSubjectMapping);
+	meta.getBoolean(GMSEC_REQ_RESP_BEHAVIOR, noSubjectMapping, &noSubjectMapping);
 
 	insertTrackingFields(const_cast<Message&>(reply));
 
@@ -887,14 +913,14 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 	else
 	{
 		// Add the reply subject as a field of the message being sent.
-		MessageBuddy::getInternal(reply).addField(REPLY_SUBJECT_FIELD, reply.getSubject());
+		MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_SUBJECT_FIELD, reply.getSubject());
 
 		m_connIf->mwReply(request, reply);
 
-		MessageBuddy::getInternal(reply).clearField(REPLY_SUBJECT_FIELD);
+		MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_SUBJECT_FIELD);
 	}
 
-	MessageBuddy::getInternal(reply).clearField(REPLY_UNIQUE_ID_FIELD);
+	MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 	removeTrackingFields(const_cast<Message&>(reply));
 }
@@ -1111,6 +1137,12 @@ Config& InternalConnection::getConfig()
 }
 
 
+Config& InternalConnection::getMessageConfig()
+{
+	return m_msgConfig;
+}
+
+
 GMSEC_U32 InternalConnection::getMessageCounter() const
 {
 	return m_messageCounter;
@@ -1212,8 +1244,8 @@ void InternalConnection::updateReplySubject(Message*& reply, bool warn)
 
 	const char* problem = 0;
 
-    // Get the REPLY_SUBJECT_FIELD from within the Reply message.
-    const Field* field = reply->getField(REPLY_SUBJECT_FIELD);
+    // Get the GMSEC_REPLY_SUBJECT_FIELD from within the Reply message.
+    const Field* field = reply->getField(GMSEC_REPLY_SUBJECT_FIELD);
 
     if (!field)
     {
@@ -1229,7 +1261,7 @@ void InternalConnection::updateReplySubject(Message*& reply, bool warn)
 
 			MessageBuddy::getInternal(*reply).setSubject(replySubject);
 
-			reply->clearField(REPLY_SUBJECT_FIELD);
+			reply->clearField(GMSEC_REPLY_SUBJECT_FIELD);
 		}
 		else
 		{
@@ -1454,41 +1486,51 @@ void InternalConnection::unsubscribeAux(SubscriptionInfo*& info)
 			m_subscriptionRegistry.erase(it);
 		}
 	}
+
+	s_activeSubscriptions.removeTopic(info->getSubject());
 }
 
 
 void InternalConnection::initializeTracking()
 {
 	// boolean config values for tracking fields
-	m_tracking.set(m_config.getBooleanValue("tracking", true));
+	m_tracking.set(m_config.getBooleanValue(GMSEC_TRACKING, true));
 
-	if (m_config.getValue("tracking-node"))
+	if (m_config.getValue(GMSEC_TRACKING_NODE))
 	{
-		m_tracking.setNode(m_config.getBooleanValue("tracking-node", false));
+		m_tracking.setNode(m_config.getBooleanValue(GMSEC_TRACKING_NODE, false));
 	}
-	if (m_config.getValue("tracking-process-id"))
+	if (m_config.getValue(GMSEC_TRACKING_PROCESS_ID))
 	{
-		m_tracking.setProcessId(m_config.getBooleanValue("tracking-process-id", false));
+		m_tracking.setProcessId(m_config.getBooleanValue(GMSEC_TRACKING_PROCESS_ID, false));
 	}
-	if (m_config.getValue("tracking-user-name"))
+	if (m_config.getValue(GMSEC_TRACKING_USERNAME))
 	{
-		m_tracking.setUserName(m_config.getBooleanValue("tracking-user-name", false));
+		m_tracking.setUserName(m_config.getBooleanValue(GMSEC_TRACKING_USERNAME, false));
 	}
-	if (m_config.getValue("tracking-connection-id"))
+	if (m_config.getValue(GMSEC_TRACKING_CONNECTION_ID))
 	{
-		m_tracking.setConnectionId(m_config.getBooleanValue("tracking-connection-id", false));
+		m_tracking.setConnectionId(m_config.getBooleanValue(GMSEC_TRACKING_CONNECTION_ID, false));
 	}
-	if (m_config.getValue("tracking-publish-time"))
+	if (m_config.getValue(GMSEC_TRACKING_PUBLISH_TIME))
 	{
-		m_tracking.setPublishTime(m_config.getBooleanValue("tracking-publish-time", false));
+		m_tracking.setPublishTime(m_config.getBooleanValue(GMSEC_TRACKING_PUBLISH_TIME, false));
 	}
-	if (m_config.getValue("tracking-unique-id"))
+	if (m_config.getValue(GMSEC_TRACKING_UNIQUE_ID))
 	{
-		m_tracking.setUniqueId(m_config.getBooleanValue("tracking-unique-id", false));
+		m_tracking.setUniqueId(m_config.getBooleanValue(GMSEC_TRACKING_UNIQUE_ID, false));
 	}
-	if (m_config.getValue("tracking-mw-info"))
+	if (m_config.getValue(GMSEC_TRACKING_MW_INFO))
 	{
-		m_tracking.setMwInfo(m_config.getBooleanValue("tracking-mw-info", false));
+		m_tracking.setMwInfo(m_config.getBooleanValue(GMSEC_TRACKING_MW_INFO, false));
+	}
+	if (m_config.getValue(GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS))
+	{
+		m_tracking.setActiveSubscriptions(m_config.getBooleanValue(GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS, false));
+	}
+	if (m_config.getValue(GMSEC_TRACKING_CONNECTION_ENDPOINT))
+	{
+		m_tracking.setConnectionEndpoint(m_config.getBooleanValue(GMSEC_TRACKING_CONNECTION_ENDPOINT, false));
 	}
 }
 
@@ -1497,7 +1539,7 @@ void InternalConnection::initializeRequest()
 {
 	const char* value = NULL;
 
-	value = m_config.getValue(OPT_REQ_RESP);
+	value = m_config.getValue(GMSEC_REQ_RESP_BEHAVIOR);
 
 	if (value && StringUtil::stringEqualsIgnoreCase(value, "OPEN-RESP"))
 	{
@@ -1515,7 +1557,7 @@ void InternalConnection::initializeRequest()
 
 	// allow override through the REPLY-STRING parameter
 	// but only if we are using subject mapping.
-	value = m_config.getValue(OPT_REPLY_STRING);
+	value = m_config.getValue(GMSEC_REPLY_SUBJECT);
 
 	if (value)
 	{
@@ -1555,8 +1597,8 @@ void InternalConnection::initializeRequest()
 		}
 		else
 		{
-			GMSEC_WARNING << OPT_REQ_RESP << " and " << OPT_REPLY_STRING
-				<< " cannot be specified at the same time; " << OPT_REPLY_STRING
+			GMSEC_WARNING << GMSEC_REQ_RESP_BEHAVIOR << " and " << GMSEC_REPLY_SUBJECT
+				<< " cannot be specified at the same time; " << GMSEC_REPLY_SUBJECT
 				<< " is being ignored.";
 		}
 	}
@@ -1564,7 +1606,7 @@ void InternalConnection::initializeRequest()
 	m_requestSpecs.replySubject = subject;
 	GMSEC_VERBOSE << "using reply subject " << subject.c_str();
 
-	value = m_config.getValue(OPT_EXPOSE_RESP);
+	value = m_config.getValue(GMSEC_EXPOSE_RESP);
 	if (value)
 	{
 		m_requestSpecs.legacy = false;
@@ -1573,7 +1615,7 @@ void InternalConnection::initializeRequest()
 
 	m_requestSpecs.multiResponse = m_config.getBooleanValue(OPT_MULTI_RESP, false);
 
-	value = m_config.getValue("republish_ms");
+	value = m_config.getValue(GMSEC_REQ_REPUBLISH_MS);
 	if (value)
 	{
 		GMSEC_I32 tmp = 0;
@@ -1663,6 +1705,60 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	    (connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
 	{
 		msg.addField("MW-INFO", getMWInfo());
+	}
+
+	if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
+	    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+	{
+		try
+		{
+			// We only apply ACTIVE-SUBSCRIPTIONS field to C2CX HB Messages.
+			const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
+
+			if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
+			{
+				std::set<std::string> activeSubs = s_activeSubscriptions.getTopics();
+
+				msg.addField("NUM-OF-SUBSCRIPTIONS", (GMSEC_U16) activeSubs.size());
+
+				if (activeSubs.size() > 0)
+				{
+					int n = 1;
+					for (std::set<std::string>::iterator it = activeSubs.begin(); it != activeSubs.end(); ++it, ++n)
+					{
+						std::ostringstream fieldName;
+						fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+
+						msg.addField(fieldName.str().c_str(), it->c_str());
+					}
+				}
+			}
+		}
+		catch (...)
+		{
+			// Ignore exception; message is not a C2CX HB message.
+		}
+	}
+
+	if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
+	    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
+	{
+		try
+		{
+			// We only apply ACTIVE-SUBSCRIPTIONS field to C2CX HB Messages.
+			const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
+
+			if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
+			{
+				const char* endpoint = (m_connectionEndpoint.empty() ? "unknown" : m_connectionEndpoint.c_str());
+
+				msg.addField("MW-CONNECTION-ENDPOINT", endpoint);
+			}
+		}
+		catch (...)
+		{
+			// Ignore exception; message is not a C2CX HB message.
+		}
 	}
 }
 
@@ -1839,16 +1935,22 @@ gmsec::api::util::TicketMutex& InternalConnection::getEventMutex()
 }
 
 
+void InternalConnection::setConnectionEndpoint(const std::string& endpoint)
+{
+	m_connectionEndpoint = endpoint;
+}
+
+
 void InternalConnection::usingAPI3x()
 {
 	m_usingAPI3x = true;
 
-	const char* policy = m_config.getValue(secure::SEC_POLICY);
+	const char* policy = m_config.getValue(secure::GMSEC_POLICY);
 
 	if (policy == NULL)
 	{
 		Config config;
-		config.addValue(secure::SEC_POLICY, "API3");
+		config.addValue(secure::GMSEC_POLICY, "API3");
 
 		DynamicFactory::initialize(getPolicy(), config);
 	}

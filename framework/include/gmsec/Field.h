@@ -23,6 +23,7 @@
 
 
 #include <gmsec/Status.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -65,7 +66,7 @@ public:
 	/** @fn Field()
 	 * @brief Create an "UNSET" field
 	 */
-	Field();
+	GMSEC_DEPRECATED Field();
 
 	/** @fn Field(const char *name, GMSEC_CHAR value)
 	 * @brief Create a named field of type GMSEC_CHAR
@@ -73,7 +74,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_CHAR value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_CHAR value);
 
 	/** @fn Field(const char *name, GMSEC_I8 value)
 	 * @brief Create a named field of type GMSEC_I8
@@ -81,7 +82,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_I8 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_I8 value);
 
 	/** @fn Field(const char *name, GMSEC_U8 value)
 	 * @brief Create a named field of type GMSEC_U8
@@ -89,7 +90,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_U8 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_U8 value);
 
 	/** @fn Field(const char *name, GMSEC_BOOL value)
 	 * @brief Create a named field of type GMSEC_BOOL
@@ -97,7 +98,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_BOOL value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_BOOL value);
 
 	/** @fn Field(const char *name, GMSEC_I16 value)
 	 * @brief Create a named field of type GMSEC_I16
@@ -105,7 +106,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_I16 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_I16 value);
 
 	/** @fn Field(const char *name, GMSEC_U16 value)
 	 * @brief Create a named field of type GMSEC_U16
@@ -113,7 +114,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_U16 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_U16 value);
 
 	/** @fn Field(const char *name, GMSEC_I32 value)
 	 * @brief Create a named field of type GMSEC_I32
@@ -121,7 +122,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_I32 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_I32 value);
 
 	/** @fn Field(const char *name, GMSEC_U32 value)
 	 * @brief Create a named field of type GMSEC_U32
@@ -129,7 +130,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_U32 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_U32 value);
 
 	/** @fn Field(const char *name, GMSEC_U64 value)
 	 * @brief Create a named field of type GMSEC_U64
@@ -137,7 +138,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_U64 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_U64 value);
 
 	/** @fn Field(const char *name, GMSEC_F32 value)
 	 * @brief Create a named field of type GMSEC_F32
@@ -145,7 +146,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_F32 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_F32 value);
 
 	/** @fn Field(const char *name, GMSEC_F64 value)
 	 * @brief Create a named field of type GMSEC_F64
@@ -153,7 +154,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_F64 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_F64 value);
 
 	/** @fn Field(const char *name, GMSEC_STRING value)
 	 * @brief Create a named field of type GMSEC_STRING
@@ -161,7 +162,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_STRING value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_STRING value);
 
 	/** @fn Field(const char *name, GMSEC_STR value)
 	 * @brief Create a named field of type GMSEC_STR
@@ -169,7 +170,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_STR value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_STR value);
 
 	/** @fn Field(const char *name, GMSEC_BIN value, GMSEC_U32 size)
 	 * @brief Create a named field of type GMSEC_BIN
@@ -178,7 +179,7 @@ public:
 	 * @param value - value of field to set
 	 * @param size - size of the field to set
 	 */
-	Field(const char *name, GMSEC_BIN value, GMSEC_U32 size);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_BIN value, GMSEC_U32 size);
 
 	/** @fn Field(const char *name, GMSEC_BLOB value, GMSEC_U32 size)
 	 * @brief Create a named field of type GMSEC_BLOB
@@ -187,7 +188,7 @@ public:
 	 * @param value - value of field to set
 	 * @param size - size of the field to set
 	 */
-	Field(const char *name, GMSEC_BLOB value, GMSEC_U32 size);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_BLOB value, GMSEC_U32 size);
 
 	/** @fn Field(const char *name, GMSEC_I64 value)
 	 * @brief Create a named field of type GMSEC_I64
@@ -195,7 +196,7 @@ public:
 	 * @param name - name of field to set
 	 * @param value - value of field to set
 	 */
-	Field(const char *name, GMSEC_I64 value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_I64 value);
 
 	/** @fn Field(const char *name, GMSEC_TYPE ftype, const char *value)
 	 * @brief Create a named field of specified type, value parsed from the value string
@@ -204,12 +205,12 @@ public:
 	 * @param ftype - target field type to set
 	 * @param value - string to parse as the type in "ftype"
 	 */
-	Field(const char *name, GMSEC_TYPE ftype, const char *value);
+	GMSEC_DEPRECATED Field(const char *name, GMSEC_TYPE ftype, const char *value);
 
 	/** @fn Field(Field &fd)
 	 * @brief (safe) deep copy constructor
 	 */
-	Field(Field &fd);
+	GMSEC_DEPRECATED Field(Field &fd);
 
 	/** @fn ~Field()
 	 * @brief Destructor.
@@ -705,7 +706,7 @@ public:
 	 *
 	 * @sa GMSEC_TYPE
 	 */
-	static GMSEC_TYPE LookupType(const char *ftype);
+	GMSEC_DEPRECATED static GMSEC_TYPE LookupType(const char *ftype);
 
 	/** @fn ToXML( const char *&outbuf )
 	 * @brief This function formats the field value to an XML tag. The buffer

@@ -15,6 +15,7 @@
 #include <gmsec4/util/Log.h>
 
 #include <memory>
+#include <string>
 
 
 using namespace gmsec::api;
@@ -159,7 +160,7 @@ void MBWire::serialize(const Message& message, char*& data, size_t& size)
 
 #define SUBJECT_START "SUBJECT="
 
-bool MBWire::deserialize(const char* data, int size, gmsec::api::Message*& message)
+bool MBWire::deserialize(const char* data, int size, gmsec::api::Message*& message, const gmsec::api::Config& msgConfig)
 {
 	message = 0;
 
@@ -200,40 +201,26 @@ bool MBWire::deserialize(const char* data, int size, gmsec::api::Message*& messa
 	unsigned char msgKind = data[index];
 	index += 1;
 
-	// create the GMSEC message; first make sure the subject is null-character terminated.
-	char* tmpSubject = new char[subLength + 1];
-
-	StringUtil::copyBytes(tmpSubject, subject, subLength);
-
-	tmpSubject[subLength] = '\0';
+	// create the GMSEC message; first construct the subject
+	std::string tmpSubject(subject, subLength);
 
 	bool result = true;
 
 	try
 	{
-		std::auto_ptr<Message> gmsecMessage(new Message(tmpSubject, static_cast<Message::MessageKind>(msgKind)));
+		std::auto_ptr<Message> gmsecMessage(new Message(tmpSubject.c_str(), static_cast<Message::MessageKind>(msgKind), msgConfig));
 
 		MessageDecoder decoder;
 
-		try
-		{
-			decoder.decode(*gmsecMessage.get(), size - index, &data[index]);
-		}
-		catch (Exception& e)
-		{
-			GMSEC_WARNING << "MBWire::deserialize: decode error " << e.what();
-			result = false;
-		}
+		decoder.decode(*gmsecMessage.get(), size - index, &data[index]);
 
 		message = gmsecMessage.release();
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
 		GMSEC_WARNING << "MBWire::deserialize: unable to create Message: " << e.what();
 		result = false;
 	}
-
-	delete [] tmpSubject;
 
 	return result;
 }

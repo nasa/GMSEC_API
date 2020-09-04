@@ -41,6 +41,7 @@
 #ifndef gmsec_c_status_c_h
 #define gmsec_c_status_c_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -58,7 +59,7 @@ extern "C"
 	 *
 	 * @sa DestroyStatus()
 	 */
-	GMSEC_API void CALL_TYPE CreateStatus(GMSEC_STATUS_HANDLE *sts);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE CreateStatus(GMSEC_STATUS_HANDLE *sts);
 
 	/** @fn DestroyStatus(GMSEC_STATUS_HANDLE *sts)
 	 * @brief This function will clean up a status and any related memory.
@@ -67,7 +68,7 @@ extern "C"
 	 *
 	 * @sa CreateStatus()
 	 */
-	GMSEC_API void CALL_TYPE DestroyStatus(GMSEC_STATUS_HANDLE *sts);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE DestroyStatus(GMSEC_STATUS_HANDLE *sts);
 
 	/** @fn GetStatus(GMSEC_STATUS_HANDLE sts)
 	 * @brief Get the complete status string from this status.
@@ -76,7 +77,7 @@ extern "C"
 	 * @param[out] sts - status to get string from
 	 * @return error string
 	 */
-	GMSEC_API const char * CALL_TYPE GetStatus(GMSEC_STATUS_HANDLE sts);
+	GMSEC_DEPRECATED GMSEC_API const char * CALL_TYPE GetStatus(GMSEC_STATUS_HANDLE sts);
 
 	/** @fn GetStatusString(GMSEC_STATUS_HANDLE sts)
 	 * @brief Get the error string from the status.
@@ -84,7 +85,7 @@ extern "C"
 	 * @param[in] sts - status to get string from
 	 * @return error string
 	 */
-	GMSEC_API const char * CALL_TYPE GetStatusString(GMSEC_STATUS_HANDLE sts);
+	GMSEC_DEPRECATED GMSEC_API const char * CALL_TYPE GetStatusString(GMSEC_STATUS_HANDLE sts);
 
 	/** @fn GetStatusClass(GMSEC_STATUS_HANDLE sts)
 	 * @brief Get "class" code of this status. This code will indicate which layer, or
@@ -95,7 +96,7 @@ extern "C"
 	 *
 	 * @sa gmsec_errors.h
 	 */
-	GMSEC_API GMSEC_STATUS_CLASS CALL_TYPE GetStatusClass(GMSEC_STATUS_HANDLE sts);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_STATUS_CLASS CALL_TYPE GetStatusClass(GMSEC_STATUS_HANDLE sts);
 
 	/** @fn GetStatusCode(GMSEC_STATUS_HANDLE sts)
 	 * @brief Get the error code of this status. This code will indicate the error
@@ -106,7 +107,7 @@ extern "C"
 	 *
 	 * @sa gmsec_errors.h
 	 */
-	GMSEC_API unsigned int CALL_TYPE GetStatusCode(GMSEC_STATUS_HANDLE sts);
+	GMSEC_DEPRECATED GMSEC_API unsigned int CALL_TYPE GetStatusCode(GMSEC_STATUS_HANDLE sts);
 
 	/** @fn GetStatusCustomCode(GMSEC_STATUS_HANDLE sts)
 	 * @brief This will return the custom error code number of this status object.
@@ -116,7 +117,7 @@ extern "C"
 	 *
 	 * @sa gmsec_errors.h
 	 */
-	GMSEC_API int CALL_TYPE gmsec_GetStatusCustomCode(GMSEC_STATUS_HANDLE sts);
+	GMSEC_DEPRECATED GMSEC_API int CALL_TYPE gmsec_GetStatusCustomCode(GMSEC_STATUS_HANDLE sts);
 
 	/** @fn isStatusError(GMSEC_STATUS_HANDLE sts)
 	 * @brief This will return 1 if the status is indicating an error, 0 otherwise.
@@ -125,7 +126,7 @@ extern "C"
 	 * @param[in] sts - status handle
 	 * @return 1 if there is an error, 0 otherwise
 	 */
-	GMSEC_API int CALL_TYPE isStatusError(GMSEC_STATUS_HANDLE sts);
+	GMSEC_DEPRECATED GMSEC_API int CALL_TYPE isStatusError(GMSEC_STATUS_HANDLE sts);
 
 #ifdef __cplusplus
 }	// extern "C"

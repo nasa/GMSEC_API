@@ -79,7 +79,7 @@ public:
 
 	
 	//INTERNAL USE ONLY helper function, look up the MessageTemplate with the matching schemaID
-	MessageTemplate findTemplate(const char* schemaID);
+	MessageTemplate& findTemplate(const char* schemaID);
 
 
 	bool checkValidSpec(unsigned int specVersionInt);
@@ -93,6 +93,9 @@ public:
 
 private:
 	friend class gmsec::api::mist::internal::InternalSchemaIDIterator;
+
+	void CALL_TYPE cleanup();
+
 
 	void CALL_TYPE load();
 
@@ -110,7 +113,7 @@ private:
 	const char* CALL_TYPE getTypeStr(Field::FieldType type);
 
 	//internal helper functions for checkValidation
-	std::string CALL_TYPE registerTemplate(const Message& msg);
+	std::string CALL_TYPE registerTemplate(const Message& msg, GMSEC_I64 level);
 	Status CALL_TYPE compare(const Message& msg, const std::list<FieldTemplate>& fields);
 	Status CALL_TYPE validate(const Message& msg, const FieldTemplate& fmtp);
 	std::string prepFieldName(const char* name, const std::list<std::string>& charList, const std::list<size_t>& indexList);
@@ -126,20 +129,20 @@ private:
 	bool CALL_TYPE hasNextID() const;
 
 
-	typedef std::map<std::string, std::string> SchemaRegistry; //message subject, schema ID
-	typedef std::list<MessageTemplate*>		   MessageTemplateList;
-	typedef std::list<FieldTemplate>		   FieldTemplateList;
-	typedef std::list<SchemaTemplate>		   SchemaTemplateList;
+	typedef std::map<std::string, std::string>      SchemaRegistry;   // message subject, schema ID
+	typedef std::map<std::string, MessageTemplate*> MessageTemplates; // schema ID, MessageTemplate
+	typedef std::list<FieldTemplate>                FieldTemplateList;
+	typedef std::list<SchemaTemplate>               SchemaTemplateList;
 
 	const Config&						m_config;
 	SchemaRegistry						m_registry;	
-	MessageTemplateList					m_templates;
+	MessageTemplates					m_templates;
 	FieldTemplateList					m_headers;	
 	SchemaTemplateList					m_directory;
 	std::string							m_specificationId; //version
 	unsigned int						m_validationLevel;
 	unsigned int						m_schemaLevel;
-	MessageTemplateList::const_iterator	m_schemaIndex;
+	MessageTemplates::const_iterator	m_schemaIndex;
 	SchemaIDIterator					m_iterator;
 	std::string							m_basePath;
 

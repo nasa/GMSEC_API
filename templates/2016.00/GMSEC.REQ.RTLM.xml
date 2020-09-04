@@ -1,3 +1,5 @@
+<!-- Replay Telemetry Request Message -->
+<!-- See Table 5-61 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.REQ.RTLM">
 	<FIELD  NAME="ACTION"
 	        MODE="REQUIRED"

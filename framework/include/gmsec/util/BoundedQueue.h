@@ -22,6 +22,7 @@
 
 
 #include <gmsec/util/Condition.h>
+#include <gmsec/util/Deprecated.h>
 
 
 namespace gmsec
@@ -55,7 +56,7 @@ public:
 	 *	@params size - The maximum size of the queue
 	 *
 	 */
-	BoundedQueue(int size)
+	GMSEC_DEPRECATED BoundedQueue(int size)
 		: maxSize(size),
 		  data(new elemType[size]),
 		  nextIdx(-1),

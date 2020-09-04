@@ -1,3 +1,5 @@
+<!-- CCSDS Frame Telemetry Message -->
+<!-- See Table 5-54 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.MSG.TLM.CCSDSFRAME">
 	<FIELD  NAME="FORMAT"
 	        MODE="REQUIRED"
@@ -75,6 +77,6 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="BIN"
+	        TYPE="BINARY"
 	        DESCRIPTION="Raw telemetry data"/>
 </SCHEMA>

@@ -35,7 +35,7 @@ C<libgmsec_perl::MistMessage-E<gt>new($subject, $schemaID, $spec)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
 	$subject - the subject string for the message.
-	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).  Note that not all schemaIDs contain a messageSubtype
+	$schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).  You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB) Note that not all schemaIDs contain a messageSubtype
 	$spec - a reference to the specification this message's schema will adhere to.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>

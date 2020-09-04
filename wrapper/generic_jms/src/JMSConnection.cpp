@@ -18,6 +18,8 @@
 
 #include "JMSConnection.h"
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/Encoder.h>
 #include <gmsec4/internal/InternalConnection.h>
 #include <gmsec4/internal/JNI.h>
@@ -320,10 +322,10 @@ JMSConnection::JMSConnection(const Config& config)
 	mwConfig(config, "lookup-connection-factory", lookupFactory, true);
 	mwConfig(config, "lookup-topic", lookupTopic, true);
 
-	persistent = config.getBooleanValue("MW-PERSISTENT", false);
+	persistent = config.getBooleanValue(JMS_PERSISTENT, false);
 
 	mwConfig(config, "JVM-CLASSPATH", jvmClasspath, true);
-	jvmIgnoreUnrecognized = config.getBooleanValue("MW-JVM-IGNORE-UNRECOGNIZED", false);
+	jvmIgnoreUnrecognized = config.getBooleanValue(JMS_JVM_IGNORE_UNRECOGNIZED, false);
 
 	std::string key;
 	std::string value;
@@ -393,18 +395,21 @@ JMSConnection::JMSConnection(const Config& config)
 	{
 		jvmArgs.push_front("-Djava.compiler=NONE");
 		jvmArgs.push_front("-Djava.class.path=" + jvmClasspath);
+		jvmArgs.push_front("-Xss2m");  // Set JVM stack size; see https://issues.apache.org/jira/browse/DAEMON-363
 
 		JavaVMOption *options = new JavaVMOption[jvmArgs.size()];
 		int n = 0;
 		GMSEC_VERBOSE << "initializing JVM with arguments:";
-		for (std::list<std::string>::const_iterator i = jvmArgs.begin(); i != jvmArgs.end(); ++i)
+		for (std::list<std::string>::const_iterator i = jvmArgs.begin(); i != jvmArgs.end(); ++i, ++n)
 		{
-			options[n++].optionString = (char*) i->c_str();
+			options[n].optionString = (char*) i->c_str();
 			GMSEC_VERBOSE << "\t" << i->c_str();
 		}
 
 		JavaVMInitArgs vm_args;
-#ifdef JNI_VERSION_1_6
+#if defined JNI_VERSION_1_8
+		vm_args.version = JNI_VERSION_1_8;
+#elif defined JNI_VERSION_1_6
 		vm_args.version = JNI_VERSION_1_6;
 #else
 		vm_args.version = JNI_VERSION_1_4;
@@ -618,6 +623,8 @@ void JMSConnection::mwConnect()
 	JNI_CATCH(envLocal)
 
 	detachMe(jvm);
+
+	getExternal().setConnectionEndpoint(provider_url);
 }
 
 
@@ -737,7 +744,7 @@ void JMSConnection::mwRequest(const Message& request, std::string& id)
 
 	id = generateUniqueId(requestCounter);
 
-	MessageBuddy::getInternal(request).addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
+	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 	MessageBuddy::getInternal(request).addField(GENERIC_JMS_REPLY, requestSpecs.replySubject.c_str());
 
 	mwPublish(request, getExternal().getConfig());
@@ -750,7 +757,7 @@ void JMSConnection::mwReply(const Message& request, const Message& reply)
 {
 	// Get the Request's Unique ID, and put it into a field in the Reply
 	try {
-		const StringField& uniqueID = request.getStringField(REPLY_UNIQUE_ID_FIELD);
+		const StringField& uniqueID = request.getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 		MessageBuddy::getInternal(reply).addField(uniqueID);
 	}
@@ -947,7 +954,7 @@ void JMSConnection::prepareBytes(const Message& msg, DataBuffer& buffer)
 
 void JMSConnection::unloadBytes(const DataBuffer& buffer, Message::MessageKind kind, Message*& gmsecMessage, std::string& rawSubject)
 {
-	std::auto_ptr<Message> msg(new Message(GENERIC_TMP_SUBJECT, kind));
+	std::auto_ptr<Message> msg(new Message(GENERIC_TMP_SUBJECT, kind, getExternal().getMessageConfig()));
 	ValueMap               meta;
 
 #if 0

@@ -41,6 +41,7 @@
 #ifndef gmsec_c_status_h
 #define gmsec_c_status_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -58,7 +59,7 @@ extern "C"
 	 *
 	 * @sa gmsec_DestroyStatus()
 	 */
-	GMSEC_API void CALL_TYPE gmsec_CreateStatus(GMSEC_STATUS_OBJECT *sts);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE gmsec_CreateStatus(GMSEC_STATUS_OBJECT *sts);
 
 	/** @fn gmsec_DestroyStatus(GMSEC_STATUS_OBJECT *sts)
 	 * @brief This function will clean up a status and any related memory.
@@ -67,7 +68,7 @@ extern "C"
 	 *
 	 * @sa gmsec_CreateStatus()
 	 */
-	GMSEC_API void CALL_TYPE gmsec_DestroyStatus(GMSEC_STATUS_OBJECT *sts);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE gmsec_DestroyStatus(GMSEC_STATUS_OBJECT *sts);
 
 	/** @fn gmsec_GetStatus(GMSEC_STATUS_OBJECT sts)
 	 * @brief Get the complete status string from this status.
@@ -76,7 +77,7 @@ extern "C"
 	 * @param[out] sts - status to get string from
 	 * @return error string
 	 */
-	GMSEC_API const char * CALL_TYPE gmsec_GetStatus(GMSEC_STATUS_OBJECT sts);
+	GMSEC_DEPRECATED GMSEC_API const char * CALL_TYPE gmsec_GetStatus(GMSEC_STATUS_OBJECT sts);
 
 	/** @fn gmsec_GetStatusString(GMSEC_STATUS_OBJECT sts)
 	 * @brief Get the error string from the status.
@@ -84,7 +85,7 @@ extern "C"
 	 * @param[in] sts - status to get string from
 	 * @return error string
 	 */
-	GMSEC_API const char * CALL_TYPE gmsec_GetStatusString(GMSEC_STATUS_OBJECT sts);
+	GMSEC_DEPRECATED GMSEC_API const char * CALL_TYPE gmsec_GetStatusString(GMSEC_STATUS_OBJECT sts);
 
 	/** @fn gmsec_GetStatusClass(GMSEC_STATUS_OBJECT sts)
 	 * @brief Get "class" code of this status. This code will indicate which layer, or
@@ -95,7 +96,7 @@ extern "C"
 	 *
 	 * @sa gmsec_errors.h
 	 */
-	GMSEC_API GMSEC_STATUS_CLASS CALL_TYPE gmsec_GetStatusClass(GMSEC_STATUS_OBJECT sts);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_STATUS_CLASS CALL_TYPE gmsec_GetStatusClass(GMSEC_STATUS_OBJECT sts);
 
 	/** @fn gmsec_GetStatusCode(GMSEC_STATUS_OBJECT sts)
 	 * @brief Get the error code of this status. This code will indicate the error
@@ -106,7 +107,7 @@ extern "C"
 	 *
 	 * @sa gmsec_errors.h
 	 */
-	GMSEC_API unsigned int CALL_TYPE gmsec_GetStatusCode(GMSEC_STATUS_OBJECT sts);
+	GMSEC_DEPRECATED GMSEC_API unsigned int CALL_TYPE gmsec_GetStatusCode(GMSEC_STATUS_OBJECT sts);
 
 	/** @fn gmsec_GetStatusCustomCode(GMSEC_STATUS_OBJECT sts)
 	 * @brief This will return the custom error code number of this status object.
@@ -116,7 +117,7 @@ extern "C"
 	 *
 	 * @sa gmsec_errors.h
 	 */
-	GMSEC_API int CALL_TYPE gmsec_GetStatusCustomCode(GMSEC_STATUS_OBJECT sts);
+	GMSEC_DEPRECATED GMSEC_API int CALL_TYPE gmsec_GetStatusCustomCode(GMSEC_STATUS_OBJECT sts);
 
 	/** @fn gmsec_isStatusError(GMSEC_STATUS_OBJECT sts)
 	 * @brief This will return 1 if the status is indicating an error, 0 otherwise.
@@ -125,7 +126,7 @@ extern "C"
 	 * @param[in] sts - status handle
 	 * @return 1 if there is an error, 0 otherwise
 	 */
-	GMSEC_API int CALL_TYPE gmsec_isStatusError(GMSEC_STATUS_OBJECT sts);
+	GMSEC_DEPRECATED GMSEC_API int CALL_TYPE gmsec_isStatusError(GMSEC_STATUS_OBJECT sts);
 
 #ifdef __cplusplus
 }	// extern "C"

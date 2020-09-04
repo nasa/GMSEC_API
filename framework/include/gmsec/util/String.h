@@ -19,6 +19,7 @@
 #ifndef gmsec_util_String_h
 #define gmsec_util_String_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <stddef.h>
 
@@ -42,7 +43,7 @@ public:
 	*	@brief Standard constructor. 
 	*
 	*/
-	String();
+	GMSEC_DEPRECATED String();
 
 	/* @fn String(const String instring)
  	*
@@ -50,7 +51,7 @@ public:
  	*
  	* 	@param instring - The String that will be copied into the new String
  	*/
-	String(const String& instring);
+	GMSEC_DEPRECATED String(const String& instring);
 
 	/* @fn String(const char* instring)
  	*
@@ -58,7 +59,7 @@ public:
  	*
  	* 	@param instring - The string that will be copied into the new String
  	*/
-	String(const char* instring);
+	GMSEC_DEPRECATED String(const char* instring);
 
 	/* @fn ~String()
  	*

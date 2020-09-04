@@ -14,9 +14,9 @@ setlocal EnableExtensions
 
 set version=
 
-if exist ..\..\include\gmsec_version.h (
+if exist %~dp0\..\..\include\gmsec_version.h (
 
-	findstr /L GMSEC_VERSION_NUMBER ..\..\include\gmsec_version.h > tempversion.txt
+	findstr /L GMSEC_VERSION_NUMBER %~dp0\..\..\include\gmsec_version.h > tempversion.txt
 
 	for /f "tokens=3" %%i in (tempversion.txt) do set version=%%i
 
@@ -606,7 +606,7 @@ REM ## CheckEnvironmentVariables
 REM ##
 REM ##########################################################################
 :CheckEnvironmentVariables
-set env_file=%1.env
+set env_file=%~dp0\%1.env
 if exist %env_file% (
 	echo.
 	call:Header "Checking for optional %1 environment variables..."
@@ -636,7 +636,7 @@ if !result! == "" (
 
 	set min_perl_ver=5.8.0
 
-	perl perl_ver.pl 1>NUl 2>NUL
+	perl %~dp0\perl_ver.pl 1>NUl 2>NUL
 
 	if !errorlevel! == 0 (
 		call:Success "Perl with version !min_perl_ver! (or later) found"

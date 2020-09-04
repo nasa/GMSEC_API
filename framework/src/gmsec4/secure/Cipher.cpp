@@ -202,7 +202,7 @@ Status RotateCipher::initialize (const Config &config)
 {
 	status.reset();
 
-	const char* value = config.getValue(KEY_DELTA);
+	const char* value = config.getValue(GMSEC_CIPHER_DELTA);
 
 	if (value)
 	{

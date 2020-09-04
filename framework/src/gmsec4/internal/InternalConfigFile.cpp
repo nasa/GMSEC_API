@@ -276,6 +276,51 @@ const char* InternalConfigFile::lookupSubscription(const char* name) const
 }
 
 
+const ConfigFile::SubscriptionEntry& InternalConfigFile::lookupSubscriptionEntry(const char* name)
+{
+	if (!name || std::string(name).empty())
+	{
+		throw Exception(CONFIGFILE_ERROR, OTHER_ERROR_CODE,
+			"Subscription name cannot be NULL, nor an empty string");
+	}
+
+	NodeMap::const_iterator node = m_subscriptionNodes.find(name);
+
+	if (node == m_subscriptionNodes.end())
+	{
+		std::string err_msg = "Subscription does not exist for the name ";
+
+		err_msg += name;
+
+		GMSEC_WARNING << err_msg.c_str();
+
+		throw Exception(CONFIGFILE_ERROR, OTHER_ERROR_CODE, err_msg.c_str());
+	}
+
+	m_subEntry.reset(new ConfigFile::SubscriptionEntry());
+
+	m_subEntry->setName(node->first.c_str());
+	m_subEntry->setSubject(getStrAttr(node->second, "PATTERN"));
+ 
+	for(tinyxml2::XMLElement* element = node->second->FirstChildElement("EXCLUDE");
+	    element;
+	    element = element->NextSiblingElement())
+	{
+		const char* exclude = getStrAttr(element, "PATTERN");
+		if (exclude)
+		{
+			m_subEntry->addExcludedPattern(exclude);
+		}
+		else
+		{
+			GMSEC_WARNING << "InternalConfigFile::SubscriptionEntry:  A pattern element has no excluded subject attribute defined.";
+		}
+	}
+ 
+	return *(m_subEntry.get());
+}
+
+
 void InternalConfigFile::addSubscription(const char* name, const char* subscription)
 {
 	if (!name || std::string(name).empty())
@@ -681,23 +726,39 @@ ConfigFile::MessageEntry InternalConfigFile::nextMessage()
 }
 
 
-ConfigFile::SubscriptionEntry InternalConfigFile::nextSubscription()
+const ConfigFile::SubscriptionEntry& InternalConfigFile::nextSubscription()
 {
 	if (!hasNextSubscription())
 	{
 		throw Exception(CONFIGFILE_ERROR, ITER_INVALID_NEXT, "No more Subscription entries");
 	}
 
-	ConfigFile::SubscriptionEntry entry;
+	m_subEntry.reset(new ConfigFile::SubscriptionEntry());
 
 	std::string tmpSubject = getStrAttr(m_subscriptionNodesIter->second, "PATTERN");
 
-	entry.setName(m_subscriptionNodesIter->first.c_str());
-	entry.setSubject(tmpSubject.c_str());
+	m_subEntry->setName(m_subscriptionNodesIter->first.c_str());
+	m_subEntry->setSubject(tmpSubject.c_str());
+
+	for(tinyxml2::XMLElement* element = m_subscriptionNodesIter->second->FirstChildElement("EXCLUDE");
+		element;
+		element = element->NextSiblingElement())
+	{
+		const char* exclude = getStrAttr(element, "PATTERN");
+
+		if (exclude)
+		{
+			m_subEntry->addExcludedPattern(exclude);
+		}
+		else
+		{
+			GMSEC_WARNING << "InternalConfigFile::SubscriptionEntry:  A pattern element has no excluded subject attribute defined.";
+		}
+	}
 
 	++m_subscriptionNodesIter;
 
-	return entry;
+	return *(m_subEntry.get());
 }
 
 
@@ -1339,14 +1400,18 @@ void InternalMessageEntry::setMessage(const Message& msg)
 //
 InternalSubscriptionEntry::InternalSubscriptionEntry()
 	: m_name(),
-	  m_subject()
+	  m_pattern(),
+	  m_excludedPatterns(),
+	  m_excludedPatternsIter(m_excludedPatterns.begin())
 {
 }
 
 
 InternalSubscriptionEntry::InternalSubscriptionEntry(const InternalSubscriptionEntry& other)
 	: m_name(other.m_name),
-	  m_subject(other.m_subject)
+	  m_pattern(other.m_pattern),
+	  m_excludedPatterns(other.m_excludedPatterns),
+	  m_excludedPatternsIter(m_excludedPatterns.begin())
 {
 }
 
@@ -1360,8 +1425,10 @@ InternalSubscriptionEntry& InternalSubscriptionEntry::operator=(const InternalSu
 {
 	if (this != &other)
 	{
-		m_name    = other.m_name;
-		m_subject = other.m_subject;
+		m_name                 = other.m_name;
+		m_pattern              = other.m_pattern;
+		m_excludedPatterns     = other.m_excludedPatterns;
+		m_excludedPatternsIter = m_excludedPatterns.begin();
 	}
 
 	return *this;
@@ -1374,9 +1441,9 @@ const char* InternalSubscriptionEntry::getName() const
 }
 
 
-const char* InternalSubscriptionEntry::getSubject() const
+const char* InternalSubscriptionEntry::getPattern() const
 {
-	return m_subject.c_str();
+	return m_pattern.c_str();
 }
 
 
@@ -1386,7 +1453,45 @@ void InternalSubscriptionEntry::setName(const char* name)
 }
 
 
-void InternalSubscriptionEntry::setSubject(const char* subject)
+void InternalSubscriptionEntry::setPattern(const char* pattern)
 {
-	m_subject = subject;
+	m_pattern = pattern;
+}
+
+
+bool InternalSubscriptionEntry::hasNextExcludedPattern() const
+{
+	// We need to ensure that non-const iterators are used when performing the
+	// check of whether we have another excluded pattern or not.
+	// This nonsense is needed to workaround a compiler limitation on Solaris.
+
+	InternalSubscriptionEntry& safe = const_cast<InternalSubscriptionEntry&>(*this);
+
+	return safe.m_excludedPatternsIter != safe.m_excludedPatterns.end();
+}
+
+
+const char* InternalSubscriptionEntry::nextExcludedPattern() const
+{
+	if (!hasNextExcludedPattern())
+	{
+		throw Exception(CONFIGFILE_ERROR, ITER_INVALID_NEXT, "No more Excluded Subject entries");
+	}
+
+	const char* pattern = m_excludedPatternsIter->c_str();
+        
+	++m_excludedPatternsIter;
+
+	return pattern;
+}
+
+
+void InternalSubscriptionEntry::addExcludedPattern(const char* pattern)
+{
+	m_excludedPatterns.push_back(pattern);	
+
+	if (m_excludedPatterns.size() == 1)
+	{
+		m_excludedPatternsIter = m_excludedPatterns.begin();
+	}
 }

@@ -31,7 +31,7 @@ INCS      = -I$(GMSEC_HOME)/include \
 STL_PORT = -library=stlport4
 
 # define C/C++ compiler flags
-ifndef ($(DEBUG_FLAGS),)
+ifneq ($(DEBUG_FLAGS),)
 DEBUG_FLAGS = -g
 endif
 

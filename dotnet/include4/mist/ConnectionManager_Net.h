@@ -127,13 +127,20 @@ public:
 
 
 	/// <summary>
-	/// Sets the internal list of fields which are to be automatically placed in all messages sent by this ConnectionManager.
-	/// Internal copies of the Fields are made, ownership is not retained by the ConnectionManager. The supplied set of fields
-	/// will not be validated here, validation occurs at the time a message is to be published.
+	/// Sets the internal list of fields that are added to all messages that are created
+	/// using the ConnectionManager.  Internal copies of the provided Fields are made, thus
+	/// ownership is not retained by the ConnectionManager. The supplied set of fields will not
+	/// be validated here; validation occurs at the time a message is to be published.
 	/// </summary>
 	///
 	/// <param name="standardFields">The list of fields to set as standard fields</param>
 	void SetStandardFields(System::Collections::Generic::List<Field^>^ standardFields);
+
+
+	/// <summary>
+	/// Returns the list of standard fields that are associated with the Connection Manager.
+	/// </summary>
+	System::Collections::Generic::List<Field^>^ GetStandardFields();
 
 
 	/// <summary>Adds the standard fields (if any) to the given Message object.</summary>
@@ -455,7 +462,7 @@ public:
 	///
 	/// <returns>The status of the operation.</returns>
 	///
-	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.
+	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.</note>
 	Status^ ChangeComponentStatus(Field^ componentStatus);
 
 
@@ -470,7 +477,7 @@ public:
 	///
 	/// <returns>The status of the operation.</returns>
 	///
-	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.
+	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.</note>
 	Status^ ChangeComponentInfo(Field^ componentInfo);
 
 
@@ -485,7 +492,7 @@ public:
 	///
 	/// <returns>The status of the operation.</returns>
 	///
-	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.
+	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.</note>
 	Status^ ChangeCPUMemory(Field^ cpuMemory);
 
 
@@ -500,7 +507,7 @@ public:
 	///
 	/// <returns>The status of the operation.</returns>
 	///
-	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.
+	/// <note>This method has been deprecated; use SetHeartbeatServiceField() instead.</note>
 	Status^ ChangeCPUUtil(Field^ cpuUtil);
 
 
@@ -514,6 +521,10 @@ public:
 	/// <param name="field">The field containing new or update information for the heartbeat message</param>
 	///
 	/// <returns>The status of the operation.</returns>
+	///
+	/// <note>If a (valid) PUB-RATE field is passed to this method, and the Heartbeat Service
+	/// is running, then the Heartbeat Service publish rate will be changed to the provided
+	/// rate.  Note that a publish rate of 0 seconds or less will be treated as an error.</note>
 	Status^ SetHeartbeatServiceField(Field^ field);
 
 

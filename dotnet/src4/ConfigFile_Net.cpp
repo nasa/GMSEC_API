@@ -249,6 +249,29 @@ String^ ConfigFile::LookupSubscription(String^ name)
 }
 
 
+ConfigFile::SubscriptionEntry^ ConfigFile::LookupSubscriptionEntry(String^ name)
+{
+	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONFIGFILE_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConfigFile is null");
+	THROW_EXCEPTION_IF_NULLPTR(name, StatusClass::CONFIGFILE_ERROR, StatusCode::UNINITIALIZED_OBJECT, "Name string is null");
+
+	char* nameStr = nullptr;
+
+	try
+	{
+		nameStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(name).ToPointer());
+
+		gmsec::api::ConfigFile::SubscriptionEntry& entry =
+			const_cast<gmsec::api::ConfigFile::SubscriptionEntry&>(m_impl->lookupSubscriptionEntry(nameStr));
+
+		return gcnew ConfigFile::SubscriptionEntry(&entry);
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		throw gcnew GMSEC_Exception(e);
+	}
+}
+
+
 void ConfigFile::AddSubscription(String^ name, String^ subscription)
 {
 	THROW_EXCEPTION_IF_NULLPTR(m_impl, StatusClass::CONFIGFILE_ERROR, StatusCode::UNINITIALIZED_OBJECT, "ConfigFile is null");
@@ -666,7 +689,24 @@ String^ ConfigFile::SubscriptionEntry::GetName()
 
 String^ ConfigFile::SubscriptionEntry::GetSubject()
 {
-	return gcnew String(m_entry->getSubject());
+	return gcnew String(m_entry->getPattern());
+}
+
+
+String^ ConfigFile::SubscriptionEntry::GetPattern()
+{
+    return gcnew String(m_entry->getPattern());
+}
+
+
+String^ ConfigFile::SubscriptionEntry::NextExcludedPattern()
+{
+	return gcnew String(m_entry->nextExcludedPattern());
+}
+
+bool ConfigFile::SubscriptionEntry::HasNextExcludedPattern()
+{
+	return m_entry->hasNextExcludedPattern();
 }
 
 
@@ -702,7 +742,11 @@ gmsec::api::ConfigFile::SubscriptionEntry* ConfigFile::SubscriptionEntry::GetUnm
 
 void ConfigFile::SubscriptionEntry::ResetUnmanagedImplementation()
 {
-	m_entry = nullptr;
+	if (m_entry != nullptr)
+	{
+		delete m_entry;
+		m_entry = nullptr;
+	}
 }
 
 

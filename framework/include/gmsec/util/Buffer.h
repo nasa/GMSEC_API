@@ -21,6 +21,8 @@
 #ifndef gmsec_util_Buffer_h
 #define gmsec_util_Buffer_h
 
+#include <gmsec/util/Deprecated.h>
+
 
 namespace gmsec {
 namespace util {
@@ -37,7 +39,7 @@ public:
 
 	typedef T data_t;
 
-	Buffer(int count = 0)
+	GMSEC_DEPRECATED Buffer(int count = 0)
 		: ptr(0), owned(false), used(0), space(0) {
 		if (count > 0)
 		{
@@ -48,10 +50,10 @@ public:
 		}
 	}
 
-	Buffer(const T * p, int count, bool ownership)
+	GMSEC_DEPRECATED Buffer(const T * p, int count, bool ownership)
 		: ptr(p), owned(ownership), used(count), space(count) { }
 
-	Buffer(const Buffer<T>& other)
+	GMSEC_DEPRECATED Buffer(const Buffer<T>& other)
 		: ptr(0), owned(true), used(other.size()), space(other.size()) {
 		if (used > 0)
 			ptr = new T[other.size()];

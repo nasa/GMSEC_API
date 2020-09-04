@@ -139,6 +139,7 @@ ref class Status;
 /// </code>
 /// </example>
 /// <seealso cref="Connection::Request(Message^ request, Int32 timeout, ReplyCallback^ cb, Int32 republish_ms)" />
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class ReplyCallback abstract : public Nasa::Gmsec::Net::ErrorCallback 
 {
 private:

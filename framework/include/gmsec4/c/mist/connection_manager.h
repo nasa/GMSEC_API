@@ -26,22 +26,66 @@
  *
  * Example creation and use:
  * @code
- * GMSEC_Config        config  = configCreateWithArgs(argc, argv);
- * GMSEC_Status        status  = statusCreate();
- * GMSEC_ConnectionMgr connMgr = connectionManagerCreateUsingISD(config, GMSEC_TRUE, C_GMSEC_ISD_CURRENT, status);
- *
- * if (connMgr)
+ * #include <gmsec4_c.h>
+ * 
+ * int main(int argc, char** argv)
  * {
+ *     GMSEC_Config        config  = configCreateWithArgs(argc, argv);
+ *     GMSEC_Status        status  = statusCreate();
+ *     GMSEC_ConnectionMgr connMgr = NULL;
+ *     GMSEC_Message       msg     = NULL;
+ * 
+ *     configAddValue(config, "loglevel", "info", status);
+ *     if (statusIsError(status)) goto Error;
+ * 
+ *     // Create connection manager
+ *     connMgr = connectionManagerCreate(config, status);
+ *     if (statusIsError(status)) goto Error;
+ * 
+ *     // Initialize connection manager
  *     connectionManagerInitialize(connMgr, status);
- *
- *     ...
- *
+ *     if (statusIsError(status)) goto Error;
+ * 
+ *     // Create a message
+ *     msg = messageCreate("GMSEC.FOO.BAR", GMSEC_PUBLISH, status);
+ *     if (statusIsError(status)) goto Error;
+ * 
+ *     // Publish the message
+ *     connectionManagerPublish(connMgr, msg, status);
+ *     if (statusIsError(status)) goto Error;
+ * 
+ *     GMSEC_INFO("Published Message:\n%s", messageToXML(msg, NULL));
+ * 
+ *     // Cleanup connection manager
  *     connectionManagerCleanup(connMgr, status);
- *     connectionManagerDestroy(&connMgr);
- * }
- * else
- * {
- *     printf("Error creating connection -- %s\n", statusGet(status));
+ *     if (statusIsError(status)) goto Error;
+ * 
+ *     goto Cleanup;
+ * 
+ * Error:
+ *     GMSEC_ERROR("Error occurred; reason: %s", statusGet(status));
+ * 
+ * Cleanup:
+ *     if (msg != NULL)
+ *     {
+ *         messageDestroy(&msg);
+ *     }
+ * 
+ *     if (connMgr != NULL)
+ *     {
+ *         connectionManagerDestroy(&connMgr);
+ *     }
+ * 
+ *     // Other clean up
+ *     statusDestroy(&status);
+ *     configDestroy(&config);
+ * 
+ *     // Call shutdown routine for registered middleware(s) to
+ *     // clean up any middleware-related resources.  Currently
+ *     // only ActiveMQ users need to call this.
+ *     connectionShutdownAllMiddlewares();
+ *
+ *     return 0;
  * }
  * @endcode
  */
@@ -195,9 +239,10 @@ extern "C"
 	/**
 	 * @fn void connectionManagerSetStandardFields(GMSEC_ConnectionMgr connMgr, const GMSEC_Field fields[], size_t numFields, GMSEC_Status status)
 	 *
-	 * @brief Sets the internal list of fields which are to be automatically placed in all messages sent by this ConnectionManager.
-	 * Internal copies of the Fields are made, ownership is not retained by the ConnectionManager. The supplied set of fields will
-	 * not be validated here, validation occurs at the time a message is to be published.
+	 * @brief Sets the internal list of fields that are added to all messages that are created
+	 * using the ConnectionManager.  Internal copies of the provided Fields are made, thus
+	 * ownership is not retained by the ConnectionManager. The supplied set of fields will not
+	 * be validated here; validation occurs at the time a message is to be published.
 	 *
 	 * @param[in]  connMgr   - the handle to the ConnectionManager object
 	 * @param[in]  fields    - the array of fields to associate with the ConnectionManager
@@ -205,6 +250,24 @@ extern "C"
 	 * @param[out] status    - the result of the operation
 	 */
 	GMSEC_API void connectionManagerSetStandardFields(GMSEC_ConnectionMgr connMgr, const GMSEC_Field fields[], size_t numFields, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_Field* connectionManagerGetStandardFields(GMSEC_ConnectionMgr connMgr, size_t* numFields, GMSEC_Status status)
+	 *
+	 * @brief Returns the standard fields that have been associated with the Connection Manager.
+	 *
+	 * @param[in]  connMgr   - the handle to the ConnectionManager object
+	 * @param[out] numFields - the number of fields in the array that is returned
+	 * @param[out] status    - the result of the operation
+	 *
+	 * @return An array of GMSEC_Field objects.
+	 *
+	 * @note Use freeFieldArray() to deallocate the memory associated with the returned GMSEC_Field array.
+	 *
+	 * @sa freeFieldArray()
+	 */
+	GMSEC_API GMSEC_Field* connectionManagerGetStandardFields(GMSEC_ConnectionMgr connMgr, size_t* numFields, GMSEC_Status status);
 
 
 	/**
@@ -710,6 +773,10 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @param[in]  connMgr - the handle to the ConnectionManager object
 	 * @param[in]  field   - the handle to the field to include within the heartbeat message
 	 * @param[out] status  - out parameter operation result status
+	 *
+	 * @note If a (valid) PUB-RATE field is passed to this method, and the Heartbeat Service
+	 * is running, then the Heartbeat Service publish rate will be changed to the provided
+	 * rate.  Note that a publish rate of 0 seconds or less will be treated as an error.
 	 */
 	GMSEC_API void connectionManagerSetHeartbeatServiceField(GMSEC_ConnectionMgr connMgr, const GMSEC_Field field, GMSEC_Status status);
 
@@ -1026,6 +1093,16 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * safe to assume that a timeout occurred.
 	 */
 	GMSEC_API GMSEC_Message connectionManagerRequestSimpleService(GMSEC_ConnectionMgr connMgr, const char* subject, const char* opName, const GMSEC_Field opNumber, const GMSEC_Field fields[], size_t numFields, const GMSEC_ServiceParam params[], size_t numParams, GMSEC_I32 timeout, GMSEC_I32 republish_ms, GMSEC_Status status);
+
+
+	/**
+	 * @fn void freeFieldArray(GMSEC_Field* array)
+	 *
+	 * @brief To be used ONLY to free an array of GMSEC_Field object(s) that is returned/owned by the API.
+	 *
+	 * @param[in] array - the array to be freed/deallocated.
+	 */
+	GMSEC_API void freeFieldArray(GMSEC_Field* array);
 
 
 #ifdef __cplusplus

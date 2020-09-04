@@ -30,7 +30,6 @@
 
 #ifdef WIN32
 
-
 #ifdef GMSECAPI_EXPORTS
 #define GMSEC_API __declspec(dllexport)
 #define GMSEC_TEMPLATE

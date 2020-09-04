@@ -1,3 +1,5 @@
+<!-- TDM Frame Telemetry Message -->
+<!-- See Table 5-55 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.MSG.TLM.TDM">
 	<FIELD  NAME="FORMAT"
 	        MODE="REQUIRED"

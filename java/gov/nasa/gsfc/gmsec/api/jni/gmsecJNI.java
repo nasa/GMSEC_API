@@ -120,6 +120,7 @@ public class gmsecJNI
 	public final static native long ConfigFile_LookupConfig(long jarg1, JNIConfigFile configFile, String name);
 	public final static native long ConfigFile_LookupMessage(long jarg1, JNIConfigFile configFile, String name);
 	public final static native String ConfigFile_LookupSubscription(long jarg1, JNIConfigFile configFile, String name);
+	public final static native long ConfigFile_LookupSubscriptionEntry(long jarg1, JNIConfigFile configFile, String name);
 	public final static native void ConfigFile_AddSubscription(long jarg1, JNIConfigFile configFile, String name, String subject);
 	public final static native void ConfigFile_AddConfig(long jarg1, JNIConfigFile configFile, String name, long jarg2, JNIConfig config);
 	public final static native void ConfigFile_AddMessage(long jarg1, JNIConfigFile configFile, String name, long jarg2, JNIMessage msg);
@@ -291,7 +292,9 @@ public class gmsecJNI
 	//
 	public final static native String SubscriptionEntry_GetName(long jarg1, JNISubscriptionEntry entry);
 	public final static native String SubscriptionEntry_GetSubject(long jarg1, JNISubscriptionEntry entry);
-
+	public final static native String SubscriptionEntry_GetPattern(long jarg1, JNISubscriptionEntry entry);
+	public final static native boolean SubscriptionEntry_HasNextExcludedPattern(long jarg1, JNISubscriptionEntry entry);
+	public final static native String SubscriptionEntry_NextExcludedPattern(long jarg1, JNISubscriptionEntry entry);
 
 	// Base Field native class functions
 	public final static native int Field_GetType(long fieldPtr, JNIField field);
@@ -417,6 +420,7 @@ public class gmsecJNI
 	public final static native long ConnectionManager_GetSpecification(long jarg1, JNIConnectionManager connMgr);
 	public final static native void ConnectionManager_SetSpecification(long jarg1, JNIConnectionManager connMgr, long jarg2, JNISpecification jspec, Specification spec);
 	public final static native void ConnectionManager_SetStandardFields(long jarg1, JNIConnectionManager connMgr, long[] fldPtrs, JNIField[] flds, int numFields);
+	public final static native long[] ConnectionManager_GetStandardFields(long jarg1, JNIConnectionManager connMgr);
 	public final static native void ConnectionManager_AddStandardFields(long jarg1, JNIConnectionManager connMgr, long msgPtr, JNIMessage msg);
 	public final static native void ConnectionManager_RegisterEventCallback(long jarg1, JNIConnectionManager connMgr, int event, long cbPtr);
 	public final static native long ConnectionManager_Subscribe(long jarg1, JNIConnectionManager connMgr, String subject);

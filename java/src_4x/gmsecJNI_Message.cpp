@@ -556,7 +556,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetBi
 				{
 					const BinaryField& field = msg->getBinaryField(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new BinaryField(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -594,7 +594,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetBo
 				{
 					const BooleanField& field = msg->getBooleanField(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new BooleanField(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -632,7 +632,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetCh
 				{
 					const CharField& field = msg->getCharField(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new CharField(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -670,7 +670,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetF3
 				{
 					const F32Field& field = msg->getF32Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new F32Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -708,7 +708,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetF6
 				{
 					const F64Field& field = msg->getF64Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new F64Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -746,7 +746,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetI8
 				{
 					const I8Field& field = msg->getI8Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new I8Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -784,7 +784,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetI1
 				{
 					const I16Field& field = msg->getI16Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new I16Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -822,7 +822,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetI3
 				{
 					const I32Field& field = msg->getI32Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new I32Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -860,7 +860,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetI6
 				{
 					const I64Field& field = msg->getI64Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new I64Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -898,7 +898,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetU8
 				{
 					const U8Field& field = msg->getU8Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new U8Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -936,7 +936,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetU1
 				{
 					const U16Field& field = msg->getU16Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new U16Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -974,7 +974,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetU3
 				{
 					const U32Field& field = msg->getU32Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new U32Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -1012,7 +1012,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetU6
 				{
 					const U64Field& field = msg->getU64Field(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new U64Field(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{
@@ -1050,7 +1050,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1GetSt
 				{
 					const StringField& field = msg->getStringField(name.c_str());
 
-					result = JNI_POINTER_TO_JLONG(new StringField(field));
+					result = JNI_POINTER_TO_JLONG(&field);
 				}
 				catch (Exception& e)
 				{

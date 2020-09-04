@@ -13,4 +13,11 @@ perl -i.bak -pe "s/onMessage\(gmsec::api::Connection \&conn, gmsec::api::Message
 perl -i.bak -pe "s/onEvent\(gmsec::api::Connection \&conn, gmsec::api::Status const \&status, gmsec::api::Connection::ConnectionEvent event\) \{/onEvent(gmsec::api::Connection &conn, gmsec::api::Status const &status, gmsec::api::Connection::ConnectionEvent event) {\n  GMSEC_SWIG_SET_PERL_CONTEXT;/g" interfaces\libgmsec_perl_wrap.cxx
 perl -i.bak -pe "s/onReply\(gmsec::api::Connection \&conn, gmsec::api::Message const \&request, gmsec::api::Message const \&reply\) \{/onReply(gmsec::api::Connection &conn, gmsec::api::Message const &request, gmsec::api::Message const &reply) {\n  GMSEC_SWIG_SET_PERL_CONTEXT;/g" interfaces\libgmsec_perl_wrap.cxx
 perl -i.bak -pe "s/LogHandler::onMessage\(gmsec::api::util::LogEntry const \&entry\) \{/LogHandler::onMessage(gmsec::api::util::LogEntry const &entry) {\n  GMSEC_SWIG_SET_PERL_CONTEXT;/g" interfaces\libgmsec_perl_wrap.cxx
+
+rem Additional handling for ensuring that the globally-defined XEntry classes (from ConfigFile) are used
+rem Need to include the comma at the end of the replacement string in order to not overwrite the SWIG-generated definition for the (unused) ConfigFile::XEntry classes.
+perl -i.bak -pe "s/SWIGTYPE_p_gmsec__api__ConfigFile__SubscriptionEntry,/SWIGTYPE_p_SubscriptionEntry,/g" interfaces\libgmsec_perl_wrap.cxx
+perl -i.bak -pe "s/SWIGTYPE_p_gmsec__api__ConfigFile__MessageEntry,/SWIGTYPE_p_MessageEntry,/g" interfaces\libgmsec_perl_wrap.cxx
+perl -i.bak -pe "s/SWIGTYPE_p_gmsec__api__ConfigFile__ConfigEntry,/SWIGTYPE_p_ConfigEntry,/g" interfaces\libgmsec_perl_wrap.cxx
+
 @echo on

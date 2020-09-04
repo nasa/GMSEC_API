@@ -17,6 +17,7 @@
 
 #include <gmsec4/c/mist/mist_defs.h>
 
+#include <gmsec4/util/Deprecated.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4_defs.h>
@@ -81,7 +82,8 @@ extern "C"
 	 *
 	 * @param[in]  subject  - the message subject
 	 * @param[in]  schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.1.MSG.C2CX)
+	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.GMSEC.MSG.MVAL) You may also use the 
+	 * shorthand notation of messageKind.messageType (e.g. MSG.MVAL)  
 	 * @param[in]  spec     - the specification this message's schema will adhere to
 	 * @param[out] status   - the result of the operation
 	 *
@@ -107,7 +109,8 @@ extern "C"
 	 *
 	 * @param[in]  subject  - the message subject
 	 * @param[in]  schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.1.MSG.C2CX)
+	 * format of: major.minor.schemaLevel.messagekind.messagetype (e.g. 2016.00.GMSEC.MSG.MVAL) You may also use the 
+	 * shorthand notation of messageKind.messageType (e.g. MSG.MVAL)  
 	 * @param[in]  config   - the configuration to associate with the message
 	 * @param[in]  spec     - the specification this message's schema will adhere to
 	 * @param[out] status   - the result of the operation
@@ -193,7 +196,7 @@ extern "C"
 	 *
 	 * @sa mnemonicMessageGetNumMnemonics
 	 */
-	GMSEC_API const GMSEC_Mnemonic mnemonicMessageGetMnemonic(const GMSEC_Message msg, size_t index, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API const GMSEC_Mnemonic mnemonicMessageGetMnemonic(const GMSEC_Message msg, size_t index, GMSEC_Status status);
 
 
 	/**
