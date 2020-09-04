@@ -1,1 +1,0 @@
-# GMSEC_API
