@@ -50,9 +50,13 @@ java_api:
 
 
 perl_api:
-	cd ./perl; \
-		PERL_CC=$(PERL_CC) perl -Iextra Makefile.PL PREFIX=../bin ; \
+	cd ./perl/gmsec; \
+		PERL_CC=$(PERL_CC) perl -Iextra Makefile.PL PREFIX=../../bin ; \
 		$(MAKE) ; $(MAKE) install
+# Note: Perl binding for API 4.X is currently only supported on Windows and Linux platforms.
+ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
+	$(MAKE) -C perl/gmsec4
+endif
 
 
 env_val:
@@ -86,7 +90,8 @@ clean: clean-gcov
 	@ for dir in framework examples wrapper java doxygen tools; do \
 		$(MAKE) -C $$dir $@ ; \
 	done
-	- @ [ -f perl/Makefile ] && $(MAKE) -C perl veryclean
+	- @ [ -f perl/gmsec/Makefile ] && $(MAKE) -C perl/gmsec veryclean
+	- @ $(MAKE) -C perl/gmsec4 clean
 	$(RM) c.ver os.ver java.ver
 
 clean-gcov:
@@ -99,7 +104,7 @@ install:
 	if [ -d $(RELEASE) ] ; then rm -rf $(RELEASE) ; fi
 	mkdir -p $(RELEASE)/GMSEC_API
 	tar cvf - *.txt bin config templates examples -C framework include \
-		--exclude='.*' --exclude=vendor \
+		--exclude='.svn' --exclude=vendor \
 		--exclude=secure --exclude=internal \
 		| tar xvf - -C $(RELEASE)/GMSEC_API
 	(cd $(RELEASE); tar zcvf GMSEC_API.tgz GMSEC_API)

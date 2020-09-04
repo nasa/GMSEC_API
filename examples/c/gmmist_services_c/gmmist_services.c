@@ -66,7 +66,7 @@ GMSEC_BOOL gm_Run(gm_t* this)
 
 	GMSEC_Field definedFields[4];
 	GMSEC_Field logDefinedFields[2];
-	GMSEC_Field hbDefinedFields[2];
+	GMSEC_Field hbDefinedFields[3];
 
 	GMSEC_Field fieldLogSeverity = i16FieldCreate("SEVERITY", 1, this->status);
 	
@@ -106,15 +106,17 @@ GMSEC_BOOL gm_Run(gm_t* this)
 	GMSEC_INFO("Adding general heartbeat fields");
 
 	hbDefinedFields[0] = i16FieldCreate("PUB-RATE", 1, this->status);
-	hbDefinedFields[1] = stringFieldCreate("MSG-ID", "My heartbeat identifier", this->status);
+	hbDefinedFields[1] = i16FieldCreate("COUNTER", 0, this->status);
+	hbDefinedFields[2] = stringFieldCreate("MSG-ID", "My heartbeat identifier", this->status);
 
 	GMSEC_INFO("Starting heartbeat service");
-	connectionManagerStartHeartbeatService(this->connMgr, "GMSEC.GMSEC-MISSION.NOT-A-SPACECRAFT.MSG.C2CX.HB", hbDefinedFields, 2, this->status);
+	connectionManagerStartHeartbeatService(this->connMgr, "GMSEC.GMSEC-MISSION.NOT-A-SPACECRAFT.MSG.C2CX.HB", hbDefinedFields, 3, this->status);
 	GMSEC_INFO("Heartbeat service has been started. Publish rate is defined by PUB-RATE, defaulting to 30 seconds if not defined.");
 	GMSEC_INFO("Component status will be reported as nominal unless otherwise instructed. The counter will automatically increment.");
 
 	fieldDestroy(&hbDefinedFields[0]);
 	fieldDestroy(&hbDefinedFields[1]);
+	fieldDestroy(&hbDefinedFields[2]);
 
 	connectionManagerPublishLog(this->connMgr, "Heartbest service has been started!", fieldLogSeverity, this->status);
 

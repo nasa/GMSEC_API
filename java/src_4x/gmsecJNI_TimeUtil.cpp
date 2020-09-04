@@ -46,7 +46,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_TimeUtil_1Fo
 	int            subs = (int) jSubseconds;
 	char*          buf  = new char[GMSEC_TIME_BUFSIZE + subs];
 
-	TimeUtil::formatTime(spec, buf, subs);
+	TimeUtil::formatTime(spec, subs, buf);
 
 	jstring theTime = jenv->NewStringUTF(buf);
 

@@ -6,11 +6,12 @@
  */
 
 
-
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.mist.*;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
 
 
 /**
@@ -29,7 +30,7 @@ public class JNIProductFile
 	protected boolean swigCMemOwn;
 
 
-	protected JNIProductFile(long cPtr, boolean cMemoryOwn)
+	public JNIProductFile(long cPtr, boolean cMemoryOwn)
 	{
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;
@@ -59,7 +60,7 @@ public class JNIProductFile
 	}
 
 
-	protected static long getCPtr(JNIProductFile obj)
+	public static long getCPtr(JNIProductFile obj)
 	{
 		return (obj == null) ? 0 : obj.swigCPtr;
 	}

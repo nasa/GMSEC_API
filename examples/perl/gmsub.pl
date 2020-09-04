@@ -1,207 +1,191 @@
- 
+#
 # Copyright 2007-2016 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
-
-
-
-
-
-
-
- 
-# gmsub.pl
 #
-# A example demonstration of GMSEC subscriber functionality.
+
+# 
+# gmsub.pl
+# 
+# A perl example demonstration of GMSEC publish/subscribe functionality.
+# The associated example gmsub.cpp will publish a message and this program
+# will subscribe and listen for it.
+# gmsub should be run before gmpub.
+# 
 
 
-
-use lib '../../bin/lib';
 use strict;
-use GMSECAPI;
 use Util;
 
+use libgmsec_perl;
+
+*isa = \&UNIVERSAL::isa;
+
 {
-   my $task = bless({});
-   Util::driver($task, @ARGV);
+	my $task = bless({});
+	Util::driver($task, @ARGV);
 }
+
 
 sub printUsage
-{ 
-   my ($self, $config) = @_;
-   my $hasConnectionType = Util::hasConnectionType($config);
+{
+	my ($self, $config) = @_;
+	my $hasConnectionType = Util::hasConnectionType($config);
+	return 0 if ($hasConnectionType);
 
-   return 0 if ($hasConnectionType); 
+	print "\nusage: perl gmsub.pl connectiontype=<middleware> [ <parameter>=<value> ]" .
 
-   print "\n\nusage: perl gmsub.pl connectiontype=<middleware> ";
-   print "[ <parameter>=<value> ]";
-   print "\n\n\tNote that the parameter 'connectiontype' is required.";
-   print "\n\tThe rest of other parameters are optional.";
-   print "\n\n\tserver=<server name>";
-   print " (required if middleware is not bolt/MB locally)";
-   print "\n\tsubject=<subject name>";
-   print "\n\titerations=<iterations>";
-   print "\n\tsubject.<N>=<sub-subject name>";
-   print "\n\t\tNote: N must be 1 or greater";
-   print "\n\t\tFor example, subject.1=GMSEC.A subject.2=GMSEC.B";
-   print "\n\tmsg_timeout_ms=<timeout period (milliseconds)>";
-   print "\n\tprog_timeout_s=<timeout period (seconds)>";
-   print "\n\t\tNote: msg_timeout_ms must be specified for prog_timeout_s";
-   print "\n\tcfgfile=<config_filename.xml>";
-   print "\n\nFor more information, see API User's Guide\n\n";
+	"\n\n\tNote that the parameter 'connectiontype' is required." .
+	"\n\tThe rest of other parameters are optional." .
 
-   return 1;
+	"\n\n\tserver=<server name> (required if middleware is not bolt/MB locally)" .
+	"\n\tsubject=<subject name>" .
+	"\n\tsubject.N=<sub-subject name>" .
+	"\n\t\tNote: N must be 1 or greater" .
+	"\n\t\tFor example, subject.1=GMSEC.A subject.2=GMSEC.B"  .
+	"\n\titerations=<iterations>" .
+	"\n\tmsg_timeout_ms=<timeout period (milliseconds)>" .
+	"\n\tprog_timeout_s=<timeout period (milliseconds)>" .
+	"\n\t\tNote: msg_timeout_ms must be defined to use prog_timeout_s" .
+	"\n\tloglevel=<log level>" .
+	"\n\tcfgfile=<config_filename.xml>" .
+	"\n\nFor more information, see API User's Guide\n";
+
+	return 1;
 }
+
 
 sub run
 {
-   my ($self, $config) = @_;
+	my ($self, $config) = @_;
 
-   # Get the subjects 
-   my @subjects = Util::getSubjects($config);
-   my $iterations = Util::getInteger($config, 'ITERATIONS', 0);
-   my $msg_timeout_ms = Util::getInteger($config, 'MSG_TIMEOUT_MS', 
-                                         $GMSEC_WAIT_FOREVER);
-   my $prog_timeout_s = Util::getInteger($config, 'PROG_TIMEOUT_S',
-   										 $GMSEC_WAIT_FOREVER);
-   if($msg_timeout_ms == $GMSEC_WAIT_FOREVER && 
-						$prog_timeout_s != $GMSEC_WAIT_FOREVER)
-   {
-		Util::report("Usage: To use prog_timeout_s, msg_timeout_ms must be specified!");
-		return 1;
-   }
+	# Determine run-time settings
+	my @subjects = Util::determineSubjects($config);
+	my $iterations = Util::getInteger($config, "ITERATIONS", 0);
+	my $msg_timeout_ms = Util::getInteger($config, "MSG-TIMEOUT-MS", $libgmsec_perl::GMSEC_WAIT_FOREVER);
+	my $prog_timeout_s = Util::getInteger($config, 'PROG-TIMEOUT-S', $libgmsec_perl::GMSEC_WAIT_FOREVER);
 
-   # Output GMSEC API version
-   Util::report(GMSECAPI::ConnectionFactory::GetAPIVersion());
+	if ($iterations > 0)
+	{
+		libgmsec_perl::LogInfo("Waiting for up to " . $iterations . " messages");
+	}
 
-   if ($iterations > 0)
-   {
-      Util::report("waiting for up to " . $iterations . " messages");
-   }
+	# Output GMSEC API version
+	libgmsec_perl::LogInfo(libgmsec_perl::Connection::getAPIVersion());
 
-   # Create the Connection
-   my $connection = GMSECAPI::ConnectionFactory::Create($config);
-   Util::check('ConnectionFactory.Create',
-       GMSECAPI::ConnectionFactory::Status());
-   $self->{CONNECTION} = $connection;
+	eval
+	{
+		# Create the Connection
+		my $connection = libgmsec_perl::Connection::create($config);
+		$self->{CONNECTION} = $connection;
 
-   # Connect
-   unless ($connection->Connect) {
-     Util::check('Connect', $connection->Status);
-   }
+		# Connect
+		$connection->connect();
 
-   # Output middleware version
-   Util::report("Middleware version = " . $connection->GetLibraryVersion());
+		# Output middleware version
+		libgmsec_perl::LogInfo("Middleware version = " . $connection->getLibraryVersion());
 
-   # Subscribe
-   for my $subject (@subjects) {
-     Util::report("subscribing to " . $subject);
-     unless ($connection->Subscribe($subject)) {
- 	     Util::check('Subscribe', $connection->Status);
-     }
-   }
+		# Output example program-specific information
+		libgmsec_perl::LogInfo("Using subjects: " . join(", ", @subjects));
+		if ($iterations > 0)
+		{
+			libgmsec_perl::LogInfo("Receiving " . $iterations . " message(s)");
+		}
+		if ($msg_timeout_ms > $libgmsec_perl::GMSEC_WAIT_FOREVER)
+		{
+			libgmsec_perl::LogInfo("Message receipt timeouts set to occur after " . $msg_timeout_ms . " ms");
+		}
 
-   my $count = 0;
-   my $done = 0;
-   my $prevTime = time();
-   my $nextTime;
-   my $elapsedTime = 0;
+		# Subscribe
+		for my $subject (@subjects)
+		{
+			libgmsec_perl::LogInfo("Subscribing to " . $subject);
+			push(@{$self->{SUBINFO}}, $connection->subscribe($subject));
+		}
 
-   # Listen
-   while (not $done)
-   {
-	  if($elapsedTime >= $prog_timeout_s && $prog_timeout_s != $GMSEC_WAIT_FOREVER)
-	  {
-	     $done = 1;
-	     next;
-	  }
-	  
-      my $message = $connection->GetNextMsg($msg_timeout_ms);
-      my $status = $connection->Status;
+		my $done = 0;
+		my $count = 0;
+		my $elapsedTime = 0;
+		my $currentTime = 0;
+		my $prevTime = 0;
 
-      if($prog_timeout_s != $GMSEC_WAIT_FOREVER)
-      {
-	     $nextTime = time();
-	     $elapsedTime += ($nextTime - $prevTime);
-	     $prevTime = $nextTime;
-	  }
+		# Receive messages
+		while (!$done)
+		{
+			if ($prog_timeout_s != $libgmsec_perl::GMSEC_WAIT_FOREVER && $elapsedTime >= $prog_timeout_s)
+			{
+				libgmsec_perl::LogInfo("Program timeout reached!");
+				$done = 1;
+				next;
+			}
 
-      $self->{MESSAGE} = $message;
-      
-      if ($status->GetCode() == $GMSEC_TIMEOUT_OCCURRED) 
-      { 
-         Util::checkNoThrow('GetNextMsg(' . $msg_timeout_ms . ')', $status);
-         next; 
-      }
-      else
-      {
-         Util::check('GetNextMsg(' . $msg_timeout_ms . ')', $status);
-      }
+			my $message = $connection->receive($msg_timeout_ms);
 
-      if ($message->isValid())
-      {
-         $count++;
-         $done = 1 if ($iterations > 0 && $count >= $iterations);
+			if ($prog_timeout_s != $libgmsec_perl::GMSEC_WAIT_FOREVER)
+			{
+				$currentTime = libgmsec_perl::TimeUtil->getCurrentTime_s();
+				$elapsedTime += ($currentTime - $prevTime);
+				$prevTime = $currentTime;
+			}
 
-         # Dump the message
-         print "received =>\n", $message->ToXML, "\n";
+			if (!$message)
+			{
+				libgmsec_perl::LogInfo("Timeout occurred");
+			}
+			else
+			{
+				libgmsec_perl::LogInfo("Received:\n" . $message->toXML());
 
-         my $temp_subject = $message->GetSubject;
-         Util::check('GetSubject()', $message->Status);
+				$done = ($iterations > 0 ? 1 : 0) && ++$count >= $iterations;
+				$done = $done || ($message->getSubject() eq "GMSEC.TERMINATE" ? 1 : 0);
 
-         $done = 1 if ($temp_subject eq "GMSEC.TERMINATE");
+				$connection->release($message);
+			}
+		}
+	};
+	if (isa($@, 'libgmsec_perl::Exception'))
+	{
+		libgmsec_perl::LogError($@->what());
+	}
+	elsif($@)
+	{
+		libgmsec_perl::LogError($@);
+	}
 
-         my $temp_msg = $message;
-         $message = $NULL;
-         $self->{MESSAGE} = $message;
-         # Destroy the Message
-         unless ( $connection->DestroyMessage($temp_msg) ) {
-            Util::check('DestroyMessage', $connection->Status);
-         }
-      }
-   }
-   return 1;
+	$self->cleanup();
 }
 
 
 sub cleanup
 {
-   my ($self) = @_;
-   
+	my ($self) = @_;
 
-   my $message = $self->{MESSAGE};
-   my $connection = $self->{CONNECTION};
-	
-   # Destroy the message
-   if ($message) 
-   {
-      print "destroying message\n";
-      unless ($connection->DestroyMessage($message)) {
-         Util::check('DestroyMessage', $connection->Status);
-      }
-   }
+	my $connection = $self->{CONNECTION};
 
-   if ($connection) 
-   {
-      # Disconnect if necessary
-      if ($connection->IsConnected) 
-      {
-         print "disconnecting\n";
-         unless ($connection->Disconnect) {
-            Util::check('Disconnect', $connection->Status);
-         }
-      }
+	if ($connection)
+	{
+		for my $subInfo (@{$self->{SUBINFO}})
+		{
+			eval
+			{
+				libgmsec_perl::LogInfo("Unsubscribing from " . $subInfo->getSubject());
+				$connection->unsubscribe($subInfo);
+			};
+			if (isa($@, 'libgmsec_perl::Exception'))
+			{
+				libgmsec_perl::LogError($@->what());
+			}
+			elsif($@)
+			{
+				libgmsec_perl::LogError($@);
+			}
+		}
 
-      # Destroy the Connection
-      print "destroying connection\n";
-      unless (GMSECAPI::ConnectionFactory::Destroy($connection)) {
-          Util::check('ConnectionFactory.Destroy',
-                      GMSECAPI::ConnectionFactory::Status());
-      }
-   }
-   
-   
+		libgmsec_perl::Connection::destroy($connection);
+	}
+
+	libgmsec_perl::Connection::shutdownAllMiddlewares();
 }
 
 

@@ -113,6 +113,8 @@ public:
 	jmethodID methodLogEntryInitJZ;
 	jfieldID fieldLogLevel_value;
 	jfieldID fieldLogTime_value;
+	jfieldID fieldLogFile_value;
+	jfieldID fieldLogLine_value;
 	jfieldID fieldLogMessage_value;
 
 	// LogLevel references
@@ -125,16 +127,15 @@ public:
 	jfieldID fieldLogLevelVERBOSE;
 	jfieldID fieldLogLevelDEBUG;
 
+	// Message references
+	jclass classMessage;
+	jmethodID methodMessageInit;
+
 	// TimeSpec references
 	jclass classTimeSpec;
 	jmethodID methodTimeSpecInitJZ;
 	jfieldID fieldSeconds_value;
 	jfieldID fieldNanoseconds_value;
-
-	// Message references
-	jclass classMessage;
-	jmethodID methodMessageInit;
-	jmethodID methodMessageSetImpl;
 
 	// MIST ConnectionManagerCallback references
 	jmethodID methodConnMgrCallbackOnMessage;
@@ -153,6 +154,10 @@ public:
 	jfieldID fieldConnectionManager_extConnMgr;
 	jfieldID fieldConnectionManager_swigCPtr;
 	jfieldID fieldConnectionManager_swigCMemOwn;
+
+	// U64 references
+	jclass classU64;
+	jmethodID methodU64Init;
 
 	// for detaching thread of JVM version is greater than 1.4
 	jboolean enableDetach;

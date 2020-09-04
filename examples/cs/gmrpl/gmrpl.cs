@@ -28,7 +28,7 @@ namespace gmrpl
 	class gmrpl : GmsecExample
 	{
 		private Connection conn;
-
+        private List<SubscriptionInfo> info = new List<SubscriptionInfo>(); 
 
 		public gmrpl()
 		{
@@ -58,7 +58,15 @@ namespace gmrpl
 		{
 			if (conn != null)
 			{
-				conn.Disconnect();
+                for (int i = info.Count - 1; i >= 0; i--)
+                {
+                    Log.Info("Unsubscribing to " + info[i].GetSubject());
+                    var temp = info[i];
+                    conn.Unsubscribe(ref temp);
+                    info.RemoveAt(i);
+                }
+                
+                conn.Disconnect();
 
 				Connection.Destroy(ref conn);
 			}
@@ -104,8 +112,8 @@ namespace gmrpl
 				{
 					Log.Info("Subscribing to " + subjects[i]);
 
-					conn.Subscribe(subjects[i]);
-				}
+					info.Add(conn.Subscribe(subjects[i]));
+                }
 
 				// Wait for messages
 				bool done = false;

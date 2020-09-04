@@ -39,7 +39,7 @@ class Message;
  * concurrently amongst those connections.  Because of this, the use of a gmsec::api::util::AutoMutex is
  * suggested to enforce thread safety.
  *
- * Example Callback class:
+ * Example ReplyCallback class:
  * @code
  * class ReqReplyCallback : public ReplyCallback
  * {
@@ -73,7 +73,7 @@ class GMSEC_API ReplyCallback : public gmsec::api::EventCallback
 public:
 	/** @fn onReply(Connection& conn, const Message& request, const Message& reply)
 	 * @brief This function is called by the API in response to a reply recieved from a request,
-	 * from within the request() call. A class derrived from gmsec::api::ReplyCallback needs to be
+	 * from within the request() call. A class derived from gmsec::api::ReplyCallback needs to be
 	 * passed into the request() call.
 	 *
 	 * Please note that if a ReplyCallback is registered to multiple connections, onReply() can be
@@ -85,10 +85,10 @@ public:
 	 *   @endcode
 	 *   The CALL_TYPE macro is required and is there to handle a compatibility problem with the Windows linker.
 	 *
-	 * @note <b>DO NOT DESTROY</b> the Connection that is passed into this function by the API.
+	 * @note <b>DO NOT DESTROY</b> the Connection or Messages that are passed into this function by the API.
 	 * They are owned by the API and do not need to be managed by the client program. Also, they can
 	 * not be stored by the client program beyond the scope of this callback function. In order to store
-	 * the Message, it must be copied.
+	 * the Messages, they must be copied.
 	 *
 	 * @param conn - connection on which the message was received
 	 * @param request - the pending request message

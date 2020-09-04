@@ -26,11 +26,19 @@ namespace mist
 {
 	class Device;
 
-namespace internal
+	namespace internal
+	{
+		class InternalDeviceIterator;
+	}
+
+namespace message
 {
-	class InternalDeviceMessage;
-	class InternalDeviceIterator;
+	namespace internal
+	{
+		class InternalDeviceMessage;
+	}
 }
+
 
 
 /** @class DeviceIterator
@@ -83,7 +91,7 @@ public:
 
 
 private:
-	friend class gmsec::api::mist::internal::InternalDeviceMessage;
+	friend class gmsec::api::mist::message::internal::InternalDeviceMessage;
 
 	/**
 	 * @fn DeviceIterator(const DeviceMessage& msg)
@@ -92,7 +100,7 @@ private:
 	 *
 	 * @param msg - the DeviceMessage object to use when iterating over the Device objects.
 	 */
-    DeviceIterator(mist::internal::InternalDeviceMessage& msg);
+	DeviceIterator(mist::message::internal::InternalDeviceMessage& msg);
 
 
 	// Declared, but not implemented
@@ -103,7 +111,7 @@ private:
 	//DeviceIterator& operator=(const DeviceIterator&);
 
 
-    gmsec::api::mist::internal::InternalDeviceIterator* m_iter;
+	gmsec::api::mist::internal::InternalDeviceIterator* m_iter;
 };
 
 } // namespace mist

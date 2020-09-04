@@ -13,25 +13,29 @@ public class Util
 {
 	static boolean initialize(Config config)
 	{
-		String loglevel = get(config, "LOGLEVEL", "INFO");
+		String loglevel = config.getValue("LOGLEVEL", "INFO");
+		String logfile  = config.getValue("LOGFILE", null);
 
 		Log.setReportingLevel(Log.levelFromString(loglevel));
 
-		Log.registerHandler(new LogHandler() {
-			public void onMessage(LogEntry entry)
-			{
-				String time = TimeUtil.formatTime(entry.time);
+		if (logfile == null)
+		{
+			Log.registerHandler(new LogHandler() {
+				public void onMessage(LogEntry entry)
+				{
+					StringBuilder sb = new StringBuilder();
 
-				StringBuilder sb = new StringBuilder();
+					sb.append(TimeUtil.formatTime(entry.time)).append(" [").append(entry.level.toString()).append("] ");
+					sb.append("[").append(entry.fileName).append(":").append(entry.lineNumber).append("] ");
+					sb.append(entry.message).append("\n");
 
-				sb.append(time).append(" ");
-				sb.append("[").append(Log.levelToString(entry.level)).append("] ");
-				sb.append(": ").append(entry.message).append("\n");
+					String output = sb.toString().replace("\n", "\n\t");
 
-				System.out.println(sb.toString());
-			}
-		});
-		Log.debug("Registered custom LogHandler!");
+					System.err.println(output);
+				}
+			});
+			Log.debug("Registered custom LogHandler!");
+		}
 
 		return true;
 	}

@@ -1023,6 +1023,13 @@ XMLNode* XMLText::ShallowClone( XMLDocument* doc ) const
 
 bool XMLText::ShallowEqual( const XMLNode* compare ) const
 {
+	//BEGIN: Added by GMSEC
+	if (!compare)
+	{
+		return false;
+	}
+	//END: Added by GMSEC
+
     return ( compare->ToText() && XMLUtil::StringEqual( compare->ToText()->Value(), Value() ));
 }
 
@@ -1069,6 +1076,13 @@ XMLNode* XMLComment::ShallowClone( XMLDocument* doc ) const
 
 bool XMLComment::ShallowEqual( const XMLNode* compare ) const
 {
+	//BEGIN: Added by GMSEC
+	if (!compare)
+	{
+		return false;
+	}
+	//END: Added by GMSEC
+
     return ( compare->ToComment() && XMLUtil::StringEqual( compare->ToComment()->Value(), Value() ));
 }
 
@@ -1120,6 +1134,13 @@ XMLNode* XMLDeclaration::ShallowClone( XMLDocument* doc ) const
 
 bool XMLDeclaration::ShallowEqual( const XMLNode* compare ) const
 {
+	//BEGIN: Added by GMSEC
+	if (!compare)
+	{
+		return false;
+	}
+	//END: Added by GMSEC
+
     return ( compare->ToDeclaration() && XMLUtil::StringEqual( compare->ToDeclaration()->Value(), Value() ));
 }
 
@@ -1167,6 +1188,13 @@ XMLNode* XMLUnknown::ShallowClone( XMLDocument* doc ) const
 
 bool XMLUnknown::ShallowEqual( const XMLNode* compare ) const
 {
+	//BEGIN: Added by GMSEC
+	if (!compare)
+	{
+		return false;
+	}
+	//END: Added by GMSEC
+
     return ( compare->ToUnknown() && XMLUtil::StringEqual( compare->ToUnknown()->Value(), Value() ));
 }
 
@@ -1832,7 +1860,7 @@ XMLError XMLDocument::Parse( const char* p, size_t len )
         return _errorID;
     }
 
-	int delta = p - start;	// skip initial whitespace, BOM, etc.
+	size_t delta = p - start;	// skip initial whitespace, BOM, etc.
     ParseDeep( _charBuffer+delta, 0 );
     return _errorID;
 }
@@ -1908,7 +1936,7 @@ void XMLPrinter::Puts(const char* s, size_t len)
         fputs( s, _fp);
     }
     else {
-        char* p = _buffer.PushArr( len ) - 1;
+        char* p = _buffer.PushArr( int(len) ) - 1;
         memcpy(p, s, len);
     }
 }

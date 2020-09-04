@@ -14,40 +14,21 @@
 typedef long long __int64; /* to satisfy gcc on Windows */
 #endif
 
-#include <gmsec4/Connection.h>
-
 #include <gmsec4/internal/StringUtil.h>
+
+#include <gmsec4/field/Field.h>
+
+#include <gmsec4/Connection.h>
+#include <gmsec4/Exception.h>
+#include <gmsec4/Message.h>
+
+#include <gmsec4/util/Log.h>
 
 #include <jni.h>
 
 #include <stdexcept>
 #include <string>
 #include <cstring>
-
-
-// Forward declarations
-namespace gmsec
-{
-namespace api
-{
-	class Config;
-	class ConfigFile;
-	class Connection;
-	class Field;
-	class Message;
-	class Status;
-
-	namespace mist
-	{
-		class ConnectionManager;
-	}
-
-	namespace util
-	{
-		class LogHandler;
-	}
-}
-}
 
 
 #define JNI_POINTER_TO_JLONG(x)            reinterpret_cast<jlong>(x)
@@ -83,23 +64,27 @@ namespace api
 #define JNI_JLONG_TO_SUBSCRIPTION_INFO(x)  reinterpret_cast<gmsec::api::SubscriptionInfo*>(x)
 
 #define JNI_JLONG_TO_TIMESPEC(x)           reinterpret_cast<GMSEC_TimeSpec*>(x)
-#define JNI_JLONG_TO_LOGHANDLER(x)         reinterpret_cast<gmsec::api::util::LogHandler *>(x)
+#define JNI_JLONG_TO_LOGHANDLER(x)         reinterpret_cast<gmsec::api::util::LogHandler*>(x)
 
-#define JNI_JLONG_TO_CONNECTION_MANAGER(x) reinterpret_cast<gmsec::api::mist::ConnectionManager *>(x)
-#define JNI_JLONG_TO_DEVICE(x)             reinterpret_cast<gmsec::api::mist::Device *>(x)
-#define JNI_JLONG_TO_DEVICE_ITER(x)        reinterpret_cast<gmsec::api::mist::DeviceIterator *>(x)
-#define JNI_JLONG_TO_DEVICE_MSG(x)         reinterpret_cast<gmsec::api::mist::DeviceMessage*>(x)
-#define JNI_JLONG_TO_DEVICE_PARAM(x)       reinterpret_cast<gmsec::api::mist::DeviceParam *>(x)
-#define JNI_JLONG_TO_MNEMONIC(x)           reinterpret_cast<gmsec::api::mist::Mnemonic *>(x)
-#define JNI_JLONG_TO_MNEMONIC_ITER(x)      reinterpret_cast<gmsec::api::mist::MnemonicIterator *>(x)
-#define JNI_JLONG_TO_MNEMONIC_MSG(x)       reinterpret_cast<gmsec::api::mist::MnemonicMessage*>(x)
-#define JNI_JLONG_TO_MNEMONIC_SAMPLE(x)    reinterpret_cast<gmsec::api::mist::MnemonicSample *>(x)
-#define JNI_JLONG_TO_PRODUCT_FILE(x)       reinterpret_cast<gmsec::api::mist::ProductFile *>(x)
-#define JNI_JLONG_TO_PRODUCT_FILE_ITER(x)  reinterpret_cast<gmsec::api::mist::ProductFileIterator *>(x)
-#define JNI_JLONG_TO_PRODUCT_FILE_MSG(x)   reinterpret_cast<gmsec::api::mist::ProductFileMessage*>(x)
-#define JNI_JLONG_TO_SERVICE_PARAM(x)      reinterpret_cast<gmsec::api::mist::ServiceParam *>(x)
+#define JNI_JLONG_TO_CONNECTION_MANAGER(x) reinterpret_cast<gmsec::api::mist::ConnectionManager*>(x)
+#define JNI_JLONG_TO_DEVICE(x)             reinterpret_cast<gmsec::api::mist::Device*>(x)
+#define JNI_JLONG_TO_DEVICE_ITER(x)        reinterpret_cast<gmsec::api::mist::DeviceIterator*>(x)
+#define JNI_JLONG_TO_DEVICE_PARAM(x)       reinterpret_cast<gmsec::api::mist::DeviceParam*>(x)
+#define JNI_JLONG_TO_MNEMONIC(x)           reinterpret_cast<gmsec::api::mist::Mnemonic*>(x)
+#define JNI_JLONG_TO_MNEMONIC_ITER(x)      reinterpret_cast<gmsec::api::mist::MnemonicIterator*>(x)
+#define JNI_JLONG_TO_MNEMONIC_SAMPLE(x)    reinterpret_cast<gmsec::api::mist::MnemonicSample*>(x)
+#define JNI_JLONG_TO_PRODUCT_FILE(x)       reinterpret_cast<gmsec::api::mist::ProductFile*>(x)
+#define JNI_JLONG_TO_PRODUCT_FILE_ITER(x)  reinterpret_cast<gmsec::api::mist::ProductFileIterator*>(x)
+#define JNI_JLONG_TO_SERVICE_PARAM(x)      reinterpret_cast<gmsec::api::mist::ServiceParam*>(x)
+#define JNI_JLONG_TO_SCHEMA_ID_ITER(x)     reinterpret_cast<gmsec::api::mist::SchemaIDIterator*>(x);
+#define JNI_JLONG_TO_SPECIFICATION(x)      reinterpret_cast<gmsec::api::mist::Specification*>(x);
 
 #define JNI_JLONG_TO_CONN_MGR_SUBSCRIPTION_INFO(x)  reinterpret_cast<gmsec::api::mist::SubscriptionInfo*>(x)
+
+#define JNI_JLONG_TO_DEVICE_MSG(x)         reinterpret_cast<gmsec::api::mist::message::DeviceMessage*>(x)
+#define JNI_JLONG_TO_MISTMESSAGE(x)        reinterpret_cast<gmsec::api::mist::message::MistMessage*>(x)
+#define JNI_JLONG_TO_MNEMONIC_MSG(x)       reinterpret_cast<gmsec::api::mist::message::MnemonicMessage*>(x)
+#define JNI_JLONG_TO_PRODUCT_FILE_MSG(x)   reinterpret_cast<gmsec::api::mist::message::ProductFileMessage*>(x)
 
 
 #ifdef WIN32
@@ -114,11 +99,15 @@ namespace api
 
 
 /* The JNI_CATCH macro prevents any exceptions from propagating
-through a JNI call.  The JVM knows nothing about C++ exceptions.
-*/
+   through a JNI call.  The JVM knows nothing about C++ exceptions.
+ */
 #define JNI_CATCH \
+    catch (gmsec::api::Exception& e) { \
+		GMSEC_DEBUG << "Encountered gmsec::api::Exception - " << e.what(); \
+		ThrowGmsecException(jenv, e.what()); \
+    } \
     catch (std::bad_alloc& e) { \
-        FPRINTF(stderr, "%s:%d: encountered bad_alloc %s\n", __FILE__, __LINE__, e.what()); \
+		GMSEC_DEBUG << "Encountered std::bad_alloc - " << e.what(); \
         if (jvmOk(jenv, "catch(bad_alloc&)") && ::strlen(e.what()) < 200) { \
             char buffer[256]; \
             gmsec::api::util::StringUtil::stringFormat(buffer, sizeof(buffer), "GMSEC JNI encountered bad_alloc %s", e.what()); \
@@ -126,7 +115,7 @@ through a JNI call.  The JVM knows nothing about C++ exceptions.
         } \
     } \
     catch (std::exception& e) { \
-        FPRINTF(stderr, "%s:%d: encountered exception %s\n", __FILE__, __LINE__, e.what()); \
+		GMSEC_DEBUG << "Encountered std::exception - " << e.what(); \
         if (jvmOk(jenv, "catch(exception&)") && ::strlen(e.what()) < 200) { \
             char buffer[256]; \
             gmsec::api::util::StringUtil::stringFormat(buffer, sizeof(buffer), "GMSEC JNI encountered %s", e.what()); \
@@ -134,12 +123,11 @@ through a JNI call.  The JVM knows nothing about C++ exceptions.
         } \
     } \
     catch (...) { \
-        FPRINTF(stderr, "%s:%d: encountered unknown exception\n", __FILE__, __LINE__); \
+		GMSEC_DEBUG << "Encountered unknown exception"; \
         if (jvmOk(jenv, "catch(...)")) { \
             gmsec::api::jni::SWIG_JavaThrowException(jenv, SWIG_JavaUnknownError, "GMSEC JNI encountered unknown exception"); \
         } \
     }
-
 
 
 namespace gmsec
@@ -173,7 +161,7 @@ typedef enum
 	SWIG_JavaArithmeticException,
 	SWIG_JavaIllegalArgumentException,
 	SWIG_JavaNullPointerException,
-	SWIG_JavaUnknownError
+	SWIG_JavaUnknownError,
 } SWIG_JavaExceptionCodes;
 
 
@@ -256,6 +244,15 @@ private:
 
 
 jobject createJavaMessage(JNIEnv* jenv, const gmsec::api::Message& message);
+
+
+int messageKindToJava(JNIEnv* jenv, gmsec::api::Message::MessageKind msgKind);
+
+
+gmsec::api::Message::MessageKind messageKindToNative(JNIEnv* jenv, jint msgKind);
+
+
+int fieldTypeToJava(JNIEnv* jenv, gmsec::api::Field::FieldType fieldType);
 
 
 jobject convertEvent(JNIEnv* jenv, gmsec::api::Connection::ConnectionEvent event);

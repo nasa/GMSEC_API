@@ -68,11 +68,12 @@ namespace mist
 namespace internal
 {
 
-HeartbeatService::HeartbeatService(const Config& config, const Message& msg)
+HeartbeatService::HeartbeatService(const Config& config, const Message& msgTemplate)
 	: m_config(config),
 	  m_connection(0),
-	  m_msg(msg),
+	  m_msg(msgTemplate),
 	  m_pubInterval(30),
+	  m_counter(0),
 	  m_startupLatch(1),
 	  m_shutdownLatch(1)
 {
@@ -155,7 +156,7 @@ bool HeartbeatService::stop(unsigned int timeout_ms)
 {
 	if (!m_alive.get())
 	{
-		GMSEC_WARNING << "HeartbeatService::stop: not running";
+		GMSEC_WARNING << "HeartbeatService is not, or is no longer, running";
 		return false;
 	}
 
@@ -218,7 +219,22 @@ void HeartbeatService::run()
 
 				try
 				{
+					const Field* field = m_msg.getField("COUNTER");
+
+					if (field != NULL)
+					{
+						if (field->getType() == Field::I16_TYPE)
+						{
+							m_msg.addField("COUNTER", GMSEC_I16(++m_counter));
+						}
+						else if (field->getType() == Field::U16_TYPE)
+						{
+							m_msg.addField("COUNTER", ++m_counter);
+						}
+					}
+
 					m_connection->publish(m_msg);
+
 					GMSEC_INFO << "HeartbeatService published C2CX-HB message.";
 				}
 				catch (Exception& e)

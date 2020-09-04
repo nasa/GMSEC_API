@@ -1901,6 +1901,50 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src_4x\gmsecJNI_MistMessage.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\..\objects\Debug/api4/"
+						ObjectFile=".\..\objects\Debug/api4/"
+						ProgramDataBaseFileName=".\..\objects\Debug/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\..\objects\Debug/api4/"
+						ObjectFile=".\..\objects\Debug/api4/"
+						ProgramDataBaseFileName=".\..\objects\Debug/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\objects/Release/api4/"
+						ObjectFile=".\objects/Release/api4/"
+						ProgramDataBaseFileName=".\objects/Release/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\objects/Release/api4/"
+						ObjectFile=".\objects/Release/api4/"
+						ProgramDataBaseFileName=".\objects/Release/api4/"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\src_4x\gmsecJNI_Mnemonic.cpp"
 				>
 				<FileConfiguration
@@ -2253,7 +2297,95 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\src_4x\gmsecJNI_SchemaIDIterator.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\..\objects\Debug/api4/"
+						ObjectFile=".\..\objects\Debug/api4/"
+						ProgramDataBaseFileName=".\..\objects\Debug/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\..\objects\Debug/api4/"
+						ObjectFile=".\..\objects\Debug/api4/"
+						ProgramDataBaseFileName=".\..\objects\Debug/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\objects/Release/api4/"
+						ObjectFile=".\objects/Release/api4/"
+						ProgramDataBaseFileName=".\objects/Release/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\objects/Release/api4/"
+						ObjectFile=".\objects/Release/api4/"
+						ProgramDataBaseFileName=".\objects/Release/api4/"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\src_4x\gmsecJNI_ServiceParam.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\..\objects\Debug/api4/"
+						ObjectFile=".\..\objects\Debug/api4/"
+						ProgramDataBaseFileName=".\..\objects\Debug/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\..\objects\Debug/api4/"
+						ObjectFile=".\..\objects\Debug/api4/"
+						ProgramDataBaseFileName=".\..\objects\Debug/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\objects/Release/api4/"
+						ObjectFile=".\objects/Release/api4/"
+						ProgramDataBaseFileName=".\objects/Release/api4/"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AssemblerListingLocation=".\objects/Release/api4/"
+						ObjectFile=".\objects/Release/api4/"
+						ProgramDataBaseFileName=".\objects/Release/api4/"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src_4x\gmsecJNI_Specification.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

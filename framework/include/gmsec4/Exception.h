@@ -126,7 +126,7 @@ public:
 
 	/**
 	 * @fn GMSEC_I32 getCustomCode() const
-	 * @brief Returns the custom error code associated with the exception.
+	 * @brief An error code originating from a third party library (middleware or otherwise) related to the error that occurred.
 	 * @return A StatusCode enumerated value.
 	 */
 	GMSEC_I32 CALL_TYPE getCustomCode() const;

@@ -6,8 +6,8 @@
  */
 
 
-#ifndef GMSEC_API_INTERNAL_PRODUCT_FILE_ITERATOR_H
-#define GMSEC_API_INTERNAL_PRODUCT_FILE_ITERATOR_H
+#ifndef GMSEC_API_INTERNAL_MESSAGE_PRODUCT_FILE_ITERATOR_H
+#define GMSEC_API_INTERNAL_MESSAGE_PRODUCT_FILE_ITERATOR_H
 
 #include <gmsec4/util/wdllexp.h>
 
@@ -18,17 +18,24 @@ namespace api
 {
 namespace mist
 {
-class ProductFile;
+	class ProductFile;
+
+	namespace message
+	{
+		namespace internal
+		{
+			class InternalProductFileMessage;
+		}
+	}
 
 namespace internal
 {
-class InternalProductFileMessage;
-
 
 class GMSEC_API InternalProductFileIterator
 {
+
 public:
-	InternalProductFileIterator(InternalProductFileMessage& msg);
+	InternalProductFileIterator(gmsec::api::mist::message::internal::InternalProductFileMessage& msg);
 
 
     ~InternalProductFileIterator();
@@ -52,9 +59,9 @@ private:
 	bool CALL_TYPE makeReady();
 
 
-	InternalProductFileMessage& m_msg;
-	bool                        m_ready;
-	const ProductFile*          m_nextProductFile;
+	gmsec::api::mist::message::internal::InternalProductFileMessage& m_msg;
+	bool                                                             m_ready;
+	const ProductFile*                                               m_nextProductFile;
 };
 
 } // namespace internal

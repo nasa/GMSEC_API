@@ -86,6 +86,7 @@ private:
 	Config&     config;
 	Connection* connection;
 	Subjects    subjects;
+	SubscriptionInfo** info;
 };
 
 
@@ -102,6 +103,12 @@ gmrpl_cb::~gmrpl_cb()
 {
 	if (connection)
 	{
+		for (size_t i = 0; i < subjects.size(); ++i)
+		{
+			GMSEC_INFO << "Unsubscribing from " << subjects[i].c_str();
+			connection->unsubscribe(info[i]);
+		}
+		delete[] info;
 		connection->disconnect();
 		Connection::destroy(connection);
 	}
@@ -137,11 +144,12 @@ bool gmrpl_cb::run()
 
 		//o Subscribe
 		RequestCallback cb;
-
+		
+		info = new SubscriptionInfo*[subjects.size()];
 		for (size_t i = 0; i < subjects.size(); ++i)
 		{
 			GMSEC_INFO << "Subscribing to " << subjects[i].c_str();
-			connection->subscribe(subjects[i].c_str(), &cb);
+			info[i] = connection->subscribe(subjects[i].c_str(), &cb);
 		}
 
 		bool   done = false;

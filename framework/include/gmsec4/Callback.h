@@ -28,7 +28,7 @@ class Message;
 
 /** @class Callback
  * @brief This class is the abstract base class for received message callbacks.
- * A user created class, derrived from this class, can be passed into
+ * A user created class, derived from this class, can be passed into
  * %Subscribe() and %Request() to have user code executed asynchronously
  * when a message is received.
  * Please note that because users are able to create their own Callback class, reentrancy is not

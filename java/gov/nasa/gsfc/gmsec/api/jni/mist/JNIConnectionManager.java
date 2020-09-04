@@ -6,7 +6,7 @@
  */
 
 
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.Config;
 import gov.nasa.gsfc.gmsec.api.Connection;
@@ -27,9 +27,16 @@ import gov.nasa.gsfc.gmsec.api.mist.Device;
 import gov.nasa.gsfc.gmsec.api.mist.Mnemonic;
 import gov.nasa.gsfc.gmsec.api.mist.ProductFile;
 import gov.nasa.gsfc.gmsec.api.mist.ServiceParam;
+import gov.nasa.gsfc.gmsec.api.mist.Specification;
 import gov.nasa.gsfc.gmsec.api.mist.SubscriptionInfo;
 
 import gov.nasa.gsfc.gmsec.api.util.Log;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
+import gov.nasa.gsfc.gmsec.api.jni.JNIConfig;
+import gov.nasa.gsfc.gmsec.api.jni.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.JNIMessage;
+import gov.nasa.gsfc.gmsec.api.jni.JNIStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -92,7 +99,7 @@ public class JNIConnectionManager
 	}
 
 
-	public JNIConnectionManager(ConnectionManager connMgr, Config cfg)
+	public JNIConnectionManager(ConnectionManager connMgr, Config cfg) throws GMSEC_Exception
 	{
 		this(gmsecJNI.new_ConnectionManager(JNIConfig.getCPtr(Config.getInternal(cfg)), Config.getInternal(cfg)), true);
 
@@ -100,7 +107,7 @@ public class JNIConnectionManager
 	}
 
 
-	public JNIConnectionManager(ConnectionManager connMgr, Config cfg, boolean validate)
+	public JNIConnectionManager(ConnectionManager connMgr, Config cfg, boolean validate) throws GMSEC_Exception
 	{
 		this(gmsecJNI.new_ConnectionManager(JNIConfig.getCPtr(Config.getInternal(cfg)), Config.getInternal(cfg), validate), true);
 
@@ -108,7 +115,7 @@ public class JNIConnectionManager
 	}
 
 
-	public JNIConnectionManager(ConnectionManager connMgr, Config cfg, boolean validate, int version)
+	public JNIConnectionManager(ConnectionManager connMgr, Config cfg, boolean validate, int version) throws GMSEC_Exception
 	{
 		this(gmsecJNI.new_ConnectionManager(JNIConfig.getCPtr(Config.getInternal(cfg)), Config.getInternal(cfg), validate, version), true);
 
@@ -116,7 +123,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void initialize()
+	public void initialize() throws GMSEC_Exception
 	{
 		gmsecJNI.ConnectionManager_Initialize(swigCPtr, this);
 	}
@@ -128,9 +135,22 @@ public class JNIConnectionManager
 	}
 
 
-	public String getLibraryVersion()
+	public String getLibraryVersion() throws GMSEC_Exception
 	{
 		return gmsecJNI.ConnectionManager_GetLibraryVersion(swigCPtr, this);
+	}
+
+
+	public Specification getSpecification() throws GMSEC_Exception
+	{
+		long cPtr = gmsecJNI.ConnectionManager_GetSpecification(swigCPtr, this);
+
+		if (cPtr != 0)
+		{
+			return new Specification(new JNISpecification(cPtr, false));
+		}
+
+		return null;
 	}
 
 
@@ -152,7 +172,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void registerEventCallback(Connection.ConnectionEvent event, ConnectionManagerEventCallback cb)
+	public void registerEventCallback(Connection.ConnectionEvent event, ConnectionManagerEventCallback cb) throws GMSEC_Exception
 	{
 		cb.setConnectionManager(this);
 
@@ -170,7 +190,7 @@ public class JNIConnectionManager
 	}
 
 
-	public SubscriptionInfo subscribe(String subject)
+	public SubscriptionInfo subscribe(String subject) throws GMSEC_Exception
 	{
 		long cPtr = gmsecJNI.ConnectionManager_Subscribe(swigCPtr, this, subject);
 
@@ -183,7 +203,7 @@ public class JNIConnectionManager
 	}
 
 
-	public SubscriptionInfo subscribe(String subject, ConnectionManagerCallback cb)
+	public SubscriptionInfo subscribe(String subject, ConnectionManagerCallback cb) throws GMSEC_Exception
 	{
 		cb.setConnectionManager(this);
 
@@ -206,7 +226,7 @@ public class JNIConnectionManager
 	}
 
 
-	public SubscriptionInfo subscribe(String subject, Config config)
+	public SubscriptionInfo subscribe(String subject, Config config) throws GMSEC_Exception
 	{
 		JNIConfig jCfg = Config.getInternal(config);
 
@@ -221,7 +241,7 @@ public class JNIConnectionManager
 	}
 
 
-	public SubscriptionInfo subscribe(String subject, Config config, ConnectionManagerCallback cb)
+	public SubscriptionInfo subscribe(String subject, Config config, ConnectionManagerCallback cb) throws GMSEC_Exception
 	{
 		cb.setConnectionManager(this);
 
@@ -246,7 +266,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void unsubscribe(SubscriptionInfo info)
+	public void unsubscribe(SubscriptionInfo info) throws GMSEC_Exception
 	{
 		JNIConnMgrSubscriptionInfo jSubInfo = SubscriptionInfo.getInternal(info);
 
@@ -261,7 +281,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void publish(Message msg)
+	public void publish(Message msg) throws GMSEC_Exception
 	{
 		JNIMessage jMsg = Message.getInternal(msg);
 
@@ -269,7 +289,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void publish(Message msg, Config config)
+	public void publish(Message msg, Config config) throws GMSEC_Exception
 	{
 		JNIMessage jMsg = Message.getInternal(msg);
 		JNIConfig  jCfg = Config.getInternal(config);
@@ -278,7 +298,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void request(Message request, int timeout, ConnectionManagerReplyCallback cb, int republish_ms)
+	public void request(Message request, int timeout, ConnectionManagerReplyCallback cb, int republish_ms) throws GMSEC_Exception
 	{
 		cb.setConnectionManager(this);
 
@@ -289,7 +309,7 @@ public class JNIConnectionManager
 	}
 
 
-	public Message request(Message request, int timeout, int republish_ms)
+	public Message request(Message request, int timeout, int republish_ms) throws GMSEC_Exception
 	{
 		JNIMessage jReq = Message.getInternal(request);
 
@@ -297,14 +317,14 @@ public class JNIConnectionManager
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;
 	}
 
 
-	public void cancelRequest(ConnectionManagerReplyCallback cb)
+	public void cancelRequest(ConnectionManagerReplyCallback cb) throws GMSEC_Exception
 	{
 		if (cb.getConnectionManager() != this)
 		{
@@ -317,7 +337,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void reply(Message request, Message reply)
+	public void reply(Message request, Message reply) throws GMSEC_Exception
 	{
 		JNIMessage jReq = Message.getInternal(request);
 		JNIMessage jRep = Message.getInternal(reply);
@@ -326,7 +346,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void dispatch(Message msg)
+	public void dispatch(Message msg) throws GMSEC_Exception
 	{
 		JNIMessage jMsg = Message.getInternal(msg);
 
@@ -334,38 +354,38 @@ public class JNIConnectionManager
 	}
 
 
-	public Message receive(int timeout)
+	public Message receive(int timeout) throws GMSEC_Exception
 	{
 		long cPtr = gmsecJNI.ConnectionManager_Receive(swigCPtr, this, timeout);
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;
 	}
 
 
-	public boolean startAutoDispatch()
+	public boolean startAutoDispatch() throws GMSEC_Exception
 	{
 		return gmsecJNI.ConnectionManager_StartAutoDispatch(swigCPtr, this);
 	}
 
 
-	public boolean stopAutoDispatch(boolean waitForCompletion)
+	public boolean stopAutoDispatch(boolean waitForCompletion) throws GMSEC_Exception
 	{
 		return gmsecJNI.ConnectionManager_StopAutoDispatch(swigCPtr, this, waitForCompletion);
 	}
 
 
-	public void excludeSubject(String subject)
+	public void excludeSubject(String subject) throws GMSEC_Exception
 	{
 		gmsecJNI.ConnectionManager_ExcludeSubject(swigCPtr, this, subject);
 	}
 
 
-	public void removeExcludedSubject(String subject)
+	public void removeExcludedSubject(String subject) throws GMSEC_Exception
 	{
 		gmsecJNI.ConnectionManager_RemoveExcludedSubject(swigCPtr, this, subject);
 	}
@@ -374,7 +394,7 @@ public class JNIConnectionManager
 	/***************Start Heartbeat Section************************************************/
 
 
-	public Message createHeartbeatMessage(String subject, java.util.List<Field> heartbeatFields)
+	public Message createHeartbeatMessage(String subject, java.util.List<Field> heartbeatFields) throws GMSEC_Exception
 	{
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(heartbeatFields);
 		JNIField[] jFields    = ArrayListConverter.listToJNIFields(heartbeatFields);
@@ -384,14 +404,14 @@ public class JNIConnectionManager
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;
 	}
 
 
-	public void startHeartbeatService(String subject, java.util.List<Field> heartbeatFields)
+	public void startHeartbeatService(String subject, java.util.List<Field> heartbeatFields) throws GMSEC_Exception
 	{
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(heartbeatFields);
 		JNIField[] jFields    = ArrayListConverter.listToJNIFields(heartbeatFields);
@@ -450,7 +470,7 @@ public class JNIConnectionManager
 	/***************Start Log Section*****************************************************/
 
 
-	public Message createLogMessage(String subject, java.util.List<Field> logFields)
+	public Message createLogMessage(String subject, java.util.List<Field> logFields) throws GMSEC_Exception
 	{
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(logFields);
 		JNIField[] jFields    = ArrayListConverter.listToJNIFields(logFields);
@@ -460,14 +480,14 @@ public class JNIConnectionManager
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;
 	}
 
 
-	public void setLoggingDefaults(String subject, java.util.List<Field> logFields)
+	public void setLoggingDefaults(String subject, java.util.List<Field> logFields) throws GMSEC_Exception
 	{
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(logFields);
 		JNIField[] jFields    = ArrayListConverter.listToJNIFields(logFields);
@@ -477,7 +497,7 @@ public class JNIConnectionManager
 	}
 
 
-	public void publishLog(String logMessage, Field severity)
+	public void publishLog(String logMessage, Field severity) throws GMSEC_Exception
 	{
 		JNIField jFld = Field.getInternal(severity);
 
@@ -488,7 +508,7 @@ public class JNIConnectionManager
 	/***************Start Directive Section************************************************/
 
 
-	public void requestDirective(String subject, Field directiveString, java.util.List<Field> fields)
+	public void requestDirective(String subject, Field directiveString, java.util.List<Field> fields) throws GMSEC_Exception
 	{
 		JNIField   jFld       = Field.getInternal(directiveString);
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(fields);
@@ -501,7 +521,7 @@ public class JNIConnectionManager
 
 
 	public void requestDirective(String subject, Field directiveString, java.util.List<Field> fields,
-					int timeout, ConnectionManagerReplyCallback cb, int republish_ms)
+					int timeout, ConnectionManagerReplyCallback cb, int republish_ms) throws GMSEC_Exception
 	{
 		cb.setConnectionManager(this);
 
@@ -517,7 +537,7 @@ public class JNIConnectionManager
 
 
 	public Message requestDirective(String subject, Field directiveString, java.util.List<Field> fields,
-		int timeout, int republish_ms)
+		int timeout, int republish_ms) throws GMSEC_Exception
 	{
 		JNIField   jFld       = Field.getInternal(directiveString);
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(fields);
@@ -529,7 +549,7 @@ public class JNIConnectionManager
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;
@@ -537,7 +557,7 @@ public class JNIConnectionManager
 
 
 	public void acknowledgeDirectiveRequest(String subject, Message request, 
-					gmsecMIST.ResponseStatus status, java.util.List<Field> fields)
+					gmsecMIST.ResponseStatus status, java.util.List<Field> fields) throws GMSEC_Exception
 	{
 		JNIMessage jReq       = Message.getInternal(request);
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(fields);
@@ -549,26 +569,26 @@ public class JNIConnectionManager
 	}
 
 
-	public void publishResourceMessage(String subject, long sampleInterval, long averageInterval)
+	public void publishResourceMessage(String subject, long sampleInterval, long averageInterval) throws GMSEC_Exception
 	{
 		gmsecJNI.ConnectionManager_PublishResourceMessage(swigCPtr, this, subject, sampleInterval, averageInterval);
 	}
 
 
-	public Message createResourceMessage(String subject, long sampleInterval, long averageInterval)
+	public Message createResourceMessage(String subject, long sampleInterval, long averageInterval) throws GMSEC_Exception
 	{
 		long cPtr = gmsecJNI.ConnectionManager_CreateResourceMessage(swigCPtr, this, subject, sampleInterval, averageInterval);
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;
 	}
 
 
-	public void startResourceMessageService(String subject, long interval, long sampleInterval, long averageInterval)
+	public void startResourceMessageService(String subject, long interval, long sampleInterval, long averageInterval) throws GMSEC_Exception
 	{
 		gmsecJNI.ConnectionManager_StartResourceMessageService(swigCPtr, this, subject,
 			interval, sampleInterval, averageInterval);
@@ -585,7 +605,7 @@ public class JNIConnectionManager
 
 
 	public void acknowledgeSimpleService(String subject, Message request, gmsecMIST.ResponseStatus status,
-					java.util.List<Field> fields)
+					java.util.List<Field> fields) throws GMSEC_Exception
 	{
 		JNIMessage jReq       = Message.getInternal(request);
 		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(fields);
@@ -598,7 +618,7 @@ public class JNIConnectionManager
 
 
 	public void requestSimpleService(String subject, String opName, Field opNumber,
-					java.util.List<Field> fields, java.util.List<ServiceParam> params)
+					java.util.List<Field> fields, java.util.List<ServiceParam> params) throws GMSEC_Exception
 	{
 		JNIField          jOpNumber  = Field.getInternal(opNumber);
 		long[]            jFieldPtrs = ArrayListConverter.listToFieldPtrs(fields);
@@ -617,7 +637,7 @@ public class JNIConnectionManager
 
 	public void requestSimpleService(String subject, String opName, Field opNumber,
 					java.util.List<Field> fields, java.util.List<ServiceParam> params,
-					int timeout, ConnectionManagerReplyCallback cb, int republish_ms)
+					int timeout, ConnectionManagerReplyCallback cb, int republish_ms) throws GMSEC_Exception
 	{
 		cb.setConnectionManager(this);
 
@@ -640,7 +660,7 @@ public class JNIConnectionManager
 
 	public Message requestSimpleService(String subject, String opName, Field opNumber,
 						java.util.List<Field> fields, java.util.List<ServiceParam> params,
-						int timeout, int republish_ms)
+						int timeout, int republish_ms) throws GMSEC_Exception
 	{
 		JNIField          jOpNumber  = Field.getInternal(opNumber);
 		long[]            jFieldPtrs = ArrayListConverter.listToFieldPtrs(fields);
@@ -658,7 +678,7 @@ public class JNIConnectionManager
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;

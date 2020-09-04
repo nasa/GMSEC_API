@@ -25,6 +25,7 @@
 #include <gmsec4/util/CountDownLatch.h>
 #include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/Mutex.h>
+#include <gmsec4/util/DataList.h>
 
 #include <string>
 
@@ -43,8 +44,12 @@ class GMSEC_API ResourceService
 {
 public:
 	// Constructor for heartbeat service.
-	ResourceService(const Config& config, std::string subject, size_t pubInterval, size_t sampleInterval, size_t averageInterval);
-
+	ResourceService(const Config& config, 
+					const gmsec::api::util::DataList<Field*>& standardFields,
+					std::string subject, 
+					size_t pubInterval, 
+					size_t sampleInterval, 
+					size_t averageInterval);
 
 	// Destructor turns off thread operations
 	~ResourceService();

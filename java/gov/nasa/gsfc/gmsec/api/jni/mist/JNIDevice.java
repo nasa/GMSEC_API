@@ -6,7 +6,7 @@
  */
 
 
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 
@@ -14,6 +14,10 @@ import gov.nasa.gsfc.gmsec.api.field.Field;
 
 import gov.nasa.gsfc.gmsec.api.mist.Device;
 import gov.nasa.gsfc.gmsec.api.mist.DeviceParam;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
+import gov.nasa.gsfc.gmsec.api.jni.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.JNIFieldConverter;
 
 
 
@@ -23,7 +27,7 @@ public class JNIDevice
 	protected boolean swigCMemOwn;
 
 
-	protected JNIDevice(long cPtr, boolean cMemoryOwn)
+	public JNIDevice(long cPtr, boolean cMemoryOwn)
 	{
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;
@@ -53,7 +57,7 @@ public class JNIDevice
 	}
 
 
-	protected static long getCPtr(JNIDevice obj)
+	public static long getCPtr(JNIDevice obj)
 	{
 		return (obj == null) ? 0 : obj.swigCPtr;
 	}

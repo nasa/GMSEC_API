@@ -53,6 +53,7 @@ namespace mist
 	class ConnectionManagerEventCallback;
 	class ConnectionManagerReplyCallback;
 	class SubscriptionInfo;
+	class Specification;
 
 namespace internal
 {
@@ -86,19 +87,24 @@ class GMSEC_API ConnectionManager
 {
 public:
 	/**
-	 * @fn ConnectionManager(const Config &cfg, bool validate = true, unsigned int version = GMSEC_ISD_CURRENT)
+	 * @fn ConnectionManager(const Config &cfg, bool validate = false, unsigned int version = GMSEC_ISD_CURRENT)
 	 *
 	 * @brief Constructor - Initializes the ConnectionManager instance without
 	 * attempting a connection to the middleware.
 	 *
+	 * @note Message validation will be disabled, unless otherwise indicated.  If enabled, or if the configuration
+	 * option GMSEC-MSG-CONTENT-VALIDATE is set to true, then messages will be validated against the default version
+	 * of the GMSEC Interface Specification Document (ISD).  The version of the ISD can be changed by specifying the
+	 * configuration option GMSEC-SPECIFICATION-VERSION to a valid value (e.g. 201400).
+	 *
 	 * @param cfg - The config object used to construct the underlying 
 	 * GMSEC connection object
 	 * @param validate - boolean flag to indicate whether the ConnectionManager
-	 * should validate messages produced (default is true)
+	 * should validate messages (default is false)
 	 * @param version - the version of the GMSEC message specification to be used
 	 * in validating messages (default is GMSEC_ISD_CURRENT)
 	 */
-	ConnectionManager(const Config& cfg, bool validate = true, unsigned int version = GMSEC_ISD_CURRENT);
+	ConnectionManager(const Config& cfg, bool validate = false, unsigned int version = GMSEC_ISD_CURRENT);
 
 
 	/**
@@ -144,6 +150,18 @@ public:
 	 * @return library version
 	 */
 	const char* CALL_TYPE getLibraryVersion() const;
+
+
+	/**
+	 * @fn Specification& getSpecification() const
+	 *
+	 * @desc Returns the Specification object associated with the Connection Manager.
+	 *
+	 * @return A Specification object.
+	 *
+	 * @throws An Exception is thrown if the Connection Manager has not been initialized.
+	 */
+	Specification& CALL_TYPE getSpecification() const;
 
 
 	/**
@@ -1019,7 +1037,6 @@ public:
 	                                        const gmsec::api::util::DataList<ServiceParam*>& sParams,
 	                                        GMSEC_I32 timeout, 
 	                                        GMSEC_I32 republish_ms = 0);
-
 
 
 	/* @cond For C API support ONLY! */

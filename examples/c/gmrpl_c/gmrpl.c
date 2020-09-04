@@ -29,6 +29,7 @@ typedef struct
 	GMSEC_Connection connection;
 	GMSEC_Message    message;
 	GMSEC_Message    reply;
+	GMSEC_SubscriptionInfo* info;
 	char*            stringHolder;
 } gmrpl_t;
 
@@ -106,8 +107,9 @@ GMSEC_BOOL gmrpl_Run(gmrpl_t* this)
 	GMSEC_INFO("Middleware version = %s", connectionGetLibraryVersion(this->connection, NULL));
 
 	/* Subscribe */
+	this->info = (GMSEC_SubscriptionInfo*)malloc(2 * sizeof(GMSEC_SubscriptionInfo));
 	GMSEC_INFO("Subscribing to %s", subject);
-	connectionSubscribe(this->connection, subject, this->status);
+	this->info[0] = connectionSubscribe(this->connection, subject, this->status);
 	if (!example_check("Subscribing...", this->status))
 	{
 		return GMSEC_FALSE;
@@ -115,7 +117,7 @@ GMSEC_BOOL gmrpl_Run(gmrpl_t* this)
 
 	subject = "GMSEC.TERMINATE";
 	GMSEC_INFO("Subscribing to %s", subject);
-	connectionSubscribe(this->connection, subject, this->status);
+	this->info[1] = connectionSubscribe(this->connection, subject, this->status);
 	if (!example_check("Subscribing...", this->status))
 	{
 		return GMSEC_FALSE;
@@ -210,6 +212,8 @@ GMSEC_BOOL gmrpl_Run(gmrpl_t* this)
 
 void gmrpl_Cleanup(gmrpl_t* this)
 {
+	int i;
+
 	/* Destroy Reply */
 	if (this->reply != NULL)
 	{
@@ -221,6 +225,17 @@ void gmrpl_Cleanup(gmrpl_t* this)
 	{
 		messageDestroy(&this->message);
 	}
+	
+	for(i = 1; i >= 0; i--)
+	{
+		GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info[i]));
+		connectionUnsubscribe(this->connection, &(this->info[i]), this->status);
+		if (!example_check("Unsubscribing...", this->status))
+		{
+			GMSEC_ERROR("Problem with Unsubscribing...");
+		}
+	}
+	free(this->info);
 
 	/* Destroy connection */
 	if (this->connection != NULL)

@@ -22,6 +22,19 @@
 #define GMSEC_USING_VS2008 1
 #endif
 
+// Undefine macros defined by the perl libraries which cause problems with the 4.X Perl
+// linking on Windows
+//
+#if (defined WIN32)
+#if (defined connect)
+#undef connect
+#endif
+
+#if (defined wait)
+#undef wait
+#endif
+#endif
+
 
 // The following section defines GMSEC types that are being used with API 4.x, but that also
 // are used by API 3.x.  In order to avoid collisions with definitions, we will block this
@@ -48,8 +61,8 @@
  */
 typedef enum
 {
-	GMSEC_FALSE, /**< FALSE */
-	GMSEC_TRUE   /**< TRUE  */
+	GMSEC_FALSE = 0, /**< FALSE */
+	GMSEC_TRUE = 1   /**< TRUE  */
 } GMSEC_BOOL;
 
 
@@ -248,14 +261,14 @@ typedef GMSEC_F64 GMSEC_DOUBLE;
  */
 enum LogLevel
 {
-	logNONE,      /**< Disable logging */
-	logERROR,     /**< Error level logging */
-	logSECURE,    /**< Secure level logging */
-	logWARNING,   /**< Warning level logging */
-	logINFO,      /**< Info level logging */
-	logVERBOSE,   /**< Verbose level logging */
-	logDEBUG,     /**< Debug level logging */
-	logNLEVEL
+	logNONE = 0,      /**< Disable logging */
+	logERROR = 1,     /**< Error level logging */
+	logSECURE = 2,    /**< Secure level logging */
+	logWARNING = 3,   /**< Warning level logging */
+	logINFO = 4,      /**< Info level logging */
+	logVERBOSE = 5,   /**< Verbose level logging */
+	logDEBUG = 6,     /**< Debug level logging */
+	logNLEVEL = 7
 };
 
 
@@ -274,15 +287,16 @@ enum LogLevel
  */
 typedef enum
 {
-	GMSEC_DISPATCHER_ERROR_EVENT,        /**< Error occurred while attempting to dispatch message */
-	GMSEC_REQUEST_TIMEOUT_EVENT,         /**< A timeout occurred while attempting to receive a reply for a pending request. */
-	GMSEC_CONN_SUCCESSFUL_EVENT,         /**< Successfully connected to the middleware server. */
-	GMSEC_CONN_BROKEN_EVENT,             /**< %Connection to middleware server has been broken. */
-	GMSEC_CONN_RECONNECT_EVENT,          /**< An attempt is being made to reconnect to the middleware server. */
-	GMSEC_CONN_EXCEPTION_EVENT,          /**< An error, possibly fatal, has occurred with the connection to the middleware. */
-	GMSEC_GMD_ERROR_EVENT,               /**< SmartSockets Guaranteed Message Delivery (GMD) error. */
-	GMSEC_WSMQ_ASYNC_STATUS_CHECK_EVENT, /**< WebSphere MQ Asynchronous Put Status reporting event. */
-	GMSEC_ALL_EVENTS                     /**< Monitor all events. */
+	GMSEC_DISPATCHER_ERROR_EVENT = 0,        /**< Error occurred while attempting to dispatch message */
+	GMSEC_REQUEST_TIMEOUT_EVENT = 1,         /**< A timeout occurred while attempting to receive a reply for a pending request. */
+	GMSEC_CONN_SUCCESSFUL_EVENT = 2,         /**< Successfully connected to the middleware server. */
+	GMSEC_CONN_BROKEN_EVENT = 3,             /**< %Connection to middleware server has been broken. */
+	GMSEC_CONN_RECONNECT_EVENT = 4,          /**< An attempt is being made to reconnect to the middleware server. */
+	GMSEC_CONN_EXCEPTION_EVENT = 5,          /**< An error, possibly fatal, has occurred with the connection to the middleware. */
+	GMSEC_GMD_ERROR_EVENT = 6,               /**< SmartSockets Guaranteed Message Delivery (GMD) error. */
+	GMSEC_WSMQ_ASYNC_STATUS_CHECK_EVENT = 7, /**< WebSphere MQ Asynchronous Put Status reporting event. */
+	GMSEC_ALL_EVENTS = 8,                    /**< Monitor all events. */
+	MSG_PUBLISH_FAILURE_EVENT = 9            /**< Failure occurred while attempting to asynchronously publish a message. */
 } GMSEC_ConnectionEvent;
 
 
@@ -442,6 +456,16 @@ typedef void* GMSEC_ProductFile;
 
 
 /**
+ * @typedef GMSEC_SchemaIDIterator
+ *
+ * @desc A handle to a MIST SchemaIDIterator object.
+ *
+ * @sa specificationGetSchemaIDIterator
+ */
+typedef void* GMSEC_SchemaIDIterator;
+
+
+/**
  * @typedef GMSEC_ServiceParam
  *
  * @desc A handle to a MIST ServerParam object.
@@ -450,6 +474,18 @@ typedef void* GMSEC_ProductFile;
  * @sa serviceParamDestroy
  */
 typedef void* GMSEC_ServiceParam;
+
+
+/**
+ * @typedef GMSEC_Specification
+ *
+ * @desc A handle to a MIST Specification object.
+ *
+ * @sa specificationCreate
+ * @sa specificationCreateCopy
+ * @sa specificationDestroy
+ */
+typedef void* GMSEC_Specification;
 
 
 /**

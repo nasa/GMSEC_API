@@ -17,7 +17,7 @@ public class JNIStatus extends gov.nasa.gsfc.gmsec.api.Status
 	private long      swigCPtr;
 	protected boolean swigCMemOwn;
 
-	protected JNIStatus(long cPtr, boolean cMemoryOwn)
+	public JNIStatus(long cPtr, boolean cMemoryOwn)
 	{
 		swigCMemOwn = cMemoryOwn;
 		swigCPtr    = cPtr;
@@ -109,7 +109,7 @@ public class JNIStatus extends gov.nasa.gsfc.gmsec.api.Status
 	{
 		int clazz = gmsecJNI.Status_GetClassification(swigCPtr, this);
 
-		return StatusClassification.values()[clazz];
+		return StatusClassification.getUsingValue(clazz);
 	}
 
 
@@ -123,7 +123,7 @@ public class JNIStatus extends gov.nasa.gsfc.gmsec.api.Status
 	{
 		int code = gmsecJNI.Status_GetCode(swigCPtr, this);
 
-		return StatusCode.values()[code];
+		return StatusCode.getUsingValue(code);
 	}
 
 

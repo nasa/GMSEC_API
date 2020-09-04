@@ -16,12 +16,15 @@
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.Log;
 
+import java.util.ArrayList;
+
 
 public class gmsub implements Example
 {
 	private Config     config;
 	private Connection connection;
 	private Message    message;
+	private ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 
 	public gmsub(Config config) throws GMSEC_Exception, ExampleException
@@ -125,7 +128,7 @@ public boolean run() throws GMSEC_Exception
 		for (String subject : subjects)
 		{
 			Log.info("subscribing to " + subject);
-			connection.subscribe(subject);
+			info.add(connection.subscribe(subject));
 		}
 
 		// Wait for messages
@@ -180,6 +183,12 @@ public boolean run() throws GMSEC_Exception
 	{
 		if (connection != null)
 		{
+			for(int i = info.size()-1; i >= 0; i-- )
+			{
+				Log.info("Unsubscribing from " + info.get(i).getSubject());
+				connection.unsubscribe(info.get(i));
+				info.remove(i);
+			}
 			Util.closeConnection(connection);
 		}
 

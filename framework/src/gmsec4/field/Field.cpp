@@ -60,5 +60,29 @@ void Field::isHeader(bool header)
 }
 
 
+GMSEC_I64 Field::getIntegerValue() const
+{
+	return m_internal->getIntegerValue();
+}
+
+
+GMSEC_U64 Field::getUnsignedIntegerValue() const
+{
+	return m_internal->getUnsignedIntegerValue();
+}
+
+
+GMSEC_F64 Field::getDoubleValue() const
+{
+	return m_internal->getDoubleValue();
+}
+
+
+const char* Field::getStringValue() const
+{
+	return m_internal->getStringValue();
+}
+
+
 } //namespace api
 } //namespace gmsec

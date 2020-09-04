@@ -255,6 +255,9 @@ public:
 	 * @return The element at the given position index.
 	 *
 	 * @throws An Exception is thrown if the index is out of range.
+	 *
+	 * @note This method is highly inefficient; it is better to iterate over
+	 * a DataList than to attempt direct access based on an index.
 	 */
 	T& get(size_t index)
 	{
@@ -276,6 +279,9 @@ public:
 	 * @return The element at the given position index.
 	 *
 	 * @throws An Exception is thrown if the index is out of range.
+	 *
+	 * @note This method is highly inefficient; it is better to iterate over
+	 * a DataList than to attempt direct access based on an index.
 	 */
 	const T& get(size_t index) const
 	{

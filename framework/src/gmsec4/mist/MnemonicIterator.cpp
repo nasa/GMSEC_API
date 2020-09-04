@@ -10,16 +10,18 @@
 
 #include <gmsec4/mist/Mnemonic.h>
 
-#include <gmsec4/internal/mist/InternalMnemonicMessage.h>
+#include <gmsec4/internal/mist/message/InternalMnemonicMessage.h>
+
 #include <gmsec4/internal/mist/InternalMnemonicIterator.h>
 
 
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::mist::message::internal;
 
 
 MnemonicIterator::MnemonicIterator(InternalMnemonicMessage& msg)
-	: m_iter(new InternalMnemonicIterator(msg))
+	: m_iter(new gmsec::api::mist::internal::InternalMnemonicIterator(msg))
 {
 }
 

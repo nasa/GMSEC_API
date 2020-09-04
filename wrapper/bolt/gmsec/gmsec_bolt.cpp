@@ -86,7 +86,7 @@ GMSEC_MW_API void createConnection(const Config* config, internal::ConnectionInt
 				boltconn = new MultipleConnection(*config);
 			}
 
-			*status = boltconn->setServers(servers);
+			boltconn->setServers(servers);
 
 			*connIf = boltconn;
 		}

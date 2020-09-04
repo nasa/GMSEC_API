@@ -139,10 +139,8 @@ const char* MBConnection::getMWInfo()
 }
 
 
-Status MBConnection::mwConnect()
+void MBConnection::mwConnect()
 {
-	Status status;
-
 	// Initialize our request specs
 	m_reqSpecs = getExternal().getRequestSpecs();
 
@@ -161,6 +159,7 @@ Status MBConnection::mwConnect()
 
 	// connect to the specifyied server or to
 	// localhost if no server was specified
+	Status status;
 	if (m_server.length() > 0)
 	{
 		status = m_sock->connect(m_port, (char*)m_server.c_str());
@@ -173,8 +172,7 @@ Status MBConnection::mwConnect()
 	if (status.isError())
 	{
 		// Return server not found error
-		status.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE,"No Message Bus Server found.", CONNECT_SERVER_NOT_FOUND);
-		return status;
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, CONNECT_SERVER_NOT_FOUND, "No Message Bus Server found");
 	}
 
 	m_sock->setDebug(false);
@@ -211,7 +209,7 @@ Status MBConnection::mwConnect()
 	if (status.isError())
 	{
 		status.setCustomCode(CONNECT_MISSING_ACK);
-		return status;
+		goto cleanup;
 	}
 
 	GMSEC_DEBUG << "Connected to server "
@@ -231,7 +229,7 @@ Status MBConnection::mwConnect()
 		if (status.isError())
 		{
 			status.setCustomCode(CONNECT_NO_LOOP_FAILED);
-			return status;
+			goto cleanup;
 		}
 	}
 
@@ -250,26 +248,23 @@ Status MBConnection::mwConnect()
 	// connection.
 	if (m_reqSpecs.requestReplyEnabled)
 	{
-		status = mwSubscribe(m_reqSpecs.replySubject.c_str(), getExternal().getConfig());
-
-		if (status.isError())
-		{
-			status.setCustomCode(CONNECT_SUBSCRIBE_RESPONSE_FAILED);
-		}
+		mwSubscribe(m_reqSpecs.replySubject.c_str(), getExternal().getConfig());
 	}
 
-	return status;
+cleanup:
+	if (status.isError())
+	{
+		throw Exception(status);
+	}
 }
 
 
-Status MBConnection::mwDisconnect()
+void MBConnection::mwDisconnect()
 {
-	Status status;
-
 	// send the disconnect command to the server
 	char tBuff[2] = { CMD_DISC, 0 };
 
-	status = m_sock->write(tBuff, sizeof(tBuff));
+	Status status = m_sock->write(tBuff, sizeof(tBuff));
 
 	if (status.isError())
 	{
@@ -283,6 +278,7 @@ Status MBConnection::mwDisconnect()
 		m_readerThreadShared->shutdown();
 
 		m_readerThreadShared.reset();
+		m_readerThread->join();
 		m_readerThread.reset();
 	}
 	m_sock->disconnect();
@@ -299,15 +295,11 @@ Status MBConnection::mwDisconnect()
 	}
 
 	GMSEC_INFO << "Connection disconnected";
-
-	return status;
 }
 
 
-Status MBConnection::mwSubscribe(const char* subject, const Config& config)
+void MBConnection::mwSubscribe(const char* subject, const Config& config)
 {
-	Status status;
-
 	// set up the subscription latch
 	{
 		AutoMutex hold(m_subscribeMutex);
@@ -325,7 +317,7 @@ Status MBConnection::mwSubscribe(const char* subject, const Config& config)
 	// send the subscribe command and the subject to
 	// subscribe to
 	StringUtil::stringFormat(outCmd, space, "%c%s", CMD_SUB, subject);
-	status = m_sock->write(outCmd, space);
+	Status status = m_sock->write(outCmd, space);
 	m_sock->addConfig(outCmd);
 	delete []outCmd;
 
@@ -339,32 +331,34 @@ Status MBConnection::mwSubscribe(const char* subject, const Config& config)
 		m_subscribeLatch = 0;
 	}
 
-	return status;
+	if (status.isError())
+	{
+		throw Exception(status);
+	}
 }
 
 
-Status MBConnection::mwUnsubscribe(const char* subject)
+void MBConnection::mwUnsubscribe(const char* subject)
 {
-	Status status;
-
 	int space = StringUtil::stringLength(subject) + 2;
 	char* outCmd = new char[space];
 
 	// send the unsubscribe command and the subject
 	// to unsubscribe from
 	StringUtil::stringFormat(outCmd, space, "%c%s", CMD_USUB, subject);
-	status = m_sock->write(outCmd, space);
+	Status status = m_sock->write(outCmd, space);
 	m_sock->removeConfig(outCmd);
 	delete []outCmd;
 
-	return status;
+	if (status.isError())
+	{
+		throw Exception(status);
+	}
 }
 
 
-Status MBConnection::mwPublish(const Message& msg, const Config& config)
+void MBConnection::mwPublish(const Message& msg, const Config& config)
 {
-	Status status;
-
 	// prepare the command string and send it
 	char*  buffer     = 0;
 	size_t bufferSize = 0;
@@ -374,18 +368,19 @@ Status MBConnection::mwPublish(const Message& msg, const Config& config)
 	std::ostringstream strm;
 	strm << getExternal().getID() << "_" << getExternal().getMessageCounter();
 
-	status = m_sock->write(buffer, bufferSize, strm.str().c_str());
+	Status status = m_sock->write(buffer, bufferSize, strm.str().c_str());
 
 	delete [] buffer;
 
-	return status;
+	if (status.isError())
+	{
+		throw Exception(status);
+	}
 }
 
 
-Status MBConnection::mwRequest(const Message& request, std::string& id)
+void MBConnection::mwRequest(const Message& request, std::string& id)
 {
-	Status status;
-
 	long thisID = getExternal().getMessageCounter() + 1;
 
 	std::ostringstream os;
@@ -398,44 +393,34 @@ Status MBConnection::mwRequest(const Message& request, std::string& id)
 	// Add a field with the subject to publish the reply to
 	MessageBuddy::getInternal(request).addField(MB_MY_SUBJECT_FIELD_NAME, m_reqSpecs.replySubject.c_str());
 
-	status = mwPublish(request, getExternal().getConfig());
-
-	return status;
+	mwPublish(request, getExternal().getConfig());
 }
 
 
-Status MBConnection::mwReply(const Message& request, const Message& reply)
+void MBConnection::mwReply(const Message& request, const Message& reply)
 {
-	Status status;
-
 	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
 	const StringField* mySubject = dynamic_cast<const StringField*>(request.getField(MB_MY_SUBJECT_FIELD_NAME));
 
 	if (!uniqueID)
 	{
-		status.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
-		return status;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
 	if (!mySubject)
 	{
-		status.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique subject field");
-		return status;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique subject field");
 	}
 
 	// set the UNIQUE ID and the ROUTING SUBJECT within the reply message
 	MessageBuddy::getInternal(reply).addField(*uniqueID);
 	MessageBuddy::getInternal(reply).setSubject(mySubject->getValue());
 
-	status = mwPublish(reply, getExternal().getConfig());
-
-	return status;
+	mwPublish(reply, getExternal().getConfig());
 }
 
 
-Status MBConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
+void MBConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 {
-	Status status;
-
 	double endTime = 0.0;
 
 	msg = NULL;
@@ -443,8 +428,7 @@ Status MBConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 	// if the connection is not there then report the error to the user
 	if (m_readerThread.get() == NULL || m_readerThreadShared->getConnWasDropped())
 	{
-		status.set(CONNECTION_ERROR, INVALID_CONNECTION, "Connect to server host was lost");
-		return status;
+		throw Exception(CONNECTION_ERROR, INVALID_CONNECTION, "Connect to server host was lost");
 	}
 
 	if ((timeout != GMSEC_WAIT_FOREVER) && (timeout != GMSEC_NO_WAIT))
@@ -465,12 +449,9 @@ Status MBConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 	{
 		if (m_readerThread.get() == NULL || m_readerThreadShared->getConnWasDropped())
 		{
-			status = mwDisconnect();
+			mwDisconnect();
 
-			if (status.isError() == 0)
-			{
-				status.set(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to server host was lost");
-			}
+			throw Exception(CONNECTION_ERROR, INVALID_CONNECTION , "Connection to server host was lost");
 		}
 	}
 	else
@@ -482,8 +463,6 @@ Status MBConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 			getExternal().updateReplySubject(msg);
 		}
 	}
-
-	return status;
 }
 
 

@@ -30,6 +30,7 @@ public class JNIFieldConverter
 				case U8_TYPE:     field = new U8Field(new JNIU8Field(cPtr, false)); break;
 				case U16_TYPE:    field = new U16Field(new JNIU16Field(cPtr, false)); break;
 				case U32_TYPE:    field = new U32Field(new JNIU32Field(cPtr, false)); break;
+				case U64_TYPE:    field = new U64Field(new JNIU64Field(cPtr, false)); break;
 				case STRING_TYPE: field = new StringField(new JNIStringField(cPtr, false)); break;
 			}
 		}

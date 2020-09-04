@@ -20,6 +20,7 @@
 
 #include <sstream>
 #include <algorithm>
+#include <cmath>
 #include <ctime>
 #include <cerrno>
 #include <iterator>
@@ -310,6 +311,9 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 				int second = atoi(subSecondComps.at(0).c_str());
 				double milli = atoi(subSecondComps.at(1).c_str());
 
+				size_t subs      = subSecondComps.at(1).length();
+				double milli_div = std::pow((double) 10, (double) subs);
+
 				time_t now = time(NULL);
 				struct tm utc;
 
@@ -365,7 +369,7 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 
 				time_t reversed = mktime(&newtime);
 				reversed += localTimeOffsetSeconds;
-				double time = reversed + (milli / 1000);
+				double time = reversed + (milli / milli_div);
 				return time;
 
 			}

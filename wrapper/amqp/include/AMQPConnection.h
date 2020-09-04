@@ -17,6 +17,7 @@
 
 #include <gmsec4/internal/ConnectionInterface.h>
 #include <gmsec4/internal/Encoder.h>
+#include <gmsec4/internal/TicketMutex.h>
 #include <gmsec4/internal/UniqueFilter.h>
 
 #include <gmsec4/Config.h>
@@ -133,56 +134,56 @@ public:
 	 * @fn mwConnect()
 	 * @brief Establish connection to the server.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwConnect();
+	virtual void CALL_TYPE mwConnect();
 
 
 	/**
 	 * @fn mwDisconnect()
 	 * @brief End connection to the server.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwDisconnect();
+	virtual void CALL_TYPE mwDisconnect();
 
 
 	/**
 	 * @fn mwSubscribe(const char* subject, const gmsec::api::Config& config)
 	 * @brief Subscribe to a subject without a callback
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
 
 
 	/**
 	 * @fn mwUnsubscribe(const char* subject)
 	 * @brief Unsubscribe from a subject
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwUnsubscribe(const char* subject);
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject);
 
 
 	/**
 	 * @fn mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config)
 	 * @brief Send the message to the middleware.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
 
 
 	/**
 	 * @fn mwRequest(const gmsec::api::Message& request, std::string& id);
 	 * @brief Send a request message to the middleware.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string& id);
+	virtual void CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string& id);
 
 
 	/**
 	 * @fn mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply)
 	 * @brief Send a reply message to the middleware.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
+	virtual void CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
 
 
 	/**
 	 * @fn mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout)
 	 * @brief pull the next message off the inbound queue
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
+	virtual void CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
 	
 
 	std::string fixSubject(const char* str);
@@ -260,6 +261,8 @@ private:
 	bool                                      threadSafe;
 	bool                                      useFilter;
 	SSLConfiguration                          sslConfig;
+
+	gmsec::api::util::TicketMutex             m_mutex;
 };
 
 

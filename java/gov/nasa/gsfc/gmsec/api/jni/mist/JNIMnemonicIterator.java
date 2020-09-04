@@ -6,10 +6,12 @@
  */
 
 
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.mist.Mnemonic;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
 
 
 public class JNIMnemonicIterator
@@ -18,7 +20,7 @@ public class JNIMnemonicIterator
 	private boolean swigCMemOwn;
 
 
-	protected JNIMnemonicIterator(long cPtr, boolean cMemoryOwn)
+	public JNIMnemonicIterator(long cPtr, boolean cMemoryOwn)
 	{
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;

@@ -209,11 +209,11 @@ private:
 	std::string generateUniqueId(long id);
 
 
-	gmsec::api::Status openObjectHandle(const std::string& subject, MQMD& md, MQHOBJ& objHandle);
+	void openObjectHandle(const std::string& subject, MQMD& md, MQHOBJ& objHandle);
 
-	gmsec::api::Status createMsgHandle(gmsec::api::internal::ValueMap& meta, MQHMSG& msgHandle, MQPMO& msgOptions);
+	void createMsgHandle(gmsec::api::internal::ValueMap& meta, MQHMSG& msgHandle, MQPMO& msgOptions);
 
-	gmsec::api::Status publishMessage(MQHOBJ& objHandle, MQMD& msgDesc, MQPMO& msgOpts, gmsec::api::util::DataBuffer& buffer);
+	void publishMessage(MQHOBJ& objHandle, MQMD& msgDesc, MQPMO& msgOpts, gmsec::api::util::DataBuffer& buffer);
 
 	gmsec::api::Status reconnect();
 
@@ -281,7 +281,7 @@ public:
 	 *
 	 *	@return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwConnect();
+	virtual void CALL_TYPE mwConnect();
 
 
 	/** @fn mwDisconnect()
@@ -291,7 +291,7 @@ public:
 	 *
 	 *	@return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwDisconnect();
+	virtual void CALL_TYPE mwDisconnect();
 
 
 	/**	@fn mwSubscribe(const char* subject, const gmsec::api::Config& config)
@@ -307,7 +307,7 @@ public:
 	 *
 	 *  @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
 
 
 	/**	@fn mwUnsubscribe(const char* subject)
@@ -320,7 +320,7 @@ public:
 	 *
 	 *	@return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwUnsubscribe(const char* subject);
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject);
 
 
 	/**	@fn mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config)
@@ -333,7 +333,7 @@ public:
 	 *
 	 *	@return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
 
 
 	/**	@fn mwRequest(const gmsec::api::Message& request, std::string &id)
@@ -346,7 +346,7 @@ public:
 	 *	@return status - result of the connection operation
 	 *
 	**/
-	virtual gmsec::api::Status CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string &id);
+	virtual void CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string &id);
 
 
 	/**	@fn mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply)
@@ -365,7 +365,7 @@ public:
 	 *
 	 *	@return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
+	virtual void CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
 
 
 	/**	@fn mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout)
@@ -382,7 +382,7 @@ public:
 	 *
 	 *	@return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
+	virtual void CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
 
 	bool fromMW(const gmsec::api::util::DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg, bool forReplies);
 
@@ -405,12 +405,12 @@ public:
 	 *	@brief Populates a MQHCONN handle with an active, connected WebSphere MQ connection handle
 	 *
 	 */
-	static gmsec::api::Status createLiveConnection(MQHCONN& subConn,
-	                                               const std::string& qmanager,
-	                                               const std::string& hostname, 
-	                                               const std::string& channel,
-	                                               const std::string& pCipherSpec,
-	                                               const std::string& pKeyReposStem);
+	static void createLiveConnection(MQHCONN& subConn,
+	                                 const std::string& qmanager,
+	                                 const std::string& hostname, 
+	                                 const std::string& channel,
+	                                 const std::string& pCipherSpec,
+	                                 const std::string& pKeyReposStem);
 };
 
 

@@ -25,11 +25,17 @@ namespace api
 namespace mist
 {
 	class Mnemonic;
+	namespace internal
+	{
+		class InternalMnemonicIterator;
+	}
 
-namespace internal
+namespace message
 {
-	class InternalMnemonicMessage;
-	class InternalMnemonicIterator;
+	namespace internal
+	{
+		class InternalMnemonicMessage;
+	}
 }
 
 
@@ -83,7 +89,7 @@ public:
 
 
 private:
-	friend class gmsec::api::mist::internal::InternalMnemonicMessage;
+	friend class gmsec::api::mist::message::internal::InternalMnemonicMessage;
 
 	/**
 	 * @fn MnemonicIterator(const MnemonicMessage& msg)
@@ -92,7 +98,7 @@ private:
 	 *
 	 * @param msg - the MnemonicMessage object to use when iterating over the Mnemonic objects.
 	 */
-    MnemonicIterator(mist::internal::InternalMnemonicMessage& msg);
+	MnemonicIterator(mist::message::internal::InternalMnemonicMessage& msg);
 
 
 	// Declared, but not implemented
@@ -103,7 +109,7 @@ private:
 	//MnemonicIterator& operator=(const MnemonicIterator&);
 
 
-    gmsec::api::mist::internal::InternalMnemonicIterator* m_iter;
+	gmsec::api::mist::internal::InternalMnemonicIterator* m_iter;
 };
 
 } // namespace mist

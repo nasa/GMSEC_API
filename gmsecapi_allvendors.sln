@@ -40,6 +40,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "activemq384", "wrapper\acti
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "websphere80", "wrapper\websphere80\websphere80.vcproj", "{62A948D2-876B-4F8C-8C75-C3BED86A81E4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_perl", "perl\gmsec4\libgmsec_perl.vcproj", "{8D4F2C8C-A403-4242-9C02-58DC93306D38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -256,6 +258,17 @@ Global
 		{62A948D2-876B-4F8C-8C75-C3BED86A81E4}.Release-SNK|Win32.ActiveCfg = Release|x64
 		{62A948D2-876B-4F8C-8C75-C3BED86A81E4}.Release-SNK|x64.ActiveCfg = Release|x64
 		{62A948D2-876B-4F8C-8C75-C3BED86A81E4}.Release-SNK|x64.Build.0 = Release|x64
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Debug|Win32.Build.0 = Debug|Win32
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Debug|x64.ActiveCfg = Debug|x64
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Debug|x64.Build.0 = Debug|x64
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release|Win32.ActiveCfg = Release|Win32
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release|Win32.Build.0 = Release|Win32
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release|x64.ActiveCfg = Release|x64
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release|x64.Build.0 = Release|x64
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release-SNK|Win32.ActiveCfg = Release|x64
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release-SNK|x64.ActiveCfg = Release|x64
+		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release-SNK|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

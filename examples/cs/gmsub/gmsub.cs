@@ -26,7 +26,7 @@ namespace gmsub
 	{
 		private Config     config;
 		private Connection conn;
-
+        private List<SubscriptionInfo> info = new List<SubscriptionInfo>(); 
 
 		public gmsub()
 		{
@@ -59,7 +59,15 @@ namespace gmsub
 		{
 			if(conn != null)
 			{
-				conn.Disconnect();
+                for (int i = info.Count - 1; i >= 0; i--)
+                {
+                    Log.Info("Unsubscribing to " + info[i].GetSubject());
+                    var temp = info[i];
+                    conn.Unsubscribe(ref temp);
+                    info.RemoveAt(i);
+                }
+
+                conn.Disconnect();
 
 				Connection.Destroy(ref conn);
 			}
@@ -109,7 +117,7 @@ namespace gmsub
 				for (int i = 0; i < subjects.Count; i++)
 				{
 					Log.Info("Subscribing to "+subjects[i]);
-					conn.Subscribe(subjects[i]);
+					info.Add(conn.Subscribe(subjects[i]));
 				}
 
 				//Wait & Print Out Messages

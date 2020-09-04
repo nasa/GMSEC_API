@@ -63,11 +63,11 @@ public:
 
 	/** @fn Config( const char *xml )
 	 * @brief This constructor will create a config and parse values from the passed in xml string.
-	 * The xml format is the same as used by the FromXML() and ToXML() functions.
+	 * The xml format is the same as used by the fromXML() and toXML() functions.
 	 *
-	 * @param xml - string in xml format (see FromXML)
+	 * @param xml - string in xml format (see fromXML)
 	 *
-	 * @sa FromXML() @n ToXML()
+	 * @sa fromXML() @n toXML()
 	 */
 	Config(const char *xml);
 
@@ -99,7 +99,6 @@ public:
 	 *
 	 * @param name - name of value to add
 	 * @param value - value to be added
-	 * @return status object with the result of the operation
 	 * @throws Exception if either name or value are NULL, or are empty strings
 	 */
 	void CALL_TYPE addValue(const char* name, const char* value);
@@ -130,13 +129,16 @@ public:
 
 
 	/**
-	 * @fn const char* getValue(const char* name) const
+	 * @fn const char* getValue(const char* name, const char* defaultValue) const
 	 *
-	 * @brief This function gets a value by name. The scope of the value is the life of the Config object.
+	 * @brief This function gets a value by name and if there is no value assigned to will return 
+	 * the defaultValue parameter. defaultValue can be NULL or empty. The scope of the value is the life of
+	 * the Config object.
 	 *
 	 * @param name - name of value to get
+	 * @param defaultValue - default value to be returned if no value exist for name parameter
 	 *
-	 * @return If the key entry is found, then the associated value is returned; otherwise NULL is returned.
+	 * @return If the key entry is found, then the associated value is returned; otherwise defaultValue is returned.
 	 *
 	 * @throws Exception if name is NULL
 	 */
@@ -148,7 +150,10 @@ public:
 	 * valid boolean interpretion of the value.
 	 *
 	 * @param name - name of value to get
+	 * @param defaultValue - default value to be returned if no value exist for name parameter
+	 * 
 	 * @return value of named item
+	 *
 	 * @throws Exception if name is NULL
 	 */
 	bool CALL_TYPE getBooleanValue(const char* name) const;
@@ -184,7 +189,10 @@ public:
 	 * a integer, the default value is returned.
 	 *
 	 * @param name - name of value to get
+	 * @param defaultValue - default value to be returned if no value exist for name parameter
+	 *
 	 * @return value of named item
+	 *
 	 * @throws Exception if name is NULL
 	 */
 	int CALL_TYPE getIntegerValue(const char* name, int defaultValue) const;
@@ -208,7 +216,10 @@ public:
 	 * a double, the default value is returned.
 	 *
 	 * @param name - name of value to get
+	 * @param defaultValue - default value to be returned if no value exist for name parameter
+	 *
 	 * @return value of named item
+	 *
 	 * @throws Exception if name is NULL
 	 */
 	double CALL_TYPE getDoubleValue(const char* name, double defaultValue) const;
@@ -223,7 +234,7 @@ public:
 	/** @fn getFirst(const char*& name, const char*& value) const
 	 * @brief This function gets the first name & value for iteration. The scope
 	 * of the name and value are the life of the Config object, or
-	 * until the next %GetFirst() call.
+	 * until the next %getFirst() call.
 	 *
 	 * @param name - output parameter name of value
 	 * @param value - output parameter value
@@ -250,7 +261,7 @@ public:
 	 * @brief Merge the given %Config object with the current %Config object.
 	 *
 	 * @param other - the %Config object from which to read name/value pairs.
-	 * @param overwriteExisting - indicates whether to overwrite any existing name/value
+	 * @param [optional] overwriteExisting - indicates whether to overwrite any existing name/value
 	 * pairs within the working %Config object.  If flag is omitted, then the default is
 	 * to overwrite existing name/value pairs.
 	 */
@@ -275,8 +286,8 @@ public:
 	 * Example xml string:
 	 * @code
 	 * <CONFIG>
-	 *    <PARAMETER NAME="connectiontype">gmsec_ss</PARAMETER>
-	 *    <PARAMETER NAME="server">tcp:10.1.2.159</PARAMETER>
+	 *    <PARAMETER NAME="mw-id">bolt</PARAMETER>
+	 *    <PARAMETER NAME="server">127.0.0.1</PARAMETER>
 	 *    <PARAMETER NAME="tracking">true</PARAMETER>
 	 *    <PARAMETER NAME="isthreaded">true</PARAMETER>
 	 * </CONFIG>

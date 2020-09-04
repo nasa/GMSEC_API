@@ -639,6 +639,10 @@ const char* API4_Adapter::API4EventToAPI3(gmsec::api::Connection::ConnectionEven
 	case gmsec::api::Connection::ALL_EVENTS:
 		event3 = GMSEC_ALL_ERRORS_EVENT;
 		break;
+
+	default:
+		event3 = GMSEC_ALL_ERRORS_EVENT;
+		break;
 	}
 
 	return event3;

@@ -7,11 +7,13 @@
 
 
 #include <gmsec4/internal/mist/InternalDeviceIterator.h>
-#include <gmsec4/internal/mist/InternalDeviceMessage.h>
+
+#include <gmsec4/internal/mist/message/InternalDeviceMessage.h>
 
 
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::mist::message::internal;
 
 
 InternalDeviceIterator::InternalDeviceIterator(InternalDeviceMessage& msg)

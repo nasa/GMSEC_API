@@ -16,8 +16,6 @@
 #define GMSEC_API_INTERNAL_CALLBACK_LOOKUP_H
 
 
-#include <gmsec4/Status.h>
-
 #include <gmsec4/internal/ci_less.h>
 
 #include <gmsec4/Callback.h>
@@ -91,7 +89,7 @@ public:
 	 *	@brief This function registers a subject or pattern with a Callback to
 	 *	be called when messages that match are received.
 	 */
-	virtual Status CALL_TYPE addCallback(const char* subject, Callback* cb);
+	virtual void CALL_TYPE addCallback(const char* subject, Callback* cb);
 
 
 	/** @fn removeCallback(const char* subject)
@@ -99,7 +97,7 @@ public:
 	 *	@brief This function removes all Callbacks that are registed for a
 	 *	certain subject or pattern.
 	 */
-	virtual Status CALL_TYPE removeCallback(const char* subject);
+	virtual void CALL_TYPE removeCallback(const char* subject);
 
 
 	/** @fn removeCallback(const char* subject, Callback* cb)
@@ -107,7 +105,7 @@ public:
 	 *	@brief This function removes a particular Callback that is registed for a
 	 *	certain subject or pattern.
 	 */
-	virtual Status CALL_TYPE removeCallback(const char* subject, Callback* cb);
+	virtual void CALL_TYPE removeCallback(const char* subject, Callback* cb);
 
 
 	virtual void CALL_TYPE collectCallbacks(const char* subject, callbackList& callbacks);
@@ -125,7 +123,7 @@ public:
 	 *	received message to all the callbacks that are registerd to
 	 *	subject or pattern that matches the message's subject.
 	 */
-	virtual Status CALL_TYPE dispatchMsg(const char* subject, const Message& msg);
+	virtual void CALL_TYPE dispatchMsg(const char* subject, const Message& msg);
 
 
 	/** @fn getCallbackCount(const char* subject);

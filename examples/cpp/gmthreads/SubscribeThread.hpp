@@ -41,6 +41,7 @@ private:
 
 	gmsec::api::Config&     config;
 	gmsec::api::Connection* connection;
+	gmsec::api::SubscriptionInfo* info;
 };
 
 #endif

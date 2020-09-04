@@ -13,20 +13,16 @@ import gov.nasa.gsfc.gmsec.api.field.*;
 
 
 
-public class JNIMessage extends Message
+public class JNIMessage
 {
 	protected long    swigCPtr;
 	protected boolean swigCMemOwn;
 
 
-	protected JNIMessage(long cPtr, boolean cMemoryOwn)
+	public JNIMessage(long cPtr, boolean cMemoryOwn)
 	{
-		super((JNIMessage) null);
-
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;
-
-		registerChild(this);
 	}
 
 
@@ -53,7 +49,7 @@ public class JNIMessage extends Message
 	}
 
 
-	protected static long getCPtr(JNIMessage obj)
+	public static long getCPtr(JNIMessage obj)
 	{
 		return (obj == null) ? 0 : obj.swigCPtr;
 	}
@@ -329,6 +325,30 @@ public class JNIMessage extends Message
 	}
 
 
+	public long getIntegerValue(String fieldName) throws GMSEC_Exception
+	{
+		return gmsecJNI.Message_GetIntegerValue(swigCPtr, this, fieldName);
+	}
+
+
+	public U64 getUnsignedIntegerValue(String fieldName) throws GMSEC_Exception
+	{
+		return gmsecJNI.Message_GetUnsignedIntegerValue(swigCPtr, this, fieldName);
+	}
+
+
+	public double getDoubleValue(String fieldName) throws GMSEC_Exception
+	{
+		return gmsecJNI.Message_GetDoubleValue(swigCPtr, this, fieldName);
+	}
+
+
+	public String getStringValue(String fieldName) throws GMSEC_Exception
+	{
+		return gmsecJNI.Message_GetStringValue(swigCPtr, this, fieldName);
+	}
+
+
 	public Field getField(String name)
 	{
 		long cPtr = gmsecJNI.Message_GetField(swigCPtr, this, name);
@@ -337,7 +357,7 @@ public class JNIMessage extends Message
 	}
 
 
-	public Field.FieldType getFieldType(String name)
+	public Field.FieldType getFieldType(String name) throws GMSEC_Exception
 	{
 		int intType = gmsecJNI.Message_GetFieldType(swigCPtr, this, name);
 

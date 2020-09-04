@@ -14,12 +14,12 @@
 
 #include <gmsec4/util/StdThread.h>
 
-#include <gmsec4/internal/StringUtil.h>
-
-#include <gmsec/internal/rawbuf.h>
-#include <gmsec/util/sysutil.h>
-
+#include <gmsec4/util/Buffer.h>
 #include <gmsec4/util/Log.h>
+
+#include <gmsec4/internal/Rawbuf.h>
+#include <gmsec4/internal/StringUtil.h>
+#include <gmsec4/internal/SystemUtil.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -35,7 +35,7 @@ enum ThreadState
 {
 	INIT,
 	LAUNCHING,	// thread starting
-	FAILED,	// failed to launch
+	FAILED,	    // failed to launch
 	ABORTED,	// destroyed without run
 	ACTIVE,
 	COMPLETE,
@@ -47,20 +47,20 @@ static const int IS_DEBUG = 1;
 
 
 
-static Mutex &getMutex()
+static Mutex& getMutex()
 {
 	static Mutex mutex;
 	return mutex;
 }
 
 
-static std::string errorInfo(int code, const char * action = 0)
+static std::string errorInfo(int code, const char* action = 0)
 {
 	std::string tmp;
-	gmsec::util::getErrorString(code, tmp);
+	SystemUtil::getErrorString(code, tmp);
 
 	char raw[256] = {0};
-	gmsec::util::rawbuf buffer(raw, sizeof(raw));
+	rawbuf buffer(raw, sizeof(raw));
 	std::ostream out(&buffer);
 
 	out << code << ": " << tmp << std::ends;
@@ -68,7 +68,9 @@ static std::string errorInfo(int code, const char * action = 0)
 	tmp = raw;
 
 	if (action)
+	{
 		std::cerr << "StdThread.cpp:" << action << ' ' << tmp << '\n';
+	}
 
 	return tmp;
 }
@@ -78,7 +80,9 @@ static std::string state_s(int s)
 {
 	static const char *name[] = { "INIT", "LAUNCHING", "FAILED", "ABORTED", "ACTIVE", "COMPLETE" };
 	if (s >= INIT && s <= COMPLETE)
+	{
 		return name[s];
+	}
 	static bool warned = 0;
 	if (!warned)
 	{
@@ -91,8 +95,8 @@ static std::string state_s(int s)
 
 static bool isBigEndian()
 {
-	long x = 1;
-	char * p = (char *) &x;
+	long  x = 1;
+	char* p = (char*) &x;
 	return p[0] == 0;
 }
 
@@ -128,13 +132,13 @@ static StdThread::id_t handleToID(const StdThread::handle_t in)
 
 /* If we really want to support an exact representation */
 
-#include <gmsec/util/Buffer.h>
+#include <gmsec4/util/Buffer.h>
 
 static std::string handleToString(const StdThread::handle_t in)
 {
 	std::string out;
 
-	const GMSEC_U8 * raw = (GMSEC_U8 *) &in;
+	const GMSEC_U8* raw = (GMSEC_U8*) &in;
 	DataBuffer buffer(raw, sizeof(in), false);
 	convertBlobToBase16(buffer, out);
 
@@ -153,15 +157,19 @@ void StdThread::zero()
 }
 
 
-void *StdThread::process0(void *arg)
+void* StdThread::process0(void* arg)
 {
-	Invoker *invoker = (Invoker *) arg;
+	Invoker* invoker = (Invoker*) arg;
 
 	try
 	{
 		invoker->invoke();
 	}
-	catch (std::exception &e)
+	catch (gmsec::api::Exception& e)
+	{
+		GMSEC_ERROR << "StdThread.process0: caught " << e.what();
+	}
+	catch (std::exception& e)
 	{
 		GMSEC_ERROR << "StdThread.process0: caught " << e.what();
 	}
@@ -176,10 +184,10 @@ void *StdThread::process0(void *arg)
 }
 
 
-std::string StdThread::describe(const char *tag)
+std::string StdThread::describe(const char* tag)
 {
 	char raw[512];
-	gmsec::util::rawbuf buffer(raw, sizeof(raw));
+	rawbuf buffer(raw, sizeof(raw));
 	std::ostream os(&buffer);
 
 	os << (tag ? tag : "StdThread");
@@ -212,7 +220,9 @@ StdThread::~StdThread()
 	}
 
 	if (fInfo->is(INIT))
+	{
 		fInfo->set(ABORTED);
+	}
 
 	delete fInvoker;
 	fInvoker = 0;
@@ -274,7 +284,7 @@ int StdThread::start()
 	// Ownership of the Invoker will be passed to process0 if the thread
 	// is successfully started.  If it is not successfully started, 
 	// ownership will be returned to this StdThread.
-	Invoker *invoker = fInvoker;
+	Invoker* invoker = fInvoker;
 	fInvoker = 0;
 	int result = GMSEC_FALSE;
 
@@ -284,19 +294,17 @@ int StdThread::start()
 #ifdef WIN32
 
 	DWORD tmpID = 0;
-	LPSECURITY_ATTRIBUTES securityAttributes
-		= THREAD_SUSPEND_RESUME & THREAD_TERMINATE;
+	LPSECURITY_ATTRIBUTES securityAttributes = THREAD_SUSPEND_RESUME & THREAD_TERMINATE;
 	SIZE_T stackSize = 0; // 0 => default stack size
 	DWORD creationFlags = 0;
 
-	fHandle = CreateThread(
-			securityAttributes,
-			stackSize,
-			(LPTHREAD_START_ROUTINE) &StdThread::process0,
-			invoker, // argument for new thread
-			creationFlags,
-			&tmpID // pointer to returned thread identifier
-			);
+	fHandle = CreateThread(securityAttributes,
+	                       stackSize,
+	                       (LPTHREAD_START_ROUTINE) &StdThread::process0,
+	                       invoker, // argument for new thread
+	                       creationFlags,
+	                       &tmpID // pointer to returned thread identifier
+	                       );
 
 	if (tmpID)
 	{
@@ -417,7 +425,7 @@ int StdThread::join()
 
 #else
 
-	void *nothing = 0;
+	void* nothing = 0;
 	int code = pthread_join(fHandle, &nothing);
 	if (code)
 	{
@@ -445,10 +453,10 @@ int StdThread::detach()
 #ifdef WIN32
        // nothing
 #else
-       int code = pthread_detach(fHandle);
-       if (code)
+	int code = pthread_detach(fHandle);
+	if (code)
 	{
-               GMSEC_ERROR << describe().c_str() << ": pthread_detach => " << errorInfo(code, "pthread_detach").c_str();
+		GMSEC_ERROR << describe().c_str() << ": pthread_detach => " << errorInfo(code, "pthread_detach").c_str();
 	}
 #endif
 
@@ -466,13 +474,13 @@ void StdThread::yield()
 }
 
 
-void StdThread::setName(const char * name)
+void StdThread::setName(const char* name)
 {
-	fName = name;
+	fName = (name ? name : "Unknown Thread");
 }
 
 
-void StdThread::Invoker::setShared(StdSharedPtr<Info> &in)
+void StdThread::Invoker::setShared(StdSharedPtr<Info>& in)
 {
 	info = in;
 }
@@ -519,4 +527,3 @@ bool StdThread::Info::is(int i) const
 	AutoMutex hold(getMutex());
 	return state == i;
 }
-

@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Device
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Device__Ljava_lang_String_2I
   (JNIEnv *jenv, jclass jcls, jstring jName, jint jStatus)
 {
 	jlong created = 0;
@@ -51,7 +51,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Device
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Device__Ljava_lang_String_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIDeviceParam_2I
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1Device__Ljava_lang_String_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_mist_JNIDeviceParam_2I
   (JNIEnv *jenv, jclass jcls, jstring jName, jint jStatus, jlongArray jDeviceParamPtrs, jobjectArray jDeviceParams, jint jNumDeviceParams)
 {
 	jlong created = 0;

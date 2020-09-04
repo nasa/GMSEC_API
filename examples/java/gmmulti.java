@@ -17,6 +17,8 @@
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.*;
 
+import java.util.ArrayList;
+
 
 class TestConstant 
 {
@@ -63,6 +65,7 @@ public class gmmulti implements Example
 {
 	Config     config;
 	Connection connection;
+	ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 	gmmulti(Config config) throws ExampleException
 	{
@@ -104,10 +107,10 @@ public class gmmulti implements Example
 
 		// Subscribe
 		Log.info("Callback's subscribing to " + TestConstant.SUBJECT1);
-		connection.subscribe(TestConstant.SUBJECT1, new MyCallback());
+		info.add(connection.subscribe(TestConstant.SUBJECT1, new MyCallback()));
 
 		Log.info("Callback's subscribing to " + TestConstant.SUBJECT2);
-		connection.subscribe(TestConstant.SUBJECT2, new PublishFinalCB());
+		info.add(connection.subscribe(TestConstant.SUBJECT2, new PublishFinalCB()));
 
 		// start autodispatcher
 		connection.startAutoDispatch();
@@ -139,6 +142,12 @@ public class gmmulti implements Example
 	{
 		if (connection != null)
 		{
+			for(int i = info.size()-1; i >= 0; i-- )
+			{
+				Log.info("Unsubscribing from " + info.get(i).getSubject());
+				connection.unsubscribe(info.get(i));
+				info.remove(i);
+			}
 			Util.closeConnection(connection);
 		}
 

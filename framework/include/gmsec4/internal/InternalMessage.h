@@ -84,6 +84,11 @@ public:
 
 	bool CALL_TYPE clearField(const char* name);
 
+    GMSEC_I64 CALL_TYPE getIntegerValue(const char* fieldName) const;
+    GMSEC_U64 CALL_TYPE getUnsignedIntegerValue(const char* fieldName) const;
+    GMSEC_F64 CALL_TYPE getDoubleValue(const char* fieldName) const;
+    const char* CALL_TYPE getStringValue(const char* fieldName) const;
+
 	const Field* CALL_TYPE getField(const char* name) const;
 
 	Field::FieldType CALL_TYPE getFieldType(const char* name) const;

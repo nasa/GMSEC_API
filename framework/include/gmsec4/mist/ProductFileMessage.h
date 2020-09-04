@@ -33,15 +33,35 @@ namespace mist
 {
 	class ProductFileIterator;
 
-namespace internal
+namespace message
 {
-	class InternalProductFileMessage;
+	namespace internal
+	{
+		class InternalProductFileMessage;
+	}
 }
 
 /**
  * @class ProductFileMessage
  *
  * @brief The Message object contains a GMSEC MSG PROD message.
+ * The following message schema IDs and their templates are supported: @n
+ * 2014.00.GMSEC.MSG.PROD.AAA @n
+ * 2014.00.GMSEC.MSG.PROD.AUTO @n
+ * 2014.00.GMSEC.MSG.PROD.FD @n
+ * 2014.00.GMSEC.MSG.PROD.MAS @n
+ * 2014.00.GMSEC.MSG.PROD.PAS @n
+ * 2014.00.GMSEC.MSG.PROD.SC @n
+ * 2014.00.GMSEC.MSG.PROD.TAC @n
+ * 2016.00.GMSEC.MSG.PROD.AAA @n
+ * 2016.00.GMSEC.MSG.PROD.AUTO @n
+ * 2016.00.GMSEC.MSG.PROD.FD @n
+ * 2016.00.GMSEC.MSG.PROD.MAS @n
+ * 2016.00.GMSEC.MSG.PROD.PAS @n
+ * 2016.00.GMSEC.MSG.PROD.SC @n
+ * 2016.00.GMSEC.MSG.PROD.TAC @n
+ *
+ * @note gmsec::api::mist::ProductFileMessage has been deprecated.  It is recommended to use gmsec::api::mist::message::ProductFileMessage
  *
  * @sa Message @n
  *     Config @n
@@ -59,7 +79,7 @@ public:
 	 *
 	 * @param subject - The subject string for the message.
 	 * @param responseStatus - RESPONSE-STATUS field to indert into a MSG PROD message.
-	 * @param productType - PROD-TYPE field to indert into a MSG PROD message.
+	 * @param productType - PROD-TYPE field to insert into a MSG PROD message.
 	 * @param productSubtype - PROD-SUBTYPE field to indert into a MSG PROD message.
 	 * @param version - The version of the GMSEC message specification to be used.
 	 */
@@ -74,7 +94,7 @@ public:
 	 * @param subject - The subject string for the message.
 	 * @param config  - A configuration to associate with the message.
 	 * @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param productType - PROD-TYPE field to indert into a MSG PROD message.
+	 * @param productType - PROD-TYPE field to insert into a MSG PROD message.
 	 * @param productSubtype - PROD-SUBTYPE field to indert into a MSG PROD message.
 	 * @param version - The version of the GMSEC message specification to be used.
 	 */
@@ -189,7 +209,7 @@ public:
 	 *
 	 * @return A reference to a ProductFileIterator object.
 	 */
-	ProductFileIterator& CALL_TYPE getProductFileIterator() const;
+	gmsec::api::mist::ProductFileIterator& CALL_TYPE getProductFileIterator() const;
 
 
 	/**
@@ -201,7 +221,8 @@ public:
 
 
 private:
-	internal::InternalProductFileMessage* m_internal;
+	// Defined so as to preserve binary compatibility with API 4.1
+	void* filler;
 };
 
 } // namespace mist

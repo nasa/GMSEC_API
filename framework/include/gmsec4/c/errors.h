@@ -94,6 +94,7 @@ typedef enum
 	GMSEC_API_CONNECTION_RECONNECT = 41,		/**< Connection reconnect  */
 	GMSEC_API_JSON_PARSE_ERROR = 42,			/**< Error parsing JSON */
 	GMSEC_API_PARSE_ERROR = 43,					/**< General error parsing */
+	GMSEC_INVALID_STRING_PARAM = 44,            /**< Invalid string parameter */
 
 
 	/*
@@ -122,6 +123,11 @@ typedef enum
 	GMSEC_API_RESOURCE_INFO_NET_ERROR = 120,			/**< Error accessing network information by resource information system */
 	GMSEC_API_RESOURCE_INFO_SAMPLING_ERROR = 121,		/**< Error sampling system resources by resource information system */
 	GMSEC_API_FIELD_NOT_ADDED = 122,					/**< Error prevented field from being added to message */
+	GMSEC_API_FIELD_TEMPLATE_NOT_FOUND = 123,			/**< Could not fin a field template with the name provided */
+	GMSEC_API_INVALID_TYPE_CONVERSION = 124,			/**< Error converting data type: incompatible data types */
+	GMSEC_API_VALUE_OUT_OF_RANGE = 125,					/**< Error converting data type: value overflows container */
+	GMSEC_API_MESSAGE_FAILED_VALIDATION = 126,			/**< The message failed to pass validation dur to one or more errors */
+	GMSEC_API_FIELD_FAILED_VALIDATION = 127,			/**< The field failed to pass validation dur to one or more errors */
 
 	GMSEC_API_OTHER_ERROR_CODE = 500					/**< Other error */
 } GMSEC_StatusCode;

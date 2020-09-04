@@ -15,7 +15,7 @@
 
 package gov.nasa.gsfc.gmsec.api.mist;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIConnMgrSubscriptionInfo;
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIConnMgrSubscriptionInfo;
 
 
 /**

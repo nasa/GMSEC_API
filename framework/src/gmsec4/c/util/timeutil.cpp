@@ -29,9 +29,33 @@ GMSEC_TimeSpec CALL_TYPE timeUtilGetCurrentTime()
 }
 
 
+double CALL_TYPE timeUtilGetCurrentTime_s(GMSEC_TimeSpec* ts)
+{
+	return gmsec::api::util::TimeUtil::getCurrentTime_s(ts);
+}
+
+
+GMSEC_TimeSpec CALL_TYPE timeUtilGetCharTime(const char* timeString)
+{
+	return gmsec::api::util::TimeUtil::getCharTime(timeString);
+}
+
+
+double CALL_TYPE timeUtilGetCharTime_s(const char* timeString)
+{
+	return gmsec::api::util::TimeUtil::getCharTime_s(timeString);
+}
+
+
 void CALL_TYPE timeUtilFormatTime(const GMSEC_TimeSpec time, GMSEC_Time buffer)
 {
 	gmsec::api::util::TimeUtil::formatTime(time, buffer);
+}
+
+
+void CALL_TYPE timeUtilFormatTimeSubs(const GMSEC_TimeSpec time, int subs, GMSEC_Time buffer)
+{
+	gmsec::api::util::TimeUtil::formatTime(time, subs, buffer);
 }
 
 

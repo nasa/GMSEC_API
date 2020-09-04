@@ -41,6 +41,7 @@ private:
 	Config&     config;
 	Connection* connection;
 	Subjects    subjects;
+	SubscriptionInfo** info;
 };
 
 
@@ -58,6 +59,12 @@ gmsub::~gmsub()
 {
 	if (connection)
 	{
+		for (size_t i = 0; i < subjects.size(); ++i)
+		{
+			GMSEC_INFO << "Unsubscribing from " << subjects[i].c_str();
+			connection->unsubscribe(info[i]);
+		}
+		delete[] info;
 		connection->disconnect();
 		Connection::destroy(connection);
 	}
@@ -98,10 +105,11 @@ bool gmsub::run()
 		GMSEC_INFO << "Middleware version = " << connection->getLibraryVersion();
 
 		//o Subscribe
+		info = new SubscriptionInfo*[subjects.size()];
 		for (size_t i = 0; i < subjects.size(); ++i)
 		{
 			GMSEC_INFO << "Subscribing to " << subjects[i].c_str();
-			connection->subscribe(subjects[i].c_str());
+			info[i] = connection->subscribe(subjects[i].c_str());
 		}
 
 		//o Wait for, and print out messages

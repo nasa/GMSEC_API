@@ -89,7 +89,7 @@ void SubscribeThread::setup()
 	connection->connect();
 
 	//o Subscribe
-	connection->subscribe("GMSEC.>");
+	info = connection->subscribe("GMSEC.>");
 }
 
 
@@ -97,6 +97,8 @@ void SubscribeThread::teardown()
 {
 	if (connection)
 	{
+		GMSEC_INFO << "Unsubscribing from " << info->getSubject();
+		connection->unsubscribe(info);
 		connection->disconnect();
 		Connection::destroy(connection);
 	}

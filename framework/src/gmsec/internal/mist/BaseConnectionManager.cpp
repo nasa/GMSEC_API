@@ -22,10 +22,10 @@
 #include <gmsec/mist/ConnectionManagerReplyCallback.h>
 #include <gmsec/mist/MIST_errors.h>
 
+#include <gmsec/internal/API4_Adapter.h>
 #include <gmsec/internal/mist/Context.h>
 #include <gmsec/internal/mist/ConnMgrCallbacks.h>
 #include <gmsec/internal/mist/ConnMgrCallbackCache.h>
-#include <gmsec/internal/mist/Specification.h>
 
 #include <gmsec/Connection.h>
 #include <gmsec/ConnectionFactory.h>
@@ -42,6 +42,10 @@
 #include <gmsec/util/Mutex.h>
 #include <gmsec/util/Atomics.h>
 #include <gmsec/util/timeutil.h>
+
+#include <gmsec4/mist/Specification.h>
+
+#include <gmsec4/Exception.h>
 
 #include <algorithm>
 #include <string>
@@ -112,7 +116,6 @@ BaseConnectionManager::~BaseConnectionManager()
 
 
 	delete specification;
-	specification = 0;
 
 
 	for (size_t i = 0; i < countStandardFieldsAllMessages; ++i)
@@ -219,8 +222,14 @@ Status BaseConnectionManager::Initialize()
 	// a) Users construct a Specification to pass to the ConnectionManager
 	// b) Users pass a base directory via const char * to ConnectionManager
 
-	specification = new Specification();
-	result = specification->Load(NULL, specVersion);
+	try
+	{
+		specification = new gmsec::api::mist::Specification(gmsec::internal::API4_Adapter::API3ConfigToAPI4(&config));
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		result = gmsec::internal::API4_Adapter::API4ExceptionToAPI3(e);
+	}
 
 	if(result.IsError())
 	{
@@ -1496,57 +1505,32 @@ Status BaseConnectionManager::LookupAndValidate(Message *msg)
 	Status result;
 
 	// Lookup the message template
-	gmsec::util::String msgId;
-	result = specification->LookupTemplate(msg, msgId);
-	if (result.IsError() && result.GetCode() == GMSEC_INCORRECT_FIELD_TYPE)
+	try
 	{
-		return result;
-	}
-	// NOTE: THIS IS NOT AN ERROR CASE!
-	// If no template exists, print a debug message and return a NOMINAL status
-	else if (result.IsError() && result.GetCode() == GMSEC_TEMPLATE_ID_DOES_NOT_EXIST)
-	{
-		const char * msgXml = 0;
-		msg->ToXML(msgXml);
-		LOG_DEBUG << "Unable to find a template for message: " << msgXml;
-		result = Status();
-		return result;
-	}
+		gmsec::api::Message* msg4 = gmsec::internal::API4_Adapter::referenceAPI4Message(msg);
 
-	// Validate the message against its corresponding template
-	Context context(msgId.c_str(), true);
-	result = specification->Validate(msg, context);
-	if (result.IsError())
-	{
-		size_t validationErrors = context.GetStatusCount();
-		GMSEC_STR subject;
-		msg->GetSubject(subject);
-		LOG_ERROR << "Listing " << validationErrors << " validation error for message " << subject;
-		for(size_t i = 0; i < validationErrors; i++)
+		// Check to see if required fields are included; if not, add them so that validation
+		// will not complain.
+		static const char* REQUIRED_FIELDS[] = { "MISSION-ID", "FACILITY", "COMPONENT", NULL };
+
+		for (size_t i = 0; REQUIRED_FIELDS[i] != NULL; ++i)
 		{
-			const char * name;
-			const char * desc;
-			int code;
-
-			Status validationResult = context.GetStatusIndex(i, name, desc, code);
-
-			if(!validationResult.IsError())
+			if (msg4->getField(REQUIRED_FIELDS[i]) == NULL)
 			{
-				LOG_ERROR << "Name: " << name << ", Description: " << desc << ", Code: " << code;
+				msg4->addField(REQUIRED_FIELDS[i], "UNSET");
 			}
-
-			util::stringDestroy(name);
-			util::stringDestroy(desc);
 		}
 
-		return result;
+		specification->validateMessage(*msg4);
+	}
+	catch (gmsec::api::Exception& e)
+	{
+		result = gmsec::internal::API4_Adapter::API4ExceptionToAPI3(e);
 	}
 
 	return result;
 }
 
 }
-
 }
-
 }
