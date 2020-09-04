@@ -15,8 +15,7 @@
     Creating multiple connections to the same middleware is not prevented but may not be supported
     by all middleware implementations.
 
-    Connection objects make use of a gmsec::util::AutoMutex by default and are therefore considered
-    thread-safe.
+    Connection objects make use of a Mutex by default and are therefore considered thread-safe.
 
     Example creation and use:
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -100,6 +100,12 @@ ProductFileMessage::ProductFileMessage(const char* data)
 }
 
 
+ProductFileMessage::ProductFileMessage(const Specification& spec, const char* data)
+	: MistMessage(new InternalProductFileMessage(spec, data))
+{
+}
+
+
 ProductFileMessage& ProductFileMessage::operator=(const ProductFileMessage& other)
 {
 	if (this != &other)
@@ -160,5 +166,7 @@ ProductFileIterator& ProductFileMessage::getProductFileIterator() const
 
 ProductFileMessage ProductFileMessage::convertMessage(const Message& message)
 {
+	GMSEC_DISABLE_DEPRECATED_WARNINGS
 	return ProductFileMessage(message.toXML());
+	GMSEC_ENABLE_DEPRECATED_WARNINGS
 }

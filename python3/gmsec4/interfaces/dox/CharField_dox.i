@@ -6,55 +6,28 @@
 
     CONSTRUCTOR:
 
-    CharField(self, name, value)
+    CharField(name: str, value: char)
 
-    Constructor for creating a specialized Field object containing a
-    character value.
+    Constructor for creating a specialized Field containing a character value.
 
     Parameters
     ----------
-    name: the name of the Field
-    value: the character value to store
+    name  : The name of the Field
+    value : The character value to store
 
     Exceptions
     ----------
     A GmsecError is thrown if the name is NULL, or is an empty string.
 ";
 
-
-
-%feature("docstring") gmsec::api::CharField::toJSON "
-
-    toJSON(self) -> char const *
-
-    Convenience method that returns the JSON string representation of
-    this object.
-
-    Returns
-    -------
-    A JSON string.
-";
-
-%feature("docstring") gmsec::api::CharField::toXML "
-
-    toXML(self) -> char const *
-
-    Convenience method that returns the XML string representation of
-    this object.
-
-    Returns
-    -------
-    An XML string.
-";
-
 %feature("docstring") gmsec::api::CharField::getValue "
 
-    getValue(self) -> GMSEC_CHAR
+    get_value(self) -> char
 
-    Exposes the underlying character value held by the object.
+    Exposes the underlying character value held by the field.
 
     Returns
     -------
-    Returns the character value associated with the object.
+    Returns the character value associated with the field.
 ";
 

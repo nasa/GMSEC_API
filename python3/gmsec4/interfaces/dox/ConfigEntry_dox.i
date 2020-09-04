@@ -7,7 +7,7 @@
 
 %feature("docstring") ConfigEntry::getConfig "
 
-    getConfig(self) -> Config
+    get_config(self) -> Config
 
     Returns the Config object associated with the Config entry.
 
@@ -15,7 +15,7 @@
 
 %feature("docstring") ConfigEntry::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
     Returns the name associated with the Config entry.
 

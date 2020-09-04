@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -561,6 +561,14 @@ void BoltConnection::mwPublishAux(const Message& message, SharedPacket& packet)
 				meta->add(Property::createFlag(GMSEC_REQ_RESP_BEHAVIOR, true));
 			}
 		}
+	}
+	else if (kind == Message::REQUEST)
+	{
+		std::string uniqueID = generateID();
+
+		const_cast<Message&>(message).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
+
+		makePacket(message, packet, PACKET_REQUEST);
 	}
 	else
 	{

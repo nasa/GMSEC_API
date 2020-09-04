@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -36,6 +36,7 @@
 #include <gmsec4/util/BoundedQueue.h>
 #include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/StdThread.h>
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4/secure/Policy.h>
@@ -43,7 +44,6 @@
 #include <string>
 #include <list>
 #include <map>
-#include <memory>
 #include <queue>
 
 
@@ -281,7 +281,6 @@ private:
 	bool checkExistingSubscription(const char* subject, Callback* cb = NULL) const;
 	void unsubscribeAux(SubscriptionInfo*& info);
 
-	void initializeTracking();
 	void initializeRequest();
 
 	void resolveRequestTimeout(GMSEC_I32& timeout_ms);
@@ -314,18 +313,18 @@ private:
 
 	typedef std::map<Connection::ConnectionEvent, EventCallback*> EventCallbackMap;
 
-	typedef std::auto_ptr<gmsec::api::util::StdThread>    RequestThread;
-	typedef gmsec::api::util::StdSharedPtr<RequestShared> RequestSharedData;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> RequestThread;
+	typedef gmsec::api::util::StdSharedPtr<RequestShared>               RequestSharedData;
 
-	typedef std::auto_ptr<gmsec::api::util::StdThread>                     PerfLoggerThread;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread>    PerfLoggerThread;
 	typedef gmsec::api::util::StdSharedPtr<performance::PerformanceLogger> PerfLoggerSharedData;
 
-	typedef gmsec::api::util::BoundedQueue<MessagePublishTask> AsynchronousQueue;
-	typedef std::auto_ptr<gmsec::api::util::StdThread>         AsynchronousThread;
-	typedef gmsec::api::util::StdSharedPtr<AsyncPublisher>     AsynchronousPubService;
+	typedef gmsec::api::util::BoundedQueue<MessagePublishTask>          AsynchronousQueue;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> AsynchronousThread;
+	typedef gmsec::api::util::StdSharedPtr<AsyncPublisher>              AsynchronousPubService;
 
-	typedef std::auto_ptr<gmsec::api::util::StdThread>                MsgAggregationToolkitThread;
-	typedef gmsec::api::util::StdSharedPtr<MessageAggregationToolkit> MsgAggregationToolkitShared;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> MsgAggregationToolkitThread;
+	typedef gmsec::api::util::StdSharedPtr<MessageAggregationToolkit>   MsgAggregationToolkitShared;
 
 
 	// Member data

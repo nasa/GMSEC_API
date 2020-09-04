@@ -1,5 +1,5 @@
  
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -134,11 +134,19 @@ __END__
 
 =head1 NAME
 
-GMSECAPI - Standard Perl Interface to the GMSEC API
+GMSECAPI - Standard Perl Interface to the GMSEC API (for the 3.x Interface)
+
+=head1 DEPRECATION NOTICE
+
+B<IMPORTANT: The Perl binding for the API 3.x interface has been deprecated.>
+For new software development, please refer to the newer Perl binding for the API 4.x interface located at:
+
+=for html <a href="../perl_4x/index.html">API 4.x Perl Binding</a><br><br>
+
 
 =head1 CAVEAT
 
-B<A threaded version of Perl is required for this API to work.>  Please note that thread support is not always built in by default.  All binaries retrieved from ActiveState at L<http://www.activestate.com/ActivePerl> are supported.  This includes the Linux, Solaris, and Windows versions.  It has been tested successfully with Perl versions 5.6.2 and 5.8.3.  Below are directions for configuration options needed to build a compatible version of perl.  Also note that the Perl GMSEC API built with either of these two versions of perl are not compatible with the other.  The GMSEC releases are built with the latest ActiveState release of perl.
+B<A threaded version of Perl is required for this API to work.>  Please note that thread support is not always built in by default. All binaries retrieved from ActiveState at L<http://www.activestate.com/ActivePerl> are supported. This includes the Linux, Solaris, and Windows versions. It has been tested successfully with Perl versions 5.6.2 and 5.8.3. Below are directions for configuration options needed to build a compatible version of perl. Also note that the Perl GMSEC API built with either of these two versions of perl are not compatible with the other. Windows versions of the GMSEC API are built with ActiveState 5.14.2 of Perl.
 
     1. Download http://www.cpan.org/src/5.0/perl-5.6.2.tar.gz
     2. Unzip and untar the downloaded file in a separate directory.

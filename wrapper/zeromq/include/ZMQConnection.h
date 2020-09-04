@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,11 +18,9 @@
 
 #include <gmsec4_defs.h>
 
-//#include <gmsec4/ConfigOptions.h>
-
 #include <gmsec4/internal/ConnectionInterface.h>
-#include <gmsec4/internal/UniqueFilter.h>
 #include <gmsec4/internal/Encoder.h>
+#include <gmsec4/internal/UniqueFilter.h>
 
 #include <gmsec4/Message.h>
 #include <gmsec4/Status.h>
@@ -31,8 +29,8 @@
 #include <gmsec4/util/Condition.h>
 #include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/StdThread.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
-#include <memory>
 #include <queue>
 
 
@@ -51,8 +49,8 @@ class ZMQMessageListener;
 class GMSEC_ZEROMQ_API ZMQConnection : public gmsec::api::internal::ConnectionInterface
 {
 public:
-	typedef std::auto_ptr<gmsec::api::util::StdThread>         MsgListenerThread;
-	typedef gmsec::api::util::StdSharedPtr<ZMQMessageListener> SharedMsgListener;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> MsgListenerThread;
+	typedef gmsec::api::util::StdSharedPtr<ZMQMessageListener>          SharedMsgListener;
 
 
 private:

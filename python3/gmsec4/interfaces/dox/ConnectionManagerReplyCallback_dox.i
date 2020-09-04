@@ -3,24 +3,35 @@
 
     This class is the abstract base class for received replies from
     asynchronous request messages.
-    A user created class, derrived from this class, can be passed into
+    A user created class, derived from this class, can be passed into
     request() to have user code executed asynchronously when a reply is
     received or when an error occurs.
-    Please note that because users are able to create their own
+
+    Note that because users are able to create their own
     ConnectionManagerReplyCallback class, reentrancy is not guaranteed
     unless they implement their own reentrancy rules.
-    Also note that because a ConnectionManagerReplyCallback can be
-    registered to multiple connections, it can be run concurrently
-    amongst those connections. Because of this, the use of an AutoMutex
-    is suggested to enforce thread safety.
+
+    In addition, if a ConnectionManagerReplyCallback is registered to
+    multiple Connection Manager objects, on_reply() can be invoked
+    concurrently from different threads. Use of a Mutex is suggested
+    to enforce thread safety.
 
     Example Callback class:
     class MyReplyCallback(libgmsec_python3.ConnectionManagerReplyCallback):
-        def onReply(self, connMgr, status, event):
+        def __init__(self):
+            libgmsec_python3.ConnectionManagerReplyCallback.__init__(self)
+            self.mutex = libgmsec_python3.Mutex()
+
+        def on_reply(self, connMgr, status, event):
+            self.mutex.enter_mutex()
             print(request.toXML())
             print(reply.toXML())
-        def onEvent(self, connMgr, status, event):
+            self.mutex.leave_mutex()
+
+        def on_event(self, connMgr, status, event):
+            self.mutex.enter_mutex()
             print(status.get())
+            self.mutex.leave_mutex()
 
     Example ConnectionManagerReplyCallback registration:
     cb = MyReplyCallback()
@@ -36,33 +47,29 @@
 
 %feature("docstring") gmsec::api::mist::ConnectionManagerReplyCallback::onReply "
 
-    onReply(self, connMgr, request, reply)
+    on_reply(self, connMgr: ConnectionManager, request: Message, reply: Message)
 
-    This function is called by the API in response to a reply received
-    from a request, from within the Request call. A class derrived from
+    This method is called by the API in response to a reply received
+    from a request, from within the Request call. A class derived from
     ConnectionManagerReplyCallback needs to be passed into the
     request() call.
 
-    Please note that if a callback is registered to multiple
-    connections, onReply can be invoked concurrently from the different
-    connection threads.
+    If a callback is registered to multiple connections, on_reply() can
+    be invoked concurrently from the different connection threads.
 
-    Note: DO NOT DESTROY the ConnectionManager, or the Messages that
-        are passed into this function by the API. They are owned by the
-        API and do not need to be managed by the client program. Also,
-        they can not be stored by the client program beyond the scope
-        of this callback function. In order to store a Message, the
-        message must be copied.
+    Note: DO NOT STORE or CHANGE STATE of the ConnectionManager object
+    that is passed to the callback method.
+
+    Note: DO NOT STORE the Message objects for use beyond the scope of
+    the callback. Otherwise, make a copy of the Message object(s).
 
     Parameters
     ----------
-    connMgr: connection manager on which the message was received
-    request: the pending request
-    reply: the received reply
+    connMgr : ConnectionManager on which the message was received
+    request : The request Message
+    reply   : The reply Message
 
     See Also
     --------
-    ConnectionManager::request(self, request, timeout,
-                                     cb, republish_ms)
-
+    ConnectionManager::request(self, request, timeout, cb, republish_ms)
 ";

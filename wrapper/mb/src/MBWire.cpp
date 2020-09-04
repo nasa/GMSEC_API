@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,8 +13,8 @@
 #include <gmsec4/Exception.h>
 
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
-#include <memory>
 #include <string>
 
 
@@ -208,7 +208,7 @@ bool MBWire::deserialize(const char* data, int size, gmsec::api::Message*& messa
 
 	try
 	{
-		std::auto_ptr<Message> gmsecMessage(new Message(tmpSubject.c_str(), static_cast<Message::MessageKind>(msgKind), msgConfig));
+		StdUniquePtr<Message> gmsecMessage(new Message(tmpSubject.c_str(), static_cast<Message::MessageKind>(msgKind), msgConfig));
 
 		MessageDecoder decoder;
 

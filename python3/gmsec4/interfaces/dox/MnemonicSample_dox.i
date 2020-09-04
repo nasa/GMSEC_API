@@ -12,28 +12,29 @@
 
     CONSTRUCTORS:
 
-    MnemonicSample(self, timestamp, rawValue)
+    MnemonicSample(timestamp: str, rawValue: Field)
 
-    Initializes the MnemonicSample object with a timestamp and value.
-
-    Parameters
-    ----------
-    timestamp: The time at which the sampled value was taken.
-    rawValue: The raw value of the parameter.
-
-    MnemonicSample(self, other)
-
-    Copy constructor - Initializes the MnemonicSample object from
-    another MnemonicSample.
+    Initializes the MnemonicSample with a timestamp and value.
 
     Parameters
     ----------
-    other: The other MnemonicSample to inherit values from.
+    timestamp : The time at which the sampled value was taken.
+    rawValue  : The Field containing the raw value of the parameter.
+
+
+
+    MnemonicSample(other: MnemonicSample)
+
+    Copy constructor - Initializes the MnemonicSample from another MnemonicSample.
+
+    Parameters
+    ----------
+    other : The MnemonicSample to copy.
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getQuality "
 
-    getQuality(self) -> bool
+    get_quality(self) -> bool
 
     Accessor for the quality
 
@@ -48,7 +49,7 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::hasQuality "
 
-    hasQuality(self) -> bool
+    has_quality(self) -> bool
 
     Returns the availability of a MnemonicSample quality flag
 
@@ -59,7 +60,7 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getLimit "
 
-    getLimit(self) -> gmsec::api::mist::MnemonicSample::LimitFlag
+    get_limit(self) -> MnemonicSample::LimitFlag
 
     Accessor for the limit
 
@@ -74,33 +75,30 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::setQuality "
 
-    setQuality(self, quality)
+    set_quality(self, quality: bool)
 
-    Supplies a quality flag for the MnemonicSample
+    Assigns a quality flag for the MnemonicSample
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::setLimitEnableDisable "
 
-    setLimitEnableDisable(self, value)
+    set_limit_enable_disable(self, value: bool)
 
-    Supplies a boolean flag for the MnemonicSample
-    setLimitEnableDisable(bool value)
+    Assigns a limit enable/disable flag for the MnemonicSample
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::setTextValue "
 
-    setTextValue(self, value)
+    set_text_value(self, value: str)
 
-    Supplies a string for the MnemonicSample text value and makes a
-    copy of the string
+    Assigns a string for the MnemonicSample text value
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::hasEUValue "
 
-    hasEUValue(self) -> bool
+    has_EU_value(self) -> bool
 
-    Returns the availability of a MnemonicSample value in
-    engineering units
+    Returns the availability of a MnemonicSample value in engineering units
 
     Returns
     -------
@@ -118,13 +116,13 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getTextValue "
 
-    getTextValue(self) -> char const *
+    get_text_value(self) -> str
 
     Accessor for the text value
 
     Returns
     -------
-    A pointer to the MnemonicSample text value field
+    The MnemonicSample text value field
 
     Exceptions
     ----------
@@ -133,18 +131,18 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::hasFlags "
 
-    hasFlags(self) -> bool
+    has_flags(self) -> bool
 
     Returns the availability of a MnemonicSample flags field
 
     Returns
     -------
-    True if MnemonicSample flags value has been set, false otherwise
+    True if MnemonicSample flags value has been set; False otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getEUValue "
 
-    getEUValue(self) -> Field
+    get_EU_value(self) -> Field
 
     Accessor for the EU Value
 
@@ -159,40 +157,40 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::hasTextValue "
 
-    hasTextValue(self) -> bool
+    has_text_value(self) -> bool
 
     Returns the availability of a MnemonicSample text value
 
     Returns
     -------
-    True if MnemonicSample text value has been set, false otherwise
+    True if MnemonicSample text value has been set; False otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::hasStalenessStatus "
 
-    hasStalenessStatus(self) -> bool
+    has_staleness_status(self) -> bool
 
     Returns the availability of a MnemonicSample staleness status
 
     Returns
     -------
-    True if MnemonicSample staleness has been set, false otherwise
+    True if MnemonicSample staleness has been set; False otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::hasLimit "
 
-    hasLimit(self) -> bool
+    has_limit(self) -> bool
 
     Returns the availability of a MnemonicSample limit
 
     Returns
     -------
-    True if MnemonicSample limit has been set, false otherwise
+    True if MnemonicSample limit has been set; False otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getTimestamp "
 
-    getTimestamp(self) -> char const *
+    get_timestamp(self) -> str
 
     Retrieves the timestamp of the MnemonicSample
 
@@ -203,13 +201,13 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getFlags "
 
-    getFlags(self) -> GMSEC_I32
+    get_flags(self) -> int
 
     Accessor for the flags
 
     Returns
     -------
-    A reference to the MnemonicSample flags field
+    The MnemonicSample flags field
 
     Exceptions
     ----------
@@ -218,7 +216,7 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getStalenessStatus "
 
-    getStalenessStatus(self) -> bool
+    get_staleness_status(self) -> bool
 
     Accessor for the staleness
 
@@ -233,14 +231,14 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::setStalenessStatus "
 
-    setStalenessStatus(self, staleness)
+    set_staleness_status(self, staleness: bool)
 
-    Supplies a staleness flag for the MnemonicSample
+    Assigns a staleness flag for the MnemonicSample
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getLimitEnableDisable "
 
-    getLimitEnableDisable(self) -> bool
+    get_limit_enable_disable(self) -> bool
 
     Accessor for the limit enable/disable flag
 
@@ -250,29 +248,25 @@
 
     Exceptions
     ----------
-    A GmsecError is thrown if the limit enable/disable flag has not
-    been set
+    A GmsecError is thrown if the limit enable/disable flag has not been set
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::hasLimitEnableDisable "
 
-    hasLimitEnableDisable(self) -> bool
+    has_limit_enable_disable(self) -> bool
 
-    Returns the availability of a MnemonicSample limit enable/disable
-    flag
+    Returns the availability of a MnemonicSample limit enable/disable flag
 
     Returns
     -------
-    True if MnemonicSample limit enable/disable flag has been set,
-    false otherwise
+    True if MnemonicSample limit enable/disable flag has been set; False otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::setEUValue "
 
-    setEUValue(self, value)
+    set_EU_value(self, value: Field)
 
-    Supplies a field for the MnemonicSample EU value and makes a copy
-    of the field
+    Assigns a Field for the MnemonicSample EU value
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::__eq__ "
@@ -286,14 +280,14 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::setFlags "
 
-    setFlags(self, flags)
+    set_flags(self, flags)
 
-    Supplies a GMSEC_I32 for the MnemonicSample flags value
+    Assigns a GMSEC_I32 for the MnemonicSample flags value
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::getRawValue "
 
-    getRawValue(self) -> Field
+    get_raw_value(self) -> Field
 
     Retrieves the value of the MnemonicSample
 
@@ -304,7 +298,7 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicSample::setLimit "
 
-    setLimit(self, arg2)
+    set_limit(self, limit: MnemonicSample.LimitFlag)
 
-    Supplies a limit flag for the MnemonicSample limit
+    Assigns a limit flag for the MnemonicSample limit
 ";

@@ -4,40 +4,77 @@
     Base class for all field types.
 ";
 
-%feature("docstring") gmsec::api::Field::getDoubleValue "
+%feature("docstring") gmsec::api::Field::getName "
 
-    getDoubleValue(self) -> GMSEC_F64
+    get_name(self) -> str
 
-    Attempts to convert the field value into a 64-bit floating point
-    number representation.
+    Returns the name associated with the Field.
 
     Returns
     -------
-    Returns the field value as a floating point number.
+    String containing Field name.
+";
+
+%feature("docstring") gmsec::api::Field::setName "
+
+    set_name(self, name: str)
+
+    Sets the field name with the given string.
 
     Exceptions
     ----------
-    A GmsecError is thrown if the field cannot be successfully
-    converted to a double.
+    A GmsecError is thrown if the field name is null or contains an empty string.
 ";
 
 %feature("docstring") gmsec::api::Field::getType "
 
-    getType(self) -> gmsec::api::Field::FieldType
+    get_type(self) -> int
 
-    Returns the type of the Field object.
+    Returns the type of the Field.
 
     Returns
     -------
     FieldType enumerated value.
 ";
 
+%feature("docstring") gmsec::api::Field::isHeader "
+
+    is_header(self) -> bool
+
+    Returns whether the Field represents a header field.
+
+    Returns
+    -------
+    Returns True if a header field; False otherwise.
+";
+
+%feature("docstring") gmsec::api::Field::toXML "
+
+    to_XML(self) -> str
+
+    Converts the Field into an XML string representation.
+
+    Returns
+    -------
+    Returns an XML string.
+";
+
+%feature("docstring") gmsec::api::Field::toJSON "
+
+    to_JSON(self) -> str
+
+    Converts the Field into a JSON string representation.
+
+    Returns
+    -------
+    Returns an JSON string.
+";
+
 %feature("docstring") gmsec::api::Field::getIntegerValue "
 
-    getIntegerValue(self) -> GMSEC_I64
+    get_integer_value(self) -> int
 
-    Attempts to convert the field value into a signed 64-bit integer
-    number representation.
+    Attempts to convert the field value into a signed 64-bit integer number representation.
 
     Returns
     -------
@@ -45,27 +82,14 @@
 
     Exceptions
     ----------
-    A GmsecError is thrown if the field cannot be successfully
-    converted to an integer.
-";
-
-%feature("docstring") gmsec::api::Field::toXML "
-
-    toXML(self) -> char const *
-
-    Converts the Field object into an XML string representation.
-
-    Returns
-    -------
-    Returns an XML string.
+    A GmsecError is thrown if the field cannot be successfully converted to an integer.
 ";
 
 %feature("docstring") gmsec::api::Field::getUnsignedIntegerValue "
 
-    getUnsignedIntegerValue(self) -> GMSEC_U64
+    get_unsigned_integer_value(self) -> unsigned int
 
-    Attempts to convert the field value into an unsigned 64-bit integer
-    number representation.
+    Attempts to convert the field value into an unsigned 64-bit integer number representation.
 
     Returns
     -------
@@ -73,46 +97,27 @@
 
     Exceptions
     ----------
-    A GmsecError is thrown if the field cannot be successfully
-    converted to an unsigned integer.
+    A GmsecError is thrown if the field cannot be successfully converted to an unsigned integer.
 ";
 
-%feature("docstring") gmsec::api::Field::getName "
+%feature("docstring") gmsec::api::Field::getDoubleValue "
 
-    getName(self) -> char const *
+    get_double_value(self) -> double
 
-    Returns the name associated with the Field object.
+    Attempts to convert the field value into a 64-bit floating point number representation.
 
     Returns
     -------
-    String containing Field name.
-";
+    Returns the field value as a floating point number.
 
-%feature("docstring") gmsec::api::Field::toJSON "
-
-    toJSON(self) -> char const *
-
-    Converts the Field object into a JSON string representation.
-
-    Returns
-    -------
-    Returns an JSON string.
-";
-
-%feature("docstring") gmsec::api::Field::isHeader "
-
-    isHeader(self) -> bool
-
-    Returns whether the Field represents a header field.
-
-    Returns
-    -------
-    Returns true if a header field; false otherwise.
+    Exceptions
+    ----------
+    A GmsecError is thrown if the field cannot be successfully converted to a double.
 ";
 
 %feature("docstring") gmsec::api::Field::getStringValue "
 
-    getStringValue(self) -> char const *
+    get_string_value(self) -> str
 
     Attempts to convert the field value into string representation.
 
@@ -122,6 +127,24 @@
 
     Exceptions
     ----------
-    A GmsecError is thrown if the field cannot be successfully
-    converted to a string.
+    A GmsecError is thrown if the field cannot be successfully converted to a string.
 ";
+
+%feature("docstring") gmsec::api::Field::clone "
+
+    clone(self) -> Field
+
+    Creates/returns a clone of the Field.
+
+    Returns
+    -------
+    A clone of the Field.
+";
+
+%feature("docstring") gmsec::api::Field::destroyClone "
+
+    destroy_clone(self, clone: Field) 
+
+    Destroys the cloned Field.
+";
+

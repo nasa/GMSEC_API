@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -100,7 +100,7 @@ public class JNIDevice
 	{
 		long cPtr = gmsecJNI.Device_GetNumber(swigCPtr, this);
 
-		return JNIFieldConverter.createFieldReference(cPtr);
+		return JNIFieldConverter.cloneField(cPtr);
 	}
 
 
@@ -226,7 +226,7 @@ public class JNIDevice
 	{
 		long cPtr = gmsecJNI.Device_GetInfo(swigCPtr, this);
 
-		return JNIFieldConverter.createFieldReference(cPtr);
+		return JNIFieldConverter.cloneField(cPtr);
 	}
 
 

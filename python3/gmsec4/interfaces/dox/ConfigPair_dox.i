@@ -1,7 +1,7 @@
 
 %feature("docstring") ConfigPair "
 
-    Class that wraps a name value pair in a Config object
+    Class that wraps a name value pair in a Config
 
     See Also
     --------
@@ -10,14 +10,14 @@
 
 %feature("docstring") ConfigPair::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
-    returns the name associated with the ConfigPair object
+    Returns the name associated with the ConfigPair
 ";
 
 %feature("docstring") ConfigPair::getValue "
 
-    getValue(self) -> char const *
+    get_value(self) -> str
 
-    returns the value associated with the ConfigPair object
+    Returns the value associated with the ConfigPair
 ";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -24,7 +24,6 @@
 #include <gmsec4/util/Atomics.h>
 #include <gmsec4/util/CountDownLatch.h>
 #include <gmsec4/util/StdSharedPtr.h>
-#include <gmsec4/util/Mutex.h>
 #include <gmsec4/util/DataList.h>
 
 #include <string>
@@ -88,18 +87,16 @@ private:
 	// Defined, but not implemented
 	ResourceService();
 	ResourceService(const ResourceService&);
+	ResourceService& operator=(const ResourceService&);
 
 	Config              m_config;
-	ConnectionManager*  m_connMann;
+	ConnectionManager*  m_connMgr;
+	std::string         m_subject;
+	size_t              m_pubInterval;
+	size_t              m_sampleInterval;
+	size_t              m_averageInterval;
 
-	std::string m_subject;
-	size_t           m_pubInterval;
-	size_t           m_sampleInterval;
-	size_t           m_averageInterval;
-
-	gmsec::api::util::AtomicBoolean m_alive;
-	gmsec::api::util::Mutex         m_msgMutex;
-
+	gmsec::api::util::AtomicBoolean  m_alive;
 	gmsec::api::util::CountDownLatch m_startupLatch;
 	gmsec::api::util::CountDownLatch m_shutdownLatch;
 };

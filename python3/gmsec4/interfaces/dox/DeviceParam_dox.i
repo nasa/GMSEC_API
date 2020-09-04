@@ -7,24 +7,25 @@
 
     CONSTRUCTORS:
 
-    DeviceParam(self, name, timestamp, value)
+    DeviceParam(self, name: str, timestamp: str, value: Field)
 
-    Initializes the DeviceParam object with a name, timestamp, and
-    value.
-
-    Parameters
-    ----------
-    name: The name of the DeviceParam.
-    timestamp: The time at which the sampled value was taken.
-    value: The value of the parameter.
-
-    DeviceParam(self, deviceParam)
-
-    Initializes the DeviceParam object from another DeviceParam.
+    Initializes the DeviceParam with a name, timestamp, and value.
 
     Parameters
     ----------
-    deviceParam: The other DeviceParam to inherit values from.
+    name      : The name of the DeviceParam.
+    timestamp : The time at which the sampled value was taken.
+    value     : The Field value of the parameter.
+
+
+
+    DeviceParam(self, deviceParam: DeviceParam)
+
+    Copy-constructor that initializes the DeviceParam from another DeviceParam.
+
+    Parameters
+    ----------
+    deviceParam : The other DeviceParam to copy.
 ";
 
 %feature("docstring") gmsec::api::mist::DeviceParam::__eq__ "
@@ -43,7 +44,7 @@
 
 %feature("docstring") gmsec::api::mist::DeviceParam::getTimestamp "
 
-    getTimestamp(self) -> char const *
+    get_timestamp(self) -> str
 
     Retrieves the timestamp of the DeviceParam
 
@@ -54,7 +55,7 @@
 
 %feature("docstring") gmsec::api::mist::DeviceParam::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
     Retrieves the name of the DeviceParam
 
@@ -65,11 +66,11 @@
 
 %feature("docstring") gmsec::api::mist::DeviceParam::getValue "
 
-    getValue(self) -> Field
+    get_value(self) -> Field
 
     Retrieves the value of the DeviceParam
 
     Returns
     -------
-    The value of the DeviceParam
+    The Field value of the DeviceParam
 ";

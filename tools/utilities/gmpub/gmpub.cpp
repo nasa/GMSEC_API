@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,11 +17,15 @@
 
 #include "../Utility.h"
 
-#include <memory>
 #include <string>
 
 using namespace gmsec::api;
+using namespace gmsec::api::mist;
+using namespace gmsec::api::mist::message;
 using namespace gmsec::api::util;
+
+
+const char* const DEFAULT_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.GMPUB.HB";
 
 
 class GMSEC_Publisher : public Utility
@@ -36,16 +40,16 @@ public:
 	bool run();
 
 private:
-	Connection* connection;
+	ConnectionManager* connMgr;
 
 	void publish(Message& msg);
-	void publish(int iteration, const std::string& subject);
+	void publish(GMSEC_U16 counter, GMSEC_U32 interval_ms, const std::string& subject);
 };
 
 
 GMSEC_Publisher::GMSEC_Publisher(const Config& c)
 	: Utility(c),
-	  connection(0)
+	  connMgr(0)
 {
 	/* Initialize utility */
 	initialize();
@@ -54,18 +58,18 @@ GMSEC_Publisher::GMSEC_Publisher(const Config& c)
 
 GMSEC_Publisher::~GMSEC_Publisher()
 {
-	if (connection)
+	if (connMgr)
 	{
 		try
 		{
-			connection->disconnect();
+			connMgr->cleanup();
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			GMSEC_ERROR << e.what();
 		}
 
-		Connection::destroy(connection);
+		delete connMgr;
 	}
 
 	Connection::shutdownAllMiddlewares();
@@ -99,27 +103,27 @@ bool GMSEC_Publisher::run()
 	bool success = true;
 
 	/* output GMSEC API version */
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
 		//o Create the Connection
-		connection = Connection::create(getConfig());
+		connMgr = new ConnectionManager(getConfig());
 
 		//o Connect
-		connection->connect();
+		connMgr->initialize();
 
 		//o Output middleware version
-		GMSEC_INFO << "Middleware version = " << connection->getLibraryVersion();
+		GMSEC_INFO << "Middleware version = " << connMgr->getLibraryVersion();
 
 		//o Get information from the command line
 		std::string msgFile     = get("MSG-FILE", "");
 		std::string cfgFile     = get("CFG-FILE", "");
-		int         iterations  = get("ITERATIONS", 1);
-		int         interval_ms = get("INTERVAL-MS", 1000);
+		GMSEC_I32   iterations  = get("ITERATIONS", 1);
+		GMSEC_U32   interval_ms = get("INTERVAL-MS", 1000);
 		std::string subject;
 
-		std::auto_ptr<Message> msg;
+		StdUniquePtr<Message> msg;
 
 		if (!msgFile.empty())
 		{
@@ -143,7 +147,7 @@ bool GMSEC_Publisher::run()
 		}
 		else
 		{
-			subject = get("SUBJECT", "GMSEC.TEST.PUBLISH");
+			subject = get("SUBJECT", DEFAULT_MESSAGE_SUBJECT);
 		}
 
 		//o Output information
@@ -167,7 +171,7 @@ bool GMSEC_Publisher::run()
 		}
 
 		//o Publish message(s)
-		for (int i = 0; i < iterations || iterations == -1; ++i)
+		for (GMSEC_I32 i = 0; i < iterations || iterations == -1; ++i)
 		{
 			if (msg.get())
 			{
@@ -176,8 +180,24 @@ bool GMSEC_Publisher::run()
 			}
 			else
 			{
+				GMSEC_U16 counter;
+
+				if (connMgr->getSpecification().getVersion() == mist::GMSEC_ISD_2014_00)
+				{
+					counter = (GMSEC_U16)((i+1) % 32768);
+				}
+				else
+				{
+					counter = (GMSEC_U16)((i+1) % 65536);
+				}
+
+				if (counter == 0)
+				{
+					++counter;  // COUNTER is always 1+
+				}
+
 				// Publish canned message
-				publish(i, subject);
+				publish(counter, interval_ms, subject);
 			}
 
 			if (i < (iterations - 1) || iterations == -1)
@@ -204,37 +224,36 @@ void GMSEC_Publisher::publish(Message& message)
 	}
 
 	//o Publish Message
-	connection->publish(message);
+	connMgr->publish(message);
 
 	//o Display XML representation of message
 	GMSEC_INFO << "Published:\n" << message.toXML();
 }
 
 
-void GMSEC_Publisher::publish(int iteration, const std::string& subject)
+void GMSEC_Publisher::publish(GMSEC_U16 counter, GMSEC_U32 interval_ms, const std::string& subject)
 {
-	int value = iteration + 1;
+	MistMessage message(subject.c_str(), "MSG.C2CX.HB", connMgr->getSpecification());
 
-	//o Create message
-	Message message(subject.c_str(), Message::PUBLISH);
+	message.setValue("MISSION-ID", "MY-MISSION");
+	message.setValue("FACILITY", "MY-FACILITY");
+	message.setValue("COMPONENT", "GMPUB");
 
-	//o Add fields to message
-	message.addField("CHAR-FIELD", (GMSEC_CHAR) 'c');
-	message.addField("BOOL-FIELD-TRUE", true);
-	message.addField("BOOL-FIELD-FALSE", false);
-	message.addField("I8-FIELD", (GMSEC_I8) value);
-	message.addField("I16-FIELD", (GMSEC_I16) value);
-	message.addField("I32-FIELD", (GMSEC_I32) value);
-	message.addField("I64-FIELD", (GMSEC_I64) value);
-	message.addField("U8-FIELD", (GMSEC_U8) value);
-	message.addField("U16-FIELD", (GMSEC_U16) value);
-	message.addField("U32-FIELD", (GMSEC_U32) value);
-	message.addField("U64-FIELD", (GMSEC_U64) value);
-	message.addField("COUNT", (GMSEC_I32) iteration);
-	message.addField("STRING-FIELD", "This is a test");
-	message.addField("F32-FIELD", GMSEC_F32(1 + 1. / (value == 0 ? 1 : value)));
-	message.addField("F64-FIELD", GMSEC_F64(1 + 1. / (value == 0 ? 1 : value)));
-	message.addField("BIN-FIELD", (GMSEC_BIN) "JLMNOPQ", 7);
+	if (connMgr->getSpecification().getVersion() == mist::GMSEC_ISD_2014_00)
+	{
+		std::stringstream oss;
+		oss << "MY-MESSAGE-ID-" << counter;
+
+		message.addField("MSG-ID", oss.str().c_str());
+	}
+	else if (connMgr->getSpecification().getVersion() >= mist::GMSEC_ISD_2018_00)
+	{
+		message.addField("DOMAIN1", "MY-DOMAIN-1");
+		message.addField("DOMAIN2", "MY-DOMAIN-2");
+	}
+
+	message.setValue("COUNTER", (GMSEC_I64) counter);
+	message.setValue("PUB-RATE", (GMSEC_I64) (interval_ms/1000));
 
 	if (getConfig().getBooleanValue("ENCRYPT", false))
 	{
@@ -242,7 +261,7 @@ void GMSEC_Publisher::publish(int iteration, const std::string& subject)
 	}
 
 	//o Publish Message
-	connection->publish(message);
+	connMgr->publish(message);
 
 	//o Display XML representation of message
 	GMSEC_INFO << "Published:\n" << message.toXML();

@@ -2,7 +2,7 @@
 
 
 """
- Copyright 2007-2018 United States Government as represented by the
+ Copyright 2007-2019 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -43,11 +43,7 @@ def main():
     # pass configuration options into objects such as Connections,
     # ConnectionManagers, Subscribe and Publish function calls, Messages,
     # etc.
-    config = libgmsec_python3.Config()
-
-    for arg in sys.argv[1:]:
-        value = arg.split('=')
-        config.add_value(value[0], value[1])
+    config = libgmsec_python3.Config(sys.argv)
 
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output

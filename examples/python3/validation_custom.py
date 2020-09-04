@@ -2,7 +2,7 @@
 
 
 """
- Copyright 2007-2018 United States Government as represented by the
+ Copyright 2007-2019 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -50,7 +50,7 @@ class ValidationCallback(libgmsec_python3.ConnectionManagerCallback):
 
             # Start by checking to ensure that this is a PROD message
             if (isProdMsg(message)):
-                prodMessage = libgmsec_python3.ProductFileMessage(message.to_XML())
+                prodMessage = libgmsec_python3.ProductFileMessage(connMgr.get_specification(), message.to_XML())
 
                 # Get the iterator so that we can analyze each Product File within the message
                 prodFileIter = prodMessage.get_product_file_iterator()
@@ -84,17 +84,11 @@ def main():
 
 
     # Load the command-line input into a GMSEC Config object
-    config = libgmsec_python3.Config()
-
-    for arg in sys.argv[1:]:
-        value = arg.split('=')
-        config.add_value(value[0], value[1])
-
+    config = libgmsec_python3.Config(sys.argv)
 
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
     # on the terminal/command line
-
     initializeLogging(config);
 
     # Enable Message validation.  This parameter is "false" by default.

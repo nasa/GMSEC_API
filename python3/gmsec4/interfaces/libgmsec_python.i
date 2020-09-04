@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,6 +13,8 @@
 %apply char* {unsigned char*};
 
 %module libgmsec_python3
+
+#pragma SWIG nowarn=451
 
 %include gmsec_version.i
 
@@ -112,6 +114,7 @@
 %include ConfigFile.i
 %include ConfigFileIterator.i
 %include MessageFieldIterator.i
+%include HeartbeatGenerator.i
 
 %include mist/ConnectionManagerCallback.i
 %include mist/ConnectionManagerEventCallback.i

@@ -4,6 +4,8 @@
 using namespace gmsec::api;
 %}
 
+%ignore gmsec::api::util::AutoMutex;
+
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/util/Mutex.h>
 

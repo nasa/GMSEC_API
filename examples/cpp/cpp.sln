@@ -55,6 +55,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "websphere_publish_async", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "message_field_iterator", "message_field_iterator\message_field_iterator.vcxproj", "{75A9E7F4-0B31-4E15-9AF5-D1F75ABF8EDA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "heartbeat_generator", "heartbeat_generator\heartbeat_generator.vcxproj", "{28738811-98BA-422E-A09A-626F4A88258F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -271,6 +273,14 @@ Global
 		{75A9E7F4-0B31-4E15-9AF5-D1F75ABF8EDA}.Release|Win32.Build.0 = Release|Win32
 		{75A9E7F4-0B31-4E15-9AF5-D1F75ABF8EDA}.Release|x64.ActiveCfg = Release|x64
 		{75A9E7F4-0B31-4E15-9AF5-D1F75ABF8EDA}.Release|x64.Build.0 = Release|x64
+		{28738811-98BA-422E-A09A-626F4A88258F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{28738811-98BA-422E-A09A-626F4A88258F}.Debug|Win32.Build.0 = Debug|Win32
+		{28738811-98BA-422E-A09A-626F4A88258F}.Debug|x64.ActiveCfg = Debug|x64
+		{28738811-98BA-422E-A09A-626F4A88258F}.Debug|x64.Build.0 = Debug|x64
+		{28738811-98BA-422E-A09A-626F4A88258F}.Release|Win32.ActiveCfg = Release|Win32
+		{28738811-98BA-422E-A09A-626F4A88258F}.Release|Win32.Build.0 = Release|Win32
+		{28738811-98BA-422E-A09A-626F4A88258F}.Release|x64.ActiveCfg = Release|x64
+		{28738811-98BA-422E-A09A-626F4A88258F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

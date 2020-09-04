@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,7 +32,7 @@
 #include <gmsec/util/Mutex.h>
 #include <gmsec/util/StdThread.h>
 
-#include <memory>
+#include <gmsec4/util/StdUniquePtr.h>
 
 
 namespace gmsec
@@ -163,7 +163,7 @@ class GMSEC_API BaseConnectionManager
 
 		bool validateMessages;
 
-		std::auto_ptr<gmsec::util::StdThread> hbThread;
+		gmsec::api::util::StdUniquePtr<gmsec::util::StdThread> hbThread;
 		gmsec::util::gshared_ptr<HeartbeatService> hbService;
 
 		Field** standardFieldsAllMessages;

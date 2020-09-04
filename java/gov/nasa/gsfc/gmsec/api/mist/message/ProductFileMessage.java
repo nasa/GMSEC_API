@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -230,7 +230,10 @@ public class ProductFileMessage extends MistMessage
 	 *
 	 * @throws IllegalArgumentException Thrown if the data string is null or contains an empty string.
 	 * @throws GMSEC_Exception Thrown if the data string cannot be parsed.
+	 *
+	 * @deprecated This constructor has been deprecated; use ProductFileMessage(Specification, String) instead.
 	 */
+	@Deprecated
 	public ProductFileMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
 		super((JNIProductFileMessage) null);
@@ -241,6 +244,38 @@ public class ProductFileMessage extends MistMessage
 		}
 
 		registerChild(new JNIProductFileMessage(data));
+	}
+
+
+	/**
+	 * Initializes a ProductFileMessage using an XML or JSON string, and ensures the message adheres
+	 * to the provided specification.
+	 *
+	 * @param spec The Specification this message's schema will adhere to.
+	 * @param data XML or JSON string used to initialize the message
+	 *
+	 * @throws IllegalArgumentException Thrown if the Specification is null.
+	 * @throws IllegalArgumentException Thrown if the data string is null.
+	 * @throws GMSEC_Exception Thrown if data string contains invalid an XML or JSON statement.
+	 *
+	 * @see Message#toXML()
+	 * @see Message#toJSON()
+	 */
+	public ProductFileMessage(Specification spec, String data)
+		throws IllegalArgumentException, GMSEC_Exception
+	{
+		super((JNIMistMessage) null);
+
+		if (spec == null)
+		{
+			throw new IllegalArgumentException("Specification cannot be null");
+		}
+		if (data == null || data.isEmpty())
+		{
+			throw new IllegalArgumentException("Data cannot be null, nor contain an empty string");
+		}
+
+		registerChild(new JNIProductFileMessage(Specification.getInternal(spec), data));
 	}
 
 

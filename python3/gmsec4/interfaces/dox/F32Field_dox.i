@@ -7,55 +7,29 @@
 
     CONSTRUCTOR:
 
-    F32Field(self, name, value)
+    F32Field(self, name: str, value: float)
 
-    Constructor for creating a specialized Field object containing a
-    32-bit floating point value
+    Constructor for creating a specialized Field containing a
+    32-bit floating point value.
 
     Parameters
     ----------
-    name: the name of the Field
-    value: the floating point value to store
+    name  : The name of the Field
+    value : The floating point value to store
 
     Exceptions
     ----------
-    A GmsecError is thrown if the name is NULL, or is an empty string.
-";
-
-
-%feature("docstring") gmsec::api::F32Field::toXML "
-
-    toXML(self) -> char const *
-
-    Convenience method that returns the XML string representation of
-    this object.
-
-    Returns
-    -------
-    An XML string.
+    A GmsecError is thrown if the name is None, or is an empty string.
 ";
 
 
 %feature("docstring") gmsec::api::F32Field::getValue "
 
-    getValue(self) -> GMSEC_F32
+    get_value(self) -> float
 
-    Exposes the underlying value held by the object.
-
-    Returns
-    -------
-    Returns the value associated with the object.
-";
-
-
-%feature("docstring") gmsec::api::F32Field::toJSON "
-
-    toJSON(self) -> char const *
-
-    Convenience method that returns the JSON string representation of
-    this object.
+    Exposes the underlying value held by the field.
 
     Returns
     -------
-    A JSON string.
+    Returns the value associated with the field.
 ";

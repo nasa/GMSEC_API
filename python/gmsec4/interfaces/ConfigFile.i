@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -52,6 +52,11 @@ private:
 %ignore gmsec::api::ConfigFile::ConfigEntry;
 %ignore gmsec::api::ConfigFile::MessageEntry;
 %ignore gmsec::api::ConfigFile::SubscriptionEntry;
+
+%ignore gmsec::api::ConfigFile::ConfigEntry::operator=(const ConfigEntry&);
+%ignore gmsec::api::ConfigFile::MessageEntry::operator=(const MessageEntry&);
+%ignore gmsec::api::ConfigFile::SubscriptionEntry::operator=(const SubscriptionEntry&);
+
 
 %{
 #include <gmsec4/ConfigFile.h>

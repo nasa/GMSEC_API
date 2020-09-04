@@ -1,5 +1,5 @@
  
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -25,7 +25,7 @@ include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 .PHONY: check_support build library perl_api perl_api_3x perl_api_4x python_api python_api_4x python3_api python3_api_4x env_val api_docs mw_wrapper clean install tools
 
 
-default: check_support build library xslt mw_wrappers java_api perl_api python_api python3_api csharp_api env_val tools
+default: check_support build library xslt mw_wrappers java_api perl_api python_api python3_api csharp_api env_val tools patch-mac
 
 
 check_support:
@@ -268,6 +268,10 @@ tools:
 	$(MAKE) -C tools
 
 
+patch-mac:
+	@$(GMSEC_HOME)/fix-loader-path.sh
+
+
 api_docs:
 	$(MAKE) -C doxygen
 
@@ -312,6 +316,7 @@ install:
 	@ echo "###########################################################"
 	if [ -d $(RELEASE) ] ; then rm -rf $(RELEASE) ; fi
 	mkdir -p $(RELEASE)/GMSEC_API
+	find . -type d -name '\?' | xargs -n 20 rm -rf   # remove oracle_jre_usage info (if any)
 	tar cf - *.txt bin config templates examples -C framework include \
 		--exclude='.svn' --exclude=vendor \
 		--exclude=secure --exclude=internal \

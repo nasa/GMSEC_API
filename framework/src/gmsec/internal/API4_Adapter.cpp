@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -453,10 +453,9 @@ GMSEC_STATUS_CLASS API4_Adapter::API4StatusClassToAPI3(gmsec::api::StatusClass c
 	case gmsec::api::POLICY_ERROR: return GMSEC_STATUS_POLICY_ERROR;
 	case gmsec::api::CUSTOM_ERROR: return GMSEC_STATUS_CUSTOM_ERROR;
 	case gmsec::api::OTHER_ERROR: return GMSEC_STATUS_OTHER_ERROR;
-	default: return GMSEC_STATUS_OTHER_ERROR;
 	}
 
-    return GMSEC_STATUS_OTHER_ERROR;
+    return (GMSEC_STATUS_CLASS) class4;
 }
 
 
@@ -510,10 +509,9 @@ GMSEC_U32 API4_Adapter::API4StatusCodeToAPI3(gmsec::api::StatusCode code4)
 	case gmsec::api::CONNECTION_RECONNECT: return GMSEC_CONNECTION_RECONNECT;
 	case gmsec::api::JSON_PARSE_ERROR: return GMSEC_JSON_PARSE_ERROR;
 	case gmsec::api::OTHER_ERROR_CODE:return GMSEC_OTHER_ERROR;
-	default: return GMSEC_OTHER_ERROR;
 	}
 
-	return GMSEC_OTHER_ERROR;
+	return (GMSEC_U32) code4;
 }
 
 
@@ -671,18 +669,6 @@ void API4_Adapter::API4EventCallback::onEvent(gmsec::api::Connection& conn4,
 	{
 		Message* msg3 = MessageBuddy::createMessage(new gmsec::api::Message(*reqMsg));
 
-		gmsec::api::Message* msg4 = MessageBuddy::getInternal(msg3)->getAdapter();
-
-		GMSEC_I32          kind;
-		gmsec::api::Status kindAvail = gmsec::api::internal::MessageBuddy::getInternal(*msg4).getDetails().getI32("KIND-3X", kind, NULL);
-    
-		if (!kindAvail.isError())
-		{
-			gmsec::api::Message::MessageKind origMsgKind = static_cast<gmsec::api::Message::MessageKind>(kind);
-    
-			gmsec::api::internal::MessageBuddy::getInternal(*msg4).setKind(origMsgKind);
-		}
-
 		m_ecb3->OnError(m_conn3, msg3, &status3, event3);
 
 		MessageBuddy::destroyMessage(msg3);
@@ -707,18 +693,6 @@ void API4_Adapter::API4Callback::onMessage(gmsec::api::Connection& conn, const g
 {
 	Message* msg3 = MessageBuddy::createMessage(new gmsec::api::Message(msg));
 
-	gmsec::api::Message* msg4 = MessageBuddy::getInternal(msg3)->getAdapter();
-
-	GMSEC_I32          kind;
-	gmsec::api::Status kindAvail = gmsec::api::internal::MessageBuddy::getInternal(*msg4).getDetails().getI32("KIND-3X", kind, NULL);
-    
-	if (!kindAvail.isError())
-	{
-		gmsec::api::Message::MessageKind origMsgKind = static_cast<gmsec::api::Message::MessageKind>(kind);
-    
-		gmsec::api::internal::MessageBuddy::getInternal(*msg4).setKind(origMsgKind);
-	}
-
 	m_cb3->OnMessage(m_conn3, msg3);
 
 	MessageBuddy::destroyMessage(msg3);
@@ -741,28 +715,6 @@ void API4_Adapter::API4ReplyCallback::onReply(gmsec::api::Connection& conn,
 {
 	Message* req3 = MessageBuddy::createMessage(const_cast<gmsec::api::Message*>(new gmsec::api::Message(request)));
 	Message* rep3 = MessageBuddy::createMessage(const_cast<gmsec::api::Message*>(new gmsec::api::Message(reply)));
-
-	gmsec::api::Message* req4 = MessageBuddy::getInternal(req3)->getAdapter();
-	gmsec::api::Message* rep4 = MessageBuddy::getInternal(rep3)->getAdapter();
-
-	GMSEC_I32          kind;
-	gmsec::api::Status kindAvail = gmsec::api::internal::MessageBuddy::getInternal(*req4).getDetails().getI32("KIND-3X", kind, NULL);
-    
-	if (!kindAvail.isError())
-	{
-		gmsec::api::Message::MessageKind origMsgKind = static_cast<gmsec::api::Message::MessageKind>(kind);
-    
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).setKind(origMsgKind);
-	}
-
-	kindAvail = gmsec::api::internal::MessageBuddy::getInternal(*rep4).getDetails().getI32("KIND-3X", kind, NULL);
-    
-	if (!kindAvail.isError())
-	{
-		gmsec::api::Message::MessageKind origMsgKind = static_cast<gmsec::api::Message::MessageKind>(kind);
-    
-		gmsec::api::internal::MessageBuddy::getInternal(*rep4).setKind(origMsgKind);
-	}
 
 	if (m_cb3)
 	{
@@ -795,18 +747,6 @@ void API4_Adapter::API4ReplyCallback::onEvent(gmsec::api::Connection& conn4,
 	if (reqMsg != NULL)
 	{
 		Message* msg3 = MessageBuddy::createMessage(new gmsec::api::Message(*reqMsg));
-
-		gmsec::api::Message* msg4 = MessageBuddy::getInternal(msg3)->getAdapter();
-
-		GMSEC_I32          kind;
-		gmsec::api::Status kindAvail = gmsec::api::internal::MessageBuddy::getInternal(*msg4).getDetails().getI32("KIND-3X", kind, NULL);
-    
-		if (!kindAvail.isError())
-		{
-			gmsec::api::Message::MessageKind origMsgKind = static_cast<gmsec::api::Message::MessageKind>(kind);
-    
-			gmsec::api::internal::MessageBuddy::getInternal(*msg4).setKind(origMsgKind);
-		}
 
 		m_rcb3->OnError(m_conn3, msg3, &status3, event3);
 

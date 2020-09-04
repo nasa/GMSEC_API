@@ -1,6 +1,6 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
- * Administrator of the National Aeronautics and Space Administration.
+ * Copyright 2007-2019 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
@@ -13,6 +13,10 @@ using namespace gmsec::api::mist;
 
 %ignore gmsec::api::mist::ProductFile(const char*, const char*, const char*, const char*, GMSEC_BIN, size_t);
 %ignore gmsec::api::mist::ProductFile::getContents(GMSEC_BIN&) const;
+
+%ignore gmsec::api::mist::ProductFile::operator=(const ProductFile&);
+%ignore gmsec::api::mist::ProductFile::operator==(const ProductFile&) const;
+%ignore gmsec::api::mist::ProductFile::operator!=(const ProductFile&) const;
 
 %include "dox/ProductFile_dox.i"
 %include <gmsec4/util/wdllexp.h>

@@ -6,40 +6,31 @@
 
     See Also
     --------
-    Connection::subscribe
-    Connection::unsubscribe
+    ConnectionManager::subscribe()
+    ConnectionManager::unsubscribe()
 
 ";
 
 %feature("docstring") gmsec::api::mist::SubscriptionInfo::getCallback "
 
-    getCallback(self) -> Callback
+    get_callback(self) -> ConnectionManagerCallback
 
-    Returns the Callback object, if any, used when setting up the
+    Returns the ConnectionManagerCallback object, if any, used when setting up the
     subscription.
 
     Returns
     -------
-    Pointer to Callback object.
+    Pointer to ConnectionManagerCallback object.
 ";
 
 %feature("docstring") gmsec::api::mist::SubscriptionInfo::getSubject "
 
-    getSubject(self) -> char const *
+    get_subject(self) -> str
 
     Returns the subject string used when setting up the subscription.
 
     Returns
     -------
     Subject string.
-";
-
-%feature("docstring") gmsec::api::mist::SubscriptionInfo::getCallbackFunction "
-
-    getCallbackFunction(self) -> void *
-
-    Returns
-    -------
-    Returns pointer to callback function that is used by C subscribers.
 ";
 

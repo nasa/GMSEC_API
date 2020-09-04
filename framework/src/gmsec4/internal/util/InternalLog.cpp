@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -74,12 +74,12 @@ static gmsec::api::util::LogHandler* ceeHandlers[logNLEVEL];
 //
 LogLevel InternalLog::s_maxLevel = logNONE;
 
+static gmsec::api::internal::DefaultHandler s_defaultHandler(&std::cerr);
+
 
 void InternalLog::setReportingLevel(LogLevel level)
 {
 	InternalLog::s_maxLevel = level;
-
-	(void) getDefaultHandler();
 }
 
 
@@ -191,6 +191,12 @@ std::string InternalLog::prepareLogMessage(const LogEntry& entry)
 	std::string file = (entry.file ? entry.file : "unknown");
 	std::string msg  = (entry.message ? entry.message : "");
 
+#ifdef WIN32
+	file = file.substr(file.rfind("\\") + 1);
+#else
+	file = file.substr(file.rfind("/") + 1);
+#endif
+
 	// The constant 128 has been arbitrarily chosen; it should (hopefully) be sufficient to
 	// store the ancillary data associated with a log message that has not already been
 	// accounted for using the sizes of known strings or buffers.
@@ -225,8 +231,7 @@ std::string InternalLog::prepareLogMessage(const LogEntry& entry)
 
 gmsec::api::internal::DefaultHandler& getDefaultHandler()
 {
-	static gmsec::api::internal::DefaultHandler handler(&std::cerr);
-	return handler;
+	return s_defaultHandler;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,7 +10,7 @@
 /** @file ConnectionManagerReplyCallback.h
  *
  *  @brief This file contains the abstract base class for asynchronous request-reply callbacks.
-**/
+ */
 
 #ifndef CONNECTION_MANAGER_REPLYCALLBACK_H
 #define CONNECTION_MANAGER_REPLYCALLBACK_H
@@ -33,45 +33,48 @@ namespace mist
 class ConnectionManager;
 
 
-/** @class ConnectionManagerReplyCallback
+/**
+ * @class ConnectionManagerReplyCallback
+ *
  * @brief This class is the abstract base class for received replies from asynchronous request messages.
- * A user created class, derrived from this class, can be passed into
+ * A user created class, derived from this class, can be passed into
  * %request() to have user code executed asynchronously when a reply is received or when an error occurs.
- * Please note that because users are able to create their own ConnectionManagerReplyCallback class,
+ *
+ * Note that because users are able to create their own ConnectionManagerReplyCallback class,
  * reentrancy is not guaranteed unless they implement their own reentrancy rules.
- * Also note that because a ConnectionManagerReplyCallback can be registered to multiple connections,
- * it can be run concurrently amongst those connections.  Because of this, the use of a gmsec::util::AutoMutex
- * is * suggested to enforce thread safety.
+ *
+ * In addition, if a ConnectionManagerReplyCallback is registered to multiple Connection Manager objects,
+ * onReply() can be invoked concurrently from different threads. Use of a gmsec::util::AutoMutex is
+ * suggested to enforce thread safety.
  *
  * Example Callback class:
  * @code
- * class MyReplyCallback : public ConnectionManagerReplyCallback
- * {
- *  public:
- *      virtual void CALL_TYPE onReply(ConnectionManager& connMgr, const Message& request, const Message& reply)
- *      {
- *          cout << request.toXML() << endl;
- *          cout << reply.toXML()   << endl;
- *      }
- *      virtual void CALL_TYPE onEvent(ConnectionManager& connMgr, const Status& result, const char* event)
- *      {
- *          cout << result->get() << endl;
- *      }
- * };
+   class MyReplyCallback : public ConnectionManagerReplyCallback
+   {
+    public:
+        virtual void CALL_TYPE onReply(ConnectionManager& connMgr, const Message& request, const Message& reply)
+        {
+            cout << request.toXML() << endl;
+            cout << reply.toXML()   << endl;
+        }
+        virtual void CALL_TYPE onEvent(ConnectionManager& connMgr, const Status& result, const char* event)
+        {
+            cout << result->get() << endl;
+        }
+   };
  * @endcode
  *
  * Example ConnectionManagerReplyCallback registration:
  * @code
- * MyReplyCallback* cb = new MyReplyCack;
- * Message reqMsg("GMSEC.MISSION.SAT.REQ.DIR", Message::REQUEST);
- * int timeout = 1000;
- *
- * try {
- *     connMgr->request(reqMsg, timeout, cb);
- * }
- * catch (Exception& e) {
- *     cout << e.what() << endl;
- * }
+   MyReplyCallback* cb = new MyReplyCack;
+   Message reqMsg("GMSEC.MISSION.SAT.REQ.DIR", Message::REQUEST);
+   int timeout = 1000;
+   try {
+       connMgr->request(reqMsg, timeout, cb);
+   }
+   catch (Exception& e) {
+       cout << e.what() << endl;
+   }
  * @endcode
 */
 class GMSEC_API ConnectionManagerReplyCallback : public ConnectionManagerEventCallback
@@ -81,26 +84,26 @@ public:
 	virtual ~ConnectionManagerReplyCallback() { }
 
 
-	/** @fn onReply(ConnectionManager& connMgr, const Message& request, const Message& reply)
+	/**
+	 * @fn onReply(ConnectionManager& connMgr, const Message& request, const Message& reply)
 	 *
-	 * @brief This function is called by the API in response to a reply recieved from a request,
-	 * from within the Request call. A class derrived from gmsec::mist::ConnectionManagerReplyCallback needs
+	 * @brief This method is called by the API in response to a reply recieved from a request,
+	 * from within the Request call. A class derived from gmsec::mist::ConnectionManagerReplyCallback needs
 	 * to be passed into the request() call.
 	 *
-	 * Please note that if a callback is registered to multiple connections, onReply can be invoked concurrently
+	 * Note that if a callback is registered to multiple connections, onReply can be invoked concurrently
 	 * from the different connection threads.
 	 *
-	 * The prototype for this funtion is:
-	 * @code
-	 * virtual void CALL_TYPE onReply(ConnectionManager& connMgr, const Message& request, const Message& reply)
-	 * @endcode
+	 * The prototype for this method is:
+	 * @code virtual void CALL_TYPE onReply(ConnectionManager& connMgr, const Message& request, const Message& reply) @endcode
 	 * The CALL_TYPE macro is required and is there to handle a compatibility
 	 * problem with the Windows linker.
 	 *
-	 * @note <b>DO NOT DESTROY</b> the ConnectionManager, or the Messages that are passed into this function by
-	 * the API.  They are owned by the API and do not need to be managed by the client program. Also, they can
-	 * not be stored by the client program beyond the scope of this callback function. In order to store
-	 * a Message, the message must be copied.
+	 * @note <b>DO NOT STORE or CHANGE STATE</b> of the ConnectionManager object that is passed to the callback
+	 * method.
+	 *
+	 * @note<b>DO NOT STORE</b> the Message objects for use beyond the scope of the callback. Otherwise,
+	 * make a copy of the Message object(s).
 	 *
 	 * @param connMgr - connection manager on which the message was received
 	 * @param request - the pending request

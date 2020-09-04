@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -29,7 +29,7 @@ libgmsec_perl::ConnectionManagerEventCallback
 
 This class is the abstract base class for MIST event callbacks.  A user created class, derived from this class, can be passed into registerEventCallback() to have user code executed asynchronously when an event (typically an error) occurs in the connection object.
 Please note that because users are able to create their own ConnectionManagerEventCallback class, reentrancy is not guaranteed unless if they implement their own reentrancy rules.
-A,so note that because ConnectionManagerEventCallback can be registered to multiple connections, it can be run concurrently amongst those connections.  Because of this, the use of libgmsec_perl::AutoMutex is suggested to enforce thread safety.
+A,so note that because ConnectionManagerEventCallback can be registered to multiple connections, it can be run concurrently amongst those connections.  Because of this, the use of libgmsec_perl::Mutex is suggested to enforce thread safety.
 
 Example EventCallback class:
 

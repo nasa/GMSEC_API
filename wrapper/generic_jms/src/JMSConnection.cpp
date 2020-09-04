@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -28,6 +28,7 @@
 #include <gmsec4/internal/SystemUtil.h>
 
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/TimeUtil.h>
 
 #include <gmsec4/Exception.h>
@@ -961,8 +962,8 @@ void JMSConnection::prepareBytes(const Message& msg, DataBuffer& buffer)
 
 void JMSConnection::unloadBytes(const DataBuffer& buffer, Message::MessageKind kind, Message*& gmsecMessage, std::string& rawSubject)
 {
-	std::auto_ptr<Message> msg(new Message(GENERIC_TMP_SUBJECT, kind, getExternal().getMessageConfig()));
-	ValueMap               meta;
+	StdUniquePtr<Message> msg(new Message(GENERIC_TMP_SUBJECT, kind, getExternal().getMessageConfig()));
+	ValueMap              meta;
 
 #if 0
 	MessageDecoder decoder;

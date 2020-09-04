@@ -3,46 +3,40 @@
 
     This file contains a class for managing configuration files.
 
-    A ConfigFile object has a one-to-many mapping to connection
-    configurations. If a user wishes to maintain only one connection
-    per object, the use of a Config object is suggested.
-
-    Please see the C++ documentation for example contents of a
-    configuration file used for ingest.
-
+    A ConfigFile has a one-to-many mapping to connection
+    configurations. If a user wishes to maintain only a single
+    Connection, the use of Config is suggested.
 
     CONSTRUCTORS:
 
-    ConfigFile(self)
+    ConfigFile()
 
-    Basic constructor that creates an empty configuration file object.
+    Basic constructor that creates an empty ConfigFile.
 
-    Once the ConfigFile object has been created, use load(filepath) to
+    Once the ConfigFile has been created, use load(filepath) to
     load a configuration file, or if the plan is to add elements to the
-    empty ConfigFile object, then use save(filepath) to save any
+    empty ConfigFile, then use save(filepath) to save any
     changes.
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::removeSubscription "
 
-    removeSubscription(self, name) -> bool
+    remove_subscription(self, name: str) -> bool
 
-    Removes the Subscription definition which is mapped to the provided
-    name.
+    Removes the Subscription definition which is mapped to the provided name.
 
     Parameters
     ----------
-    name: name associated with the subscription
+    name : Name associated with the subscription.
 
     Returns
     -------
-    whether successful or not
-
+    True if removal was successful, False if not.
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::addCustomXML "
 
-    addCustomXML(self, xml)
+    add_custom_XML(self, xml: str)
 
     Adds a custom XML string to the ConfigFile.
 
@@ -57,45 +51,43 @@
     if there are no subscription definitions then it will be added as
     the very first child of the root element.
 
-    Note: Adding a custom XML to a newly instantiated ConfigFile object
+    Note: Adding a custom XML to a newly instantiated ConfigFile
     that has not loaded a document will create a new XML document.
 
     Parameters
     ----------
-    xml: a custom, user-created XML string
+    xml : A custom, user-created XML string.
 
     Exceptions
     ----------
     A GmsecError is thrown if XML string is NULL, contains an empty
     string, or if an XML parsing error occurs
-
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::removeMessage "
 
-    removeMessage(self, name) -> bool
+    remove_message(self, name: str) -> bool
 
     Removes the Message definition which is mapped to the provided name.
 
     Parameters
     ----------
-    name: name associated with the message definition
+    name : Name associated with the message definition
 
     Returns
     -------
-    whether successful or not
-
+    True if removal was successful, False if not.
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::lookupMessage "
 
-    lookupMessage(self, name) -> Message
+    lookup_message(self, name: str) -> Message
 
     This function will attempt to find a named message in the
     config file and create a new message from that xml
     the loaded fields and values.
 
-    Example config file load and get massage:
+    Example config file load and get message:
     try:
         cfgFile = ConfigFile()
 
@@ -104,7 +96,7 @@
 
         # attempt to get Message from ConfigFile
         try:
-            msg = cfgFile.lookupMessage(\"MyMessage\")
+            msg = cfgFile.lookup_message(\"MyMessage\")
 
             # do something with msg
         except GmsecError as me:
@@ -114,27 +106,23 @@
 
     Parameters
     ----------
-    name: value in the name=\"\" attribute of the <MESSAGE/> block to
-    seed the Message object
+    name : Value in the name=\"\" attribute of the <MESSAGE/> block to seed the Message.
 
     Returns
     -------
-    Message object that correlates with the given name
+    Message that correlates with the given name.
 
     Exceptions
     ----------
-    A GmsecError is thrown for cases where message configuration for
-    the given name does not exist
-
+    A GmsecError is thrown for cases where message configuration for the given name does not exist.
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::addMessage "
 
-    addMessage(self, name, message)
+    add_message(self, name: str, message: Message)
 
     Adds a message definition to the list of messages.
-    The Message object, though passed by reference, will not be
-    modified.
+    The Message, though passed by reference, will not be modified.
 
     Programmatic XML element addition will use pre-defined hierarchical
     rules for determining the placement of elements within the document,
@@ -153,13 +141,13 @@
     overwrite the current message definition.
 
     Note: Adding a message definition to a newly instantiated
-    ConfigFile object that has not loaded a document will create a new
+    ConfigFile that has not loaded a document will create a new
     XML document.
 
     Parameters
     ----------
-    name: name to be associated with the message definition
-    message: gmsec message
+    name    : Name to be associated with the message definition
+    message : Message to add
 
     Exceptions
     ----------
@@ -168,22 +156,22 @@
 
 %feature("docstring") gmsec::api::ConfigFile::toXML "
 
-    toXML(self) -> char const *
+    to_XML(self) -> str
 
     This function produces an XML config file containing all known
     config file tags.
 
     Returns
     -------
-    The XML string representation of the ConfigFile object
+    The XML string representation of the ConfigFile
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::addConfig "
 
-    addConfig(self, name, config)
+    add_config(self, name: str, config: Config)
 
     Adds a config definition to the list of configurations.
-    The Config object, though passed by reference, will not be modified.
+    The Config, though passed by reference, will not be modified.
 
     Programmatic XML element addition will use pre-defined hierarchical
     rules for determining the placement of elements within the document,
@@ -199,13 +187,13 @@
     Note: Adding a config with a name that currently exists will
     overwrite the current configuration definition.
 
-    Note: Adding a config to a newly instantiated ConfigFile object
+    Note: Adding a config to a newly instantiated ConfigFile
     that has not loaded a document will create a new XML document.
 
     Parameters
     ----------
-    name: name to be associated with the configuration
-    config: gmsec config
+    name   : Name to be associated with the configuration
+    config : Config to add
 
     Exceptions
     ----------
@@ -214,7 +202,7 @@
 
 %feature("docstring") gmsec::api::ConfigFile::addSubscription "
 
-    addSubscription(self, name, subscription)
+    add_subscription(self, name: str, subscription: str)
 
     Adds a Subscription definition to the list of subscriptions.
 
@@ -229,13 +217,13 @@
     overwrite the current subscription.
 
     Note: Adding a subscription definition to a newly instantiated
-    ConfigFile object that has not loaded a document will create a new
+    ConfigFile that has not loaded a document will create a new
     XML document.
 
     Parameters
     ----------
-    name: name to be associated with the subscription
-    subscription: XML string representation of a gmsec Subscription.
+    name         : Name to be associated with the subscription.
+    subscription : XML string representation of a GMSEC subscription topic.
 
     Exceptions
     ----------
@@ -245,7 +233,7 @@
 
 %feature("docstring") gmsec::api::ConfigFile::fromXML "
 
-    fromXML(self, xml)
+    from_XML(self, xml: str)
 
     This function parses the XML in the passed in string.
     It will return errors explaining what, if anything, went wrong.
@@ -257,7 +245,7 @@
 
 %feature("docstring") gmsec::api::ConfigFile::save "
 
-    save(self, filePath=None, compact=False)
+    save(self, filePath=None: str, compact=False: bool)
 
     This function saves the currently open configuration file to
     the location specified.
@@ -265,11 +253,10 @@
 
     Parameters
     ----------
-    filePath: The location to which the file will be saved;
-        if no path is specified or is specified as NULL, then the path,
-        if any, that was used with load(filepath) will be used.
-
-    compact: determines whether the XML output will be compacted or not
+    filePath : The location to which the file will be saved;
+               if no path is specified or is specified as NULL, then the path,
+               if any, that was used with load(filepath) will be used.
+    compact  : To indicate whether the XML output will be compacted or not; default is False
 
     Exceptions
     ----------
@@ -279,10 +266,10 @@
 
 %feature("docstring") gmsec::api::ConfigFile::lookupConfig "
 
-    lookupConfig(self, name) -> Config
+    lookup_config(self, name: str) -> Config
 
     This function will attempt to find a named Config in the
-    config file and set the passed in config object with
+    config file and set the passed in Config with
     the loaded values.
 
     Example config file load and get config:
@@ -294,69 +281,64 @@
 
         # attempt to get Config from ConfigFile
         try:
-            cfg = cfgFile.lookupConfig(\"MyConfig\")
+            cfg = cfgFile.lookup_config(\"MyConfig\")
 
             # do something with cfg
+
         except GmsecError as e:
             # handle error Config lookup error
+
     except GmsecError as e:
         # handle configuration file parsing error
 
     Parameters
     ----------
-    name: value in the name=\"\" attribute of the <CONFIG/> block to
-    seed the Config object
+    name : Value in the name=\"\" attribute of the <CONFIG/> block to seed the Config
 
     Returns
     -------
-    Config object that correlates with the given name
+    Config that correlates with the given name
 
     Exceptions
     ----------
-    A GmsecError is thrown for cases where configuration for the given
-    name does not exist
+    A GmsecError is thrown for cases where configuration for the given name does not exist
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::removeConfig "
 
-    removeConfig(self, name) -> bool
+    remove_config(self, name: str) -> bool
 
     Removes the Config definition which is mapped to the provided name.
 
     Parameters
     ----------
-    name: name associated with the configuration definition
+    name : Name associated with the configuration definition
 
     Returns
     -------
-    whether successful or not
+    True if removal was successful, False if not
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::isLoaded "
 
-    isLoaded(self) -> bool
-
-    Parameters
-    ----------
-    self: This function will return true is the config file was
-    successfully loaded
+    is_loaded(self) -> bool
 
     Returns
     -------
-    true if file loaded
+    True if file loaded, False otherwise.
 
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::load "
 
-    load(self, filepath)
+    load(self, filepath: str)
 
     This function opens the configuration file and parses the XML
     It will return errors explaining what, if anything, went wrong.
 
     Parameters
     ----------
-    filepath: The location to which the file will be saved
+    filepath : The location to which the file will be saved
 
     Exceptions
     ----------
@@ -365,28 +347,27 @@
 
 %feature("docstring") gmsec::api::ConfigFile::removeCustomXML "
 
-    removeCustomXML(self, xml) -> bool
+    remove_custom_XML(self, xml: str) -> bool
 
     Removes the provided xml element.
 
     Parameters
     ----------
-    xml: xml element string matching the custom xml definition
+    xml : XML element string matching the custom xml definition
 
     Returns
     -------
-    whether successful or not
+    True if removal was successful, False if not
 
     Exceptions
     ----------
-    A GmsecError is thrown if XML string is NULL, contains an empty
-    string, or if an XML parsing error occurs
-
+    A GmsecError is thrown if XML string is NULL, contains an empty string, or if an XML parsing error occurs
 ";
 
-%feature("docstring") gmsec::api::ConfigFile::lookupSubscription "
 
-    lookupSubscription(self, name) -> char const *
+%feature("docstring") gmsec::api::ConfigFile::lookupSubscriptionEntry "
+
+    lookup_subscription_entry(self, name: str) -> SubscriptionEntry
 
     This function will look up a subscription pattern defined in
     the config file. This is useful to allow easy modification of
@@ -395,48 +376,57 @@
     Example
     try:
         cfgFile = ConfigFile()
-        pattern = ""
 
         # load & parse configuration file
         cfgFile.load(\"/some/path/to/config.xml\")
 
-        # get Message from file
-        pattern = cgfFile.lookupSubscription(\"MySubscription\")
-        if pattern != None:
-            # success
-        else:
+        # get subscription entry from file
+        try:
+            entry = cgfFile.lookup_subscription_entry(\"MySubscription\")
+
+            name  = entry.get_name()
+            topic = entry.get_pattern()
+
+            while entry.has_next_excluded_pattern():
+                excluded_topic = entry.next_excluded_pattern()
+
+        except GmsecError as e:
             # handle error Config lookup error
+
     except GmsecError as e:
         # handle configuration file parsing error
 
+
     Parameters
     ----------
-    name: value in the name=\"\" attribute of the <SUBSCRIPTION/> block
-    containing the subscription pattern
+    name : Value in the name=\"\" attribute of the <SUBSCRIPTION/> block containing the subscription pattern
 
     Returns
     -------
-    subject pattern topic associated with SUBSCRIPTION block, or NULL
-    if not found
+    SubscriptionEntry associated with SUBSCRIPTION block
+
+    Exceptions
+    ---------
+    A GmsecError is thrown if the SubcriptionEntry cannot be found.
 ";
 
 %feature("docstring") gmsec::api::ConfigFile::getIterator "
 
-    getIterator(self) -> ConfigFileIterator
+    get_iterator(self) -> ConfigFileIterator
 
     Method that allows the callee to get the ConfigFileIterator
     associated with the ConfigFile. This iterator will allow for
     applications to iterate over the entries stored within the
-    ConfigFile.  The iterator is reset each time getIterator() is
+    ConfigFile.  The iterator is reset each time get_iterator() is
     called.  The iterator itself is destroyed when the ConfigFile
-    object is destroyed.
+    is destroyed.
 
-    Note: Only one ConfigFileIterator object is associated with a
-    ConfigFile object; multiple calls to getIterator() will return a
-    reference to the same ConfigFileIterator object.  Each call will
+    Note: Only one ConfigFileIterator is associated with a
+    ConfigFile; multiple calls to get_iterator() will return a
+    reference to the same ConfigFileIterator.  Each call will
     reset the iterator.
 
     Returns
     -------
-    A reference to a ConfigFileIterator object.
+    A reference to a ConfigFileIterator.
 ";

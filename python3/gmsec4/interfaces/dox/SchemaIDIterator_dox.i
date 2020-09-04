@@ -5,12 +5,12 @@
 
     See Also
     --------
-    Specification::getSchemaIDIterator()
+    Specification::get_schema_id_iterator()
 ";
 
 %feature("docstring") gmsec::api::mist::SchemaIDIterator::hasNext "
 
-    hasNext(self) -> bool
+    has_next(self) -> bool
 
     Provides information as to whether there are additional Schema IDs
     that can be referenced using next().
@@ -22,7 +22,7 @@
 
 %feature("docstring") gmsec::api::mist::SchemaIDIterator::next "
 
-    next(self) -> char const *
+    next(self) -> str
 
     Returns a reference to the next available Schema ID.
 

@@ -2,7 +2,7 @@
 
 
 """
- Copyright 2007-2018 United States Government as represented by the
+ Copyright 2007-2019 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -30,46 +30,36 @@ class BaseHandler(libgmsec_python3.LogHandler):
         # Use a mutex so messages from different threads don't get mixed up
         libgmsec_python3.LogHandler.__init__(self)
         self.mutex = libgmsec_python3.Mutex()
-        self.whoAmI = wai
+        self.whoami = wai
 
     def on_message(self, entry):
-        
-        autoMutex = libgmsec_python3.AutoMutex(self.mutex)
+        self.mutex.enter_mutex()
 
         tempBuffer = libgmsec_python3.TimeUtil.format_time(entry.time)
 
-        string = "[BaseHandler::on_message] for: " + self.whoAmI + " : " + tempBuffer + " [" + libgmsec_python3.Log.to_string(entry.level) + "]" + " [" + entry.file + ":" + str(entry.line) + "] " + entry.message + "\n" 
-        print(string)
+        msg = "[BaseHandler::on_message] for: " + self.whoami \
+            + " : " + tempBuffer + " [" + libgmsec_python3.Log.to_string(entry.level) + "]" \
+            + " [" + entry.file + ":" + str(entry.line) + "] " + entry.message + "\n" 
+
+        print(msg.replace("\n", "\n\t"))
+
+        self.mutex.leave_mutex()
 
 
 # Different Handlers can be implemented for each logging level, if so desired
 class ErrorHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"GMSEC_ERROR")
 
 class WarningHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"GMSEC_WARNING")
 
 class InfoHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"GMSEC_INFO")
 
-class VerboseHandler(BaseHandler):
-
-    def __init__(self):
-        BaseHandler.__init__(self,"GMSEC_VERBOSE")
-
-class DebugHandler(BaseHandler):
-
-    def __init__(self):
-        BaseHandler.__init__(self,"GMSEC_DEBUG")
-
 class AnyHandler(BaseHandler):
-
     def __init__(self):
         BaseHandler.__init__(self,"ANY_HANDLER") 
 
@@ -81,26 +71,22 @@ def main(agrv=None):
         print(usageMessage)
         return -1
 
-    config = libgmsec_python3.Config()
-
-    for arg in sys.argv[1:]:
-        value = arg.split('=')
-        config.add_value(value[0], value[1])
-
+    config = libgmsec_python3.Config(sys.argv)
 
     # Create and register log handlers
-    errorHandler = ErrorHandler()
-    warningHandler =  WarningHandler()
-    infoHandler = InfoHandler()
-    verboseHandler = VerboseHandler()
-    debugHandler = DebugHandler()
-    anyHandler = AnyHandler()
+    errorHandler   = ErrorHandler()
+    warningHandler = WarningHandler()
+    infoHandler    = InfoHandler()
+    anyHandler     = AnyHandler()
 
-    libgmsec_python3.Log.register_handler(libgmsec_python3.logERROR, errorHandler)
-    libgmsec_python3.Log.register_handler(libgmsec_python3.logWARNING, warningHandler)
-    libgmsec_python3.Log.register_handler(libgmsec_python3.logINFO, infoHandler)
-    libgmsec_python3.Log.register_handler(libgmsec_python3.logVERBOSE, verboseHandler)
-    libgmsec_python3.Log.register_handler(libgmsec_python3.logDEBUG, debugHandler)
+    libgmsec_python3.Log.register_handler(errorHandler,   libgmsec_python3.logERROR)
+    libgmsec_python3.Log.register_handler(warningHandler, libgmsec_python3.logWARNING)
+    libgmsec_python3.Log.register_handler(infoHandler,    libgmsec_python3.logINFO)
+    # Note: At this time, for the Python3 binding, setting log handlers for logVERBOSE and logDEBUG are not permitted,
+    # This is because certain middleware wrappers output log messages after the custom Python log handler
+    # has been garbage collected, and this can lead to fatal errors.
+    libgmsec_python3.Log.register_handler(anyHandler, libgmsec_python3.logVERBOSE)   # has no effect, but shown for demo purposes
+    libgmsec_python3.Log.register_handler(anyHandler,   libgmsec_python3.logDEBUG)     # has no effect, but shown for demo purposes
 
     # Set logging reporting level
     libgmsec_python3.Log.set_reporting_level(libgmsec_python3.logVERBOSE)

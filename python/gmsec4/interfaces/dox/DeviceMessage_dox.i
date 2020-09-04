@@ -4,22 +4,24 @@
 
 %feature("docstring") gmsec::api::mist::message::DeviceMessage "
 
-    The Message object contains a GMSEC MSG C2CX DEV message.
-    The following message schema IDs and their templates are supported: @n
-    GMSEC.MSG.C2CX.DEV
+The Message object contains a GMSEC MSG C2CX DEV message.
+The following message schema IDs and their templates are supported: @n
+GMSEC.MSG.C2CX.DEV
 
-    CONSTRUCTORS:
+CONSTRUCTORS:
 
-    DeviceMessage(self, subject, version)
+>>> DeviceMessage(self, subject, spec)
 
     Initializes the message instance.
 
     Parameters
     ----------
     subject: The subject string for the message.
-    version: The version of the GMSEC message specification to be used.
+    spec: The specification this message's schema will adhere to.
 
-    DeviceMessage(self, subject, config, version)
+
+
+>>> DeviceMessage(self, subject, config, spec)
 
     Initializes the message instance and associates a Configuration object with the message.
 
@@ -27,15 +29,51 @@
     ----------
     subject: The subject string for the message.
     config: A configuration to associate with the message.
-    version: The version of the GMSEC message specification to be used.
+    spec: The specification this message's schema will adhere to.
 
-    DeviceMessage(self, data)
+
+
+>>> DeviceMessage(self, other)
+
+    Copy constructor - initializes the message instance using the other given DeviceMessage
+
+    Parameters
+    ----------
+    other: The other DeviceMessage object to copy.
+
+
+
+>>> DeviceMessage(self, data)
 
     Initialize DeviceMessage from XML or JSON string.
 
     Parameters
     ----------
     data: XML or JSON string used to initialize the DeviceMessage.
+
+    Exceptions
+    ----------
+    An Exception is thrown if the given data does not represent a valid XML or JSON statement.
+
+    Note
+    ----------
+    This constructor has been deprecated. Use DeviceMessage(self, spec, data) instead.
+
+
+
+>>> DeviceMessage(self, spec, data)
+
+    Initializes a Device Message using the given XML or JSON data representation of the message, and ensures the message adheres to the provided specification.
+
+    Parameters
+    ----------
+    spec: The specification this message's schema will adhere to.
+    data: XML or JSON string used to initialize the DeviceMessage.
+
+    Exceptions
+    ----------
+    An Exception is thrown if the given data does not represent a valid XML or JSON statement.
+    An Exception is thrown if the given data does not represent a Device Message.
 ";
 
 

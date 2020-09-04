@@ -1,4 +1,4 @@
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -412,35 +412,40 @@ function CheckJava
 	if [ ! -z $java_home ]; then
 		java_ver=$($java_home/bin/java -version 2>&1 | grep "version" | cut -d' ' -f3 | cut -d'"' -f2)
 
-		Success "Detected Java $java_ver"
+		if [ ! -z $java_ver ]; then
+			Success "Detected Java $java_ver"
 
-		# Attempt to execute validator application in GMSEC API to verify if the version of Java is compatible.
-		#
-		java=$java_home/bin/java
-		cp=$gmsec_api_bin/gmsecapi.jar
-		validator=gov.nasa.gsfc.gmsecapi.util.SystemValidator
-
-		$java -cp $cp $validator 2>&1 | grep "java.lang.UnsupportedClassVersionError" > /dev/null
-
-		if [ $? -eq 0 ]; then
-			Failure "GMSEC is not compatible with Java $java_ver"
-			result=1
-		else
-			Success "GMSEC is compatible with Java $java_ver"
-		fi
-
-		if [ $check_jms == true ]; then
-			# Check if the GMSEC JMS wrapper is compatible with the Java version.
+			# Attempt to execute validator application in GMSEC API to verify if the version of Java is compatible.
 			#
-		    min_java_ver="1.6.0"
+			java=$java_home/bin/java
+			cp=$gmsec_api_bin/gmsecapi.jar
+			validator=gov.nasa.gsfc.gmsecapi.util.SystemValidator
 
-			echo $java_ver | grep "1.5" > /dev/null
+			$java -cp $cp $validator 2>&1 | grep "java.lang.UnsupportedClassVersionError" > /dev/null
+
 			if [ $? -eq 0 ]; then
-				Failure "GMSEC JMS wrapper requires Java $min_java_ver or later"
+				Failure "GMSEC is not compatible with Java $java_ver"
 				result=1
 			else
-				Success "GMSEC JMS wrapper compatible with Java $java_ver"
+				Success "GMSEC is compatible with Java $java_ver"
 			fi
+
+			if [ $check_jms == true ]; then
+				# Check if the GMSEC JMS wrapper is compatible with the Java version.
+				#
+		    	min_java_ver="1.6.0"
+
+				echo $java_ver | grep "1.5" > /dev/null
+				if [ $? -eq 0 ]; then
+					Failure "GMSEC JMS wrapper requires Java $min_java_ver or later"
+					result=1
+				else
+					Success "GMSEC JMS wrapper compatible with Java $java_ver"
+				fi
+			fi
+		else
+			Failure "Check installation of Java"
+			result=1
 		fi
 	fi
 

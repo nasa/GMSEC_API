@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,6 +20,7 @@ typedef long long __int64; /* to satisfy gcc on Windows */
 
 #include <gmsec4/Connection.h>
 #include <gmsec4/Exception.h>
+#include <gmsec4/HeartbeatGenerator.h>
 #include <gmsec4/Message.h>
 
 #include <gmsec4/util/Log.h>
@@ -40,6 +41,8 @@ typedef long long __int64; /* to satisfy gcc on Windows */
 #define JNI_JLONG_TO_CONNECTION(x)         reinterpret_cast<gmsec::api::Connection *>(x)
 #define JNI_JLONG_TO_MESSAGE(x)            reinterpret_cast<gmsec::api::Message *>(x)
 #define JNI_JLONG_TO_MSG_FIELD_ITER(x)     reinterpret_cast<gmsec::api::MessageFieldIterator *>(x)
+
+#define JNI_JLONG_TO_HEARTBEAT_GENERATOR(x) reinterpret_cast<gmsec::api::HeartbeatGenerator*>(x)
 
 #define JNI_JLONG_TO_CONFIG_ENTRY(x)       reinterpret_cast<gmsec::api::ConfigFile::ConfigEntry *>(x)
 #define JNI_JLONG_TO_MESSAGE_ENTRY(x)      reinterpret_cast<gmsec::api::ConfigFile::MessageEntry *>(x)

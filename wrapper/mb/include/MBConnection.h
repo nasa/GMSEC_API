@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,11 +18,11 @@
 #include <gmsec4/Message.h>
 
 #include <gmsec4/util/CountDownLatch.h>
-#include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/Mutex.h>
+#include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/StdThread.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
-#include <memory>
 #include <string>
 
 #ifdef WIN32
@@ -142,8 +142,8 @@ public:
 
 
 private:
-	typedef std::auto_ptr<gmsec::api::util::StdThread>     ReaderThread;
-	typedef gmsec::api::util::StdSharedPtr<MBReaderThread> ReaderThreadShared;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> ReaderThread;
+	typedef gmsec::api::util::StdSharedPtr<MBReaderThread>              ReaderThreadShared;
 
 	static void runReaderThread(ReaderThreadShared shared);
 	static void stopReaderThread(ReaderThreadShared shared);

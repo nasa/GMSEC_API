@@ -1,6 +1,6 @@
 /*
- * Copyright 2007-2016 United States Government as represented by the
- * Administrator of the National Aeronautics and Space Administration.
+ * Copyright 2007-2019 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
@@ -13,7 +13,7 @@ using namespace gmsec::api::mist;
 %}
 
 
-/*Functions containing lists that will be redefined*/
+/* Methods containing lists that will be redefined */
 %ignore gmsec::api::mist::ConnectionManager::setStandardFields(const gmsec::api::util::DataList<gmsec::api::Field*>&);
 %ignore gmsec::api::mist::ConnectionManager::createHeartbeatMessage(const char*, const gmsec::api::util::DataList<gmsec::api::Field*>&);
 %ignore gmsec::api::mist::ConnectionManager::startHeartbeatService(const char*, const gmsec::api::util::DataList<gmsec::api::Field*>&);
@@ -28,6 +28,7 @@ using namespace gmsec::api::mist;
 %ignore gmsec::api::mist::ConnectionManager::requestSimpleService(const char*, const char*, const gmsec::api::Field&, const gmsec::api::util::DataList<gmsec::api::Field*>&, const gmsec::api::util::DataList<gmsec::api::mist::ServiceParam*>&, int, gmsec::api::mist::ConnectionManagerReplyCallback*, int);
 %ignore gmsec::api::mist::ConnectionManager::requestSimpleService(const char*, const char*, const gmsec::api::Field&, const gmsec::api::util::DataList<gmsec::api::Field*>&, const gmsec::api::util::DataList<gmsec::api::mist::ServiceParam*>&, int, int);
 %ignore gmsec::api::mist::ConnectionManager::getStandardFields() const;
+%ignore gmsec::api::mist::ConnectionManager::shutdownAllMiddlewares();
 
 /* Ignore deprecated methods */
 %ignore gmsec::api::mist::ConnectionManager::changeComponentStatus(const Field&);
@@ -69,7 +70,6 @@ using namespace gmsec::api::mist;
 %rename("stop_resource_message_service") stopResourceMessageService;
 %rename("acknowledge_simple_service") acknowledgeSimpleService;
 %rename("request_simple_service") requestSimpleService;
-%rename("shutdown_all_middlewares") shutdownAllMiddlewares;
 
 %include "dox/ConnectionManager_dox.i"
 %include "dox/FieldList_dox.i"
@@ -223,6 +223,14 @@ namespace std
     {
         self->release(message);
     }
+
+
+%pythoncode %{
+    @staticmethod
+    def shutdown_all_middlewares():
+        pass
+%}
+
 }
 
 

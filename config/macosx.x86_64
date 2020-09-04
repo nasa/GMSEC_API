@@ -1,4 +1,4 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -18,6 +18,14 @@ BINDIR      = $(GMSEC_HOME)/bin
 #
 JAVA_BIN    = $(JDK_HOME)/bin
 JAVA_INCS   = -I$(JDK_HOME)/include -I$(JDK_HOME)/include/darwin
+
+ifndef PYTHON_HOME
+PYTHON_HOME = /usr
+endif
+
+ifndef PYTHON3_HOME
+PYTHON3_HOME = /usr/local
+endif
 
 # Uncomment if using Mac OS X 10.8 (Mountain Lion) or later release.
 #

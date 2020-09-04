@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -118,7 +118,22 @@ public:
 	 *
 	 * @param data - XML or JSON string used to initialize MnemonicMessage.
 	 */
-	MnemonicMessage(const char* data);
+	GMSEC_DEPRECATED MnemonicMessage(const char* data);
+
+
+	/**
+	 * @fn MnemonicMessage(const Specification& spec, const char* data)
+	 *
+	 * @brief Initializes a Mnemonic Message using the given XML or JSON data representation of the message,
+	 * and ensures the message adheres to the provided specification.
+	 *
+	 * @param spec - A reference to the specification this message's schema will adhere to.
+	 * @param data - XML or JSON string used to initialize the message
+	 *
+	 * @throw An Exception is thrown if the given data does not represent a valid XML or JSON statement.
+	 * @throw An Exception is thrown if the given data does not represent a Mnemonic Message.
+	 */
+	MnemonicMessage(const Specification& spec, const char* data);
 
 
 	/**

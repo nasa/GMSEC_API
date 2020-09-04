@@ -5,16 +5,23 @@
 %feature("docstring") gmsec::api::EventCallback "
 
     This class is the abstract base class for event callbacks.
-    A user created class, derrived from this class, can be passed into registerEventCallback() to have
-    user code executed asynchronously when an event occurs in the connection object.
-    Please note that because users are able to create their own EventCallback class, reentrancy is not
-    guaranteed unless if they implement their own reentrancy rules.
-    Also note that because an EventCallback can be registered to multiple connections, it can be run
-    concurrently amongst those connections.  Because of this, the use of a gmsec::api::util::AutoMutex is
-    suggested to enforce thread safety.
+    A user created class, derived from this class, can be passed into
+    registerEventCallback() to have user code executed asynchronously
+    when an event occurs in the Connection.
+
+    Note that because users are able to create their own EventCallback
+    class, reentrancy is not guaranteed unless if they implement their
+    own reentrancy rules.
+
+    In addition, if an EventCallback is registered to multiple Connection
+    objects, onEvent() can be invoked concurrently from different threads.
+    Use of a Mutex is suggested to enforce thread safety.
 
     Example callback class:
     class MyEventCallback(libgmsec_python.EventCallback):
+        def __init__(self):
+            libgmsec_python.EventCallback.__init__(self)
+
         def onEvent(self, conn, status, event):
             print status.get()
 
@@ -31,15 +38,18 @@
 
     onEvent(self, conn, status, event)
 
-    This function is called in response to a error after a call to registerEventCallback().
+    This method is called in response to a error after a call to
+    registerEventCallback().
 
-    Please note that if an EventCallback is registered to multiple connections, onEvent() can be invoked
-    concurrently from the different connection threads.
+    If an EventCallback is registered to multiple connections, onEvent()
+    can be invoked concurrently from the different connection threads.
 
-    Note: DO NOT DESTROY the Connection that is passed into this function by the API.
-        It is owned by the API and does not need to be managed by the client program. References to
-        the Connection object, the Status object and the event string should not be stored by the
-        client program beyond the scope of this callback function.
+    Note: DO NOT DESTROY or CHANGE STATE of the Connection object that
+    is passed to the callback method, nor store it for use beyond the
+    scope of the callback.
+
+    Note: DO NOT STORE the Status object for use beyond the scope of
+    the callback. Otherwise, make a copy of the Status object.
 
     Parameters
     ----------

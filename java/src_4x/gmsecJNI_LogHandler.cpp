@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -68,10 +68,18 @@ void CxxLogHandlerProxy::onMessage(const LogEntry& entry)
 			default:         return; // we should never be here; if so, then just return.
 		}
 
+		std::string file = (entry.file ? entry.file : "<unknown>");
+
+#ifdef WIN32
+		file = file.substr(file.rfind("\\") + 1);
+#else
+		file = file.substr(file.rfind("/") + 1);
+#endif
+
 		jmethodID callbackMethod = Cache::getCache().methodLogHandlerOnMessage;
 		jobject   levelObj       = jenv->GetStaticObjectField(Cache::getCache().classLogLevel, levelField);
 		jobject   timeSpecObj    = jenv->NewObject(Cache::getCache().classTimeSpec, Cache::getCache().methodTimeSpecInitJZ);
-		jstring   fileStr        = makeJavaString(jenv, entry.file);
+		jstring   fileStr        = makeJavaString(jenv, file.c_str());
 		jint      lineNumber     = (jint) entry.line;
 		jstring   msgStr         = makeJavaString(jenv, entry.message);
 		jobject   logEntryObj    = jenv->NewObject(Cache::getCache().classLogEntry, Cache::getCache().methodLogEntryInitJZ);

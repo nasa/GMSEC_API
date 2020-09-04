@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,7 +27,9 @@ using System.Collections.Generic;
 
 class connection_state
 {
-	static String RSRC_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.RESOURCE_SERVICE.RSRC";
+	static String RSRC_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.RESOURCE-SERVICE.RSRC";
+	static int    RSRC_PUBLISH_RATE    = 5; // in seconds
+
 	static int Main(string[] args)
 	{
 		if (args.Length < 1)
@@ -55,15 +57,28 @@ class connection_state
 			// be used by all GMSEC Messages
 			List<Field> headerFields = new List<Field>();
 
-			F32Field versionField = new F32Field("HEADER-VERSION", 2010.0f);
-			StringField missionField = new StringField("MISSION-ID", "GMSEC");
-			StringField facilityField = new StringField("FACILITY", "GMSEC Lab");
-			StringField componentField = new StringField("COMPONENT", "heartbeat_service");
+			uint version = connManager.GetSpecification().GetVersion();
 
-			headerFields.Add(versionField);
+			StringField missionField = new StringField("MISSION-ID", "MY-MISSION");
+			StringField facilityField = new StringField("FACILITY", "MY-FACILITY");
+			StringField componentField = new StringField("COMPONENT", "RESOURCE-SERVICE");
+			StringField domain1Field = new StringField("DOMAIN1", "MY-DOMAIN-1");
+			StringField domain2Field = new StringField("DOMAIN2", "MY-DOMAIN-2");
+			StringField msgID = new StringField("MSG-ID", "MY-MSG-ID");
+
 			headerFields.Add(missionField);
 			headerFields.Add(facilityField);
 			headerFields.Add(componentField);
+
+			if (version == 201400)
+			{
+				headerFields.Add(msgID);
+			}
+			else if (version >= 201800)
+			{
+				headerFields.Add(domain1Field);
+				headerFields.Add(domain2Field);
+			}
 
 			//o Use setStandardFields to define a set of header fields for
 			// all messages which are created or published on the
@@ -88,9 +103,8 @@ class connection_state
 			// parameter provided to the startResourceMessageService() function.
 			// If an interval is not provided, the service will default to
 			// publishing a message every 60 seconds.
-			int interval_s = 30;
-			Log.Info("Starting the Resource Message service, a message will be published every " + interval_s + " seconds");
-			connManager.StartResourceMessageService(RSRC_MESSAGE_SUBJECT, interval_s, 1, 10);
+			Log.Info("Starting the Resource Message service, a message will be published every " + RSRC_PUBLISH_RATE + " seconds");
+			connManager.StartResourceMessageService(RSRC_MESSAGE_SUBJECT, RSRC_PUBLISH_RATE, 1, 10);
 
 			//o Wait for user input to end the program
 			Log.Info("Publishing C2CX Resource Messages indefinitely, press <enter> to exit the program");

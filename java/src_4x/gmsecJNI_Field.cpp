@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -74,6 +74,38 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1GetNa
 	JNI_CATCH
 
 	return name;
+}
+
+
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1SetName
+  (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField, jstring jFieldName)
+{
+	try
+	{
+		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
+		if (field == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Field.setName"))
+			{
+				try
+				{
+					field->setName(fieldName.c_str());
+				}
+				catch (Exception& e)
+				{
+					ThrowGmsecException(jenv, e.what());
+				}
+			}
+		}
+	}
+	JNI_CATCH
 }
 
 

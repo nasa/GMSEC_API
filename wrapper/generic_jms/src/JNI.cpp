@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -170,19 +170,21 @@ bool checkJVM (JNIEnv * jenv, const char *tag)
 			jstring     estring  = (jstring) jenv->CallObjectMethod(e, toString);
 
 			jboolean    isCopy;
+			const char* utf = jenv->GetStringUTFChars(estring, &isCopy);
 
-			message  = jenv->GetStringUTFChars(estring, &isCopy);
+			if (utf != NULL)
+			{
+				message = utf;
 
+				jenv->ReleaseStringUTFChars(estring, utf);
+			}
 		}
 		GMSEC_ERROR << "gmsec.jni.checkJVM[" << tag << "] JVM has an exception:"
 		            << message.c_str();
 
-		throw gmsec::api::Exception(
-		                         MIDDLEWARE_ERROR,
-		                         OTHER_ERROR_CODE,
-		                         (std::string("Problem detected in checkJVM:  ") +
-		                         tag).c_str());
-
+		throw gmsec::api::Exception(MIDDLEWARE_ERROR,
+		                            OTHER_ERROR_CODE,
+		                            (std::string("Problem detected in checkJVM: ") + tag).c_str());
 	}
 
 	return ok;

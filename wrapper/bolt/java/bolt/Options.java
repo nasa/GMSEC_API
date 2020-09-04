@@ -1,18 +1,15 @@
 
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-
-
-
-
 package bolt;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Options
@@ -39,6 +36,7 @@ public class Options
 	int clientsPerManager = CLIENTS_PER_MANAGER;
 	int selectionTimeout_ms = 2000;
 	int backlogSize = 50;
+	Level logLevel = Level.INFO;
 
 	int inactivityInterval_ms = 8 * 1000;
 	int inactivityTimeout_ms = 20 * 1000;
@@ -56,8 +54,10 @@ public class Options
 
 	boolean usage (String message) {
 		Log.warning(source, message);
-		Log.monitor(source, "\nusage: <progname> [key=value]...\n"
-				+ "\nknown key/values are"
+		Log.monitor(source, "\nUsage: java -jar bolt.jar [logging option] [key=value] ...\n"
+				+ "\nLogging options:\n"
+				+ "\n\t--SEVERE, --WARNING, --INFO, --FINE, --FINER, --FINEST, --OFF\n"
+				+ "\nKnown key/values are:"
 				+ "\n\tport=<integer>"
 				+ "\n\tmaxMessageSize=<integer>"
 				+ "\n\tinputBufferSize=<integer>"
@@ -73,40 +73,43 @@ public class Options
 	}
 
 	boolean parse (String[] args) {
-
 		for (String arg : args) {
-			int p = arg.indexOf('=');
-			if (p == -1)
-				return usage("invalid argument " + arg);
+			if (arg.startsWith("--")) {
+				logLevel = Level.parse(arg.substring(2).toUpperCase());
+			}
+			else {
+				int p = arg.indexOf('=');
+				if (p == -1)
+					return usage("invalid argument " + arg);
 
-			String key = arg.substring(0, p);
-			String value = arg.substring(p + 1);
+				String key = arg.substring(0, p);
+				String value = arg.substring(p + 1);
 
-			if (key.equalsIgnoreCase("port"))
-				port = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("maxMessageSize"))
-				maxMessageSize = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("inputBufferSize"))
-				inputBufferSize = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("outputBufferSize"))
-				outputBufferSize = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("clientsPerManager"))
-				clientsPerManager = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("inputBufferLimit"))
-				inputBufferLimit = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("inactivityInterval_ms"))
-				inactivityInterval_ms = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("inactivityTimeout_ms"))
-				inactivityTimeout_ms = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("selectionTimeout_ms"))
-				selectionTimeout_ms = Integer.parseInt(value);
-			else if (key.equalsIgnoreCase("backlogSize"))
-				backlogSize = Integer.parseInt(value);
-			else
-				return usage("unknown option " + arg);
+				if (key.equalsIgnoreCase("port"))
+					port = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("maxMessageSize"))
+					maxMessageSize = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("inputBufferSize"))
+					inputBufferSize = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("outputBufferSize"))
+					outputBufferSize = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("clientsPerManager"))
+					clientsPerManager = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("inputBufferLimit"))
+					inputBufferLimit = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("inactivityInterval_ms"))
+					inactivityInterval_ms = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("inactivityTimeout_ms"))
+					inactivityTimeout_ms = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("selectionTimeout_ms"))
+					selectionTimeout_ms = Integer.parseInt(value);
+				else if (key.equalsIgnoreCase("backlogSize"))
+					backlogSize = Integer.parseInt(value);
+				else
+					return usage("unknown option " + arg);
+			}
 		}
 
 		return true;
 	}
-
 }

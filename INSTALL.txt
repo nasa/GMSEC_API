@@ -1,5 +1,5 @@
  
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -17,8 +17,6 @@ distribution. The steps in this file assume you have:
 * for all other systems: make and the GNU Compiler Collection
         * Red Hat Enterprise Linux 6: gcc 4.4.6, GNU make 3.81 [1]
         * Red Hat Enterprise Linux 7: gcc 4.8.5, GNU make 3.82 [1]
-        * Mac OS X (PowerPC): gcc 4.0.1, GNU make 3.81
-        * Mac OS X (Intel): gcc 4.0.1, GNU make 3.80
         * Mac OS X (Intel): gcc LLVM 5.1 (clang-503.0.40), GNU make 3.81
 * for Java: Oracle JDK version 1.8 or higher
 * for Perl (non-Windows):
@@ -34,7 +32,7 @@ distribution. The steps in this file assume you have:
 		* SWIG 3.0.10 or later
 		* (non-Windows): python-devel package
 * for Python 3:
-        * Python 3.6
+        * Python 3.6 or later
 		* SWIG 3.0.10 or later
 		* (non-Windows): python36u package, available through IUS 
 						(https://centos7.iuscommunity.org/ius-release.rpm)
@@ -68,10 +66,15 @@ Binaries for libxslt and libxml2 are available at:
 For Windows:
 	http://xmlsoft.org/sources/win32/
 	
-For Linux (via RPM):
-	libxml2 and libxml2-devel packages
-	libxslt and libxslt-devel packages
+For RHEL/CentOS:
+	$ sudo yum install libxml2-devel libxslt-devel
 	
+For Ubuntu:
+	$ sudo apt-get install libxml2-dev libxslt-dev
+
+For macOS:
+	Install Xcode from the App Store.
+
 The libraries can also be built from source, which are also available from the
 xmlsoft.org website. Build and installation instructions are included with 
 the source code.
@@ -261,7 +264,7 @@ of the following:
 Linux x86 (gcc)          linux.x86
 Linux x86_64 (gcc)       linux.x86_64 or linux.x86_64-32bit
 
-Mac OS X x86_64 (gcc)    macosx.x86_64
+macOS x86_64 (gcc)       macosx.x86_64
 
 
 The configuration files associated with these platforms are in
@@ -269,22 +272,13 @@ The configuration files associated with these platforms are in
             + config/
                 + ...
 
-For platforms that have Mac OS X 10.8 (Mountain Lion) or later, edit both the
-macosx.x86_64 and basic.macosx.x86_64 configuration files to uncomment appro-
-priate definitions that are required to support the Clang compiler.  Refer to
-the variables for OPT_STDCPP, JAVA_BIN and JAVA_INCS.
-
-For other UNIX/Linux-like platforms, adding a config file here (based on the
-existing options) can address platform specifics (e.g., OS, architecture,
-compiler, other tools).
-
 
 JDK PATH:
 ---------
 Set the JDK_HOME environment variable to your JDK installation
 e.g.  export JDK_HOME=/usr/java/jdk1.8.0_131
 
-For Mac users, here's an example of your JDK_HOME
+For macOS users, here's an example of setting JDK_HOME
 e.g.  export JDK_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.131.jdk/Contents/Home/
 
 
@@ -318,18 +312,12 @@ directory in question contains a subdirectory named "CORE")
 e.g.  export PERL5_LIB=/usr/lib64/perl5
 
 
-PYTHON DEVELOPMENT HEADERS :
+PYTHON3 DEVELOPMENT HEADERS :
 -------------
-Set the PYTHON_INC environment variable to the directory containing the Python
-development header files WITHOUT the Python version number (This will be
-discerned by the Makefile executing "python --version").
-
-e.g. export PYTHON_INC=/usr/include/python
-
 For Python3 support, set PYTHON3_HOME to the location where Python3 development
 folder is located.
 
-e.g. export PYTHON3_HOME=/usr
+e.g. export PYTHON3_HOME=/usr/local/python3
 
 
 SWIG HOME :
@@ -348,7 +336,16 @@ shared libraries depends on the operating system:
  Platform              Environment Variable
 -------------         ----------------------
 Linux                 LD_LIBRARY_PATH
-Mac OS X              DYLD_LIBRARY_PATH
+macOS                 DYLD_LIBRARY_PATH
+
+
+Note: For macOS users whose system has System Integrity Protection (SIP)
+enabled, setting DYLD_LIBRARY_PATH will be moot. Instead, create soft-links of
+the GMSEC API libraries in /usr/local/lib. For example:
+
+cd /usr/local/lib
+sudo ln -s /opt/GMSEC/GMSEC_API/bin/*.dylib .
+sudo ln -s /opt/GMSEC/GMSEC_API/bin/*.jnilib .
 
 
 Update the environment variable corresponding to the platform to include
@@ -380,7 +377,7 @@ Building the API :
 To begin building the GMSEC API, execute the following commands:
 
     $ cd GMSEC_API
-    $ make              # for RHEL, Mac
+    $ make              # for RHEL, macOS
 
 When the make-process has completed, the GMSEC API will have been built, along
 with related software, such as the C and C++ example applications, and the
