@@ -49,6 +49,8 @@ private:
 	int fPublishTimeFlag;
 	int fUniqueIdFlag;
 	int fMwInfoFlag;
+	int fActiveSubscriptionsFlag;
+	int fConnectionEndpointFlag;
 
 	mutable std::string fDetails;
 
@@ -84,6 +86,8 @@ public:
 	int getPublishTime() const;
 	int getUniqueId() const;
 	int getMwInfo() const;
+	int getActiveSubscriptions() const;
+	int getConnectionEndpoint() const;
 
 
 	/** @fn SetTracking( int flag )
@@ -97,6 +101,8 @@ public:
 	void setPublishTime(int flag);
 	void setUniqueId(int flag);
 	void setMwInfo(int flag);
+	void setActiveSubscriptions(int flag);
+	void setConnectionEndpoint(int flag);
 
 
 	void set(const TrackingDetails &other);

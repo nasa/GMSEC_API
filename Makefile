@@ -25,10 +25,10 @@ GMSEC_HOME = .
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
-.PHONY: check_support build library perl_api env_val api_docs mw_wrapper all_examples clean install tools
+.PHONY: check_support build library perl_api python_api env_val api_docs mw_wrapper clean install tools
 
 
-default: check_support build library mw_wrappers all_examples java_api perl_api env_val tools
+default: check_support build library mw_wrappers java_api perl_api python_api env_val tools
 
 
 check_support:
@@ -60,6 +60,10 @@ endif
 ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
 	$(MAKE) -C perl/gmsec4
 endif
+
+
+python_api:
+	$(MAKE) -C python/gmsec4
 
 
 env_val:
@@ -95,6 +99,7 @@ clean: clean-gcov
 	done
 	- @ [ -f perl/gmsec/Makefile ] && $(MAKE) -C perl/gmsec veryclean
 	- @ $(MAKE) -C perl/gmsec4 clean
+	- @ $(MAKE) -C python/gmsec4 clean
 	$(RM) c.ver os.ver java.ver
 
 clean-gcov:

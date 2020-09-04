@@ -18,6 +18,8 @@
 #include <gmsec4/internal/mist/InternalSchemaIDIterator.h>
 #include <gmsec4/mist/mist_defs.h>
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/internal/FileUtil.h>
 #include <gmsec4/internal/StringUtil.h>
 
@@ -45,7 +47,7 @@ InternalSpecification::InternalSpecification(const Config& config)
 	: m_config(config),
 	  m_iterator(*this)
 {
-	const char* path = m_config.getValue("GMSEC-SCHEMA-PATH");
+	const char* path = m_config.getValue(GMSEC_SCHEMA_PATH);
 	if(!path)
 	{
 		m_basePath = "";
@@ -55,7 +57,7 @@ InternalSpecification::InternalSpecification(const Config& config)
 		m_basePath = path;
 	}
 
-	const char* version = m_config.getValue("GMSEC-SPECIFICATION-VERSION");
+	const char* version = m_config.getValue(GMSEC_MESSAGE_SPEC_VERSION);
 	if(version)
 	{//it exists
 		int versionInt;
@@ -83,7 +85,7 @@ InternalSpecification::InternalSpecification(const Config& config)
 		m_specificationId = oss.str();
 	}
 
-	const char* valLevel = m_config.getValue("GMSEC-VALIDATION-LEVEL");
+	const char* valLevel = m_config.getValue(GMSEC_VALIDATION_LEVEL);
 	if(valLevel)
 	{
 		if(StringUtil::stringEqualsIgnoreCase(valLevel, "NO_ENFORCEMENT"))
@@ -131,7 +133,7 @@ InternalSpecification::InternalSpecification(const Config& config)
 		m_validationLevel = 1;
 	}
 
-	const char* schemaLevel = m_config.getValue("GMSEC-SCHEMA-LEVEL");
+	const char* schemaLevel = m_config.getValue(GMSEC_SCHEMA_LEVEL);
 	if(schemaLevel)
 	{
 		int schemaLevelInt;
@@ -160,7 +162,14 @@ InternalSpecification::InternalSpecification(const Config& config)
 
 
 	// Finally, attempt to load the schemas
-	load();
+	try {
+		load();
+	}
+	catch (const Exception& e) {
+		cleanup();
+		throw e;
+	}
+
 	m_schemaIndex = m_templates.begin();
 }
 
@@ -174,18 +183,20 @@ InternalSpecification::InternalSpecification(const InternalSpecification& other)
 	  m_basePath(other.m_basePath)
 {
 	// Finally, attempt to load the schemas
-	load();
+	try {
+		load();
+	}
+	catch (const Exception& e) {
+		cleanup();
+		throw e;
+	}
 	m_schemaIndex = m_templates.begin();
 }
 
 
 InternalSpecification::~InternalSpecification()
 {
-	for(MessageTemplateList::const_iterator it = m_templates.begin(); it != m_templates.end(); ++it)
-	{
-		delete *it;
-	}
-	m_templates.clear();
+	cleanup();
 }
 
 
@@ -214,7 +225,73 @@ Status InternalSpecification::loadTemplate(const char* path)
 				}
 				else if(id != specID)
 				{
-					m_templates.push_back(new MessageTemplate(id.c_str(), fields));
+					// The types of Schema IDs that the API (currently) supports.
+					//
+					// Schema ID Type 1: major.minor.schemaLevel.messagekind.messagetype.<optionalmessagesubtype>
+					// Schema ID Type 2: messagekind.messagetype.<optionalmessagesubtype>
+
+					// We store the Message Template using a Type 1 Schema ID (if not already stored)
+					if (m_templates.find(id) == m_templates.end())
+					{
+						m_templates[id] = new MessageTemplate(id.c_str(), fields);
+					}
+					else
+					{
+						std::ostringstream errmsg;
+						errmsg <<  "Duplicate Schema Name of " << id << " found in: " << path;
+
+						throw Exception(MIST_ERROR, TEMPLATE_DIR_ERROR, errmsg.str().c_str());
+					}
+
+					// We then store another copy of the Message Template using a Type 2 Schema ID (if not already stored)
+					std::vector<std::string> elements = StringUtil::split(id, '.');
+					if (elements.size() >= 5)
+					{
+						// have Major and Minor number, and presumably, addendum name (e.g. GMSEC or COMPATC2)
+						std::ostringstream oss;
+						for (size_t i = 3; i < elements.size(); ++i)
+						{
+							oss << elements.at(i) << ".";
+						}
+						std::string short_id = oss.str();
+						short_id.erase(short_id.length() - 1);  // erase trailing period
+
+
+						//o Check if Message Templates map has an entry for the short ID
+						//o     If not
+						//o			1. Add new Message Template to the map
+						//o
+						//o     Else
+						//o 		1. Iterate through Schema List; for each entry,
+						//o					Check if the schema level matches our desired level AND the schema ID is or part of our short ID; if so,
+						//o						Stow the schema level name
+						//o
+						//o			2. Check if the schema name that was found is the same as our addendum name (that comes from the Specification ID)
+						//o					If so, delete existing Message Template
+						//o					Add new Message Template to the map
+						//o
+						if (m_templates.find(short_id) == m_templates.end())
+						{
+							m_templates[short_id] = new MessageTemplate(id.c_str(), fields);
+						}
+						else
+						{
+							std::string  levelName;
+							for (SchemaTemplateList::iterator it = m_directory.begin(); it != m_directory.end(); ++it)
+							{
+								if ((it->getLevel() == m_schemaLevel) && (short_id.find(it->getID()) != std::string::npos))
+								{
+									levelName = it->getLevelName();
+								}
+							}
+
+							if (levelName == elements.at(2))
+							{
+								delete m_templates[short_id];
+								m_templates[short_id] = new MessageTemplate(id.c_str(), fields);
+							}
+						}
+					}
 				}
 			}
 			xml.Clear();
@@ -255,7 +332,7 @@ void InternalSpecification::validateMessage(const Message& msg)
 	{//the message subject is not registered with a schemaID yet
 	 //we'll have to build a schemaID for the message and register it
 
-		schemaID = registerTemplate(msg);
+		schemaID = registerTemplate(msg, m_schemaLevel);
 
 		if(schemaID == "")
 		{//if registerTemplate returned a blank string, then that means a matching template wasn't found
@@ -267,31 +344,30 @@ void InternalSpecification::validateMessage(const Message& msg)
 
 	//now grab the message template with the matching schemaID
 	bool foundSchema = false;
-	for(MessageTemplateList::const_iterator it = m_templates.begin(); it != m_templates.end(); ++it)
+	MessageTemplates::const_iterator it2 = m_templates.find(schemaID);
+
+	if (it2 != m_templates.end())
 	{
-		MessageTemplate temp = **it;
-		if(StringUtil::stringEquals(temp.getID(), schemaID.c_str()))
+		const MessageTemplate* temp = it2->second;
+
+		foundSchema = true;
+		//this list of fields will contain the combined header and contents
+		std::list<FieldTemplate> fields;
+
+		//first prepare the header fields with the values we need to validate
+		fields = prepHeaders(schemaID.c_str());
+
+		for(FieldTemplateList::const_iterator it3 = temp->listFieldTemplates().begin(); it3 != temp->listFieldTemplates().end(); ++it3)
+		{//add content fields
+			fields.push_back(*it3);
+		}
+
+		//compare the field list to the fields in the message
+		status = compare(msg, fields);
+
+		if(status.isError())
 		{
-			foundSchema = true;
-			//this list of fields will contain the combined header and contents
-			std::list<FieldTemplate> fields;
-
-			//first prepare the header fields with the values we need to validate
-			fields = prepHeaders(schemaID.c_str());
-
-			//for(size_t j=0; j<temp.listFieldTemplates().size(); j++)
-			for(FieldTemplateList::const_iterator it = temp.listFieldTemplates().begin(); it != temp.listFieldTemplates().end(); ++it)
-			{//add content fields
-				fields.push_back(*it);
-			}
-
-			//compare the field list to the fields in the message
-			status = compare(msg, fields);
-
-			if(status.isError())
-			{
-				throw Exception(status);
-			}
+			throw Exception(status);
 		}
 	}
 
@@ -347,6 +423,8 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 	//list of the start position of each open array control in the list of field templates
 	std::list<FieldTemplateList::const_iterator> arrayStartList;
 
+	std::list<std::string> modifiedFieldNames;
+
 	for(FieldTemplateList::const_iterator fieldIndex = fields.begin(); fieldIndex != fields.end(); ++fieldIndex)
 	{//iterating through all the fields to make sure they are all in the message and correct
 
@@ -354,8 +432,8 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 		FieldTemplate temp = *fieldIndex;
 
 		//check to see if the current field template is a control field
-		if(StringUtil::stringEquals(temp.getMode(), "CONTROL") &&
-		   StringUtil::stringEquals(temp.getName(), "ARRAY-START"))
+		if(StringUtil::stringEquals(temp.getMode().c_str(), "CONTROL") &&
+		   StringUtil::stringEquals(temp.getName().c_str(), "ARRAY-START"))
 		{
 			arrayLevel++;
 			skipArrayLevel = arrayLevel;
@@ -373,13 +451,13 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 				if(arrayLevel>1)
 				{//array is nested, the field name that contains the size of the nested array has an index placeholder
 				 //index placeholder needs to be replaced with the index of the object in the array
-					std::string name = prepFieldName(temp.getSize(),arrayCharList, arrayIndexList);
+					std::string name = prepFieldName(temp.getSize().c_str(),arrayCharList, arrayIndexList);
 					size_t size = msg.getIntegerValue(name.c_str());
 					arraySizeList.push_back(size);
 				}
 				else
 				{
-					size_t size = msg.getIntegerValue(temp.getSize());
+					size_t size = msg.getIntegerValue(temp.getSize().c_str());
 					arraySizeList.push_back(size);
 				}
 
@@ -396,8 +474,8 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 				 //if the array is required, we throw the error
 					for(FieldTemplateList::const_iterator it2 = fields.begin(); it2 != fields.end(); ++it2)
 					{
-						if(StringUtil::stringEquals(it2->getName(), temp.getSize()) &&
-						   StringUtil::stringEquals(it2->getMode(), "OPTIONAL"))
+						if(StringUtil::stringEquals(it2->getName().c_str(), temp.getSize().c_str()) &&
+						   StringUtil::stringEquals(it2->getMode().c_str(), "OPTIONAL"))
 						{//we have determined the array is optional and we will be skipping it
 							skipArray = true;
 							break;
@@ -423,8 +501,8 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 				}
 			}
 		}
-		else if(StringUtil::stringEquals(temp.getMode(), "CONTROL") &&
-				StringUtil::stringEquals(temp.getName(), "ARRAY-END"))
+		else if(StringUtil::stringEquals(temp.getMode().c_str(), "CONTROL") &&
+				StringUtil::stringEquals(temp.getName().c_str(), "ARRAY-END"))
 		{
 			if(skipArray && skipArrayLevel == arrayLevel)
 			{//we've reached the end of the array that is being skipped
@@ -466,12 +544,13 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 		//modify the name of the field template as necessary
 		if(arrayLevel > 0)
 		{
-			std::string name = prepFieldName(temp.getName(), arrayCharList, arrayIndexList);
+			std::string name = prepFieldName(temp.getName().c_str(), arrayCharList, arrayIndexList);
+			modifiedFieldNames.push_back(name);
 			temp.setName(name.c_str());
 		}
 
 		//begin validation process for the field
-		if(StringUtil::stringEquals(temp.getMode(), "REQUIRED") && 
+		if(StringUtil::stringEquals(temp.getMode().c_str(), "REQUIRED") && 
 		   m_validationLevel > 0)
 		{//Required fields must be validated if m_validation is set at all
 
@@ -483,7 +562,7 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 				errorList.append("\n   ").append(lastError.get());
 			}
 		}
-		else if(StringUtil::stringEquals(temp.getMode(), "OPTIONAL") && 
+		else if(StringUtil::stringEquals(temp.getMode().c_str(), "OPTIONAL") && 
 			    m_validationLevel > 1)
 		{//Optional fields must be validated if m_validation is set greater than 1
 
@@ -507,7 +586,7 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 			bool found = false;
 			for(FieldTemplateList::const_iterator it = fields.begin(); it != fields.end(); ++it)
 			{//now look for a matching field in the template fields
-				if(StringUtil::stringEquals(field.getName(), it->getName()))
+				if(StringUtil::stringEquals(field.getName(), it->getName().c_str()))
 				{
 					found = true;
 					break;
@@ -515,16 +594,29 @@ Status InternalSpecification::compare(const Message& msg, const std::list<FieldT
 			}
 			if(!found)
 			{
-				std::ostringstream err;
-				err << "Message contains user-defined field " << field.getName() 
-					<< ", which is disallowed under the current validation settings";
-				GMSEC_ERROR << err.str().c_str();
-				status.set(MIST_ERROR, NON_ALLOWED_FIELD, err.str().c_str());
-				lastError = status;
-				errorList.append("\n   ").append(lastError.get());
+				for(std::list<std::string>::const_iterator it = modifiedFieldNames.begin(); it != modifiedFieldNames.end(); ++it)
+				{
+					std::string modifiedName = *it;
+					if(StringUtil::stringEquals(field.getName(), modifiedName.c_str()))
+					{
+						found = true;
+						break;
+					}
+				}
+				if(!found)
+				{
+					std::ostringstream err;
+					err << "Message contains user-defined field " << field.getName() 
+						<< ", which is disallowed under the current validation settings";
+					GMSEC_ERROR << err.str().c_str();
+					status.set(MIST_ERROR, NON_ALLOWED_FIELD, err.str().c_str());
+					lastError = status;
+					errorList.append("\n   ").append(lastError.get());
+				}
 			}
 		}
 	}
+
 	if(status.isError())
 	{
 		std::string err = msg.getSubject();
@@ -572,35 +664,49 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 {
 	Status status;
 
-	//first convert the header field template into an actual field we can compare with
-	std::auto_ptr<Field> tmpField(ftmp.toField());
-
 	std::string mode = ftmp.getMode();
-	std::string type = ftmp.getType();
-	bool unset = false;
 
 	std::string cumulativeError;
 
-	if(StringUtil::stringEquals(type.c_str(), "UNSET"))
-	{
-		unset = true;
-	}
+	//convert the field template into an actual field we can compare with
+	//std::auto_ptr<Field> tmpField(ftmp.toField());
 
-	//now look for a field in the message with a matching name
 	try
 	{
-		const Field* msgField = msg.getField(ftmp.getName());
+		//now look for a field in the message with a matching name
+		const Field* msgField = msg.getField(ftmp.getName().c_str());
 		
 		if(msgField)
 		{//we found a matching field!
-			if(!unset)
+
+			if(!ftmp.isTypeVariable())
 			{
-				if(msgField->getType() != tmpField->getType())
-				{//the field types need to match in order for validation to succeed
+				//get the list of possible valid types the field could have
+				std::list<Field::FieldType> types = ftmp.getTypes();
+
+				bool valid = false;
+				for (std::list<Field::FieldType>::const_iterator it = types.begin(); it != types.end(); ++it)
+				{//running through the list of types the field template has
+
+					Field::FieldType type = *it;
+
+					if(msgField->getType() == type)
+					{//the field's type needs to match one of the types in the list
+						valid = true;
+					}
+				}
+
+				if(!valid)
+				{
 					std::stringstream err;
 					err << msgField->getName()
 						<< " has incorrect field type of " << getTypeStr(msgField->getType())
-						<< ", expected type " << getTypeStr(tmpField->getType());
+						<< ".  Valid type(s): ";
+					for(std::list<Field::FieldType>::const_iterator it = types.begin(); it != types.end(); ++it)
+					{
+						Field::FieldType type = *it;
+						err << getTypeStr(type) << " ";
+					}
 					//GMSEC_ERROR << err.str().c_str();
 					status.set(MIST_ERROR, INCORRECT_FIELD_TYPE, err.str().c_str());
 					cumulativeError.append("\n      ").append(status.get());
@@ -609,12 +715,12 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 			
 			//TODO MAV:
 			//EXPAND THIS BLOCK FOR MULTIPLE VALUES
-			std::string testValue = ftmp.getValue();
-			if(testValue != "")
+			if(ftmp.hasExplicitValue())
 			{//if the template's value isn't blank, the message field's value needs to be validated as well
 
 				//for simplicity's sake, we're comparing the values as strings, since we can pretty much turn any type into a string
 				std::string msgValue = getValue(msg, msgField->getName());
+				std::string testValue = ftmp.getValue();
 
 				if(msgValue != testValue)
 				{
@@ -634,7 +740,7 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 			if(mode == "REQUIRED")
 			{//validation fails at this point if the field is required
 				std::stringstream err;
-				err << tmpField->getName() 
+				err << ftmp.getName() 
 					<< " is a required field, but is missing from message.  ";
 				//GMSEC_ERROR << err.str().c_str();
 				status.set(MIST_ERROR, MISSING_REQUIRED_FIELD, err.str().c_str());
@@ -647,7 +753,7 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 		if(mode == "REQUIRED")
 		{//validation fails at this point if the field is required
 			std::stringstream err;
-			err << tmpField->getName() 
+			err << ftmp.getName() 
 				<< " is a required field, but is missing from message.  ";
 			//GMSEC_ERROR << err.str().c_str();
 			status.set(MIST_ERROR, MISSING_REQUIRED_FIELD, err.str().c_str());
@@ -666,13 +772,12 @@ Status InternalSpecification::validate(const Message& msg, const FieldTemplate& 
 }
 
 
-std::string InternalSpecification::registerTemplate(const Message& msg)
+std::string InternalSpecification::registerTemplate(const Message& msg, GMSEC_I64 schemaLevel)
 {
 	std::string typeDef;
 	std::string subTypeDef;
 
 	//when searching for a match in the directory, we want to start schema level indicated by the user
-	GMSEC_I64 schemaLevel = m_schemaLevel;
 	std::string levelName;
 
 	//This is the schemaID minus the spec version. We'll look this name up in the directory
@@ -726,17 +831,16 @@ std::string InternalSpecification::registerTemplate(const Message& msg)
 	//Now look for matching schemaID in list of templates
 	while(schemaLevel >=0)
 	{//searching on the highest layer first, as defined by the user
-		for(MessageTemplateList::const_iterator it = m_templates.begin(); it != m_templates.end(); ++it)
-		{//now searching through list of schemas
-			MessageTemplate temp = **it;
-			if(StringUtil::stringEquals(temp.getID(), schemaID.c_str()))
-			{//found it!
-				GMSEC_VERBOSE << "Subject " << msg.getSubject() << " registered with Schema ID " << schemaID.c_str();
-				m_registry.insert(std::pair<std::string, std::string>(msg.getSubject(), schemaID));
-				return schemaID;
-			}
+		MessageTemplates::const_iterator it = m_templates.find(schemaID);
+		if (it != m_templates.end())
+		{
+			GMSEC_VERBOSE << "Subject " << msg.getSubject() << " registered with Schema ID " << schemaID.c_str();
+			m_registry.insert(std::pair<std::string, std::string>(msg.getSubject(), schemaID));
+			return schemaID;
 		}
-		schemaLevel--;
+
+		//If here, we did not find the schemaID; try a lookup at the next lowest level
+		return registerTemplate(msg, --schemaLevel);
 	}
 
 	//if this return statement was reached then it means that there was 
@@ -755,7 +859,7 @@ bool InternalSpecification::findDefinition(size_t schemaLevel, std::string& name
 	bool found = false;
 	std::string oldName;
 
-	while(oldName != name)
+	while(oldName != name && !found)
 	{//so long as the name is updated it means there may be a more specific definition available
 		oldName = name;
 		for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
@@ -791,71 +895,35 @@ bool InternalSpecification::findDefinition(size_t schemaLevel, std::string& name
 }
 
 
+void InternalSpecification::cleanup()
+{
+	for (MessageTemplates::iterator it = m_templates.begin(); it != m_templates.end(); ++it)
+	{
+		delete it->second;
+	}
+	m_templates.clear();
+	m_headers.clear();
+	m_directory.clear();
+	m_registry.clear();
+}
+
+
 void InternalSpecification::load()
 {
-	if(!m_registry.empty())
-	{//spec was previously loaded, wipe registry so messages can be reclassified with new templates
-		m_registry.clear();
-	}
+	Status status;    //This var will get overridden by the current status, error or non-error
+	Status lastError; //This is the last error found by InternalSpecification::Load
+	                  //This is to avoid potential scenarios where an error status 
+	                  //is overridden by a non-error status
 
-	if(!m_templates.empty())
-	{//spec was previously loaded, remove templates and reload
-		for(MessageTemplateList::const_iterator it = m_templates.begin(); it != m_templates.end(); ++it)
-		{
-			delete *it;
-		}
-		m_templates.clear();
-	}
+	std::string template_dir;
 
-	if(!m_headers.empty())
-	{
-		m_headers.clear();
-	}
-
-	if(!m_directory.empty())
-	{
-		m_directory.clear();
-	}
-
-	Status                 status;	  //This var will get overridden by the current status, error or non-error
-	Status				   lastError; //This is the last error found by InternalSpecification::Load
-									  //This is to avoid potential scenarios where an error status 
-									  //is overridden by a non-error status
-	std::string            load_dir;
-	std::list<std::string> schema_files;
-
-	char major_version_str[5]; // Major version comes from the year.
-	                           // It is assumed that this code will
-	                           // not be used beyond year 9999,
-	                           // which has 4 digits (and we
-	                           // add one for the end of a c-string,
-	                           // to get max size 5)
-
-	char minor_version_str[3]; // Minor versions are allowed
-	                           // from 0 to 99, or 2 digits max
-	                           // (and we add one for the end of
-	                           // a c-string, to get max size 3
-
-	//
-	// Get major, minor version number strings
-	//
-	StringUtil::stringFormat(major_version_str, sizeof(major_version_str), "%04u", getVersion()/100);
-	StringUtil::stringFormat(minor_version_str, sizeof(minor_version_str), "%02u", getVersion()-((getVersion()/100)*100));
-
-	//
-	// Load paths
-	//
+	// Deduce template directory path
 	if (m_basePath.empty())
 	{
 		std::string shared_object_path;
 
 		if (FileUtil::getCurrentSharedObjectPath(shared_object_path) == false)
 		{
-			if(status.isError())
-			{
-				throw Exception(status);
-			}
-
 			std::string err_msg = "Could not get system-specified base path.";
 
 			status.set(MIST_ERROR, TEMPLATE_DIR_NOT_FOUND, err_msg.c_str());
@@ -868,17 +936,12 @@ void InternalSpecification::load()
 	
 			if (dirMarker != std::string::npos)
 			{
-				load_dir = shared_object_path.substr(0, dirMarker) + FileUtil::PATH_SEPARATOR + ".." + FileUtil::PATH_SEPARATOR + "templates";
+				template_dir = shared_object_path.substr(0, dirMarker) + FileUtil::PATH_SEPARATOR + ".." + FileUtil::PATH_SEPARATOR + "templates";
 			}
 			else
 			{
-				if(status.isError())
-				{
-					throw Exception(status);
-				}
-	
 				std::string err_msg = "Could not list files in template directory ";
-				err_msg += load_dir;
+				err_msg += template_dir;
 
 				status.set(MIST_ERROR, TEMPLATE_DIR_NOT_FOUND, err_msg.c_str());
 	
@@ -888,41 +951,72 @@ void InternalSpecification::load()
 	}
 	else
 	{
-		load_dir = m_basePath;
+		template_dir = m_basePath;
 	}
 
 	if (!status.isError())
 	{
-		load_dir += FileUtil::PATH_SEPARATOR;
-		load_dir += major_version_str;
-		load_dir += ".";
-		load_dir += minor_version_str;
+		char major_version_str[5]; // Major version comes from the year.
+		                           // It is assumed that this code will
+		                           // not be used beyond year 9999,
+		                           // which has 4 digits (and we
+		                           // add one for the end of a c-string,
+		                           // to get max size 5)
 
-		if (FileUtil::getFilesInDirectory(load_dir, schema_files) == false)
+		char minor_version_str[3]; // Minor versions are allowed
+		                           // from 0 to 99, or 2 digits max
+		                           // (and we add one for the end of
+		                           // a c-string, to get max size 3
+
+		// Get major, minor version number strings
+		StringUtil::stringFormat(major_version_str, sizeof(major_version_str), "%04u", getVersion() / 100);
+		StringUtil::stringFormat(minor_version_str, sizeof(minor_version_str), "%02u", getVersion() % 100);
+
+		// Adjust template (load) directory path
+		template_dir += FileUtil::PATH_SEPARATOR;
+		template_dir += major_version_str;
+		template_dir += ".";
+		template_dir += minor_version_str;
+
+		std::list<std::string> schema_files;
+
+		//TODO: Allow for filtering of specific file types (e.g. those with an xml extension).
+		if (FileUtil::getFilesInDirectory(template_dir, schema_files) == false)
 		{
-			if(status.isError())
-			{
-				throw Exception(status);
-			}
-
 			std::string err_msg = "Could not list files in template directory ";
-			err_msg += load_dir;
+			err_msg += template_dir;
 
 			status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, err_msg.c_str());
 
 			GMSEC_ERROR << err_msg.c_str();
-
 		}
 		else
 		{
+			static std::string DIRECTORY_FILE = ".DIRECTORY.xml";
+
+			// Always load the DIRECTORY file first...
+			std::string path = template_dir;
+			path += FileUtil::PATH_SEPARATOR;
+			path += DIRECTORY_FILE;
+
+			status = loadTemplate(path.c_str());
+
+			if (m_directory.empty() || status.isError())
+			{
+				status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, "Template Directory information failed to load");
+				throw Exception(status);
+			}
+
+			// Then other files...
 			for (std::list<std::string>::iterator it = schema_files.begin(); it != schema_files.end(); ++it)
 			{
 				std::string filename = *it;
 
-				if (filename != ".." && filename != ".")
+				// We do not care about directories (current or above), or the DIRECTORY file (which has
+				// already been processed)
+				if (filename != ".." && filename != "." && filename != DIRECTORY_FILE)
 				{
-					std::string path = load_dir;
-					
+					path  = template_dir;
 					path += FileUtil::PATH_SEPARATOR;
 					path += filename;
 
@@ -940,19 +1034,14 @@ void InternalSpecification::load()
 					}
 				}
 			}
-			if (m_directory.empty())
-			{
-				status.set(MIST_ERROR, TEMPLATE_DIR_ERROR, "Template Directory information failed to load");
-				throw Exception(status);
-			}
 		}
 	}
 
-	if(lastError.isError())
+	if (lastError.isError())
 	{
 		throw Exception(lastError);
 	}
-	else if(status.isError())
+	else if (status.isError())
 	{
 		throw Exception(status);
 	}
@@ -1074,20 +1163,28 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 
 		}//done running through the child elements
 
-		//the directory must have at minimum a definition for a Level-0 HEADER
-		bool found = false;
-		for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
+		//the directory must have a HEADER entry for each schema level in the directory
+		for(unsigned int i = 0; i <= m_schemaLevel; ++i)
 		{
-			if(StringUtil::stringEquals(it->getID(), "HEADER") && it->getLevel() == 0)
+			bool found = false;
+			for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
 			{
-				found = true;
+				std::string id = it->getID();
+				if(StringUtil::stringEquals(it->getID(), "HEADER") && it->getLevel() == i)
+				{
+					found = true;
+					break;
+				}
+			}
+
+			if(!found)
+			{
+				oss.clear();
+				oss.str("");
+				oss << "DIRECTORY is missing definition for LEVEL-" << i << " HEADER";
+				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 				break;
 			}
-		}
-
-		if(!found)
-		{
-			status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, "DIRECTORY is missing definition for LEVEL-0 HEADER");
 		}
 
 		return status;
@@ -1115,13 +1212,13 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			{
 				fieldTemplate.setMode(attribute->Value());
 
-				if(StringUtil::stringEquals(fieldTemplate.getMode(), "CONTROL") && 
-				   StringUtil::stringEquals(fieldTemplate.getName(), "ARRAY-START"))
+				if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(), "CONTROL") && 
+				   StringUtil::stringEquals(fieldTemplate.getName().c_str(), "ARRAY-START"))
 				{//encountered ARRAY-START, set array control flag
 					arrayControlActive++;
 				}
-				else if(StringUtil::stringEquals(fieldTemplate.getMode(), "CONTROL") && 
-						StringUtil::stringEquals(fieldTemplate.getName(), "ARRAY-END"))
+				else if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(), "CONTROL") && 
+						StringUtil::stringEquals(fieldTemplate.getName().c_str(), "ARRAY-END"))
 				{//encountered ARRAY-END, clear array control flag if it is set or throw error
 					if(arrayControlActive > 0)
 					{//clear flag
@@ -1139,8 +1236,23 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			{
 				fieldTemplate.setClass(attribute->Value());
 			}
+			else if(StringUtil::stringEquals(attribute->Name(), "TYPE"))
+			{
+				std::string value = attribute->Value();
+				std::list<std::string> types;
+
+				std::vector<std::string> list = StringUtil::split(value,',');
+
+				for(std::vector<std::string>::const_iterator it = list.begin(); it != list.end(); ++it)
+				{
+					std::string type = StringUtil::trim(*it);
+					types.push_back(type);
+				}
+
+				fieldTemplate.setTypes(types);
+			}
 			else if(StringUtil::stringEquals(attribute->Name(), "VALUE"))
-			{//TODO: MOVE VALUE PARSING BELOW TYPE PARSING
+			{
 				fieldTemplate.setValue(attribute->Value());
 	
 				//TODO MAV:
@@ -1196,10 +1308,6 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 					//if type is binary blob:
 						//PANIC
 			}
-			else if(StringUtil::stringEquals(attribute->Name(), "TYPE"))
-			{//TODO: MOVE TYPE PARSING ABOVE VALUE PARSING
-				fieldTemplate.setType(attribute->Value());
-			}
 			else if(StringUtil::stringEquals(attribute->Name(), "DESCRIPTION"))
 			{
 				fieldTemplate.setDescription(attribute->Value());
@@ -1218,7 +1326,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			}
 		}//done parsing the attributes
 
-		if(StringUtil::stringEquals(fieldTemplate.getName(), ""))
+		if(StringUtil::stringEquals(fieldTemplate.getName().c_str(), ""))
 		{//throw an error if f_name wasn't parsed
 			oss.clear();
 			oss.str("");
@@ -1227,7 +1335,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 			GMSEC_ERROR << status.get();
 		}
 
-		if(StringUtil::stringEquals(fieldTemplate.getMode(), ""))
+		if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(), ""))
 		{//throw an error if f_mode wasn't parsed
 			oss.clear();
 			oss.str("");
@@ -1237,10 +1345,10 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 		}
 
 		//check to make sure all attributes are accounted for
-		if(StringUtil::stringEquals(fieldTemplate.getMode(), "REQUIRED") || 
-		   StringUtil::stringEquals(fieldTemplate.getMode(), "OPTIONAL"))
+		if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(), "REQUIRED") || 
+		   StringUtil::stringEquals(fieldTemplate.getMode().c_str(), "OPTIONAL"))
 		{//checking attributes for regular field templates
-			if(StringUtil::stringEquals(fieldTemplate.getClass(), ""))
+			if(StringUtil::stringEquals(fieldTemplate.getClass().c_str(), ""))
 			{
 				oss.clear();
 				oss.str("");
@@ -1248,43 +1356,50 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 				GMSEC_ERROR << status.get();
 			}
-			if(!(StringUtil::stringEquals(fieldTemplate.getType(), "CHAR")	  || 
-				 StringUtil::stringEquals(fieldTemplate.getType(), "BIN")	  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "BLOB")	  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "BOOL")	  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "BOOLEAN") ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "I8")	  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "I16")     ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "SHORT")	  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "I32")     ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "LONG")	  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "I64")     ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "U8")      ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "U16")     ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "USHORT")  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "U32")     ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "ULONG")	  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "U64")     ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "F32")     ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "FLOAT")	  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "F64")     ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "DOUBLE")  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "STRING")  ||
-				 StringUtil::stringEquals(fieldTemplate.getType(), "UNSET")))
+			std::list<std::string> types = fieldTemplate.getTypeStrings();
+			for(std::list<std::string>::const_iterator it = types.begin(); it != types.end(); ++it)
 			{
-				oss.clear();
-				oss.str("");
-				oss << schemaID << ": the field template " << fieldTemplate.getName() << " contains unrecognized type \"" << fieldTemplate.getType() << "\"";
-				status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
-				GMSEC_ERROR << status.get();
+				std::string type = *it;
+				if(!(StringUtil::stringEquals(type.c_str(), "CHAR")			|| 
+					 StringUtil::stringEquals(type.c_str(), "BIN")			||
+					 StringUtil::stringEquals(type.c_str(), "BINARY")		||
+					 StringUtil::stringEquals(type.c_str(), "BLOB")			||
+					 StringUtil::stringEquals(type.c_str(), "BOOL")			||
+					 StringUtil::stringEquals(type.c_str(), "BOOLEAN")		||
+					 StringUtil::stringEquals(type.c_str(), "I8")			||
+					 StringUtil::stringEquals(type.c_str(), "I16")			||
+					 StringUtil::stringEquals(type.c_str(), "SHORT")		||
+					 StringUtil::stringEquals(type.c_str(), "I32")			||
+					 StringUtil::stringEquals(type.c_str(), "LONG")			||
+					 StringUtil::stringEquals(type.c_str(), "I64")			||
+					 StringUtil::stringEquals(type.c_str(), "U8")			||
+					 StringUtil::stringEquals(type.c_str(), "U16")			||
+					 StringUtil::stringEquals(type.c_str(), "USHORT")		||
+					 StringUtil::stringEquals(type.c_str(), "U32")			||
+					 StringUtil::stringEquals(type.c_str(), "ULONG")		||
+					 StringUtil::stringEquals(type.c_str(), "U64")			||
+					 StringUtil::stringEquals(type.c_str(), "F32")			||
+					 StringUtil::stringEquals(type.c_str(), "FLOAT")		||
+					 StringUtil::stringEquals(type.c_str(), "F64")			||
+					 StringUtil::stringEquals(type.c_str(), "DOUBLE")		||
+					 StringUtil::stringEquals(type.c_str(), "STRING")		||
+					 StringUtil::stringEquals(type.c_str(), "VARIABLE")		||
+					 StringUtil::stringEquals(type.c_str(), "UNSET")))
+				{
+					oss.clear();
+					oss.str("");
+					oss << schemaID << ": the field template " << fieldTemplate.getName() << " contains unrecognized type \"" << fieldTemplate.getType() << "\"";
+					status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
+					GMSEC_ERROR << status.get();
+				}
 			}
 		}//done checking attributes for regular fields
 
-		if(StringUtil::stringEquals(fieldTemplate.getMode(), "CONTROL"))
+		if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(), "CONTROL"))
 		{//checking control fields to make sure all attributes are present
-			if(StringUtil::stringEquals(fieldTemplate.getName(), "ARRAY-START"))
+			if(StringUtil::stringEquals(fieldTemplate.getName().c_str(), "ARRAY-START"))
 			{
-				if(StringUtil::stringEquals(fieldTemplate.getValue(), ""))
+				if(StringUtil::stringEquals(fieldTemplate.getValue().c_str(), ""))
 				{
 					oss.clear();
 					oss.str("");
@@ -1292,7 +1407,7 @@ Status InternalSpecification::parser(tinyxml2::XMLElement* xmlSchema,
 					status.set(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, oss.str().c_str());
 					GMSEC_ERROR << status.get();
 				}
-				if(StringUtil::stringEquals(fieldTemplate.getSize(), ""))
+				if(StringUtil::stringEquals(fieldTemplate.getSize().c_str(), ""))
 				{
 					oss.clear();
 					oss.str("");
@@ -1325,11 +1440,31 @@ std::list<FieldTemplate> InternalSpecification::prepHeaders(const char* schemaID
 {
 	std::string id = schemaID;
 	std::string typeDef;
-	std::string subTypeDef;
+	std::string subtypeDef;
+	std::string type;
+	std::string subtype;
 
-	//the major and minor revision isn't in the schema's name in the directory
-	//so we need to trim these two parts off first
-	id = id.substr(8,id.length()-8);
+	// The types of Schema IDs that the API (currently) supports.
+	//
+	// Schema ID Type 1: major.minor.schemaLevel.messagekind.messagetype.<optionalmessagesubtype>
+	// Schema ID Type 2: messagekind.messagetype.<optionalmessagesubtype>
+
+	std::vector<std::string> elements = StringUtil::split(id, '.');
+
+	if (elements.size() >= 5)        // Type 1
+	{
+		//the major and minor revision isn't in the schema's name in the directory
+		//so we need to trim these two parts off
+		id = id.substr(8,id.length()-8);
+
+		type    = elements.at(3);
+		subtype = elements.at(4);
+	}
+	else if (elements.size() >= 2)   // Type 2
+	{
+		type    = elements.at(0);
+		subtype = elements.at(1);
+	}
 
 	for(SchemaTemplateList::const_iterator it = m_directory.begin(); it != m_directory.end(); ++it)
 	{//look up schemaID in the directory
@@ -1339,7 +1474,7 @@ std::list<FieldTemplate> InternalSpecification::prepHeaders(const char* schemaID
 		{//found it
 			//the common headers only contain the first two definitions, so we only need the first two
 			typeDef = temp.getFirstDefinition();
-			subTypeDef = temp.getNextDefinition();
+			subtypeDef = temp.getNextDefinition();
 			break;
 		}
 	}
@@ -1355,7 +1490,7 @@ std::list<FieldTemplate> InternalSpecification::prepHeaders(const char* schemaID
 			if(StringUtil::stringEquals(temp.getID(), genID.c_str()))
 			{
 				typeDef = temp.getFirstDefinition();
-				subTypeDef = temp.getNextDefinition();
+				subtypeDef = temp.getNextDefinition();
 				break;
 			}
 		}
@@ -1372,34 +1507,10 @@ std::list<FieldTemplate> InternalSpecification::prepHeaders(const char* schemaID
 			if(StringUtil::stringEquals(temp.getID(), "HEADER"))
 			{
 				typeDef = temp.getFirstDefinition();
-				subTypeDef = temp.getNextDefinition();
+				subtypeDef = temp.getNextDefinition();
 				break;
 			}
 		}
-	}
-
-	//schema ID layout:
-	//Major-Version.Minor-Version.Message-Type.Message-SubType.Additional-Types...
-	//remember we have trimmed off the major and minor versions as the directory doesn't reference them
-
-	//3rd element of the schemaID (Level-ID)
-	size_t index1 = id.find(".");
-
-	//4th element of schemaID (Message-Type)
-	size_t index2 = id.find(".", index1+1);
-	std::string type = id.substr(index1+1, index2-index1-1);
-
-	//5th element of schemaID (Message-SubType)
-	size_t index3 = id.find(".", index2+1);
-	std::string subType;
-	if(index3 == std::string::npos)
-	{
-		index3 = id.size() - 1;
-		subType = id.substr(index2+1, index3-index2);
-	}
-	else
-	{
-		subType = id.substr(index2+1, index3-index2-1);
 	}
 
 	FieldTemplateList fields;
@@ -1407,13 +1518,13 @@ std::list<FieldTemplate> InternalSpecification::prepHeaders(const char* schemaID
 	for(FieldTemplateList::const_iterator it = m_headers.begin(); it != m_headers.end(); ++it)
 	{
 		FieldTemplate temp = *it;
-		if(StringUtil::stringEquals(temp.getName(), typeDef.c_str()))
+		if(StringUtil::stringEquals(temp.getName().c_str(), typeDef.c_str()))
 		{
 			temp.setValue(type.c_str());
 		}
-		else if(StringUtil::stringEquals(temp.getName(), subTypeDef.c_str()))
+		else if(StringUtil::stringEquals(temp.getName().c_str(), subtypeDef.c_str()))
 		{
-			temp.setValue(subType.c_str());
+			temp.setValue(subtype.c_str());
 		}
 
 		fields.push_back(temp);
@@ -1433,27 +1544,18 @@ const char* InternalSpecification::nextID()
 {
 	if(hasNextID())
 	{
-		const MessageTemplate& temp = **m_schemaIndex;
+		const MessageTemplate* temp = m_schemaIndex->second;
 		m_schemaIndex++;
-		return temp.getID();
+		return temp->getID();
 	}
-	else
-	{
-		throw Exception(MIST_ERROR, INDEX_OUT_OF_RANGE, "next() has reached end of list");
-	}
+
+	throw Exception(MIST_ERROR, INDEX_OUT_OF_RANGE, "next() has reached end of list");
 }
 
 
 bool InternalSpecification::hasNextID() const
 {
-	if(m_schemaIndex != m_templates.end())
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return m_schemaIndex != m_templates.end();
 }
 
 
@@ -1620,7 +1722,15 @@ void InternalSpecification::setVersion(unsigned int version)
 		m_specificationId = oss.str();
 
 		//the templates need to be reloaded since the spec has been changed
-		load();
+		cleanup();
+
+		try {
+			load();
+		}
+		catch (const Exception& e) {
+			cleanup();
+			throw e;
+		}
 	}
 	else
 	{
@@ -1629,21 +1739,18 @@ void InternalSpecification::setVersion(unsigned int version)
 }
 
 
-MessageTemplate InternalSpecification::findTemplate(const char* schemaID)
+MessageTemplate& InternalSpecification::findTemplate(const char* schemaID)
 {
 	if (!schemaID || std::string(schemaID).empty())
 	{
 		throw Exception(MIST_ERROR, TEMPLATE_ID_DOES_NOT_EXIST, "Schema ID cannot be null or contain an empty string");
 	}
 
-	for(MessageTemplateList::const_iterator it = m_templates.begin(); it != m_templates.end(); ++it)
-	{
-		const MessageTemplate* temp = *it;
+	MessageTemplates::const_iterator it = m_templates.find(schemaID);
 
-		if(StringUtil::stringEqualsIgnoreCase(temp->getID(), schemaID))
-		{
-			return *temp;
-		}
+	if (it != m_templates.end())
+	{
+		return *(it->second);
 	}
 
 	//A message template was not returned, which means there wasn't a matching one in the list
@@ -1656,7 +1763,7 @@ MessageTemplate InternalSpecification::findTemplate(const char* schemaID)
 
 const char* InternalSpecification::getTemplateXML(const char* subject, const char* schemaID)
 {
-	m_templateXML =  findTemplate(schemaID).toXML(subject);
+	m_templateXML = findTemplate(schemaID).toXML(subject);
 	return m_templateXML.c_str();
 }
 

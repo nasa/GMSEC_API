@@ -75,6 +75,75 @@ For users that employ the same release of the API across all their systems,
 the message loss issue is highly unlikely to occur.
 
 
+==============================================================================
+= GMSEC API 4.4 release notes (2017 Dec 15)
+==============================================================================
+o This release contains an additional interface for the Python language.
+    This interface is based on the Python 2.x interface and is built and tested
+    with CPython. Please refer to the example programs in
+    GMSEC_API/examples/python and the code documentation in
+    GMSEC_API_DOCS/manual/python_4x to learn more about the use of the new
+    binding.
+
+--- Change summary -----------------------------------------------------------
+4292    Add subscription exclusion filters to subscription definitions in
+        ConfigFile
+4446    Consolidate API string constants, especially config keys, into a single
+        header file
+4671    Execute middleware performance testing and generate a performance test
+        report for GMSEC API 4.2
+4740    Add a tracking field which contains a list of unique subscription
+        subjects in a process
+4741    Add a tracking field which shows the server to which a GMSEC Connection
+        is currently connected
+4758    Simplify the example programs
+4791    Fix inconsistencies in the values of the FIELD_CLASS attributes in XML
+        template files used for message validation
+4792    Change the UNSET type attribute to VARIABLE in the XML template files
+        used for message validation
+4796    Fix various minor issues with the XML template files used for message
+        validation
+4837    Fix Magic Bus so that it handles requests for resource information
+4869    Provide support for ActiveMQ CMS 3.9.4 and OpenSSL 1.0.2
+4881    Update MistMessage constructors so that the Schema ID does not require
+        the version number of the ISD
+4898    Allow applications to register an EventCallback before connecting to
+        the bus
+4899    Setting the field storage container type after a message has been 
+        created can truncate the message
+4900    API Environment Validator script does not always report the version
+        number of the API
+4901    Allow users to set configuration options for messages that are received
+        from the GMSEC Bus
+4921    Field::getStringValue does not properly convert Binary, I8, or U8 Field
+        values to strings
+4934    Fix the message encoding and decoding logic which prevents Fields from
+        being identified as a header
+4938    Augment Field class to allow type of "BINARY" in addition to "BLOB"
+        and "BIN"
+4953    Rename Doxygen documentation directories for API 3.x
+4955    Users shall be able to change the rate of publication of the Heartbeat
+        Service
+4964    JNI objects created within Callbacks need to be destroyed after use
+4969    The JVM stack size should be specified by the Generic JMS wrapper
+4973    The Java API's registerHandler should reset to the default Java handler
+        when invoked with null
+4997    Fix the memory leak in the Java Message.getXXField() functions
+4999    Add a getStandardFields function to the ConnectionManager
+5003    ConnectionManager::request(no callback) and reply() should be able to
+        validate messages
+5015    MessagePopulator class doesn't add MSG-ID field
+5027    Fix the memory leak in the Java ConnectionManager requestSimpleService()
+5028    Fix output from Message toXML() so that the message configuration, if
+        any, is properly indented
+5032    Fix the connectionManagerCreate() function in the C binding so that it
+        does not enable message validation
+5034    MIST ignoring lower level message templates when overriding addendum is
+        applied
+5035    Infinite loop occurring when addendum is added with no header listed in
+        directory
+5050    Mark all deprecated classes and functions of the API
+
 
 ==============================================================================
 = GMSEC API 4.3 release notes (2017 May 1)
@@ -149,6 +218,8 @@ o The Config class can now ingest and output JSON data, as well as ingest
         active subscriptions
 4601    Error checking should by default be performed on subscription subjects
         with wildcard operators
+4610    Create a Python language binding
+4615    Create example programs and unit tests for Python language binding
 4616    Incorrect cast types are used in Java binding when constructing C++
         fields
 4618    Users should be able to add or change Heartbeat Service fields

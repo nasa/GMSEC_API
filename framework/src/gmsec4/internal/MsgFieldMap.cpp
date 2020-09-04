@@ -80,7 +80,29 @@ MsgFieldMap& MsgFieldMap::operator=(const MsgFieldMap& other)
 
 void MsgFieldMap::setStorageType(StorageType type)
 {
+	StorageType oldType = m_type;
+
 	m_type = type;
+
+	if (oldType != type)
+	{
+		if (oldType == BINARY_TREE_MAP)
+		{
+			// We're moving to a HASH tree
+			for (BinaryTreeMap::const_iterator it = m_binTreeMap.begin(); it != m_binTreeMap.end(); ++it)
+			{
+				this->addField(*it->second, false);
+			}
+		}
+		else
+		{
+			// We're moving to a BINARY tree
+			for (HashMap::const_iterator it = m_hashMap.begin(); it != m_hashMap.end(); ++it)
+			{
+				this->addField(*it->second, false);
+			}
+		}
+	}
 }
 
 

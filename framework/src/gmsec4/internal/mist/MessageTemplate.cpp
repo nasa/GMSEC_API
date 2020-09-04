@@ -62,16 +62,16 @@ void MessageTemplate::setFieldTemplates(const char* schemaID, const std::list<Fi
 	m_fieldTemplates = inputFields;
 }
 
-Field* MessageTemplate::getField(const char* name)
+Field* MessageTemplate::getField(const char* name, const char* type)
 {
 	Field* field = NULL;
 
 	for(std::list<FieldTemplate>::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
 	{
 		FieldTemplate temp = *it;
-		if(StringUtil::stringEquals(temp.getName(), name))
+		if(StringUtil::stringEquals(temp.getName().c_str(), name))
 		{
-			field = temp.toField();
+			field = temp.toField(type);
 			break;
 		}
 	}
@@ -152,20 +152,20 @@ const char* MessageTemplate::toXML(const char* subject)
 	{//add fields
 		FieldTemplate fieldTemplate = *it;
 
-		if(StringUtil::stringEquals(fieldTemplate.getMode(),  "CONTROL") && StringUtil::stringEquals(fieldTemplate.getName(), "ARRAY-START"))
+		if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(),  "CONTROL") && StringUtil::stringEquals(fieldTemplate.getName().c_str(), "ARRAY-START"))
 		{
 			arrayControlActive++;
 		}
-		else if(StringUtil::stringEquals(fieldTemplate.getMode(), "CONTROL") && StringUtil::stringEquals(fieldTemplate.getName(), "ARRAY-END"))
+		else if(StringUtil::stringEquals(fieldTemplate.getMode().c_str(), "CONTROL") && StringUtil::stringEquals(fieldTemplate.getName().c_str(), "ARRAY-END"))
 		{
 			arrayControlActive--;
 		}
 
-		if(arrayControlActive == 0 && !StringUtil::stringEquals(fieldTemplate.getValue(), ""))
+		if(arrayControlActive == 0 && fieldTemplate.hasExplicitType() && fieldTemplate.hasExplicitValue())
 		{
 			try
 			{
-				std::auto_ptr<Field> field(fieldTemplate.toField());
+				std::auto_ptr<Field> field(fieldTemplate.toField(fieldTemplate.getType()));
 
 				msg.addField(*(field.get()));
 			}

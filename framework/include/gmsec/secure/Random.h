@@ -32,6 +32,7 @@
 
 #include <gmsec/Config.h>
 #include <gmsec/util/Buffer.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/sysutil.h>
 #include <gmsec/util/wdllexp.h>
 
@@ -52,7 +53,7 @@ class GMSEC_API Random
 {
 public:
 
-	Random ();
+	GMSEC_DEPRECATED Random ();
 	~Random ();
 
 	bool isValid () const;
@@ -137,7 +138,7 @@ class GMSEC_API SystemRandom : public BaseRandom
 {
 public:
 
-	SystemRandom ();
+	GMSEC_DEPRECATED SystemRandom ();
 	virtual ~SystemRandom ();
 
 	virtual bool isValid () const;
@@ -172,7 +173,7 @@ class GMSEC_API MersenneTwister : public BaseRandom
 {
 public:
 
-	MersenneTwister ();
+	GMSEC_DEPRECATED MersenneTwister ();
 	virtual ~MersenneTwister ();
 
 	virtual bool isValid () const;

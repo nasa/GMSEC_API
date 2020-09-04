@@ -61,7 +61,8 @@ public:
 	*
 	* @param subject - the subject string for the message.
 	* @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).  
+	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).
+	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB)    
 	* Not all schemaIDs contain a messageSubtype
 	* 
 	* @param spec - A reference to the specification this message's schema will adhere to.
@@ -77,7 +78,8 @@ public:
 	*
 	* @param subject - the subject string for the message.
 	* @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).  
+	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.C2CX.HB).
+	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.C2CX.HB)  
 	* Not all schemaIDs contain a messageSubtype
 	* @param config - A configuration to associate with the message.
 	* @param spec - A reference to the specification this message's schema will adhere to.

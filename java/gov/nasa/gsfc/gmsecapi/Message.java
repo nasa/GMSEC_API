@@ -24,10 +24,13 @@ import org.w3c.dom.*;
 
 /** @class Message
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief The Message object is a container for GMSEC Messages.  The methods of this
  * class allow the construction and manipulation of the data in a message.
  *
  */
+@Deprecated
 public class Message implements MessageImpl
 {
 	private MessageImpl fMsg = null;

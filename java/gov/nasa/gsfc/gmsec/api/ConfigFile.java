@@ -172,10 +172,38 @@ public class ConfigFile
 		/**
 		 * @fn String getSubject()
 		 * @desc Returns the subject/topic associated with the Subscription entry.
+		 * @note This function has been deprecated; use getPattern() instead.
 		 */
 		public String getSubject()
 		{
 			return m_jniEntry.getSubject();
+		}
+
+		/**
+		 * @fn String getPattern()
+		 * @desc Returns the pattern associated with the Subscription entry.
+		 */
+		public String getPattern()
+		{
+			return m_jniEntry.getPattern();
+		}
+		
+		/**
+		 * @fn boolean hasNextExcludedPattern()
+		 * @desc Returns whether there is a next escluded pattern associated with the Subscription entry
+		 */
+		public boolean hasNextExcludedPattern()
+		{
+			return m_jniEntry.hasNextExcludedPattern();
+		}
+
+		/**
+		 * @fn String nextExcludedPattern()
+		 * @desc Returns the next excluded pattern associated with the Subscription entry. 
+		 */
+		public String nextExcludedPattern()
+		{
+			return m_jniEntry.nextExcludedPattern();
 		}
 	}
 
@@ -409,6 +437,8 @@ public class ConfigFile
 	 *
 	 * @brief This function will attempt to locate within the ConfigFile a Subscription entry associated
 	 * with the given name, and return the subject/topic associated with such.
+	 * 
+	 * @note This function has been deprecated; use lookupSubscriptionEntry instead
 	 *
 	 * Example
 	 * @code
@@ -448,6 +478,52 @@ public class ConfigFile
 		}
 
 		return m_jniConfigFile.lookupSubscription(name);
+	}
+
+
+	/**
+	 * @fn SubscriptionEntry lookupSubscriptionEntry(String name)
+	 *
+	 * @brief This function will attempt to locate within the ConfigFile a Subscription entry associated
+	 * with the given name, and return the subject/topic associated with such.
+	 *
+	 * Example
+	 * @code
+	 * try {
+	 *     ConfigFile cfgFile = new ConfigFile();
+	 *
+	 *     // load and parse configuration file
+	 *     cfgFile.load("/some/path/to/config.xml");
+	 *
+	 *     // attempt to acquire Subscription Entry
+	 *     try {
+	 *         SubscriptionEntry entry = cfgFile.lookupSubscriptionEntry("MySubscription");
+	 *
+	 *         ...
+	 *     }
+	 *     catch (GMSEC_Exception e) {
+	 *         // handle lookup error for Subscription Entry
+	 *     }
+	 * }
+	 * catch (IllegalArgumentException | GMSEC_Exception e) {
+	 *     // handle error
+	 * }
+	 * @endcode
+	 *
+	 * @param name - name of the Subscription entry
+	 *
+	 * @throws An IllegalArgumentException if the given Subscription name is null or contains an empty string.
+	 * @throws A GMSEC_Exception is thrown if the Subscription Entry cannot be returned.
+	 */ 
+	public SubscriptionEntry lookupSubscriptionEntry(String name)
+		throws IllegalArgumentException, GMSEC_Exception
+	{
+		if (name == null || name.isEmpty())
+		{
+			throw new IllegalArgumentException("Subscription name is null or contains an empty string");
+		}
+
+		return m_jniConfigFile.lookupSubscriptionEntry(name);
 	}
 
 

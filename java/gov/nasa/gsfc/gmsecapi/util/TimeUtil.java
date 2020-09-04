@@ -18,8 +18,10 @@ import gov.nasa.gsfc.gmsecapi.jni.*;
 
 
 /**
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
  * @brief TimeUtil class
  */
+@Deprecated
 public class TimeUtil
 {
 	/**

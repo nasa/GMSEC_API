@@ -414,7 +414,14 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Subscription
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_SubscriptionEntry_1GetSubject
   (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
 {
-	jstring jSubject = 0;
+	return Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_SubscriptionEntry_1GetPattern(jenv, jcls, jSubEntryPtr, jSubEntry);
+}
+
+
+JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_SubscriptionEntry_1GetPattern
+  (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
+{
+	jstring jPattern = 0;
 
 	try
 	{
@@ -426,16 +433,74 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Subscription
 		}
 		else
 		{
-			const char* subject = entry->getSubject();
+			const char* pattern = entry->getPattern();
 
-			jSubject = makeJavaString(jenv, subject);
+			jPattern = makeJavaString(jenv, pattern);
 
-			jvmOk(jenv, "SubscriptionEntry::getSubject");
+			jvmOk(jenv, "SubscriptionEntry::getPattern");
 		}
 	}
 	JNI_CATCH
 
-	return jSubject;
+	return jPattern;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_SubscriptionEntry_1HasNextExcludedPattern
+  (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
+
+		if (!entry)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionEntry reference is null");
+		}
+		else
+		{
+			result = (entry->hasNextExcludedPattern() ? JNI_TRUE : JNI_FALSE);
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_SubscriptionEntry_1NextExcludedPattern
+  (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
+{
+	jstring jPattern = 0;
+
+	try
+	{
+		ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
+
+		if (!entry)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionEntry reference is null");
+		}
+		else
+		{
+			try
+			{
+				const char* pattern = entry->nextExcludedPattern();
+
+				jPattern = makeJavaString(jenv, pattern);
+
+				jvmOk(jenv, "SubscriptionEntry::nextExcludedPattern");
+			}
+			catch (const Exception& e)
+			{
+				ThrowGmsecException(jenv, e.what());
+			}
+		}
+	}
+	JNI_CATCH
+
+	return jPattern;
 }
 
 

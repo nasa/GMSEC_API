@@ -2,7 +2,6 @@
 
 #include <gmsec4/internal/InternalConnection.h>
 
-//TODO: Replace with consolidated configuration file
 #include <gmsec4/internal/ConnectionInterface.h>
 #include <gmsec4/internal/Subject.h>
 
@@ -161,7 +160,7 @@ void MessageAggregationToolkit::processAggregatedMsg(Message*& msg)
 
 		DataBuffer data(msgData, msgSize, true);  // msgData will be deleted when DataBuffer is destroyed
 
-		std::auto_ptr<Message> tmpMsg(new Message(msg->getSubject(), msg->getKind()));
+		std::auto_ptr<Message> tmpMsg(new Message(msg->getSubject(), msg->getKind(), m_connection->getMessageConfig()));
 
 		m_decoder.decode(*tmpMsg.get(), data);
 

@@ -13,29 +13,68 @@
  *
  * Example creation and use:
  * @code
- * GMSEC_Config     config = configCreateWithArgs(argc, argv);
- * GMSEC_Status     status = statusCreate();
- * GMSEC_Connection conn   = connectionCreate(config, status);
- *
- * if (conn)
+ * #include <gmsec4_c.h>
+ * 
+ * int main(int argc, const char** argv)
  * {
+ *     GMSEC_Config     config = configCreateWithArgs(argc, argv);
+ *     GMSEC_Status     status = statusCreate();
+ *     GMSEC_Connection conn   = NULL;
+ *     GMSEC_Message    msg    = NULL;
+ *
+ *     configAddValue(config, "loglevel", "info", status);
+ *     if (statusIsError(status)) goto Error;
+ *
+ *     // Create connection
+ *     conn = connectionCreate(config, status);
+ *     if (statusIsError(status)) goto Error;
+ *
+ *     // Connect to the middleware server
  *     connectionConnect(conn, status);
+ *     if (statusIsError(status)) goto Error;
  *
- *     GMSEC_Message msg = messageCreate("GMSEC.FOO.BAR", GMSEC_MSG_PUBLISH, status);
+ *     // Create a message
+ *     msg = messageCreate("GMSEC.FOO.BAR", GMSEC_PUBLISH, status);
+ *     if (statusIsError(status)) goto Error;
  *
- *     if (msg)
+ *     // Publish the message
+ *     connectionPublish(conn, msg, status);
+ *     if (statusIsError(status)) goto Error;
+ *
+ *     GMSEC_INFO("Published Message:\n%s", messageToXML(msg, NULL));
+ *
+ *     // Disconnect from the middleware server
+ *     connectionDisconnect(conn, status);
+ *     if (statusIsError(status)) goto Error;
+ *
+ *     goto Cleanup;
+ *
+ * Error:
+ *     GMSEC_ERROR("Error occurred; reason: %s", statusGet(status));
+ *
+ * Cleanup:
+ *     if (msg != NULL)
  *     {
- *         connectionPublish(conn, msg, status);
- *
+ *         // Destroy the message
  *         messageDestroy(&msg);
  *     }
  *
- *     connectionDisconnect(conn, status);
- *     connectionDestroy(&conn);
- * }
- * else
- * {
- *     printf("Error creating connection -- %s\n", statusGet(status));
+ *     if (conn != NULL)
+ *     {
+ *         // Destroy the connection 
+ *         connectionDestroy(&conn);
+ *     }
+ *
+ *     // Other clean up
+ *     statusDestroy(&status);
+ *     configDestroy(&config);
+ *
+ *     // Call shutdown routine for registered middleware(s) to
+ *     // clean up any middleware-related resources.  Currently
+ *     // only ActiveMQ users need to call this.
+ *     connectionShutdownAllMiddlewares();
+ *
+ *     return 0;
  * }
  * @endcode
  */

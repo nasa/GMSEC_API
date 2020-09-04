@@ -56,6 +56,7 @@
 #ifndef gmsec_c_configfile_c_h
 #define gmsec_c_configfile_c_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -77,7 +78,7 @@ extern "C"
 	 *
 	 * @sa DestroyConfigFile()
 	 */
-	GMSEC_API void CreateConfigFile(GMSEC_CONFIGFILE_HANDLE *cfgfile, const char *filepath, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CreateConfigFile(GMSEC_CONFIGFILE_HANDLE *cfgfile, const char *filepath, GMSEC_STATUS_HANDLE status);
 
 	/** @fn DestroyConfigFile(GMSEC_CONFIGFILE_HANDLE *cfgfile, GMSEC_STATUS_HANDLE status)
 	 *
@@ -91,7 +92,7 @@ extern "C"
 	 *
 	 * @sa CreateConfigFile()
 	 */
-	GMSEC_API void DestroyConfigFile(GMSEC_CONFIGFILE_HANDLE *cfgfile, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void DestroyConfigFile(GMSEC_CONFIGFILE_HANDLE *cfgfile, GMSEC_STATUS_HANDLE status);
 
 	/** @fn LoadConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status)
 	 *
@@ -103,7 +104,7 @@ extern "C"
 	 * @param[in]  cfgfile - ConfigFile handle
 	 * @param[out] status - out parameter operation result status
 	 */
-	GMSEC_API void LoadConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void LoadConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status);
 
 	/** @fn LoadConfigFilePath(GMSEC_CONFIGFILE_HANDLE cfgfile, const char* filePath, GMSEC_STATUS_HANDLE status)
 	 *
@@ -116,7 +117,7 @@ extern "C"
 	 * @param[in]  filePath - The relative or absolute path to the file to load
 	 * @param[out] status - out parameter operation result status
 	 */
-	GMSEC_API void LoadConfigFilePath(GMSEC_CONFIGFILE_HANDLE cfgfile, const char* filePath, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void LoadConfigFilePath(GMSEC_CONFIGFILE_HANDLE cfgfile, const char* filePath, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileSave(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *filePath, GMSEC_BOOL gbCompact, GMSEC_STATUS_HANDLE status);
 	 * 
@@ -131,7 +132,7 @@ extern "C"
 	 * @param[in]  compact - determines whether the XML output will be compacted or not
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileSave(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *filePath, GMSEC_BOOL gbCompact, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileSave(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *filePath, GMSEC_BOOL gbCompact, GMSEC_STATUS_HANDLE status);
 
 	/** @fn FromXMLConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *xml, GMSEC_STATUS_HANDLE status)
 	 *
@@ -144,7 +145,7 @@ extern "C"
 	 * @param[in]  xml - string xml input
 	 * @param[out] status - out parameter operation result status
 	 */
-	GMSEC_API void FromXMLConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *xml, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void FromXMLConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *xml, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ToXMLConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, const char **xml, GMSEC_STATUS_HANDLE status)
 	 *
@@ -157,7 +158,7 @@ extern "C"
 	 * @param[out] xml - string xml output
 	 * @param[out] status - out parameter operation result status
 	 */
-	GMSEC_API void ToXMLConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, const char **xml, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ToXMLConfigFile(GMSEC_CONFIGFILE_HANDLE cfgfile, const char **xml, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileIsLoaded(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_BOOL loaded);
 	 * 
@@ -166,7 +167,7 @@ extern "C"
 	 * @param[in]  cfgfile - ConfigFile Handle
 	 * @param[out] GMSEC_BOOL - out parameter, operation result status
 	 */
-	GMSEC_API GMSEC_BOOL ConfigFileIsLoaded(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_BOOL loaded);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_BOOL ConfigFileIsLoaded(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_BOOL loaded);
 
 	/** @fn LookupConfigFileConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_CONFIG_HANDLE cfg, GMSEC_STATUS_HANDLE status)
 	 *
@@ -204,7 +205,7 @@ extern "C"
 	 * @param[out] cfg - config that has already been created with CreateConfig()
 	 * @param[out] status - out parameter operation result status
 	 */
-	GMSEC_API void LookupConfigFileConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_CONFIG_HANDLE cfg, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void LookupConfigFileConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_CONFIG_HANDLE cfg, GMSEC_STATUS_HANDLE status);
 
 	/** @fn LookupConfigFileMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status)
 	 *
@@ -242,7 +243,7 @@ extern "C"
 	 * @param[out] msg - message that has already been created with CreateMessage()
 	 * @param[out] status - out parameter operation result status
 	 */
-	GMSEC_API void LookupConfigFileMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void LookupConfigFileMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status);
 
 	/** @fn LookupConfigFileSubscription( GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, const char **pattern, GMSEC_STATUS_HANDLE status )
 	 * @brief This function will look up a subscription pattern defined in
@@ -271,7 +272,7 @@ extern "C"
 	 * @param[out] pattern - out parameter, the pattern defined in the config file
 	 * @param[out] status - out parameter operation result status
 	 */
-	GMSEC_API void LookupConfigFileSubscription(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, const char **pattern, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void LookupConfigFileSubscription(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, const char **pattern, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileAddSubscription(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status, const char *subscription, const char *name);
 	 *
@@ -292,7 +293,7 @@ extern "C"
 	 * @param[in]  subscription - XML string representation of a gmsec Subscription.
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileAddSubscription(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, const char *subscription, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileAddSubscription(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, const char *subscription, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileAddMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status, GMSEC_MESSAGE_HANDLE message, const char *name);
 	 * 
@@ -318,7 +319,7 @@ extern "C"
 	 * @param[in]  message - gmsec message
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileAddMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_MESSAGE_HANDLE message, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileAddMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_MESSAGE_HANDLE message, GMSEC_STATUS_HANDLE status);
 
 	/** ConfigFileAddConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status, GMSEC_CONFIG_HANDLE config, const char *name);
 	 *
@@ -342,7 +343,7 @@ extern "C"
 	 * @param[in]  config - gmsec config
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileAddConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_CONFIG_HANDLE config, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileAddConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_CONFIG_HANDLE config, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileAddCustomXML(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status, const char *xml);
 	 *
@@ -365,7 +366,7 @@ extern "C"
 	 * @param[in]  xml - a custom, user-created XML string
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileAddCustomXML(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *xml, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileAddCustomXML(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *xml, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileRemoveSubscription(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status, const char *name);
 	 * 
@@ -375,7 +376,7 @@ extern "C"
 	 * @param[in]  name - name associated with the subscription
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileRemoveSubscription(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileRemoveSubscription(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileRemoveConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status, const char *name);
 	 *
@@ -385,7 +386,7 @@ extern "C"
 	 * @param[in]  name - name associated with the configuration definition
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileRemoveConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileRemoveConfig(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileRemoveMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status, const char *name);
 	 *
@@ -395,7 +396,7 @@ extern "C"
 	 * @param[in]  name - name associated with the message definition
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileRemoveMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileRemoveMessage(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *name, GMSEC_STATUS_HANDLE status);
 
 	/** @fn ConfigFileRemoveCustomXML(GMSEC_CONFIGFILE_HANDLE cfgfile, GMSEC_STATUS_HANDLE status, const char *xml);
 	 * @brief Removes the provided xml element.
@@ -404,7 +405,7 @@ extern "C"
 	 * @param[in]  xml - xml element string matching the custom xml definition
 	 * @param[out] status - out parameter, operation result status
 	 */
-	GMSEC_API void ConfigFileRemoveCustomXML(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *xml, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void ConfigFileRemoveCustomXML(GMSEC_CONFIGFILE_HANDLE cfgfile, const char *xml, GMSEC_STATUS_HANDLE status);
 
 
 #ifdef __cplusplus

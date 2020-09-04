@@ -38,6 +38,7 @@ ref class Connection;
 /// <summary>
 /// Field type identifiers
 /// </summary>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public enum class GMSECTypeDefs : UInt16
 {
 	/// <summary>field type identifier for UNSET field</summary>
@@ -90,6 +91,7 @@ public enum class GMSECTypeDefs : UInt16
 };
 
 /// <summary>GMSEC Boolean</summary>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public enum class GMSECBooleanDefs : Int16
 {
 	/// <summary>
@@ -102,6 +104,7 @@ public enum class GMSECBooleanDefs : Int16
 };
 
 /// <summary>Tracking Field Defs</summary>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public enum class GMSECMessageTrackingFieldsDefs : System::Int16
 {
 	/// <summary>GMSEC Tracking fields unset</summary>
@@ -113,6 +116,7 @@ public enum class GMSECMessageTrackingFieldsDefs : System::Int16
 };
 
 /// <summary>Message kind identifiers</summary>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public enum class GMSECMsgKindDefs : UInt16
 {
 	/// <summary>unset message kind</summary>
@@ -129,6 +133,7 @@ public enum class GMSECMsgKindDefs : UInt16
 };
 
 /// <summary>Special timeout values</summary>
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public enum class GMSECWaitDefs
 {
 	/// <summary>timeout "no wait" constant - causes methods with timeouts to not block</summary>

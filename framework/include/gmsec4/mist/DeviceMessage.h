@@ -18,6 +18,8 @@
 
 #include <gmsec4/Message.h>
 
+#include <gmsec4/util/Deprecated.h>
+
 
 namespace gmsec
 {
@@ -72,7 +74,7 @@ class GMSEC_API DeviceMessage : public Message
 	 * @param subject - The subject string for the message.
 	 * @param version - The version of the GMSEC message specification to be used.
 	 */
-	DeviceMessage(const char* subject, unsigned int version);
+	GMSEC_DEPRECATED DeviceMessage(const char* subject, unsigned int version);
 
 
 	/**
@@ -84,7 +86,7 @@ class GMSEC_API DeviceMessage : public Message
 	 * @param config - A configuration to associate with the message.
 	 * @param version - The version of the GMSEC message specification to be used.
 	 */
-	DeviceMessage(const char* subject, const Config& config, unsigned int version);
+	GMSEC_DEPRECATED DeviceMessage(const char* subject, const Config& config, unsigned int version);
 
 
 	/**
@@ -94,7 +96,7 @@ class GMSEC_API DeviceMessage : public Message
 	 *
 	 * @param other - the other DeviceMessage object to copy.
 	 */
-	DeviceMessage(const DeviceMessage& other);
+	GMSEC_DEPRECATED DeviceMessage(const DeviceMessage& other);
 
 
 	/**
@@ -104,7 +106,7 @@ class GMSEC_API DeviceMessage : public Message
 	 *
 	 * @param data - XML or JSON string used to initialize DeviceMessage.
 	 */
-	DeviceMessage(const char* data);
+	GMSEC_DEPRECATED DeviceMessage(const char* data);
 
 
 	/**
@@ -179,7 +181,7 @@ class GMSEC_API DeviceMessage : public Message
 	 *
 	 * @brief Constructs and returns a DeviceMessage from an an ordinary message.
 	 */
-	static DeviceMessage CALL_TYPE convertMessage(const Message& message);
+	GMSEC_DEPRECATED static DeviceMessage CALL_TYPE convertMessage(const Message& message);
 
 
 private:

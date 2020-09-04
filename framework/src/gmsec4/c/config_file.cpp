@@ -261,7 +261,7 @@ const char* CALL_TYPE configFileLookupSubscription(const GMSEC_ConfigFile cfgFil
 	const char* subject = NULL;
 	Status      result;
 
-	const ConfigFile* cf = reinterpret_cast<const ConfigFile*>(cfgFile);
+	ConfigFile* cf = reinterpret_cast<ConfigFile*>(cfgFile);
 
 	if (!cf)
 	{
@@ -271,9 +271,11 @@ const char* CALL_TYPE configFileLookupSubscription(const GMSEC_ConfigFile cfgFil
 	{
 		try
 		{
-			subject = cf->lookupSubscription(name);
+			const ConfigFile::SubscriptionEntry& entry = cf->lookupSubscriptionEntry(name);
+
+			subject = entry.getPattern();
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			result = Status(e);
 		}
@@ -566,4 +568,172 @@ GMSEC_ConfigFileIterator CALL_TYPE configFileGetIterator(GMSEC_ConfigFile cfgFil
 	}
 
 	return cfgIter;
+
+}
+
+
+GMSEC_SubscriptionEntry_Handle CALL_TYPE configFileLookupSubscriptionEntry(GMSEC_ConfigFile cfgFile, const char* name, GMSEC_Status status)
+{
+	GMSEC_SubscriptionEntry_Handle entry = NULL;
+	Status                         result;
+
+	ConfigFile* cf = reinterpret_cast<ConfigFile*>(cfgFile);
+
+	if (!cf)
+	{
+		result = Status(CONFIGFILE_ERROR, UNINITIALIZED_OBJECT, "ConfigFile handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			ConfigFile::SubscriptionEntry& nativeEntry =
+				const_cast<ConfigFile::SubscriptionEntry&>(cf->lookupSubscriptionEntry(name));
+
+			entry = reinterpret_cast<GMSEC_SubscriptionEntry_Handle>(&nativeEntry);
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return entry;
+}
+
+
+const char* CALL_TYPE subscriptionEntryGetName(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status)
+{
+	const char* name = NULL;
+	Status      result;
+
+	ConfigFile::SubscriptionEntry* se = reinterpret_cast<ConfigFile::SubscriptionEntry*>(subEntry);
+
+	if (!se)
+	{
+		result = Status(CONFIGFILE_ERROR, UNINITIALIZED_OBJECT, "SubscriptionEntry handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			name = se->getName();
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return name;
+}
+
+
+const char* CALL_TYPE subscriptionEntryGetPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status)
+{
+	const char* pattern = NULL;
+	Status      result;
+
+	ConfigFile::SubscriptionEntry* se = reinterpret_cast<ConfigFile::SubscriptionEntry*>(subEntry);
+
+	if (!se)
+	{
+		result = Status(CONFIGFILE_ERROR, UNINITIALIZED_OBJECT, "SubscriptionEntry handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			pattern = se->getPattern();
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return pattern;
+}
+
+
+GMSEC_BOOL CALL_TYPE subscriptionEntryHasNextExcludedPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status)
+{
+	GMSEC_BOOL flag = GMSEC_FALSE;
+	Status     result;
+
+	ConfigFile::SubscriptionEntry* se = reinterpret_cast<ConfigFile::SubscriptionEntry*>(subEntry);
+
+	if (!se)
+	{
+		result = Status(ITERATOR_ERROR, UNINITIALIZED_OBJECT, "SubscriptionEntry handle is NULL");
+	}
+	else
+	{
+		flag = (se->hasNextExcludedPattern() ? GMSEC_TRUE : GMSEC_FALSE);
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return flag;
+}
+
+
+const char* CALL_TYPE subscriptionEntryNextExcludedPattern(GMSEC_SubscriptionEntry_Handle subEntry, GMSEC_Status status)
+{
+	const char* subject = NULL;
+	Status      result;
+
+	ConfigFile::SubscriptionEntry* se = reinterpret_cast<ConfigFile::SubscriptionEntry*>(subEntry);
+
+	if (!se)
+	{
+		result = Status(CONFIGFILE_ERROR, UNINITIALIZED_OBJECT, "SubscriptionEntry handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			subject = se->nextExcludedPattern();
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return subject;
+}
+
+
+void CALL_TYPE subscriptionEntryDestroy(GMSEC_SubscriptionEntry_Handle entry)
+{
+	if (entry)
+	{
+		ConfigFile::SubscriptionEntry* se = reinterpret_cast<ConfigFile::SubscriptionEntry*>(entry);
+
+		delete se;
+	}
 }

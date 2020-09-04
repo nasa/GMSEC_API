@@ -1,18 +1,16 @@
-rem     @echo OFF
+rem @echo OFF
+
 rem Copyright 2007-2017 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
 
 
-
-
-
 rem This batch file builds everything for Microsoft Windows
 
 rem Build the main part of the API
 
-set BUILD=gmsecapi gmsec_java gmsec_jni generic_jms bolt mb MBServer dotnet libgmsec_perl gmhelp
+set BUILD=gmsecapi gmsec_java gmsec_jni generic_jms bolt mb MBServer dotnet libgmsec_python libgmsec_perl gmhelp
 
 IF DEFINED WRAPPERS (
 	set BUILD=%BUILD% %WRAPPERS%
@@ -37,18 +35,27 @@ IF DEFINED GMSEC_VC6 (
 	GOTO Perl
 )
 
+echo GMSEC_VS2010 is defined as %GMSEC_VS2010%
+echo GMSEC_VS2013 is defined as %GMSEC_VS2013%
+echo GMSEC_VS2017 is defined as %GMSEC_VS2017%
+
+IF DEFINED GMSEC_VS2017 (
+	echo Calling Microsoft Visual Studio 17.0 vcvarsall script for x64 architecture
+	call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat" x64
+)
+
 IF DEFINED GMSEC_VS2013 (
+	rmdir C:\Users\nightrun\AppData\Local\Microsoft\VisualStudio\12.0 /s /q
+	rmdir C:\Users\nightrun\AppData\Roaming\Microsoft\VisualStudio\12.0 /s /q
+	echo Calling Microsoft Visual Studio 12.0 vcvarsall script for x64 architecture
 	call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
 )
 
 IF DEFINED GMSEC_VS2010 (
+	echo Upgrading project files
 	devenv "gmsecapi_allvendors.sln" /upgrade
-	cd examples/cpp
-	devenv "cpp.sln" /upgrade
-	cd ../c
-	devenv "c.sln" /upgrade
-	cd ../cs
-	devenv "cs.sln" /upgrade
+	cd tools/utilities
+	devenv "utilities.sln" /upgrade
 	cd ../..
 )
 
@@ -75,37 +82,16 @@ nmake install
 cd ..\..
 
 
-rem Build the C++ examples
+rem Build the utilities
 
-cd examples/cpp
+cd tools/utilities
 IF DEFINED GMSEC_VC6 (
 	call "C:\tools\VC98\Bin\VCVARS32.BAT"
-	MSBuild.exe cpp.sln /t:Rebuild /p:Configuration=Release /p:"VCBuildAdditionalOptions= /useenv"
+	MSBuild.exe utilities.sln /t:Rebuild /p:Configuration=Release /p:"VCBuildAdditionalOptions= /useenv"
 ) ELSE (
-	MSBuild.exe cpp.sln /t:Rebuild /p:Configuration=Release;Platform=%MCD%
+	MSBuild.exe utilities.sln /t:Rebuild /p:Configuration=Release;Platform=%MCD%
 )
-cd ..
-
-rem Build the C examples
-
-cd c
-IF DEFINED GMSEC_VC6 (
-	call "C:\tools\VC98\Bin\VCVARS32.BAT"
-	MSBuild.exe c.sln /t:Rebuild /p:Configuration=Release /p:"VCBuildAdditionalOptions= /useenv"
-) ELSE (
-	MSBuild.exe c.sln /t:Rebuild /p:Configuration=Release;Platform=%MCD%
-)
-cd ..
-
-rem Build the C# examples
-
-cd cs
-IF DEFINED GMSEC_VS2010 (	
-	MSBuild.exe cs.sln /t:Rebuild /p:TargetFrameworkVersion=v4.0;Configuration=Release;Platform="Any CPU"
-) ELSE (
-	MSBuild.exe cs.sln /t:Rebuild /p:Configuration=Release;Platform="Any CPU"
-)
-cd ../..
+cd ..\..
 
 rem Copy validator scripts
 mkdir bin\validator

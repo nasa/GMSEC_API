@@ -37,6 +37,7 @@
 #ifndef gmsec_c_connection_c_h
 #define gmsec_c_connection_c_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -57,7 +58,7 @@ extern "C"
 	 *
 	 * @sa Disconnect()
 	 */
-	GMSEC_API void Connect(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void Connect(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn Disconnect(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status)
@@ -73,7 +74,7 @@ extern "C"
 	 *
 	 * @sa Connect()
 	 */
-	GMSEC_API void Disconnect(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void Disconnect(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn GetLibraryVersion(GMSEC_CONNECTION_HANDLE conn, char **libver, GMSEC_STATUS_HANDLE status)
@@ -88,7 +89,7 @@ extern "C"
 	 * @param[out] libver - buffer for the library version
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void GetLibraryVersion(GMSEC_CONNECTION_HANDLE conn, char **libver, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void GetLibraryVersion(GMSEC_CONNECTION_HANDLE conn, char **libver, GMSEC_STATUS_HANDLE status);
 
 	/** @fn GetLibraryRootName(GMSEC_CONNECTION_HANDLE conn, char **libname, GMSEC_STATUS_HANDLE status)
 	 * @brief This function identifies the root library name and therefore the
@@ -104,7 +105,7 @@ extern "C"
 	 * @param[out] libname - buffer for the library name
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void GetLibraryRootName(GMSEC_CONNECTION_HANDLE conn, char **libname, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void GetLibraryRootName(GMSEC_CONNECTION_HANDLE conn, char **libname, GMSEC_STATUS_HANDLE status);
 
 	/** @fn RegisterErrorCallback(GMSEC_CONNECTION_HANDLE conn, char *event, GMSEC_ERROR_CALLBACK *cb, GMSEC_STATUS_HANDLE status)
 	 *
@@ -129,7 +130,7 @@ extern "C"
 	 *
 	 * @sa GMSEC_ERROR_CALLBACK
 	 */
-	GMSEC_API void RegisterErrorCallback(GMSEC_CONNECTION_HANDLE conn, char *event, GMSEC_ERROR_CALLBACK *cb, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void RegisterErrorCallback(GMSEC_CONNECTION_HANDLE conn, char *event, GMSEC_ERROR_CALLBACK *cb, GMSEC_STATUS_HANDLE status);
 
 	/** @fn Subscribe(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_STATUS_HANDLE status)
 	 *
@@ -171,7 +172,7 @@ extern "C"
 	 *
 	 * @sa UnSubscribe()
 	 */
-	GMSEC_API void Subscribe(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void Subscribe(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn SubscribeWCallback(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status)
@@ -196,7 +197,7 @@ extern "C"
 	 *
 	 * @sa UnSubscribeWCallback()
 	 */
-	GMSEC_API void SubscribeWCallback(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void SubscribeWCallback(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn UnSubscribe(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_STATUS_HANDLE status)
@@ -211,7 +212,7 @@ extern "C"
 	 *
 	 * @sa Subscribe()
 	 */
-	GMSEC_API void UnSubscribe(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void UnSubscribe(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_STATUS_HANDLE status);
 
 	/** @fn UnSubscribeWCallback(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status)
 	 *
@@ -230,7 +231,7 @@ extern "C"
 	 *
 	 * @sa SubscribeWCallback()
 	 */
-	GMSEC_API void UnSubscribeWCallback(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void UnSubscribeWCallback(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn CreateMessageDflt(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE *msg, GMSEC_STATUS_HANDLE status)
@@ -247,7 +248,7 @@ extern "C"
 	 *
 	 * @sa DestroyMessage()
 	 */
-	GMSEC_API void CreateMessageDflt(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE *msg, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CreateMessageDflt(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE *msg, GMSEC_STATUS_HANDLE status);
 
 	/** @fn CreateMessage(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_MSG_KIND msgKind, GMSEC_MESSAGE_HANDLE *msg, GMSEC_STATUS_HANDLE status)
 	 *
@@ -265,7 +266,7 @@ extern "C"
 	 *
 	 * @sa DestroyMessage()
 	 */
-	GMSEC_API void CreateMessage(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_MSG_KIND msgKind, GMSEC_MESSAGE_HANDLE *msg, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CreateMessage(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_MSG_KIND msgKind, GMSEC_MESSAGE_HANDLE *msg, GMSEC_STATUS_HANDLE status);
 
 	/** @fn CreateMessageWCFG(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_MSG_KIND msgKind, GMSEC_MESSAGE_HANDLE *msg, GMSEC_CONFIG_HANDLE config, GMSEC_STATUS_HANDLE status)
 	 *
@@ -284,7 +285,7 @@ extern "C"
 	 *
 	 * @sa DestroyMessage()
 	 */
-	GMSEC_API void CreateMessageWCFG(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_MSG_KIND msgKind, GMSEC_MESSAGE_HANDLE *msg, GMSEC_CONFIG_HANDLE config, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CreateMessageWCFG(GMSEC_CONNECTION_HANDLE conn, char *subject, GMSEC_MSG_KIND msgKind, GMSEC_MESSAGE_HANDLE *msg, GMSEC_CONFIG_HANDLE config, GMSEC_STATUS_HANDLE status);
 
 	/** @fn CloneMessage(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE in, GMSEC_MESSAGE_HANDLE *out, GMSEC_STATUS_HANDLE status)
 	 *
@@ -302,7 +303,7 @@ extern "C"
 	 * @param[out] status - out parameter operation status
 	 *
 	 */
-	GMSEC_API void CloneMessage(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE in, GMSEC_MESSAGE_HANDLE *out, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CloneMessage(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE in, GMSEC_MESSAGE_HANDLE *out, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn DestroyMessage(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status)
@@ -320,7 +321,7 @@ extern "C"
 	 *     CreateMessage()	@n
 	 *     CreateMessageWCFG()
 	 */
-	GMSEC_API void DestroyMessage(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void DestroyMessage(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn Publish(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status)
@@ -334,7 +335,7 @@ extern "C"
 	 * @param[in]  msg - Message handle to send
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void Publish(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void Publish(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn RequestWCallback(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status)
@@ -352,7 +353,7 @@ extern "C"
 	 * @param[in]  cb - Callback function pointer
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void RequestWCallback(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void RequestWCallback(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_CALLBACK *cb, GMSEC_STATUS_HANDLE status);
 
 	/** @fn RequestWReplyCallback(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_REPLY_CALLBACK *cb, GMSEC_ERROR_CALLBACK *er, GMSEC_STATUS_HANDLE status)
 	 *
@@ -370,7 +371,7 @@ extern "C"
 	 * @param[in]  er - Error Callback function pointer
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void RequestWReplyCallback(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_REPLY_CALLBACK *cb, GMSEC_ERROR_CALLBACK *er, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void RequestWReplyCallback(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_REPLY_CALLBACK *cb, GMSEC_ERROR_CALLBACK *er, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn Request(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_MESSAGE_HANDLE *reply, GMSEC_STATUS_HANDLE status)
@@ -388,7 +389,7 @@ extern "C"
 	 * @param[out] reply - pointer to Message handle for reply message
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void Request(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_MESSAGE_HANDLE *reply, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void Request(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request, GMSEC_I32 timeout, GMSEC_MESSAGE_HANDLE *reply, GMSEC_STATUS_HANDLE status);
 
 	/** @fn Reply(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request,GMSEC_MESSAGE_HANDLE reply, GMSEC_STATUS_HANDLE status)
 	 *
@@ -402,7 +403,7 @@ extern "C"
 	 * @param[in]  reply - Message handle to reply message
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void Reply(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request,GMSEC_MESSAGE_HANDLE reply, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void Reply(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE request,GMSEC_MESSAGE_HANDLE reply, GMSEC_STATUS_HANDLE status);
 
 	/** @fn StartAutoDispatch(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status)
 	 *
@@ -419,7 +420,7 @@ extern "C"
 	 *
 	 * @sa StopAutoDispatch()
 	 */
-	GMSEC_API void StartAutoDispatch(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void StartAutoDispatch(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn StopAutoDispatch(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status)
@@ -434,7 +435,7 @@ extern "C"
 	 *
 	 * @sa StartAutoDispatch()
 	 */
-	GMSEC_API void StopAutoDispatch(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void StopAutoDispatch(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn GetNextMsg(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE *msg, GMSEC_I32 timeout, GMSEC_STATUS_HANDLE status)
@@ -454,7 +455,7 @@ extern "C"
 	 * @param[in]  timeout - time to wait
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void GetNextMsg(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE *msg, GMSEC_I32 timeout, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void GetNextMsg(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE *msg, GMSEC_I32 timeout, GMSEC_STATUS_HANDLE status);
 
 	/** @fn IsConnected(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status)
 	 *
@@ -468,7 +469,7 @@ extern "C"
 	 * @param[in]  conn - Connection handle
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API int IsConnected(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API int IsConnected(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
 
 	/** @fn DispatchMsg(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status)
 	 *
@@ -482,7 +483,7 @@ extern "C"
 	 * @param[out] msg - Message handle to be dispatched
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void DispatchMsg(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void DispatchMsg(GMSEC_CONNECTION_HANDLE conn, GMSEC_MESSAGE_HANDLE msg, GMSEC_STATUS_HANDLE status);
 
 
 	/** @fn GetLastDispatcherStatus( GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status )
@@ -501,7 +502,7 @@ extern "C"
 	 * @param[in]  conn - Connection handle
 	 * @param[out] status - out parameter operation status
 	 */
-	GMSEC_API void GetLastDispatcherStatus(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void GetLastDispatcherStatus(GMSEC_CONNECTION_HANDLE conn, GMSEC_STATUS_HANDLE status);
 
 #ifdef __cplusplus
 }	// extern "C"

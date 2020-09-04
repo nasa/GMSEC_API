@@ -20,6 +20,7 @@
 #define gmsec_util_Atomics_h
 
 #include <gmsec_defs.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/Mutex.h>
 
 
@@ -37,7 +38,7 @@ public:
 	*	
 	*	@param initialValue - The initial value of the object
 	*/
-	AtomicInteger(int initialValue);
+	GMSEC_DEPRECATED AtomicInteger(int initialValue);
 
 	/*	@fn ~AtomicInteger()
 	*
@@ -164,7 +165,7 @@ public:
 	*	
 	*	@param initialValue - The initial value of the object
 	*/
-	AtomicBoolean(bool initialValue = false);
+	GMSEC_DEPRECATED AtomicBoolean(bool initialValue = false);
 
 	/*	@fn ~AtomicBoolean()
 	*
@@ -225,7 +226,7 @@ public:
 	*	
 	*	@param initialValue - The initial value of the object
 	*/
-	AtomicLong(long initialValue);
+	GMSEC_DEPRECATED AtomicLong(long initialValue);
 
 	/*	@fn ~AtomicLong()
 	*
@@ -323,7 +324,7 @@ private:
 	gmsec::util::Mutex mutex;
 };
 
-GMSEC_I32 GMSEC_API syncAddAndFetch(volatile GMSEC_I32 *p, GMSEC_I32 n);
+GMSEC_DEPRECATED GMSEC_I32 GMSEC_API syncAddAndFetch(volatile GMSEC_I32 *p, GMSEC_I32 n);
 
 }
 }

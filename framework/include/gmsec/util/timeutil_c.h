@@ -23,6 +23,7 @@
 #define gmsec_util_timeutil_c_h
 
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -32,7 +33,7 @@ extern "C"
 #endif
 
 
-	GMSEC_API void CALL_TYPE gmsec_FormatTime_s(double time_s, char *buffer);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE gmsec_FormatTime_s(double time_s, char *buffer);
 
 
 #ifdef __cplusplus

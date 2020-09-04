@@ -22,6 +22,7 @@
 
 #include <gmsec4_defs.h>
 
+#include <gmsec4/util/Deprecated.h>
 #include <gmsec4/util/wdllexp.h>
 
 #include <stddef.h>
@@ -255,7 +256,7 @@ extern "C"
 	 *
 	 * @sa productFileMessageGetNumProductFiles
 	 */
-	GMSEC_API const GMSEC_ProductFile productFileMessageGetProductFile(const GMSEC_Message msg, size_t index, GMSEC_Status status);
+	GMSEC_DEPRECATED GMSEC_API const GMSEC_ProductFile productFileMessageGetProductFile(const GMSEC_Message msg, size_t index, GMSEC_Status status);
 
 
 	/**

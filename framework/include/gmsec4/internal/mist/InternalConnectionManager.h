@@ -92,6 +92,9 @@ public:
 	void CALL_TYPE setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields);
 
 
+	const gmsec::api::util::DataList<Field*>& CALL_TYPE getStandardFields() const;
+
+
 	void CALL_TYPE addStandardFields(Message& msg) const;
 
 

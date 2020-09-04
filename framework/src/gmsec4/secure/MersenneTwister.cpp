@@ -58,6 +58,8 @@
 
 #include <gmsec4/secure/Random.h>
 
+#include <gmsec4/ConfigOptions.h>
+
 #include <gmsec4/util/Log.h>
 #include <gmsec4/util/TimeUtil.h>
 
@@ -111,7 +113,7 @@ Status MersenneTwister::initialize(const Config &config)
 	Status localStatus;
 	DataBuffer seed;
 
-	const char* value = config.getValue("SEC-RANDOM-SEED-NUMBER");
+	const char* value = config.getValue(GMSEC_RANDOM_SEED_NUMBER);
 	if (value)
 	{
 		GMSEC_I32 tmp = 0;
@@ -126,14 +128,14 @@ Status MersenneTwister::initialize(const Config &config)
 		}
 	}
 
-	value = config.getValue("SEC-RANDOM-SEED-STRING");
+	value = config.getValue(GMSEC_RANDOM_SEED_STRING);
 	if (value)
 	{
 		seed.reset((const DataBuffer::data_t *) value, StringUtil::stringLength(value), false);
 		return setSeed(seed);
 	}
 
-	value = config.getValue("SEC-RANDOM-SEED-CRYPT");
+	value = config.getValue(GMSEC_RANDOM_SEED_CRYPT);
 	if (value)
 	{
 		GMSEC_I32 bytes = 0;

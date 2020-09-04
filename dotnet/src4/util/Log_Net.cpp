@@ -35,19 +35,31 @@ LoggingLevel Log::GetReportingLevel()
 
 void Log::RegisterHandler(LogHandler^ handler)
 {
-	THROW_EXCEPTION_IF_NULLPTR(handler, StatusClass::OTHER_ERROR, StatusCode::INVALID_CALLBACK, "LogHandler is null");
-	THROW_EXCEPTION_IF_NULLPTR(handler->GetUnmanagedImplementation(), StatusClass::OTHER_ERROR, StatusCode::INVALID_CALLBACK, "LogHandler implementation is null");
+	if (handler == nullptr)
+	{
+		gmsec::api::util::Log::registerHandler(reinterpret_cast<gmsec::api::util::LogHandler*>(NULL));
+	}
+	else
+	{
+		THROW_EXCEPTION_IF_NULLPTR(handler->GetUnmanagedImplementation(), StatusClass::OTHER_ERROR, StatusCode::INVALID_CALLBACK, "LogHandler implementation is null");
 
-	gmsec::api::util::Log::registerHandler(handler->GetUnmanagedImplementation());
+		gmsec::api::util::Log::registerHandler(handler->GetUnmanagedImplementation());
+	}
 }
 
 
 void Log::RegisterHandler(LoggingLevel level, LogHandler^ handler)
 {
-	THROW_EXCEPTION_IF_NULLPTR(handler, StatusClass::OTHER_ERROR, StatusCode::INVALID_CALLBACK, "LogHandler is null");
-	THROW_EXCEPTION_IF_NULLPTR(handler->GetUnmanagedImplementation(), StatusClass::OTHER_ERROR, StatusCode::INVALID_CALLBACK, "LogHandler implementation is null");
+	if (handler == nullptr)
+	{
+		gmsec::api::util::Log::registerHandler(static_cast<LogLevel>(level), reinterpret_cast<gmsec::api::util::LogHandler*>(NULL));
+	}
+	else
+	{
+		THROW_EXCEPTION_IF_NULLPTR(handler->GetUnmanagedImplementation(), StatusClass::OTHER_ERROR, StatusCode::INVALID_CALLBACK, "LogHandler implementation is null");
 
-	gmsec::api::util::Log::registerHandler(static_cast<LogLevel>(level), handler->GetUnmanagedImplementation());
+		gmsec::api::util::Log::registerHandler(static_cast<LogLevel>(level), handler->GetUnmanagedImplementation());
+	}
 }
 
 

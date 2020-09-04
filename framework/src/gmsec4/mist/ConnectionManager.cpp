@@ -94,6 +94,12 @@ void ConnectionManager::setStandardFields(const gmsec::api::util::DataList<Field
 }
 
 
+const gmsec::api::util::DataList<Field*>& ConnectionManager::getStandardFields() const
+{
+	return m_internal->getStandardFields();
+}
+
+
 void ConnectionManager::addStandardFields(Message& msg) const
 {
 	m_internal->addStandardFields(msg);

@@ -110,7 +110,7 @@
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
-	        TYPE="UNSET"
+	        TYPE="VARIABLE"
 	        DESCRIPTION="Value of the named parameter being reported. Component must ascertain the data type before accessing the value (e.g. with a function call).  Of type 'Variable' in the GMSEC ISD."/>
 	<FIELD	NAME="ARRAY-END"
 			MODE="CONTROL"

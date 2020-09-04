@@ -1,3 +1,4 @@
+<!-- See Section 5.6.1.2 of the GMSEC Users Guide for more information  -->
 <DIRECTORY NAME="2016.00">
 	<SCHEMA NAME="HEADER"
 			DEFINITION="MESSAGE-TYPE.MESSAGE-SUBTYPE"
@@ -14,7 +15,7 @@
 	<SCHEMA NAME="MSG.LOG"
 			DEFINITION="MESSAGE-TYPE.MESSAGE-SUBTYPE"
 			LEVEL-0="GMSEC"
-			DESCRIPTION="Log Message (If it wasn't obvious enough for you)"/>
+			DESCRIPTION="Log Message"/>
 	<SCHEMA NAME="MSG.MVAL"
 			DEFINITION="MESSAGE-TYPE.MESSAGE-SUBTYPE"
 			LEVEL-0="GMSEC"

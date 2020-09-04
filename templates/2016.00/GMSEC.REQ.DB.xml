@@ -1,3 +1,5 @@
+<!-- Database Attributes Request Message -->
+<!-- See Table 5-105 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.REQ.DB">
 	<FIELD  NAME="ATTRIBUTE-TYPE"
 	        MODE="REQUIRED"
@@ -28,7 +30,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE="TAC"
 	        TYPE="STRING"
-	        DESCRIPTION="Product type and subtype being requested. (See Table 4-29. Product Categories... Value is TAC:  Telemetry and Command)"/>
+	        DESCRIPTION="Product type and subtype being requested. (See Table 4-21. Product Categories... Value is TAC:  Telemetry and Command)"/>
 	<FIELD  NAME="PROD-SUBTYPE"
 	        MODE="OPTIONAL"
 	        FIELD_CLASS="STANDARD"
@@ -107,7 +109,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="NAME of the first mnemonic"/>
+	        DESCRIPTION="NAME of the nth mnemonic"/>
 	<FIELD	NAME="ARRAY-END"
 			MODE="CONTROL"
 			DESCRIPTION="Control field indicating the end of an array of object fields"/>

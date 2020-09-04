@@ -16,6 +16,7 @@
 #include "ConnectionMgr.h"
 
 #include "ConnMgrCallback.h"
+#include "MBConnection.h"
 #include "MBFastMessage.h"
 #include "MBResourceData.h"
 #include "MBService.h"
@@ -173,8 +174,9 @@ void ConnectionMgr::run()
 			// publish a new message
 			{
 				Message* msg = NULL;
+				Config   msgConfig;
 
-				MBWire::deserialize(inBuff, buffLen, msg);
+				MBWire::deserialize(inBuff, buffLen, msg, msgConfig);
 
 				if (msg == NULL)
 				{
@@ -187,7 +189,7 @@ void ConnectionMgr::run()
 						// We got a request for MBServer resource data,
 						// so call doResourceMessage() to retrieve this data and send
 						// message.
-						doResourceMessage(inBuff, buffLen);
+						doResourceMessage(*msg);
 					}
 					else
 					{
@@ -208,7 +210,7 @@ void ConnectionMgr::run()
 			break;
 
 		case CMD_NLOOP:
-			m_isLoopingMsgs = 0;
+			m_isLoopingMsgs = false;
 			break;
 
 		default:
@@ -261,103 +263,49 @@ void ConnectionMgr::sendMsgToClient(MBFastMessage* msg)
 }
 
 
-void ConnectionMgr::doResourceMessage(const char* buffer, int bufLength)
+void ConnectionMgr::doResourceMessage(const Message& request)
 {
-	// Note: When a message is sent to the MBServer the message is has
-	// has the "unique_id" appended to the message in addition to the
-	// message containing the "unique_id".  This is done for processing
-	// purposes when using redudant MBServers.
-
-	// Figure out the message size without the appended "unique_id".
-	size_t i = bufLength - 2;
-	for (; buffer[i] != '\0'; i--)
+	try
 	{
-		if (i == 0)
-		{
-			break;
-		}
-	}
+		std::string requestSubject = request.getSubject();
+		std::string routingSubject = request.getStringValue(MB_MY_SUBJECT_FIELD_NAME);
 
-	size_t noUidLength = i;
+		size_t      dirPos         = requestSubject.find("REQ");
+		std::string replySubject   = requestSubject.replace(dirPos, 3, "RESP");
 
-	// Get the pointer to the MBResourceData object.
-	MBResourceData* MBRsrcDataCollector = m_mbService->getMBResourceDataInstance();
+		// Get the pointer to the MBResourceData object.
+		MBResourceData* MBRsrcDataCollector = m_mbService->getMBResourceDataInstance();
 
-	// Get the resource data to be placed into the reply message that
-	// gets sent back to System Agent.
-	//
-	GMSEC_U32 total_bytes_rcvd = MBRsrcDataCollector->getBytesRcvd();
-	GMSEC_U32 total_bytes_sent = MBRsrcDataCollector->getBytesSent();
-	GMSEC_U32 total_msgs_rcvd  = MBRsrcDataCollector->getMsgsRcvd();
-	GMSEC_U32 total_msgs_sent  = MBRsrcDataCollector->getMsgsSent();
+		// Get the resource data to be placed into the reply message that
+		// gets sent back to System Agent.
+		//
+		GMSEC_U32 total_bytes_rcvd = MBRsrcDataCollector->getBytesRcvd();
+		GMSEC_U32 total_bytes_sent = MBRsrcDataCollector->getBytesSent();
+		GMSEC_U32 total_msgs_rcvd  = MBRsrcDataCollector->getMsgsRcvd();
+		GMSEC_U32 total_msgs_sent  = MBRsrcDataCollector->getMsgsSent();
 
+		Message* rsrcMsg = new Message(replySubject.c_str(), Message::REPLY);
 
-	Message* rsrcMsg = NULL;
-
-	MBWire::deserialize(buffer, noUidLength, rsrcMsg);
-
-	if (rsrcMsg != NULL)
-	{
-		MessageBuddy::getInternal(*rsrcMsg).setKind(Message::REPLY);
+		char currentTime[GMSEC_TIME_BUFSIZE];
+		TimeUtil::formatTime(TimeUtil::getCurrentTime(), currentTime);
 
 		rsrcMsg->addField("BYTES-RECEIVED", total_bytes_rcvd);
 		rsrcMsg->addField("BYTES-SENT",     total_bytes_sent);
 		rsrcMsg->addField("MSGS-RECEIVED",  total_msgs_rcvd);
 		rsrcMsg->addField("MSGS-SENT",      total_msgs_sent);
 
-		const StringField* uniqueID = dynamic_cast<const StringField*>(rsrcMsg->getField("UNIQUE-ID"));
-		const char*        uid      = NULL;
+		rsrcMsg->addField("COMPONENT", "MBServer");
+		rsrcMsg->addField(MB_MY_SUBJECT_FIELD_NAME, routingSubject.c_str());
+		rsrcMsg->addField("PUBLISH-TIME", currentTime);
+		rsrcMsg->addField(request.getStringField("REPLY-UNIQUE-ID"));
+		rsrcMsg->addField("RESPONSE-STATUS", (short) 3);
 
-		if (uniqueID != NULL)
-		{
-			uid = uniqueID->getValue();
-		}
-
-		// Serialize the reply message so it can be sent over the socket.
-		// TODO: Change all int size variables (and methods that are called) to use size_t
-		char*  serialBuf     = 0;
-		size_t serialBufSize = 0;
-
-		char*  mbMsgBuffer   = 0;
-		size_t mbMsgLength   = 0;
-
-		MBWire::serialize(*rsrcMsg, serialBuf, serialBufSize);
-
-		if (uid == NULL)
-		{
-			mbMsgBuffer = serialBuf;
-			mbMsgLength = serialBufSize;
-		}
-		else
-		{
-			size_t uidlen = strlen(uid);
-
-			mbMsgLength = serialBufSize + 1 + uidlen + 1;
-			mbMsgBuffer = new char[mbMsgLength];
-
-			StringUtil::copyBytes(mbMsgBuffer, serialBuf, serialBufSize);
-			mbMsgBuffer[serialBufSize] = '\0';
-			StringUtil::copyBytes(mbMsgBuffer + serialBufSize + 1, uid, uidlen + 1);
-			mbMsgBuffer[mbMsgLength - 1] = '\0';
-
-			delete [] serialBuf;
-		}
-
-		Message* newMsg = NULL;
-		MBWire::deserialize(mbMsgBuffer, mbMsgLength, newMsg);
-
-		if (newMsg != NULL)
-		{
-			// Put the reply message in the message queue for sending.
-			sendMsgToClient(new MBFastMessage(newMsg, this));
-		}
-
-		delete [] mbMsgBuffer;
-		delete rsrcMsg;
+		// Put the reply message in the message queue for sending.
+		sendMsgToClient(new MBFastMessage(rsrcMsg, this));
 	}
-	else
+	catch (const Exception& e)
 	{
-		GMSEC_WARNING << "Failed to deserialize resource message";
+		GMSEC_WARNING << "Unable to reply with resource message; reason: " << e.what();
 	}
 }
 

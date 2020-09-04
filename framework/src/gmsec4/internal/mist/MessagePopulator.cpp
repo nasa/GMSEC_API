@@ -38,6 +38,7 @@
 
 #include <gmsec4/util/DataList.h>
 #include <gmsec4/util/Log.h>
+#include <gmsec4/internal/SystemUtil.h>
 #include <gmsec4/util/TimeUtil.h>
 
 #include <gmsec4/internal/StringUtil.h>
@@ -93,6 +94,7 @@ void MessagePopulator::populateSimpleServiceMessage(Message &msg, const char * o
 	if(m_specVersion == GMSEC_ISD_2014_00){
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2012);
 		msg.addField("NUM-OF-PARAMS", (GMSEC_I16) sParams.size());
+		msg.addField(MSG_ID_STRING, generateUniqueID().c_str());
 	}else if(m_specVersion == GMSEC_ISD_2016_00){
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
 		msg.addField("NUM-OF-PARAMS", (GMSEC_U16) sParams.size());
@@ -169,8 +171,7 @@ void MessagePopulator::populateDirective(Message &msg, const Field& directiveStr
 
 	if(m_specVersion == GMSEC_ISD_2014_00){
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 1.0);
-		//MSG-ID required in pre-2016 specifications, autopopulate with MSG subject
-		msg.addField(MSG_ID_STRING, msg.getSubject());
+		msg.addField(MSG_ID_STRING, generateUniqueID().c_str());
 	}else if(m_specVersion == GMSEC_ISD_2016_00){
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
 	}else{
@@ -215,6 +216,12 @@ void MessagePopulator::setStandardFields(const DataList<Field*>& standardFields)
 			GMSEC_WARNING << "Field within DataList of standard fields is NULL";
 		}
 	}
+}
+
+
+const gmsec::api::util::DataList<Field*>& MessagePopulator::getStandardFields() const
+{
+	return m_standardFieldsAllMsgs;
 }
 
 
@@ -564,6 +571,7 @@ void MessagePopulator::populateSimpleServiceAck(Message &msg, ResponseStatus::Re
 
 	if(m_specVersion == GMSEC_ISD_2014_00){
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2012.0);
+		msg.addField(MSG_ID_STRING, generateUniqueID().c_str());
 	}else if(m_specVersion == GMSEC_ISD_2016_00){
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
 	}else{
@@ -593,6 +601,7 @@ void MessagePopulator::populateDirectiveAck(Message &msg, ResponseStatus::Respon
 
 	if(m_specVersion == GMSEC_ISD_2014_00){
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 1.0);
+		msg.addField(MSG_ID_STRING, generateUniqueID().c_str());
 	}else if(m_specVersion == GMSEC_ISD_2016_00){
 		msg.addField(CONTENT_VERSION_STRING, (GMSEC_F32) 2016);
 	}else{
@@ -631,11 +640,24 @@ void MessagePopulator::populateResourceStaticMembers(Message &msg, size_t counte
 		GMSEC_WARNING << "Specification version unknown: " << m_specVersion << ", unable to autopopulate CONTENT-VERSION"
 			<< " in Resource message";
 	}
-
-	
 }
 
-const gmsec::api::util::DataList<Field*>& MessagePopulator::getStandardFields() const
+
+std::string MessagePopulator::generateUniqueID()
 {
-	return m_standardFieldsAllMsgs;
+	std::ostringstream oss;
+	std::string user;
+	std::string host;
+
+	SystemUtil::getUserName(user);
+	SystemUtil::getHostName(host);
+
+	oss << user << "." 
+		<< host << "."
+		<< SystemUtil::getProcessID() << "."
+		<< TimeUtil::getCurrentTime().nanoseconds;
+
+	std::string subject = oss.str();
+
+	return subject;
 }

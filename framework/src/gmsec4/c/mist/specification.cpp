@@ -216,7 +216,11 @@ const char* CALL_TYPE specificationGetTemplateXML(GMSEC_Specification spec, cons
 	}
 	else
 	{
+		GMSEC_DISABLE_DEPRECATED_WARNINGS
+
 		xml = s->getTemplateXML(subject, schemaID);
+
+		GMSEC_ENABLE_DEPRECATED_WARNINGS
 	}
 
 	if (status)

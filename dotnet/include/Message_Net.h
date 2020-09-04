@@ -103,6 +103,7 @@ ref class Connection;
 /// </example>
 /// <seealso cref="Connection" />
 /// <seealso cref="Field" />
+[Obsolete("API 3.x has been deprecated; use API 4.x instead.")]
 public ref class Message
 {
 private:

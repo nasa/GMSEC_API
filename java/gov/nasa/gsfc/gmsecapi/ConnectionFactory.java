@@ -15,9 +15,12 @@ package gov.nasa.gsfc.gmsecapi;
 /**
  * @class ConnectionFactory
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This is the class for creating and destroying connections.
  *
  */
+@Deprecated
 public class ConnectionFactory
 {
 	// Do not allow instantiations of this class.

@@ -333,6 +333,8 @@ typedef void* GMSEC_ConfigFile;
 typedef void* GMSEC_ConfigFileIterator;
 
 
+typedef void* GMSEC_SubscriptionEntry_Handle;
+
 /**
  * @typedef GMSEC_Connection
  *

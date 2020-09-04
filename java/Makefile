@@ -177,7 +177,7 @@ $(BINDIR)/$(TARGET): $(OBJECTS_3x) $(OBJECTS_4x)
 
 
 $(OBJDIR_3x)/%.o: $(OBJDIR_3x)/%.cpp
-	$(CXX) -c $(API_CXXFLAGS) $< -o $@
+	$(CXX) -c -w $(API_CXXFLAGS) $< -o $@
 
 
 $(OBJDIR_4x)/%.o: $(OBJDIR_4x)/%.cpp

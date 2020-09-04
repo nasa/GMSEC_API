@@ -1,3 +1,5 @@
+<!-- Short Description Response Message -->
+<!-- See Table 5-113 of the 2016 GMSEC Interface Specification Document for more information -->
 <SCHEMA NAME="2016.00.GMSEC.RESP.DB.4">
 	<FIELD  NAME="RESPONSE-STATUS"
 	        MODE="REQUIRED"
@@ -51,7 +53,7 @@
 	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
-	        DESCRIPTION="Short Description for mnemonic"/>
+	        DESCRIPTION="Short Description for mnemonic n"/>
 	<FIELD	NAME="ARRAY-END"
 			MODE="CONTROL"
 			DESCRIPTION="Control field indicating the end of an array of object fields"/>

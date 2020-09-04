@@ -19,6 +19,7 @@
 
 #include <gmsec/FieldIterator.h>
 #include <gmsec/Config.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -418,7 +419,7 @@ public:
 	 *
 	 * @return current date/time in GMSEC standard format
 	 */
-	static const char * CALL_TYPE GetTime();
+	GMSEC_DEPRECATED static const char * CALL_TYPE GetTime();
 
 	/** @fn LookupKind( const char *kind )
 	 * @brief Lookup a standard message kind identifier by string name. The valid strings
@@ -429,7 +430,7 @@ public:
 	 *
 	 * @sa GMSEC_MSG_KIND
 	 */
-	static GMSEC_MSG_KIND LookupKind(const char *kind);
+	GMSEC_DEPRECATED static GMSEC_MSG_KIND LookupKind(const char *kind);
 
 	/** @fn Reset(FieldIterator &iter)
 	 * @brief Resets a field iterator object to start from the beginning of a message's

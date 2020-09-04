@@ -19,8 +19,9 @@
 #include <gmsec4/mist/message/MistMessage.h>
 
 #include <gmsec4/mist/ProductFile.h>
-
 #include <gmsec4/mist/mist_defs.h>
+
+#include <gmsec4/util/Deprecated.h>
 
 
 namespace gmsec
@@ -49,48 +50,27 @@ namespace message
  *
  * @brief A MistMessage object that is capable of storing ProductFile objects
  * The following message schema IDs and their templates are supported: @n
- * 2014.00.GMSEC.MSG.PROD.AAA @n
- * 2014.00.GMSEC.MSG.PROD.AUTO @n
- * 2014.00.GMSEC.MSG.PROD.FD @n
- * 2014.00.GMSEC.MSG.PROD.MAS @n
- * 2014.00.GMSEC.MSG.PROD.PAS @n
- * 2014.00.GMSEC.MSG.PROD.SC @n
- * 2014.00.GMSEC.MSG.PROD.TAC @n
- * 2014.00.GMSEC.REQ.PROD.AAA @n
- * 2014.00.GMSEC.REQ.PROD.AUTO @n
- * 2014.00.GMSEC.REQ.PROD.FD @n
- * 2014.00.GMSEC.REQ.PROD.MAS @n
- * 2014.00.GMSEC.REQ.PROD.PAS @n
- * 2014.00.GMSEC.REQ.PROD.SC @n
- * 2014.00.GMSEC.REQ.PROD.TAC @n
- * 2014.00.GMSEC.RESP.PROD.AAA @n
- * 2014.00.GMSEC.RESP.PROD.AUTO @n
- * 2014.00.GMSEC.RESP.PROD.FD @n
- * 2014.00.GMSEC.RESP.PROD.MAS @n
- * 2014.00.GMSEC.RESP.PROD.PAS @n
- * 2014.00.GMSEC.RESP.PROD.SC @n
- * 2014.00.GMSEC.RESP.PROD.TAC @n
- * 2016.00.GMSEC.MSG.PROD.AAA @n
- * 2016.00.GMSEC.MSG.PROD.AUTO @n
- * 2016.00.GMSEC.MSG.PROD.FD @n
- * 2016.00.GMSEC.MSG.PROD.MAS @n
- * 2016.00.GMSEC.MSG.PROD.PAS @n
- * 2016.00.GMSEC.MSG.PROD.SC @n
- * 2016.00.GMSEC.MSG.PROD.TAC @n
- * 2016.00.GMSEC.REQ.PROD.AAA @n
- * 2016.00.GMSEC.REQ.PROD.AUTO @n
- * 2016.00.GMSEC.REQ.PROD.FD @n
- * 2016.00.GMSEC.REQ.PROD.MAS @n
- * 2016.00.GMSEC.REQ.PROD.PAS @n
- * 2016.00.GMSEC.REQ.PROD.SC @n
- * 2016.00.GMSEC.REQ.PROD.TAC @n
- * 2016.00.GMSEC.RESP.PROD.AAA @n
- * 2016.00.GMSEC.RESP.PROD.AUTO @n
- * 2016.00.GMSEC.RESP.PROD.FD @n
- * 2016.00.GMSEC.RESP.PROD.MAS @n
- * 2016.00.GMSEC.RESP.PROD.PAS @n
- * 2016.00.GMSEC.RESP.PROD.SC @n
- * 2016.00.GMSEC.RESP.PROD.TAC
+ * MSG.PROD.AAA @n
+ * MSG.PROD.AUTO @n
+ * MSG.PROD.FD @n
+ * MSG.PROD.MAS @n
+ * MSG.PROD.PAS @n
+ * MSG.PROD.SC @n
+ * MSG.PROD.TAC @n
+ * REQ.PROD.AAA @n
+ * REQ.PROD.AUTO @n
+ * REQ.PROD.FD @n
+ * REQ.PROD.MAS @n
+ * REQ.PROD.PAS @n
+ * REQ.PROD.SC @n
+ * REQ.PROD.TAC @n
+ * RESP.PROD.AAA @n
+ * RESP.PROD.AUTO @n
+ * RESP.PROD.FD @n
+ * RESP.PROD.MAS @n
+ * RESP.PROD.PAS @n
+ * RESP.PROD.SC @n
+ * RESP.PROD.TAC @n
  *
  * @sa Message @n
  *	   MistMessage @n
@@ -156,6 +136,7 @@ public:
 	* @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
 	* @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
 	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
+	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
 	* @param spec - A reference to the specification this message's schema will adhere to.
 	* 
 	* @throw An exception is thrown if Specification fails to load the template directory or if schemaID is not a valid ID.
@@ -174,6 +155,7 @@ public:
 	* @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
 	* @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
 	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
+	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
 	* @param config  - A configuration to associate with the message.
 	* @param spec - A reference to the specification this message's schema will adhere to.
 	*
@@ -236,14 +218,19 @@ public:
 	/**
 	 * @fn const ProductFile getProductFile(size_t index) const
 	 *
-	 * @brief Get ProductFile numbered at index.
+	 * @brief Get ProductFile numbered at index. Note that the index which will be
+	 * retrieved does not correspond to the GMSEC ISD and starts from 0 instead of 1.
+	 * For example, getProductFile(0) would return the ProductFile corresponding to
+	 * FILE.1.
 	 *
 	 * @return ProductFile at specified index inside of ProductFileMessage.
 	 *
 	 * @throw Throws an exception if the index specified is not in the
 	 *        range of ProductFiles in this message.
+	 *
+	 * @note This function has been deprecated, use ProductFileIterator instead.
 	 */
-	const ProductFile& CALL_TYPE getProductFile(size_t index) const;
+	GMSEC_DEPRECATED const ProductFile& CALL_TYPE getProductFile(size_t index) const;
 
 
 	/**

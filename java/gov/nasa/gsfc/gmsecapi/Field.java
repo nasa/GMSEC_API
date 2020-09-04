@@ -12,9 +12,12 @@ package gov.nasa.gsfc.gmsecapi;
 
 /** @class Field
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief This is the base class for GMSEC message fields.
  *
  */
+@Deprecated
 public class Field
 {
 	protected static final int DEFAULT_XML_FIELD_SIZE = 150;

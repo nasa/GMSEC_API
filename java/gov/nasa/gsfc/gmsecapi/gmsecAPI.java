@@ -16,9 +16,12 @@ package gov.nasa.gsfc.gmsecapi;
 /** 
  * @class gmsecAPI
  *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
  * @brief The constants needed for the GMSEC API are in this file.
  *
  */
+@Deprecated
 public class gmsecAPI
 {
 	/**

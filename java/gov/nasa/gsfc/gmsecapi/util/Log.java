@@ -16,9 +16,11 @@ import gov.nasa.gsfc.gmsecapi.jni.*;
 
 /**
  * @class Log
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
  * @brief Basic logging class. This class supports basic logging to any output
  *        stream. This class is thread-safe.
  */
+@Deprecated
 public class Log
 {
 	/** @fn SetReportingLevel(int level)

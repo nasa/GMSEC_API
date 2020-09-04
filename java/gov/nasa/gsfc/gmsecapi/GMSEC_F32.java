@@ -14,10 +14,13 @@
 package gov.nasa.gsfc.gmsecapi;
 
 /** @class GMSEC_F32
-*
-* @brief This is a container class for the GMSEC 32-bit floating-point field type.
-*
-*/
+ *
+ * @deprecated API 3.x has been deprecated; use API 4.x instead.
+ *
+ * @brief This is a container class for the GMSEC 32-bit floating-point field type.
+ *
+ */
+@Deprecated
 public class GMSEC_F32
 {
 	public float value;

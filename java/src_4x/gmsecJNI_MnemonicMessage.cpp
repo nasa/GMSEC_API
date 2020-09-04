@@ -20,6 +20,8 @@
 
 #include <gmsec4/mist/message/MnemonicMessage.h>
 
+#include <gmsec4/util/Deprecated.h>
+
 
 using namespace gmsec::api;
 using namespace gmsec::api::jni;
@@ -198,6 +200,7 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessage
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessage_1GetMnemonic
   (JNIEnv *jenv, jclass jcls, jlong jMnemMsgPtr, jobject jMnemMsg, jint jIndex)
 {
@@ -222,6 +225,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessag
 
 	return jMnemonic;
 }
+GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MnemonicMessage_1GetMnemonicIterator

@@ -251,7 +251,7 @@ C<libgmsec_perl::ConnectionManager-E<gt>cleanup()>
 
 =head3 getLibraryVersion()
 
-C<libgmsec_perl::Connection-E<gt>getLibraryVersion()>
+C<libgmsec_perl::ConnectionManager-E<gt>getLibraryVersion()>
 
     This function returns a string containing the version information for the associated middleware of the connection.
 
@@ -273,7 +273,7 @@ C<libgmsec_perl::ConnectionManager-E<gt>getSpecification()>
 
 C<libgmsec_perl::ConnectionManager-E<gt>setStandardFields($standardFields)>
 
-    Sets the internal list of fields which are to be automatically placed in all messages sent by this ConnetionManager.  Internal copies of the Fields are made, ownership is not retained by the ConnectionManager.  The supplied set of fields will not be validated here, validation occurs at the time a message is to be published.
+     Sets the internal list of fields that are added to all messages that are created using the ConnectionManager.  Internal copies of the provided Fields are made, thus ownership is not retained by the ConnectionManager. The supplied set of fields will not be validated here; validation occurs at the time a message is to be published.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
     

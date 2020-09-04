@@ -93,11 +93,8 @@ void MBReaderThread::run()
 
 				hadConnError = true;
 
-				//DMW GMSEC_WARNING << "Read error.  ReaderThread stopped.";
-				//DMW m_connWasDropped.set(true);
 				TimeUtil::millisleep(1000);
 			}
-			//DMW break;
 			continue;
 		}
 
@@ -122,7 +119,7 @@ void MBReaderThread::run()
 		// parse the message
 		Message* gmsecMsg = NULL;
 
-		bool msgDecoded = MBWire::deserialize(buffer, bufferSize, gmsecMsg);
+		bool msgDecoded = MBWire::deserialize(buffer, bufferSize, gmsecMsg, m_connection->getExternal().getMessageConfig());
 
 		if (!msgDecoded || gmsecMsg == NULL)
 		{
@@ -140,7 +137,26 @@ void MBReaderThread::run()
 		// add the message to reply queue or the message queue accordingly
 		if (gmsecMsg->getKind() == Message::REPLY)
 		{
-			if (m_replySubject == gmsecMsg->getSubject())
+			bool processReply = (m_replySubject == gmsecMsg->getSubject());
+
+			if (!processReply)
+			{
+				// Check if we are dealing with an MB Resource Message
+				try
+				{
+					const StringField& mySubjectField = gmsecMsg->getStringField(MB_MY_SUBJECT_FIELD_NAME);
+
+					processReply = (m_replySubject == mySubjectField.getValue());
+
+					gmsecMsg->clearField(MB_MY_SUBJECT_FIELD_NAME);
+				}
+				catch (const Exception& e)
+				{
+					processReply = false;
+				}
+			}
+
+			if (processReply)
 			{
 				pushReply(gmsecMsg);
 			}

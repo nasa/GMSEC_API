@@ -24,6 +24,7 @@
 
 #include <gmsec/Status.h>
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 #include <stddef.h>   // for size_t
@@ -237,7 +238,7 @@ class GMSEC_API ConnectionManager
 		 * should validate messages produced (default is false)
 		 *
 		 */
-		ConnectionManager(Config &cfg, unsigned int version = GMSEC_ISD_CURRENT, bool validate = false);
+		GMSEC_DEPRECATED ConnectionManager(Config &cfg, unsigned int version = GMSEC_ISD_CURRENT, bool validate = false);
 
 		/** @fn ~ConnectionManager()
 		 * @brief Destructor - tears down the ConnectionManager.

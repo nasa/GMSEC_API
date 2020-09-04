@@ -18,6 +18,8 @@
 
 #include <gmsec4/mist/SchemaIDIterator.h>
 
+#include <gmsec4/util/Deprecated.h>
+
 namespace gmsec
 {
 namespace api
@@ -102,7 +104,7 @@ public:
 	*
 	* @return a reference to a SchemaIDIterator object
     */
-	SchemaIDIterator& getSchemaIDIterator();
+	SchemaIDIterator& CALL_TYPE getSchemaIDIterator();
 
 
    /**
@@ -110,7 +112,7 @@ public:
 	*
 	* @brief returns the version of the ISD being used as an unsigned integer.
     */
-	unsigned int getVersion() const;
+	unsigned int CALL_TYPE getVersion() const;
 
 
    /**
@@ -125,8 +127,9 @@ public:
 	* @return XML string representation of the message schema.
 	*
 	* @throw An exception is thrown if the provided schemaID is not available in the list of loaded schema.
+	* @note This function has been deprecated
     */
-	const char* getTemplateXML(const char* subject, const char* schemaID);
+	GMSEC_DEPRECATED const char* CALL_TYPE getTemplateXML(const char* subject, const char* schemaID);
 
 private:
 	friend class gmsec::api::mist::internal::SpecificationBuddy;

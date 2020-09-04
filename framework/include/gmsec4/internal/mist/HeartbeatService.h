@@ -26,6 +26,8 @@
 #include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/Mutex.h>
 
+#include <memory>
+
 
 namespace gmsec
 {
@@ -83,6 +85,19 @@ public:
 	bool isRunning();
 
 private:
+	struct ActionInfo
+	{
+		ActionInfo(double interval);
+
+		bool tryNow();
+
+		void setInterval(double interval);
+
+	private:
+		double last_s;
+		double interval_s;
+	};
+
 	// The main processing function for the HeartbeatService.
 	void run();
 
@@ -93,12 +108,14 @@ private:
 	HeartbeatService();
 	HeartbeatService(const HeartbeatService&);
 
-	Config              m_config;
-	Connection*         m_connection;
-	Message             m_msg;
+	Config                    m_config;
+	Connection*               m_connection;
+	Message                   m_msg;
 
-	GMSEC_I32           m_pubInterval;
-	GMSEC_U16			m_counter;
+	GMSEC_U16                 m_pubInterval;
+	GMSEC_U16                 m_counter;
+
+	std::auto_ptr<ActionInfo> m_publishAction;
 
 	gmsec::api::util::AtomicBoolean m_alive;
 	gmsec::api::util::Mutex         m_msgMutex;

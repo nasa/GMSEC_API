@@ -35,7 +35,7 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMnemonicMessage;
  * @class MnemonicMessage
  *
  * @brief The Message object contains a mnemonic value message with one of 3 schema definitions:
- * GMSEC.MSG.MVAL, GMSEC.REQ.MVAL, GMSEC.RESP.MVAL
+ * MSG.MVAL, REQ.MVAL, RESP.MVAL
  *
  * @sa Message
  * @sa MistMessage
@@ -59,6 +59,9 @@ public class MnemonicMessage extends MistMessage
 	 * @brief Default constructor - Initializes the message instance
 	 *
 	 * @param subject - The subject string for the message.
+	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+	 * format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). You may also
+	 * use the shorthand notation of messageKind.messageType (e.g. MSG.MVAL).
 	 * @param spec    - A reference to the specification this message's schema will adhere to.
 	 *
 	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
@@ -92,6 +95,9 @@ public class MnemonicMessage extends MistMessage
      * @brief constructor - Initializes the message instance and associates a Configuration object
      *
      * @param subject - The subject string for the message.
+	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+	 * format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). You may also
+	 * use the shorthand notation of messageKind.messageType (e.g. MSG.MVAL).
      * @param config  - A configuration to associate with the message.
      * @param spec    - A reference to the specification this message's schema will adhere to.
 	 *
@@ -213,7 +219,10 @@ public class MnemonicMessage extends MistMessage
 	 * @throws A GMSEC_Exception is thrown if the specified index is outside the number of mnemonics in the message.
 	 *
 	 * @sa getNumMnemonics()
+	 *
+	 * @deprecated This method has been deprecated; use MnemonicIterator instead.
 	 */
+	@Deprecated
 	public Mnemonic getMnemonic(int index) throws GMSEC_Exception
 	{
 		return ((JNIMnemonicMessage) MistMessage.getInternal(this)).getMnemonic(index);

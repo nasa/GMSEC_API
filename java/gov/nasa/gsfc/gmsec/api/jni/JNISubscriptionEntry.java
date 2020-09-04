@@ -56,4 +56,19 @@ public class JNISubscriptionEntry
 	{
 		return gmsecJNI.SubscriptionEntry_GetSubject(swigCPtr, this);
 	}
+
+	public String getPattern()
+	{
+		return gmsecJNI.SubscriptionEntry_GetPattern(swigCPtr, this);
+	}
+
+	public boolean hasNextExcludedPattern()
+	{
+		return gmsecJNI.SubscriptionEntry_HasNextExcludedPattern(swigCPtr, this);
+	}
+
+	public String nextExcludedPattern()
+	{
+		return gmsecJNI.SubscriptionEntry_NextExcludedPattern(swigCPtr, this);
+	}
 }

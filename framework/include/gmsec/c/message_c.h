@@ -58,6 +58,7 @@
 #ifndef gmsec_c_message_c_h
 #define gmsec_c_message_c_h
 
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 #include <gmsec_defs.h>
 
@@ -72,7 +73,7 @@ extern "C"
 	 * @param[in] msg - message to test for validity
 	 * @return GMSEC_BOOL - 1 or 0 for true or false
 	 */
-	GMSEC_API GMSEC_BOOL CALL_TYPE isMsgValid(GMSEC_MESSAGE_HANDLE msg);
+	GMSEC_DEPRECATED GMSEC_API GMSEC_BOOL CALL_TYPE isMsgValid(GMSEC_MESSAGE_HANDLE msg);
 
 	/** @fn SetMsgKind(GMSEC_MESSAGE_HANDLE msg, GMSEC_MSG_KIND kind, GMSEC_STATUS_HANDLE status)
 	 * @brief this will set the 'kind' for this message.
@@ -86,7 +87,7 @@ extern "C"
 	 *
 	 * @sa GetMsgKind()
 	 */
-	GMSEC_API void CALL_TYPE SetMsgKind(GMSEC_MESSAGE_HANDLE msg, GMSEC_MSG_KIND kind, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE SetMsgKind(GMSEC_MESSAGE_HANDLE msg, GMSEC_MSG_KIND kind, GMSEC_STATUS_HANDLE status);
 
 	/** @fn GetMsgKind(GMSEC_MESSAGE_HANDLE msg, GMSEC_MSG_KIND *kind, GMSEC_STATUS_HANDLE status)
 	 * @brief this will get the current 'kind' of this message
@@ -100,7 +101,7 @@ extern "C"
 	 *
 	 * @sa SetMsgKind()
 	 */
-	GMSEC_API void CALL_TYPE GetMsgKind(GMSEC_MESSAGE_HANDLE msg, GMSEC_MSG_KIND *kind, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE GetMsgKind(GMSEC_MESSAGE_HANDLE msg, GMSEC_MSG_KIND *kind, GMSEC_STATUS_HANDLE status);
 
 	/** @fn SetMsgSubject(GMSEC_MESSAGE_HANDLE msg, char* subject, GMSEC_STATUS_HANDLE status)
 	 * @brief this will set the current message subject
@@ -112,7 +113,7 @@ extern "C"
 	 * @param[in]     subject - message subject to set
 	 * @param[out]    status -  operation result status
 	 */
-	GMSEC_API void CALL_TYPE SetMsgSubject(GMSEC_MESSAGE_HANDLE msg, char* subject, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE SetMsgSubject(GMSEC_MESSAGE_HANDLE msg, char* subject, GMSEC_STATUS_HANDLE status);
 
 	/** @fn GetMsgSubject(GMSEC_MESSAGE_HANDLE msg, char* *subject, GMSEC_STATUS_HANDLE status)
 	 * @brief this will get the current message subject
@@ -124,7 +125,7 @@ extern "C"
 	 * @param[out] subject - current message subject
 	 * @param[out] status - operation result status
 	 */
-	GMSEC_API void CALL_TYPE GetMsgSubject(GMSEC_MESSAGE_HANDLE msg, char* *subject, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE GetMsgSubject(GMSEC_MESSAGE_HANDLE msg, char* *subject, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgSetConfig(GMSEC_MESSAGE_HANDLE msg, GMSEC_CONFIG_HANDLE config, GMSEC_STATUS_HANDLE status)
 	 * @brief This function sets the Configuration of this message.  This can be used to
@@ -146,7 +147,7 @@ extern "C"
 	 * @param[in]     config - configuration to set
 	 * @param[out]    status - operation result status
 	 */
-	GMSEC_API void CALL_TYPE MsgSetConfig(GMSEC_MESSAGE_HANDLE msg, GMSEC_CONFIG_HANDLE config, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgSetConfig(GMSEC_MESSAGE_HANDLE msg, GMSEC_CONFIG_HANDLE config, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgClearFields(GMSEC_MESSAGE_HANDLE msg,GMSEC_STATUS_HANDLE status)
 	 * @brief This function will clear all fields from this message.
@@ -156,7 +157,7 @@ extern "C"
 	 * @param[in,out]  msg - on input message to operate upon.  On output a new empty message
 	 * @param[out]     status - operation result status
 	 */
-	GMSEC_API void CALL_TYPE MsgClearFields(GMSEC_MESSAGE_HANDLE msg,GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgClearFields(GMSEC_MESSAGE_HANDLE msg,GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgAddField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status)
 	 * @brief This function will add a new field to this message. A new field will be added to the message
@@ -193,7 +194,7 @@ extern "C"
 	 * @param[in]      field - field to add
 	 * @param[out]     status - operation result status
 	 */
-	GMSEC_API void CALL_TYPE MsgAddField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgAddField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgClearField(GMSEC_MESSAGE_HANDLE msg, char* name, GMSEC_STATUS_HANDLE status)
 	 * @brief This function will remove a field from this message by name.
@@ -204,7 +205,7 @@ extern "C"
 	 * @param[in]     name - name of field to remove
 	 * @param[out]    status - operation result status
 	 */
-	GMSEC_API void CALL_TYPE MsgClearField(GMSEC_MESSAGE_HANDLE msg, char *name, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgClearField(GMSEC_MESSAGE_HANDLE msg, char *name, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgGetField(GMSEC_MESSAGE_HANDLE msg, char* name, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status)
 	 * @brief This function will copy a field within a message into a field created by the client program, by name.
@@ -238,7 +239,7 @@ extern "C"
 	 * @param[out] field - field to copy
 	 * @param[out] status - operation result status
 	 */
-	GMSEC_API void CALL_TYPE MsgGetField(GMSEC_MESSAGE_HANDLE msg, char* name, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgGetField(GMSEC_MESSAGE_HANDLE msg, char* name, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgGetFieldCount(GMSEC_MESSAGE_HANDLE msg, GMSEC_I32 *count, GMSEC_STATUS_HANDLE status)
 	 * @brief this will return the number of fields in the message.
@@ -250,7 +251,7 @@ extern "C"
 	 * @param[out] count - number of fields
 	 * @param[out] status - operation result status
 	 */
-	GMSEC_API void CALL_TYPE MsgGetFieldCount(GMSEC_MESSAGE_HANDLE msg, GMSEC_I32 *count, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgGetFieldCount(GMSEC_MESSAGE_HANDLE msg, GMSEC_I32 *count, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgGetFirstField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status)
 	 * @brief This function and MsgGetNextField() are used to iterate through the fields of a message.
@@ -284,7 +285,7 @@ extern "C"
 	 *
 	 * @sa MsgGetNextField
 	 */
-	GMSEC_API void CALL_TYPE MsgGetFirstField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgGetFirstField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgGetNextField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status)
 	 * @brief This function and MsgGetFirstField() are used to iterate through the fields of a message.
@@ -298,7 +299,7 @@ extern "C"
 	 *
 	 * @sa MsgGetFirstField
 	 */
-	GMSEC_API void CALL_TYPE MsgGetNextField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgGetNextField(GMSEC_MESSAGE_HANDLE msg, GMSEC_FIELD_HANDLE field, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgToXML( GMSEC_MESSAGE_HANDLE msg, char **outst, GMSEC_STATUS_HANDLE status )
 	 * @brief This function will dump a message to an xml string. This format is compatible with
@@ -329,7 +330,7 @@ extern "C"
 	 *
 	 * @sa GetConfigFileMessage()
 	 */
-	GMSEC_API void CALL_TYPE MsgToXML(GMSEC_MESSAGE_HANDLE msg, char **outst, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgToXML(GMSEC_MESSAGE_HANDLE msg, char **outst, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgFromXML( GMSEC_MESSAGE_HANDLE msg, char *xml, GMSEC_STATUS_HANDLE status )
 	 * @brief This function will set subject, kind, and fields into a message as specified by the passed in
@@ -344,7 +345,7 @@ extern "C"
 	 *
 	 * @sa GetConfigFileMessage()
 	 */
-	GMSEC_API void CALL_TYPE MsgFromXML(GMSEC_MESSAGE_HANDLE msg, char *xml, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgFromXML(GMSEC_MESSAGE_HANDLE msg, char *xml, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgGetSize(  GMSEC_MESSAGE_HANDLE msg, GMSEC_U32 *size, GMSEC_STATUS_HANDLE status )
 	 * @brief This function will return the physical storage size of the message in bytes.
@@ -358,7 +359,7 @@ extern "C"
 	 * @param[out] size - the size of the message in bytes
 	 * @param[out] status - operation result status
 	 */
-	GMSEC_API void CALL_TYPE MsgGetSize(GMSEC_MESSAGE_HANDLE msg, GMSEC_U32 *size, GMSEC_STATUS_HANDLE status);
+	GMSEC_DEPRECATED GMSEC_API void CALL_TYPE MsgGetSize(GMSEC_MESSAGE_HANDLE msg, GMSEC_U32 *size, GMSEC_STATUS_HANDLE status);
 
 	/** @fn MsgGetTime()
 	 * @brief This function will return the current time in the GMSEC standard date/time format.
@@ -370,7 +371,7 @@ extern "C"
 	 *
 	 * @return string
 	 */
-	GMSEC_API const char * CALL_TYPE MsgGetTime();
+	GMSEC_DEPRECATED GMSEC_API const char * CALL_TYPE MsgGetTime();
 
 
 #ifdef __cplusplus

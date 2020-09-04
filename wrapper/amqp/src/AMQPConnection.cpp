@@ -573,6 +573,8 @@ void AMQPConnection::mwConnect()
 			subscriptions[specs.replySubject] = reqSubInfo;
 		}
 	}
+
+	getExternal().setConnectionEndpoint(hostname);
 }
 
 
@@ -621,7 +623,7 @@ void AMQPConnection::mwSubscribe(const char* subject, const Config& config)
 	subThread->start();
 		
 	// Allow subscription thread to initialize before proceeding
-	if (subscribeCondition.wait(2000) != AMQPConnection::LISTENING)
+	if (subscribeCondition.wait(5000) != AMQPConnection::LISTENING)
 	{
 		ableToSubscribe = false;
 	}
@@ -784,7 +786,7 @@ void AMQPConnection::mwRequest(const Message& request, std::string& id)
 		id = generateUniqueId(++requestCounter);
 	}
 
-	MessageBuddy::getInternal(request).addField(REPLY_UNIQUE_ID_FIELD, id.c_str());
+	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 
 	if (specs.useSubjectMapping)
 	{
@@ -792,7 +794,7 @@ void AMQPConnection::mwRequest(const Message& request, std::string& id)
 	}
 	else
 	{
-		MessageBuddy::getInternal(request).getDetails().setBoolean(OPT_REQ_RESP, true);
+		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 	}
 
 	// Send request for reply (subscription thread was started on connection)
@@ -805,7 +807,7 @@ void AMQPConnection::mwRequest(const Message& request, std::string& id)
 void AMQPConnection::mwReply(const Message& request, const Message& reply)
 {
 	// Get the Request's Unique ID, and put it into a field in the Reply
-	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
+	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(AMQP_REPLY));
 
 	if (uniqueID == NULL)
@@ -817,7 +819,7 @@ void AMQPConnection::mwReply(const Message& request, const Message& reply)
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain reply address field");
 	}
 
-	MessageBuddy::getInternal(reply).addField(REPLY_UNIQUE_ID_FIELD, uniqueID->getValue());
+	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID->getValue());
 
 	MessageBuddy::getInternal(reply).setSubject(replyAddr->getValue());
 
@@ -936,18 +938,18 @@ void AMQPConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 					{
 						ValueMap& meta = MessageBuddy::getInternal(*msg).getDetails();
 						
-						meta.setBoolean(OPT_REQ_RESP, true);
+						meta.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
 						
 						if (msg->getKind() == Message::REQUEST)
 						{
-							const StringField* uniqueID = dynamic_cast<const StringField*>(msg->getField(REPLY_UNIQUE_ID_FIELD));
+							const StringField* uniqueID = dynamic_cast<const StringField*>(msg->getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
 
 							if (uniqueID != NULL)
 							{
-								meta.setString(REPLY_UNIQUE_ID_FIELD, uniqueID->getValue());
+								meta.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID->getValue());
 								
-								// Remove REPLY_UNIQUE_ID_FIELD from the message
-								msg->clearField(REPLY_UNIQUE_ID_FIELD);
+								// Remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message
+								msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 							}
 						}
 					}
@@ -1171,7 +1173,7 @@ void AMQPConnection::handleMessage(pn_message_t* message, bool replies)
 	DataBuffer buffer((GMSEC_U8 *) bodyBytes.start, bodyBytes.size, false);
 
 	Message::MessageKind kind = static_cast<Message::MessageKind>(*pn_message_get_content_type(message));
-	gmsecMessage.reset(new Message(subject, kind));
+	gmsecMessage.reset(new Message(subject, kind, getExternal().getMessageConfig()));
 
 	properties = pn_message_properties(message);
 	parseProperties(*gmsecMessage.get(), meta, properties);

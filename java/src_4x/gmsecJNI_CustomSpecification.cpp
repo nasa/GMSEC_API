@@ -38,6 +38,12 @@ CustomSpecification::~CustomSpecification()
 		AutoJEnv aje;
 		JNIEnv* jenv = aje.getEnv();
 
+		if (!jenv)
+		{
+			GMSEC_ERROR << "CustomSpecification::~CustomSpecification() -- unable to attach to the current thread";
+			return;
+		}
+
 		jenv->DeleteGlobalRef(jSpec);
 	}
 }
@@ -53,6 +59,12 @@ void CustomSpecification::validateMessage(const Message& msg)
 
     AutoJEnv aje;
     JNIEnv* jenv = aje.getEnv();
+
+	if (!jenv)
+	{
+		GMSEC_ERROR << "CustomSpecification::validateMessage() -- unable to attach to the current thread";
+		return;
+	}
 
 	jclass clazz = jenv->GetObjectClass(jSpec);
 
@@ -78,8 +90,9 @@ void CustomSpecification::validateMessage(const Message& msg)
         return;
     }
 
-
 	jenv->CallVoidMethod(jSpec, validateMessageMethod, jMessage);
+
+	jenv->DeleteLocalRef(jMessage);
 
 	if (jenv->ExceptionCheck())
 	{

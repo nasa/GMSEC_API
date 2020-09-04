@@ -24,6 +24,7 @@
 #define gmsec_Connection_h
 
 #include <gmsec/Message.h>
+#include <gmsec/util/Deprecated.h>
 #include <gmsec/util/wdllexp.h>
 
 
@@ -416,7 +417,7 @@ public:
 	 * @param cb - Callback to call when reply is receieved
 	 * @return status - result of the request operation
 	 */
-	Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, Callback *cb, GMSEC_I32 republish_ms = 0);
+	GMSEC_DEPRECATED Status CALL_TYPE Request(Message *request, GMSEC_I32 timeout, Callback *cb, GMSEC_I32 republish_ms = 0);
 
 	/** @fn Request(Message *request, GMSEC_I32 timeout, ReplyCallback *cb, GMSEC_I32 republish_ms = 0)
 	 * @brief This function will send a request asyncronously. The callback will be called for the reply
@@ -610,7 +611,7 @@ public:
 	 * infoBuffer must be at least MWINFO_BUFFER characters
 	 *  @return char pointer to infoBuffer
 	 */
-	char * CALL_TYPE GetMWINFO(char * infoBuffer);
+	GMSEC_DEPRECATED char * CALL_TYPE GetMWINFO(char * infoBuffer);
 
 	/** @fn GetMWINFO(util::String &info)
 	 *  @brief Thread Safe alternative method for const char * GetMWINFO().
