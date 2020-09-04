@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,81 +10,69 @@
  *
  * This file contains an example demonstrating how to implement additional
  * Message validation logic in addition to that which the GMSEC API provides.
- *
- * Note: This example focuses on adding additional validation upon the receipt
- * of a message.  It almost goes without saying that additional logic can be
- * added to a program prior to invoking the publish() function without having
- * to do anything special.
  */
 
 using GMSEC.API;
 using System;
 using System.Collections.Generic;
 
-class ValidationCallback: ConnectionManagerCallback
+
+class CustomMessageValidator : MessageValidator
 {
-	public override void OnMessage(ConnectionManager connMgr, Message message)
+	public override Status ValidateMessage(Message msg)
 	{
+		Status status = new Status();
+
 		try
 		{
-			//o Run the message through the GMSEC API-supplied validation
-			connMgr.GetSpecification().ValidateMessage(message);
+			//o Get message type and subtype
+			string type    = "";
+			string subtype = "";
 
-			//o In this example scenario, we are expecting to receive a
-			// GMSEC PROD message containing a URI to a location on the disk
-			// where a product file has been placed for retrieval.  In this
-			// case, we want to validate that the location on the disk is
-			// in an area which we would expect (i.e. Something that the
-			// team has agreed upon prior to operational deployment).
-			//
-			// By validating this URI, we ensure that no malicious users
-			// have infiltrated the system and somehow modified the messages
-			// to cause us to retrieve a file from an unknown location.
-
-			//o Start by checking to ensure that this is a PROD message
-			if (IsProdMsg(message))
+			if (msg.HasField("MESSAGE-TYPE"))
 			{
-				ProductFileMessage prodMessage = new ProductFileMessage(message.ToXML());
+				type = msg.GetStringValue("MESSAGE-TYPE");
+			}
+			if (msg.HasField("C2CX-SUBTYPE"))
+			{
+				subtype = msg.GetStringValue("C2CX-SUBTYPE");
+			}
+			else if (msg.HasField("MESSAGE-SUBTYPE"))
+			{
+				subtype = msg.GetStringValue("MESSAGE-SUBTYPE");
+			}
 
-				//o Extract the Product File URI location(s) from the
-				// message using a ProductFileIterator
-				ProductFileIterator prodIter = prodMessage.GetProductFileIterator();
+			//o Ensure we have a Heartbeat message and it contains the PUB-RATE field
+			if (type == "MSG" && subtype == "HB" && msg.HasField("PUB-RATE"))
+			{
+				Int64 pubRate = msg.GetIntegerValue("PUB-RATE");
 
-				while (prodIter.HasNext())
+				//o Ensure PUB-RATE field value is between 10 and 60 (inclusive)
+				if (pubRate < 10 || pubRate > 60)
 				{
-					ProductFile prodFile = prodIter.Next();
-
-					//o Check to ensure that the URI contains "//hostname/dir"
-					String prodUri = prodFile.GetURI();
-					if (prodUri.IndexOf("//hostname/dir") == -1)
-					{
-						Log.Info("The following error is expected because the ProductFile has an illegal URI field value.");
-
-						String errorMsg = "Received an invalid PROD Message (bad URI):\n" + message.ToXML();
-						throw new GmsecException(StatusClass.MIST_ERROR, StatusCode.MESSAGE_FAILED_VALIDATION, errorMsg, 0);
-					}
+					status.Set(StatusClass.MSG_ERROR, StatusCode.VALUE_OUT_OF_RANGE, "PUB-RATE field does not have a valid value");
 				}
-
-				Log.Info("Received a valid message:\n" + message.ToXML());
+			}
+			else
+			{
+				status.Set(StatusClass.MSG_ERROR, StatusCode.INVALID_MSG, "Non-Heartbeat message received");
 			}
 		}
 		catch (GmsecException e)
 		{
-			Log.Error(e.ToString());
+			status = new Status(e.GetErrorClass(), e.GetErrorCode(), e.GetErrorMessage(), e.GetCustomCode());
 		}
-	}
 
-	public bool IsProdMsg(Message message)
-	{
-		bool result = message.GetStringValue("MESSAGE-TYPE") == "MSG" && message.GetStringValue("MESSAGE-SUBTYPE") == "PROD";
-
-		return result;
+		return status;
 	}
 }
 
+
 class validation_custom
 {
-	static private String PROD_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.PROD.PRODUCT_MESSAGE";
+	static private string HB_MSG_SUBJECT     = "GMSEC.MISSION.SATELLITE.MSG.HB.VALIDATION-CUSTOM";
+	static private string ALT_HB_MSG_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.VALIDATION-CUSTOM.HB";
+
 
 	static int Main(string[] args)
 	{
@@ -99,7 +87,8 @@ class validation_custom
 		InitializeLogging(config);
 
 		//o Enable Message validation.  This parameter is "false" by default.
-		config.AddValue("GMSEC-MSG-CONTENT-VALIDATE", "true");
+		config.AddValue("gmsec-msg-content-validate-send", "true");
+		config.AddValue("gmsec-validation-level", "3");
 
 		Log.Info("API version: " + ConnectionManager.GetAPIVersion());
 
@@ -107,34 +96,69 @@ class validation_custom
 		{
 			ConnectionManager connMgr = new ConnectionManager(config);
 
-			Log.Info("Opening the connection to the middleware server");
 			connMgr.Initialize();
 
 			Log.Info("Middleware version: " + connMgr.GetLibraryVersion());
 
-			//o Set up the ValidationCallback and subscribe
-			ValidationCallback vc = new ValidationCallback();
-			connMgr.Subscribe(PROD_MESSAGE_SUBJECT, vc);
-
-			//o Start the AutoDispatcher
-			connMgr.StartAutoDispatch();
+			//o Register custom message validator
+			CustomMessageValidator cmv = new CustomMessageValidator();
+			connMgr.RegisterMessageValidator(cmv);
 
 			//o Create and publish a simple Product File Message
-			SetupStandardFields(connMgr);
+			uint specVersion = connMgr.GetSpecification().GetVersion();
+			SetupStandardFields(specVersion);
 
-			ProductFileMessage productMessage = CreateProductFileMessage(connMgr, "//hostname/dir/filename");
+			//o Create Heartbeat Message
+			//o Note: Message subject and schema ID vary depending on the specification in use
+			string subject  = (specVersion > Gmsec.GMSEC_ISD_2018_00 ? HB_MSG_SUBJECT : ALT_HB_MSG_SUBJECT);
+			string schemaID = (specVersion > Gmsec.GMSEC_ISD_2018_00 ? "MSG.HB" : "MSG.C2CX.HB");
 
-			connMgr.Publish(productMessage);
+			MistMessage msg = new MistMessage(subject, schemaID, connMgr.GetSpecification());
 
-			productMessage = CreateProductFileMessage(connMgr, "//badhost/dir/filename");
+			//o Add PUB-RATE field with illegal value
+			msg.SetValue("PUB-RATE", "5");
 
-			//o Publish the message to the middleware bus
-			connMgr.Publish(productMessage);
+			//o For very old specifications, we need to add a MSG-ID field
+			if (specVersion <= Gmsec.GMSEC_ISD_2014_00)
+			{
+				msg.AddField("MSG-ID", "12345");
+			}
 
-			connMgr.StopAutoDispatch();
+			//o Attempt to publish malformed message
+			try
+			{
+				Log.Info("Attempting to publish malformed message...");
+				connMgr.Publish(msg);
+
+				Log.Warning("Was expecting an error");
+			}
+			catch (GmsecException e)
+			{
+				//o We expect to encounter error with the PUB-RATE field
+				Log.Info("This is an expected error:\n" + e.ToString());
+			}
+
+			//o Fix PUB-RATE field with legal value
+			msg.SetValue("PUB-RATE", "15");
+
+			//o Publish a good message
+			try
+			{
+				Log.Info("Attempting to publish good message...");
+				connMgr.Publish(msg);
+
+				Log.Info("Message published!");
+			}
+			catch (GmsecException e)
+			{
+				Log.Warning("Unexpected error:\n" + e.ToString());
+			}
 
 			//o Disconnect from the middleware and clean up the Connection
 			connMgr.Cleanup();
+
+			//o Clear standard/common fields used with all messages
+			ClearStandardFields();
 		}
 		catch (GmsecException e)
 		{
@@ -160,54 +184,38 @@ class validation_custom
 		}
 	}
 
-	static void SetupStandardFields(ConnectionManager connMgr)
+	static void SetupStandardFields(uint specVersion)
 	{
 		FieldList definedFields = new FieldList();
 
-		StringField missionField = new StringField("MISSION-ID", "MISSION");
-		StringField satIdField = new StringField("SAT-ID-PHYSICAL", "SPACECRAFT");
-		StringField facilityField = new StringField("FACILITY", "GMSEC Lab");
-		StringField componentField = new StringField("COMPONENT", "device_message");
+		StringField mission       = new StringField("MISSION-ID", "MISSION");
+		StringField constellation = new StringField("CONSTELLATION-ID", "CONSTELLATION");
+		StringField satIdPhys     = new StringField("SAT-ID-PHYSICAL", "SATELLITE");
+		StringField satIdLog      = new StringField("SAT-ID-LOGICAL", "SATELLITE");
+		StringField facility      = new StringField("FACILITY", "GMSEC-LAB");
+		StringField component     = new StringField("COMPONENT", "VALIDATE-CUSTOM");
 
-		definedFields.Add(missionField);
-		definedFields.Add(satIdField);
-		definedFields.Add(facilityField);
-		definedFields.Add(componentField);
+		definedFields.Add(mission);
+		definedFields.Add(constellation);
+		definedFields.Add(satIdPhys);
+		definedFields.Add(satIdLog);
+		definedFields.Add(facility);
+		definedFields.Add(component);
 
-		if (connMgr.GetSpecification().GetVersion() >= Gmsec.GMSEC_ISD_2018_00)
+		if (specVersion >= Gmsec.GMSEC_ISD_2018_00)
 		{
-			StringField domain1 = new StringField("DOMAIN1", "MY-DOMAIN-1");
-			StringField domain2 = new StringField("DOMAIN2", "MY-DOMAIN-2");
+			StringField domain1 = new StringField("DOMAIN1", "DOMAIN1");
+			StringField domain2 = new StringField("DOMAIN2", "DOMAIN2");
 
 			definedFields.Add(domain1);
 			definedFields.Add(domain2);
 		}
 
-		connMgr.SetStandardFields(definedFields);
+		MistMessage.SetStandardFields(definedFields);
 	}
 
-	static ProductFileMessage CreateProductFileMessage(ConnectionManager connMgr, String filePath)
+	static void ClearStandardFields()
 	{
-		ProductFile externalFile = new ProductFile("External File", "External File Description", "1.0.0", "TXT", filePath);
-
-		ProductFileMessage productMessage;
-
-		if (connMgr.GetSpecification().GetVersion() <= Gmsec.GMSEC_ISD_2016_00)
-		{
-			productMessage = new ProductFileMessage(PROD_MESSAGE_SUBJECT, ResponseStatus.Response.SUCCESSFUL_COMPLETION, "MSG.PROD.AUTO", connMgr.GetSpecification());
-		}
-		else
-		{
-			productMessage = new ProductFileMessage(PROD_MESSAGE_SUBJECT, ResponseStatus.Response.SUCCESSFUL_COMPLETION, "MSG.PROD", connMgr.GetSpecification());
-
-			productMessage.AddField("PROD-TYPE", "AUTO");
-			productMessage.AddField("PROD-SUBTYPE", "DM");
-		}
-
-		productMessage.AddProductFile(externalFile);
-
-		connMgr.AddStandardFields(productMessage);
-
-		return productMessage;
+		MistMessage.ClearStandardFields();
 	}
 }

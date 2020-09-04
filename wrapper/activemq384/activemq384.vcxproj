@@ -106,7 +106,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\activemq\include;..\..\framework\include;..\..\..\SUPPORT\activemq384\include\apr-1;..\..\..\SUPPORT\activemq384\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\activemq\include;..\..\framework\include;..\..\..\GMSEC_SUPPORT\activemq384\include\apr-1;..\..\..\GMSEC_SUPPORT\activemq384\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_WINDOWS;_USRDLL;GMSEC_ACTIVEMQ_EXPORTS;GMSEC_LIBROOTNAME=gmsec_activemq384;ACTIVEMQ_CMS_V3;ACTIVEMQ_USE_MSG_RESET;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -130,7 +130,7 @@
       <AdditionalDependencies>gmsecapi_d.lib;activemq-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../bin/gmsec_activemq38_d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\SUPPORT\activemq384\lib;..\..\objects\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\GMSEC_SUPPORT\activemq384\lib;..\..\objects\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/gmsec_activemq384_d.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -159,7 +159,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\activemq\include;..\..\framework\include;..\..\..\SUPPORT\activemq384\include\apr-1;..\..\..\SUPPORT\activemq384\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\activemq\include;..\..\framework\include;..\..\..\GMSEC_SUPPORT\activemq384\include\apr-1;..\..\..\GMSEC_SUPPORT\activemq384\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;_DEBUG;_WINDOWS;_USRDLL;GMSEC_ACTIVEMQ_EXPORTS;GMSEC_LIBROOTNAME=gmsec_activemq384;ACTIVEMQ_CMS_V3;ACTIVEMQ_USE_MSG_RESET;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
@@ -183,7 +183,7 @@
       <AdditionalDependencies>gmsecapi_d.lib;activemq-cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../bin/gmsec_activemq38_d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\SUPPORT\activemq384\lib;..\..\objects\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\GMSEC_SUPPORT\activemq384\lib;..\..\objects\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/gmsec_activemq_d.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -213,7 +213,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\activemq\include;..\..\framework\include;..\..\..\SUPPORT\activemq384\include\apr-1;..\..\..\SUPPORT\activemq384\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\activemq\include;..\..\framework\include;..\..\..\GMSEC_SUPPORT\activemq384\include\apr-1;..\..\..\GMSEC_SUPPORT\activemq384\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_WINDOWS;_USRDLL;GMSEC_ACTIVEMQ_EXPORTS;GMSEC_LIBROOTNAME=gmsec_activemq384;ACTIVEMQ_CMS_V3;ACTIVEMQ_USE_MSG_RESET;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -234,7 +234,7 @@
       <AdditionalDependencies>gmsecapi.lib;activemq-cpp.lib;libeay32.lib;ssleay32.lib;libapr-1.lib;wsock32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../bin/gmsec_activemq38.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\SUPPORT\activemq384\lib;..\..\objects\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\GMSEC_SUPPORT\activemq384\lib;..\..\objects\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>.\Release/gmsec_activemq384.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
@@ -263,7 +263,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\activemq\include;..\..\framework\include;..\..\..\SUPPORT\activemq384\include\apr-1;..\..\..\SUPPORT\activemq384\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\activemq\include;..\..\framework\include;..\..\..\GMSEC_SUPPORT\activemq384\include\apr-1;..\..\..\GMSEC_SUPPORT\activemq384\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;_WINDOWS;_USRDLL;GMSEC_ACTIVEMQ_EXPORTS;GMSEC_LIBROOTNAME=gmsec_activemq384;ACTIVEMQ_CMS_V3;ACTIVEMQ_USE_MSG_RESET;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -284,7 +284,7 @@
       <AdditionalDependencies>gmsecapi.lib;activemq-cpp.lib;libapr-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../bin/gmsec_activemq38.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>..\..\..\SUPPORT\activemq384\lib;..\..\objects\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\GMSEC_SUPPORT\activemq384\lib;..\..\objects\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>.\Release/gmsec_activemq3.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />

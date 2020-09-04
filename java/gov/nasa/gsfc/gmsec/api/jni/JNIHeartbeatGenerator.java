@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -86,8 +86,8 @@ public class JNIHeartbeatGenerator
 	public JNIHeartbeatGenerator(Config config, String hbMsgSubject, int hbPubRate, Collection<Field> fields)
 		throws GMSEC_Exception
 	{
-		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(new ArrayList(fields));
-		JNIField[] jFields    = ArrayListConverter.listToJNIFields(new ArrayList(fields));
+		long[]     jFieldPtrs = ArrayListConverter.listToFieldPtrs(new ArrayList<Field>(fields));
+		JNIField[] jFields    = ArrayListConverter.listToJNIFields(new ArrayList<Field>(fields));
 		int        numFields  = (fields == null ? 0 : fields.size());
 
         gmsecJNI.MistMessageSetStandardFields(jFieldPtrs, jFields, numFields);

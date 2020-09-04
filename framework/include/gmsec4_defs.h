@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -709,21 +709,26 @@ typedef void GMSEC_ConnectionMgrReplyCallback(GMSEC_ConnectionMgr connMgr, const
 
 
 /**
- * @typedef GMSEC_SpecificationValidateMessage
+ * @typedef GMSEC_MessageValidator
  *
- * @brief Typedef for GMSEC_SpecificationValidateMessage
+ * @brief Typedef for GMSEC_MessageValidator function.
  *
  * @code
- * void GMSEC_SpecificationValidateMessage(GMSEC_Specification customSpec, const GMSEC_Message msg, GMSEC_Status status)
+ * void CustomMessageValidator(const GMSEC_Message msg, GMSEC_Status status)
+ * {
+ *    // Perform validation check on message
+ *
+ *    if (error == GMSEC_TRUE)
+ *        statusSet(status, clazz, code, reason, customCode);
+ * }
  * @endcode
  *
- * @param[in]  customSpec - handle to the custom Specification object
- * @param[in]  msg        - the message to validate
- * @param[out] status     - the status of the operation, should one need to be returned
+ * @param[in]  msg    - the message to validate
+ * @param[out] status - the status of the operation, should one need to be returned
  *
- * @sa connectionManagerSetSpecification
+ * @sa connectionManagerRegisterCustomMessageValidator
  */
-typedef void GMSEC_SpecificationValidateMessage(GMSEC_Specification customSpec, const GMSEC_Message msg, GMSEC_Status status);
+typedef void GMSEC_MessageValidator(const GMSEC_Message msg, GMSEC_Status status);
 
 
 /**

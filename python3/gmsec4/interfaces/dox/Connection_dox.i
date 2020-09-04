@@ -337,12 +337,11 @@
 
 
 
-    publish(self, msg: Message, config: Config)
+    publish(self, msg: Message, mwConfig: Config)
 
-    This method will publish a message to the middleware
-    using the Config provided to toggle between special
-    middleware-level publish functionalities. (eg. ActiveMQ - Durable
-    Producer)
+    Publishes the given message to the middleware
+    using the given configuration to enable or disable certain middleware-level
+    publish functionalities (e.g. ActiveMQ - Durable Producer).
 
     Note: The actual Message published to the middleware will contain
     tracking fields; to disable this feature, create a Connection
@@ -350,8 +349,8 @@
 
     Parameters
     ----------
-    msg    : Message to be published
-    config : Config to be used by the publish operation
+    msg      : Message to be published
+    mwConfig : Config object for providing middleware configuration options
 
     Exceptions
     ----------

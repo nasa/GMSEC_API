@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -53,7 +53,7 @@ C<libgmsec_perl::MistMessage-E<gt>new($subject, $schemaID, $spec)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
     $subject - the subject string for the message.
-    $schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of messageKind.messageType.messageSubtype (e.g. MSG.C2CX.HB). Note that not all schemaIDs contain a messageSubtype
+    $schemaID - the string used to identify the message schema in C2MS or other message specification (e.g. MSG.HB).
     $spec - a reference to the specification to which this message schema will adhere.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
@@ -69,7 +69,7 @@ C<libgmsec_perl::MistMessage-E<gt>new($subject, $schemaID, $config, $spec)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
     $subject - the subject string for the message.
-    $schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the format of messageKind.messageType.messageSubtype (e.g. MSG.C2CX.HB). Note that not all schemaIDs contain a messageSubtype
+    $schemaID - the string used to identify the message schema in C2MS or other message specification (e.g. MSG.HB).
     $config - A Configuration object to associate with the message
     $spec - a reference to the specification to which this messages schema will adhere.
 

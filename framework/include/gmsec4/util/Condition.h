@@ -1,29 +1,22 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-/** @file Condition.h
+/**
+ * @file Condition.h
  *
- *  @brief This file contains a class for cross platform condition variable support
-**/
+ * @brief This file contains a class for cross platform condition variable support.
+ */
 
 #ifndef GMSEC_API_UTIL_CONDITION_H
 #define GMSEC_API_UTIL_CONDITION_H
 
 
 #include <gmsec4/util/TimeUtil.h>
-
-
-#if defined (WIN32)
-#include <windows.h>
-#include <process.h>
-#else
-#include <pthread.h>
-#endif
 
 
 /*
@@ -88,11 +81,18 @@ external mutex example with AutoMutex
 */
 
 
-namespace gmsec {
-namespace api {
-namespace util {
+namespace gmsec
+{
+namespace api
+{
+	namespace internal
+	{
+		class InternalCondition;
+	}
 
-class Mutex;
+namespace util
+{
+	class Mutex;
 
 
 class GMSEC_API Condition
@@ -113,6 +113,7 @@ public:
 	 * @brief Standard constructor. Initializes the internal platform dependent
 	 * modules.
 	 *
+	 * @throw An Exception is thrown if the Condition cannot be created.
 	 */
 	Condition();
 
@@ -122,6 +123,8 @@ public:
 	 *
 	 * @brief Standard constructor. Initializes the internal platform dependent
 	 * modules with an externally managed mutex.
+	 *
+	 * @throw An Exception is thrown if the Condition cannot be created.
 	 */
 	Condition(Mutex& mutex);
 
@@ -201,32 +204,24 @@ private:
 	Condition(const Condition&);
 	Condition& operator=(const Condition&);
 
+	gmsec::api::internal::InternalCondition* m_internal;
 
-	int    status;
-	bool   ownsMutex;
-	Mutex* mutex;
-
-#if defined (WIN32)
-	// Number of waiting threads.
-	int waiters_count_;
-
-	CRITICAL_SECTION waiters_count_lock_;
-
-	// Semaphore used to queue up threads waiting for the condition to
-	// become signaled.
-	HANDLE sema_;
-
-	// An auto-reset event used by the broadcast/signal thread to wait
-	// for all the waiting thread(s) to wake up and be released from the
-	// semaphore.
-	HANDLE waiters_done_;
-
-	// Keeps track of whether we were broadcasting or signaling.  This
-	// allows us to optimize the code if we're just signaling.
-	int was_broadcast_;
-
+	// Add padding to ensure binary compatibility
+	//
+#if defined(_M_IX86) || defined(__i386__) || defined(__i386) || defined(__i486__) || defined(__i486) || defined(i386)
+	// 32-bit architecture
+	#ifdef WIN32
+		char padding[48];   // windows
+	#else
+		char padding[60];   // non-windows
+	#endif
 #else
-	pthread_cond_t cv;
+	// 64-bit architecture
+	#ifdef WIN32
+		char padding[80];   // windows
+	#else
+		char padding[56];   // non-windows
+	#endif
 #endif
 };
 

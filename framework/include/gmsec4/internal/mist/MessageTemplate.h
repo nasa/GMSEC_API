@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,8 +16,11 @@
 #ifndef GMSEC_MIST_INTERNAL_MESSAGE_TEMPLATE_H
 #define GMSEC_MIST_INTERNAL_MESSAGE_TEMPLATE_H
 
+#include <gmsec4/internal/mist/FieldTemplate.h>
+
 #include <gmsec4/Message.h>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -39,18 +42,13 @@ namespace mist
 
 namespace internal
 {
-	// Forward declaration(s)
-	class FieldTemplate;
-
 
 class GMSEC_API MessageTemplate
 {
 public:
 	typedef std::vector<FieldTemplate*> FieldTemplateList;
 
-	MessageTemplate();
-
-	MessageTemplate(const char* schemaID, const FieldTemplateList& inputFields);
+	MessageTemplate(const char* schemaID, const FieldTemplateList& inputFields, unsigned int schemaLevel);
 
 	MessageTemplate(const MessageTemplate& other);
 
@@ -68,13 +66,31 @@ public:
 
 	const FieldTemplateList& getFieldTemplates() const;
 
+	unsigned int getSchemaLevel() const;
+
 	//returns an xml that can be used for a message data constructor
 	const char* toXML(const char* subject);
 
+
+	//convenience method to display the info associated with the FieldTemplate
+	//usage: std::cout << ftmp << std::endl
+	friend std::ostream& operator<<(std::ostream& os, const MessageTemplate& msgTemp)
+	{
+		os << "ID          : " << msgTemp.m_id            << "\n"
+		   << "Schema Level: " << msgTemp.m_schemaLevel   << "\n";
+
+		for (FieldTemplateList::const_iterator it = msgTemp.m_fieldTemplates.begin(); it != msgTemp.m_fieldTemplates.end(); ++it)
+		{
+			const FieldTemplate* tmp = *it;
+			os << *tmp << "\n";
+		}
+
+		return os;
+	}
+
 private:
-	//helper function, takes a referenced list of FieldTemplates and stores them as a copy.
-	//the template is also assigned a new ID.
-	void setFieldTemplates(const char* schemaID, const FieldTemplateList& inputFields);
+	// Defined, but not implemented.
+	MessageTemplate();
 
 	//helper method to detroy resources in FieldTemplateList.
 	void cleanup();
@@ -84,6 +100,7 @@ private:
 
 	std::string		  m_id;
 	FieldTemplateList m_fieldTemplates;
+	unsigned int      m_schemaLevel;
 	std::string		  m_xml;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,6 +9,7 @@
 package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.mist.MessageSpecification;
+import gov.nasa.gsfc.gmsec.api.mist.MessageValidator;
 import gov.nasa.gsfc.gmsec.api.mist.SchemaIDIterator;
 import gov.nasa.gsfc.gmsec.api.mist.Specification;
 
@@ -28,11 +29,14 @@ public class JNISpecification
 	private long      swigCPtr;
 	protected boolean swigCMemOwn;
 
+	private MessageValidator validator;
+
 
 	protected JNISpecification(long cPtr, boolean cMemoryOwn)
 	{
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;
+		validator   = null;
 	}
 
 
@@ -55,7 +59,8 @@ public class JNISpecification
 			swigCMemOwn = false;
 		}
 
-		swigCPtr = 0;
+		swigCPtr  = 0;
+		validator = null;
 	}
 
 
@@ -97,10 +102,31 @@ public class JNISpecification
 	}
 
 
+	public Specification.SchemaLevel getSchemaLevel()
+	{
+		int level = gmsecJNI.Specification_GetSchemaLevel(swigCPtr, this);
+
+		return Specification.SchemaLevel.values()[level];
+	}
+
+
 	public List<MessageSpecification> getMessageSpecifications()
 	{
 		return gmsecJNI.Specification_GetMessageSpecifications(swigCPtr, this);
 	}
+
+
+    public void registerMessageValidator(MessageValidator val)
+    {
+        long valPtr = JNIMessageValidator.getCPtr(MessageValidator.getInternal(val));
+
+        gmsecJNI.Specification_RegisterMessageValidator(swigCPtr, this, valPtr);
+
+        // We store a handle to the MessageValidator (in case the user has declared it
+        // as an anonymous object) so that the JVM garbage collector does not dispose of it after it
+        // has been sent over the JNI layer.
+        validator = val;
+    }
 
 
 	public String getTemplateXML(String subject, String schemaID)

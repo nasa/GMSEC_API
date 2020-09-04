@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -148,18 +148,6 @@ const char* const OPT_ASYNC_PUBLISH                  	= "MW-ASYNC-PUBLISH";
 const char* const OPT_ASYNC_STATUS_CHECK             	= "MW-ASYNC-STATUS-CHECK";
 const char* const OPT_ASYNC_STATUS_CHECK_MESSAGE_INTERVAL = "MW-ASYNC-STATUS-CHECK-MESSAGE-INTERVAL";
 const char* const OPT_MESSAGE_WAIT_PERIOD               = "MW-MESSAGE-WAIT-PERIOD";
-
-const char* const DEFAULT_CHANNEL   			= "SYSTEM.DEF.SVRCONN";
-const char* const TOPIC_PREFIX      			= ""; 
-const char* const WEBSPHERE_REPLY   			= "WEBSPHERE_REPLY_ADDR";
-const char* const WEBSPHERE_SUBJECT 			= "GMSEC_SUBJECT_WEBSPHERE";
-const char* const WEBSPHERE_KIND    			= "GMSEC_KIND_WEBSPHERE";
-const char* const DEFAULT_SUBJECT   			= "BOGUS.TOPIC";
-
-const char* const MW_PROP_PATTERN   			= "gmsec.%";
-const char* const MW_PROP_PREFIX    			= "gmsec.";
-const char* const MW_PROP_SUBJECT   			= "SUBJECT";
-const char* const MW_PROP_KIND      			= "KIND";
 
 
 //ZeroMQ

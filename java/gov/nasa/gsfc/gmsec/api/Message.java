@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -772,6 +772,21 @@ public class Message
 		}
 
 		return m_jniMessage.getStringValue(fieldName);
+	}
+
+
+    /**
+     * Reports whether the field, identified by name, is present in the Message.
+     *
+     * @param name The name of field to find
+     *
+     * @return True if the field is found; false otherwise.
+     *
+     * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+     */
+    public boolean hasField(String name) throws IllegalArgumentException
+	{
+		return (getField(name) != null);
 	}
 
 

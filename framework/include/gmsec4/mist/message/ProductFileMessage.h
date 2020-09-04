@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -49,28 +49,6 @@ namespace message
  * @class ProductFileMessage
  *
  * @brief A MistMessage object that is capable of storing ProductFile objects
- * The following message schema IDs and their templates are supported: @n
- * MSG.PROD.AAA @n
- * MSG.PROD.AUTO @n
- * MSG.PROD.FD @n
- * MSG.PROD.MAS @n
- * MSG.PROD.PAS @n
- * MSG.PROD.SC @n
- * MSG.PROD.TAC @n
- * REQ.PROD.AAA @n
- * REQ.PROD.AUTO @n
- * REQ.PROD.FD @n
- * REQ.PROD.MAS @n
- * REQ.PROD.PAS @n
- * REQ.PROD.SC @n
- * REQ.PROD.TAC @n
- * RESP.PROD.AAA @n
- * RESP.PROD.AUTO @n
- * RESP.PROD.FD @n
- * RESP.PROD.MAS @n
- * RESP.PROD.PAS @n
- * RESP.PROD.SC @n
- * RESP.PROD.TAC @n
  *
  * @sa Message @n
  *	   MistMessage @n
@@ -134,9 +112,9 @@ public:
 	*
 	* @param subject - The subject string for the message.
 	* @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	* @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
-	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
+	* @param schemaID - the string used to identify the message schema in C2MS or other message specification. The schema ID has the
+	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2019.00.C2MS.MSG.PROD)
+	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD)
 	* @param spec - A reference to the specification this message's schema will adhere to.
 	* 
 	* @throw An exception is thrown if Specification fails to load the template directory or if schemaID is not a valid ID.
@@ -153,9 +131,9 @@ public:
 	*
 	* @param subject - The subject string for the message.
 	* @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	* @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
-	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
-	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
+	* @param schemaID - the string used to identify the message schema in C2MS or other message specification. The schema ID has the
+	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2019.00.C2MS.MSG.PROD)
+	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD)
 	* @param config  - A configuration to associate with the message.
 	* @param spec - A reference to the specification this message's schema will adhere to.
 	*

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,6 +12,9 @@
 #include <gmsec4/internal/StringUtil.h>
 
 #include <gmsec4/Exception.h>
+
+#include <limits>
+#include <cmath>
 
 #include <assert.h>
 
@@ -134,6 +137,22 @@ static bool isInfinity(double x)
 		exponent = (p[1] >> 4) + 16 * (p[0] & 0x7f);
 
 	return exponent == 0x7ff;
+}
+
+
+bool MathUtil::floatEquals(GMSEC_F32 f1, GMSEC_F32 f2)
+{
+    static GMSEC_F32 epsilon = std::numeric_limits<GMSEC_F32>::epsilon();
+
+    return fabsf(f1 - f2) < epsilon;
+}
+
+
+bool MathUtil::doubleEquals(GMSEC_F64 d1, GMSEC_F64 d2)
+{
+    static GMSEC_F64 epsilon = std::numeric_limits<GMSEC_F64>::epsilon();
+
+    return fabs(d1 - d2) < epsilon;
 }
 
 

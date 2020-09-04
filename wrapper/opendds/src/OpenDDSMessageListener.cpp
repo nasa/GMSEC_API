@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,6 +8,7 @@
 
 #include <gmsec4/internal/InternalConnection.h>
 #include <gmsec4/internal/MessageBuddy.h>
+#include <gmsec4/internal/Subject.h>
 
 #include <gmsec4/util/Log.h>
 #include <gmsec4/util/StdUniquePtr.h>
@@ -25,12 +26,14 @@ using namespace gmsec::api::util;
 using namespace gmsec::api::internal;
 using namespace gmsec_opendds;
 
-OpenDDSMessageListener::OpenDDSMessageListener(OpenDDSConnection* conn,
+OpenDDSMessageListener::OpenDDSMessageListener(const char* subjectPattern,
+                                               OpenDDSConnection* conn,
                                                Queue &queue,
                                                const gmsec::api::internal::RequestSpecs& specs,
                                                bool isReplyListener,
                                                bool dropMessages)
-	: connection(conn),
+	: subjectPattern(subjectPattern),
+	  connection(conn),
 	  queue(queue),
 	  requestSpecs(specs),
 	  isReplyListener(isReplyListener),
@@ -96,6 +99,13 @@ void OpenDDSMessageListener::on_data_available(DDS::DataReader_ptr reader)
 			// Decode the meta object
 			ValueMap meta;
 			parseProperties(meta, metaBuffer, *message.get());
+
+			// If we receive a message, and its subject does not match the topic pattern we are seeking,
+			// then drop like hot potato.
+			if (Subject::doesSubjectMatchPattern(message.get()->getSubject(), subjectPattern) == false)
+			{
+				return;
+			}
 
 			MessageInfo info;
 

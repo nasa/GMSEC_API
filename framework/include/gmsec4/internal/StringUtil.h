@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -398,6 +398,37 @@ public:
 	 * @throws An Exception is thrown if the data value is NULL.
 	 */
 	static std::string toJSON(const char* data);
+
+
+	/**
+	 * @fn bool isLeapYear(unsigned int year)
+	 * @brief Reports whether the given year is a leap-year or not.
+	 */
+	static bool isLeapYear(unsigned int year);
+
+
+	/**
+	 * @fn bool isValidHeaderString(const std::string& fieldValue)
+	 * @brief Reports whether the given string is a valid header string.
+	 * @param value - the string to check
+	 */
+	static bool isValidHeaderString(const std::string& value);
+
+
+	/**
+	 * @fn bool isValidTimestamp(const std::string& fieldValue)
+	 * @brief Reports whether the given time string is valid.
+	 * @param value - the string to check
+	 */
+	static bool isValidTimestamp(const std::string& value);
+
+
+	/**
+	 * @fn bool isValidIpAddress(const std::string& fieldValue)
+	 * @brief Reports whether the given string contains a valid IPv4 or IPv6 address.
+	 * @param value - the string to check
+	 */
+	static bool isValidIpAddress(const std::string& value);
 };
 
 

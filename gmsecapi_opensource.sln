@@ -21,8 +21,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmhelp", "tools\gmhelp\gmhe
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_perl", "perl\gmsec4\libgmsec_perl.vcxproj", "{8D4F2C8C-A403-4242-9C02-58DC93306D38}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_python", "python\gmsec4\libgmsec_python.vcxproj", "{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_csharp", "csharp\gmsec4\libgmsec_csharp.vcxproj", "{00ED94E9-3301-4AD0-81C3-8745C620A2F6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_python3", "python3\gmsec4\libgmsec_python3.vcxproj", "{56908689-E380-45F4-9DEA-FD4F8279A812}"
@@ -144,17 +142,6 @@ Global
 		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release-SNK|Win32.ActiveCfg = Release|x64
 		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release-SNK|x64.ActiveCfg = Release|x64
 		{8D4F2C8C-A403-4242-9C02-58DC93306D38}.Release-SNK|x64.Build.0 = Release|x64
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Debug|Win32.Build.0 = Debug|Win32
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Debug|x64.ActiveCfg = Debug|x64
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Debug|x64.Build.0 = Debug|x64
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Release|Win32.ActiveCfg = Release|Win32
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Release|Win32.Build.0 = Release|Win32
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Release|x64.ActiveCfg = Release|x64
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Release|x64.Build.0 = Release|x64
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Release-SNK|Win32.ActiveCfg = Release|x64
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Release-SNK|x64.ActiveCfg = Release|x64
-		{A4325D93-4AA6-45F7-979F-55B5ABB1DE43}.Release-SNK|x64.Build.0 = Release|x64
 		{00ED94E9-3301-4AD0-81C3-8745C620A2F6}.Debug|Win32.ActiveCfg = Debug|Win32
 		{00ED94E9-3301-4AD0-81C3-8745C620A2F6}.Debug|Win32.Build.0 = Debug|Win32
 		{00ED94E9-3301-4AD0-81C3-8745C620A2F6}.Debug|x64.ActiveCfg = Debug|x64

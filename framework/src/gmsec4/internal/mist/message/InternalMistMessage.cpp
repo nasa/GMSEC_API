@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -44,7 +44,9 @@ namespace message
 namespace internal
 {
 
-DataList<Field*> InternalMistMessage::m_standardFields;
+// Static member declaration
+DataList<Field*> InternalMistMessage::s_standardFields;
+SchemaIdMapping  InternalMistMessage::s_schemaIdMap;
 
 
 InternalMistMessage::InternalMistMessage(const char* subject,
@@ -54,16 +56,10 @@ InternalMistMessage::InternalMistMessage(const char* subject,
 	: InternalMessage(subject, kind),
 	  m_valid(false),
 	  m_valueBuffer(),
-	  m_spec(0),
-	  m_template()
+	  m_specVersion(spec.getVersion()),
+	  m_template(0)
 {
-	StdUniquePtr<Specification> managedSpec(new Specification(spec));
-
-	m_spec = managedSpec.get();
-
-	registerTemplate(schemaID);
-
-	managedSpec.release();
+	registerTemplate(spec, schemaID);
 
 	init();
 }
@@ -77,16 +73,10 @@ InternalMistMessage::InternalMistMessage(const char* subject,
 	: InternalMessage(subject, kind, config),
 	  m_valid(false),
 	  m_valueBuffer(),
-	  m_spec(0),
-	  m_template()
+	  m_specVersion(spec.getVersion()),
+	  m_template(0)
 {
-	StdUniquePtr<Specification> managedSpec(new Specification(spec));
-
-	m_spec = managedSpec.get();
-
-	registerTemplate(schemaID);
-
-	managedSpec.release();
+	registerTemplate(spec, schemaID);
 
 	init();
 }
@@ -96,24 +86,18 @@ InternalMistMessage::InternalMistMessage(const InternalMistMessage& other)
 	: InternalMessage(other),
 	  m_valid(false),
 	  m_valueBuffer(),
-	  m_spec(0),
-	  m_template()
+	  m_specVersion(other.getSpecVersion()),
+	  m_template(0)
 {
-	StdUniquePtr<Specification> managedSpec(new Specification(*other.m_spec));
-
-	m_spec = managedSpec.get();
-
 	if(other.getTemplate().getID()!= NULL)
 	{
 		std::string id = other.getTemplate().getID();
 
 		if(id != "")
 		{
-			m_template = MessageTemplate(other.getTemplate());
+			m_template.reset(new MessageTemplate(other.getTemplate()));
 		}
 	}
-
-	managedSpec.release();
 
 	init();
 }
@@ -123,8 +107,8 @@ InternalMistMessage::InternalMistMessage(const Message& msg)
 	: InternalMessage(msg.getSubject(), msg.getKind(), msg.getConfig()),
 	  m_valid(false),
 	  m_valueBuffer(),
-	  m_spec(0),
-	  m_template()
+	  m_specVersion(GMSEC_ISD_CURRENT),
+	  m_template(0)
 {
 	convertMessage(msg, Config());
 }
@@ -134,8 +118,8 @@ InternalMistMessage::InternalMistMessage(const Message& msg, const Config& specC
 	: InternalMessage(msg.getSubject(), msg.getKind(), msg.getConfig()),
 	  m_valid(false),
 	  m_valueBuffer(),
-	  m_spec(0),
-	  m_template()
+	  m_specVersion(GMSEC_ISD_CURRENT),
+	  m_template(0)
 {
 	convertMessage(msg, specConfig);
 }
@@ -145,8 +129,8 @@ InternalMistMessage::InternalMistMessage(const char* data)
 	: InternalMessage(data),
 	  m_valid(false),
 	  m_valueBuffer(),
-	  m_spec(0),
-	  m_template()
+	  m_specVersion(GMSEC_ISD_CURRENT),
+	  m_template(0)
 {
 	std::ostringstream oss;
 
@@ -181,7 +165,21 @@ InternalMistMessage::InternalMistMessage(const char* data)
 			specCfg.addValue("gmsec-specification-version", oss.str().c_str());
 			specCfg.addValue("gmsec-legacy-schema-files", "false");
 		}
-		else if (version != mist::GMSEC_ISD_2014_00 && version != mist::GMSEC_ISD_2016_00 && version != mist::GMSEC_ISD_2018_00)
+		else if (version <= mist::GMSEC_ISD_2019_00)
+		{
+			oss << mist::GMSEC_ISD_2019_00;
+
+			specCfg.addValue("gmsec-specification-version", oss.str().c_str());
+			specCfg.addValue("gmsec-legacy-schema_files", "false");
+		}
+		else if (version <= mist::GMSEC_ISD_CURRENT)
+		{
+			oss << mist::GMSEC_ISD_CURRENT;
+
+			specCfg.addValue("gmsec-specification-version", oss.str().c_str());
+			specCfg.addValue("gmsec-legacy-schema_files", "false");
+		}
+		else
 		{
 			GMSEC_WARNING << "Unknown value supplied with CONTENT-VERSION field (" << version << "); defaulting to GMSEC_ISD_CURRENT";
 
@@ -201,17 +199,13 @@ InternalMistMessage::InternalMistMessage(const char* data)
 		specCfg.addValue("gmsec-legacy-schema-files", "false");
 	}
 	
-	// If we have made it here, then we can finally instantiate our Specification object
-	// but we guard it using a StdUniquePtr in case other anomalies occur.
-	StdUniquePtr<Specification> managedSpec(new Specification(specCfg));
+	Specification spec(specCfg);
 
-	m_spec = managedSpec.get();
+	m_specVersion = spec.getVersion();
 
-	std::string schemaID = deduceSchemaID(*this);
+	std::string schemaID = deduceSchemaID(spec, *this);
 
-	registerTemplate(schemaID.c_str());
-
-	managedSpec.release();
+	registerTemplate(spec, schemaID.c_str());
 
 	init();
 }
@@ -221,18 +215,12 @@ InternalMistMessage::InternalMistMessage(const Specification& spec, const char* 
 	: InternalMessage(data),
 	  m_valid(false),
 	  m_valueBuffer(),
-	  m_spec(0),
-	  m_template()
+	  m_specVersion(spec.getVersion()),
+	  m_template(0)
 {
-	StdUniquePtr<Specification> managedSpec(new Specification(spec));
+	std::string schemaID = deduceSchemaID(spec, *this);
 
-	m_spec = managedSpec.get();
-
-	std::string schemaID = deduceSchemaID(*this);
-
-	registerTemplate(schemaID.c_str());
-
-	managedSpec.release();
+	registerTemplate(spec, schemaID.c_str());
 
 	init();
 
@@ -243,9 +231,9 @@ InternalMistMessage::InternalMistMessage(const Specification& spec, const char* 
 		const Field& field = iter.next();
 
 		try {
-			const FieldTemplate& fieldTemp = findFieldTemplate(field.getName());
+			const FieldTemplate& ftmp = findFieldTemplate(field.getName());
 
-			if (fieldTemp.hasExplicitType()) {
+			if (ftmp.hasExplicitType()) {
 				// Convert field, if necessary, for the given Specification.
 				setValue(field.getName(), field.getStringValue());
 			}
@@ -254,33 +242,45 @@ InternalMistMessage::InternalMistMessage(const Specification& spec, const char* 
 			// Ignore error
 		}
 	}
+
+	// If necessary, remove old-style field.
+	if (spec.getVersion() >= GMSEC_ISD_2019_00)
+	{
+		(void) clearField("C2CX-SUBTYPE");
+	}
+	else if (spec.getVersion() < GMSEC_ISD_2018_00)
+	{
+		(void) clearField("SPECIFICATION");
+	}
 }
 
 
 InternalMistMessage::~InternalMistMessage()
 {
-	delete m_spec;
 }
 
 
-void InternalMistMessage::registerTemplate(const char* schemaID)
+void InternalMistMessage::registerTemplate(const Specification& spec, const char* schemaID)
 {
+	// Check if were provided with an alias for the schema ID, or if it needs to be translated to another
+	// value for use with the given message specification version.
+	std::string id = s_schemaIdMap.getSchemaId(schemaID, spec.getVersion());
+
 	try
 	{
-		std::string id = schemaID;   // note: schemaID has already been verified to be non-NULL
+		const MessageTemplate& msgTemp = SpecificationBuddy::getInternal(spec).findTemplate(id.c_str());
 
-		const MessageTemplate& msgTemp = SpecificationBuddy::getInternal(*m_spec).findTemplate(id.c_str());
 		const MessageTemplate::FieldTemplateList& msgFieldTemps = msgTemp.getFieldTemplates();
 
 		//found the right template, now add the header fields
-		MessageTemplate::FieldTemplateList fields = SpecificationBuddy::getInternal(*m_spec).prepHeaders(id.c_str());
+		MessageTemplate::FieldTemplateList fields = SpecificationBuddy::getInternal(spec).prepHeaders(id.c_str());
 
 		for (MessageTemplate::FieldTemplateList::const_iterator it = msgFieldTemps.begin(); it != msgFieldTemps.end(); ++it)
 		{
 			fields.push_back(new FieldTemplate(*(*it)));
 		}
 
-		m_template = MessageTemplate(id.c_str(), fields);
+		m_template.reset(new MessageTemplate(id.c_str(), fields, msgTemp.getSchemaLevel()));
 
 		for (MessageTemplate::FieldTemplateList::iterator it = fields.begin(); it != fields.end(); ++it)
 		{
@@ -289,7 +289,7 @@ void InternalMistMessage::registerTemplate(const char* schemaID)
 	}
 	catch (const Exception& e)
 	{
-		GMSEC_ERROR << "Failed to create MistMessage: schemaID given is not valid";
+		GMSEC_ERROR << "Failed to create MistMessage: given schemaID is not valid";
 		throw e;
 	}
 }
@@ -323,7 +323,7 @@ void InternalMistMessage::setStandardFields(const DataList<Field*>& standardFiel
 
 		if (field)
 		{
-			m_standardFields.push_back(InternalField::makeFieldCopy(*field));
+			s_standardFields.push_back(InternalField::makeFieldCopy(*field));
 		}
 		else
 		{
@@ -341,29 +341,28 @@ void InternalMistMessage::clearStandardFields()
 
 void InternalMistMessage::destroyStandardFields()
 {
-	for (DataList<Field*>::iterator it = m_standardFields.begin(); it != m_standardFields.end(); ++it)
+	for (DataList<Field*>::iterator it = s_standardFields.begin(); it != s_standardFields.end(); ++it)
 	{
 		delete *it;
 	}
 
-	m_standardFields.clear();
+	s_standardFields.clear();
 }
 
 
 const char* InternalMistMessage::getSchemaID() const
 {
-	std::string id = m_template.getID();
-	if(id == "")
+	if (std::string(m_template->getID()).empty())
 	{
 		GMSEC_WARNING << getSubject() << " does not have an attached schema template";
 	}
-	return m_template.getID();
+	return m_template->getID();
 }
 
 
 const MessageTemplate& InternalMistMessage::getTemplate() const
 {
-	return m_template;
+	return *(m_template.get());
 }
 
 
@@ -1122,14 +1121,25 @@ const FieldTemplate& InternalMistMessage::findFieldTemplate(const char* fieldNam
 {
 	//nested array controls have their placeholder value added to the end of the list
 	std::list<std::string> placeHolders;
+	std::vector<std::string> elements = StringUtil::split(fieldName, '.');
+	std::string prefixes;
+
+	//recreate the field name without the index numbers (just the prefixes, the even numbered elements)
+	for (size_t i = 0; i < elements.size(); ++i)
+	{
+		if (i % 2 == 0)
+		{
+			prefixes.append(elements.at(i));
+		}
+	}
 
 	size_t arrayControlActive = 0;
 
-	const MessageTemplate::FieldTemplateList& msgFieldTemps = m_template.getFieldTemplates();
+	const MessageTemplate::FieldTemplateList& msgFieldTemps = m_template->getFieldTemplates();
 
 	for (MessageTemplate::FieldTemplateList::const_iterator ft = msgFieldTemps.begin(); ft != msgFieldTemps.end(); ++ft)
 	{
-		const FieldTemplate* temp = *ft;
+		FieldTemplate* temp = *ft;
 
 		if (StringUtil::stringEqualsIgnoreCase(temp->getName().c_str(), "ARRAY-START") &&
 		    StringUtil::stringEqualsIgnoreCase(temp->getMode().c_str(), "CONTROL"))
@@ -1144,6 +1154,36 @@ const FieldTemplate& InternalMistMessage::findFieldTemplate(const char* fieldNam
 		{
 			//we can remove the last last value since we're done with it
 			arrayControlActive--;
+		}
+		else if (StringUtil::stringEqualsIgnoreCase(temp->getMode().c_str(), "CONTROL") && temp->hasChildren())
+		{
+			if (StringUtil::stringEqualsIgnoreCase(elements.front().c_str(), temp->getPrefix().c_str()))
+			{
+				//found matching prefixes, field is a child of this container
+
+				MessageTemplate::FieldTemplateList children;
+
+				temp->getAllChildren(children);
+
+				for (MessageTemplate::FieldTemplateList::const_iterator it = children.begin(); it != children.end(); ++it)
+				{
+					std::string name = (*it)->getModifiedName();
+					std::vector<std::string> nameElements = StringUtil::split(name, '.');
+					name = "";
+					for (size_t i = 0; i < nameElements.size(); ++i)
+					{
+						if (i % 2 == 0)
+						{
+							name.append(nameElements.at(i));
+						}
+					}
+					
+					if (StringUtil::stringEqualsIgnoreCase(prefixes.c_str(), name.c_str()))
+					{
+						return *(*it);
+					}
+				}
+			}
 		}
 
 		if (arrayControlActive > 0)
@@ -1260,12 +1300,16 @@ Message::MessageKind InternalMistMessage::findKind(const char* schemaID, unsigne
 		throw Exception(MSG_ERROR, UNKNOWN_MSG_TYPE, "SchemaID cannot be NULL nor contain an empty string");
 	}
 
+	// Check if were provided with an alias for the schema ID, or if it needs to be translated to another
+	// value for use with the given message specification version.
+	std::string id = s_schemaIdMap.getSchemaId(schemaID, version);
+
 	// The types of Schema IDs that the API (currently) supports.
 	//
 	// Schema ID Type 1: major.minor.schemaLevel.messagekind.messagetype.<optionalmessagesubtype>
 	// Schema ID Type 2: messagekind.messagetype.<optionalmessagesubtype>
 
-	std::vector<std::string> elements = StringUtil::split(schemaID, '.');
+	std::vector<std::string> elements = StringUtil::split(id, '.');
 	std::string kind;
 
 	if (elements.size() >= 5)        // Type 1
@@ -1292,7 +1336,7 @@ Message::MessageKind InternalMistMessage::findKind(const char* schemaID, unsigne
 	else
 	{
 		std::ostringstream err;
-		err << "MistMessage::findKind(): unable to determine the MessageKind \"" << kind.c_str() << "\"";
+		err << "MistMessage::findKind(): unable to determine the MessageKind from schema ID '" << schemaID << "'";
 		throw Exception(MSG_ERROR, UNKNOWN_MSG_TYPE, err.str().c_str());
 	}
 }
@@ -1300,13 +1344,7 @@ Message::MessageKind InternalMistMessage::findKind(const char* schemaID, unsigne
 
 unsigned int InternalMistMessage::getSpecVersion() const
 {
-	return m_spec->getVersion();
-}
-
-
-void InternalMistMessage::setSpecVersion(unsigned int version)
-{
-	SpecificationBuddy::getInternal(*m_spec).setVersion(version);
+	return m_specVersion;
 }
 
 
@@ -1336,17 +1374,17 @@ void InternalMistMessage::init()
 
 	// Add standard fields (if any) to the message
 	//
-	for (DataList<Field*>::const_iterator it = m_standardFields.begin(); it != m_standardFields.end(); ++it)
+	for (DataList<Field*>::const_iterator it = s_standardFields.begin(); it != s_standardFields.end(); ++it)
 	{
 		const Field* field = *it;
 
 		try
 		{
-			const FieldTemplate& fieldTemp = findFieldTemplate(field->getName());
+			const FieldTemplate& ftmp = findFieldTemplate(field->getName());
 
 			// Make copy of the field, and identify whether it is a header field.
 			Field* copy = InternalField::makeFieldCopy(*field);
-			copy->isHeader(fieldTemp.isHeader());
+			copy->isHeader(ftmp.isHeader());
 
 			// Add standard field to this message, and ensure another copy is not made.
 			this->addField(*copy, false);
@@ -1360,7 +1398,7 @@ void InternalMistMessage::init()
 }
 
 
-std::string InternalMistMessage::deduceSchemaID(const InternalMessage& msg)
+std::string InternalMistMessage::deduceSchemaID(const Specification& spec, const InternalMessage& msg)
 {
 	std::string schemaID;
 
@@ -1380,7 +1418,14 @@ std::string InternalMistMessage::deduceSchemaID(const InternalMessage& msg)
 	std::string subtype;
 	try
 	{
-		subtype = msg.getStringValue("MESSAGE-SUBTYPE");
+		if (getSpecVersion() >= GMSEC_ISD_2019_00 && StringUtil::stringEqualsIgnoreCase(msg.getStringValue("MESSAGE-SUBTYPE"), "C2CX"))
+		{
+			subtype = msg.getStringValue("C2CX-SUBTYPE");
+		}
+		else
+		{
+			subtype = msg.getStringValue("MESSAGE-SUBTYPE");
+		}
 		schemaID.append(".").append(subtype);
 	}
 	catch(...)
@@ -1389,7 +1434,7 @@ std::string InternalMistMessage::deduceSchemaID(const InternalMessage& msg)
 	}
 
 	//determine if there is an additional subtype
-	const std::list<SchemaTemplate>& directory = SpecificationBuddy::getInternal(*m_spec).getDirectory();
+	const std::list<SchemaTemplate>& directory = SpecificationBuddy::getInternal(spec).getDirectory();
 
 	for (std::list<SchemaTemplate>::const_iterator it = directory.begin(); it != directory.end(); ++it)
 	{
@@ -1411,29 +1456,36 @@ std::string InternalMistMessage::deduceSchemaID(const InternalMessage& msg)
 		}
 	}
 
+	// When working with old spec versions, we may need to convert schema ID to old style that included ".C2CX"
+	if (getSpecVersion() < GMSEC_ISD_2019_00 &&
+	    (schemaID == "MSG.CFG" || schemaID == "MSG.CNTL" || schemaID == "MSG.DEV" || schemaID == "MSG.HB" || schemaID == "MSG.RSRC"))
+	{
+		schemaID.insert(3, ".C2CX");
+	}
+
 	return schemaID;
 }
 
 
 void InternalMistMessage::convertMessage(const Message& msg, const Config& specConfig)
 {
-	StdUniquePtr<Specification> managedSpec(new Specification(specConfig));
+	Specification spec(specConfig);
 
-	m_spec = managedSpec.get();
+	m_specVersion = spec.getVersion();
 
-	std::string schemaID = deduceSchemaID(MessageBuddy::getInternal(msg));
+	std::string schemaID = deduceSchemaID(spec, MessageBuddy::getInternal(msg));
 
-	registerTemplate(schemaID.c_str());
-
-	managedSpec.release();
+	registerTemplate(spec, schemaID.c_str());
 
 	init();
 
-	MessageFieldIterator& iter = msg.getFieldIterator();
+	const MessageFieldIterator& iter = msg.getFieldIterator();
 
 	while (iter.hasNext())
 	{
 		const Field& field = iter.next();
+
+		if (this->hasField(field.getName())) continue;
 
 		try
 		{
@@ -1448,6 +1500,15 @@ void InternalMistMessage::convertMessage(const Message& msg, const Config& specC
 			// Unknown field; add it directly as is (i.e. no conversion)
 			addField(field);
 		}
+	}
+
+	if (m_specVersion >= GMSEC_ISD_2019_00)
+	{
+		(void) clearField("C2CX-SUBTYPE");
+	}
+	else if (m_specVersion < GMSEC_ISD_2018_00)
+	{
+		(void) clearField("SPECIFICATION");
 	}
 
 	// copy meta-data (if any)

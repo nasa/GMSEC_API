@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -40,6 +40,8 @@ namespace MESSAGE
 /// The following message schema IDs and their templates are supported:
 /// 2014.00.GMSEC.MSG.C2CX.DEV
 /// 2016.00.GMSEC.MSG.C2CX.DEV
+/// 2019.00.C2MS.MSG.DEV
+/// MSG.DEV
 /// </summary>
 ///
 /// <seealso cref="MistMessage"/>

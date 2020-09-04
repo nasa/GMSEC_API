@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -270,27 +270,45 @@ Field* InternalField::fromJSON(const Json::Value& root)
 
 GMSEC_I64 InternalField::getIntegerValue() const
 {
-	const GMSEC_F64 dbl = getDoubleValue();
+	GMSEC_F64 value = 0;
 
-	if ((dbl < GMSEC_F64(std::numeric_limits<GMSEC_I64>::min())) || (dbl > GMSEC_F64(std::numeric_limits<GMSEC_I64>::max())))
+	try
+	{
+		value = getDoubleValue();
+	}
+	catch (...)
 	{
 		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an integer");
 	}
 
-	return (GMSEC_I64) dbl;
+	if ((value < GMSEC_F64(std::numeric_limits<GMSEC_I64>::min())) || (value > GMSEC_F64(std::numeric_limits<GMSEC_I64>::max())))
+	{
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an integer");
+	}
+
+	return (GMSEC_I64) value;
 }
 
 
 GMSEC_U64 InternalField::getUnsignedIntegerValue() const
 {
-	const GMSEC_F64 dbl = getDoubleValue();
+	GMSEC_F64 value = 0;
 
-	if ((dbl < GMSEC_F64(std::numeric_limits<GMSEC_U64>::min())) || (dbl > GMSEC_F64(std::numeric_limits<GMSEC_U64>::max())))
+	try
+	{
+		value = getDoubleValue();
+	}
+	catch (...)
 	{
 		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an unsigned integer");
 	}
 
-	return (GMSEC_U64) dbl;
+	if ((value < GMSEC_F64(std::numeric_limits<GMSEC_U64>::min())) || (value > GMSEC_F64(std::numeric_limits<GMSEC_U64>::max())))
+	{
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an unsigned integer");
+	}
+
+	return (GMSEC_U64) value;
 }
 
 
@@ -342,7 +360,19 @@ GMSEC_F64 InternalField::getDoubleValue() const
 			break;
 
 		case Field::F32_TYPE:
-			value = (GMSEC_F64) dynamic_cast<const InternalF32Field*>(this)->getValue();
+			{
+				// We (try to) convert the field value to a string, and then to a 64-bit float in order to
+				// achieve better precision. Going from a 32-bit float directly to a 64-bit float
+				// can result in an imprecise number being returned.
+				try
+				{
+					value = StringUtil::getValue<GMSEC_F64>( this->getStringValue() );
+				}
+				catch (...)
+				{
+					value = (GMSEC_F64) dynamic_cast<const InternalF32Field*>(this)->getValue();
+				}
+			}
 			break;
 
 		case Field::F64_TYPE:

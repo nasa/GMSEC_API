@@ -1,6 +1,6 @@
 @echo OFF
 
-set SUPPORT=..\..\..\SUPPORT\opendds-3.12.1
+set SUPPORT=..\..\..\GMSEC_SUPPORT\opendds-3.12.1
 
 set ACE_ROOT=%SUPPORT%
 set DDS_ROOT=%ACE_ROOT%

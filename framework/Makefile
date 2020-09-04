@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -190,8 +190,9 @@ INTERNAL4_OBJ	= \
 	$(OBJDIR4)/internal/field/InternalU64Field.o \
 	$(OBJDIR4)/internal/mist/ConnMgrCallbacks.o \
 	$(OBJDIR4)/internal/mist/ConnMgrCallbackCache.o \
-	$(OBJDIR4)/internal/mist/CustomSpecification.o \
+	$(OBJDIR4)/internal/mist/CustomMessageValidator.o \
 	$(OBJDIR4)/internal/mist/FieldTemplate.o \
+	$(OBJDIR4)/internal/mist/FieldTemplateDependency.o \
 	$(OBJDIR4)/internal/mist/HeartbeatService.o \
 	$(OBJDIR4)/internal/mist/InternalConnectionManager.o \
 	$(OBJDIR4)/internal/mist/InternalDevice.o \
@@ -220,9 +221,11 @@ INTERNAL4_OBJ	= \
 	$(OBJDIR4)/internal/mist/message/InternalMnemonicMessage.o \
 	$(OBJDIR4)/internal/mist/message/InternalProductFileMessage.o \
 	$(OBJDIR4)/internal/performance/PerformanceLogger.o \
+	$(OBJDIR4)/internal/util/InternalCondition.o \
 	$(OBJDIR4)/internal/util/InternalLog.o \
 	$(OBJDIR4)/internal/util/InternalLoggerStream.o \
-	$(OBJDIR4)/internal/util/InternalLogStream.o
+	$(OBJDIR4)/internal/util/InternalLogStream.o \
+	$(OBJDIR4)/internal/util/InternalMutex.o
 
 
 COBJDIR4=$(OBJDIR4)/c

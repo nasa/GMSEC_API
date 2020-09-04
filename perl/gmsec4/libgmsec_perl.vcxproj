@@ -166,7 +166,7 @@ copy .\interfaces\libgmsec_perl.pm .\..\..\bin\lib\GMSECAPI4\libgmsec_perl.pm
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(PERL5_HOME)\lib\CORE;..\..\framework\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PERL5_HOME)\perl\lib\CORE;..\..\framework\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WIN32IOP_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -178,11 +178,12 @@ copy .\interfaces\libgmsec_perl.pm .\..\..\bin\lib\GMSECAPI4\libgmsec_perl.pm
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat />
       <UndefinePreprocessorDefinitions>connect;wait;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gmsecapi.lib;perl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmsecapi.lib;libperl530.a;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\bin\libgmsec_perl.dll</OutputFile>
-      <AdditionalLibraryDirectories>..\..\objects\$(Configuration);$(PERL5_HOME)\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\objects\$(Configuration);$(PERL5_HOME)\perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs />
       <LinkTimeCodeGeneration />
       <RandomizedBaseAddress>false</RandomizedBaseAddress>

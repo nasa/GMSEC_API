@@ -1,4 +1,4 @@
-# Copyright 2007-2019  United States Government as represented by the
+# Copyright 2007-2020  United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -9,15 +9,7 @@
 
 MAKEFILE      = Makefile
 
-SUPPORT       = $(GMSEC_HOME)/../SUPPORT
-
-ifndef LIBXML2_HOME
-LIBXML2_HOME  = /usr
-endif
-
-ifndef LIBXSLT_HOME
-LIBXSLT_HOME  = /usr
-endif
+SUPPORT       = $(GMSEC_HOME)/../GMSEC_SUPPORT
 
 BASE_WRAPPERS = mb
 
@@ -25,12 +17,18 @@ ifdef JDK_HOME
 BASE_WRAPPERS += bolt generic_jms
 
 JAVA_BIN      = $(JDK_HOME)/bin
+JAVA_OPTS     = --release 8
 endif
 
 WRAPPERS      = $(BASE_WRAPPERS) $(MW_WRAPPERS) $(USER_WRAPPERS)
 
 SHLIB_EXT     = so
 JSHLIB_EXT    = so
+
+
+# Typical location of C++ header files; on MacOSX this varies.
+CXX_INCS      = /usr/include/c++/$(shell $(CXX) -dumpversion)
+
 
 # Uncomment the definition below if debugging of the API is required.
 #

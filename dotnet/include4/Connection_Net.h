@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -194,12 +194,19 @@ public:
 	void Publish(Message^ message);
 
 
-	/// <summary>Publishes a message to the middleware using the config object provided to toggle between special
-	/// middleware-level publish functionalities. (eg. ActiveMQ - Durable Producer)</summary>
-	/// <param name="message">The message to publish.</summary>
-	/// <param name="config">The configuration object to be used by the publish operation.</summary>
+	/// <summary>
+	/// Publishes the given message to the middleware using the given configuration to enable or disable
+	/// certain middleware-level publish functionalities (e.g. ActiveMQ - Durable Producer).
+	/// <note type="note">
+	/// The actual Message published to the middleware will contain tracking fields;
+	/// to disable this feature, create a Connection object with the tracking=off
+	/// configuration option.
+	/// </note>
+	/// </summary>
+	/// <param name="message">The message to publish.
+	/// <param name="mwConfig">Configuration object for providing middleware configuration options
 	/// <exception cref="GMSEC_Exception">If an error occurs while attempting to publish the message.</exception>
-	void Publish(Message^ message, Config^ config);
+	void Publish(Message^ message, Config^ mwConfig);
 
 
 	/// <summary>Sends a request asyncronously. The callback will be called for the reply if it is received within

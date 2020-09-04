@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -187,6 +187,30 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specification_1
 }
 
 
+JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specification_1GetSchemaLevel
+  (JNIEnv *jenv, jclass jcls, jlong jSpecPtr, jobject jSpec)
+{
+	jint level = 0;
+
+	try
+	{
+		Specification* spec = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+
+		if (spec == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else
+		{
+			level = (jint) spec->getSchemaLevel();
+		}
+	}
+	JNI_CATCH
+
+	return level;
+}
+
+
 JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specification_1GetMessageSpecifications
   (JNIEnv *jenv, jclass jcls, jlong jSpecPtr, jobject jSpec)
 {
@@ -259,6 +283,32 @@ JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specificatio
 
 	return jMsgSpecs;
 }
+
+
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Specification_1RegisterMessageValidator
+  (JNIEnv *jenv, jclass jclass, jlong jSpecPtr, jobject jSpec, jlong jValPtr)
+{
+	try
+	{
+		Specification*    spec      = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+        MessageValidator* validator = reinterpret_cast<MessageValidator*>(jValPtr);
+
+		if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else if (!validator)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageValidator reference is null");
+		}
+		else
+		{
+			spec->registerMessageValidator(validator);
+		}
+	}
+	JNI_CATCH
+}
+
 
 
 GMSEC_DISABLE_DEPRECATED_WARNINGS

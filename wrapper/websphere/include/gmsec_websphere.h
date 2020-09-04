@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -80,19 +80,5 @@ extern "C"
 
 #endif
 
-
-//Constants
-/*DMW 
-#define DEFAULT_CHANNEL    "SYSTEM.DEF.SVRCONN"
-#define UNSET              "UNSET"
-#define PUBLISH            "PUBLISH"
-#define REQUEST            "REQUEST"
-#define REPLY              "REPLY"
-#define TOPIC_PREFIX       ""
-#define WEBSPHERE_REPLY    "WEBSPHERE_REPLY_ADDR"
-#define WEBSPHERE_SUBJECT  "GMSEC_SUBJECT_WEBSPHERE"
-#define WEBSPHERE_KIND     "GMSEC_KIND_WEBSPHERE"
-#define NONE               "NONE"
-*/
 
 #endif	// GMSEC_WEBSPHERE_H

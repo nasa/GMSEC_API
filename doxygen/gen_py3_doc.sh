@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
 
 
-PY_DOC3=../../SUPPORT/python-3.6.5/bin/pydoc3
+PY_DOC3=../../GMSEC_SUPPORT/python-3.6.5/bin/pydoc3
 
 if [ ! -f ${PY_DOC3} ]; then
 	echo "Error: ${PY_DOC3} not found."

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,10 +39,15 @@ using namespace gmsec::api::mist;
 /* Ignore deprecated methods */
 %ignore gmsec::api::mist::Specification::getTemplateXML(const char*, const char*);
 
+/* Ignore C methods */
+%ignore gmsec::api::mist::Specification::registerMessageValidator(GMSEC_MessageValidator*);
+
 %rename("ValidateMessage") validateMessage;
 %rename("GetSchemaIDIterator") getSchemaIDIterator;
 %rename("GetVersion") getVersion;
+%rename("GetSchemaLevel") getSchemaLevel;
 %rename("GetMessageSpecifications") getMessageSpecifications;
+%rename("RegisterMessageValidator") registerMessageValidator;
 
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/Specification.h>

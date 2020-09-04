@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -24,11 +24,16 @@ namespace GMSEC.API {
 
 public class Specification : global::System.IDisposable {
 
-  /// <summary>Initializes the %Specification instance with a configuration.</summary>
+  /// <summary>Initializes the %Specification with the default message specification (NASA/GMSEC Addendum).</summary>
   ///
-  /// <param name="config">Configuration object</param>
+  /// <exception cref="GmsecException">Thrown if an error occurs loading the message specification.</exception>
+  public Specification() {
+  }
+
+  /// <summary>Initializes the %Specification with the given configuration.</summary>
   ///
   /// <exception cref="GmsecException">Thrown if expected values from the configuration are missing.</exception>
+  /// <exception cref="GmsecException">Thrown if an error occurs loading the message specification.</exception>
   ///
   /// <seealso cref="Config"/>
   public Specification(Config config) {
@@ -73,12 +78,28 @@ public class Specification : global::System.IDisposable {
   public uint GetVersion() {
   }
 
+  /// <summary>Returns the schema level of the message specification in use.</summary>
+  public Specification.SchemaLevel GetSchemaLevel() {
+  }
+
   /// <summary>
   /// Accessor for acquiring the list of MessageSpecification objects associated with the %Specification.
   /// </summary>
   public MessageSpecificationList GetMessageSpecifications() {
   }
 
+  /// <summary>
+  /// Registers the given MessageValidator to be used when message validation takes place.
+  /// </summary>
+  ///
+  /// <param name="validator">The custom MessageValidator to validate messages.</param>
+  ///
+  /// <exception cref="GmsecException">Thrown if the MessageValidator is null.</exception>
+  ///
+  /// <seealso cref="MessageValidator"/>
+  /// <seealso cref="ConnectionManager.RegisterMessageValidator"/>
+  public void RegisterMessageValidator(MessageValidator validator) {
+  }
 }
 
 }

@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -9,7 +9,6 @@ DOX_CFG_FILES       = gmsec_c_3x_dox       \
                       gmsec_cpp_4x_dox     \
                       gmsec_java_3x_dox    \
                       gmsec_java_4x_dox    \
-                      gmsec_python_4x_dox  \
                       gmsec_python3_4x_dox \
                       gmsec_csharp_4x_dox  \
 

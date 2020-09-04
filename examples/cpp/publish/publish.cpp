@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -98,7 +98,7 @@ int main (int argc, char* argv[])
 		//o Disconnect from the middleware and clean up the Connection
 		connMgr.cleanup();
 	}
-	catch (Exception e)
+	catch (const Exception& e)
 	{
 		GMSEC_ERROR << e.what();
 		return -1;
@@ -110,8 +110,8 @@ int main (int argc, char* argv[])
 
 void initializeLogging(Config& config)
 {
-	const char* logLevel  = config.getValue("LOGLEVEL");
-	const char* logFile   = config.getValue("LOGFILE");
+	const char* logLevel = config.getValue("LOGLEVEL");
+	const char* logFile  = config.getValue("LOGFILE");
 
 	if (!logLevel)
 	{

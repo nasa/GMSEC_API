@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -392,17 +392,18 @@ public:
 
 
 	/**
-	 * @fn void publish(const Message& msg, const Config& config)
-	 * @brief This function will publish a message to the middleware
-	 * using the config object provided to toggle between special middleware-level
-	 * publish functionalities. (eg. ActiveMQ - Durable Producer)
+	 * @fn void publish(const Message& msg, const Config& mwConfig)
+	 *
+	 * @brief Publishes the given message to the middleware
+	 * using the given configuration to enable or disable certain middleware-level
+	 * publish functionalities (e.g. ActiveMQ - Durable Producer).
 	 *
 	 * @note The actual Message published to the middleware will contain tracking fields;
 	 * to disable this feature, create a Connection object with the tracking=off
 	 * configuration option.
 	 *
 	 * @param msg - message to be published
-	 * @param config - config object to be used by the publish operation
+	 * @param mwConfig - config object for providing middleware configuration options
 	 *
 	 * @throw Exception if error occurs while attempting to publish the message
 	 *
@@ -411,7 +412,7 @@ public:
 	 *     startAutoDispatch() @n
 	 *     stopAutoDispatch()
 	 */
-	void CALL_TYPE publish(const Message& msg, const Config& config);
+	void CALL_TYPE publish(const Message& msg, const Config& mwConfig);
 
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -53,6 +53,7 @@ namespace mist
 	class ConnectionManagerCallback;
 	class ConnectionManagerEventCallback;
 	class ConnectionManagerReplyCallback;
+	class MessageValidator;
 	class SubscriptionInfo;
 	class Specification;
 
@@ -236,9 +237,22 @@ public:
 
 
 	/**
+	 * @fn void registerMessageValidator(MessageValidator* validator)
+	 *
+	 * @brief Registers the give message validator to be used when message validation takes place.
+	 *
+	 * @param validator - A custom message validation object.
+	 *
+	 * @throw An Exception is thrown if the validator object is NULL.
+	 */
+	void CALL_TYPE registerMessageValidator(MessageValidator* validator);
+
+
+	/**
 	 * @fn void registerEventCallback(Connection::ConnectionEvent event, ConnectionManagerEventCallback *cb)
 	 *
-	 * @brief This is a pass-through function to the underlying connection.
+	 * @brief Uses the given event callback to notify applications of notable events occuring with the Connection Manager
+	 * or the connection to the GMSEC Bus.
 	 *
 	 * @param event - type of event to register
 	 * @param cb - object derived from EventCallback to register for this error event
@@ -329,21 +343,25 @@ public:
 
 
 	/**
-	 * @fn void publish(const Message& msg, const Config& config)
+	 * @fn void publish(const Message& msg, const Config& mwConfig)
 	 *
-	 * @brief If this connection manager has been created with "validate"
-	 * option disabled, this is a pass-through function to the underlying connection.
-	 * Otherwise the message will be validated before it is published.  The given
-	 * configuration object is applied to the message.
+	 * @brief Publishes the given message to the middleware
+	 * using the given configuration to enable or disable certain middleware-level
+	 * publish functionalities (e.g. ActiveMQ - Durable Producer). Message will still
+	 * be validated if message validation is enabled.
+	 *
+	 * @note The actual Message published to the middleware will contain tracking fields;
+	 * to disable this feature, create a ConnectionManager object with the tracking=off
+	 * configuration option.
 	 *
 	 * @param msg - The GMSEC message to be published
-	 * @param config - config object to be used by the publish operation
+	 * @param mwConfig - config object for providing middleware configuration options
 	 *
 	 * @throw An Exception is thrown if the %ConnectionManager has not been initialized.
 	 * @throw An Exception is thrown if the message fails validation, or if any other severe
 	 * error occurs with sending the message.
 	 */
-	void CALL_TYPE publish(const Message& msg, const Config &config);
+	void CALL_TYPE publish(const Message& msg, const Config &mwConfig);
 
 
 	/**
@@ -595,7 +613,7 @@ public:
 	 * from setStandardFields(), nor the fields supplied in the first argument of this function are sufficient to
 	 * complete a set of fields required by validation, an error will be returned.
 	 *
-	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
+	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard
 	 *
 	 * @note When the user done with the message, they should destroy it using release.
@@ -623,7 +641,7 @@ public:
 	 * If users would like to have a COUNTER field added to the published heartbeat message, then the Heartbeat
 	 * Service should be provided with this field within the list of fields provided to this method.
 	 *
-	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
+	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard
 	 *
 	 * @param subject         - subject to set as the default for heartbeat messages
@@ -1163,6 +1181,11 @@ public:
 	 * @desc Calls shutdown routines for each middleware that has a shutdown routine registered.
 	 */
 	static void shutdownAllMiddlewares();
+
+
+	/* @cond For C API support ONLY! */
+	void CALL_TYPE registerMessageValidator(GMSEC_MessageValidator* validator);
+	/* @endcond */
 
 
 	/* @cond For C API support ONLY! */

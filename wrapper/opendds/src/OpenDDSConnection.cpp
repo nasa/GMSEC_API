@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,6 +30,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 
 using namespace gmsec::api;
@@ -42,17 +43,60 @@ namespace gmsec_opendds
 class OpenDDSMiddleware : public Middleware
 {
 public:
-	OpenDDSMiddleware() {}
+	OpenDDSMiddleware()
+	{
+		ACE::init();
+
+		GMSEC_INFO << "Initialized OpenDDS";
+	}
 
 	~OpenDDSMiddleware()
 	{
+		GMSEC_INFO << "Finalizing OpenDDS";
+
 		TheServiceParticipant->shutdown();
 
-#ifdef WIN32
 		ACE::fini();
-#endif
 	}
 };
+
+
+static std::string topicToFilenamePattern(const std::string& gmsecTopic)
+{
+	std::vector<std::string> elements = StringUtil::split(gmsecTopic, '.');
+
+	std::string pattern;
+
+	for (size_t i = 0; i < elements.size(); ++i)
+	{
+		if (elements[i] == ">" || elements[i] == "*")
+		{
+			pattern += ".*";
+		}
+		else if (elements[i] == "+")
+		{
+			pattern += "*";
+		}
+		else
+		{
+			if (!pattern.empty())
+			{
+				pattern += ".";
+			}
+
+			pattern += elements[i];
+		}
+	}
+
+	return pattern;
+}
+
+
+static Mutex& getClassMutex()
+{
+	static Mutex mutex;
+	return mutex;
+}
 
 
 OpenDDSConnection::OpenDDSConnection(const Config& config)
@@ -67,17 +111,18 @@ OpenDDSConnection::OpenDDSConnection(const Config& config)
 	  m_subscriptions(),
 	  m_domainId(0)
 {
-	static bool initialized = false; //TODO: Replace it with something thread safe
+	static bool initialized = false;
+
 	if (!initialized)
 	{
-		// Register our custom Middleware object so that TheServiceParticipant can be shutdown.
-		Middleware::addMiddleware(OPENDDS_VERSION_STRING, new OpenDDSMiddleware());
+		AutoMutex hold(getClassMutex());
 
-#ifdef WIN32
-		ACE::init();
-#endif
-
-		initialized = true;
+		if (!initialized)
+		{
+			// Register our custom Middleware object so that TheServiceParticipant can be shutdown.
+			Middleware::addMiddleware(OPENDDS_VERSION_STRING, new OpenDDSMiddleware());
+			initialized = true;
+		}
 	}
 
 	m_openddsConfig = config.getValue("mw-opendds-config-file", m_openddsConfig.c_str());
@@ -273,14 +318,6 @@ void OpenDDSConnection::mwSubscribe(const char* subject, const Config &config)
 		}
 	}
 
-	if ((subject1.find('*') != std::string::npos) ||
-	    (subject1.find('+') != std::string::npos) ||
-	    (subject1.find('>') != std::string::npos))
-	{
-		throw Exception(MIDDLEWARE_ERROR, INVALID_SUBJECT_NAME,
-			"Error: OpenDDS does not allow for wildcards (i.e. *, >, +) in a subcription subject/topic");
-	}
-
 	bool isForReplies = config.getBooleanValue("__IS_FOR_REPLIES__", false);
 	bool dropMessages = config.getBooleanValue("__DROP_MESSAGES__", false);
 
@@ -296,7 +333,7 @@ void OpenDDSConnection::mwSubscribe(const char* subject, const Config &config)
 	CORBA::String_var type_name = ts->get_type_name();
 	
 	DDS::Topic_var topic = m_participant->create_topic(
-		subject, 
+		"Message",
 		type_name, 
 		TOPIC_QOS_DEFAULT, 
 		DDS::TopicListener::_nil(), 
@@ -308,8 +345,14 @@ void OpenDDSConnection::mwSubscribe(const char* subject, const Config &config)
 	}
 
 	// Create Subscriber
+    DDS::SubscriberQos sub_qos;
+    m_participant->get_default_subscriber_qos(sub_qos);
+
+    sub_qos.partition.name.length(1);
+    sub_qos.partition.name[0] = topicToFilenamePattern(subject1).c_str();
+
 	DDS::Subscriber_var subscriber = m_participant->create_subscriber(
-		SUBSCRIBER_QOS_DEFAULT,
+		sub_qos,
 		DDS::SubscriberListener::_nil(), 
 		OpenDDS::DCPS::DEFAULT_STATUS_MASK);
 
@@ -319,7 +362,7 @@ void OpenDDSConnection::mwSubscribe(const char* subject, const Config &config)
 	}
 
 	// Create DataReader Listener
-	DDS::DataReaderListener_var listener(new OpenDDSMessageListener(this, m_queue, m_requestSpecs, isForReplies, dropMessages));
+	DDS::DataReaderListener_var listener(new OpenDDSMessageListener(subject, this, m_queue, m_requestSpecs, isForReplies, dropMessages));
 
 	if (CORBA::is_nil(listener.in()))
 	{
@@ -327,9 +370,6 @@ void OpenDDSConnection::mwSubscribe(const char* subject, const Config &config)
 	}
 
 	// Create DataReader
-	// DDS::DataReaderQoS dr_default_qos;
-	// subscriber->get_default_datareader_qos(dr_default_qos);
-
 	DDS::DataReader_var reader = subscriber->create_datareader(
 		topic.in(), 
 		DATAREADER_QOS_DEFAULT, 
@@ -589,7 +629,7 @@ OpenDDSConnection::OpenDDSWriter* OpenDDSConnection::createWriter(const std::str
 	// Create Topic
 	CORBA::String_var type_name = ts->get_type_name();
 	DDS::Topic_var topic = m_participant->create_topic(
-		subject.c_str(), 
+		"Message",
 		type_name, 
 		default_topic_qos, 
 		DDS::TopicListener::_nil(), 
@@ -601,8 +641,13 @@ OpenDDSConnection::OpenDDSWriter* OpenDDSConnection::createWriter(const std::str
 	}
 
 	// Create Publisher
+	DDS::PublisherQos pub_qos;
+	m_participant->get_default_publisher_qos(pub_qos);
+	pub_qos.partition.name.length(1);
+	pub_qos.partition.name[0] = subject.c_str();
+
     DDS::Publisher_var publisher = m_participant->create_publisher(
-		PUBLISHER_QOS_DEFAULT, 
+		pub_qos, 
 		DDS::PublisherListener::_nil(), 
 		OpenDDS::DCPS::DEFAULT_STATUS_MASK);
 

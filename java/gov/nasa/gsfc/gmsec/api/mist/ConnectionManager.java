@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -288,6 +288,24 @@ public class ConnectionManager
 
 
 	/**
+	 * Registers the given message validator to be used when message validation takes place.
+	 *
+	 * @param validator The custom message validator
+	 *
+	 * @throws IllegalArgumentException Thrown if the given validator object is null.
+	 */
+	public void registerMessageValidator(MessageValidator validator)
+	{
+		if (validator == null)
+		{
+			throw new IllegalArgumentException("MessageValidator is null");
+		}
+
+		m_jniConnMgr.registerMessageValidator(validator);
+	}
+
+
+	/**
 	 * Registers the given callback for the specified event.
 	 *
 	 * @param event Type of event to register
@@ -486,31 +504,35 @@ public class ConnectionManager
 
 
 	/**
-	 * If this connection manager has been created with "validate"
-	 * option disabled, this is a pass-through function to the underlying connection.
-	 * Otherwise the message will be validated before it is published.  The given
-	 * configuration object is applied to the message.
+	 * Publishes the given message to the middleware using the given configuration to
+	 * enable or disable certain middleware-level publish functionalities
+	 * (e.g. ActiveMQ - Durable Producer). Message will still
+	 * be validated if message validation is enabled.
+	 * <p>
+	 * Note: The actual Message published to the middleware will contain tracking fields;
+	 * to disable this feature, create a ConnectionManager object with the tracking=off
+	 * configuration option.
 	 *
 	 * @param msg The GMSEC message to be published
-	 * @param config Config object to be used by the publish operation
+	 * @param mwConfig Config object for providing middleware configuration options
 	 *
 	 * @throws IllegalArgumentException Thrown if the given Message object is null.
 	 * @throws IllegalArgumentException Thrown if the given Config object is null.
 	 * @throws GMSEC_Exception Thrown if the message fails validation, or if any other severe
 	 * error occurs with sending the message.
 	 */
-	public void publish(Message msg, Config config) throws IllegalArgumentException, GMSEC_Exception
+	public void publish(Message msg, Config mwConfig) throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (msg == null)
 		{
 			throw new IllegalArgumentException("Message is null");
 		}
-		if (config == null)
+		if (mwConfig == null)
 		{
 			throw new IllegalArgumentException("Config is null");
 		}
 
-		m_jniConnMgr.publish(msg, config);
+		m_jniConnMgr.publish(msg, mwConfig);
 	}
 
 
@@ -869,7 +891,7 @@ public class ConnectionManager
 	 * from setStandardFields(), nor the fields supplied in the first argument of this function are sufficient to
 	 * complete a set of fields required by validation, an error will be returned.
 	 * <p>
-	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
+	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard
 	 *
 	 * @param subject The topic (subject) that will be applied to the returned messages.
@@ -903,7 +925,7 @@ public class ConnectionManager
 	 * If users would like to have a COUNTER field added to the published heartbeat message, then the Heartbeat
 	 * Service should be provided with this field within the list of field provided to this method.
 	 * <p>
-	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
+	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard
 	 *
 	 * @param subject Subject to set as the default for heartbeat messages

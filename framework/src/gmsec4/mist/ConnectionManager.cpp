@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -124,6 +124,12 @@ void ConnectionManager::addStandardFields(Message& msg) const
 }
 
 
+void ConnectionManager::registerMessageValidator(MessageValidator* validator)
+{
+	m_internal->registerMessageValidator(validator);
+}
+
+
 void ConnectionManager::registerEventCallback(Connection::ConnectionEvent event, ConnectionManagerEventCallback* cb)
 {
 	m_internal->registerEventCallback(event, cb);
@@ -154,9 +160,9 @@ void ConnectionManager::publish(const Message& msg)
 }
 
 
-void ConnectionManager::publish(const Message& msg, const Config &config)
+void ConnectionManager::publish(const Message& msg, const Config &mwConfig)
 {
-	m_internal->publish(msg, config);
+	m_internal->publish(msg, mwConfig);
 }
 
 
@@ -398,6 +404,18 @@ void ConnectionManager::acknowledgeDirectiveRequest(const char * subject, const 
 }
 
 
+void ConnectionManager::shutdownAllMiddlewares()
+{
+	internal::InternalConnectionManager::shutdownAllMiddlewares();
+}
+
+
+void ConnectionManager::registerMessageValidator(GMSEC_MessageValidator* validator)
+{
+    m_internal->registerMessageValidator(validator);
+}
+
+
 void ConnectionManager::registerEventCallback(Connection::ConnectionEvent event, GMSEC_ConnectionMgrEventCallback* ecb)
 {
 	m_internal->registerEventCallback(event, ecb);
@@ -438,12 +456,6 @@ void ConnectionManager::requestSimpleService(const char* subject, const char* op
 		GMSEC_I32 republish_ms)
 {
 	m_internal->requestSimpleService(subject, opName, opNumber, fields, params, timeout, rcb, ecb, republish_ms);
-}
-
-
-void ConnectionManager::shutdownAllMiddlewares()
-{
-	internal::InternalConnectionManager::shutdownAllMiddlewares();
 }
 
 }  //namespace mist
