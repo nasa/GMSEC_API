@@ -1,0 +1,24 @@
+--- jsoncpp-0.y.z/dist/json/json.h	2015-09-22 15:46:27.204708956 -0400
++++ GMSEC_API/framework/support/include/json.h	2015-09-15 12:33:54.477847925 -0400
+@@ -62,6 +62,11 @@
+ Public Domain "license" you can re-license your copy using whatever
+ license you like.
+ 
++---------------------------------------------------------------------
++The GMSEC API tweaks the namespace of JsonCpp.
++See tinyxml2.diff for details.
++---------------------------------------------------------------------
++
+ */
+ 
+ // //////////////////////////////////////////////////////////////////////
+@@ -195,6 +200,9 @@
+ #define JSONCPP_DEPRECATED(message)
+ #endif // if !defined(JSONCPP_DEPRECATED)
+ 
++/* The GMSEC API tweak to JsonCpp changes the Json namespace */
++#define Json gmsec_json
++
+ namespace Json {
+ typedef int Int;
+ typedef unsigned int UInt;

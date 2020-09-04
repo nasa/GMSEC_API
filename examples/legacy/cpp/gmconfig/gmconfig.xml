@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+
+<!--
+   Copyright 2007-2016 United States Government as represented by the
+   Administrator of The National Aeronautics and Space Administration.
+   No copyright is claimed in the United States under Title 17, U.S. Code.
+   All Rights Reserved.
+-->
+
+
+
+
+
+
+
+<DEFINITIONS>
+	<SUBSCRIPTION NAME="events" PATTERN="GMSEC.MISSION.CONST.SAT.EVT.MSG.>"/>
+	<SUBSCRIPTION NAME="custom1" PATTERN="CUSTOM.MESSAGE.SUBJECTS.*"/>
+	<CONFIG NAME="config2">
+		<PARAMETER NAME="connectiontype">gmsec_bolt</PARAMETER>
+		<PARAMETER NAME="server">localhost</PARAMETER>
+		<PARAMETER NAME="port">9000</PARAMETER>
+	</CONFIG>		
+	<CONFIG NAME="config1">
+		<PARAMETER NAME="connectiontype">gmsec_bolt</PARAMETER>
+		<PARAMETER NAME="server">localhost</PARAMETER>
+		<PARAMETER NAME="tracking">true</PARAMETER>
+		<PARAMETER NAME="isthreaded">true</PARAMETER>
+		<PARAMETER NAME="compress">true</PARAMETER>
+	</CONFIG>
+    <MESSAGE NAME="msg1" SUBJECT="GMSEC.MISSION.CONST.SAT.EVT.MSG" KIND="publish">
+		<CONFIG NAME="msg_config">
+			<PARAMETER NAME="KIND">GMSEC_MSG_PUBLISH</PARAMETER>
+		</CONFIG>		
+		<FIELD TYPE="CHAR" NAME="C">c</FIELD>
+		<FIELD TYPE="BOOL" NAME="BT">TRUE</FIELD>
+		<FIELD TYPE="BOOL" NAME="BF">FALSE</FIELD>
+		<FIELD TYPE="I32" NAME="I">123</FIELD>
+		<FIELD TYPE="STRING" NAME="S">This is a test</FIELD>
+		<FIELD TYPE="F32" NAME="F">123</FIELD>
+		<FIELD TYPE="F64" NAME="D">123</FIELD>
+		<FIELD TYPE="BIN" NAME="X">4a4c4d4e4f5051</FIELD>
+	</MESSAGE>
+</DEFINITIONS>
