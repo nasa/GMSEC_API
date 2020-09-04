@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -38,10 +38,8 @@
 #include <sstream>
 
 
-static const char* const HEADER_VERSION_STRING    = "HEADER-VERSION";
 static const char* const MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
 static const char* const MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
-static const char* const CONTENT_VERSION_STRING   = "CONTENT-VERSION";
 static const char* const MSG_ID_STRING            = "MSG-ID";
 static const char* const MSG_STRING               = "MSG";
 static const char* const MVAL_STRING              = "MVAL";

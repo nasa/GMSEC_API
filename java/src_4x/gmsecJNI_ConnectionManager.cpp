@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -313,31 +313,6 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMana
 }
 
 
-#if 0
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1SetSpecification
-  (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jSpecPtr, jobject jjSpec, jobject jSpec)
-{
-	ConnectionManager*   connMgr = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
-	CustomSpecification* spec    = reinterpret_cast<CustomSpecification*>(jSpecPtr);
-
-	if (!connMgr)
-	{
-		SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
-	}
-	else if (!spec)
-	{
-		SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
-	}
-	else
-	{
-		spec->registerObserver(jenv, jSpec);
-
-		connMgr->setSpecification(spec);
-	}
-}
-#endif
-
-
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1SetStandardFields
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields)
 {
@@ -427,6 +402,31 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 		else
 		{
 			connMgr->addStandardFields(*msg);
+		}
+	}
+	JNI_CATCH
+}
+
+
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RegisterMessageValidator
+  (JNIEnv *jenv, jclass jclass, jlong jConnMgrPtr, jobject jConnMgr, jlong jValPtr)
+{
+	try
+	{
+		ConnectionManager* connMgr   = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
+        MessageValidator*  validator = reinterpret_cast<MessageValidator*>(jValPtr);
+
+		if (!connMgr)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
+		}
+		else if (!validator)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageValidator reference is null");
+		}
+		else
+		{
+			connMgr->registerMessageValidator(validator);
 		}
 	}
 	JNI_CATCH

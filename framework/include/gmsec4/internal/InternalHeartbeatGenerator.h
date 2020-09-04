@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -96,10 +96,11 @@ private:
 
 	typedef gmsec::api::util::StdThread      Service;
 	typedef gmsec::api::util::CountDownLatch CountdownLatch;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::mist::message::MistMessage> HBMessage;
 
 	Config                                         m_config;
 	gmsec::api::mist::ConnectionManager            m_connMgr;
-	gmsec::api::mist::message::MistMessage         m_hbMsg;
+	HBMessage                                      m_hbMsg;
 	GMSEC_U16                                      m_pubRate;
 	GMSEC_U16                                      m_counter;
 

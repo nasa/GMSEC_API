@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -15,7 +15,7 @@ SWIG_OPTS       = -c++ -perl5 $(SWIG_SWG) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
 
 FRAMEWORK_DIR   = ../../framework
 
-GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include/c++/$(shell $(CXX) -dumpversion)
+GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I$(CXX_INCS)
 PERL_INCS       = -I$(PERL5_LIB)/CORE
 API_CXXFLAGS   += -Wno-literal-suffix $(PERL_INCS)
 

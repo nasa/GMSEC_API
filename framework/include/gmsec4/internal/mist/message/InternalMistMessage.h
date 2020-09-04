@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,8 +12,10 @@
 
 #include <gmsec4/internal/mist/MessageTemplate.h>
 #include <gmsec4/internal/mist/FieldTemplate.h>
+#include <gmsec4/internal/mist/SchemaIdMapping.h>
 
 #include <gmsec4/util/DataList.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <string>
 
@@ -84,7 +86,6 @@ public:
 	const char* getSchemaID() const;
 
 	unsigned int getSpecVersion() const;
-	void setSpecVersion(unsigned int version);
 
 	const gmsec::api::mist::internal::MessageTemplate& getTemplate() const;
 
@@ -94,7 +95,7 @@ public:
 
 	void init();
 
-	std::string deduceSchemaID(const InternalMessage& msg);
+	std::string deduceSchemaID(const Specification& spec, const InternalMessage& msg);
 
 	void convertMessage(const Message& msg, const Config& specConfig);
 
@@ -105,7 +106,7 @@ public:
 
 	//helper function for constructer, search spec for appropriate template
 	//given by schema ID, assign to m_template
-	void registerTemplate(const char* schemaID);
+	void registerTemplate(const Specification& spec, const char* schemaID);
 
 private:
 
@@ -121,15 +122,18 @@ private:
 	//without it, the string inside getValue() will be destroyed before it can be returned
 	std::string	m_valueBuffer;
 
-	//specification the message will be based off of
-	gmsec::api::mist::Specification* m_spec;
+	//specification version the message will be based off of
+	unsigned int m_specVersion;
 
 	//this template contains the schema to be used for both populating the message
 	//as well as for use by validation (to be implemented)
-	gmsec::api::mist::internal::MessageTemplate m_template;
+	gmsec::api::util::StdUniquePtr<gmsec::api::mist::internal::MessageTemplate> m_template;
 
 	//List of standard fields (if any) that are included with all Mist Messages
-	static gmsec::api::util::DataList<Field*> m_standardFields;
+	static gmsec::api::util::DataList<Field*> s_standardFields;
+
+	//Mapping of aliases schema IDs to those that match the message templates
+	static gmsec::api::mist::internal::SchemaIdMapping s_schemaIdMap;
 };
 
 } // namespace internal

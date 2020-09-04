@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -190,7 +190,9 @@ void ConnectionMgr::run()
 						// We got a request for MBServer resource data,
 						// so call doResourceMessage() to retrieve this data and send
 						// message.
+#if 0
 						doResourceMessage(*msg);
+#endif
 					}
 					else
 					{
@@ -416,7 +418,7 @@ void ConnectionMgr::doPublish(const MBFastMessage& msg)
 		return;
 	}
 
-	m_mbService->dispatchMsg(subject, *msg.get());
+	m_mbService->dispatchMsg(*msg.get());
 }
 
 

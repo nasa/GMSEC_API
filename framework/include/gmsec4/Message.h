@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -705,6 +705,20 @@ public:
 	 * be converted to a string value.
 	 */
 	const char* CALL_TYPE getStringValue(const char* fieldName) const;
+
+
+	/**
+	 * @fn bool hasField(const char* name) const
+	 *
+	 * @brief Reports whether the field, identified by name, is present in the Message.
+	 *
+	 * @param name - the name of field to find
+	 *
+	 * @return True if the field is found; false otherwise.
+	 *
+	 * @throws Exception is thrown if the given field name is NULL or contains an empty string.
+	 */
+	bool hasField(const char* name) const;
 
 
 	/**

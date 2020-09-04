@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -146,9 +146,9 @@ public class ProductFileMessage extends MistMessage
 	 *
 	 * @param subject        The subject string for the message.
 	 * @param responseStatus RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param schemaID       The string used to identify the message schema in the GMSEC ISD. The schema ID has the
-	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
-	 * You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
+	 * @param schemaID       The string used to identify the message schema in C2MS or other message specification. The schema ID has the
+	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2019.00.C2MS.MSG.PROD)
+	 * Users may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD)
 	 * @param spec           A reference to the specification this message's schema will adhere to.
 	 *
 	 * @throws IllegalArgumentException Thrown if the subject string is null or contains an empty string.
@@ -184,9 +184,9 @@ public class ProductFileMessage extends MistMessage
 	 *
 	 * @param subject        The subject string for the message.
 	 * @param responseStatus RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param schemaID       The string used to identify the message schema in the GMSEC ISD.The schema ID has the
-	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
-	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
+	 * @param schemaID       The string used to identify the message schema in C2MS or other message specification. The schema ID has the
+	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2019.00.C2MS.MSG.PROD)
+	 * Users may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD)
      * @param config         A configuration to associate with the message.
 	 * @param spec           A reference to the specification this message's schema will adhere to.
 	 *

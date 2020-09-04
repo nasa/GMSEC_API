@@ -1,0 +1,262 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Defaults.xsd"/>
+	<xs:include schemaLocation="Fields.xsd"/>
+
+	<xs:simpleType name="CONTENT-VERSION_Type">
+		<xs:restriction base="xs:float">
+			<xs:enumeration value="2019"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PRIORITY_Type">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="1"/>
+			<xs:enumeration value="2"/>
+			<xs:enumeration value="3"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="PARAM">
+		<xs:complexType>
+			<xs:all>
+
+				<xs:element name="NAME" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Name of the parameter</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="VALUE" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Value of the parameter; Component must ascertain the data type before accessing the value (e.g., with a function call)</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="TYPE" type="FIELD_Type"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+
+			</xs:all>
+			<xs:attribute name="INDEX" type="xs:unsignedShort" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="REQ.SERV">
+		<xs:complexType>
+			<xs:all>
+
+				<xs:element name="SUBJECT" type="C2MS_SUBJECT_Type"/>
+				<xs:element name="CONTENT">
+					<xs:complexType>
+						<xs:all>
+
+							<xs:element name="CONTENT-VERSION">
+								<xs:annotation>
+									<xs:documentation>Version Number for this message content description</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="CONTENT-VERSION_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="F32"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="RESPONSE">
+								<xs:annotation>
+									<xs:documentation>Indicates if a response is required.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:boolean">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="BOOLEAN"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="REQUEST-ID">
+								<xs:annotation>
+									<xs:documentation>ID to identify the request message - if different request the request is a replacement; else it is a new request.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:unsignedShort">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="USER" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Which user/work position/proc/schedule the message is coming from</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="SERVICE-NAME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Name of the service offered by a component</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="SERVICE-VERSION" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Version of the service</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="SERVICE-NUMBER" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Number of the service</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:short">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="I16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="OPERATION-NAME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>The PROD- fields are optionally used when the RESP.AMVAL has been specified above. Name of the product being requested.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="OPERATION-NUMBER" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>If MSG.AMVAL is selected above, specifies the speed of data delivery in Kilobits per second</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="NATURAL_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="I16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="OPERATION-VERSION" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Name of the service offered by a component</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="NUM-OF-PARAMS" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Number of parameters included within the service request</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:unsignedShort">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="PARAMS" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element ref="PARAM" minOccurs="0" maxOccurs="100"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="PRIORITY" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Indicates processing priority, if applicable</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="PRIORITY_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="I16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="REQUESTED-EXECUTION-TIME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Absolute or relative time can apply.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="TIME_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="REQUESTED-EXPIRATION-TIME" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Absolute or relative time can apply.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="TIME_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,6 +12,7 @@
 using namespace gmsec::api;
 %}
 
+%ignore gmsec::api::Status::Status(const Exception&);
 %ignore gmsec::api::Status::operator=(const Status&);
 
 %rename("IsError") isError;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,19 +16,19 @@
 
 #include <gmsec4/mist/ConnectionManager.h>
 
-#include <gmsec4/mist/message/MistMessage.h>
-
 #include <gmsec4/Config.h>
 #include <gmsec4/Connection.h>
 #include <gmsec4/Message.h>
 #include <gmsec4/Status.h>
 
+#include <gmsec4/internal/mist/CustomMessageValidator.h>
 #include <gmsec4/internal/mist/HeartbeatService.h>
 #include <gmsec4/internal/mist/MistCallbackAdapter.h>
 #include <gmsec4/internal/mist/ResourceService.h>
 
 #include <gmsec4/internal/mist/MessagePopulator.h>
 
+#include <gmsec4/util/Atomics.h>
 #include <gmsec4/util/DataList.h>
 #include <gmsec4/util/Mutex.h>
 #include <gmsec4/util/StdSharedPtr.h>
@@ -55,6 +55,7 @@ namespace mist
 	class ConnectionManagerCallback;
 	class ConnectionManagerEventCallback;
 	class ConnectionManagerReplyCallback;
+	class MessageValidator;
 	class Specification;
 	class SubscriptionInfo;
 
@@ -96,9 +97,6 @@ public:
 	Specification& CALL_TYPE getSpecification() const;
 
 
-	void CALL_TYPE setSpecification(Specification* spec);
-
-
 	void CALL_TYPE setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields);
 
 
@@ -106,6 +104,9 @@ public:
 
 
 	void CALL_TYPE addStandardFields(Message& msg) const;
+
+
+	void CALL_TYPE registerMessageValidator(MessageValidator* validator);
 
 
 	void CALL_TYPE registerEventCallback(Connection::ConnectionEvent event, ConnectionManagerEventCallback* cb);
@@ -123,7 +124,7 @@ public:
 	void CALL_TYPE publish(const Message& msg);
 
 
-	void CALL_TYPE publish(const Message& msg, const Config &config);
+	void CALL_TYPE publish(const Message& msg, const Config &mwConfig);
 
 
 	void CALL_TYPE request(const Message& request, GMSEC_I32 timeout, ConnectionManagerReplyCallback* cb, GMSEC_I32 republish_ms = 0);
@@ -180,7 +181,7 @@ public:
 	void CALL_TYPE startHeartbeatService(const char* subject, const gmsec::api::util::DataList<Field*>& heartbeatFields);
 
 
-	void CALL_TYPE stopHeartbeatService();
+	void CALL_TYPE stopHeartbeatService(bool throwExceptionOnError = true);
 
 
 	Status CALL_TYPE setHeartbeatServiceField(const Field& field);
@@ -231,7 +232,7 @@ public:
 	void publishResourceMessage(const char* subject, size_t pubRate, size_t sampleInterval, size_t averageInterval);
 
 
-	message::MistMessage createResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval);
+	Message createResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval);
 
 
 	void startResourceMessageService(const char* subject, size_t intervalSeconds, size_t sampleInterval, size_t averageInterval);
@@ -268,7 +269,7 @@ public:
 
 
     /* For C-binding only! */
-	void CALL_TYPE setSpecification(Specification* spec, GMSEC_SpecificationValidateMessage* validateMsg);
+	void CALL_TYPE registerMessageValidator(GMSEC_MessageValidator* validator);
 
 
     /* For C-binding only! */
@@ -349,7 +350,6 @@ private:
 	Connection*                          m_connection;
 	ValidateLevel                        m_validate;
 	Specification*                       m_specification;
-	Specification*                       m_customSpecification;
 
 	std::string                          m_heartbeatServiceSubject;
 	FieldList                            m_heartbeatServiceFields;
@@ -357,7 +357,9 @@ private:
 	std::string                          m_logSubject;
 	FieldList                            m_standardLogFields;
 
-	GMSEC_U16                            m_resourceMessageCounter;
+	gmsec::api::util::AtomicInteger      m_msgIdCounter;
+	gmsec::api::util::AtomicInteger      m_requestIdCounter;
+	gmsec::api::util::AtomicInteger      m_resourceMessageCounter;
 	SubscriptionList                     m_subscriptions;
 	MessagePopulator*                    m_messagePopulator;
 	mutable gmsec::api::util::Mutex      m_cmLock;
@@ -372,8 +374,7 @@ private:
 	gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> m_rsrcThread;
 	gmsec::api::util::StdSharedPtr<ResourceService>             m_rsrcService;
 
-	// will be used for support of C binding
-	CustomSpecification* m_ceeCustomSpec;
+	CustomMessageValidator* m_ceeMessageValidator;
 };
 
 

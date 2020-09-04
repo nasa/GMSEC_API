@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -49,6 +49,21 @@ TrackingDetails::TrackingDetails()
 	fMwInfoFlag(MESSAGE_TRACKINGFIELDS_UNSET),
 	fActiveSubscriptionsFlag(MESSAGE_TRACKINGFIELDS_UNSET),
 	fConnectionEndpointFlag(MESSAGE_TRACKINGFIELDS_UNSET)
+{
+}
+
+
+TrackingDetails::TrackingDetails(const TrackingDetails& other)
+	: fTrackingFlag(other.fTrackingFlag),
+	  fNodeFlag(other.fNodeFlag),
+	  fProcessIdFlag(other.fProcessIdFlag),
+	  fUserNameFlag(other.fUserNameFlag),
+	  fConnectionIdFlag(other.fConnectionIdFlag),
+	  fPublishTimeFlag(other.fPublishTimeFlag),
+	  fUniqueIdFlag(other.fUniqueIdFlag),
+	  fMwInfoFlag(other.fMwInfoFlag),
+	  fActiveSubscriptionsFlag(other.fActiveSubscriptionsFlag),
+	  fConnectionEndpointFlag(other.fConnectionEndpointFlag)
 {
 }
 

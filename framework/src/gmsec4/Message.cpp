@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -225,6 +225,12 @@ GMSEC_F64 Message::getDoubleValue(const char* fieldName) const
 const char* Message::getStringValue(const char* fieldName) const
 {
 	return m_iMessage->getStringValue(fieldName);
+}
+
+
+bool Message::hasField(const char* name) const
+{
+	return m_iMessage->hasField(name);
 }
 
 

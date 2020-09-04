@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <DEFINITIONS>
 <!--
-RELEASE COMPLIANCY: GMSEC ISD VERSION MAY 2018
+RELEASE COMPLIANCY: GMSEC Addendum to C2MS VERSION MAY 2018
 
 Notes:
 After each field is the field's requirement to be within the message.  This

@@ -2,7 +2,7 @@
 
 
 """
- Copyright 2007-2019 United States Government as represented by the
+ Copyright 2007-2020 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -13,66 +13,45 @@
  
  This file contains an example demonstrating how to implement additional
  Message validation logic in addition to that which the GMSEC API provides.
-
- Note: This example focuses on adding additional validation upon the receipt
- of a message.  It almost goes without saying that additional logic can be
- added to a program prior to invoking the publish() function without having
- to do anything special.
 """
-import libgmsec_python3
+
+import libgmsec_python3 as lp
 import sys 
 
-PROD_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.PROD.PRODUCT_MESSAGE"
+
+HB_MSG_SUBJECT     = "GMSEC.MISSION.SATELLITE.MSG.HB.VALIDATION-CUSTOM"
+ALT_HB_MSG_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.VALIDATION-CUSTOM.HB"
 
 
-# Create a callback and define message content validation logic which will
-# be used in combination with the GMSEC API validation.
-class ValidationCallback(libgmsec_python3.ConnectionManagerCallback):
+class CustomMessageValidator(lp.MessageValidator):
 
     def __init__(self):
-        libgmsec_python3.ConnectionManagerCallback.__init__(self)
+        super().__init__()
 
-    def on_message(self, connMgr, message):
-        try:
-            # Run the message through the GMSEC API-supplied validation
-            connMgr.get_specification().validate_message(message)
+    def validate_message(self, msg):
+        status = lp.Status()
 
-            # In this example scenario, we are expecting to receive a
-            # GMSEC PROD message containing a URI to a location on the disk
-            # where a product file has been placed for retrieval.  In this
-            # case, we want to validate that the location on the disk is
-            # in an area which we would expect (i.e. Something that the
-            # team has agreed upon prior to operational deployment).
-            #
-            # By validating this URI, we ensure that no malicious users
-            # have infiltrated the system and somehow modified the messages
-            # to cause us to retrieve a file from an unknown location.
+        # Get message type and subtype
+        msgType = ""
+        subtype = ""
 
-            # Start by checking to ensure that this is a PROD message
-            if (isProdMsg(message)):
-                prodMessage = libgmsec_python3.ProductFileMessage(connMgr.get_specification(), message.to_XML())
+        if msg.has_field("MESSAGE-TYPE"):
+            msgType = msg.get_string_value("MESSAGE-TYPE")
+        if msg.has_field("C2CX-SUBTYPE"):
+            subtype = msg.get_string_value("C2CX-SUBTYPE")
+        elif msg.has_field("MESSAGE-SUBTYPE"):
+            subtype = msg.get_string_value("MESSAGE-SUBTYPE")
 
-                # Get the iterator so that we can analyze each Product File within the message
-                prodFileIter = prodMessage.get_product_file_iterator()
+        # Ensure we have a Heartbeat message and it contains the PUB-RATE field
+        if msgType == "MSG" and subtype == "HB" and msg.has_field("PUB-RATE"):
+            pubRate = msg.get_integer_value("PUB-RATE")
+            if pubRate < 10 or pubRate > 60:
+                status.set(lp.MSG_ERROR, lp.VALUE_OUT_OF_RANGE, "PUB-RATE field does not have a valid value")
 
-                # For each Product File available...
-                while prodFileIter.has_next():
+        else:
+            status.set(lp.MSG_ERROR, lp.INVALID_MSG, "Non-Heartbeat message received")
 
-                    # Get the next Product File
-                    prodFile = prodFileIter.next()
-
-                    # Extract the URI from the Product File
-                    prodUri = prodFile.get_URI()
-
-                    # Check to ensure that the URI contains "//hostname/dir"; if not, report an error
-                    if (prodUri.find("//hostname/dir") == -1):
-                        errorMsg = "This error is expected; received an invalid PROD Message (bad URI):\n" + prodMessage.to_XML()
-                        raise libgmsec_python3.GmsecError(libgmsec_python3.MIST_ERROR, libgmsec_python3.MESSAGE_FAILED_VALIDATION, errorMsg)
-                             
-                libgmsec_python3.log_info("Received a valid message:\n" + prodMessage.to_XML())
-                        
-        except libgmsec_python3.GmsecError as e:
-            libgmsec_python3.log_error(str(e))
+        return status
 
 
 def main():
@@ -84,7 +63,7 @@ def main():
 
 
     # Load the command-line input into a GMSEC Config object
-    config = libgmsec_python3.Config(sys.argv)
+    config = lp.Config(sys.argv)
 
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
@@ -92,42 +71,75 @@ def main():
     initializeLogging(config);
 
     # Enable Message validation.  This parameter is "false" by default.
-    config.add_value("GMSEC-MSG-CONTENT-VALIDATE", "true")
+    config.add_value("gmsec-msg-content-validate-send", "true")
+    config.add_value("gmsec-validation-level", "3")
 
-    libgmsec_python3.log_info(libgmsec_python3.ConnectionManager.get_API_version())
+    lp.log_info("API version: " + lp.ConnectionManager.get_API_version())
 
     try:
-        connMgr = libgmsec_python3.ConnectionManager(config)
+        connMgr = lp.ConnectionManager(config)
 
-        libgmsec_python3.log_info("Opening the connection to the middleware server")
         connMgr.initialize()
 
-        connMgr.get_library_version()
+        lp.log_info("Middleware version: " + connMgr.get_library_version())
 
-        # Set up the ValidationCallback and subscribe
-        vc = ValidationCallback()
-        connMgr.subscribe(PROD_MESSAGE_SUBJECT, vc)
+        # Register custom message validator
+        validator = CustomMessageValidator()
+        connMgr.register_message_validator(validator)
 
-        # Start the AutoDispatcher
-        connMgr.start_auto_dispatch()
+        # Set up standard/common fields used with all messages
+        specVersion = connMgr.get_specification().get_version()
+        setupStandardFields(specVersion)
 
-        # Create and publish a simple Product File Message
-        setupStandardFields(connMgr)
+        # Create Heartbeat Message
+        # Note: Message subject and schema ID vary depending on the specification in use
+        if specVersion > lp.GMSEC_ISD_2018_00:
+            subject  = HB_MSG_SUBJECT
+            schemaID = "MSG.HB"
+        else:
+            subject  = ALT_HB_MSG_SUBJECT
+            schemaID = "MSG.C2CX.HB"
 
-        productMessage = createProductFileMessage(connMgr, "//hostname/dir/filename")
+        msg = lp.MistMessage(subject, schemaID, connMgr.get_specification())
 
-        # Publish the message to the middleware bus
-        connMgr.publish(productMessage)
+        # Add PUB-RATE field with illegal value
+        msg.set_value("PUB-RATE", "5")
 
-        productMessage = createProductFileMessage(connMgr, "//badhost/dir/filename")
+        # For very old specifications, we need to add a MSG-ID field
+        if specVersion <= lp.GMSEC_ISD_2014_00:
+            msg.add_field("MSG-ID", "12345")
 
-        connMgr.publish(productMessage)
+        # Attempt to publish malformed message
+        try:
+            lp.log_info("Attempting to publish malformed message...")
+            connMgr.publish(msg)
+
+            lp.log_warning("Was expecting an error")
+
+        except lp.GmsecError as e:
+            # We expect to encounter error with the PUB-RATE field
+            lp.log_info("This is an expected error:\n" + str(e))
+
+        # Fix PUB-RATE field with legal value
+        msg.set_value("PUB-RATE", "15")
+
+        # Publish a good message
+        try:
+            lp.log_info("Attempting to publish good message...")
+            connMgr.publish(msg)
+
+            lp.log_info("Message published!")
+
+        except lp.GmsecError as e:
+            lp.log_warning("Unexpected error:\n" + str(e))
 
         # Disconnect from the middleware and clean up the Connection
         connMgr.cleanup()
+
+        clearStandardFields()
         
-    except libgmsec_python3.GmsecError as e:
-        libgmsec_python3.log_error(str(e))
+    except lp.GmsecError as e:
+        lp.log_error(str(e))
         return -1
 
     return 0
@@ -135,8 +147,8 @@ def main():
 
 def initializeLogging(config):
 
-    logLevel  = config.get_value("LOGLEVEL")
-    logFile   = config.get_value("LOGFILE")
+    logLevel = config.get_value("LOGLEVEL")
+    logFile  = config.get_value("LOGFILE")
 
     if (not logLevel):
         config.add_value("LOGLEVEL", "INFO")
@@ -145,53 +157,35 @@ def initializeLogging(config):
         config.add_value("LOGFILE", "STDERR")
 
 
-def setupStandardFields(connMgr):
+def setupStandardFields(specVersion):
 
-    definedFields = libgmsec_python3.FieldList()
+    definedFields = lp.FieldList()
 
-    missionField = libgmsec_python3.StringField("MISSION-ID", "MISSION")
-    satIdField = libgmsec_python3.StringField("SAT-ID-PHYSICAL", "SPACECRAFT")
-    facilityField = libgmsec_python3.StringField("FACILITY", "GMSEC Lab")
-    componentField = libgmsec_python3.StringField("COMPONENT", "validation_custom")
+    mission       = lp.StringField("MISSION-ID", "MISSION")
+    constellation = lp.StringField("CONSTELLATION-ID", "CONSTELLATION")
+    satIdPhys     = lp.StringField("SAT-ID-PHYSICAL", "SATELLITE")
+    satIdLog      = lp.StringField("SAT-ID-LOGICAL", "SATELLITE")
+    facility      = lp.StringField("FACILITY", "GMSEC-LAB")
+    component     = lp.StringField("COMPONENT", "VALIDATION-CUSTOM")
+    domain1       = lp.StringField("DOMAIN1", "DOMAIN1")
+    domain2       = lp.StringField("DOMAIN2", "DOMAIN2")
 
-    definedFields.append(missionField)
-    definedFields.append(satIdField)
-    definedFields.append(facilityField)
-    definedFields.append(componentField)
+    definedFields.append(mission)
+    definedFields.append(constellation)
+    definedFields.append(satIdPhys)
+    definedFields.append(satIdLog)
+    definedFields.append(facility)
+    definedFields.append(component)
 
-    if (connMgr.get_specification().get_version() >= libgmsec_python3.GMSEC_ISD_2018_00):
-        domain1 = libgmsec_python3.StringField("DOMAIN1", "MY-DOMAIN-1")
-        domain2 = libgmsec_python3.StringField("DOMAIN2", "MY-DOMAIN-2")
+    if specVersion >= lp.GMSEC_ISD_2018_00:
         definedFields.append(domain1)
         definedFields.append(domain2)
 
-    connMgr.set_standard_fields(definedFields)
+    lp.MistMessage.set_standard_fields(definedFields)
 
 
-def createProductFileMessage(connMgr, filePath):
-
-    externalFile = libgmsec_python3.ProductFile("External File", "External File Description", "1.0.0", "TXT", filePath)
-
-    if (connMgr.get_specification().get_version() <= libgmsec_python3.GMSEC_ISD_2016_00):
-        productMessage = libgmsec_python3.ProductFileMessage(PROD_MESSAGE_SUBJECT, libgmsec_python3.ResponseStatus.SUCCESSFUL_COMPLETION, "MSG.PROD.AUTO", connMgr.get_specification())
-    else:
-        productMessage = libgmsec_python3.ProductFileMessage(PROD_MESSAGE_SUBJECT, libgmsec_python3.ResponseStatus.SUCCESSFUL_COMPLETION, "MSG.PROD", connMgr.get_specification())
-        productMessage.add_field("PROD-TYPE", "AUTO");
-        productMessage.add_field("PROD-SUBTYPE", "DM");
-
-    productMessage.add_product_file(externalFile)
-
-    connMgr.add_standard_fields(productMessage)
-
-    return productMessage
-    
-
-
-def isProdMsg(message):
-
-    result = (message.get_string_value("MESSAGE-TYPE") == "MSG" and message.get_string_value("MESSAGE-SUBTYPE") == "PROD") 
-    return result
-
+def clearStandardFields():
+    lp.MistMessage.clear_standard_fields()
 
 
 #
@@ -199,5 +193,4 @@ def isProdMsg(message):
 #
 if __name__=="__main__":
     sys.exit(main())
-
 

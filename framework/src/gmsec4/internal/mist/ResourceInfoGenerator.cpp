@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -11,17 +11,15 @@
  *
  *  @brief The ResourceInfoGenerator encapsulates common API functions for 
  *  gathering system resource information and adding them to a GMSEC message
- *
-**/
+ */
 
 #include <gmsec4/internal/mist/ResourceInfoGenerator.h>
-
-#include <gmsec4/mist/message/MistMessage.h>
 
 #include <gmsec4/mist/mist_defs.h>
 
 #include <gmsec4/Exception.h>
 #include <gmsec4/Errors.h>
+#include <gmsec4/Message.h>
 
 #include <gmsec4/util/Log.h>
 #include <gmsec4/util/TimeUtil.h>
@@ -32,6 +30,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cstdlib>
+#include <cerrno>
 
 #ifdef WIN32
 #include <windows.h>
@@ -39,23 +38,7 @@
 #include "pdhmsg.h"
 #include "TCHAR.h"
 #include <iphlpapi.h>
-#elif defined(__sun)
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <unistd.h>
-#include <strings.h>
-#include <sys/types.h>
-#include <sys/statvfs.h>
-#include <sys/utsname.h>
-#elif defined(__hpux)
-#include <iostream>
-#include <fstream>
-#include <sys/statvfs.h>
-#include <sys/utsname.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+
 #elif defined(__linux__)
 #include <iostream>
 #include <fstream>
@@ -70,6 +53,7 @@
 #include <ifaddrs.h>
 #include <unistd.h>
 #include <string.h>
+
 #elif defined(__APPLE__)
 #include <iostream>
 #include <fstream>
@@ -90,7 +74,6 @@ using namespace gmsec::api;
 using namespace gmsec::api::internal;
 using namespace gmsec::api::util;
 using namespace gmsec::api::mist;
-using namespace gmsec::api::mist::message;
 using namespace gmsec::api::mist::internal;
 
 using namespace std;
@@ -163,7 +146,7 @@ static bool checkStatus(const char* operation, PDH_STATUS status)
 #endif
 
 
-void ResourceInfoGenerator::addMainMemoryStats(MistMessage& msg, unsigned int version, size_t movingAverageSamples)
+void ResourceInfoGenerator::addMainMemoryStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples)
 {
 	MainMemoryStats stats_this_iteration;
 
@@ -174,6 +157,7 @@ void ResourceInfoGenerator::addMainMemoryStats(MistMessage& msg, unsigned int ve
 	stats_this_iteration.available_virtual_memory  = 0;
 
 #ifdef WIN32
+
 	MEMORYSTATUSEX statex;
 
 	statex.dwLength = sizeof(statex);
@@ -193,141 +177,6 @@ void ResourceInfoGenerator::addMainMemoryStats(MistMessage& msg, unsigned int ve
 		                "Failed to query virtual memory stats");
 	}
 
-#elif defined(__sun)
-
-	long memory_page_size        = sysconf(_SC_PAGE_SIZE);
-	long memory_physical_pages   = sysconf(_SC_PHYS_PAGES);
-	long memory_pages_not_in_use = sysconf(_SC_AVPHYS_PAGES);
-
-	GMSEC_F32 memory_percent_utilized =
-	  1.0 - ((GMSEC_F32)(memory_pages_not_in_use)/(GMSEC_F32)memory_physical_pages);
-
-	GMSEC_I64 total_physical_memory =
-	  (GMSEC_I64)memory_page_size * (GMSEC_I64)memory_physical_pages;
-
-	GMSEC_I64 available_physical_memory =
-	  (GMSEC_I64)memory_page_size * (GMSEC_I64)memory_pages_not_in_use;
-
-	FILE* pipe_output_fp = popen("/usr/bin/sh -c \"/usr/sbin/swap -s\"", "r");
-
-	bool               done           = false;
-	int                num_args       = 0;
-	char               buffer[CHAR_BUF_LEN];
-	unsigned long int  dummy          = 0;
-	unsigned long int  available_vm   = 0;
-	unsigned long int  used_vm        = 0;
-
-	std::istringstream iss;
-
-	pipeStreamToInputStream(iss, pipe_output_fp);
-
-	pclose(pipe_output_fp);
-
-	done = false;
-	while (iss.getline(buffer, sizeof(buffer), '\n'))
-	{
-		num_args = sscanf(buffer, "total: %luk bytes allocated + %luk reserved = %luk used, %luk available",
-		                  &dummy, &dummy,
-		                  &used_vm, &available_vm);
-
-		if (num_args == 4)
-		{
-			done = true;
-		}
-	}
-
-	if (!done)
-	{
-		throw Exception(MIST_ERROR, RESOURCE_INFO_MEMORY_ERROR,
-		                "Failed to query virtual memory stats");
-	}
-
-	GMSEC_I64 total_virtual_memory = ((GMSEC_I64)used_vm+(GMSEC_I64)available_vm)*1024;
-
-	GMSEC_I64 available_virtual_memory = (GMSEC_I64)available_vm*1024;
-
-	stats_this_iteration.memory_percent_utilized   = memory_percent_utilized*100.0;
-	stats_this_iteration.total_physical_memory     = total_physical_memory;
-	stats_this_iteration.available_physical_memory = available_physical_memory;
-	stats_this_iteration.total_virtual_memory      = total_virtual_memory;
-	stats_this_iteration.available_virtual_memory  = available_virtual_memory;
-
-#elif defined(__hpux)
-
-	bool haveStats = false;
-	int  tries     = 40;
-
-	while (!haveStats && tries-- > 0)
-	{
-		system("top -f /tmp/tmpout.top");
-
-		TimeUtil::millisleep(100);
-
-		struct stat top_stats;
-		stat("/tmp/tmpout.top", &top_stats);
-
-		haveStats = (top_stats.st_size > 0);
-	}
-
-	if (!haveStats)
-	{
-		GMSEC_ERROR << "Failed to acquire MEMORY stats";
-		return;
-	}
-
-	bool              done     = false;
-	int               num_args = 0;
-	char              buffer[CHAR_BUF_LEN];
-	unsigned long int real_mem;
-	unsigned long int available_real_mem;
-	unsigned long int virtual_mem;
-	unsigned long int available_virtual_mem;
-	unsigned long int free_mem;
-
-	ifstream          ifs("/tmp/tmpout.top", ios::in);
-
-	while (ifs.getline(buffer, sizeof(buffer), '\n') && !done)
-	{
-		if (StringUtil::stringCompareCount(buffer, "Memory:", 7) == 0)
-		{
-			num_args = sscanf(buffer, "Memory: %luK (%luK) real, %luK (%luK) virtual, %luK free",
-			                  &real_mem,
-			                  &available_real_mem,
-			                  &virtual_mem,
-			                  &available_virtual_mem,
-					  &free_mem);
-
-			if (num_args == 5)
-			{
-				done = true;
-			}
-		}
-	}
-
-	if (!done)
-	{
-		throw Exception(MIST_ERROR, RESOURCE_INFO_MEMORY_ERROR,
-		                "Failed to query memory stats");
-	}
-	else
-	{
-		unlink("/tmp/tmpout.top");
-	}
-
-	GMSEC_I64 total_virtual_memory = (GMSEC_I64) virtual_mem * 1024;
-	GMSEC_I64 available_virtual_memory = (GMSEC_I64) available_virtual_mem * 1024;
-
-
-	GMSEC_I64 total_physical_memory = (GMSEC_I64) real_mem * 1024;
-	GMSEC_I64 available_physical_memory = (GMSEC_I64) available_real_mem * 1024;
-
-	GMSEC_F32 memory_percent_utilized = 1.0 - ((GMSEC_F32) available_real_mem / (GMSEC_F32) real_mem);
-
-	stats_this_iteration.memory_percent_utilized   = memory_percent_utilized*100.0;
-	stats_this_iteration.total_physical_memory     = total_physical_memory;
-	stats_this_iteration.available_physical_memory = available_physical_memory;
-	stats_this_iteration.total_virtual_memory      = total_virtual_memory;
-	stats_this_iteration.available_virtual_memory  = available_virtual_memory;
 #elif defined(__linux__)
 
 	struct sysinfo sys_info;
@@ -502,7 +351,7 @@ void ResourceInfoGenerator::addMainMemoryStats(MistMessage& msg, unsigned int ve
 	average_total_virtual_memory      /= m_mainMemoryStatsQueue.size(); // This total virtual memory shouldn't change (the average should be the same as a one-time sample), but keep it consistent with the other logic
 	average_available_virtual_memory  /= m_mainMemoryStatsQueue.size();
 
-	if (version >= GMSEC_ISD_2016_00)
+	if (specVersion >= GMSEC_ISD_2016_00)
 	{
 		msg.addField("MEM.UTIL", average_memory_percent_utilized);
 		msg.addField("MEM.PHYSICAL.TOTAL", (GMSEC_U64) average_total_physical_memory); 
@@ -513,7 +362,7 @@ void ResourceInfoGenerator::addMainMemoryStats(MistMessage& msg, unsigned int ve
 }
 
 
-void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version, size_t movingAverageSamples)
+void ResourceInfoGenerator::addDiskStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples)
 {
 	//This function responsible for adding:
 	//NUM-OF-DISKS
@@ -526,7 +375,6 @@ void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version,
 	stats_this_iteration.num_of_disks = 0;
 
 #ifdef WIN32
-	
 
 	int drType=NULL;
 	char drAvail[CHAR_BUF_LEN];//Max drive str size
@@ -571,196 +419,8 @@ void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version,
 
 	stats_this_iteration.num_of_disks = driveCount;
 
-#elif defined(__sun)
-
-	//
-	// Read from Solaris file /etc/vfstab to obtain mounted disks
-	// info.
-	//
-	// The file fields are:
-	//
-	// 		 1 - device path to mount
-	// 		 2 - device path to fsck
-	// 		 3 - mount directory
-	// 		 4 - filesystem type
-	// 		 5 - fsck pass
-	// 		 6 - mount at boot
-	// 		 7 - mount options
-	//
-
-	char           buffer[CHAR_BUF_LEN];
-
-	ifstream       ifs("/etc/vfstab", ios::in);
-
-	GMSEC_I16      num_of_disks = 0;
-
-	while (ifs.getline(buffer, sizeof(buffer), '\n'))
-	{
-		char*       token        = strtok(buffer, " \t");
-		int         token_count  = 0;
-		std::string device_path;
-		std::string mount_directory;
-
-		while (token != NULL)
-		{
-			token_count++;
-
-			if (token_count == 1)
-			{
-				device_path = token;
-			}
-			else if (token_count == 3)
-			{
-				mount_directory = token;
-
-				if (StringUtil::stringCompareCount(device_path.c_str(), "/dev/", 5) == 0 && strstr(mount_directory.c_str(), "/") != NULL)
-				{
-					StatsForOneDisk stats_for_one_disk;
-
-					num_of_disks++;
-
-					stats_for_one_disk.disk_name = device_path;
-
-					struct statvfs stat_buf;
-
-					if (statvfs(mount_directory.c_str(),
-					            &stat_buf) == 0) // success
-					{
-						GMSEC_I64 disk_size_in_bytes =
-						  (GMSEC_I64)stat_buf.f_blocks*(GMSEC_I64)stat_buf.f_frsize;
-
-						stats_for_one_disk.disk_size = static_cast<GMSEC_F32>(disk_size_in_bytes)/static_cast<GMSEC_F32>(1024.0*1024.0);
-
-						GMSEC_F64 disk_free_percentage =
-						  (GMSEC_F64)stat_buf.f_bfree/
-						  (GMSEC_F64)stat_buf.f_blocks;
-
-						GMSEC_F64 disk_util_percentage =
-						  1.0 - disk_free_percentage;
-
-						stats_for_one_disk.disk_util = static_cast<GMSEC_F32>(disk_util_percentage*100.0);
-
-					}
-					else
-					{
-						std::string err_str =
-						  "Failed to query disk stats on ";
-						err_str += device_path;
-	
-						throw Exception(MIST_ERROR,
-								RESOURCE_INFO_DISK_ERROR,
-						                err_str.c_str());
-					}
-
-					stats_this_iteration.stats.push_back(stats_for_one_disk);
-				}
-			}
-
-			token = strtok(NULL, " \t");
-
-		}
-	}
-
-	ifs.close();
-
-	stats_this_iteration.num_of_disks = num_of_disks;
-
-#elif defined(__hpux)
-
-	//
-	// Read from file /etc/fstab to obtain mounted disks
-	// info.
-	//
-	// The file fields are:
-	//
-	// 		 1 - device path to mount
-	// 		 2 - mount directory
-	// 		 3 - filesystem type
-	// 		 4 - options
-	// 		 5 - backup frequency
-	// 		 6 - pass number
-	// 		 7 - comment
-	//
-
-	char           buffer[CHAR_BUF_LEN];
-
-	ifstream       ifs("/etc/fstab", ios::in);
-
-	GMSEC_I16      num_of_disks = 0;
-
-	while (ifs.getline(buffer, sizeof(buffer), '\n'))
-	{
-		char*       token        = strtok(buffer, " \t");
-		int         token_count  = 0;
-		std::string device_path;
-		std::string mount_directory;
-
-		while (token != NULL)
-		{
-			token_count++;
-
-			if (token_count == 1)
-			{
-				device_path = token;
-			}
-			else if (token_count == 2)
-			{
-				mount_directory = token;
-
-				if (StringUtil::stringCompareCount(device_path.c_str(), "/dev/", 5) == 0 && strstr(mount_directory.c_str(), "/") != NULL)
-				{
-					StatsForOneDisk stats_for_one_disk;
-
-					num_of_disks++;
-
-					stats_for_one_disk.disk_name = device_path;
-
-					struct statvfs stat_buf;
-
-					if (statvfs(mount_directory.c_str(),
-					            &stat_buf) == 0) // success
-					{
-						GMSEC_I64 disk_size_in_bytes =
-						  (GMSEC_I64)stat_buf.f_blocks*(GMSEC_I64)stat_buf.f_frsize;
-
-						stats_for_one_disk.disk_size = static_cast<GMSEC_F32>(disk_size_in_bytes)/static_cast<GMSEC_F32>(1024.0*1024.0);
-
-						GMSEC_F64 disk_free_percentage =
-						  (GMSEC_F64)stat_buf.f_bfree/
-						  (GMSEC_F64)stat_buf.f_blocks;
-
-						GMSEC_F64 disk_util_percentage =
-						  1.0 - disk_free_percentage;
-
-						stats_for_one_disk.disk_util = static_cast<GMSEC_F32>(disk_util_percentage*100.0);
-
-					}
-					else
-					{
-						std::string err_str =
-						  "Failed to query disk stats on ";
-						err_str += device_path;
-	
-						throw Exception(MIST_ERROR,
-								RESOURCE_INFO_DISK_ERROR,
-						                err_str.c_str());
-					}
-
-					stats_this_iteration.stats.push_back(stats_for_one_disk);
-
-				}
-			}
-
-			token = strtok(NULL, " \t");
-
-		}
-	}
-
-	ifs.close();
-
-	stats_this_iteration.num_of_disks = num_of_disks;
-
 #elif defined(__linux__)
+
 	//
 	// Read from Linux pseudo-file /proc/mounts to obtain mounted disks
 	// info.
@@ -802,45 +462,35 @@ void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version,
 
 				if (StringUtil::stringCompareCount(device_path.c_str(), "/dev", 4) == 0)
 				{
-					StatsForOneDisk stats_for_one_disk;
-
-					num_of_disks++;
-
-					stats_for_one_disk.disk_name = device_path;
-
 					struct statfs stat_buf;
 	
-					if (statfs(mount_directory.c_str(),
-					           &stat_buf) == 0) // success
+					if (statfs(mount_directory.c_str(), &stat_buf) == 0) // success
 					{
-						GMSEC_I64 disk_size_in_bytes =
-						  stat_buf.f_blocks*stat_buf.f_bsize;
+						StatsForOneDisk stats_for_one_disk;
+
+						++num_of_disks;
+
+						stats_for_one_disk.disk_name = device_path;
+
+						GMSEC_I64 disk_size_in_bytes = stat_buf.f_blocks*stat_buf.f_bsize;
 	
 						stats_for_one_disk.disk_size = static_cast<GMSEC_F32>(disk_size_in_bytes)/static_cast<GMSEC_F32>(1024.0*1024.0);
 
-						GMSEC_F64 disk_free_percentage =
-						  (GMSEC_F64)stat_buf.f_bfree/
-						  (GMSEC_F64)stat_buf.f_blocks;
+						GMSEC_F64 disk_free_percentage = (GMSEC_F64)stat_buf.f_bfree/ (GMSEC_F64)stat_buf.f_blocks;
 
-						GMSEC_F64 disk_util_percentage =
-						  1.0 - disk_free_percentage;
+						GMSEC_F64 disk_util_percentage = 1.0 - disk_free_percentage;
 
 						stats_for_one_disk.disk_util = static_cast<GMSEC_F32>(disk_util_percentage*100.0);
 
+						stats_this_iteration.stats.push_back(stats_for_one_disk);
 					}
 					else
 					{
-						std::string err_str =
-						  "Failed to query disk stats on ";
-						err_str += device_path;
+						std::ostringstream err_str;
+						err_str << "Failed to query disk stats on " << device_path << " [" << strerror(errno) << "]";
 	
-						throw Exception(MIST_ERROR,
-								RESOURCE_INFO_DISK_ERROR,
-						                err_str.c_str());
+						GMSEC_WARNING << err_str.str().c_str();
 					}
-
-					stats_this_iteration.stats.push_back(stats_for_one_disk);
-
 				}
 			}
 
@@ -904,45 +554,35 @@ void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version,
 
 				if (StringUtil::stringCompareCount(device_path.c_str(), "/dev/", 5) == 0 && strstr(mount_directory.c_str(), "/") != NULL)
 				{
-					StatsForOneDisk stats_for_one_disk;
-
-					num_of_disks++;
-
-					stats_for_one_disk.disk_name = device_path;
-
 					struct statvfs stat_buf;
 
-					if (statvfs(mount_directory.c_str(),
-					            &stat_buf) == 0) // success
+					if (statvfs(mount_directory.c_str(), &stat_buf) == 0) // success
 					{
-						GMSEC_I64 disk_size_in_bytes =
-						  (GMSEC_I64)stat_buf.f_blocks*(GMSEC_I64)stat_buf.f_frsize;
+						StatsForOneDisk stats_for_one_disk;
+
+						++num_of_disks;
+
+						stats_for_one_disk.disk_name = device_path;
+
+						GMSEC_I64 disk_size_in_bytes = (GMSEC_I64)stat_buf.f_blocks*(GMSEC_I64)stat_buf.f_frsize;
 
 						stats_for_one_disk.disk_size = static_cast<GMSEC_F32>(disk_size_in_bytes)/static_cast<GMSEC_F32>(1024.0*1024.0);
 
-						GMSEC_F64 disk_free_percentage =
-						  (GMSEC_F64)stat_buf.f_bfree/
-						  (GMSEC_F64)stat_buf.f_blocks;
+						GMSEC_F64 disk_free_percentage = (GMSEC_F64)stat_buf.f_bfree/ (GMSEC_F64)stat_buf.f_blocks;
 
-						GMSEC_F64 disk_util_percentage =
-						  1.0 - disk_free_percentage;
+						GMSEC_F64 disk_util_percentage = 1.0 - disk_free_percentage;
 
 						stats_for_one_disk.disk_util = static_cast<GMSEC_F32>(disk_util_percentage*100.0);
 
+						stats_this_iteration.stats.push_back(stats_for_one_disk);
 					}
 					else
 					{
-						std::string err_str =
-						  "Failed to query disk stats on ";
-						err_str += device_path;
+						std::ostringstream err_str;
+						err_str << "Failed to query disk stats on " << device_path << " [" << strerror(errno) << "]";
 	
-						throw Exception(MIST_ERROR,
-								RESOURCE_INFO_DISK_ERROR,
-						                err_str.c_str());
+						GMSEC_WARNING << err_str.str().c_str();
 					}
-
-					stats_this_iteration.stats.push_back(stats_for_one_disk);
-
 				}
 			}
 
@@ -955,8 +595,7 @@ void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version,
 
 
 #else
-	throw Exception(MIST_ERROR, RESOURCE_DISK_MEMORY_ERROR,
-	                "Failed to query disk stats:  unknown operating system");
+	throw Exception(MIST_ERROR, RESOURCE_DISK_MEMORY_ERROR, "Failed to query disk stats: unknown operating system");
 #endif
 
         //
@@ -997,7 +636,7 @@ void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version,
 		msg.addField(field_key, stats_this_iteration.stats[disk_count].disk_name.c_str());
 
 		StringUtil::stringFormat(field_key, sizeof(field_key), "DISK.%d.SIZE", disk_count+1);
-		if (version <= GMSEC_ISD_2014_00)
+		if (specVersion <= GMSEC_ISD_2014_00)
 		{
 			msg.addField(field_key, average_disk_size);
 		}
@@ -1010,7 +649,7 @@ void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version,
 		msg.addField(field_key, average_disk_util);
 	}
 
-	if (version <= GMSEC_ISD_2014_00)
+	if (specVersion <= GMSEC_ISD_2014_00)
 	{
 		msg.addField("NUM-OF-DISKS", stats_this_iteration.num_of_disks);
 	}
@@ -1021,7 +660,7 @@ void ResourceInfoGenerator::addDiskStats(MistMessage& msg, unsigned int version,
 }
 
 
-void ResourceInfoGenerator::addCPUStats(MistMessage& msg, unsigned int version, size_t movingAverageSamples)
+void ResourceInfoGenerator::addCPUStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples)
 {
 	//This function is responsible for:
 	//NUM-OF-CPUS, I16
@@ -1033,6 +672,7 @@ void ResourceInfoGenerator::addCPUStats(MistMessage& msg, unsigned int version, 
 	stats_this_iteration.cpu_total_util = 0.0;
 
 #ifdef WIN32
+
 	SYSTEM_INFO systemInfo;
 	GetSystemInfo(&systemInfo);
 
@@ -1152,156 +792,6 @@ void ResourceInfoGenerator::addCPUStats(MistMessage& msg, unsigned int version, 
 	{
 		throw Exception(MIST_ERROR, RESOURCE_INFO_CPU_ERROR, "Unable to collect system CPU resource information");
 	}
-
-
-#elif defined(__sun)
-
-	//
-	// Read from output of mpstat program to determine number of CPUs
-	// and CPU utilization.
-	//
-	// Sample user+system ticks and total ticks twice.  Get the difference
-	// between the samples for each data point.
-	//
-	// Then divide delta_user_and_system_ticks/delta_total_ticks.
-	//
-
-	FILE* pipe_output_fp = popen("/usr/bin/sh -c mpstat", "r");
-
-	char               buffer[CHAR_BUF_LEN];
-	GMSEC_I16          num_cpus          = 0;
-	int                num_args          = 0;
-	unsigned long int  dummy             = 0;
-	unsigned long int  cpu               = 0;
-
-	CPUTickStruct      cpu_tick_struct;
-
-	std::istringstream iss;
-
-	pipeStreamToInputStream(iss, pipe_output_fp);
-
-	pclose(pipe_output_fp);
-
-	while (iss.getline(buffer, sizeof(buffer), '\n'))
-	{
-		num_args = sscanf(buffer,
-		                  "%lu %lu %lu %lu "
-		                  "%lu %lu %lu %lu "
-		                  "%lu %lu %lu %lu "
-		                  "%lu %lu %lu %lu",
-		                  &cpu, &dummy, &dummy, &dummy,
-		                  &dummy, &dummy, &dummy, &dummy,
-		                  &dummy, &dummy, &dummy, &dummy,
-		                  &cpu_tick_struct.user_mode_ticks,
-		                  &cpu_tick_struct.system_mode_ticks,
-		                  &dummy,
-		                  &cpu_tick_struct.idle_mode_ticks);
-
-		if (num_args == 16)
-		{
-			num_cpus++;
-
-			GMSEC_F32 cpu_util = 0.0;
-
-			if (cpu_tick_struct.user_mode_ticks +
-			    cpu_tick_struct.system_mode_ticks +
-			    cpu_tick_struct.idle_mode_ticks > 0)
-			{
-				cpu_util = (GMSEC_F32)(cpu_tick_struct.user_mode_ticks + cpu_tick_struct.system_mode_ticks)/(GMSEC_F32)(cpu_tick_struct.user_mode_ticks + cpu_tick_struct.system_mode_ticks + cpu_tick_struct.idle_mode_ticks);
-				cpu_util *= 100.0;
-			}
-
-			stats_this_iteration.cpu_utils.push_back(cpu_util);
-		}
-	}
-
-	stats_this_iteration.num_cpus = num_cpus;
-
-#elif defined(__hpux)
-
-	bool haveStats = false;
-	int  tries     = 40;
-
-	while (!haveStats && tries-- > 0)
-	{
-		system("top -w -f /tmp/tmpout.top");
-
-		TimeUtil::millisleep(100);
-
-		struct stat top_stats;
-		stat("/tmp/tmpout.top", &top_stats);
-
-		haveStats = (top_stats.st_size > 0);
-	}
-
-	if (!haveStats)
-	{
-		GMSEC_ERROR << "Failed to acquire CPU stats";
-		return;
-	}
-
-	char              buffer[CHAR_BUF_LEN];
-	bool              done                     = false;
-	int               num_args                 = 0;
-	float             dummy                    = 0.0;
-	float             user                     = 0.0;
-	float             nice                     = 0.0;
-	float             sys                      = 0.0;
-	float             idle                     = 0.0;
-	GMSEC_I16         num_cpus                 = 0;
-	GMSEC_I16         cpu_count                = 0;
-	bool              ready_to_fetch_cpu_loads = false;
-	CPUTickStruct     cpu_tick_struct;
-
-	std::ifstream ifs("/tmp/tmpout.top", ios::in);
-
-	while (ifs.getline(buffer, sizeof(buffer), '\n'))
-	{
-		if (StringUtil::stringCompareCount(buffer, "Cpu states:", 11) == 0)
-		{
-			num_args = sscanf(buffer, "Cpu states: %hd", &num_cpus);
-
-		}
-		else if (StringUtil::stringCompareCount(buffer, " LOAD", 5) == 0)
-		{
-			ready_to_fetch_cpu_loads = true;
-		}
-		else if (ready_to_fetch_cpu_loads)
-		{
-			//
-			// Get rid of '%' chars in buffer; sscanf doesn't deal with
-			// them gracefully.
-			//
-			unsigned int index = 0;
-
-			while (buffer[index] != '\0' && index < sizeof(buffer)-1)
-			{
-				if (buffer[index] == '%')
-				{
-					buffer[index] = ' ';
-				}
-
-				index++;
-			}
-
-			num_args = sscanf(buffer, " %f %f %f %f %f",
-			                  &dummy, &user, &nice, &sys, &idle);
-
-			if (num_args == 5 && cpu_count < num_cpus)
-			{
-				cpu_count++;
-
-				GMSEC_F32 cpu_util =
-				  (GMSEC_F32)(user + sys);
-
-				stats_this_iteration.cpu_utils.push_back(cpu_util);
-			}
-		}
-	}
-
-	unlink("/tmp/tmpout.top");
-
-	stats_this_iteration.num_cpus = num_cpus;
 
 #elif defined(__linux__)
 
@@ -1493,6 +983,7 @@ void ResourceInfoGenerator::addCPUStats(MistMessage& msg, unsigned int version, 
 		GMSEC_F32 average_cpu_utils = 0.0;
 
 #ifndef __linux__
+
 		//
 		// This is for non-Linux
 		//
@@ -1507,6 +998,7 @@ void ResourceInfoGenerator::addCPUStats(MistMessage& msg, unsigned int version, 
 		average_cpu_utils /= ((GMSEC_F32)m_cpuStatsQueue.size());
 
 #else
+
 		//
 		// This is for Linux
 		//
@@ -1547,7 +1039,7 @@ void ResourceInfoGenerator::addCPUStats(MistMessage& msg, unsigned int version, 
 
 	}// for cpu_count
 
-	if (version <= GMSEC_ISD_2014_00)
+	if (specVersion <= GMSEC_ISD_2014_00)
 	{
 		msg.addField("NUM-OF-CPUS", stats_this_iteration.num_cpus);
 	}
@@ -1558,7 +1050,7 @@ void ResourceInfoGenerator::addCPUStats(MistMessage& msg, unsigned int version, 
 }
 
 
-void ResourceInfoGenerator::addNetworkStats(MistMessage& msg, unsigned int version, size_t movingAverageSamples)
+void ResourceInfoGenerator::addNetworkStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples)
 {
 	//This function is responsible for:
 	//NUM-OF-NET-PORTS, I16
@@ -1572,7 +1064,9 @@ void ResourceInfoGenerator::addNetworkStats(MistMessage& msg, unsigned int versi
 	//NET-PORT.n.MSGS-SENT, F32
 	//NET-PORT.n.MSGS-RECEIVED, F32
 	//NET-PORT.n.ERRORS, F32
+
 #ifdef WIN32
+
 	IP_ADAPTER_INFO  *pAdapterInfo;
 	ULONG            ulOutBufLen;
 	DWORD            dwRetVal;
@@ -1663,7 +1157,7 @@ void ResourceInfoGenerator::addNetworkStats(MistMessage& msg, unsigned int versi
 		++idx;
 	}
 
-	if (version <= GMSEC_ISD_2014_00)
+	if (specVersion <= GMSEC_ISD_2014_00)
 	{
 		msg.addField("NUM-OF-NET-PORTS", (GMSEC_I16) idx);
 	}
@@ -1673,248 +1167,6 @@ void ResourceInfoGenerator::addNetworkStats(MistMessage& msg, unsigned int versi
 	}
 
 	free(pAdapterInfo);
-
-#elif defined(__sun)
-
-	GMSEC_I16                num_net_ports = 0;
-	int                      num_args = 0;
-	char                     buffer[CHAR_BUF_LEN];
-	char                     interface_name[CHAR_BUF_LEN];
-	char                     dummy[CHAR_BUF_LEN];
-	char                     ip_address[CHAR_BUF_LEN];
-	char                     mac_address[CHAR_BUF_LEN];
-	std::vector<std::string> ip_addresses;
-
-	FILE* pipe_output_fp = popen("/usr/bin/sh -c \"netstat -in\"", "r");
-
-	std::istringstream       iss;
-
-	pipeStreamToInputStream(iss, pipe_output_fp);
-
-	pclose(pipe_output_fp);
-
-	while (iss.getline(buffer, sizeof(buffer), '\n'))
-	{
-		num_args = sscanf(buffer, "%s %s %s %s",
-		                  interface_name,
-		                  dummy,
-		                  dummy,
-		                  ip_address);
-
-		if (num_args == 4)
-		{
-			if (strstr(ip_address, ".") != NULL)
-			{
-				num_net_ports++;
-
-				ip_addresses.push_back(ip_address);
-
-				char tmp_string[CHAR_BUF_LEN];
-
-				//
-				// Add NET-PORT.n.NAME, String
-				//
-				StringUtil::stringFormat(tmp_string,
-				                         sizeof(tmp_string),
-				                         "NET-PORT.%u.NAME",
-				                         num_net_ports);
-				msg.addField(tmp_string, interface_name);
-
-				//
-				// Add NET-PORT.n.IP-ADR, String
-				//
-				StringUtil::stringFormat(tmp_string,
-				                         sizeof(tmp_string),
-				                         "NET-PORT.%u.IP-ADR",
-				                         num_net_ports);
-				msg.addField(tmp_string, ip_address);
-
-			}
-		}
-	}
-
-	iss.clear();
-
-	pipe_output_fp = popen("/usr/bin/sh -c \"netstat -pn\"", "r");
-
-	pipeStreamToInputStream(iss, pipe_output_fp);
-
-	pclose(pipe_output_fp);
-
-	while (iss.getline(buffer, sizeof(buffer), '\n'))
-	{
-		num_args = sscanf(buffer, "%s %s %s %s %s",
-		                  dummy,
-		                  ip_address,
-		                  dummy,
-		                  dummy,
-		                  mac_address);
-
-		if (num_args == 5)
-		{
-			if (strstr(ip_address, ".") != NULL)
-			{
-				if (std::find(ip_addresses.begin(),
-				              ip_addresses.end(),
-				              ip_address) !=
-				    ip_addresses.end())
-				{
-					char tmp_string[CHAR_BUF_LEN];
-
-					//
-					// Add NET-PORT.n.EUI-ADR,String
-					//
-					StringUtil::stringFormat(tmp_string,
-					                         sizeof(tmp_string),
-					                         "NET-PORT.%u.EUI-ADR",
-					                         num_net_ports);
-					msg.addField(tmp_string, mac_address);
-				}
-			}
-		}
-	}
-
-	
-	if (version <= GMSEC_ISD_2014_00)
-	{
-		msg.addField("NUM-OF-NET-PORTS", num_net_ports);
-	}
-	else
-	{
-		msg.addField("NUM-OF-NET-PORTS", (GMSEC_U16) num_net_ports);
-	}
-
-#elif defined(__hpux)
-
-	GMSEC_I16                num_net_ports = 0;
-	int                      num_args = 0;
-	char                     buffer[CHAR_BUF_LEN];
-	char                     interface_name[CHAR_BUF_LEN];
-	char                     dummy[CHAR_BUF_LEN];
-	char                     ip_address[CHAR_BUF_LEN];
-	GMSEC_I16                interface_num = 0;
-	char                     mac_address_str[CHAR_BUF_LEN];
-
-	std::vector<std::string> interface_names;
-
-	FILE* pipe_output_fp = popen("netstat -in", "r");
-
-	std::istringstream       iss;
-
-	pipeStreamToInputStream(iss, pipe_output_fp);
-
-	pclose(pipe_output_fp);
-
-	while (iss.getline(buffer, sizeof(buffer), '\n'))
-	{
-		num_args = sscanf(buffer, "%s %s %s %s",
-		                  interface_name,
-		                  dummy,
-		                  dummy,
-		                  ip_address);
-
-		if (num_args == 4)
-		{
-			if (strstr(ip_address, ".") != NULL)
-			{
-				num_net_ports++;
-
-				char tmp_string[CHAR_BUF_LEN];
-
-				//
-				// Add NET-PORT.n.NAME, String
-				//
-				StringUtil::stringFormat(tmp_string,
-				                         sizeof(tmp_string),
-				                         "NET-PORT.%u.NAME",
-				                         num_net_ports);
-				msg.addField(tmp_string, interface_name);
-
-				interface_names.push_back(interface_name);
-
-				//
-				// Add NET-PORT.n.IP-ADR, String
-				//
-				StringUtil::stringFormat(tmp_string,
-				                         sizeof(tmp_string),
-				                         "NET-PORT.%u.IP-ADR",
-				                         num_net_ports);
-				msg.addField(tmp_string, ip_address);
-
-			}
-		}
-	}
-
-	iss.clear();
-
-	pipe_output_fp = popen("/usr/sbin/lanscan", "r");
-
-	pipeStreamToInputStream(iss, pipe_output_fp);
-
-	pclose(pipe_output_fp);
-
-	while (iss.getline(buffer, sizeof(buffer), '\n'))
-	{
-		num_args = sscanf(buffer, "%s %s %s %s %s",
-		                  dummy,
-		                  mac_address_str,
-		                  dummy,
-		                  dummy,
-		                  interface_name);
-
-		if (num_args == 5)
-		{
-			char tmp_string[CHAR_BUF_LEN];
-
-			//
-			// Search for interface num in interface_names
-			// vector; just use a linear search because
-			// the list is not expected to be long
-			//
-			std::vector<std::string>::iterator it =
-			  interface_names.begin();
-
-			interface_num = 0;
-
-			bool found = false;
-
-			while (it != interface_names.end() &&
-			       !found)
-			{
-				if (*it == interface_name)
-				{
-					found = true;
-				}
-				else
-				{
-					it++;
-					interface_num++;
-				}
-			}
-
-			if (found)
-			{
-				//
-				// Add NET-PORT.n.EUI-ADR,String
-				//
-				StringUtil::stringFormat(tmp_string,
-				                         sizeof(tmp_string),
-				                         "NET-PORT.%hd.EUI-ADR",
-				                         interface_num+1);
-
-				msg.addField(tmp_string, normalizeMacAddressStr(mac_address_str));
-			}
-		}
-	}
-
-	if (version <= GMSEC_ISD_2014_00)
-	{
-		msg.addField("NUM-OF-NET-PORTS", num_net_ports);
-	}
-	else
-	{
-		msg.addField("NUM-OF-NET-PORTS", (GMSEC_U16) num_net_ports);
-	}
 
 #elif defined(__linux__)
 
@@ -1988,7 +1240,7 @@ void ResourceInfoGenerator::addNetworkStats(MistMessage& msg, unsigned int versi
 			freeifaddrs(ifap_head); // Please read man page for getifaddrs about dynamic allocation of ifap and the need to (ideally) free it after use
 		}
 
-		if (version <= GMSEC_ISD_2014_00)
+		if (specVersion <= GMSEC_ISD_2014_00)
 		{
 			msg.addField("NUM-OF-NET-PORTS", num_net_ports);
 		}
@@ -2132,7 +1384,7 @@ void ResourceInfoGenerator::addNetworkStats(MistMessage& msg, unsigned int versi
 		}
 	}
 
-	if (version <= GMSEC_ISD_2014_00)
+	if (specVersion <= GMSEC_ISD_2014_00)
 	{
 		msg.addField("NUM-OF-NET-PORTS", num_net_ports);
 	}
@@ -2152,6 +1404,7 @@ void ResourceInfoGenerator::addNetworkStats(MistMessage& msg, unsigned int versi
 std::string ResourceInfoGenerator::getOSVersion()
 {
 #ifdef WIN32
+
 	OSVERSIONINFO osvi;
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -2168,7 +1421,7 @@ std::string ResourceInfoGenerator::getOSVersion()
 		                "Failed to query Windows version information");
 	}
 
-#elif defined(__sun) || defined(__hpux) || defined(__linux__) || defined(__APPLE__)
+#elif defined(__linux__) || defined(__APPLE__)
 
 	struct utsname utsname_buf;
 
@@ -2218,60 +1471,3 @@ void ResourceInfoGenerator::pipeStreamToInputStream(std::istringstream& iss,
 	iss.str(oss.str());
 
 }
-
-#ifdef __hpux
-
-const char* ResourceInfoGenerator::normalizeMacAddressStr(const char* macAddrStr)
-{
-	char                  buffer[CHAR_BUF_LEN];
-	std::vector<unsigned char> mac_addr_elements;
-	unsigned long long    mac_addr                  = 0;
-	unsigned char         mac_addr_element          = 0;
-	unsigned int          num_mac_addr_elements     = 0; 
-	static char           ret_buffer[CHAR_BUF_LEN];
-
-	sscanf(macAddrStr, "%llX", &mac_addr);
-
-	while (mac_addr > 0)
-	{
-		num_mac_addr_elements++;
-		mac_addr_element = mac_addr%16;
-		mac_addr_elements.push_back(mac_addr_element);
-		mac_addr /= 16;
-	}
-
-	while (num_mac_addr_elements < 12) // MAC addresses contain 12 hex digits
-	{
-		num_mac_addr_elements++;
-		mac_addr_elements.push_back(0);
-	}
-
-	if (mac_addr_elements.size() == 12)
-	{
-		StringUtil::stringFormat(ret_buffer, sizeof(ret_buffer),
-		                          "%X%X:%X%X:%X%X:%X%X:%X%X:%X%X",
-		                          mac_addr_elements[11],
-		                          mac_addr_elements[10],
-		                          mac_addr_elements[9],
-		                          mac_addr_elements[8],
-		                          mac_addr_elements[7],
-		                          mac_addr_elements[6],
-		                          mac_addr_elements[5],
-		                          mac_addr_elements[4],
-		                          mac_addr_elements[3],
-		                          mac_addr_elements[2],
-		                          mac_addr_elements[1],
-		                          mac_addr_elements[0]);
-	}
-	else
-	{
-		throw Exception(MIST_ERROR,
-		                RESOURCE_INFO_NET_ERROR,
-				"Hardware address found was invalid");
-	}
-
-	return ret_buffer;
-
-}
-
-#endif

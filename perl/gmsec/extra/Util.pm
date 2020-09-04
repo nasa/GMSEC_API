@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -67,26 +67,27 @@ sub args
 
 		# Starting with VS2015, M$ broke up MSVCRT and MSVCPRT into three libraries.
 		# Users now need to link against not only MSVCRT (or MSVCPRT), but also against
-		# VCRUNTIME and UCRT.
+		# VCRUNTIME.
 		#
 		# Thanks M$!
 		#
 		# Note: We need a better way to extract the VS version number
 		#
 		if ($msdk =~ /2015/ || $msdk =~ /2017/) {
-			$ldfrom .= ' vcruntime.lib ucrt.lib';
+			$ldfrom .= ' vcruntime.lib';
 		}
 
 		$ldfrom .= ' msvcprt.lib gmsecapi.lib';
 
-		$inc .= qq( -I"$msvc/include" -I"$msdk/include");
-		$define = '-DWIN32';
+		$inc .= qq( /I"$msvc/include" /I"$msdk/include");
+		$define = '/DWIN32';
 
 		if ($vc6) {
-			$define .= ' -DGMSEC_VC6=1';
+			$define .= ' /DGMSEC_VC6=1';
 		}
 
 		$ccflags .= " /EHsc";
+
 		$lddlflags = join(' ', $Config::Config{lddlflags}, @libdir);
 	}
 	else {

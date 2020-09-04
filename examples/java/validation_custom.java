@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,90 +10,80 @@
  *
  * This file contains an example demonstrating how to implement additional
  * Message validation logic in addition to that which the GMSEC API provides.
- *
- * Note: This example focuses on adding additional validation upon the receipt
- * of a message.  It almost goes without saying that additional logic can be
- * added to a program prior to invoking the publish() function without having
- * to do anything special.
  */
 
 import gov.nasa.gsfc.gmsec.api.*;
-import gov.nasa.gsfc.gmsec.api.util.Log;
-import gov.nasa.gsfc.gmsec.api.mist.ConnectionManager;
-import gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerCallback;
-import gov.nasa.gsfc.gmsec.api.field.StringField;
+
 import gov.nasa.gsfc.gmsec.api.field.Field;
-import gov.nasa.gsfc.gmsec.api.mist.ProductFile;
-import gov.nasa.gsfc.gmsec.api.mist.ProductFileIterator;
-import gov.nasa.gsfc.gmsec.api.mist.message.ProductFileMessage;
+import gov.nasa.gsfc.gmsec.api.field.StringField;
+
 import gov.nasa.gsfc.gmsec.api.mist.gmsecMIST;
+import gov.nasa.gsfc.gmsec.api.mist.ConnectionManager;
+import gov.nasa.gsfc.gmsec.api.mist.MessageValidator;
+
+import gov.nasa.gsfc.gmsec.api.mist.message.MistMessage;
+
+import gov.nasa.gsfc.gmsec.api.util.Log;
+
 import java.util.ArrayList;
 
-class ValidationCallback extends ConnectionManagerCallback
+
+class CustomMessageValidator extends MessageValidator
 {
-	public void onMessage(ConnectionManager connMgr, Message message)
+	public Status validateMessage(Message msg)
 	{
+		Status status = new Status();
+
 		try
 		{
-			//o Run the message through the GMSEC API-supplied validation
-			connMgr.getSpecification().validateMessage(message);
+			//o Get message type and subtype
+			String type    = "";
+			String subtype = "";
 
-			//o In this example scenario, we are expecting to receive a
-			// GMSEC PROD message containing a URI to a location on the disk
-			// where a product file has been placed for retrieval.  In this
-			// case, we want to validate that the location on the disk is
-			// in an area which we would expect (i.e. Something that the
-			// team has agreed upon prior to operational deployment).
-			//
-			// By validating this URI, we ensure that no malicious users
-			// have infiltrated the system and somehow modified the messages
-			// to cause us to retrieve a file from an unknown location.
-
-			//o Start by checking to ensure that this is a PROD message
-			if (isProdMsg(message))
+			if (msg.hasField("MESSAGE-TYPE"))
 			{
-				ProductFileMessage prodMessage = new ProductFileMessage(connMgr.getSpecification(), message.toXML());
+				type = msg.getStringValue("MESSAGE-TYPE");
+			}
+			if (msg.hasField("C2CX-SUBTYPE"))
+			{
+				subtype = msg.getStringValue("C2CX-SUBTYPE");
+			}
+			else if (msg.hasField("MESSAGE-SUBTYPE"))
+			{
+				subtype = msg.getStringValue("MESSAGE-SUBTYPE");
+			}
 
-				//o Extract the Product File URI location(s) from the
-				// message using a ProductFileIterator
-				ProductFileIterator prodIter = prodMessage.getProductFileIterator();
+			//o Ensure we have a Heartbeat message and it contains the PUB-RATE field
+			if (type.equals("MSG") && subtype.equals("HB") && msg.hasField("PUB-RATE"))
+			{
+				long pubRate = msg.getIntegerValue("PUB-RATE");
 
-				while(prodIter.hasNext())
+				//o Ensure PUB-RATE field value is between 10 and 60 (inclusive)
+				if (pubRate < 10 || pubRate > 60)
 				{
-					ProductFile prodFile = prodIter.next();
-
-					String prodUri = prodFile.getURI();
-
-					//o Check to ensure that the URI contains "//hostname/dir"
-					if (!prodUri.contains("//hostname/dir"))
-					{
-						String errMsg = "Received an invalid PROD Message (bad URI):\n" + message.toXML();
-						throw new GMSEC_Exception(StatusClassification.MIST_ERROR, StatusCode.MESSAGE_FAILED_VALIDATION, errMsg);
-					}
+					status.set(StatusClassification.MSG_ERROR, StatusCode.VALUE_OUT_OF_RANGE, "PUB-RATE field does not have a valid value");
 				}
-
-				Log.info("Received a valid message:\n" + message.toXML());
+			}
+			else
+			{
+				status.set(StatusClassification.MSG_ERROR, StatusCode.INVALID_MSG, "Non-Heartbeat message received");
 			}
 		}
-		catch(Exception e)
+		catch (GMSEC_Exception e)
 		{
-			Log.error(e.getMessage());
+			status = new Status(e.getErrorClassification(), e.getErrorCode(), e.getErrorMessage(), e.getCustomCode());
 		}
-	}
 
-	public static boolean isProdMsg(Message message) throws GMSEC_Exception
-	{
-		boolean result =
-			message.getStringValue("MESSAGE-TYPE").equals("MSG") &&
-			message.getStringValue("MESSAGE-SUBTYPE").equals("PROD");
-
-		return result;
+		return status;
 	}
 }
 
+
 public class validation_custom
 {
-	public static final String PROD_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.PROD.PRODUCT_MESSAGE";
+	private static final String HB_MSG_SUBJECT     = "GMSEC.MISSION.SATELLITE.MSG.HB.VALIDATION-CUSTOM";
+	private static final String ALT_HB_MSG_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.VALIDATION-CUSTOM.HB";
+
 
 	public static void main(String[] args)
 	{
@@ -107,41 +97,79 @@ public class validation_custom
 
 		initializeLogging(config);
 
-		//o Enable Message validation.  This parameter is "false" by default.
-		config.addValue("GMSEC-MSG-CONTENT-VALIDATE", "true");
+		//o Enable Message validation via connection configuration
+		config.addValue("gmsec-msg-content-validate-send", "true");
+		config.addValue("gmsec-validation-level", "3");
 
-		Log.info(ConnectionManager.getAPIVersion());
+		Log.info("API version: " + ConnectionManager.getAPIVersion());
 
 		try
 		{
 			ConnectionManager connMgr = new ConnectionManager(config);
 
-			Log.info("Opening the connection to the middleware server");
 			connMgr.initialize();
 
-			Log.info(connMgr.getLibraryVersion());
+			Log.info("Middleware version: " + connMgr.getLibraryVersion());
 
-			//o Set up the ValidationCallback and subscribe
-			ValidationCallback vc = new ValidationCallback();
-			connMgr.subscribe(PROD_MESSAGE_SUBJECT, vc);
+			//o Register custom message validator
+			CustomMessageValidator cmv = new CustomMessageValidator();
+			connMgr.registerMessageValidator(cmv);
 
-			//o Start the AutoDispatcher
-			connMgr.startAutoDispatch();
+			//o Set up standard/common fields used with all messages
+			int specVersion = connMgr.getSpecification().getVersion();
+			setupStandardFields(specVersion);
 
-			//o Create and publish a simple Product File Message
-			setupStandardFields(connMgr);
+			//o Create Heartbeat Message
+			//o Note: Message subject and schema ID vary depending on the specification in use
+			final String subject  = (specVersion > gmsecMIST.GMSEC_ISD_2018_00 ? HB_MSG_SUBJECT : ALT_HB_MSG_SUBJECT);
+			final String schemaID = (specVersion > gmsecMIST.GMSEC_ISD_2018_00 ? "MSG.HB" : "MSG.C2CX.HB");
 
-			ProductFileMessage productMessage = createProductFileMessage(connMgr, "//hostname/dir/filename");
+			MistMessage msg = new MistMessage(subject, schemaID, connMgr.getSpecification());
 
-			//o Publish the message to the middleware bus
-			connMgr.publish(productMessage);
+			//o Add PUB-RATE field with illegal value
+			msg.setValue("PUB-RATE", "5");
 
-			productMessage = createProductFileMessage(connMgr, "//badhost/dir/filename");
+			//o For very old specifications, we need to add a MSG-ID field
+			if (specVersion <= gmsecMIST.GMSEC_ISD_2014_00)
+			{
+				msg.addField("MSG-ID", "12345");
+			}
 
-			connMgr.publish(productMessage);
+			//o Attempt to publish malformed message
+			try
+			{
+				Log.info("Attempting to publish malformed message...");
+				connMgr.publish(msg);
+
+				Log.warning("Was expecting an error");
+			}
+			catch (GMSEC_Exception e)
+			{
+				//o We expect to encounter error with the PUB-RATE field
+				Log.info("This is an expected error:\n" + e.getMessage());
+			}
+
+			//o Fix PUB-RATE field with legal value
+			msg.setValue("PUB-RATE", "15");
+
+			//o Publish a good message
+			try
+			{
+				Log.info("Attempting to publish good message...");
+				connMgr.publish(msg);
+
+				Log.info("Message published!");
+			}
+			catch (GMSEC_Exception e)
+			{
+				Log.warning("Unexpected error:\n" + e.getMessage());
+			}
 
 			//o Disconnect from the middleware and clean up the Connection
 			connMgr.cleanup();
+
+			//o Clear standard/common fields used with all messages
+			clearStandardFields();
 		}
 		catch (GMSEC_Exception e)
 		{
@@ -157,74 +185,51 @@ public class validation_custom
 		// If it was not specified in the command-line arguments, set
 		// LOGLEVEL to 'INFO' and LOGFILE to 'stdout' to allow the
 		// program report output on the terminal/command line
-		try
-		{
-			String logLevel = config.getValue("LOGLEVEL");
-			String logFile = config.getValue("LOGFILE");
+		String logLevel = config.getValue("LOGLEVEL");
+		String logFile  = config.getValue("LOGFILE");
 
-			if (logLevel == null)
-			{
-				config.addValue("LOGLEVEL", "INFO");
-			}
-			if (logFile == null)
-			{
-				config.addValue("LOGFILE", "STDOUT");
-			}
-		}
-		catch(Exception e)
+		if (logLevel == null)
 		{
-		  Log.error(e.toString());
+			config.addValue("LOGLEVEL", "INFO");
+		}
+		if (logFile == null)
+		{
+			config.addValue("LOGFILE", "STDOUT");
 		}
 	}
 
-	public static void setupStandardFields(ConnectionManager connMgr) throws GMSEC_Exception
+	private static void setupStandardFields(int specVersion)
+		throws GMSEC_Exception
 	{
 		ArrayList<Field> definedFields = new ArrayList<Field>();
 
-		StringField missionField = new StringField("MISSION-ID", "MISSION");
-		StringField satIdField = new StringField("SAT-ID-PHYSICAL", "SPACECRAFT");
-		StringField facilityField = new StringField("FACILITY", "GMSEC Lab");
-		StringField componentField = new StringField("COMPONENT", "validation_custom");
+		StringField mission       = new StringField("MISSION-ID", "MISSION");
+		StringField constellation = new StringField("CONSTELLATION-ID", "CONSTELLATION");
+		StringField satIdPhys     = new StringField("SAT-ID-PHYSICAL", "SATELLITE");
+		StringField satIdLog      = new StringField("SAT-ID-LOGICAL", "SATELLITE");
+		StringField facility      = new StringField("FACILITY", "GMSEC-LAB");
+		StringField component     = new StringField("COMPONENT", "VALIDATION-CUSTOM");
+		StringField domain1       = new StringField("DOMAIN1", "DOMAIN1");
+		StringField domain2       = new StringField("DOMAIN2", "DOMAIN2");
 
-		definedFields.add(missionField);
-		definedFields.add(satIdField);
-		definedFields.add(facilityField);
-		definedFields.add(componentField);
+		definedFields.add(mission);
+		definedFields.add(constellation);
+		definedFields.add(satIdPhys);
+		definedFields.add(satIdLog);
+		definedFields.add(facility);
+		definedFields.add(component);
 
-		if (connMgr.getSpecification().getVersion() >= gmsecMIST.GMSEC_ISD_2018_00)
+		if (specVersion >= gmsecMIST.GMSEC_ISD_2018_00)
 		{
-			StringField domain1 = new StringField("DOMAIN1", "MY-DOMAIN-1");
-			StringField domain2 = new StringField("DOMAIN2", "MY-DOMAIN-2");
-
 			definedFields.add(domain1);
 			definedFields.add(domain2);
 		}
 
-		connMgr.setStandardFields(definedFields);
+		MistMessage.setStandardFields(definedFields);
 	}
 
-	public static ProductFileMessage createProductFileMessage(ConnectionManager connMgr, String filePath)
+	private static void clearStandardFields()
 	{
-		ProductFile externalFile = new ProductFile("External File", "External File Description", "1.0.0", "TXT", filePath);
-
-		ProductFileMessage productMessage;
-
-		if (connMgr.getSpecification().getVersion() <= gmsecMIST.GMSEC_ISD_2016_00)
-		{
-			productMessage = new ProductFileMessage(PROD_MESSAGE_SUBJECT, gmsecMIST.ResponseStatus.SUCCESSFUL_COMPLETION, "MSG.PROD.AUTO", connMgr.getSpecification());
-		}
-		else
-		{
-			productMessage = new ProductFileMessage(PROD_MESSAGE_SUBJECT, gmsecMIST.ResponseStatus.SUCCESSFUL_COMPLETION, "MSG.PROD", connMgr.getSpecification());
-
-			productMessage.addField("PROD-TYPE", "AUTO");
-			productMessage.addField("PROD-SUBTYPE", "DM");
-		}
-
-		productMessage.addProductFile(externalFile);
-
-		connMgr.addStandardFields(productMessage);
-
-		return productMessage;
+		MistMessage.clearStandardFields();
 	}
 }

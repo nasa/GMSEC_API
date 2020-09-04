@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,9 +32,31 @@
 #define C_GMSEC_ISD_2018_00 201800
 
 /**
- * @desc Definition for the default version of the GMSEC Interface Specification Document (ISD)
+ * @desc Definition for the 2019 version of the Command and Control Message Specificaiton (C2MS)
  */
-#define C_GMSEC_ISD_CURRENT C_GMSEC_ISD_2018_00
+#define C_GMSEC_ISD_2019_00 201900
+
+/**
+ * @desc Definition for the default version
+ */
+#define C_GMSEC_ISD_CURRENT C_GMSEC_ISD_2019_00
+
+
+/**
+ * @enum GMSEC_SchemaLevel
+ *
+ * @sa specificationGetSchemaLevel
+ */
+typedef enum
+{
+	GMSEC_SCHEMA_LEVEL_0,    /**< C2MS */
+	GMSEC_SCHEMA_LEVEL_1,    /**< C2MS Extensions, or optionally user-defined */
+	GMSEC_SCHEMA_LEVEL_2,    /**< NASA/GMSEC Addendum, or optionally user-defined */
+	GMSEC_SCHEMA_LEVEL_3,    /**< User-defined */
+	GMSEC_SCHEMA_LEVEL_4,    /**< User-defined */
+	GMSEC_SCHEMA_LEVEL_5,    /**< User-defined */
+	GMSEC_SCHEMA_LEVEL_6     /**< User-defined */
+} GMSEC_SchemaLevel;
 
 
 /**

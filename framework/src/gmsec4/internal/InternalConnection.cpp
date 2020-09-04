@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -61,6 +61,7 @@
 
 using namespace gmsec::api;
 using namespace gmsec::api::internal;
+using namespace gmsec::api::mist;
 using namespace gmsec::api::util;
 
 
@@ -107,8 +108,8 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	  m_callbackAdapter(0),
 	  m_parent(0),
 	  m_connectionEndpoint(),
-	  m_specVersion(0),
-	  m_specLevel(-1),
+	  m_specVersion(GMSEC_ISD_CURRENT),
+	  m_specLevel(2),
 	  m_usingAPI3x(false)
 {
 	// Determine if we have been configured to use a particular specification (ISD) version;
@@ -647,7 +648,7 @@ void InternalConnection::publish(const Message& msg)
 }
 
 
-void InternalConnection::publish(const Message& msg, const Config& config)
+void InternalConnection::publish(const Message& msg, const Config& mwConfig)
 {
 	if (m_state != Connection::CONNECTED)
 	{
@@ -656,7 +657,7 @@ void InternalConnection::publish(const Message& msg, const Config& config)
 
 	if ((m_usingAPI3x == false) && (msg.getKind() != Message::PUBLISH))
 	{
-		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Cannot publish non-PUBLISH kind message.");
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Cannot publish message with non-PUBLISH message kind.");
 	}
 
 	if (!getPolicy().isValidSubject(msg.getSubject()))
@@ -678,12 +679,14 @@ void InternalConnection::publish(const Message& msg, const Config& config)
 			throw Exception(result);
 		}
 
-		msgWasAggregated = m_msgAggregationToolkitShared->addMessage(msg, config);
+		msgWasAggregated = m_msgAggregationToolkitShared->addMessage(msg, mwConfig);
 	}
+
+	Exception result(NO_ERROR_CLASS, NO_ERROR_CODE, "");
 
 	if (!msgWasAggregated)
 	{
-		if (m_useGlobalAsyncPublish || config.getBooleanValue(GMSEC_ASYNC_PUBLISH, false))
+		if (m_useGlobalAsyncPublish || mwConfig.getBooleanValue(GMSEC_ASYNC_PUBLISH, false))
 		{
 			if (!m_asyncPubService.get())
 			{
@@ -694,7 +697,7 @@ void InternalConnection::publish(const Message& msg, const Config& config)
 
 			MessagePublishTask mpt;
 			mpt.msg    = new Message(msg);
-			mpt.config = new Config(config);
+			mpt.config = new Config(mwConfig);
 
 			m_asyncQueue->put(mpt);
 		}
@@ -702,11 +705,21 @@ void InternalConnection::publish(const Message& msg, const Config& config)
 		{
 			AutoTicket hold(getWriteMutex());
 
-			m_connIf->mwPublish(msg, config);
+			try {
+				m_connIf->mwPublish(msg, mwConfig);
+			}
+			catch (const Exception& e) {
+				result = e;
+			}
 		}
 	}
 
 	removeTrackingFields(const_cast<Message&>(msg));
+
+	if (result.getErrorClass() != NO_ERROR_CLASS)
+	{
+		throw result;
+	}
 }
 
 
@@ -951,6 +964,8 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 
 	insertTrackingFields(const_cast<Message&>(reply));
 
+	Exception result(NO_ERROR_CLASS, NO_ERROR_CODE, "");
+
 	AutoTicket hold(getWriteMutex());
 
 	if (noSubjectMapping)
@@ -960,14 +975,24 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 		// middleware reply method.
 		Config config = Config();
 
-		m_connIf->mwPublish(reply, config);
+		try {
+			m_connIf->mwPublish(reply, config);
+		}
+		catch (const Exception& e) {
+			result = e;
+		}
 	}
 	else
 	{
 		// Add the reply subject as a field of the message being sent.
 		MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_SUBJECT_FIELD, reply.getSubject());
 
-		m_connIf->mwReply(request, reply);
+		try {
+			m_connIf->mwReply(request, reply);
+		}
+		catch (const Exception& e) {
+			result = e;
+		}
 
 		MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_SUBJECT_FIELD);
 	}
@@ -976,6 +1001,11 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 	MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 	removeTrackingFields(const_cast<Message&>(reply));
+
+	if (result.getErrorClass() != NO_ERROR_CLASS)
+	{
+		throw result;
+	}
 }
 
 
@@ -1301,6 +1331,8 @@ void InternalConnection::issueRequestToMW(const Message& request, std::string& i
 
 	AutoTicket hold(getWriteMutex());
 
+	// We do not need to catch m/w exception here since the tracking fields are
+	// added to a copy of the request message, not the original request message.
 	m_connIf->mwRequest(requestCopy, id);
 }
 
@@ -1470,14 +1502,15 @@ void InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
 
 	if (msg && (msg->getKind() == Message::REQUEST || msg->getKind() == Message::REPLY))
 	{
-		try
+		const Field* uniqueID = msg->getField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+
+		if (uniqueID && uniqueID->getType() == Field::STRING_TYPE)
 		{
-			setReplyUniqueID(*msg, msg->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
+			// only closed-response clients would have a GMSEC_REPLY_UNIQUE_ID_FIELD
+
+			setReplyUniqueID(*msg, dynamic_cast<const StringField*>(uniqueID)->getValue());
+
 			msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
-		}
-		catch (...)
-		{
-			//ignore error; reply was generated by open-response configured client
 		}
 	}
 }
@@ -1688,6 +1721,10 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	{
 		std::string hostname;
 		SystemUtil::getHostName(hostname);
+		if (m_specVersion >= GMSEC_ISD_2018_00)
+		{
+			hostname = StringConverter::instance().convertString(hostname);
+		}
 		StringField field("NODE", hostname.c_str());
 		field.isHeader(true);
 		msg.addField(field);
@@ -1713,6 +1750,10 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	if ((addTracking || connTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
 	    (connTracking.getUserName() != OFF && msgTracking.getUserName() != OFF))
 	{
+		if (m_specVersion >= GMSEC_ISD_2018_00)
+		{
+			m_userName = StringConverter::instance().convertString(m_userName);
+		}
 		StringField field("USER-NAME", m_userName.c_str());
 		field.isHeader(true);
 		msg.addField(field);
@@ -1766,54 +1807,56 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	//
 	// If the user has not indicated which ISD to work with, then these tracking fields will be
 	// included in the message.
-	if (getSpecVersion() == 0 || getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
+	if (getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
 	{
-		try
+		// We only include subscription subject-pattern field(s) within Heartbeat Messages.
+		const Field* c2cxSubtype = NULL;
+
+		if (getSpecVersion() < gmsec::api::mist::GMSEC_ISD_2019_00)
 		{
-			// We only include subscription subject-pattern field(s) to C2CX HB Messages.
-			const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
+			c2cxSubtype = msg.getField("C2CX-SUBTYPE");
+		}
+		else
+		{
+			c2cxSubtype = msg.getField("MESSAGE-SUBTYPE");
+		}
 
-			if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
+		if (c2cxSubtype != NULL && StringUtil::stringEqualsIgnoreCase(c2cxSubtype->getStringValue(), "HB"))
+		{
+			if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
+	    	    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
 			{
-				if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
-		    	    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+				std::set<std::string> activeSubs = s_activeSubscriptions.getTopics();
+
+				msg.addField("NUM-OF-SUBSCRIPTIONS", (GMSEC_U16) activeSubs.size());
+
+				if (activeSubs.size() > 0)
 				{
-					std::set<std::string> activeSubs = s_activeSubscriptions.getTopics();
-
-					msg.addField("NUM-OF-SUBSCRIPTIONS", (GMSEC_U16) activeSubs.size());
-
-					if (activeSubs.size() > 0)
+					int n = 1;
+					for (std::set<std::string>::iterator it = activeSubs.begin(); it != activeSubs.end(); ++it, ++n)
 					{
-						int n = 1;
-						for (std::set<std::string>::iterator it = activeSubs.begin(); it != activeSubs.end(); ++it, ++n)
-						{
-							std::ostringstream fieldName;
-							fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+						std::ostringstream fieldName;
+						fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
 
-							msg.addField(fieldName.str().c_str(), it->c_str());
-						}
-					}
-				}
-
-				if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
-		    	    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
-				{
-					const char* endpoint = (m_connectionEndpoint.empty() ? "unknown" : m_connectionEndpoint.c_str());
-
-					if (getSpecLevel() == 0)
-					{
-						msg.addField("CONNECTION-ENDPOINT", endpoint);
-					}
-					else
-					{
-						msg.addField("MW-CONNECTION-ENDPOINT", endpoint);
+						msg.addField(fieldName.str().c_str(), it->c_str());
 					}
 				}
 			}
-		}
-		catch (...)
-		{
-			// Ignore exception; message is not a C2CX HB message.
+
+			if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
+	    	    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
+			{
+				const char* endpoint = (m_connectionEndpoint.empty() ? "unknown" : m_connectionEndpoint.c_str());
+
+				if (getSpecVersion() == GMSEC_ISD_2018_00 && getSpecLevel() == 0)
+				{
+					msg.addField("CONNECTION-ENDPOINT", endpoint);     // spelling used within 2018 C2MS-draft
+				}
+				else
+				{
+					msg.addField("MW-CONNECTION-ENDPOINT", endpoint);  // official spelling used within 2019 C2MS
+				}
+			}
 		}
 	}
 }
@@ -1873,39 +1916,49 @@ void InternalConnection::removeTrackingFields(Message& msg)
 		msg.clearField("MW-INFO");
 	}
 
-	if (getSpecVersion() == 0 || getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
+	if (getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
 	{
-		try
+		const Field* c2cxSubtype = NULL;
+
+		if (getSpecVersion() < gmsec::api::mist::GMSEC_ISD_2019_00)
 		{
-			const char* c2cxSubtype = msg.getStringValue("C2CX-SUBTYPE");
+			c2cxSubtype = msg.getField("C2CX-SUBTYPE");
+		}
+		else
+		{
+			c2cxSubtype = msg.getField("MESSAGE-SUBTYPE");
+		}
 
-			if (StringUtil::stringEqualsIgnoreCase(c2cxSubtype, "HB"))
+		if (c2cxSubtype != NULL && StringUtil::stringEqualsIgnoreCase(c2cxSubtype->getStringValue(), "HB"))
+		{
+			if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
+			    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
 			{
-				if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
-				    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+				GMSEC_I64 numSubscriptions = msg.getIntegerValue("NUM-OF-SUBSCRIPTIONS");
+
+				for (GMSEC_I64 n = 1; n <= numSubscriptions; ++n)
 				{
-					GMSEC_I64 numSubscriptions = msg.getIntegerValue("NUM-OF-SUBSCRIPTIONS");
+					std::ostringstream fieldName;
+					fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
 
-					for (GMSEC_I64 n = 1; n <= numSubscriptions; ++n)
-					{
-						std::ostringstream fieldName;
-						fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+					msg.clearField(fieldName.str().c_str());
+				}
 
-						msg.clearField(fieldName.str().c_str());
-					}
+				msg.clearField("NUM-OF-SUBSCRIPTIONS");
+			}
 
-					msg.clearField("NUM-OF-SUBSCRIPTIONS");
+			if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
+		   	    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
+			{
+				if (getSpecVersion() == GMSEC_ISD_2018_00 && getSpecLevel() == 0)
+				{
+					msg.clearField("CONNECTION-ENDPOINT");     // spelling used within 2018 C2MS-draft
+				}
+				else
+				{
+					msg.clearField("MW-CONNECTION-ENDPOINT");  // official spelling used within 2019 C2MS
 				}
 			}
-			if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
-			    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
-			{
-				msg.clearField("MW-CONNECTION-ENDPOINT");
-			}
-		}
-		catch (...)
-		{
-			// Ignore exception; message is not a C2CX HB message.
 		}
 	}
 }

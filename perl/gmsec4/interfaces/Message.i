@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -508,6 +508,12 @@ C<libgmsec_perl::Message-E<gt>getStringValue($fieldName)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exception:</b><br>
 
         An Exception is thrown if the field cannot be found, or if it cannot successfully be converted to a string value.
+
+=head3 hasField
+
+C<libgmsec_perl::Message-E<gt>hasField($fieldName)>
+
+     Reports whether the field, identified by name, is present in the Message or not.
 
 =head3 getField
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -35,16 +35,10 @@ using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
 
 
-MessageTemplate::MessageTemplate()
-  	: m_id(),
-	  m_fieldTemplates()
-{
-}
-
-
-MessageTemplate::MessageTemplate(const char* schemaID, const FieldTemplateList& inputFields)
+MessageTemplate::MessageTemplate(const char* schemaID, const FieldTemplateList& inputFields, unsigned int schemaLevel)
 	: m_id(schemaID),
-	  m_fieldTemplates()
+	  m_fieldTemplates(),
+	  m_schemaLevel(schemaLevel)
 {
 	// We need to make a deep-copy of the FieldTemplate(s)
 	for (FieldTemplateList::const_iterator it = inputFields.begin(); it != inputFields.end(); ++it)
@@ -56,7 +50,8 @@ MessageTemplate::MessageTemplate(const char* schemaID, const FieldTemplateList& 
 
 MessageTemplate::MessageTemplate(const MessageTemplate& other)
 	: m_id(other.m_id),
-	  m_fieldTemplates()
+	  m_fieldTemplates(),
+	  m_schemaLevel(other.m_schemaLevel)
 {
 	// We need to make a deep-copy of the FieldTemplate(s)
 	for (FieldTemplateList::const_iterator it = other.m_fieldTemplates.begin(); it != other.m_fieldTemplates.end(); ++it)
@@ -76,24 +71,20 @@ MessageTemplate& MessageTemplate::operator=(const MessageTemplate& other)
 {
 	if (this != &other)
 	{
-		this->setFieldTemplates(other.m_id.c_str(), other.m_fieldTemplates);
+		cleanup();
+
+		m_id = other.m_id;
+
+		// We need to make a deep-copy of the FieldTemplate(s)
+		for (FieldTemplateList::const_iterator it = other.m_fieldTemplates.begin(); it != other.m_fieldTemplates.end(); ++it)
+		{
+			m_fieldTemplates.push_back(new FieldTemplate(*(*it)));
+		}
+
+		m_schemaLevel = other.m_schemaLevel;
 	}
 
 	return *this;
-}
-
-
-void MessageTemplate::setFieldTemplates(const char* schemaID, const FieldTemplateList& inputFields)
-{
-	cleanup();
-
-	m_id = schemaID;
-
-	// We need to make a deep-copy of the FieldTemplate(s)
-	for (FieldTemplateList::const_iterator it = inputFields.begin(); it != inputFields.end(); ++it)
-	{
-		m_fieldTemplates.push_back(new FieldTemplate(*(*it)));
-	}
 }
 
 
@@ -149,6 +140,12 @@ const char* MessageTemplate::getID() const
 const MessageTemplate::FieldTemplateList& MessageTemplate::getFieldTemplates() const
 {
 	return m_fieldTemplates;
+}
+
+
+unsigned int MessageTemplate::getSchemaLevel() const
+{
+	return m_schemaLevel;
 }
 
 

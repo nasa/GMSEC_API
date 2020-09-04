@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -50,7 +50,7 @@ namespace message
  *
  * @brief A MistMessage object that is capable of storing Device objects
  * The following message schema IDs and their templates are supported: @n
- * GMSEC.MSG.C2CX.DEV
+ * MSG.DEV
  *
  * @sa Message @n
  *	   MistMessage @n

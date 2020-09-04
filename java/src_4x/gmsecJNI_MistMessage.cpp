@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -224,20 +224,21 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MistMessageSetS
 {
 	try
 	{
-		DataList<Field*> fields;
-		size_t           numFields = (size_t) jNumFields;
+		size_t numFields = (size_t) jNumFields;
 
 		if (numFields > 0)
 		{
+			DataList<Field*> fields;
+
 			jlong* fldptrs = jenv->GetLongArrayElements(jFieldPtrs, JNI_FALSE);
 
 			for (size_t i = 0; i < numFields; ++i)
 			{
 				fields.push_back(JNI_JLONG_TO_FIELD(fldptrs[i]));
 			}
-		}
 
-		MistMessage::setStandardFields(fields);
+			MistMessage::setStandardFields(fields);
+		}
 	}
 	JNI_CATCH
 }

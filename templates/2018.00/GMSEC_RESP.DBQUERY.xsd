@@ -45,90 +45,92 @@
 		</xs:restriction>
 	</xs:simpleType>
 
-	<xs:complexType name="PARAMETER_Type">
-		<xs:all>
-		
-			<xs:element name="NAME">
-				<xs:annotation>
-					<xs:documentation>Name of the parameter.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="xs:string">
-							<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
-						</xs:extension>
-					</xs:simpleContent>
-				</xs:complexType>
-			</xs:element>
+	<xs:element name="PARAMETER">
+		<xs:complexType>
+			<xs:all>
+			
+				<xs:element name="NAME">
+					<xs:annotation>
+						<xs:documentation>Name of the parameter.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
 
-			<xs:element name="SHORT-DESCRIPTION" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Short description of the parameter.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="xs:string">
-							<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
-						</xs:extension>
-					</xs:simpleContent>
-				</xs:complexType>
-			</xs:element>
+				<xs:element name="SHORT-DESCRIPTION" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Short description of the parameter.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
 
-			<xs:element name="LONG-DESCRIPTION" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Long description of the parameter.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="xs:string">
-							<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
-						</xs:extension>
-					</xs:simpleContent>
-				</xs:complexType>
-			</xs:element>
+				<xs:element name="LONG-DESCRIPTION" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Long description of the parameter.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
 
-			<xs:element name="DATATYPE">
-				<xs:annotation>
-					<xs:documentation>One of Float, Integer, Unsigned, Enumerated, String, Boolean, Binary, AbsoluteTime, RelativeTime.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="DATATYPE_Type">
-							<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
-						</xs:extension>
-					</xs:simpleContent>
-				</xs:complexType>
-			</xs:element>
+				<xs:element name="DATATYPE">
+					<xs:annotation>
+						<xs:documentation>One of Float, Integer, Unsigned, Enumerated, String, Boolean, Binary, AbsoluteTime, RelativeTime.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="DATATYPE_Type">
+								<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
 
-			<xs:element name="DATA-ENCODING" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>One of Unsigned, twosComplement, OnesComplement, BCD, packedBCD, signedMagnitude, IEEE-754_1985, MIL_1759A, UTF-8, UTF-16, binary.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="DATA-ENCODING_Type">
-							<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
-						</xs:extension>
-					</xs:simpleContent>
-				</xs:complexType>
-			</xs:element>
+				<xs:element name="DATA-ENCODING" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>One of Unsigned, twosComplement, OnesComplement, BCD, packedBCD, signedMagnitude, IEEE-754_1985, MIL_1759A, UTF-8, UTF-16, binary.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="DATA-ENCODING_Type">
+								<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
 
-			<xs:element name="SIZE-IN-BITS" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>Size of the raw value data – typically either 8, 16, 32, or 64.</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:simpleContent>
-						<xs:extension base="xs:string">
-							<xs:attribute name="TYPE" type="FIELD_Type" fixed="U32"/>
-						</xs:extension>
-					</xs:simpleContent>
-				</xs:complexType>
-			</xs:element>
+				<xs:element name="SIZE-IN-BITS" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Size of the raw value data – typically either 8, 16, 32, or 64.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="TYPE" type="FIELD_Type" fixed="U32"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
 
-		</xs:all>
-		<xs:attribute name="INDEX" type="xs:unsignedShort" use="required"/>
-	</xs:complexType>
+			</xs:all>
+			<xs:attribute name="INDEX" type="xs:unsignedShort" use="required"/>
+		</xs:complexType>
+	</xs:element>
 	
 	<xs:element name="RESP.DBQUERY">
 		<xs:annotation>

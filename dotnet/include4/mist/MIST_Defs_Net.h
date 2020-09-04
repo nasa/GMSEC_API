@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -33,11 +33,14 @@ public:
 	/// <summary>2016 version of the GMSEC Interface Specification Document (ISD).</summary>
 	static const unsigned int GMSEC_ISD_2016_00 = 201600;
 
-	/// <summary>2018 version of the GMSEC Interface Specification Document (ISD).</summary>
+	/// <summary>2018 version of the Command and Control Message Specification (C2MS).</summary>
 	static const unsigned int GMSEC_ISD_2018_00 = 201800;
 
-	/// <summary>Current version of the GMSEC Interface Specification Document (ISD).</summary>
-	static const unsigned int GMSEC_ISD_CURRENT = GMSEC_ISD_2018_00;
+	/// <summary>2019 version of the Command and Control Message Specification (C2MS).</summary>
+	static const unsigned int GMSEC_ISD_2019_00 = 201900;
+
+	/// <summary>Current version.</summary>
+	static const unsigned int GMSEC_ISD_CURRENT = GMSEC_ISD_2019_00;
 };
 
 

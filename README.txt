@@ -8,62 +8,93 @@ For technical support regarding this release, or any previous version, please
 contact the API Team at gmsec-support@lists.nasa.gov.
 
 
-
 ==============================================================================
-= ADVISEMENT ALERT (for users of 32-bit RHEL 7 distro of the GMSEC API)
+= GMSEC API 4.7 release notes (May 2020)
 ==============================================================================
-The 32-bit RHEL 7 distro of the GMSEC API does not offer support for the
-following items:
+o Support for 32-bit distributions of the GMSEC API has been dropped.
 
-    * Middleware wrappers for activemq38 or websphere80
-	* Perl binding for the GMSEC API 3.x interface
-	* Python binding
-	* C#/Mono binding
+o Java-related facets of the GMSEC API are built using OpenJDK 11. Users can
+  continue to use Java 8 through 11 to run Java applications.
 
+o Support for Python (2.7) has been dropped; users should use the Python3
+  binding instead.
 
-
-==============================================================================
-= ADVISEMENT ALERT (for users of API 4.2.1 and later versions)
-==============================================================================
-Starting with API 4.2.1, support for RHEL 5 (both x86 and x86-64) has been
-dropped.  It is recommended that users of RHEL 5 upgrade their systems to
-RHEL 7 (or RHEL 6) if they wish to adopt the latest version of the GMSEC API.
+o Perl binding under Windows is no longer built with Active State Perl;
+  Strawberry Perl is being used instead.
 
 
-
-==============================================================================
-= ADVISEMENT ALERT (for users of API 4.1 and later versions)
-==============================================================================
-Version 4.1 of the GMSEC API introduces a new external interface binding for
-Java, C, C++, and C#.  This new interface provides new functionality, including
-an expanded range of capabilities for the Messaging Interface Standardization
-Toolkit (MIST - please see the GMSEC API User's Guide).  This new interface 
-has been optimized to require less code and result in safer operations.  While
-the interface from version 3.7 and earlier is maintained, the GMSEC team 
-recommends that new software make use of this new interface. 
-
-It is also necessary for software products that use the 3.7 and earlier 
-interface to upgrade to a 4.X series of the GMSEC API shared object
-library, if those software products will be used on the same GMSEC bus as
-clients which are using the new interface.  Since the new interface allows for
-a broader range of data types, the library for the old interface has been
-updated to handle the new data types.  If this library upgrade is not 
-performed, existing software written with the GMSEC API will be unable to 
-interpret messages with new data types. 
-
-
-
-==============================================================================
-= ADVISEMENT ALERT (for users of API 4.0)
-==============================================================================
-API 4.0 has been deprecated due to various issues, some of which involve the
-refactoring of callback-related interfaces in the Java binding and changes to
-an enumerated declaration that clashed with a C/C++ NO_ERROR macro definition
-provided by Microsoft Visual Studio.
-
-It is highly recommended that users stop using API 4.0, and instead develop
-their applications using version 4.1 or greater.
-
+--- Change summary -----------------------------------------------------------
+4766    The API should be able to validate dependent fields as defined by C2MS
+        and GMSEC Addendum
+5242    API should follow soft-link when attempting to determine install
+        directory
+5245    Under Windows, build the Perl binding of the GMSEC API using Strawberry
+        Perl
+5248    OpenDDS m/w occassionally crashes on shutdown
+5249    Retrieval of binary data is not thread-safe in C# binding
+5250    Add example programs that demonstrate basic usage of C2/C2-NSS
+        capabilities of the GMSEC API
+5251    Message validation can fail when comparing supposedly equal F32 values
+5252    Tracking field insertion for C2MS (2019) Heartbeat message
+5253    API should use the 2019 C2MS as the default for XSD files
+5255    API is not referencing C++ header files on MacOSX
+5256    Optimize InternalSpecification to skip loading unused message template
+        files
+5258    Avoid the unnecessary throwing of exception within the GMSEC API
+5259    Condition class reports conflicting status
+5260    By default, gmreq should not be republishing request messages
+5261    Typo in error message when attempting to publish message with a non-
+        PUBLISH message kind
+5266    AMQP m/w wrapper provides vague error message when it fails to
+        initialize
+5268    Validation produces malformed error message when array fields are
+        involved
+5269    Add support for GMSEC-style wildcard characters in OpenDDS m/w wrapper
+5270    Allow users to register custom message validation function
+5271    Functions to create Connection Manager in C binding are not handling
+        exceptions
+5272    Perl and Python3 bindings are not properly handling GMSEC API exceptions
+5274    Add a hasField() method to Message class
+5284    Develop string utils that can be used to validate header string,
+        timestamp, and IP address values that go into message fields
+5285    Algorithm to determine leap-year reports incorrect results
+5288    The gmreq and gmrpl utilities do not create valid C2MS messages
+5290    ResourceInfoGenerator should not give up if it cannot query stats on a
+        disk
+5291    Tracking fields are not cleared from message upon receiving error from
+        m/w wrapper
+5292    ConnectionManager requestDirective() methods do not add REQUEST-ID or
+        MSG-ID
+5295    Provide the means for users to use an alias in lieu of a schema ID
+        when building a MistMessage
+5296    Provide utility app to display all available message schema IDs and
+        associated alias (if any)
+5297    Fix documentation for publish() method that accepts a Config object
+5299    ConnectionManager publishLog() does not include miscellaneous elements
+        in message subject
+5301    Validate Header String, IP Address, and Timestamp contents in Fields
+5302    Add getSchemaLevel() method to Specification
+5306    NODE and USER-NAME fields are not C2MS compliant
+5307    Add C2MS-Pipeline message templates
+5308    Add middleware wrapper for ActiveMQ CMS 3.9.5
+5309    API does not create message templates for all schema levels
+5312    Field getIntegerValue() and getUnsignedIntegerValue() report incorrect
+        error when a value cannot be produced
+5313    MistMessage does not properly convert legacy message into newer format
+5315    Duplicate message in error string when validating fields in an array
+5316    Validation incorrectly identifies name of field when comparing to
+        field template in array
+5317    API's JNI MistMessage should not set standard fields when field count
+        is zero
+5318    Bolt wrapper is not reporting connection endpoint when multiple
+        connections are used
+5319    Fix Python3 and C# documentation regarding ConnectionManager's
+        setStandardFields()
+5332    Message Bus includes homemade field in request message
+5333    IBM MQ m/w wrapper includes homemade field in request messages
+5342    API fails to handle subscription with callback with certain topics
+        ending with '+'
+5345    Do not associate a Specification object with an InternalMistMessage
 
 
 ==============================================================================

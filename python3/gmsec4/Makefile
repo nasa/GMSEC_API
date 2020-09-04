@@ -1,4 +1,4 @@
-# Copyright 2007-2019 United States Government as represented by the
+# Copyright 2007-2020 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -17,7 +17,7 @@ SWIG_OPTS       = -c++ -python -py3 -threads $(SWIG_SWG) -DCHAR_BIT=8 -DGMSEC_S1
 
 FRAMEWORK_DIR   = ../../framework
 
-GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include/c++/$(shell $(CXX) -dumpversion)
+GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I$(CXX_INCS)
 
 API_CXXFLAGS   += $(shell $(PYTHON3_HOME)/bin/python3-config --includes)
 LDFLAGS        += $(shell $(PYTHON3_HOME)/bin/python3-config --ldflags)

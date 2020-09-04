@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2019 United States Government as represented by the
+ * Copyright 2007-2020 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -201,6 +201,40 @@ unsigned int CALL_TYPE specificationGetVersion(GMSEC_Specification spec, GMSEC_S
 }
 
 
+GMSEC_SchemaLevel CALL_TYPE specificationGetSchemaLevel(GMSEC_Specification spec, GMSEC_Status status)
+{
+	Specification* s = reinterpret_cast<Specification*>(spec);
+	Status         result;
+
+	GMSEC_SchemaLevel level = GMSEC_SCHEMA_LEVEL_0;
+
+	if (!s)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Specification handle is NULL");
+	}
+	else
+	{
+		switch (s->getSchemaLevel())
+		{
+		case Specification::LEVEL_0: level = GMSEC_SCHEMA_LEVEL_0; break;
+		case Specification::LEVEL_1: level = GMSEC_SCHEMA_LEVEL_1; break;
+		case Specification::LEVEL_2: level = GMSEC_SCHEMA_LEVEL_2; break;
+		case Specification::LEVEL_3: level = GMSEC_SCHEMA_LEVEL_3; break;
+		case Specification::LEVEL_4: level = GMSEC_SCHEMA_LEVEL_4; break;
+		case Specification::LEVEL_5: level = GMSEC_SCHEMA_LEVEL_5; break;
+		case Specification::LEVEL_6: level = GMSEC_SCHEMA_LEVEL_6; break;
+		}
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return level;
+}
+
+
 void CALL_TYPE specificationGetMessageSpecifications(GMSEC_Specification spec, GMSEC_MessageSpecification** msgSpecs, int* numMsgSpecs, GMSEC_Status status)
 {
 	Specification* s = reinterpret_cast<Specification*>(spec);
@@ -283,6 +317,32 @@ void CALL_TYPE specificationDestroyMessageSpecifications(GMSEC_MessageSpecificat
 	if (status)
 	{
 		*(reinterpret_cast<Status*>(status)) = result;
+	}
+}
+
+
+void CALL_TYPE specificationRegisterMessageValidator(GMSEC_Specification spec, GMSEC_MessageValidator* validator, GMSEC_Status status)
+{
+	Status result;
+
+	Specification* s = reinterpret_cast<Specification*>(spec);
+
+	if (s == NULL)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Specification handle is NULL");
+	}
+	else if (validator == NULL || *validator == NULL)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "MessageValidator function is NULL");
+	}
+	else
+	{
+		s->registerMessageValidator(validator);
+	}
+
+	if (status)
+	{
+		*((Status*) status) = result;
 	}
 }
 

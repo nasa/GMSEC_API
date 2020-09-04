@@ -114,7 +114,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;./framework/src;..\SUPPORT\libxml2\include\libxml2;..\SUPPORT\libxslt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;./framework/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GMSECAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -134,7 +134,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;Advapi32.lib;iphlpapi.lib;pdh.Lib;libxml2.lib;libxslt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;Advapi32.lib;iphlpapi.lib;pdh.Lib;;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin/gmsecapi_d.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -165,7 +165,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;..\SUPPORT\libxml2\include\libxml2;..\SUPPORT\libxslt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GMSECAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -218,7 +218,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;./framework/src;..\SUPPORT\libxml2\include\libxml2;..\SUPPORT\libxslt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;./framework/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GMSECAPI_EXPORTS;__USE_PTYPES_INSTEAD_OF_COMMONCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -237,7 +237,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;Advapi32.lib;pdh.lib;iphlpapi.lib;libxml2.lib;libxslt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;Advapi32.lib;pdh.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin/gmsecapi.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\objects/Release/gmsecapi.pdb</ProgramDatabaseFile>
@@ -245,7 +245,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <DataExecutionPrevention />
       <ImportLibrary>.\objects/Release/gmsecapi.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalLibraryDirectories>..\SUPPORT\libxml2\lib;..\SUPPORT\libxslt\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -268,7 +268,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;..\SUPPORT\libxml2\include\libxml2;..\SUPPORT\libxslt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GMSECAPI_EXPORTS;__USE_PTYPES_INSTEAD_OF_COMMONCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -287,7 +287,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;Advapi32.lib;IPHlpApi.Lib;Pdh.Lib;libxml2.lib;libxslt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;Advapi32.lib;IPHlpApi.Lib;Pdh.Lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>bin/gmsecapi.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ProgramDatabaseFile>.\objects/Release/gmsecapi.pdb</ProgramDatabaseFile>
@@ -295,7 +295,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <DataExecutionPrevention />
       <ImportLibrary>.\objects/Release/gmsecapi.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>..\SUPPORT\libxml2\lib;..\SUPPORT\libxslt\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -1742,7 +1742,7 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ProgramDataBaseFileName>
     </ClCompile>
-    <ClCompile Include="framework\src\gmsec4\internal\mist\CustomSpecification.cpp">
+    <ClCompile Include="framework\src\gmsec4\internal\mist\CustomMessageValidator.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</ProgramDataBaseFileName>
@@ -1769,6 +1769,20 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\mist\FieldTemplateDependency.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/mist/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/mist/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/mist/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/mist/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/mist/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/mist/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/mist/</ProgramDataBaseFileName>
     </ClCompile>
     <ClCompile Include="framework\src\gmsec4\internal\mist\HeartbeatService.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/mist/</AssemblerListingLocation>
@@ -2262,6 +2276,20 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
     </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\util\InternalCondition.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/</ProgramDataBaseFileName>
+    </ClCompile>
     <ClCompile Include="framework\src\gmsec4\internal\util\InternalLog.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ObjectFileName>
@@ -2291,6 +2319,20 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
     </ClCompile>
     <ClCompile Include="framework\src\gmsec4\internal\util\InternalLogStream.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\objects/Release/api4/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api4/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec4\internal\util\InternalMutex.cpp">
       <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</AssemblerListingLocation>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ObjectFileName>
       <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\objects/Debug/api4/</ProgramDataBaseFileName>
@@ -3257,8 +3299,9 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClInclude Include="framework\include\gmsec4\internal\Middleware.h" />
     <ClInclude Include="framework\include\gmsec4\internal\mist\ConnMgrCallbackCache.h" />
     <ClInclude Include="framework\include\gmsec4\internal\mist\ConnMgrCallbacks.h" />
-    <ClInclude Include="framework\include\gmsec4\internal\mist\CustomSpecification.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\mist\CustomMessageValidator.h" />
     <ClInclude Include="framework\include\gmsec4\internal\mist\FieldTemplate.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\mist\FieldTemplateDependency.h" />
     <ClInclude Include="framework\include\gmsec4\internal\mist\HeartbeatService.h" />
     <ClInclude Include="framework\include\gmsec4\internal\mist\InternalConnectionManager.h" />
     <ClInclude Include="framework\include\gmsec4\internal\mist\InternalDevice.h" />
@@ -3300,9 +3343,12 @@ for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x
     <ClInclude Include="framework\include\gmsec4\internal\tinyxml2.h" />
     <ClInclude Include="framework\include\gmsec4\internal\TrackingDetails.h" />
     <ClInclude Include="framework\include\gmsec4\internal\UniqueFilter.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\util\InternalCondition.h" />
     <ClInclude Include="framework\include\gmsec4\internal\util\InternalLog.h" />
     <ClInclude Include="framework\include\gmsec4\internal\util\InternalLoggerStream.h" />
     <ClInclude Include="framework\include\gmsec4\internal\util\InternalLogStream.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\util\InternalMutex.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\util\MutexBuddy.h" />
     <ClInclude Include="framework\include\gmsec4\internal\Value.h" />
     <ClInclude Include="framework\include\gmsec4\Message.h" />
     <ClInclude Include="framework\include\gmsec4\MessageFieldIterator.h" />
