@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,6 +14,8 @@
 **/
 
 #include <gmsec4/internal/mist/ResourceService.h>
+
+#include <gmsec4/internal/mist/InternalConnectionManager.h>
 
 #include <gmsec4/Config.h>
 #include <gmsec4/mist/ConnectionManager.h>
@@ -78,7 +80,7 @@ ResourceService::ResourceService(const Config& config,
 								 size_t sampleInterval, 
 								 size_t averageInterval)
 	: m_config(config),
-	  m_connMann(new ConnectionManager(config)),
+	  m_connMgr(new ConnectionManager(config)),
 	  m_subject(subject),
 	  m_pubInterval(pubInterval),
 	  m_sampleInterval(sampleInterval),
@@ -87,7 +89,7 @@ ResourceService::ResourceService(const Config& config,
 	  m_shutdownLatch(1)
 {
 	m_alive.set(false);
-	m_connMann->setStandardFields(standardFields);
+	m_connMgr->setStandardFields(standardFields);
 }
 
 ResourceService::~ResourceService()
@@ -147,46 +149,38 @@ void ResourceService::run()
 		ActionInfo publish((double) m_pubInterval);
 		ActionInfo sample((double) m_sampleInterval);
 
+		InternalConnectionManager& intConnMgr = ConnectionManagerBuddy::getInternal(*m_connMgr);
+
 		// Flag that will be used to indicate that we should publish
-		// first heartbeat message immediately upon starting the
+		// first resource message immediately upon starting the
 		// service.
 		bool firstTime = true;
 
 		while (m_alive.get())
 		{
-			bool publishMsg = false;
-			bool sampleMsg  = false;
+			bool publishMsg = publish.tryNow();
+			bool sampleMsg  = sample.tryNow();
 
 			if (firstTime)
 			{
 				publishMsg = true;
-				sampleMsg  = true;
 				firstTime  = false;
-			}
-			else
-			{
-				publishMsg = publish.tryNow();
-				sampleMsg  = sample.tryNow();
 			}
 
 			if (publishMsg)
 			{
-				AutoMutex lock(m_msgMutex);
-
 				try
 				{
-					m_connMann->publishResourceMessage(m_subject.c_str(), m_sampleInterval, m_averageInterval);
+					intConnMgr.publishResourceMessage(m_subject.c_str(), m_pubInterval, m_sampleInterval, m_averageInterval);
 					GMSEC_VERBOSE << "ResourceService published C2CX-RSRC message.";
 				}
-				catch (Exception& e)
+				catch (const Exception& e)
 				{
 					GMSEC_ERROR << "ResourceService: Error publishing message -- " << e.what();
 				}
 			}
 			else if (sampleMsg)
 			{
-				AutoMutex lock(m_msgMutex);
-
 				//The ResourceInfoGenerator keeps a running queue of samples from each message created. In the event
 				//that the desired sample interval is smaller than the publish interval, this sample clause will execute
 				//to create a message, thus triggering the sample logic. 
@@ -196,14 +190,18 @@ void ResourceService::run()
 				//The savings from this change are minimal, and the work is deferred. 
 				try
 				{
-					m_connMann->createResourceMessage(m_subject.c_str(), m_sampleInterval, m_averageInterval);
-					GMSEC_DEBUG << "ResourceService sampled C2CX-RSRC message.";
+					(void) intConnMgr.createResourceMessage(m_subject.c_str(), m_sampleInterval, m_averageInterval);
+					GMSEC_VERBOSE << "ResourceService sampled C2CX-RSRC message.";
 				}
-				catch (Exception& e)
+				catch (const Exception& e)
 				{
 					GMSEC_ERROR << "ResourceService: Error sampling C2CX-RSRC message -- " << e.what();
 				}
+			}
 
+			if (m_pubInterval == 0)
+			{
+				break;
 			}
 
 			TimeUtil::millisleep(200);
@@ -227,7 +225,7 @@ Status ResourceService::setupService()
 
 	try
 	{
-		m_connMann->initialize();
+		m_connMgr->initialize();
 	}
 	catch (Exception& e)
 	{
@@ -243,18 +241,19 @@ Status ResourceService::teardownService()
 {
 	Status status;
 
-	if (m_connMann)
+	if (m_connMgr)
 	{
 		try
 		{
-			m_connMann->cleanup();
-			delete m_connMann;
-			m_connMann = NULL;
+			m_connMgr->cleanup();
 		}
 		catch (Exception& e)
 		{
 			status.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage());
 		}
+
+		delete m_connMgr;
+		m_connMgr = NULL;
 	}
 
 	return status;

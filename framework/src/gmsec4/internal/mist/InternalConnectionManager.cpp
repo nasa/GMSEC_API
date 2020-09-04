@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,20 +15,23 @@
  *  standard service for producing heartbeats, and a set of functions which streamline 
  *  log message production.
  *
-**/
+ */
 
 #include <gmsec4/internal/mist/InternalConnectionManager.h>
+
+#include <gmsec4/internal/mist/ConnMgrCallbacks.h>
+#include <gmsec4/internal/mist/ConnMgrCallbackCache.h>
 #include <gmsec4/internal/mist/CustomSpecification.h>
 #include <gmsec4/internal/mist/InternalSpecification.h>
 #include <gmsec4/internal/mist/ResourceInfoGenerator.h>
 #include <gmsec4/internal/mist/SpecificationBuddy.h>
 
-#include <gmsec4/ConfigOptions.h>
-
 #include <gmsec4/internal/field/InternalField.h>
 
-#include <gmsec4/internal/mist/ConnMgrCallbacks.h>
-#include <gmsec4/internal/mist/ConnMgrCallbackCache.h>
+#include <gmsec4/internal/MessageBuddy.h>
+#include <gmsec4/internal/StringUtil.h>
+
+#include <gmsec4/mist/message/MistMessage.h>
 
 #include <gmsec4/mist/ConnectionManager.h>
 #include <gmsec4/mist/ConnectionManagerCallback.h>
@@ -38,27 +41,28 @@
 #include <gmsec4/mist/SubscriptionInfo.h>
 #include <gmsec4/mist/mist_defs.h>
 
-#include <gmsec4/mist/message/MistMessage.h>
-
-#include <gmsec4/util/DataList.h>
-
+#include <gmsec4/ConfigOptions.h>
 #include <gmsec4/Errors.h>
 #include <gmsec4/Exception.h>
 #include <gmsec4/Fields.h>
 #include <gmsec4/SubscriptionInfo.h>
 
+#include <gmsec4/util/DataList.h>
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
-#include <gmsec4/internal/StringUtil.h>
-
-#include <memory>
+#include <limits>
 #include <sstream>
 
+#ifdef WIN32
+	#ifdef max
+	#undef max
+	#endif
+#endif
+
+using namespace gmsec::api;
+using namespace gmsec::api::internal;
 using namespace gmsec::api::util;
-
-using gmsec::api::Field;
-using gmsec::api::util::DataList;
-
 
 
 namespace gmsec
@@ -462,6 +466,7 @@ void InternalConnectionManager::publish(const Message& msg, const Config& config
 	// If validation is enabled, check the message before it is sent out
 	if (validateOnSend())
 	{
+		MessageBuddy::getInternal(msg).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
 		getSpecification().validateMessage(const_cast<Message&>(msg));
 	}
 
@@ -487,6 +492,7 @@ void InternalConnectionManager::request(const Message& request, GMSEC_I32 timeou
 	// Validate the message before it is sent out
 	if (validateOnSend())
 	{
+		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
 		getSpecification().validateMessage(const_cast<Message&>(request));
 	}
 
@@ -514,6 +520,7 @@ Message* InternalConnectionManager::request(const Message& request, GMSEC_I32 ti
 	// Validate the message before it is sent out
 	if (validateOnSend())
 	{
+		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
 		getSpecification().validateMessage(const_cast<Message&>(request));
 	}
 
@@ -561,6 +568,7 @@ void InternalConnectionManager::reply(const Message& request, const Message& rep
 	// Validate the message before it is sent out
 	if (validateOnSend())
 	{
+		MessageBuddy::getInternal(reply).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
 		getSpecification().validateMessage(const_cast<Message&>(reply));
 	}
 
@@ -578,6 +586,7 @@ void InternalConnectionManager::dispatch(const Message& msg)
 	// If validation is enabled, check the message before it is sent out
 	if (validateOnSend())
 	{
+		MessageBuddy::getInternal(msg).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
 		getSpecification().validateMessage(const_cast<Message&>(msg));
 	}
 
@@ -592,7 +601,7 @@ Message* InternalConnectionManager::receive(GMSEC_I32 timeout)
 		throw Exception(MIST_ERROR, CONNECTION_NOT_INITIALIZED, "The ConnectionManager has not been initialized!");
 	}
 
-	std::auto_ptr<Message> msg(m_connection->receive(timeout));
+	StdUniquePtr<Message> msg(m_connection->receive(timeout));
 
 	if (msg.get() != NULL && validateOnRecv())
 	{
@@ -709,6 +718,13 @@ Message InternalConnectionManager::createHeartbeatMessage(const char* subject, c
 	}
 
 	m_messagePopulator->addStandardFields(msg);
+
+	if (msg.getField("MSG-ID") == NULL && getSpecification().getVersion() <= GMSEC_ISD_2014_00)
+	{
+		std::ostringstream oss;
+		oss << "GMSEC-C2CX-HB-1";
+		msg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
+	}
 
 	return msg;
 }
@@ -1037,7 +1053,7 @@ void InternalConnectionManager::acknowledgeSimpleService(const char * subject, c
 }
 
 
-Message InternalConnectionManager::createResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval)
+message::MistMessage InternalConnectionManager::createResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval)
 {
 	if (!subject || std::string(subject).empty())
 	{
@@ -1056,23 +1072,12 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 		                "InternalConnectionManager::createResourceMessage():  A moving average interval less than the sampling interval was used.");
 	}
 
-	++m_resourceMessageCounter;
-
 	message::MistMessage msg(subject, "MSG.C2CX.RSRC", getSpecification());
-
-	msg.setValue("COUNTER", (GMSEC_I64) m_resourceMessageCounter);
-
-	std::string osVersion = ResourceInfoGenerator::getOSVersion();
-	msg.addField("OPER-SYS", osVersion.c_str());
 
 	unsigned int specVersion = getSpecification().getVersion();
 
-	if (specVersion <= GMSEC_ISD_2014_00)
-	{
-		std::ostringstream oss;
-		oss << "GMSEC-RESOURCE-MESSAGE-" << m_resourceMessageCounter;
-		msg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
-	}
+	std::string osVersion = ResourceInfoGenerator::getOSVersion();
+	msg.addField("OPER-SYS", osVersion.c_str());
 
 	try
 	{ 
@@ -1116,14 +1121,47 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 }
 
 
+//deprecated
 void InternalConnectionManager::publishResourceMessage(const char* subject, size_t sampleInterval, size_t averageInterval)
+{
+	const size_t defaultPubRate = 0;
+	publishResourceMessage(subject, defaultPubRate, sampleInterval, averageInterval);
+}
+
+
+void InternalConnectionManager::publishResourceMessage(const char* subject, size_t pubRate, size_t sampleInterval, size_t averageInterval)
 {
 	if (!subject || std::string(subject).empty())
 	{
 		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "publishResourceMessage():  The subject string is null, or is empty.");
 	}
 
-	publish(createResourceMessage(subject, sampleInterval, averageInterval));
+	message::MistMessage rsrcMsg = createResourceMessage(subject, sampleInterval, averageInterval);
+
+	++m_resourceMessageCounter;
+
+	if (getSpecification().getVersion() == GMSEC_ISD_2014_00)
+	{
+		m_resourceMessageCounter %= GMSEC_U16(std::numeric_limits<GMSEC_I16>::max() + 1);
+	}
+
+	if (m_resourceMessageCounter == 0) ++m_resourceMessageCounter;
+
+	rsrcMsg.setValue("COUNTER", (GMSEC_I64) m_resourceMessageCounter);
+
+	if (pubRate > 0)
+	{
+		rsrcMsg.setValue("PUB-RATE", (GMSEC_I64) pubRate);
+	}
+
+	if (getSpecification().getVersion() <= GMSEC_ISD_2014_00)
+	{
+		std::ostringstream oss;
+		oss << "GMSEC-RESOURCE-MESSAGE-" << m_resourceMessageCounter;
+		rsrcMsg.addField("MSG-ID", oss.str().c_str()); //Pre-2016 ISDs require this field
+	}
+
+	publish(rsrcMsg);
 }
 
 
@@ -1138,7 +1176,8 @@ void InternalConnectionManager::startResourceMessageService(const char* subject,
 		throw Exception(MIST_ERROR, RESOURCE_SERVICE_IS_RUNNING, "ResourceService is already running.");
 	}
 
-	// Start the Resource Service
+	// Kludge alert: We need to inform the 'other' ConnectionManager, which is used by the ResourceService,
+	// of the desired pub-rate for Resource Messages. The pub-rate setting will be used within createResourceMessage().
 	m_rsrcService.reset(new ResourceService(m_config, m_messagePopulator->getStandardFields(), subject, intervalSeconds, sampleInterval, averageInterval));
 	m_rsrcThread.reset(new StdThread(&ResourceService::start, m_rsrcService));
 	m_rsrcThread->start();

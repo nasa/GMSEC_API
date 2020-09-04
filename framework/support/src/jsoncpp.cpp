@@ -74,15 +74,13 @@ avoid conflicts
 // //////////////////////////////////////////////////////////////////////
 
 
-
-
-
-
 #include <json.h>
 
 #ifndef JSON_IS_AMALGAMATION
 #error "Compile with -I PATH_TO_JSON_DIRECTORY"
 #endif
+
+#include <gmsec4/util/StdUniquePtr.h>
 
 
 // //////////////////////////////////////////////////////////////////////
@@ -239,7 +237,7 @@ static int       stackDepth_g = 0;  // see readValue()
 
 namespace Json {
 
-typedef std::auto_ptr<CharReader>   CharReaderPtr;
+typedef gmsec::api::util::StdUniquePtr<CharReader>   CharReaderPtr;
 
 // Implementation of class Features
 // ////////////////////////////////
@@ -3830,7 +3828,7 @@ Value& Path::make(Value& root) const {
 
 namespace Json {
 
-typedef std::auto_ptr<StreamWriter>   StreamWriterPtr;
+typedef gmsec::api::util::StdUniquePtr<StreamWriter>   StreamWriterPtr;
 
 static bool containsControlCharacter(const char* str) {
   while (*str) {

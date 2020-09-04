@@ -1,4 +1,4 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -12,14 +12,23 @@ BINDIR    = $(GMSEC_HOME)/bin
 
 # platform location of Java headers for JNI
 JAVA_INCS = -I$(JDK_HOME)/include -I$(JDK_HOME)/include/linux
+OPEN_JDK  = $(shell $(JDK_HOME)/bin/java -version 2>&1 | grep -m 1 openjdk | cut -d' ' -f1)
+ifeq ($(findstring openjdk,$(OPEN_JDK)), openjdk)
+JAVA_LIBS = -L$(JDK_HOME)/lib/server -ljvm
+else
 JAVA_LIBS = -L$(JDK_HOME)/jre/lib/amd64/server -ljvm
+endif
 
 ifndef PERL5_LIB
 PERL5_LIB = /usr/lib64/perl5
 endif
 
-ifndef PYTHON_INC
-PYTHON_INC = /usr/include/python
+ifndef PYTHON_HOME
+PYTHON_HOME = /usr
+endif
+
+ifndef PYTHON3_HOME
+PYTHON3_HOME = $(SUPPORT)/python-3.6.5
 endif
 
 CXX	      = g++
@@ -41,7 +50,12 @@ endif
 
 # define C/C++ compiler flags
 CXXFLAGS   = $(DEBUG_FLAGS) $(COVERAGE) -Wall -D_REENTRANT $(INCS)
-CFLAGS     = $(CXXFLAGS)
+CFLAGS    := $(CXXFLAGS)
+
+GCC_VERSION := $(shell $(CXX) -dumpversion)
+ifeq ($(shell expr $(GCC_VERSION) '>=' 4.5), 1)
+CXXFLAGS  += -std=c++11
+endif
 
 LIBXML2_LIB = $(LIBXML2_HOME)/lib64
 LIBXSLT_LIB = $(LIBXSLT_HOME)/lib64

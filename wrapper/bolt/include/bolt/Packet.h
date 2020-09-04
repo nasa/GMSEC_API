@@ -1,15 +1,9 @@
-
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
-
-
-
-
 
 /*
  * @file Packet.h
@@ -23,13 +17,10 @@
 #include <bolt/Header.h>
 #include <bolt/Meta.h>
 
-#include <memory>
+#include <gmsec4/util/StdUniquePtr.h>
 
 
 namespace bolt {
-
-using std::auto_ptr;
-
 
 class Packet
 {
@@ -57,9 +48,9 @@ public:
 
 private:
 
-	auto_ptr<Header> header;
-	auto_ptr<Meta> meta;
-	auto_ptr<ByteBuffer> body;
+	gmsec::api::util::StdUniquePtr<Header> header;
+	gmsec::api::util::StdUniquePtr<Meta> meta;
+	gmsec::api::util::StdUniquePtr<ByteBuffer> body;
 };
 
 } // namespace bolt

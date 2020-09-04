@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -66,8 +66,22 @@ public class DeviceMessage : MistMessage {
   /// <exception cref="GmsecException">
   ///  Thrown if the data is null or cannot be interpreted as valid XML or JSON representation of a DeviceMessage.
   /// </exception>
+  ///
+  /// <remarks>This method has been deprecated; use DeviceMessage(Specification, string) instead.</remarks>
   public DeviceMessage(string data) {
   }
+
+  /// <summary>Constructs a DeviceMessage using an XML or JSON string, and ensures the message adheres to the provided specification</summary>
+  ///
+  /// <param name="spec">A reference to the specification this message's schema will adhere to.</param>
+  /// <param name="data">XML or JSON string used to initialize the message.</param>
+  ///
+  /// <exception cref="GMSEC_Exception">
+  /// Thrown if the data is null or cannot be interpreted as valid XML or JSON data that represents a message.
+  /// </exception>
+  public DeviceMessage(Specification spec, string data) {
+  }
+
 
   /// <summary>Add a Device to the message</summary>
   ///

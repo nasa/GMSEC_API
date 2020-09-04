@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -62,6 +62,12 @@ public class JNIDeviceMessage extends JNIMistMessage
 	public JNIDeviceMessage(String data) throws GMSEC_Exception
 	{
 		super(gmsecJNI.new_DeviceMessage(data), true);
+	}
+
+
+	public JNIDeviceMessage(JNISpecification jSpec, String data) throws GMSEC_Exception
+	{
+		super(gmsecJNI.new_DeviceMessage(JNISpecification.getCPtr(jSpec), jSpec, data), true);
 	}
 
 

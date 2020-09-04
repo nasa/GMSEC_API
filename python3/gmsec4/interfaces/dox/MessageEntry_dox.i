@@ -2,20 +2,20 @@
 %feature("docstring") MessageEntry "
 
     This class provides access to the attributes associated with a
-    ConfigFile's Message entry.
+    ConfigFile's message entry.
 ";
 
 %feature("docstring") MessageEntry::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
-    Returns the name associated with the Message entry.
+    Returns the name associated with the message entry.
 ";
 
 %feature("docstring") MessageEntry::getMessage "
 
-    getMessage(self) -> Message
+    get_message(self) -> Message
 
-    Returns the Message object associated with the Message entry.
+    Returns the Message associated with the message entry.
 ";
 

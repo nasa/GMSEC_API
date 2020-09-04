@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,16 +27,16 @@
 #include <gmsec4/internal/mist/MessageSubclassHelper.h>
 #include <gmsec4/internal/mist/MessageTemplate.h>
 
+#include <gmsec4/internal/StringUtil.h>
+
 #include <gmsec4/mist/ProductFile.h>
 #include <gmsec4/mist/mist_defs.h>
 
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <gmsec4/Exception.h>
 
-#include <gmsec4/internal/StringUtil.h>
-
-#include <memory>
 #include <sstream>
 
 
@@ -45,17 +45,17 @@ using namespace gmsec::api::mist::message;
 using namespace gmsec::api::util;
 
 
-static const char* const HEADER_VERSION_STRING    = "HEADER-VERSION";
-//static const char* const MESSAGE_TYPE_STRING      = "MESSAGE-TYPE";
-static const char* const MESSAGE_SUBTYPE_STRING   = "MESSAGE-SUBTYPE";
-//static const char* const CONTENT_VERSION_STRING   = "CONTENT-VERSION";
-//static const char* const MSG_STRING               = "MSG";
-static const char* const PROD_STRING              = "PROD";
-static const char* const RESPONSE_STATUS_STRING   = "RESPONSE-STATUS";
-static const char* const PROD_TYPE_STRING         = "PROD-TYPE";
-static const char* const PROD_SUBTYPE_STRING      = "PROD-SUBTYPE";
-static const char* const NUM_OF_FILES_STRING      = "NUM-OF-FILES";
-static const char* const NUM_OF_INPUT_FILES_STRING= "NUM-OF-INPUT-FILES";
+// Product File Message field names
+static const char* const MESSAGE_SUBTYPE_STRING    = "MESSAGE-SUBTYPE";
+static const char* const MSG_ID_STRING             = "MSG-ID";
+static const char* const RESPONSE_STATUS_STRING    = "RESPONSE-STATUS";
+static const char* const PROD_TYPE_STRING          = "PROD-TYPE";
+static const char* const PROD_SUBTYPE_STRING       = "PROD-SUBTYPE";
+static const char* const NUM_OF_FILES_STRING       = "NUM-OF-FILES";
+static const char* const NUM_OF_INPUT_FILES_STRING = "NUM-OF-INPUT-FILES";
+
+// Product Type field value
+static const char* const PROD_STRING               = "PROD";
 
 
 namespace gmsec
@@ -75,8 +75,7 @@ InternalProductFileMessage::InternalProductFileMessage(const char* subject,
 													   const Specification& spec)
 	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, spec),
 	  m_list(),
-	  m_productFileIterator(*this),
-	  m_responseStatus(responseStatus)
+	  m_productFileIterator(*this)
 {
 	init(responseStatus, schemaID);
 }
@@ -89,8 +88,7 @@ InternalProductFileMessage::InternalProductFileMessage(const char* subject,
 													   const Specification& spec)
 	: InternalMistMessage(subject, InternalMistMessage::findKind(schemaID, spec.getVersion()), schemaID, config, spec),
 	  m_list(),
-	  m_productFileIterator(*this),
-	  m_responseStatus(responseStatus)
+	  m_productFileIterator(*this)
 {
 	init(responseStatus, schemaID);
 }
@@ -99,14 +97,10 @@ InternalProductFileMessage::InternalProductFileMessage(const char* subject,
 InternalProductFileMessage::InternalProductFileMessage(const InternalProductFileMessage& other)
 	: InternalMistMessage(other),
 	  m_list(other.m_list),
-	  m_productFileIterator(*this),
-	  m_responseStatus(other.getResponseStatus()),
-	  m_productType(other.getProductType()),
-	  m_productSubtype(other.getProductSubtype())
+	  m_productFileIterator(*this)
 {
-	init(m_responseStatus, other.getSchemaID());
+	init(other.getResponseStatus(), other.getSchemaID());
 }
-
 
 
 InternalProductFileMessage::InternalProductFileMessage(const char* data)
@@ -116,15 +110,13 @@ InternalProductFileMessage::InternalProductFileMessage(const char* data)
 {
 	MessageSubclassHelper::checkStringField(MESSAGE_SUBTYPE_STRING, "InternalProductFileMessage()", PROD_STRING, *this);
 
-	std::string prodType = MessageSubclassHelper::extractStringField(PROD_TYPE_STRING, "InternalProductFileMessage::InternalProductFileMessage()", *this);
-	const char* type = NULL;
+	//Check that required fields are present
+	(void) this->getUnsignedIntegerValue(RESPONSE_STATUS_STRING);
+	(void) this->getStringValue(PROD_SUBTYPE_STRING);
+	const char* prodType = (getSpecVersion() < GMSEC_ISD_2018_00 ? this->getStringValue(PROD_TYPE_STRING) : NULL);
 
-	if (getSpecVersion() < GMSEC_ISD_2018_00)
-	{
-		type = prodType.c_str();
-	}
+	std::string schemaID = buildSchemaID(getKind(), PROD_STRING, prodType, getSpecVersion());
 
-	std::string schemaID = buildSchemaID(getKind(), PROD_STRING, type, getSpecVersion());
 	registerTemplate(schemaID.c_str());
 
 	GMSEC_U16 num_of_files;
@@ -173,17 +165,71 @@ InternalProductFileMessage::InternalProductFileMessage(const char* data)
 	{
 		m_list.push_back(extractMessageProductFile(count+1));
 	}
+}
 
-	m_responseStatus = static_cast<ResponseStatus::Response>(MessageSubclassHelper::extractI16Field(RESPONSE_STATUS_STRING, 
-						"InternalProductFileMessage::InternalProductFileMessage()", *this));
-		
-	m_productType = MessageSubclassHelper::extractStringField(PROD_TYPE_STRING, 
-												  "InternalProductFileMessage::InternalProductFileMessage()",
-												  *this);
 
-	m_productSubtype = MessageSubclassHelper::extractStringField(PROD_SUBTYPE_STRING, 
-												  "InternalProductFileMessage::InternalProductFileMessage()",
-												  *this);
+InternalProductFileMessage::InternalProductFileMessage(const Specification& spec, const char* data)
+	: InternalMistMessage(spec, data),
+	  m_list(),
+	  m_productFileIterator(*this)
+{
+	MessageSubclassHelper::checkStringField(MESSAGE_SUBTYPE_STRING, "InternalProductFileMessage()", PROD_STRING, *this);
+
+	//Check that required fields are present
+	(void) this->getUnsignedIntegerValue(RESPONSE_STATUS_STRING);
+	(void) this->getStringValue(PROD_SUBTYPE_STRING);
+	const char* prodType = (getSpecVersion() < GMSEC_ISD_2018_00 ? this->getStringValue(PROD_TYPE_STRING) : NULL);
+
+	std::string schemaID = buildSchemaID(getKind(), PROD_STRING, prodType, getSpecVersion());
+
+	registerTemplate(schemaID.c_str());
+
+	GMSEC_U16 num_of_files;
+	try
+	{
+		if (getSpecVersion() >= GMSEC_ISD_2016_00)
+		{
+			num_of_files = MessageSubclassHelper::extractU16Field(NUM_OF_FILES_STRING, 
+								"InternalProductFileMessage::InternalProductFileMessage()", *this);
+		}
+		else
+		{
+			num_of_files = MessageSubclassHelper::extractI16Field(NUM_OF_FILES_STRING, 
+								"InternalProductFileMessage::InternalProductFileMessage()", *this);
+		}
+	}
+	catch(...)
+	{//this is an optional field, not a required field
+	 //if we can't find the field, that's ok.  It means we have 0 product files.
+		num_of_files = 0;
+	}
+
+	if(num_of_files==0)
+	{//request messages uses a differently named field for its productfile count
+		try
+		{
+			if (getSpecVersion() >= GMSEC_ISD_2016_00)
+			{
+				num_of_files = MessageSubclassHelper::extractU16Field(NUM_OF_INPUT_FILES_STRING, 
+									"InternalProductFileMessage::InternalProductFileMessage()", *this);
+			}
+			else
+			{
+				num_of_files = MessageSubclassHelper::extractI16Field(NUM_OF_INPUT_FILES_STRING, 
+									"InternalProductFileMessage::InternalProductFileMessage()", *this);
+			}
+		}
+		catch(...)
+		{//this is an optional field, not a required field
+		 //if we can't find the field, that's ok.  It means we have 0 product files.
+			num_of_files = 0;
+		}
+	}
+
+	for (GMSEC_I16 count = 0; count < num_of_files; count++)
+	{
+		m_list.push_back(extractMessageProductFile(count+1));
+	}
 }
 
 
@@ -271,19 +317,19 @@ size_t InternalProductFileMessage::getNumProductFiles() const
 
 ResponseStatus::Response InternalProductFileMessage::getResponseStatus() const
 {
-	return m_responseStatus;
+	return (ResponseStatus::Response)(this->getUnsignedIntegerValue("RESPONSE-STATUS"));
 }
 
 
 const char* InternalProductFileMessage::getProductType() const
 {
-	return m_productType.c_str();
+	return this->getStringValue("PROD-TYPE");
 }
 
 
 const char* InternalProductFileMessage::getProductSubtype() const
 {
-	return m_productSubtype.c_str();
+	return this->getStringValue("PROD-SUBTYPE");
 }
 
 
@@ -425,7 +471,7 @@ void InternalProductFileMessage::init(ResponseStatus::Response responseStatus, c
 			//the field template has a predefined value, so we'll add the field to the message
 			try
 			{
-				std::auto_ptr<Field> field(temp->toField(temp->getType()));
+				StdUniquePtr<Field> field(temp->toField(temp->getType()));
 
 				addField(*(field.get()));
 			}
@@ -437,6 +483,11 @@ void InternalProductFileMessage::init(ResponseStatus::Response responseStatus, c
 	}
 
 	setValue(RESPONSE_STATUS_STRING, (GMSEC_I64)responseStatus);	
+
+	if (getSpecVersion() <= GMSEC_ISD_2014_00 && getField(MSG_ID_STRING) == NULL)
+	{
+		addField(MSG_ID_STRING, getSubject()); //MSG-ID only needed pre-2016
+	}
 }
 
 

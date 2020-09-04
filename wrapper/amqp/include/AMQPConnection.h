@@ -1,6 +1,7 @@
 /*
- * Copyright 2007-2015 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
+ * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
@@ -27,10 +28,10 @@
 #include <gmsec4/util/CountDownLatch.h>
 #include <gmsec4/util/StdSharedPtr.h>
 #include <gmsec4/util/StdThread.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <proton/messenger.h>
 
-#include <memory>
 #include <queue>
 #include <string>
 
@@ -208,9 +209,9 @@ public:
 
 
 private:
-	typedef std::auto_ptr<gmsec::api::util::StdThread>       SubscriptionThread;
-	typedef gmsec::api::util::StdSharedPtr<SubscriptionInfo> SharedSubscriptionInfo;
-	typedef std::map<std::string, SharedSubscriptionInfo>    Subscriptions;
+	typedef gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> SubscriptionThread;
+	typedef gmsec::api::util::StdSharedPtr<SubscriptionInfo>            SharedSubscriptionInfo;
+	typedef std::map<std::string, SharedSubscriptionInfo>               Subscriptions;
 
 
 	struct GMSEC_AMQP_API MsgSubscriptionResult

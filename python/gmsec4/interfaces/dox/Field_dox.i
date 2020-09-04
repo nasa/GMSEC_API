@@ -85,6 +85,17 @@
     String containing Field name.
 ";
 
+%feature("docstring") gmsec::api::Field::setName "
+
+    setName(self, name) -> void
+
+    Sets the field name with the given string.
+
+    Exceptions
+    ----------
+    An Exception is thrown if the field name is null or contains an empty string.
+";
+
 %feature("docstring") gmsec::api::Field::toJSON "
 
     toJSON(self) -> char const *
@@ -120,4 +131,22 @@
     Exceptions
     ----------
     An Exception is thrown if the field cannot be successfully converted to a string.
+";
+
+%feature("docstring") gmsec::api::Field::clone "
+
+    clone(self) -> Field*
+
+    Creates/returns a clone of the Field object.
+
+    Returns
+    -------
+    A clone of the Field object.
+";
+
+%feature("docstring") gmsec::api::Field::destroyClone "
+
+    destroyClone(self, clone) -> void
+
+    Destroys the cloned Field object.
 ";

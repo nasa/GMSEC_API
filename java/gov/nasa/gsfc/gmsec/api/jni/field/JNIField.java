@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -63,6 +63,12 @@ public class JNIField
 	}
 
 
+	public void setName(String name)
+	{
+		gmsecJNI.Field_SetName(swigCPtr, this, name);
+	}
+
+
 	public Field.FieldType getType()
 	{
 		int type = gmsecJNI.Field_GetType(swigCPtr, this);
@@ -116,5 +122,11 @@ public class JNIField
 	public boolean isHeader()
 	{
 		return gmsecJNI.Field_IsHeader(swigCPtr, this);
+	}
+
+
+	public Field clone()
+	{
+		return JNIFieldConverter.cloneField(swigCPtr);
 	}
 }

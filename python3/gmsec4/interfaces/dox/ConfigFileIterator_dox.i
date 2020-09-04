@@ -2,34 +2,34 @@
 %feature("docstring") gmsec::api::ConfigFileIterator "
 
     This class is used to access elements of a configuration file
-    (ConfigFile) object.
+    (ConfigFile).
 ";
 
 %feature("docstring") gmsec::api::ConfigFileIterator::hasNextSubscription "
 
-    hasNextSubscription(self) -> bool
+    has_next_subscription(self) -> bool
 
     Determines if there is a next subscription in the iterator
 
     Returns
     -------
-    whether there is a next
+    True if there is a next subscription, False otherwise.
 ";
 
 %feature("docstring") gmsec::api::ConfigFileIterator::hasNextMessage "
 
-    hasNextMessage(self) -> bool
+    has_next_message(self) -> bool
 
     Determines if there is a next Message in the iterator
 
     Returns
     -------
-    whether there is a next
+    True if there is a next Message, False otherwise.
 ";
 
 %feature("docstring") gmsec::api::ConfigFileIterator::nextCustomElement "
 
-    nextCustomElement(self) -> char const *
+    next_custom_element(self) -> str
 
     Returns the next custom XML element.
 
@@ -37,18 +37,15 @@
         making a copy of the returned string.  For example:
 
     try:
-        cfgFile = ConfigFile()
+        cfgFile = libgmsec_python3.ConfigFile()
+
         cfgFile.load(\"someFile.xml\")
 
         iter = cfgFile.getIterator()
 
-        customElement = ""
-
         if iter.hasCustomElement():
-            customElement = iter.nextCustomElement()
+            print(iter.nextCustomElement())
 
-        if customElement:
-            print customElement
     except GmsecError as e:
         //handle error loading ConfigFile
 
@@ -63,7 +60,7 @@
 
 %feature("docstring") gmsec::api::ConfigFileIterator::nextConfig "
 
-    nextConfig(self) -> ConfigEntry
+    next_config(self) -> ConfigEntry
 
     Returns the next ConfigEntry.
 
@@ -77,12 +74,12 @@
 
     See Also
     --------
-    hasNextConfig()
+    has_next_config()
 ";
 
 %feature("docstring") gmsec::api::ConfigFileIterator::nextSubscription "
 
-    nextSubscription(self) -> SubscriptionEntry
+    next_subscription(self) -> SubscriptionEntry
 
     Returns the next SubscriptionEntry.
 
@@ -95,12 +92,11 @@
 
     Exceptions
     ----------
-    A GmsecError is thrown if no more subscription entries are
-    available.
+    A GmsecError is thrown if no more subscription entries are available.
 
     See Also
     --------
-    hasNextSubscription()
+    has_next_subscription()
 ";
 
 %feature("docstring") gmsec::api::ConfigFileIterator::reset "
@@ -113,18 +109,18 @@
 
 %feature("docstring") gmsec::api::ConfigFileIterator::hasNextConfig "
 
-    hasNextConfig(self) -> bool
+    has_next_config(self) -> bool
 
     Determines if there is a next Config in the iterator
 
     Returns
     -------
-    whether there is a next
+    Whether there is a next Config
 ";
 
 %feature("docstring") gmsec::api::ConfigFileIterator::nextMessage "
 
-    nextMessage(self) -> MessageEntry
+    next_message(self) -> MessageEntry
 
     Returns a copy of the next MessageEntry.
 
@@ -138,16 +134,16 @@
 
     See Also
     --------
-    hasNextMessage()
+    has_next_message()
 ";
 
 %feature("docstring") gmsec::api::ConfigFileIterator::hasNextCustomElement "
 
-    hasNextCustomElement(self) -> bool
+    has_next_custom_element(self) -> bool
 
     Determines if there is another custom XML element in the iterator
 
     Returns
     -------
-    whether there is a next
+    True if there is a next custom element, False otherwise.
 ";

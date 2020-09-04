@@ -1,4 +1,4 @@
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -18,12 +18,9 @@ SWIG_OPTS       = -c++ -python -threads -classic $(SWIG_SWG) -DCHAR_BIT=8 -DGMSE
 FRAMEWORK_DIR   = ../../framework
 
 GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include/c++/$(shell $(CXX) -dumpversion)
-PYTHON_VERSION  = $(shell python --version 2>&1 | cut -d' ' -f2 | awk 'BEGIN{FS="."}{print $$1"."$$2}')
-PYTHON_INCS     = -I$(PYTHON_INC)$(PYTHON_VERSION)
-API_CXXFLAGS   += $(PYTHON_INCS)
 
-# TODO: Do we need any special handling here for Mac OSX? (i.e. PYTHON_LIB set to the directory where -lpython2.X is held)
-LDFLAGS        += -lpython$(PYTHON_VERSION)
+API_CXXFLAGS   += $(shell $(PYTHON_HOME)/bin/python-config --includes)
+LDFLAGS        += $(shell $(PYTHON_HOME)/bin/python-config --ldflags)
 
 COREOBJDIR      = $(FRAMEWORK_DIR)/src/gmsec4
 INTERNALOBJDIR  = $(FRAMEWORK_DIR)/src/gmsec4/internal

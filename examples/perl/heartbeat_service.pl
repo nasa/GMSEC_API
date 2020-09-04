@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -21,7 +21,8 @@ use libgmsec_perl;
 
 *isa = \&UNIVERSAL::isa;
 
-my $HB_MESSAGE_SUBJECT = "GMSEC.MISSION.SPACECRAFT.MSG.C2CX.HB";
+my $HB_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.HEARTBEAT-SERVICE.HB";
+my $HB_PUBLISH_RATE    = 5; # in seconds
 
 sub main
 {
@@ -59,14 +60,28 @@ sub main
 		# be used by all GMSEC Messages
 		my $headerFields = libgmsec_perl::FieldList->new();
 
-		my $missionField = libgmsec_perl::StringField->new("MISSION-ID", "GMSEC");
-		my $facilityField = libgmsec_perl::StringField->new("FACILITY", "GMSEC Lab");
-		my $componentField = libgmsec_perl::StringField->new("COMPONENT", "heartbeat_service");
+		my $version = $connManager->getSpecification()->getVersion();
+
+		my $missionField = libgmsec_perl::StringField->new("MISSION-ID", "MY-MISSION");
+		my $facilityField = libgmsec_perl::StringField->new("FACILITY", "MY-FACILITY");
+		my $componentField = libgmsec_perl::StringField->new("COMPONENT", "HEARTBEAT-SERVICE");
+		my $domain1Field = libgmsec_perl::StringField->new("DOMAIN1", "MY-DOMAIN-1");
+		my $domain2Field = libgmsec_perl::StringField->new("DOMAIN2", "MY-DOMAIN-2");
+		my $msgID = libgmsec_perl::StringField->new("MSG-ID", "MY-MSG-ID");
 
 		$headerFields->push($missionField);
 		$headerFields->push($facilityField);
 		$headerFields->push($componentField);
 
+		if($version == 201400)
+		{
+			$headerFields->push($msgID);
+		}
+		elsif($version >= 201800)
+		{
+			$headerFields->push($domain1Field);
+			$headerFields->push($domain2Field);
+		}
 
 		#o Use setStandardFields to define a set of header fields for
 		# all messages which are created or published on the
@@ -89,17 +104,16 @@ sub main
 			# the correctly typed Fields to the Message
 			my $pubField;
 			my $counterField;
-			my $version = $connManager->getSpecification()->getVersion();
-			if($version == 201600)
+			if($version >= 201600)
 			{
-				$pubField = libgmsec_perl::U16Field->new("PUB-RATE", 30);
+				$pubField = libgmsec_perl::U16Field->new("PUB-RATE", $HB_PUBLISH_RATE);
 				$counterField = libgmsec_perl::U16Field->new("COUNTER", 1);
 				$hbStandardFields->push($pubField);
 				$hbStandardFields->push($counterField);
 			}
 			elsif($version == 201400)
 			{
-				$pubField = libgmsec_perl::I16Field->new("PUB-RATE", 30);
+				$pubField = libgmsec_perl::I16Field->new("PUB-RATE", $HB_PUBLISH_RATE);
 				$counterField = libgmsec_perl::I16Field->new("COUNTER", 1);
 				$hbStandardFields->push($pubField);
 				$hbStandardFields->push($counterField);

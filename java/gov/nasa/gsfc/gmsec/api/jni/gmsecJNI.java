@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -192,6 +192,21 @@ public class gmsecJNI
 	public final static native void delete_EventCallback(long jarg1, JNIEventCallback jcb);
 
 
+	// HeartbeatGenerator native class functions
+	//
+	public final static native long new_HeartbeatGenerator(long jarg1, JNIConfig config, String subject, int pubRate);
+	public final static native long new_HeartbeatGenerator(long jarg1, JNIConfig config, String subject, int pubRate, long[] fldPtrs, JNIField[] flds, int numFields);
+	public final static native void delete_HeartbeatGenerator(long jarg1, JNIHeartbeatGenerator hbgen);
+	public final static native boolean HeartbeatGenerator_Start(long jarg1, JNIHeartbeatGenerator hbgen);
+	public final static native boolean HeartbeatGenerator_Stop(long jarg1, JNIHeartbeatGenerator hbgen);
+	public final static native boolean HeartbeatGenerator_IsRunning(long jarg1, JNIHeartbeatGenerator hbgen);
+	public final static native void HeartbeatGenerator_ChangePublishRate(long jarg1, JNIHeartbeatGenerator hbgen, int pubRate);
+	public final static native boolean HeartbeatGenerator_SetField(long jarg1, JNIHeartbeatGenerator hbgen, long jarg2, JNIField field);
+	public final static native boolean HeartbeatGenerator_SetField(long jarg1, JNIHeartbeatGenerator hbgen, String fieldName, long fieldValue);
+	public final static native boolean HeartbeatGenerator_SetField(long jarg1, JNIHeartbeatGenerator hbgen, String fieldName, double fieldValue);
+	public final static native boolean HeartbeatGenerator_SetField(long jarg1, JNIHeartbeatGenerator hbgen, String fieldName, String fieldValue);
+
+
 	// Log native class functions
 	//
 	public final static native void Log_SetReportingLevel(int jarg1);
@@ -305,6 +320,7 @@ public class gmsecJNI
 	// Base Field native class functions
 	public final static native int Field_GetType(long fieldPtr, JNIField field);
 	public final static native String Field_GetName(long fieldPtr, JNIField field);
+	public final static native void Field_SetName(long fieldPtr, JNIField field, String fieldName);
 	public final static native String Field_ToXML(long fieldPtr, JNIField field);
 	public final static native String Field_ToJSON(long fieldPtr, JNIField field);
 	public final static native long Field_GetIntegerValue(long fieldPtr, JNIField field);
@@ -539,6 +555,7 @@ public class gmsecJNI
 	public final static native long new_DeviceMessage(String subject, long jarg1, JNISpecification jSpec);
 	public final static native long new_DeviceMessage(String subject, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
 	public final static native long new_DeviceMessage(String data);
+	public final static native long new_DeviceMessage(long jarg1, JNISpecification jSpec, String data);
 	public final static native long new_DeviceMessage_Copy(long jarg1, JNIDeviceMessage jDevMsg);
 	public final static native void DeviceMessage_AddDevice(long jarg1, JNIDeviceMessage jDevMsg, long jarg2, JNIDevice jDevice);
 	public final static native int DeviceMessage_GetNumDevices(long jarg1, JNIDeviceMessage jDevMsg);
@@ -562,6 +579,7 @@ public class gmsecJNI
 	public final static native long new_MistMessage(String subject, String schemaID, long jarg1, JNISpecification jSpec);
 	public final static native long new_MistMessageWithConfig(String subject, String schemaID, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
 	public final static native long new_MistMessageWithData(String data);
+	public final static native long new_MistMessageWithSpec(long jarg1, JNISpecification jSpec, String data);
 	public final static native long new_MistMessageCopy(long jarg1, JNIMistMessage jOther);
 	public final static native long new_MistMessageFromMessage(long jarg1, JNIMessage jMsg, long jarg2, JNIConfig jConfig);
 	public final static native void delete_MistMessage(long jarg1, JNIMistMessage jMistMsg);
@@ -602,6 +620,7 @@ public class gmsecJNI
 	public final static native long new_MnemonicMessage(String subject, String schemaID, long jarg1, JNISpecification jSpec);
 	public final static native long new_MnemonicMessage(String subject, String schemaID, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
 	public final static native long new_MnemonicMessage(String data);
+	public final static native long new_MnemonicMessage(long jarg1, JNISpecification jSpec, String data);
 	public final static native long new_MnemonicMessage_Copy(long jarg1, JNIMnemonicMessage jMnemMsg);
 	public final static native void MnemonicMessage_AddMnemonic(long jarg1, JNIMnemonicMessage jMnemMsg, long jarg2, JNIMnemonic jMnem);
 	public final static native int MnemonicMessage_GetNumMnemonics(long jarg1, JNIMnemonicMessage jMnemMsg);
@@ -670,6 +689,7 @@ public class gmsecJNI
 	public final static native long new_ProductFileMessage(String subject, int status, String schemaID, long jarg1, JNISpecification jSpec);
 	public final static native long new_ProductFileMessage(String subject, int status, String schemaID, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
 	public final static native long new_ProductFileMessage(String data);
+	public final static native long new_ProductFileMessage(long jarg1, JNISpecification jSpec, String data);
 	public final static native long new_ProductFileMessage_Copy(long jarg1, JNIProductFileMessage jProductFileMsg);
 	public final static native void ProductFileMessage_AddProductFile(long jarg1, JNIProductFileMessage jProductFileMsg, long jarg2, JNIProductFile jProductFile);
 	public final static native int ProductFileMessage_GetNumProductFiles(long jarg1, JNIProductFileMessage jProductFileMsg);

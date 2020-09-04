@@ -5,51 +5,48 @@
     Status provides an error code and error message specific to the
     error type, but independent of error source.
 
-    See Also
-    --------
-    Errors.h
-
     CONSTRUCTORS:
 
-    Status(self, errorClass, errorCode, errorMsg)
+    Status(errorClass: int, errorCode: int, errorMsg: str)
 
     Parameters
     ----------
-    errorClass: Enumerated value indicating source of the error.
-    errorCode: Enumerated value indicating reason for the error.
-    errorMsg: Explanation for the error.
+    errorClass : Enumerated value indicating source of the error
+    errorCode  : Enumerated value indicating reason for the error
+    errorMsg   : Explanation for the error
 
-    See Also
-    --------
-    Errors.h
 
-    Status(self, errorClass, errorCode, errorMsg, customCode)
+
+    Status(errorClass: int, errorCode: int, errorMsg: str, customCode: int)
 
     Special constructor that can be used to set a custom error code.
 
     Parameters
     ----------
-    errorClass: Enumerated value indicating source of the error.
-    errorCode: Enumerated value indicating reason for the error.
-    errorMsg: Explanation for the error.
-    customCode: Custom error code (typically middleware specific) on
-    the root cause of the error.
+    errorClass : Enumerated value indicating source of the error
+    errorCode  : Enumerated value indicating reason for the error
+    errorMsg   : Explanation for the error
+    customCode : Custom error code (typically middleware specific) on the root cause of the error
 
-    Status(self, exception)
 
-    Special constructor that uses information from a GmsecError object. 
+
+    Status(self, exception: GmsecError)
+
+    Special constructor that uses information from a GmsecError. 
 
     Parameters
     ----------
-    An GmsecError object to inherit information from
+    exception : An GmsecError to inherit information from
 
-    Status(self, other)
+
+
+    Status(self, other: Status)
 
     Copy constructor
 
     Parameters
     ----------
-    other: The other Status object to copy.
+    other : The other Status to copy.
 ";
 
 %feature("docstring") gmsec::api::Status::reset "
@@ -61,58 +58,56 @@
 
 %feature("docstring") gmsec::api::Status::getCustomCode "
 
-    getCustomCode(self) -> GMSEC_I32
+    get_custom_code(self) -> int
 
-    This will return the custom error code number of this status object.
+    This will return the custom error code number of this Status.
 ";
 
 %feature("docstring") gmsec::api::Status::setCode "
 
-    setCode(self, code)
+    set_code(self, errorCode: int)
 
     This will set the specific error code.
 
-    See Also
-    --------
-    Errors.h
+    Parameters
+    ----------
+    errorCode : Enumerated value indicating reason for the error
 ";
 
 %feature("docstring") gmsec::api::Status::setReason "
 
-    setReason(self, reason)
+    set_reason(self, errorMsg: str)
 
     This will set the error string text.
+
+    Parameters
+    ----------
+    errorMsg : Explanation for the error
 ";
 
 %feature("docstring") gmsec::api::Status::getClass "
 
-    getClass(self) -> gmsec::api::StatusClass
+    get_class(self) -> int
 
     This function will return the error class ID.
-
-    See Also
-    --------
-    Errors.h
 ";
 
 %feature("docstring") gmsec::api::Status::isError "
 
-    isError(self) -> bool
+    is_error(self) -> bool
 
-    Used to determine whether the Status object is reporting an error
-    or not.
+    Used to determine whether the Status is reporting an error or not.
 
-    Note: Only the status class is examine; the status code is not
-    checked.
+    Note: Only the status class is examine; the status code is not checked.
 
     Returns
     -------
-    false if the status class is set to NO_ERROR; true otherwise.
+    False if the status class is set to NO_ERROR; True otherwise.
 ";
 
 %feature("docstring") gmsec::api::Status::get "
 
-    get(self) -> char const *
+    get(self) -> str
 
     This function will return a verbose error string that contains the
     Status class, code, custom code and reason.  The format is as
@@ -123,58 +118,50 @@
 
 %feature("docstring") gmsec::api::Status::getCode "
 
-    getCode(self) -> gmsec::api::StatusCode
+    get_code(self) -> int
 
-    This will return the error code number for this status for easy
-    comparison.
-
-    See Also
-    --------
-    Errors.h
+    This will return the error code number for this status for easy comparison.
 ";
 
 %feature("docstring") gmsec::api::Status::getReason "
 
-    getReason(self) -> char const *
+    get_reason(self) -> str
 
-    This function will retrieve the string detailed description of
-    this error.
+    This function will retrieve the string detailed description of this error.
 ";
 
 %feature("docstring") gmsec::api::Status::set "
 
-    set(self, eclass, code, text=None, custom=0)
+    set(self, errorClass: int, errorCode: int, errorMsg=None: str, customCode=0: int)
 
-    This is a convience function that can be used to set class, code,
-    error text and custom code.
+    This is a convience function that can be used to set class, code, error text and custom code.
 
     Parameters
     ----------
-    eclass: error class
-    code: error code
-    text: error string (optional)
-    custom: custom error code (optional)
-
-    See Also
-    --------
-    Errors.h
-
+    errorClass : Enumerated value indicating source of the error
+    errorCode  : Enumerated value indicating reason for the error
+    errorMsg   : Explanation for the error
+    customCode : Custom error code (typically middleware specific) on the root cause of the error
 ";
 
 %feature("docstring") gmsec::api::Status::setClass "
 
-    setClass(self, eclass)
+    set_class(self, errorClass: int)
 
     This will set the erorr class ID.
 
-    See Also
-    --------
-    Errors.h
+    Parameters
+    ----------
+    errorClass : Enumerated value indicating source of the error
 ";
 
 %feature("docstring") gmsec::api::Status::setCustomCode "
 
-    setCustomCode(self, code)
+    set_custom_code(self, code)
 
     This will set the specific error code.
+
+    Parameters
+    ----------
+    customCode : Custom error code (typically middleware specific) on the root cause of the error
 ";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -110,11 +110,46 @@ GMSEC_Message CALL_TYPE mistMessageCreateUsingData(const char* data, GMSEC_Statu
 
 	try
 	{
+		GMSEC_DISABLE_DEPRECATED_WARNINGS
+
 		msg = reinterpret_cast<GMSEC_Message>(new MistMessage(data));
+
+		GMSEC_ENABLE_DEPRECATED_WARNINGS
 	}
 	catch (Exception& e)
 	{
 		result = Status(e);
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return msg;
+}
+
+
+GMSEC_Message CALL_TYPE mistMessageCreateUsingSpecAndData(const GMSEC_Specification spec, const char* data, GMSEC_Status status)
+{
+	GMSEC_Message  msg = NULL;
+	Specification* s   = reinterpret_cast<Specification*>(spec);
+	Status         result;
+
+	if (!s)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Specification handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			msg = reinterpret_cast<GMSEC_Message>(new MistMessage(*s, data));
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
 	}
 
 	if (status)

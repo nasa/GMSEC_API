@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -857,6 +857,8 @@ void InternalMessage::processConfig(const Config& config)
 
 		hasNext = config.getNext(name, value);
 	}
+
+	m_tracking = TrackingDetails::initialize(config);
 }
 
 
@@ -918,61 +920,18 @@ bool InternalMessage::processConfigValue(const char* name, const char* value)
 			throw Exception(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
 		}
 	}
-
-	TrackingDetails& tracking = this->getTracking();
-
-	static const int TRACK_OFF = MESSAGE_TRACKINGFIELDS_OFF;
-	static const int TRACK_ON  = MESSAGE_TRACKINGFIELDS_ON;
-
-	// Set the tracking field state
-	if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING))
+	// Ignore tracking fields; these are processed elsewhere
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_NODE)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_PROCESS_ID)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_USERNAME)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_CONNECTION_ID)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_PUBLISH_TIME)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_UNIQUE_ID)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_MW_INFO)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS)
+	         || StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_CONNECTION_ENDPOINT))
 	{
-		tracking.set(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_NODE))
-	{
-		tracking.setNode(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_PROCESS_ID))
-	{
-		tracking.setProcessId(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_USERNAME))
-	{
-		tracking.setUserName(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_CONNECTION_ID))
-	{
-		tracking.setConnectionId(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_PUBLISH_TIME))
-	{
-		tracking.setPublishTime(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_UNIQUE_ID))
-	{
-		tracking.setUniqueId(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_MW_INFO))
-	{
-		tracking.setMwInfo(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_ACTIVE_SUBSCRIPTIONS))
-	{
-		tracking.setActiveSubscriptions(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
-		return true;
-	}
-	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_TRACKING_CONNECTION_ENDPOINT))
-	{
-		tracking.setConnectionEndpoint(StringUtil::stringEqualsIgnoreCase(value, "FALSE") ? TRACK_OFF : TRACK_ON);
 		return true;
 	}
 
@@ -1004,8 +963,8 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 		throw Exception(MSG_ERROR, XML_PARSE_ERROR, "Invalid XML -- MESSAGE element not found");
 	}
 
-	const char* subject = 0;
-	const char* mtype   = 0;
+	const char* subject = NULL;
+	const char* mtype   = NULL;
 
 	for (const tinyxml2::XMLAttribute *attr = element->FirstAttribute(); attr; attr = attr->Next())
 	{
@@ -1015,7 +974,11 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 		{
 			subject = attr->Value();
 		}
-		else if (caname && (std::string(caname) == "KIND" || std::string(caname) == "TYPE"))
+		else if (caname && (std::string(caname) == "KIND"))
+		{
+			mtype = attr->Value();
+		}
+		else if (caname && (std::string(caname) == "TYPE") && (mtype == NULL))
 		{
 			mtype = attr->Value();
 		}

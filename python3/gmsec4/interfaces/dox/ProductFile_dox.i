@@ -11,57 +11,56 @@
 
     CONSTRUCTOR:
 
-    ProductFile(self, pName, pDescription, pVersion, pFormat, pUri)
+    ProductFile(name: str, description: str, version: str, format: str, uri: str)
 
-    Initializes the ProductFile object with a URI to describe a
+    Initializes the ProductFile with a URI to describe a
     commonly accessible resource.
 
     Parameters
     ----------
-    pName: The name of the file
-    pDescription: The description of the file
-    pVersion: The version of the file
-    pFormat: The descriptor for the file format
-    pUri: The URI for the file
+    name        : The name of the file
+    description : The description of the file
+    version     : The version of the file
+    format      : The descriptor for the file format
+    uri         : The URI for the file
 
     Exceptions
     ----------
-    A GmsecError is thrown if pName, pDescription, pVersion, or
-    pFormat are NULL or empty strings.
+    A GmsecError is thrown if name, description, version, or format are None or empty strings.
 
-    ProductFile(self, pName, pDescription, pVersion,
-                      pFormat, pData, pFileSize)
 
-    Initializes the ProductFile object with the binary contents of a
-    file.
+
+    ProductFile(name: str, description: str, version: str, format: str, data: bytearray, fileSize: int)
+
+    Initializes the ProductFile with the binary contents of a file.
 
     Parameters
     ----------
-    pName: The name of the file
-    pDescription: The description of the file
-    pVersion: The version of the file
-    pFormat: The descriptor for the file format
-    pData: The binary contents of the file
-    pFileSize: The size of the binary contents of the file
+    name        : The name of the file
+    description : The description of the file
+    version     : The version of the file
+    format      : The descriptor for the file format
+    data        : The binary contents of the file
+    fileSize    : The size of the binary contents of the file
 
     Exceptions
     ----------
-    A GmsecError is thrown if pName, pDescription, pVersion, or
-    pFormat are NULL or empty strings.
+    A GmsecError is thrown if name, description, version, or format are None or empty strings.
 
-    ProductFile(self, other)
 
-    Copy constructor - Initializes the ProductFile object with the
-    information from another ProjectFile.
+
+    ProductFile(other: ProductFile)
+
+    Copy constructor - Initializes the ProductFile with the information from another ProjectFile.
 
     Parameters
     ----------
-    other: The other ProductFile object
+    other : The ProductFile to copy
 ";
 
 %feature("docstring") gmsec::api::mist::ProductFile::getDescription "
 
-    getDescription(self) -> char const *
+    get_description(self) -> str
 
     Retrieves the description of the ProductFile
 
@@ -72,7 +71,7 @@
 
 %feature("docstring") gmsec::api::mist::ProductFile::getName "
 
-    getName(self) -> char const *
+    get_name(self) -> str
 
     Retrieves the name of the ProductFile
 
@@ -83,7 +82,7 @@
 
 %feature("docstring") gmsec::api::mist::ProductFile::getFormat "
 
-    getFormat(self) -> char const *
+    get_format(self) -> str
 
     Retrieves the format of the ProductFile
 
@@ -103,41 +102,40 @@
 
 %feature("docstring") gmsec::api::mist::ProductFile::getURI "
 
-    getURI(self) -> char const *
+    get_URI(self) -> str
 
     Accessor for the ProductFile status
 
     Returns
     -------
-    A pointer to the ProductFile URI string, or NULL if he URI is not
-    available.
+    A pointer to the ProductFile URI string, or None if he URI is not available.
 ";
 
 %feature("docstring") gmsec::api::mist::ProductFile::uriAvailable "
 
-    uriAvailable(self) -> bool
+    URI_available(self) -> bool
 
     Returns the availability of a ProductFile URI
 
     Returns
     -------
-    True if a ProductFile URI has been set, false otherwise
+    True if a ProductFile URI has been set, False otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::ProductFile::contentsAvailable "
 
-    contentsAvailable(self) -> bool
+    contents_available(self) -> bool
 
     Returns the availability of a ProductFile file content
 
     Returns
     -------
-    True if a ProductFile file content has been set, false otherwise
+    True if a ProductFile file content has been set, False otherwise
 ";
 
 %feature("docstring") gmsec::api::mist::ProductFile::getVersion "
 
-    getVersion(self) -> char const *
+    get_version(self) -> str
 
     Retrieves the version of the ProductFile
 
@@ -157,7 +155,7 @@
 
 %feature("docstring") gmsec::api::mist::ProductFile::getContents "
 
-    getContents(self, contents) -> size_t
+    get_contents(self, contents) -> bytearray
 
     Accessor for the ProductFile file content
 

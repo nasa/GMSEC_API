@@ -1,14 +1,14 @@
 
 %feature("docstring") gmsec::api::mist::ProductFileIterator "
 
-    The ProductFileIterator supports iterating over the ProductFile
-    objects of a ProductFileMessage.
+    The ProductFileIterator supports iterating over the ProductFiles
+    of a ProductFileMessage.
 
     Note: ProductFileIterator is not thread safe.
 
     See Also
     --------
-    ProductFileMessage::getProductFileIterator()
+    ProductFileMessage::get_product_file_iterator()
 ";
 
 %feature("docstring") gmsec::api::mist::ProductFileIterator::reset "
@@ -23,11 +23,11 @@
 
     next(self) -> ProductFile
 
-    Returns a reference to the next available ProductFile object.
+    Returns a reference to the next available ProductFile.
 
     Returns
     -------
-    A reference to a ProductFile object.
+    A reference to a ProductFile.
 
     Exceptions
     ----------
@@ -37,12 +37,12 @@
 
 %feature("docstring") gmsec::api::mist::ProductFileIterator::hasNext "
 
-    hasNext(self) -> bool
+    has_next(self) -> bool
 
-    Provides information as to whether there are additional ProductFile
-    objects that can be referenced using next().
+    Provides information as to whether there are additional ProductFiles
+    that can be referenced using next().
 
     Returns
     -------
-    True if additional fields are available, false otherwise.
+    True if additional fields are available; False otherwise.
 ";

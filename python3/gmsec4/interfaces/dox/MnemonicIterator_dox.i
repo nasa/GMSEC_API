@@ -1,37 +1,37 @@
 
 %feature("docstring") gmsec::api::mist::MnemonicIterator "
 
-    The MnemonicIterator supports iterating over the Mnemonic objects
+    The MnemonicIterator supports iterating over the Mnemonics
     of a MnemonicMessage.
 
     Note: MnemonicIterator is not thread safe.
 
     See Also
     --------
-    MnemonicMessage::getMnemonicIterator()
+    MnemonicMessage::get_mnemonic_iterator()
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicIterator::hasNext "
 
-    hasNext(self) -> bool
+    has_next(self) -> bool
 
-    Provides information as to whether there are additional Mnemonic
-    objects that can be referenced using next().
+    Provides information as to whether there are additional Mnemonics
+    that can be referenced using next().
 
     Returns
     -------
-    True if additional fields are available, false otherwise.
+    True if additional fields are available, False otherwise.
 ";
 
 %feature("docstring") gmsec::api::mist::MnemonicIterator::next "
 
     next(self) -> Mnemonic
 
-    Returns a reference to the next available Mnemonic object.
+    Returns a reference to the next available Mnemonic.
 
     Returns
     -------
-    A reference to a Mnemonic object.
+    A reference to a Mnemonic.
 
     Exceptions
     ----------

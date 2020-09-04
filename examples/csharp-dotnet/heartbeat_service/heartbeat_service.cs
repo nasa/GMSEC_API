@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,7 +27,8 @@ using System.Collections.Generic;
 
 class heartbeat_service
 {
-	static private String HB_MESSAGE_SUBJECT = "GMSEC.MISSION.SPACECRAFT.MSG.C2CX.HB";
+	static private String HB_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.HEARTBEAT-SERVICE.HB";
+	static private int    HB_PUBLISH_RATE    = 5; // in seconds
 
 	static int Main(string[] args)
 	{
@@ -56,13 +57,28 @@ class heartbeat_service
 			// be used by all GMSEC Messages
 			List<Field> headerFields = new List<Field>();
 
-			StringField missionField = new StringField("MISSION-ID", "GMSEC");
-			StringField facilityField = new StringField("FACILITY", "GMSEC Lab");
-			StringField componentField = new StringField("COMPONENT", "heartbeat_service");
+			uint version = connManager.GetSpecification().GetVersion();
+
+			StringField missionField = new StringField("MISSION-ID", "MY-MISSION");
+			StringField facilityField = new StringField("FACILITY", "MY-FACILITY");
+			StringField componentField = new StringField("COMPONENT", "HEARTBEAT-SERVICE");
+			StringField domain1Field = new StringField("DOMAIN1", "MY-DOMAIN-1");
+			StringField domain2Field = new StringField("DOMAIN2", "MY-DOMAIN-2");
+			StringField msgID = new StringField("MSG-ID", "MY-MSG-ID");
 
 			headerFields.Add(missionField);
 			headerFields.Add(facilityField);
 			headerFields.Add(componentField);
+
+			if (version == 201400)
+			{
+				headerFields.Add(msgID);
+			}
+			else if (version >= 201800)
+			{
+				headerFields.Add(domain1Field);
+				headerFields.Add(domain2Field);
+			}
 
 			//o Use setStandardFields to define a set of header fields for
 			// all messages which are created or published on the
@@ -82,15 +98,14 @@ class heartbeat_service
 				//o Determine which version of the GMSEC message specification
 				// the ConnectionManager was initialized with and add
 				// the correctly typed Fields to the Message
-				uint version = connManager.GetSpecification().GetVersion();
-				if (version == 201600)
+				if (version >= 201600)
 				{
-					hbStandardFields.Add(new U16Field("PUB-RATE", (UInt16) 30));
+					hbStandardFields.Add(new U16Field("PUB-RATE", (UInt16) HB_PUBLISH_RATE));
 					hbStandardFields.Add(new U16Field("COUNTER", (UInt16) 1));
 				}
 				else if (version == 201400)
 				{
-					hbStandardFields.Add(new I16Field("PUB-RATE", (short) 30));
+					hbStandardFields.Add(new I16Field("PUB-RATE", (short) HB_PUBLISH_RATE));
 					hbStandardFields.Add(new I16Field("COUNTER", (short) 1));
 				}
 				//o Note: COMPONENT-STATUS is an optional field used to

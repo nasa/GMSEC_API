@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -10,6 +10,8 @@
 #include <gmsec4/mist/message/MnemonicMessage.h>
 using namespace gmsec::api::mist::message;
 %}
+
+%ignore gmsec::api::mist::message::MnemonicMessage::operator=(const MnemonicMessage&);
 
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/mist/message/MnemonicMessage.h>
@@ -60,6 +62,21 @@ C<libgmsec_perl::MnemonicMessage-E<gt>new($subject, $schemaID, $config, $spec)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
 	Exception if Specification fails to load the template directory or if schemaID is not a valid ID
+
+
+C<libgmsec_perl::MnemonicMessage-E<gt>new($spec, $data)>
+
+    Initializes a MnemonicMessage using an XML or JSON string.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $spec - A reference to the specification to which this message will adhere
+    $data - XML or JSON string used to initialize the message
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    Exception if the given data does not represent a valid XML or JSON statement.
+
 
 =head3 DESTROY
 

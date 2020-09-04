@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -100,6 +100,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1DeviceMes
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1DeviceMessage__Ljava_lang_String_2
   (JNIEnv *jenv, jclass jcls, jstring jData)
 {
@@ -114,6 +115,38 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1DeviceMes
 			DeviceMessage* devMsg = new DeviceMessage(data.c_str());
 
 			jCreated = JNI_POINTER_TO_JLONG(devMsg);
+		}
+	}
+	JNI_CATCH
+
+	return jCreated;
+}
+GMSEC_ENABLE_DEPRECATED_WARNINGS
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1DeviceMessage__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2Ljava_lang_String_2
+  (JNIEnv *jenv, jclass jcls, jlong jSpecPtr, jobject jSpec, jstring jData)
+{
+	jlong jCreated = 0;
+
+	try
+	{
+		Specification* spec = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+
+		if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else
+		{
+			JStringManager data(jenv, jData);
+
+			if (jvmOk(jenv, "DeviceMessage"))
+			{
+				DeviceMessage* devMsg = new DeviceMessage(*spec, data.c_str());
+
+				jCreated = JNI_POINTER_TO_JLONG(devMsg);
+			}
 		}
 	}
 	JNI_CATCH
@@ -251,6 +284,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_DeviceMessage_
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_DeviceMessage_1ConvertMessage
   (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg)
 {
@@ -275,6 +309,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_DeviceMessage_
 
 	return jCreated;
 }
+GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 
 #ifdef __cplusplus

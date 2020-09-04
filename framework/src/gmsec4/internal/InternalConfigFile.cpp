@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,11 +31,11 @@
 #include <gmsec4/Message.h>
 
 #include <gmsec4/util/Log.h>
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <tinyxml2.h>
 
 #include <algorithm>
-#include <memory>
 #include <cctype>
 
 
@@ -367,7 +367,7 @@ void InternalConfigFile::addSubscription(const char* name, const char* subscript
 	// Check if we were given an XML statement (e.g. <SUBSCRIPTION PATTERN="GMSEC.FOO.BAR"/>)
 	if (pattern[0] == '<')
 	{
-		std::auto_ptr<tinyxml2::XMLDocument> tmpDoc(new tinyxml2::XMLDocument());
+		StdUniquePtr<tinyxml2::XMLDocument> tmpDoc(new tinyxml2::XMLDocument());
 
 		if (tmpDoc.get() == NULL)
 		{
@@ -462,7 +462,7 @@ void InternalConfigFile::addMessage(const char* name, const Message& message)
 			"Message name cannot be NULL, nor an empty string");
 	}
 
-	std::auto_ptr<tinyxml2::XMLDocument> tmpDoc(new tinyxml2::XMLDocument());
+	StdUniquePtr<tinyxml2::XMLDocument> tmpDoc(new tinyxml2::XMLDocument());
 
 	if (tmpDoc.get() == NULL)
 	{
@@ -517,7 +517,7 @@ void InternalConfigFile::addCustomXML(const char* xml)
 		return;
 	}
 
-	std::auto_ptr<tinyxml2::XMLDocument> tmpDoc(new tinyxml2::XMLDocument());
+	StdUniquePtr<tinyxml2::XMLDocument> tmpDoc(new tinyxml2::XMLDocument());
 
 	if (tmpDoc.get() == NULL)
 	{

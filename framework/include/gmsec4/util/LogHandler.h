@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -61,7 +61,7 @@ public:
 	/**
 	 * @fn void onMessage(const LogEntry& entry) = 0
 	 *
-	 * @brief This function is called by the API in response to a log message. A class derrived from
+	 * @brief This function is called by the API in response to a log message. A class derived from
 	 * gmsec::api::util::LogHandler needs to be registered with Log::registerHandler() in order
 	 * to be called for a particular logging level.
 	 *

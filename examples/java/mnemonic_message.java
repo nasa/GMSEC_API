@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -135,6 +135,9 @@ public class mnemonic_message
 
 			//o Construct an MVAL Message and add the Mnemonic values to it
 			MnemonicMessage mvalMessage = new MnemonicMessage(MVAL_MESSAGE_SUBJECT, schemaId, connManager.getSpecification());
+
+			//o Add the mnemonic
+			mvalMessage.addMnemonic(mnemonic);
 
 			//o If validating with the 2014 spec, the MSG-ID field is
 			// required

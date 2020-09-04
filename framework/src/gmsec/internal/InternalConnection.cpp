@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,12 +20,11 @@
 #include <gmsec/internal/GarbageCollector.h>
 #include <gmsec/internal/Log.h>
 
+#include <gmsec/Callback.h>
 #include <gmsec/Config.h>
 #include <gmsec/Connection.h>
-#include <gmsec/Message.h>
-
-#include <gmsec/Callback.h>
 #include <gmsec/ErrorCallback.h>
+#include <gmsec/Message.h>
 #include <gmsec/ReplyCallback.h>
 
 #include <gmsec4/internal/ConnectionBuddy.h>
@@ -36,6 +35,8 @@
 #include <gmsec4/Exception.h>
 #include <gmsec4/Message.h>
 #include <gmsec4/SubscriptionInfo.h>
+
+#include <gmsec4/util/StdUniquePtr.h>
 
 
 using namespace gmsec;
@@ -234,7 +235,7 @@ Status InternalConnection::Subscribe(const char* subject, const Config& config, 
 
 			if (newSubscription)
 			{
-				std::auto_ptr<gmsec::api::Callback> cb4(new API4_Adapter::API4Callback(m_parent, cb));
+				gmsec::api::util::StdUniquePtr<gmsec::api::Callback> cb4(new API4_Adapter::API4Callback(m_parent, cb));
 
 				info = m_adapter->subscribe(subject, config4, cb4.get());
 
@@ -468,20 +469,8 @@ Status InternalConnection::Publish(Message* msg, const Config& config)
 	gmsec::api::Message* msg4 = API4_Adapter::referenceAPI4Message(msg);
 	gmsec::api::Config   cfg4 = API4_Adapter::API3ConfigToAPI4(&config);
 
-	if (msg4->getKind() != gmsec::api::Message::PUBLISH)
-	{
-		// We allow for the publishing of NON-PUBLISH messages.  When the message is received, we will restore the
-		// original message kind.
-		gmsec::api::internal::MessageBuddy::getInternal(*msg4).getDetails().setI32("KIND-3X", (GMSEC_I32) msg4->getKind());
-		gmsec::api::internal::MessageBuddy::getInternal(*msg4).setKind(gmsec::api::Message::PUBLISH);
-	}
-
 	try
 	{
-		gmsec::api::internal::ConnectionBuddy().getInternal(*m_adapter).insertTrackingFields(*msg4);
-
-		gmsec::api::internal::MessageBuddy::getInternal(*msg4).getDetails().setBoolean("TRACKING-FIELDS-INSERTED-BY-API3", true);
-
 		m_adapter->publish(*msg4, cfg4);
 	}
 	catch (gmsec::api::Exception& e)
@@ -514,16 +503,6 @@ Status InternalConnection::Request(Message* request, GMSEC_I32 timeout, Callback
 	}
 
 	gmsec::api::Message* req4 = API4_Adapter::referenceAPI4Message(request);
-
-	gmsec::api::internal::ConnectionBuddy().getInternal(*m_adapter).insertTrackingFields(*req4);
-
-	if (req4->getKind() != gmsec::api::Message::REQUEST)
-	{
-		// We allow for the publishing of NON-REQUEST messages.  When the message is received, we will restore the
-		// original message kind.
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).getDetails().setI32("KIND-3X", (GMSEC_I32) req4->getKind());
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).setKind(gmsec::api::Message::REQUEST);
-	}
 
 	try
 	{
@@ -562,16 +541,6 @@ Status InternalConnection::Request(Message* request, GMSEC_I32 timeout, ReplyCal
 
 	gmsec::api::Message* req4 = API4_Adapter::referenceAPI4Message(request);
 
-	gmsec::api::internal::ConnectionBuddy().getInternal(*m_adapter).insertTrackingFields(*req4);
-
-	if (req4->getKind() != gmsec::api::Message::REQUEST)
-	{
-		// We allow for the publishing of NON-REQUEST messages.  When the message is received, we will restore the
-		// original message kind.
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).getDetails().setI32("KIND-3X", (GMSEC_I32) req4->getKind());
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).setKind(gmsec::api::Message::REQUEST);
-	}
-
 	try
 	{
 		gmsec::api::ReplyCallback* rcb4 = m_collector->newReplyCallback(m_parent, rcb);
@@ -606,32 +575,12 @@ Status InternalConnection::Request(Message* request, GMSEC_I32 timeout, Message*
 
 	gmsec::api::Message* req4 = API4_Adapter::referenceAPI4Message(request);
 
-	gmsec::api::internal::ConnectionBuddy().getInternal(*m_adapter).insertTrackingFields(*req4);
-
-	if (req4->getKind() != gmsec::api::Message::REQUEST)
-	{
-		// We allow for the publishing of NON-REQUEST messages.  When the message is received, we will restore the
-		// original message kind.
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).getDetails().setI32("KIND-3X", (GMSEC_I32) req4->getKind());
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).setKind(gmsec::api::Message::REQUEST);
-	}
-
 	try
 	{
 		gmsec::api::Message* rep4 = m_adapter->request(*req4, timeout, republish_ms);
 
 		if (rep4 != NULL)
 		{
-			GMSEC_I32          kind;
-			gmsec::api::Status kindAvail = gmsec::api::internal::MessageBuddy::getInternal(*rep4).getDetails().getI32("KIND-3X", kind, NULL);
-
-			if (!kindAvail.isError())
-			{
-				gmsec::api::Message::MessageKind origMsgKind = static_cast<gmsec::api::Message::MessageKind>(kind);
-
-				gmsec::api::internal::MessageBuddy::getInternal(*rep4).setKind(origMsgKind);
-			}
-
 			reply = new Message(new InternalMessage(rep4));
 		}
 		else
@@ -670,22 +619,6 @@ Status InternalConnection::Reply(Message* request, Message* reply)
 
 	gmsec::api::Message* req4 = API4_Adapter::referenceAPI4Message(request);
 	gmsec::api::Message* rep4 = API4_Adapter::referenceAPI4Message(reply);
-
-	if (req4->getKind() != gmsec::api::Message::REQUEST)
-	{
-		// We allow for the publishing of NON-REQUEST messages.  When the message is received, we will restore the
-		// original message kind.
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).getDetails().setI32("KIND-3X", (GMSEC_I32) req4->getKind());
-		gmsec::api::internal::MessageBuddy::getInternal(*req4).setKind(gmsec::api::Message::REQUEST);
-	}
-
-	if (rep4->getKind() != gmsec::api::Message::REPLY)
-	{
-		// We allow for the publishing of NON-REPLY messages.  When the message is received, we will restore the
-		// original message kind.
-		gmsec::api::internal::MessageBuddy::getInternal(*rep4).getDetails().setI32("KIND-3X", (GMSEC_I32) rep4->getKind());
-		gmsec::api::internal::MessageBuddy::getInternal(*rep4).setKind(gmsec::api::Message::REPLY);
-	}
 
 	try
 	{
@@ -780,16 +713,6 @@ Status InternalConnection::GetNextMsg(Message*& msg, GMSEC_I32 timeout)
 		}
 		else
 		{
-			GMSEC_I32          kind;
-			gmsec::api::Status kindAvail = gmsec::api::internal::MessageBuddy::getInternal(*msg4).getDetails().getI32("KIND-3X", kind, NULL);
-
-			if (!kindAvail.isError())
-			{
-				gmsec::api::Message::MessageKind origMsgKind = static_cast<gmsec::api::Message::MessageKind>(kind);
-
-				gmsec::api::internal::MessageBuddy::getInternal(*msg4).setKind(origMsgKind);
-			}
-
 			msg = new Message(new InternalMessage(msg4));
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -28,7 +28,7 @@ libgmsec_perl::ReplyCallback
 
 =head1 DESCRIPTION
 
-This class is the abstract base class for received replies from asynchronous request messages. A user created class, derived from this class, can be passed into request() to have user code executed asynchronously when a reply is received or when an error occurs. Please note that because users are able to create their own ReplyCallback class, reentrancy is not guarunteed unless if they implement their own reentrancy rules. Also note that because a ReplyCallback can be registered to multiple connections, it can be run concurrently amongst those connections. Because of this, the use of a gmsec::api::util::AutoMutex is suggested to enforce thread safety.
+This class is the abstract base class for received replies from asynchronous request messages. A user created class, derived from this class, can be passed into request() to have user code executed asynchronously when a reply is received or when an error occurs. Please note that because users are able to create their own ReplyCallback class, reentrancy is not guarunteed unless if they implement their own reentrancy rules. Also note that because a ReplyCallback can be registered to multiple connections, it can be run concurrently amongst those connections. Because of this, the use of a gmsec::api::util::Mutex is suggested to enforce thread safety.
 
 Example ReplyCallback class:
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,10 +18,12 @@ namespace GMSEC.API {
 /// to have user code executed asynchronously when a reply is received or when an error
 /// occurs.
 /// <p>
-/// Please note that because users are able to create their own ReplyCallback class,
-/// reentrancy is not guarunteed unless if they implement their own reentrancy rules. Also
-/// note that because a ReplyCallback can be registered to multiple connections, it can be
-/// run concurrently amongst those connections.
+/// Note that because users are able to create their own ReplyCallback class, reentrancy is not
+/// guaranteed unless if they implement their own reentrancy rules.
+/// <p>
+/// In addition, if a ReplyCallback can be registered to multiple Connection objects, OnReply()
+/// can be invoked concurrently from different threads. Use of an AutoMutex is suggested to
+/// enforce thread safety.
 /// </summary>
 ///
 /// <seealso cref="Connection.Request(Message, int, ReplyCallback)"/>
@@ -37,9 +39,11 @@ public class ReplyCallback : EventCallback {
   /// </summary>
   ///
   /// <remarks>
-  /// <b>DO NOT DESTROY</b> the Connection or Message objects that are passed into this function by the API.
-  /// They are owned by the API and do not need to be managed by the client program. Also, they should not
-  /// be stored by the client program beyond the scope of this callback function.
+  /// <b>DO NOT DESTROY or CHANGE STATE</b> of the Connection object that is passed to the callback method,
+  /// nor store it for use beyond the scope of the callback method.
+  ///
+  /// <b>DO NOT STORE</b> the Message objects for use beyond the scope of the callback. Otherwise,
+  /// make a copy of the Message object(s).
   /// </remarks>
   ///
   /// <param name="conn">connection on which the message was received</param>

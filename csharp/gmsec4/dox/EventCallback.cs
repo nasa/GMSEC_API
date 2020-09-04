@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,11 +17,11 @@ namespace GMSEC.API {
 /// from this class, can be passed into RegisterEventCallback() to have user code executed
 /// asynchronously when an event occurs in the connection object.
 /// <p>
-/// Please note that because users are able to create their own EventCallback class,
-/// reentrancy is not guaranteed unless if they implement their own reentrancy rules. Also note that
-/// because an EventCallback can be registered to multiple Connections, it can be run
-/// concurrently amongst those connections. Because of this, the use of a AutoMutex is suggested to
-/// enforce thread safety.
+/// Note that because users are able to create their own EventCallback class,
+/// reentrancy is not guaranteed unless if they implement their own reentrancy rules.
+/// <p>
+/// In addition, if an EventCallback is registered to multiple Connection objects, OnEvent() can be invoked
+/// concurrently from different threads. Use of an AutoMutex is suggested to enforce thread safety.
 /// </summary>
 ///
 /// <seealso cref="Connection,RegisterEventCallback(Connection,ConnectionEvent, EventCallback)"/>
@@ -29,15 +29,17 @@ namespace GMSEC.API {
 public class EventCallback : global::System.IDisposable {
 
   /// <summary>
-  /// This function is called in response to a error after a call to RegisterEventCallback().
-  /// Please note that if an EventCallback is registered to multiple connections, OnEvent() can
+  /// This method is called in response to a error after a call to RegisterEventCallback().
+  /// Note that if an EventCallback is registered to multiple connections, OnEvent() can
   /// be invoked concurrently from the different connection threads.
   /// </summary>
   ///
   /// <remarks>
-  /// <b>DO NOT DESTROY</b> the Connection object that is passed into this function by the API.
-  /// It is owned by the API and does not need to be managed by the client program. Also, it
-  /// should not be stored by the client program beyond the scope of this callback function.
+  /// <b>DO NOT DESTROY or CHANGE STATE</b> of the Connection object that is passed to the callback method,
+  /// nor store it for use beyond the scope of the callback.
+  ///
+  /// <b>DO NOT STORE</b> the Status object for use beyond the scope of the callback. Otherwise, make a
+  /// copy of the Status object.
   /// </remarks>
   ///
   /// <param name="conn">connection on which the event was received</param>

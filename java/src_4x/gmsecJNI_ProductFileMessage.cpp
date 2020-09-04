@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -185,6 +185,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFi
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage__Ljava_lang_String_2
   (JNIEnv *jenv, jclass jcls, jstring jData)
 {
@@ -199,6 +200,38 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFi
 			ProductFileMessage* prodMsg = new ProductFileMessage(data.c_str());
 
 			jCreated = JNI_POINTER_TO_JLONG(prodMsg);
+		}
+	}
+	JNI_CATCH
+
+	return jCreated;
+}
+GMSEC_ENABLE_DEPRECATED_WARNINGS
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1ProductFileMessage__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNISpecification_2Ljava_lang_String_2
+  (JNIEnv *jenv, jclass jcls, jlong jSpecPtr, jobject jSpec, jstring jData)
+{
+	jlong jCreated = 0;
+
+	try
+	{
+		Specification* spec = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+
+		if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+		else
+		{
+			JStringManager data(jenv, jData);
+
+			if (jvmOk(jenv, "ProductTypeMessage"))
+			{
+				ProductFileMessage* prodMsg = new ProductFileMessage(*spec, data.c_str());
+
+				jCreated = JNI_POINTER_TO_JLONG(prodMsg);
+			}
 		}
 	}
 	JNI_CATCH
@@ -423,6 +456,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ProductFileM
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ProductFileMessage_1ConvertMessage
   (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg)
 {
@@ -447,6 +481,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ProductFileMes
 
 	return jCreated;
 }
+GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 
 #ifdef __cplusplus

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,6 +21,8 @@
 
 #include <gmsec4/Config.h>
 #include <gmsec4/Message.h>
+
+#include <gmsec4/util/StdUniquePtr.h>
 
 #include <cms/Connection.h>
 #include <cms/ConnectionFactory.h>
@@ -127,15 +129,15 @@ private:
 class GMSEC_ACTIVEMQ_API CMSConnection : public gmsec::api::internal::ConnectionInterface
 {
 private:
-	std::auto_ptr<cms::ConnectionFactory>    m_cmsFactory;
-	std::auto_ptr<cms::Connection>           m_connection;
-	std::auto_ptr<cms::Session>              m_publishSession;
-	std::auto_ptr<cms::Destination>          m_requestReplyDestination;
-	std::auto_ptr<cms::MessageProducer>      m_requestReplyProducer;
-	std::auto_ptr<cms::MessageConsumer>      m_replyConsumer;
-	std::map<std::string, SubscriptionInfo*> m_subscriptions;
-	MessageQueue                             m_queue;
-	gmsec::api::internal::UniqueFilter       m_uniqueFilter;
+	gmsec::api::util::StdUniquePtr<cms::ConnectionFactory> m_cmsFactory;
+	gmsec::api::util::StdUniquePtr<cms::Connection>        m_connection;
+	gmsec::api::util::StdUniquePtr<cms::Session>           m_publishSession;
+	gmsec::api::util::StdUniquePtr<cms::Destination>       m_requestReplyDestination;
+	gmsec::api::util::StdUniquePtr<cms::MessageProducer>   m_requestReplyProducer;
+	gmsec::api::util::StdUniquePtr<cms::MessageConsumer>   m_replyConsumer;
+	std::map<std::string, SubscriptionInfo*>               m_subscriptions;
+	MessageQueue                                           m_queue;
+	gmsec::api::internal::UniqueFilter                     m_uniqueFilter;
 
 	// configuration
 	std::string m_brokerURI;
@@ -168,7 +170,7 @@ private:
 	/**
 	 * @brief Prepare a CMS Message for a GMSEC Message.
 	 */
-	void prepare(const gmsec::api::Message& msg, std::auto_ptr<cms::Message>& cmsMsg);
+	void prepare(const gmsec::api::Message& msg, gmsec::api::util::StdUniquePtr<cms::Message>& cmsMsg);
 
 
 	/**

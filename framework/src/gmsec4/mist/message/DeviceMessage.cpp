@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,13 +32,13 @@ using namespace gmsec::api::mist::message::internal;
 
 
 DeviceMessage::DeviceMessage(const char* subject, const Specification& spec)
-	: MistMessage(new InternalDeviceMessage(subject, InternalDeviceMessage::buildSchemaID(spec.getVersion()).c_str(), spec))
+	: MistMessage(new InternalDeviceMessage(subject, InternalDeviceMessage::buildSchemaID().c_str(), spec))
 {
 }
 
 
 DeviceMessage::DeviceMessage(const char* subject, const gmsec::api::Config& config, const Specification& spec)
-	: MistMessage(new InternalDeviceMessage(subject, InternalDeviceMessage::buildSchemaID(spec.getVersion()).c_str(), config, spec))
+	: MistMessage(new InternalDeviceMessage(subject, InternalDeviceMessage::buildSchemaID().c_str(), config, spec))
 {
 }
 
@@ -51,6 +51,12 @@ DeviceMessage::DeviceMessage(const DeviceMessage& other)
 
 DeviceMessage::DeviceMessage(const char* data)
 	: MistMessage(new InternalDeviceMessage(data))
+{
+}
+
+
+DeviceMessage::DeviceMessage(const Specification& spec, const char* data)
+	: MistMessage(new InternalDeviceMessage(spec, data))
 {
 }
 
@@ -97,5 +103,7 @@ DeviceIterator& DeviceMessage::getDeviceIterator() const
 
 DeviceMessage DeviceMessage::convertMessage(const Message& message)
 {
+	GMSEC_DISABLE_DEPRECATED_WARNINGS
 	return DeviceMessage(message.toXML());
+	GMSEC_ENABLE_DEPRECATED_WARNINGS
 }

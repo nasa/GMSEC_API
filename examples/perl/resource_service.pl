@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -22,7 +22,8 @@ use libgmsec_perl;
 
 *isa = \&UNIVERSAL::isa;
 
-my $RSRC_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.RESOURCE_SERVICE.RSRC";
+my $RSRC_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.RESOURCE-SERVICE.RSRC";
+my $RSRC_PUBLISH_RATE    = 5; # in seconds
 
 sub main
 {
@@ -60,16 +61,28 @@ sub main
 		# be used by all GMSEC Messages
 		my $headerFields = libgmsec_perl::FieldList->new();
 
-		my $versionField = libgmsec_perl::F32Field->new("HEADER-VERSION", 2010.0);
-		my $missionField = libgmsec_perl::StringField->new("MISSION-ID", "GMSEC");
-		my $facilityField = libgmsec_perl::StringField->new("FACILITY", "GMSEC Lab");
-		my $componentField = libgmsec_perl::StringField->new("COMPONENT", "heartbeat_service");
+		my $version = $connManager->getSpecification()->getVersion();
 
-		$headerFields->push($versionField);
+		my $missionField = libgmsec_perl::StringField->new("MISSION-ID", "MY-MISSION");
+		my $facilityField = libgmsec_perl::StringField->new("FACILITY", "MY-FACILITY");
+		my $componentField = libgmsec_perl::StringField->new("COMPONENT", "RESOURCE-SERVICE");
+		my $domain1Field = libgmsec_perl::StringField->new("DOMAIN1", "MY-DOMAIN-1");
+		my $domain2Field = libgmsec_perl::StringField->new("DOMAIN2", "MY-DOMAIN-2");
+		my $msgID = libgmsec_perl::StringField->new("MSG-ID", "MY-MSG-ID");
+
 		$headerFields->push($missionField);
 		$headerFields->push($facilityField);
 		$headerFields->push($componentField);
 
+		if($version == 201400)
+		{
+			$headerFields->push($msgID);
+		}
+		elsif($version >= 201800)
+		{
+			$headerFields->push($domain1Field);
+			$headerFields->push($domain2Field);
+		}
 		#o Use setStandardFields to define a set of header fields for
 		# all messages which are created or published on the
 		# ConnectionManager using the following functions:
@@ -95,9 +108,8 @@ sub main
 		# parameter provided to the startResourceMessageService() function.
 		# If an interval is not provided, the service will default to
 		# publishing a message every 60 seconds.
-		my $interval_s = 30;
-		libgmsec_perl::LogInfo("Starting the Resource Message service, a message will be published every " . $interval_s . " seconds");
-		$connManager->startResourceMessageService($RSRC_MESSAGE_SUBJECT, $interval_s);
+		libgmsec_perl::LogInfo("Starting the Resource Message service, a message will be published every " . $RSRC_PUBLISH_RATE . " seconds");
+		$connManager->startResourceMessageService($RSRC_MESSAGE_SUBJECT, $RSRC_PUBLISH_RATE);
 
 		#o Wait for user input to end the program
 		libgmsec_perl::LogInfo("Publishing C2CX Resource Messages indefinitely, press <enter> to exit the program");

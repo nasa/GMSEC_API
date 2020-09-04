@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,11 +22,12 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIEventCallback;
  * {@link Connection#registerEventCallback(Connection.ConnectionEvent, EventCallback)}
  * to have user code executed asynchronously when an event occurs in the connection object.
  * <p>
- * Please note that because users are able to create their own EventCallback class,
+ * Note that because users are able to create their own EventCallback class,
  * reentrancy is not guaranteed unless if they implement their own reentrancy rules.
  * <p>
- * Also note that because an EventCallback can be registered to multiple connections,
- * it can be run concurrently among those connections.
+ * In addition, if an EventCallback is registered to multiple connections, onEvent() can be
+ * invoked concurrently from different connection threads. Users are encouraged to employ
+ * the use of synchronization to enforce thread safety.
  *
  * @see Connection#registerEventCallback(Connection.ConnectionEvent, EventCallback)
  */
@@ -78,11 +79,15 @@ public abstract class EventCallback
 
 	/**
 	 * Callback method that is called by the API in response to an event.
-	 * <p> 
-	 * Note: <b>DO NOT DESTROY</b> the Connection object that is passed into this method
-	 * by the API.  It is owned by the API and does not need to be managed by the client
-	 * program. Also, it should not be stored by the client program beyond the scope of
-	 * this callback function.
+	 * <p>
+	 * If an EventCallback is registered to multiple connections, onEvent() can
+	 * be invoked concurrently from the different connection threads.
+	 * <p>
+	 * <b>DO NOT DESTROY or CHANGE STATE</b> of the Connection object that is passed to the callback method,
+	 * nor store it for use beyond the scope of the callback method.
+	 * <p>
+	 * <b>DO NOT STORE</b> the Status object for use beyond the scope of the callback. Otherwise, make a
+	 * copy of the Status object.
 	 * 
 	 * @param conn   Connection related to the error.
 	 * @param status The status containing error details.

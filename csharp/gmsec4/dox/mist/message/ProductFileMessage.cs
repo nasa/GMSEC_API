@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -77,7 +77,7 @@ public class ProductFileMessage : MistMessage {
   /// <summary>Initializes the message with a given schema ID.</summary>
   ///
   /// <param name="subject">The subject string for the message.</param>
-  /// <param name="status">RESPONSE-STATUS field to insert into a MSG PROD message.</param>
+  /// <param name="responseStatus">RESPONSE-STATUS field to insert into a MSG PROD message.</param>
   /// <param name="schemaID">The string used to identify the message schema in the GMSEC ISD. The schema ID has the
   ///                        format of: messageKind.messageType.messageSubtype (e.g. MSG.PROD.AUTO).</param>
   /// <param name="config">A configuration to associate with the message.</param>
@@ -103,7 +103,20 @@ public class ProductFileMessage : MistMessage {
   /// <exception cref="GmsecException">
   /// Thrown if the data is null or cannot be interpreted as valid XML or JSON data that represents a %Product File %Message.
   /// </exception>
+  ///
+  /// <remarks>This method has been deprecated; use ProductFileMessage(Specification, string) instead.</remarks>
   public ProductFileMessage(string data) {
+  }
+
+  /// <summary>Constructs a ProductFileMessage using an XML or JSON string, and ensures the message adheres to the provided specification</summary>
+  ///
+  /// <param name="spec">A reference to the specification this message's schema will adhere to.</param>
+  /// <param name="data">XML or JSON string used to initialize the message.</param>
+  ///
+  /// <exception cref="GMSEC_Exception">
+  /// Thrown if the data is null or cannot be interpreted as valid XML or JSON data that represents a message.
+  /// </exception>
+  public ProductFileMessage(Specification spec, string data) {
   }
 
   /// <summary>Add a ProductFile to the message</summary>

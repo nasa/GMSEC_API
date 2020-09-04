@@ -24,6 +24,8 @@ using namespace gmsec::api::util;
 %rename("format_time") formatTime;
 %rename("diff_time") diffTime;
 
+%include "std_string.i"
+
 %include "dox/TimeUtil_dox.i"
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/util/TimeUtil.h>
@@ -43,4 +45,3 @@ using namespace gmsec::api::util;
                 return std::string(tmp);
         }
 };
-

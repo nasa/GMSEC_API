@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,10 +17,13 @@
 
 #include "../Utility.h"
 
-#include <memory>
-
 using namespace gmsec::api;
+using namespace gmsec::api::mist;
 using namespace gmsec::api::util;
+
+
+const char* const DEFAULT_REQUEST_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.REQ.DIR.GMRPL";
+const char* const DEFAULT_REPLY_MESSAGE_SUBJECT   = "GMSEC.MY-MISSION.MY-SAT-ID.RESP.DIR.GMRPL.+";
 
 
 class GMSEC_Request : public Utility
@@ -35,16 +38,16 @@ public:
 	bool run();
 
 private:
-	Connection* connection;
-
 	void request(Message& msg, int msg_timeout_ms, int req_republish_period);
 	void request(const std::string& subject, int msg_timeout_ms, int req_republish_period);
+
+	ConnectionManager* connMgr;
 };
 
 
 GMSEC_Request::GMSEC_Request(const Config& c)
 	: Utility(c),
-	  connection(0)
+	  connMgr(0)
 {
 	// Initialize utility
 	initialize();
@@ -53,21 +56,21 @@ GMSEC_Request::GMSEC_Request(const Config& c)
 
 GMSEC_Request::~GMSEC_Request()
 {
-	if (connection)
+	if (connMgr)
 	{
 		try
 		{
-			connection->disconnect();
+			connMgr->cleanup();
 		}
-		catch (Exception& e)
+		catch (const Exception& e)
 		{
 			GMSEC_ERROR << e.what();
 		}
 
-		Connection::destroy(connection);
+		delete connMgr;
 	}
 
-	Connection::shutdownAllMiddlewares();
+	ConnectionManager::shutdownAllMiddlewares();
 }
 
 
@@ -98,27 +101,27 @@ bool GMSEC_Request::run()
 	bool success = true;
 
 	/* output GMSEC API version */
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
-		//o Create the Connection
-		connection = Connection::create(getConfig());
+		//o Create the ConnectionManager
+		connMgr = new ConnectionManager(getConfig());
 
 		//o Connect
-		connection->connect();
+		connMgr->initialize();
 
 		//o output connection middleware version
-		GMSEC_INFO << connection->getLibraryVersion();
+		GMSEC_INFO << connMgr->getLibraryVersion();
 
 		//o Get information from the command line */
 		std::string msgFile          = get("MSG-FILE", "");
 		std::string cfgFile          = get("CFG-FILE", "");
 		int         msg_timeout_ms   = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
-		int         req_repub_tmo_ms = get("REQ-REPUBLISH-TIMEOUT-MS", GMSEC_REQUEST_REPUBLISH_NEVER);
+		int         req_repub_tmo_ms = get("REQ-REPUBLISH-TIMEOUT-MS", 1000);
 		std::string subject;
 
-		std::auto_ptr<Message> msg;
+		StdUniquePtr<Message> msg;
 
 		if (!msgFile.empty())
 		{
@@ -142,11 +145,21 @@ bool GMSEC_Request::run()
 		}
 		else
 		{
-			subject = get("SUBJECT", "GMSEC.MISSION.SAT_ID.REQ.CMD.GMRPL");
+			subject = get("SUBJECT", DEFAULT_REQUEST_MESSAGE_SUBJECT);
+		}
+
+		//o Check if we're configured for Open-Response
+		std::string responseBehavior = getConfig().getValue("gmsec-req-resp", "");
+
+		if (responseBehavior == "open-resp" || responseBehavior == "OPEN-RESP")
+		{
+			GMSEC_INFO << "Subscribing to Open-Response Subject: " << DEFAULT_REPLY_MESSAGE_SUBJECT;
+
+			(void) connMgr->subscribe(DEFAULT_REPLY_MESSAGE_SUBJECT);
 		}
 
 		//o Output information
-		GMSEC_INFO << "Using subject '" << subject.c_str() << "'";
+		GMSEC_INFO << "Issuing Request Message with Subject: " << subject.c_str();
 
 		if (msg.get())
 		{
@@ -159,7 +172,7 @@ bool GMSEC_Request::run()
 			request(subject, msg_timeout_ms, req_repub_tmo_ms);
 		}
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
 		GMSEC_ERROR << e.what();
 		success = false;
@@ -184,7 +197,7 @@ void GMSEC_Request::request(Message& request, int msg_timeout_ms, int req_republ
 	if (request.getField("RESPONSE") == NULL || request.getIntegerValue("RESPONSE") == 1)
 	{
 		//o Send Request Message
-		Message* reply = connection->request(request, msg_timeout_ms, req_republish_period);
+		Message* reply = connMgr->request(request, msg_timeout_ms, req_republish_period);
 
 		if (reply)
 		{
@@ -192,7 +205,7 @@ void GMSEC_Request::request(Message& request, int msg_timeout_ms, int req_republ
 			GMSEC_INFO << "Received reply:\n" << reply->toXML();
 
 			//o Destroy the reply message
-			connection->release(reply);
+			connMgr->release(reply);
 		}
 		else
 		{
@@ -201,7 +214,7 @@ void GMSEC_Request::request(Message& request, int msg_timeout_ms, int req_republ
 	}
 	else
 	{
-		(void) connection->request(request, 10, -1);
+		(void) connMgr->request(request, 10, -1);
 	}
 }
 
@@ -225,7 +238,7 @@ void GMSEC_Request::request(const std::string& subject, int msg_timeout_ms, int 
 	GMSEC_INFO << "Requesting:\n" << request.toXML();
 
 	//o Send Request Message
-	Message* reply = connection->request(request, msg_timeout_ms, req_republish_period);
+	Message* reply = connMgr->request(request, msg_timeout_ms, req_republish_period);
 
 	if (reply)
 	{
@@ -233,7 +246,7 @@ void GMSEC_Request::request(const std::string& subject, int msg_timeout_ms, int 
 		GMSEC_INFO << "Received reply:\n" << reply->toXML();
 
 		//o Destroy the reply message
-		connection->release(reply);
+		connMgr->release(reply);
 	}
 	else
 	{

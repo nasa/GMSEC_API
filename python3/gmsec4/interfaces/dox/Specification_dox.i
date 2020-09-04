@@ -8,12 +8,43 @@
 
     See Also
     --------
+    Config
     SchemaIDIterator
+    MessageSpecificationList
+
+    CONSTRUCTOR:
+
+    Specification(config: Config)
+
+    Initializes the Specification instance.
+
+    Parameters
+    ----------
+    config : The Config used to configure the specification.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the given Config is null.
+    A GmsecError is thrown if, for whatever reason, the Specification cannot load message templates.
+
+
+
+    Specification(other: Specification)
+
+    Copy-constructor for initializing a Specification instance.
+
+    Parameters
+    ----------
+    other : The Specification to copy.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the given Specification is null.
 ";
 
 %feature("docstring") gmsec::api::mist::Specification::validateMessage "
 
-    validateMessage(self, msg)
+    validate_message(self, msg: Message)
 
     Looks up the message subject in the message registry to grab the
     appropriate template (based on its assigned schema ID).  The
@@ -24,7 +55,7 @@
 
     Parameters
     ----------
-    msg: The message to be validated.
+    msg : The message to be validated.
 
     Exceptions
     ----------
@@ -34,64 +65,51 @@
 
 ";
 
-%feature("docstring") gmsec::api::mist::Specification::getTemplateXML "
-
-    getTemplateXML(self, subject, schemaID) -> char const *
-
-    Returns a message schema from the template with the matching
-    schemaID.
-    This message schema can be used as input for a Message data
-    constructor
-
-    Parameters
-    ----------
-    subject: message subject
-    schemaID: id used to look up the appropriate template
-
-    Returns
-    -------
-    XML string representation of the message schema.
-
-    Exceptions
-    ----------
-    A GmsecError is thrown if the provided schemaID is not available
-        in the list of loaded schema.
-
-";
-
 %feature("docstring") gmsec::api::mist::Specification::getVersion "
 
-    getVersion(self) -> unsigned int
+    get_version(self) -> unsigned int
 
-    returns the version of the ISD being used as an unsigned integer.
+    Returns the version of the ISD being used as an unsigned integer.
 ";
 
 %feature("docstring") gmsec::api::mist::Specification::getSchemaIDIterator "
 
-    getSchemaIDIterator(self) -> SchemaIDIterator
+    get_schema_id_iterator(self) -> SchemaIDIterator
 
-    returns a SchemaIDIterator, which can be used to iterated over the
+    Returns a SchemaIDIterator, which can be used to iterated over the
     IDs of the loaded templates.
 
-    Note: Only one SchemaIDIterator object is associated with a
-    Specification object; multiple calls to getSchemaIDIterator() will
-    return a reference to the same SchemaIDIterator object. Each call
+    Note: Only one SchemaIDIterator is associated with a
+    Specification; multiple calls to getSchemaIDIterator() will
+    return a reference to the same SchemaIDIterator. Each call
     will reset the iterator.
 
     Returns
     -------
-    a reference to a SchemaIDIterator object
+    A reference to a SchemaIDIterator
 ";
 
 %feature("docstring") gmsec::api::mist::Specification::getMessageSpecifications"
 
-    getMessageSpecifications(self) -> list
+    get_message_specifications(self) -> MessageSpecificationList
 
     Accessor that returns the list of MessageSpecification object(s)
-    associated with the Specification
+    associated with the Specification.
+
+    Example usage:
+
+        config = libgmsec_python3.Config()
+
+        config.add_value(\"gmsec-specification-version\", libgmsec_python3.GMSEC_ISD_CURRENT)
+
+        spec = libgmsec_python3.Specification(config)
+
+        msgSpecs = spec.get_message_specifications()
+
+        for msgSpec in msgSpecs:
+            fieldSpecs = msgSpec.get_field_specifications()
 
     Returns
     -------
-    A list of MessageSpecification object(s) associated with the
-    Specification
+    A MessageSpecificationList associated with the Specification
 ";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -50,5 +50,22 @@ using namespace gmsec::api;
     PyObject* CALL_TYPE getValue()
     {
         return PyByteArray_FromStringAndSize((const char*) self->getValue(), (Py_ssize_t) self->getLength());
+    }
+
+    BinaryField* CALL_TYPE clone() const
+    {
+        return dynamic_cast<BinaryField*>(self->clone());
+    }
+
+    static BinaryField* CALL_TYPE cast_field(Field* field)
+    {
+        BinaryField* casted = dynamic_cast<BinaryField*>(field);
+
+        if (casted == NULL)
+        {
+            throw Exception(FIELD_ERROR, FIELD_TYPE_MISMATCH, "Field cannot be casted to a BinaryField");
+        }
+
+        return casted;
     }
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,6 +41,34 @@ const char* CALL_TYPE fieldGetName(const GMSEC_Field field, GMSEC_Status status)
 	}
 
 	return name;
+}
+
+
+void CALL_TYPE fieldSetName(GMSEC_Field field, const char* name, GMSEC_Status status)
+{
+	Field*  fld  = reinterpret_cast<Field*>(field);
+	Status  result;
+
+	if (fld)
+	{
+		try
+		{
+			fld->setName(name);
+		}
+		catch (const Exception& e)
+		{
+			result = Status(e);
+		}
+	}
+	else
+	{
+		result = Status(FIELD_ERROR, UNINITIALIZED_OBJECT, "Field object is NULL");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
 }
 
 
@@ -238,6 +266,30 @@ const char* CALL_TYPE fieldGetStringValue(const GMSEC_Field field, GMSEC_Status 
 	}
 
 	return value;
+}
+
+
+GMSEC_Field CALL_TYPE fieldClone(const GMSEC_Field field, GMSEC_Status status)
+{
+	GMSEC_Field  clone = 0;
+	const Field* fld   = reinterpret_cast<const Field*>(field);
+	Status       result;
+
+	if (fld)
+	{
+		clone = reinterpret_cast<GMSEC_Field>(fld->clone());
+	}
+	else
+	{
+		result = Status(FIELD_ERROR, UNINITIALIZED_OBJECT, "Field object is NULL");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return clone;
 }
 
 

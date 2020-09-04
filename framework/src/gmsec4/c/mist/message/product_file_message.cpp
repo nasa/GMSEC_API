@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -133,6 +133,7 @@ GMSEC_Message CALL_TYPE productFileMessageCreateUsingData(const char* data, GMSE
 	GMSEC_Message msg = NULL;
 	Status        result;
 
+	GMSEC_DISABLE_DEPRECATED_WARNINGS
 	try
 	{
 		msg = reinterpret_cast<GMSEC_Message>(new ProductFileMessage(data));
@@ -141,6 +142,7 @@ GMSEC_Message CALL_TYPE productFileMessageCreateUsingData(const char* data, GMSE
 	{
 		result = Status(e);
 	}
+	GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 	if (status)
 	{
@@ -148,6 +150,37 @@ GMSEC_Message CALL_TYPE productFileMessageCreateUsingData(const char* data, GMSE
 	}
 
 	return msg;
+}
+
+
+GMSEC_Message CALL_TYPE productFileMessageCreateUsingSpecAndData(GMSEC_Specification spec, const char* data, GMSEC_Status status)
+{
+    GMSEC_Message  msg = NULL;
+    Specification* s   = reinterpret_cast<Specification*>(spec);
+    Status         result;
+
+    if (!s)
+    {
+        result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Specification handle is NULL");
+    }
+    else
+    {
+        try
+        {
+            msg = reinterpret_cast<GMSEC_Message>(new ProductFileMessage(*s, data));
+        }
+        catch (Exception& e)
+        {
+            result = Status(e);
+        }
+    }
+
+    if (status)
+    {
+        *(reinterpret_cast<Status*>(status)) = result;
+    }
+
+    return msg;
 }
 
 
@@ -387,7 +420,9 @@ GMSEC_Message CALL_TYPE productFileMessageConvert(const GMSEC_Message msg, GMSEC
 
 	if (tmpMsg)
 	{
+		GMSEC_DISABLE_DEPRECATED_WARNINGS
 		ProductFileMessage tmpProductFileMsg = ProductFileMessage::convertMessage(*tmpMsg);
+		GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 		productFileMsg = reinterpret_cast<GMSEC_Message>(new ProductFileMessage(tmpProductFileMsg));
 	}

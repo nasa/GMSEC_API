@@ -1,3 +1,10 @@
+/*
+ * Copyright 2007-2019 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
+ * No copyright is claimed in the United States under Title 17, U.S. Code.
+ * All Rights Reserved.
+ */
+
 #include <gmsec4/internal/MessageAggregationToolkit.h>
 
 #include <gmsec4/internal/InternalConnection.h>
@@ -13,9 +20,9 @@
 #include <gmsec4/util/Buffer.h>
 #include <gmsec4/util/Log.h>
 #include <gmsec4/util/Mutex.h>
+#include <gmsec4/util/StdUniquePtr.h>
 #include <gmsec4/util/TimeUtil.h>
 
-#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -165,7 +172,7 @@ void MessageAggregationToolkit::processAggregatedMsg(Message*& msg)
 
 		DataBuffer data(msgData, msgSize, true);  // msgData will be deleted when DataBuffer is destroyed
 
-		std::auto_ptr<Message> tmpMsg(new Message(msg->getSubject(), msg->getKind(), m_connection->getMessageConfig()));
+		StdUniquePtr<Message> tmpMsg(new Message(msg->getSubject(), msg->getKind(), m_connection->getMessageConfig()));
 
 		m_decoder.decode(*tmpMsg.get(), data);
 

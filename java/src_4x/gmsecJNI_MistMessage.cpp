@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -21,6 +21,7 @@
 #include <gmsec4/mist/message/MistMessage.h>
 
 #include <gmsec4/util/DataList.h>
+#include <gmsec4/util/Deprecated.h>
 
 
 using namespace gmsec::api;
@@ -94,6 +95,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MistMessa
 }
 
 
+GMSEC_DISABLE_DEPRECATED_WARNINGS
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MistMessageWithData
   (JNIEnv *jenv, jclass jcls, jstring jData)
 {
@@ -106,6 +108,34 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MistMessa
 		if (jvmOk(jenv, "MistMessage(data)"))
 		{
 			created = new MistMessage(data.c_str());
+		}
+	}
+	JNI_CATCH
+
+	return JNI_POINTER_TO_JLONG(created);
+}
+GMSEC_ENABLE_DEPRECATED_WARNINGS
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_new_1MistMessageWithSpec
+  (JNIEnv *jenv, jclass jcls, jlong jSpecPtr, jobject jSpec, jstring jData)
+{
+	MistMessage* created = 0;
+
+	try
+	{
+		Specification* spec = JNI_JLONG_TO_SPECIFICATION(jSpecPtr);
+
+		if (!spec)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Specification reference is null");
+		}
+
+		JStringManager data(jenv, jData);
+
+		if (jvmOk(jenv, "MistMessage(data, spec)"))
+		{
+			created = new MistMessage(*spec, data.c_str());
 		}
 	}
 	JNI_CATCH

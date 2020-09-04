@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -24,46 +24,43 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIConnMgrReplyCallback;
  * {@link ConnectionManager#request(Message, int, ConnectionManagerReplyCallback, int)}
  * to have user code executed asynchronously when a reply is received or when an error occurs.
  * <p>
- * Please note that because users are able to create their own ConnectionManagerReplyCallback class,
+ * Note that because users are able to create their own ConnectionManagerReplyCallback class,
  * reentrancy is not guaranteed unless they implement their own reentrancy rules.
  * <p>
- * Also note that because a ConnectionManagerReplyCallback can be registered to multiple connections,
- * it can be run concurrently among those connections.
+ * In addition, if a ConnectionManagerReplyCallback is registered to multiple Connection Managers,
+ * onReply() can be invoked concurrently from different connection manager threads.
+ * Users are encouraged to employ the use of synchronization to enforce thread safety.
  * <p>
  * Example callback class:
- * <pre>{@code
- * class MyReplyCallback : public ConnectionManagerReplyCallback
- * {
- *    public void onReply(ConnectionManager connMgr, Message request, Message reply)
- *    {
- *        System.out.println("Request Message:\n" + request.toXML());
- *        System.out.println("Reply Message:\n" + reply.toXML());
- *    }
- *
- *    public void onEvent(ConnectionManager connMgr, Status status, String event)
- *    {
- *        System.err.println(status.get());
- *    }
- * };
- * }</pre>
+   <pre>{@code
+   class MyReplyCallback : public ConnectionManagerReplyCallback
+   {
+      public void onReply(ConnectionManager connMgr, Message request, Message reply)
+      {
+          System.out.println("Request Message:\n" + request.toXML());
+          System.out.println("Reply Message:\n" + reply.toXML());
+      }
+      public void onEvent(ConnectionManager connMgr, Status status, String event)
+      {
+          System.err.println(status.get());
+      }
+   }
+   }</pre>
  * <p>
  * Example ConnectionManagerReplyCallback registration:
- * <pre>{@code
- * try
- * {
- *     Message request = new Message("GMSEC.MISSION.SAT.MY.REQUEST", Message.MessageKind.REQUEST);
- *
- *     // ... add fields to request message
- *
- *     connMgr.request(request, timeout, new MyReplyCallback(), gmsecAPI.REQUEST_REPUBLISH_NEVER);
- *
- *     ...
- * }
- * catch (GMSEC_Exception e)
- * {
- *     // handle error
- * }
- * }</pre>
+   <pre>{@code
+   try
+   {
+       Message request = new Message("GMSEC.MISSION.SAT.MY.REQUEST", Message.MessageKind.REQUEST);
+       // ... add fields to request message
+       connMgr.request(request, timeout, new MyReplyCallback(), gmsecAPI.REQUEST_REPUBLISH_NEVER);
+       ...
+   }
+   catch (GMSEC_Exception e)
+   {
+       // handle error
+   }
+   }</pre>
  *
  * @see ConnectionManager#request(Message, int, ConnectionManagerReplyCallback, int)
  * @see ConnectionManager#cancelRequest(ConnectionManagerReplyCallback)
@@ -116,16 +113,17 @@ public abstract class ConnectionManagerReplyCallback extends ConnectionManagerEv
 
 	/**
 	 * This method is called by the API in response to a reply received from a request,
-	 * from within the request(...) call. A class derrived from ConnectionManagerReplyCallback needs
+	 * from within the request(...) call. A class derived from ConnectionManagerReplyCallback needs
 	 * to be passed into the {@link ConnectionManager#request(Message, int, ConnectionManagerReplyCallback, int)} call.
 	 * <p>
-	 * Please note that if a callback is registered to multiple connections, onReply() can be invoked concurrently
+	 * If a callback is registered to multiple connections, onReply() can be invoked concurrently
 	 * from the different connection threads.
 	 * <p>
-	 * Note: <b>DO NOT DESTROY</b> the ConnectionManager, nor the Messages that are passed into this function by
-	 * the API. They are owned by the API and do not need to be managed by the client program. Also, they can
-	 * not be stored by the client program beyond the scope of this callback function. In order to store
-	 * a Message, the message must be copied.
+	 * <b>DO NOT STORE or CHANGE STATE</b> of the ConnectionManager object; it should only be used within
+	 * the scope of the callback method.
+	 * <p>
+	 * <b>DO NOT STORE</b> the Message objects for use beyond the scope of the callback. Otherwise, make a
+	 * copy of the Message object(s).
 	 *
 	 * @param connMgr Connection manager on which the message was received.
 	 * @param request The pending request message.

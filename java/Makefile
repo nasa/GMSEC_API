@@ -1,4 +1,4 @@
-# Copyright 2007-2018 United States Government as represented by the
+# Copyright 2007-2019 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -106,6 +106,7 @@ OBJECTS_4x = \
              $(SRCDIR_4x)/gmsecJNI_I32Field.o \
              $(SRCDIR_4x)/gmsecJNI_I64Field.o \
              $(SRCDIR_4x)/gmsecJNI_I8Field.o \
+             $(SRCDIR_4x)/gmsecJNI_HeartbeatGenerator.o \
              $(SRCDIR_4x)/gmsecJNI_Init.o \
              $(SRCDIR_4x)/gmsecJNI_Log.o \
              $(SRCDIR_4x)/gmsecJNI_LogHandler.o \
@@ -213,3 +214,4 @@ $(SRCDIR_4x)/%.o: $(SRCDIR_4x)/%.cpp
 gen-doc:
 	-$(JAVADOC) -public -quiet -d $(JAVADOC_DIR) -sourcepath . $(JAVADOC_4x)
 	$(JAR) cf $(BINDIR)/gmsecapi-javadoc.jar $(JAVADOC_DIR)
+	$(JAR) uf $(BINDIR)/gmsecapi.jar $(JAVADOC_DIR)

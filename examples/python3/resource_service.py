@@ -2,7 +2,7 @@
 
 
 """
- Copyright 2007-2018 United States Government as represented by the
+ Copyright 2007-2019 United States Government as represented by the
  Administrator of The National Aeronautics and Space Administration.
  No copyright is claimed in the United States under Title 17, U.S. Code.
  All Rights Reserved.
@@ -10,9 +10,9 @@
 
 
 
-""" 
+"""
  @file resource_service.py
- 
+
  This file contains an example outlining how to use the Messaging Interface
  Standardization Toolkit (MIST) namespace ConnectionManager's ResourceMessageService
  to publish GMSEC-compliant Resource (RSRC) messages to the middleware bus.
@@ -25,7 +25,9 @@
 import libgmsec_python3
 import sys
 
-RSRC_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.RESOURCE_SERVICE.RSRC"
+RSRC_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.RESOURCE-SERVICE.RSRC"
+RSRC_PUBLISH_RATE    = 5 # in seconds
+
 
 def main():
 
@@ -40,11 +42,7 @@ def main():
     # pass configuration options into objects such as Connections,
     # ConnectionManagers, Subscribe and Publish function calls, Messages,
     # etc.
-    config = libgmsec_python3.Config()
-
-    for arg in sys.argv[1:]:
-        value = arg.split('=')
-        config.add_value(value[0], value[1])
+    config = libgmsec_python3.Config(sys.argv)
 
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
@@ -70,29 +68,40 @@ def main():
 
         # Create all of the GMSEC Message header Fields which will
         # be used by all GMSEC Messages
-        headerFields = libgmsec_python3.FieldList() 
+        headerFields = libgmsec_python3.FieldList()
 
-        versionField = libgmsec_python3.F32Field("HEADER-VERSION", 2010.0)
-        missionField = libgmsec_python3.StringField("MISSION-ID", "GMSEC")
-        facilityField = libgmsec_python3.StringField("FACILITY", "GMSEC Lab")
-        componentField = libgmsec_python3.StringField("COMPONENT", "heartbeat_service")
+        version = connManager.get_specification().get_version()
 
-        headerFields.append(versionField)
+        missionField = libgmsec_python3.StringField("MISSION-ID", "MY-MISSION")
+        facilityField = libgmsec_python3.StringField("FACILITY", "MY-FACILITY")
+        componentField = libgmsec_python3.StringField("COMPONENT", "RESOURCE-SERVICE")
+        domain1Field = libgmsec_python3.StringField("DOMAIN1", "MY-DOMAIN-1")
+        domain2Field =libgmsec_python3.StringField("DOMAIN2", "MY-DOMAIN-2")
+        msgID = libgmsec_python3.StringField("MSG-ID", "MY-MSG-ID")
+
         headerFields.append(missionField)
         headerFields.append(facilityField)
         headerFields.append(componentField)
+
+        if (version == 201400):
+            headerFields.append(msgID)
+
+        elif (version >= 201800):
+            headerFields.append(domain1Field)
+            headerFields.append(domain2Field)
+
 
         # Use set_standard_fields to define a set of header fields for
         # all messages which are created or published on the
         # ConnectionManager using the following functions:
         # create_log_message, publish_log, create_heartbeat_message,
-        # start_heartbeat_service, create_resource_message, 
+        # start_heartbeat_service, create_resource_message,
         # publishResourceMessage, or start_resource_message_service
         connManager.set_standard_fields(headerFields)
 
         # Create and publish a Resource message using
         # create_resource_message() and publish()
-                
+
         # Note: This is useful for applications which may need to add
         # additional Fields to the Resource Messages which are not
         # currently added by the GMSEC API
@@ -105,10 +114,9 @@ def main():
         # parameter provided to the start_resource_message_service() function.
         # If an interval is not provided, the service will default to
         # publishing a message every 60 seconds.
-        interval_s = 30
-        libgmsec_python3.log_info("Starting the Resource Message service, a message will be published every " + str(interval_s) + " seconds")
+        libgmsec_python3.log_info("Starting the Resource Message service, a message will be published every " + str(RSRC_PUBLISH_RATE) + " seconds")
 
-        connManager.start_resource_message_service(RSRC_MESSAGE_SUBJECT, interval_s)
+        connManager.start_resource_message_service(RSRC_MESSAGE_SUBJECT, RSRC_PUBLISH_RATE)
 
         # Wait for user input to end the program
         libgmsec_python3.log_info("Publishing C2CX Resource Messages indefinitely, press <enter> to exit the program")
@@ -119,11 +127,11 @@ def main():
 
         # Cleanup
         connManager.cleanup()
-        
+
     except libgmsec_python3.GmsecError as e:
         libgmsec_python3.log_error(str(e))
         return -1
-        
+
     return 0
 
 
@@ -134,7 +142,7 @@ def initializeLogging(config):
 
     if (not logLevel):
         config.add_value("LOGLEVEL", "INFO")
-        
+
     if (not logFile):
         config.add_value("LOGFILE", "STDERR")
 
@@ -143,4 +151,4 @@ def initializeLogging(config):
 # Main entry point of script
 #
 if __name__=="__main__":
-    sys.exit(main())        
+    sys.exit(main())

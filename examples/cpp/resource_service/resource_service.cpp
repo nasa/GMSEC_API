@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -7,9 +7,9 @@
 
 
 
-/** 
+/**
  * @file resource_service.cpp
- * 
+ *
  * This file contains an example outlining how to use the Messaging Interface
  * Standardization Toolkit (MIST) namespace ConnectionManager's ResourceMessageService
  * to publish GMSEC-compliant Resource (RSRC) messages to the middleware bus.
@@ -29,7 +29,8 @@ using namespace gmsec::api;
 using namespace gmsec::api::util;
 using namespace gmsec::api::mist;
 
-const char* RSRC_MESSAGE_SUBJECT = "GMSEC.MISSION.SATELLITE.MSG.C2CX.RESOURCE_SERVICE.RSRC";
+const char* RSRC_MESSAGE_SUBJECT = "GMSEC.MY-MISSION.MY-SAT-ID.MSG.C2CX.RESOURCE-SERVICE.RSRC";
+const int   RSRC_PUBLISH_RATE    = 5;  // in seconds
 
 //o Helper functions
 void initializeLogging(Config& config);
@@ -62,21 +63,36 @@ int main(int argc, char* argv[])
 		// be used by all GMSEC Messages
 		DataList<Field*> headerFields;
 
-		F32Field    versionField("HEADER-VERSION", (GMSEC_F32) 2010.0);
-		StringField missionField("MISSION-ID", "GMSEC");
-		StringField facilityField("FACILITY", "GMSEC Lab");
-		StringField componentField("COMPONENT", "heartbeat_service");
+		int version = connManager.getSpecification().getVersion();
 
-		headerFields.push_back(&versionField);
+		StringField missionField("MISSION-ID", "MY-MISSION");
+		StringField satIDField("SAT-ID-PHYSICAL", "MY-SAT-ID");
+		StringField facilityField("FACILITY", "MY-FACILITY");
+		StringField componentField("COMPONENT", "RESOURCE-SERVICE");
+		StringField domain1Field("DOMAIN1", "MY-DOMAIN-1");
+		StringField domain2Field("DOMAIN2", "MY-DOMAIN-2");
+		StringField msgID("MSG-ID", "MY-MSG-ID");
+
 		headerFields.push_back(&missionField);
+		headerFields.push_back(&satIDField);
 		headerFields.push_back(&facilityField);
 		headerFields.push_back(&componentField);
+
+		if (version == 201400)
+		{
+			headerFields.push_back(&msgID);
+		}
+		else if (version >= 201800)
+		{
+			headerFields.push_back(&domain1Field);
+			headerFields.push_back(&domain2Field);
+		}
 
 		//o Use setStandardFields to define a set of header fields for
 		// all messages which are created or published on the
 		// ConnectionManager using the following functions:
 		// createLogMessage, publishLog, createHeartbeatMessage,
-		// startHeartbeatService, createResourceMessage, 
+		// startHeartbeatService, createResourceMessage,
 		// publishResourceMessage, or startResourceMessageService
 		connManager.setStandardFields(headerFields);
 
@@ -95,9 +111,8 @@ int main(int argc, char* argv[])
 		// parameter provided to the startResourceMessageService() function.
 		// If an interval is not provided, the service will default to
 		// publishing a message every 60 seconds.
-		size_t interval_s = 30;
-		GMSEC_INFO << "Starting the Resource Message service, a message will be published every " << interval_s << " seconds";
-		connManager.startResourceMessageService(RSRC_MESSAGE_SUBJECT, interval_s);
+		GMSEC_INFO << "Starting the Resource Message service, a message will be published every " << RSRC_PUBLISH_RATE << " seconds";
+		connManager.startResourceMessageService(RSRC_MESSAGE_SUBJECT, RSRC_PUBLISH_RATE);
 
 		//o Wait for user input to end the program
 		std::string enter;

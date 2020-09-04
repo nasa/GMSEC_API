@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,13 +17,13 @@
 
 #include "../Utility.h"
 
-#include <memory>
 #include <string>
 #include <vector>
 
-#include <time.h>
+#include <ctime>
 
 using namespace gmsec::api;
+using namespace gmsec::api::mist;
 using namespace gmsec::api::util;
 
 
@@ -39,23 +39,20 @@ public:
 	bool run();
 
 private:
-	typedef std::vector<std::string>       Subjects;
-	typedef std::vector<SubscriptionInfo*> Subscriptions;
+	typedef std::vector<std::string> Subjects;
 
 	void sendReply(const Message& request, Message& reply);
 	void sendReply(const Message& request, const std::string& subject);
 
-	Connection*   connection;
-	Subjects      subjects;
-	Subscriptions subscriptions;
+	ConnectionManager* connMgr;
+	Subjects           subjects;
 };
 
 
 GMSEC_Reply::GMSEC_Reply(const Config& c)
 	: Utility(c),
-	  connection(0),
-	  subjects(),
-	  subscriptions()
+	  connMgr(0),
+	  subjects()
 {
 	/* Initialize utility */
 	initialize();
@@ -64,30 +61,21 @@ GMSEC_Reply::GMSEC_Reply(const Config& c)
 
 GMSEC_Reply::~GMSEC_Reply()
 {
-	try
+	if (connMgr)
 	{
-		if (connection)
+		try
 		{
-			for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
-			{
-				SubscriptionInfo* info = *it;
-
-				GMSEC_INFO << "Unsubscribing from " << info->getSubject();
-
-				connection->unsubscribe(info);
-			}
-
-			connection->disconnect();
-
-			Connection::destroy(connection);
+			connMgr->cleanup();
 		}
-	}
-	catch (const Exception& e)
-	{
-		GMSEC_ERROR << e.what();
+		catch (const Exception& e)
+		{
+			GMSEC_ERROR << e.what();
+		}
+
+		delete connMgr;
 	}
 
-	Connection::shutdownAllMiddlewares();
+	ConnectionManager::shutdownAllMiddlewares();
 }
 
 
@@ -120,18 +108,18 @@ bool GMSEC_Reply::run()
 	bool success = true;
 
 	//o output GMSEC API version
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
-		//o Create the Connection
-		connection = Connection::create(getConfig());
+		//o Create the ConnectionManager
+		connMgr = new ConnectionManager(getConfig());
 
 		//o Connect
-		connection->connect();
+		connMgr->initialize();
 
 		//o output connection middleware version
-		GMSEC_INFO << connection->getLibraryVersion();
+		GMSEC_INFO << connMgr->getLibraryVersion();
 
 		//o Get info from command line
 		std::string msgFile        = get("MSG-FILE", "");
@@ -143,14 +131,11 @@ bool GMSEC_Reply::run()
 		determineSubjects(subjects);
 
 		//o Subscribe
-
 		for (size_t i = 0; i < subjects.size(); ++i)
 		{
 			GMSEC_INFO << "Subscribing to " << subjects[i].c_str();
 
-			SubscriptionInfo* info = connection->subscribe(subjects[i].c_str());
-
-			subscriptions.push_back(info);
+			(void) connMgr->subscribe(subjects[i].c_str());
 		}
 
 		bool   done = false;
@@ -169,7 +154,7 @@ bool GMSEC_Reply::run()
 			}
 
 			//o receive the next message
-			Message* message = connection->receive(msg_timeout_ms);
+			Message* message = connMgr->receive(msg_timeout_ms);
 
 			if (prog_timeout_s != GMSEC_WAIT_FOREVER)
 			{
@@ -185,6 +170,12 @@ bool GMSEC_Reply::run()
 			}
 			else
 			{
+				//o With open response, we may receive our own reply message; just ignore.
+				if (message->getKind() == Message::PUBLISH || message->getKind() == Message::REPLY)
+				{
+					continue;
+				}
+
 				done = (std::string(message->getSubject()) == "GMSEC.TERMINATE");
 
 				//o Display the XML representation of the received message
@@ -194,19 +185,8 @@ bool GMSEC_Reply::run()
 				if (message->getKind() == Message::REQUEST &&
 				    (message->getField("RESPONSE") == NULL || message->getIntegerValue("RESPONSE") == 1))
 				{
-					const char* component = 0;
-
-					//o Construct Reply message
-					try {
-						const StringField& compField = message->getStringField("COMPONENT");
-						component = compField.getValue();
-					}
-					catch (const Exception& e) {
-						GMSEC_WARNING << e.what();
-					}
-
-					std::auto_ptr<Message> reply;
-					std::string            reply_subject;
+					StdUniquePtr<Message> reply;
+					std::string           reply_subject;
 
 					if (!msgFile.empty())
 					{
@@ -230,15 +210,14 @@ bool GMSEC_Reply::run()
 					}
 					else
 					{
-						//o Set Status Code.  See API Interface Specification for available status codes.
+						//o Set Status Code. See C2MS document for available status codes.
 						int status_code = 1; // 1 = Acknowledgement
 
 						std::ostringstream tmp;
-						tmp << "GMSEC.MISSION.SAT_ID.RESP.DIR."
-					        << (component ? component : "UNKNOWN-COMPONENT") << "."
-					        << status_code;
+						tmp << message->getSubject() << "." << status_code;
 
 						reply_subject = tmp.str();
+						reply_subject.replace(reply_subject.find("REQ"), 4, "RESP.");
 					}
 
 					if (reply.get())
@@ -254,7 +233,7 @@ bool GMSEC_Reply::run()
 				}
 
 				//o Destroy request message */
-				connection->release(message);
+				connMgr->release(message);
 			}
 		}
 	}
@@ -279,7 +258,7 @@ void GMSEC_Reply::sendReply(const Message& request, Message& reply)
 	GMSEC_INFO << "Prepared Reply:\n" << reply.toXML();
 
 	//o Send Reply
-	connection->reply(request, reply);
+	connMgr->reply(request, reply);
 }
 
 
@@ -301,7 +280,7 @@ void GMSEC_Reply::sendReply(const Message& request, const std::string& subject)
 	GMSEC_INFO << "Prepared Reply:\n" << reply.toXML();
 
 	//o Send Reply
-	connection->reply(request, reply);
+	connMgr->reply(request, reply);
 }
 
 

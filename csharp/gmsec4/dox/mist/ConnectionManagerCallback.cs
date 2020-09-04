@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,6 +17,13 @@ namespace GMSEC.API {
 /// A user created class, derived from this class, can be passed into Subscribe()
 /// to have user code executed asynchronously when a message is received.
 /// </summary>
+/// <p>
+/// Note that because users are able to create their own ConnectionManagerCallback class,
+/// reentrancy is not guaranteed unless if reentrancy rules are specified.
+/// <p>
+/// In addition, if a ConnectionManagerCallback is registered to multiple Connection Managers,
+/// OnMessage() can be invoked concurrently from different threads. Use of an AutoMutex is
+/// suggested to enforce thread safety.
 ///
 /// <seealso cref="ConnectionManager.Subscribe(String, ConnectionMangerCallback)"/>
 
@@ -30,9 +37,11 @@ public class ConnectionManagerCallback : global::System.IDisposable {
   /// </summary>
   ///
   /// <remarks>
-  /// <b>DO NOT DESTROY</b> the ConnectionManager, or the Message that is passed into this method by the API.
-  /// They are owned by the API and do not need to be managed by the client program. Also, they can
-  /// not be stored by the client program beyond the scope of this callback method.
+  /// <b>DO NOT STORE or CHANGE STATE</b> of the ConnectionManager object; it should only be used within
+  /// the scope of the callback method.
+  /// 
+  /// <b>DO NOT STORE</b> the Message object for use beyond the scope of the callback. Otherwise,
+  /// make a copy of the Message object.
   /// </remarks>
   ///
   /// <param name="connMgr">ConnectionManager on which the message was received</param>

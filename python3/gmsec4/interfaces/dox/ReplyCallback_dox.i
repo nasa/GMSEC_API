@@ -3,34 +3,45 @@
 
     This class is the abstract base class for received replies from
     asynchronous request messages.
+
     A user created class, derived from this class, can be passed into
     request() to have user code executed asynchronously when a reply is
     received or when an error occurs.
-    Please note that because users are able to create their own
-    ReplyCallback class, reentrancy is not guarunteed unless if they
-    implement their own reentrancy rules.
-    Also note that because a ReplyCallback can be registered to
-    multiple connections, it can be run concurrently amongst those
-    connections. Because of this, the use of an AutoMutex is
-    suggested to enforce thread safety.
+
+    Note that because users are able to create their own ReplyCallback
+    class, reentrancy is not guaranteed unless if they implement their
+    own reentrancy rules.
+
+    In addition, if a ReplyCallback is registered to multiple Connection
+    objects, on_reply() can be invoked concurrently from different threads.
+    Use of a Mutex is suggested to enforce thread safety.
 
     Example ReplyCallback class:
 
     class ReqReplyCallback(libgmsec_python3.ReplyCallback):
+        def __init__(self):
+            libgmsec_python3.ReplyCallback.__init__(self)
+            self.mutex = libgmsec_python3.Mutex()
 
-        onReply(self, conn, request, reply):
-            print(\"Request:\\n\" + request.toXML())
-            print(\"Reply:\\n\" + reply.toXML())
+        def on_reply(self, conn, request, reply):
+            self.mutex.enter_mutex()
+            print(request.to_XML())
+            print(reply.to_XML())
+            self.mutex.leave_mutex()
 
-        onEvent(self, conn, status, event):
-            print(\"Status: \" + status.get())
-            print(\"\\nEvent: \" + str(event))
+        def on_event(self, conn, status, event):
+            self.mutex.enter_mutex()
+            print(status.get())
+            print(str(event))
+            self.mutex.leave_mutex()
 
     Example ReplyCallback registration:
 
+    cb = ReqReplyCallback()
+
     request = Message(\"GMSEC.MY.REQUEST\", Message.REQUEST)
 
-    # Add message fields
+    ...
 
     conn.request(request, timeout, cb)
 
@@ -41,30 +52,28 @@
 
 %feature("docstring") gmsec::api::ReplyCallback::onReply "
 
-    onReply(self, conn, request, reply)
+    on_reply(self, conn: Connection, request: Message, reply: Message)
 
-    This function is called by the API in response to a reply received
+    This method is called by the API in response to a reply received
     from a request, from within the request() call. A class derived
     from ReplyCallback needs to be passed into the request() call.
 
-    Please note that if a ReplyCallback is registered to multiple
-    connections, onReply() can be invoked concurrently from the
-    different connection threads.
+    Note that if a ReplyCallback is registered to multiple connections, on_reply()
+    can be invoked concurrently from the different connection threads.
 
-    Note: DO NOT DESTROY the Connection or Messages that are passed
-        into this function by the API. They are owned by the API and do
-        not need to be managed by the client program. Also, they can
-        not be stored by the client program beyond the scope of this
-        callback function. In order to store the Messages, they must
-        be copied.
+    Note: DO NOT DESTROY or CHANGE STATE of the Connection object that is passed to
+    the callback method, nor store it for use beyond the scope of the callback method.
+
+    Note: DO NOT STORE the Message objects for use beyond the scope of the callback.
+    Otherwise, make a copy of the Message object(s).
 
     Parameters
     ----------
-    conn: connection on which the message was received
-    request: the pending request message
-    reply: the received reply message
+    conn    : The Connection on which the message was received
+    request : The pending request Message
+    reply   : The received reply Message
 
     See Also
     --------
-    Connection::request()
+    Connection.request()
 ";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -122,6 +122,7 @@ GMSEC_Message CALL_TYPE deviceMessageCreateUsingData(const char* data, GMSEC_Sta
 	GMSEC_Message msg = NULL;
 	Status        result;
 
+	GMSEC_DISABLE_DEPRECATED_WARNINGS
 	try
 	{
 		msg = reinterpret_cast<GMSEC_Message>(new DeviceMessage(data));
@@ -129,6 +130,38 @@ GMSEC_Message CALL_TYPE deviceMessageCreateUsingData(const char* data, GMSEC_Sta
 	catch (Exception& e)
 	{
 		result = Status(e);
+	}
+	GMSEC_ENABLE_DEPRECATED_WARNINGS
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return msg;
+}
+
+
+GMSEC_Message CALL_TYPE deviceMessageCreateUsingSpecAndData(const GMSEC_Specification spec, const char* data, GMSEC_Status status)
+{
+	GMSEC_Message  msg = NULL;
+	Specification* s   = reinterpret_cast<Specification*>(spec);
+	Status         result;
+
+	if (!s)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "Specification handle is NULL");
+	}
+	else
+	{
+		try
+		{
+			msg = reinterpret_cast<GMSEC_Message>(new DeviceMessage(*s, data));
+		}
+		catch (Exception& e)
+		{
+			result = Status(e);
+		}
 	}
 
 	if (status)
@@ -303,7 +336,9 @@ GMSEC_Message CALL_TYPE deviceMessageConvert(const GMSEC_Message msg, GMSEC_Stat
 
 	if (tmpMsg)
 	{
+		GMSEC_DISABLE_DEPRECATED_WARNINGS
 		DeviceMessage tmpDeviceMsg = DeviceMessage::convertMessage(*tmpMsg);
+		GMSEC_ENABLE_DEPRECATED_WARNINGS
 
 		deviceMsg = reinterpret_cast<GMSEC_Message>(new DeviceMessage(tmpDeviceMsg));
 	}

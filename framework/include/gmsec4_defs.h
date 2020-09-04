@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2018 United States Government as represented by the
+ * Copyright 2007-2019 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -417,6 +417,18 @@ typedef void* GMSEC_DeviceParam;
  * @sa fieldDestroy
  */
 typedef void* GMSEC_Field;
+
+
+/**
+ * @typedef GMSEC_HeartbeatGenerator
+ *
+ * @desc Typedef for a handle to a Heartbeat Generator object.
+ *
+ * @sa heartbeatGeneratorCreate
+ * @sa heartbeatGeneratorCreateWithFields
+ * @sa heartbeatGeneratorDestroy
+ */
+typedef void* GMSEC_HeartbeatGenerator;
 
 
 /**
