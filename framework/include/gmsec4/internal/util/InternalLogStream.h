@@ -9,6 +9,10 @@
 #ifndef GMSEC_API_INTERNAL_LOG_STREAM_H
 #define GMSEC_API_INTERNAL_LOG_STREAM_H
 
+#ifdef __APPLE__
+#include <gmsec4/util/Mutex.h>
+#endif
+
 #include <gmsec4/util/wdllexp.h>
 
 #include <sstream>
@@ -34,6 +38,10 @@ public:
 	template <typename T>
 	InternalLogStream& CALL_TYPE operator<<(T& t)
 	{
+#ifdef __APPLE__
+		gmsec::api::util::AutoMutex lock(m_mutex);
+#endif
+
 		m_oss << t;
 
 		return *this;
@@ -46,6 +54,9 @@ private:
 
 	std::ostringstream  m_oss;
 	mutable std::string m_data;
+#ifdef __APPLE__
+	gmsec::api::util::Mutex m_mutex;
+#endif
 };
 
 }  // end namespace internal

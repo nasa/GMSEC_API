@@ -28,7 +28,7 @@ import gov.nasa.gsfc.gmsec.api.Status;
 
 import gov.nasa.gsfc.gmsec.api.field.Field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIConnectionManager;
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIConnectionManager;
 
 
 
@@ -78,13 +78,24 @@ public class ConnectionManager
 	 * @brief Constructor - Initializes the ConnectionManager instance without attempting a
 	 * connection to the middleware.
 	 *
+	 * @note Message validation will be disabled, unless the configuration option
+	 * GMSEC-MSG-CONTENT-VALIDATE is set to true.  If GMSEC-MSG-CONTENT-VALIDATE is set to true,
+	 * then messages will be validated against the default version of the GMSEC Interface Specification
+	 * Document (ISD).  The version of the ISD can be changed by specifying the configuration option
+	 * GMSEC-SPECIFICATION-VERSION to a valid value (e.g. 201400).
+	 *
 	 * @param cfg - The config object used to construct the underlying GMSEC connection object
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given Config object is null.
 	 */
-	public ConnectionManager(Config cfg) throws IllegalArgumentException
+	public ConnectionManager(Config cfg) throws IllegalArgumentException, GMSEC_Exception
 	{
-		this(cfg, true, gmsecMIST.GMSEC_ISD_CURRENT);
+		if (cfg == null)
+		{
+			throw new IllegalArgumentException("Config is null");
+		}
+
+		m_jniConnMgr = new JNIConnectionManager(this, cfg);
 	}
 
 
@@ -94,15 +105,23 @@ public class ConnectionManager
 	 * @brief Constructor - Initializes the ConnectionManager instance without attempting a
 	 * connection to the middleware.
 	 *
+	 * @note If message validation is enabled, then messages will be validated against the default version
+	 * of the GMSEC Interface Specification Document (ISD).  The version of the ISD can be changed by
+	 * specifying the configuration option GMSEC-SPECIFICATION-VERSION to a valid value (e.g. 201400).
+	 *
 	 * @param cfg - The config object used to construct the underlying GMSEC connection object
 	 * @param validate - flag to indicate whether the ConnectionManager should validate messages
-	 * produced (default is true)
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given Config object is null.
 	 */
-	public ConnectionManager(Config cfg, boolean validate) throws IllegalArgumentException
+	public ConnectionManager(Config cfg, boolean validate) throws IllegalArgumentException, GMSEC_Exception
 	{
-		this(cfg, validate, gmsecMIST.GMSEC_ISD_CURRENT);
+		if (cfg == null)
+		{
+			throw new IllegalArgumentException("Config is null");
+		}
+
+		m_jniConnMgr = new JNIConnectionManager(this, cfg, validate);
 	}
 
 
@@ -114,13 +133,12 @@ public class ConnectionManager
 	 *
 	 * @param cfg - The config object used to construct the underlying GMSEC connection object
 	 * @param validate - flag to indicate whether the ConnectionManager should validate messages
-	 * produced (default is true)
 	 * @param version - the version of the GMSEC message specification to be used in validating
 	 * messages (e.g. gmsecMIST.GMSEC_ISD_CURRENT)
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given Config object is null.
 	 */
-	public ConnectionManager(Config cfg, boolean validate, int version) throws IllegalArgumentException
+	public ConnectionManager(Config cfg, boolean validate, int version) throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (cfg == null)
 		{
@@ -167,9 +185,20 @@ public class ConnectionManager
 	 * @desc getLibraryVersion - This function returns the library version,
 	 * returning an error status if this operation is not successful. 
 	 */
-	public String getLibraryVersion()
+	public String getLibraryVersion() throws GMSEC_Exception
 	{
 		return m_jniConnMgr.getLibraryVersion();
+	}
+
+
+	/**
+	 * @fn Specification getSpecification()
+	 *
+	 * @desc Returns the Specification object associated with the Connection Manager.
+	 */
+	public Specification getSpecification() throws GMSEC_Exception
+	{
+		return m_jniConnMgr.getSpecification();
 	}
 
 
@@ -185,7 +214,7 @@ public class ConnectionManager
 	 * @param standardFields - The array of fields to be copied to the internal set of fields to
 	 * be appended to all messages.
 	 */
-	public void setStandardFields(java.util.List<Field> standardFields)
+	public void setStandardFields(java.util.List<Field> standardFields) throws GMSEC_Exception
 	{
 		if (standardFields != null && standardFields.size() > 0)
 		{
@@ -225,9 +254,10 @@ public class ConnectionManager
 	 * @param cb - object derived from EventCallback to register for this error event
 	 *
 	 * @throws An IllegalArgumentException is thrown if the given callback object is null.
+	 * @throws A GMSEC_Exception if the Connection Manager has not been initialized.
 	 */
 	public void registerEventCallback(Connection.ConnectionEvent event, ConnectionManagerEventCallback cb)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (cb == null)
 		{
@@ -252,7 +282,7 @@ public class ConnectionManager
 	 * @sa unsubscribe(SubscriptionInfo)
 	 */
 	public SubscriptionInfo subscribe(String subject)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -283,7 +313,7 @@ public class ConnectionManager
 	 * @sa unsubscribe(SubscriptionInfo)
 	 */
 	public SubscriptionInfo subscribe(String subject, ConnectionManagerCallback cb)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -316,7 +346,7 @@ public class ConnectionManager
 	 * @sa unsubscribe(SubscriptionInfo)
 	 */
 	public SubscriptionInfo subscribe(String subject, Config config)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -354,7 +384,7 @@ public class ConnectionManager
 	 * @sa unsubscribe(SubscriptionInfo)
 	 */
 	public SubscriptionInfo subscribe(String subject, Config config, ConnectionManagerCallback cb)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -541,7 +571,7 @@ public class ConnectionManager
 	 * @sa void request(Message request, int timeout, ConnectionManagerReplyCallback cb, int republish_ms)
 	 */
 	public void cancelRequest(ConnectionManagerReplyCallback cb)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (cb == null)
 		{
@@ -675,7 +705,7 @@ public class ConnectionManager
 	 * @sa ConnectionManager::subscribe() @n
 	 *     ConnectionManager::stopAutoDispatch()
 	 */
-	public boolean startAutoDispatch()
+	public boolean startAutoDispatch() throws GMSEC_Exception
 	{
 		return m_jniConnMgr.startAutoDispatch();
 	}
@@ -692,7 +722,7 @@ public class ConnectionManager
 	 *
 	 * @sa ConnectionManager::startAutoDispatch()
 	 */
-	public boolean stopAutoDispatch()
+	public boolean stopAutoDispatch() throws GMSEC_Exception
 	{
 		return m_jniConnMgr.stopAutoDispatch(true);
 	}
@@ -708,7 +738,7 @@ public class ConnectionManager
 	 *
 	 * @sa ConnectionManager::startAutoDispatch()
 	 */
-	public boolean stopAutoDispatch(boolean waitForCompletion)
+	public boolean stopAutoDispatch(boolean waitForCompletion) throws GMSEC_Exception
 	{
 		return m_jniConnMgr.stopAutoDispatch(waitForCompletion);
 	}
@@ -725,7 +755,7 @@ public class ConnectionManager
 	 *
 	 * @sa removeExcludedSubject()
 	 */
-	public void excludeSubject(String subject) throws IllegalArgumentException
+	public void excludeSubject(String subject) throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -748,7 +778,7 @@ public class ConnectionManager
 	 *
 	 * @sa excludeSubject()
 	 */
-	public void removeExcludedSubject(String subject) throws IllegalArgumentException
+	public void removeExcludedSubject(String subject) throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -782,7 +812,7 @@ public class ConnectionManager
 	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty-string.
 	 */
 	public Message createHeartbeatMessage(String subject, java.util.List<Field> heartbeatFields)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -810,9 +840,10 @@ public class ConnectionManager
 	 * @param heartbeatFields - Set of fields to be added to the published heartbeat messages
 	 *
 	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty-string.
+	 * @throws A GMSEC_Exception may be thrown if the Heartbeat Service is already running.
 	 */
 	public void startHeartbeatService(String subject, java.util.List<Field> heartbeatFields)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -829,7 +860,7 @@ public class ConnectionManager
 	 * @desc This method terminates opertaion of the heartbeat service and cleans up related resources.
 	 * It will be called by the global connection manager "cleanup" if not done manually by the user.
 	 */
-	public void stopHeartbeatService()
+	public void stopHeartbeatService() throws GMSEC_Exception
 	{
 		m_jniConnMgr.stopHeartbeatService();
 	}
@@ -963,7 +994,7 @@ public class ConnectionManager
 	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty-string.
 	 */
 	public Message createLogMessage(String subject, java.util.List<Field> logFields)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -986,7 +1017,7 @@ public class ConnectionManager
 	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty-string.
 	 */
 	public void setLoggingDefaults(String subject, java.util.List<Field> logFields)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -1259,7 +1290,7 @@ public class ConnectionManager
 	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty-string.
 	 */
 	public Message createResourceMessage(String subject, long sampleInterval, long averageInterval)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -1284,7 +1315,7 @@ public class ConnectionManager
 	 * @throws An IllegalArgumentException is thrown if the subject string is null, or contains an empty-string.
 	 */
 	public void startResourceMessageService(String subject, long interval, long sampleInterval, long averageInterval)
-		throws IllegalArgumentException
+		throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (subject == null || subject.isEmpty())
 		{

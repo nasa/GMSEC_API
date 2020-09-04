@@ -10,9 +10,12 @@
 //
 
 #include "gmsecJNI.h"
+#include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 
 #include <gmsec4/Fields.h>
+
+#include <sstream>
 
 
 using namespace gmsec::api;
@@ -22,32 +25,6 @@ using namespace gmsec::api::jni;
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-static int fieldTypeToJava(JNIEnv* jenv, Field::FieldType type)
-{
-	switch (type)
-	{
-	case Field::BIN_TYPE:    return 0;
-	case Field::BOOL_TYPE:   return 1;
-	case Field::CHAR_TYPE:   return 2;
-	case Field::I8_TYPE:     return 3;
-	case Field::I16_TYPE:    return 4;
-	case Field::I32_TYPE:    return 5;
-	case Field::I64_TYPE:    return 6;
-	case Field::F32_TYPE:    return 7;
-	case Field::F64_TYPE:    return 8;
-	case Field::STRING_TYPE: return 9;
-	case Field::U8_TYPE:     return 10;
-	case Field::U16_TYPE:    return 11;
-	case Field::U32_TYPE:    return 12;
-	case Field::U64_TYPE:    return 13;
-	}
-
-	ThrowGmsecException(jenv, "Unknown field type");
-
-	// We will never reach here, but the compiler will be happy nonetheless.
-	return -1;
-}
 
 
 JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1GetType
@@ -103,7 +80,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1GetNa
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1ToXML
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
-	jstring result;
+	jstring result = 0;
 
 	try
 	{
@@ -127,7 +104,7 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1ToXML
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1ToJSON
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
-	jstring result;
+	jstring result = 0;
 
 	try
 	{
@@ -140,6 +117,115 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1ToJSO
 		else
 		{
 			result = jenv->NewStringUTF(field->toJSON());
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1GetIntegerValue
+  (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
+{
+	jlong result = 0;
+
+	try
+	{
+		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
+		if (!field)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
+		}
+		else
+		{
+			result = field->getIntegerValue();
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1GetUnsignedIntegerValue
+  (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
+{
+	jobject result = 0;
+
+	try
+	{
+		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
+		if (!field)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
+		}
+		else
+		{
+			GMSEC_U64 value = field->getUnsignedIntegerValue();
+
+			std::ostringstream oss;
+			oss << value;
+
+			jstring valueAsString = jenv->NewStringUTF(oss.str().c_str());
+
+			result = jenv->NewObject(Cache::getCache().classU64, Cache::getCache().methodU64Init, valueAsString);
+
+			if (!gmsec::api::jni::jvmOk(jenv, "Field::getUnsignedIntegerValue: new U64") || !result)
+			{
+				GMSEC_WARNING << "Unable to create U64 object";
+				result = 0;
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jdouble JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1GetDoubleValue
+  (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
+{
+	jdouble result = 0;
+
+	try
+	{
+		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
+		if (!field)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
+		}
+		else
+		{
+			result = field->getDoubleValue();
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Field_1GetStringValue
+  (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
+{
+	jstring result = 0;
+
+	try
+	{
+		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
+		if (!field)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
+		}
+		else
+		{
+			result = jenv->NewStringUTF(field->getStringValue());
 		}
 	}
 	JNI_CATCH

@@ -6,13 +6,17 @@
  */
 
 
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 
 import gov.nasa.gsfc.gmsec.api.field.Field;
 
 import gov.nasa.gsfc.gmsec.api.mist.MnemonicSample;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
+import gov.nasa.gsfc.gmsec.api.jni.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.JNIFieldConverter;
 
 
 public class JNIMnemonic
@@ -21,7 +25,7 @@ public class JNIMnemonic
 	protected boolean swigCMemOwn;
 
 
-	protected JNIMnemonic(long cPtr, boolean cMemoryOwn)
+	public JNIMnemonic(long cPtr, boolean cMemoryOwn)
 	{
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;
@@ -51,7 +55,7 @@ public class JNIMnemonic
 	}
 
 
-	protected static long getCPtr(JNIMnemonic obj)
+	public static long getCPtr(JNIMnemonic obj)
 	{
 		return (obj == null) ? 0 : obj.swigCPtr;
 	}

@@ -43,6 +43,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <queue>
 
 
 namespace gmsec
@@ -66,6 +67,7 @@ class AsyncPublisher;
 class CallbackLookup;
 class ConnectionInterface;
 class ExclusionFilter;
+class MessageAggregationToolkit;
 class RequestShared;
 class SubscriptionDetails;
 
@@ -236,7 +238,7 @@ public:
 	void replyCallback(ReplyCallback* rcb, const Message& request, const Message& reply);
 
 
-	Status issueRequestToMW(const Message& request, std::string& id);
+	void issueRequestToMW(const Message& request, std::string& id);
 
 
 	static void CALL_TYPE updateReplySubject(Message*& reply, bool warn = false);
@@ -245,7 +247,7 @@ public:
 	const TrackingDetails& getTracking();
 
 
-	Status autoDispatch();
+	void autoDispatch();
 
 
 	void insertTrackingFields(Message& msg);
@@ -255,11 +257,11 @@ public:
 
 
 private:
-	Status getNextMsg(Message*& msg, GMSEC_I32 timeout);
+	void getNextMsg(Message*& msg, GMSEC_I32 timeout);
 	void dispatchMsgToCallbacks(const Message& msg, std::list<Callback*>& callbacks);
 
 	bool checkExistingSubscription(const char* subject, Callback* cb = NULL) const;
-	Status unsubscribeAux(SubscriptionInfo*& info);
+	void unsubscribeAux(SubscriptionInfo*& info);
 
 	void initializeTracking();
 	void initializeRequest();
@@ -272,6 +274,9 @@ private:
 
 	void startPerfLoggerThread();
 	void stopPerfLoggerThread();
+
+	void startMsgAggregationToolkitThread();
+	void stopMsgAggregationToolkitThread();
 
 	gmsec::api::util::TicketMutex& getReadMutex();
 	gmsec::api::util::TicketMutex& getWriteMutex();
@@ -297,6 +302,9 @@ private:
 	typedef gmsec::api::util::BoundedQueue<MessagePublishTask> AsynchronousQueue;
 	typedef std::auto_ptr<gmsec::api::util::StdThread>         AsynchronousThread;
 	typedef gmsec::api::util::StdSharedPtr<AsyncPublisher>     AsynchronousPubService;
+
+	typedef std::auto_ptr<gmsec::api::util::StdThread>                MsgAggregationToolkitThread;
+	typedef gmsec::api::util::StdSharedPtr<MessageAggregationToolkit> MsgAggregationToolkitShared;
 
 
 	// Member data
@@ -341,6 +349,9 @@ private:
 	AsynchronousQueue*                      m_asyncQueue;
 	AsynchronousThread                      m_asyncPubThread;
 	AsynchronousPubService                  m_asyncPubService;
+
+	MsgAggregationToolkitThread             m_msgAggregationToolkitThread;
+	MsgAggregationToolkitShared             m_msgAggregationToolkitShared;
 
 	// Will be used for support of legacy Callbacks
 	CallbackAdapter*                        m_callbackAdapter;

@@ -45,6 +45,11 @@ public:
 	virtual const char* CALL_TYPE toXML() const = 0;
 	virtual const char* CALL_TYPE toJSON() const = 0;
 
+	GMSEC_I64 getIntegerValue() const;
+	GMSEC_U64 getUnsignedIntegerValue() const;
+	GMSEC_F64 getDoubleValue() const;
+	const char* getStringValue() const;
+
 	// For internal use only!
 	//
 	static Field* CALL_TYPE fromXML(tinyxml2::XMLElement* element);
@@ -96,9 +101,11 @@ private:
 		return result;
 	}
 
-	std::string      m_name;
-	Field::FieldType m_type;
-	bool             m_header;
+	std::string         m_name;
+	Field::FieldType    m_type;
+	bool                m_header;
+
+	mutable std::string m_string;
 };
 
 } //namespace internal

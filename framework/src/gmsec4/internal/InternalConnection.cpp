@@ -24,6 +24,7 @@
 #include <gmsec4/internal/ExclusionFilter.h>
 #include <gmsec4/internal/InternalAutoDispatcher.h>
 #include <gmsec4/internal/InternalStatus.h>
+#include <gmsec4/internal/MessageAggregationToolkit.h>
 #include <gmsec4/internal/MessageBuddy.h>
 #include <gmsec4/internal/Middleware.h>
 #include <gmsec4/internal/RequestThread.h>
@@ -213,6 +214,15 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	}
 
 
+	m_msgAggregationToolkitShared.reset(new MessageAggregationToolkit(this));
+
+	// Check if this Connection object will perform Message aggregation
+	if (config.getBooleanValue(GMSEC_USE_MSG_BINS, false))
+	{
+		startMsgAggregationToolkitThread();
+	}
+
+
 	// Instantiate C-binding callback adapter factory.
 	m_callbackAdapter = new CallbackAdapter();
 
@@ -261,20 +271,15 @@ void InternalConnection::connect()
 		throw Exception(CONNECTION_ERROR, CONNECTION_CONNECTED, "A connection has already been established!");
 	}
 
-	Status status = m_connIf->mwConnect();
-
-	if (status.isError())
-	{
-		throw Exception(status);
-	}
+	m_connIf->mwConnect();
 
 	m_state = Connection::CONNECTED;
 
-	status = getPolicy().authenticate(*m_parent);
+	Status status = getPolicy().authenticate(*m_parent);
 
 	if (status.isError())
 	{
-		(void) m_connIf->mwDisconnect();
+		m_connIf->mwDisconnect();
 		throw Exception(status);
 	}
 
@@ -329,6 +334,8 @@ void InternalConnection::disconnect()
 				delete mpt.config;
 			}
 		}
+
+		stopMsgAggregationToolkitThread();
 
 		(void) m_connIf->mwDisconnect();
 
@@ -416,12 +423,7 @@ SubscriptionInfo* InternalConnection::subscribe(const char* subject, const Confi
 		if (checkExistingSubscription(subject, cb))
 		{
 			// New subscription
-			Status status = m_connIf->mwSubscribe(subject, config);
-
-			if (status.isError())
-			{
-				throw Exception(status);
-			}
+			m_connIf->mwSubscribe(subject, config);
 		}
 	}
 	catch (Exception& e)
@@ -503,18 +505,19 @@ void InternalConnection::unsubscribe(SubscriptionInfo*& info)
 	}
 	m_subscriptions.erase(it);
 
-	Status status = unsubscribeAux(info);
+	try
+	{
+		unsubscribeAux(info);
 
-	delete info;
-	info = 0;
-
-	if (status.isError())
+		delete info;
+		info = 0;
+	}
+	catch (const Exception& e)
 	{
 #ifdef GMSEC_USING_VS2008
 		holdRead.leave();
 #endif
-
-		throw Exception(status);
+		throw e;
 	}
 }
 
@@ -565,36 +568,47 @@ void InternalConnection::publish(const Message& msg, const Config& config)
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Message has invalid subject.");
 	}
 
-	Status status;
-
 	insertTrackingFields(const_cast<Message&>(msg));
 
-	if (m_useGlobalAsyncPublish || config.getBooleanValue(GMSEC_ASYNC_PUBLISH, false))
+	bool msgWasAggregated = false;
+
+	if (m_msgAggregationToolkitThread.get())
 	{
-		if (!m_asyncPubService.get())
+		// Check if an error has previously occurred with an attempt to publish an aggregated message.
+		Status result = m_msgAggregationToolkitShared->getPublishStatus();
+
+		if (result.isError())
 		{
-			m_asyncPubService.reset(new AsyncPublisher(m_connIf, m_asyncQueue));
-			m_asyncPubThread.reset(new StdThread(&AsyncPublisher::start, m_asyncPubService));
-			m_asyncPubThread->start();
+			throw Exception(result);
 		}
 
-		MessagePublishTask mpt;
-		mpt.msg    = new Message(msg);
-		mpt.config = new Config(config);
-
-		m_asyncQueue->put(mpt);
+		msgWasAggregated = m_msgAggregationToolkitShared->addMessage(msg, config);
 	}
-	else
+
+	if (!msgWasAggregated)
 	{
-		status = m_connIf->mwPublish(msg, config);
+		if (m_useGlobalAsyncPublish || config.getBooleanValue(GMSEC_ASYNC_PUBLISH, false))
+		{
+			if (!m_asyncPubService.get())
+			{
+				m_asyncPubService.reset(new AsyncPublisher(m_connIf, m_asyncQueue));
+				m_asyncPubThread.reset(new StdThread(&AsyncPublisher::start, m_asyncPubService));
+				m_asyncPubThread->start();
+			}
+
+			MessagePublishTask mpt;
+			mpt.msg    = new Message(msg);
+			mpt.config = new Config(config);
+
+			m_asyncQueue->put(mpt);
+		}
+		else
+		{
+			m_connIf->mwPublish(msg, config);
+		}
 	}
 
 	removeTrackingFields(const_cast<Message&>(msg));
-
-	if (status.isError())
-	{
-		throw Exception(status);
-	}
 }
 
 
@@ -834,8 +848,6 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 	bool noSubjectMapping = false;
 	meta.getBoolean(OPT_REQ_RESP, noSubjectMapping, &noSubjectMapping);
 
-	Status status;
-
 	insertTrackingFields(const_cast<Message&>(reply));
 
 	if (noSubjectMapping)
@@ -844,14 +856,14 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 		// And we publish the reply message instead of using the traditional
 		// middleware reply method.
 		Config config = Config();
-		status = m_connIf->mwPublish(reply, config);
+		m_connIf->mwPublish(reply, config);
 	}
 	else
 	{
 		// Add the reply subject as a field of the message being sent.
 		MessageBuddy::getInternal(reply).addField(REPLY_SUBJECT_FIELD, reply.getSubject());
 
-		status = m_connIf->mwReply(request, reply);
+		m_connIf->mwReply(request, reply);
 
 		MessageBuddy::getInternal(reply).clearField(REPLY_SUBJECT_FIELD);
 	}
@@ -859,11 +871,6 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 	MessageBuddy::getInternal(reply).clearField(REPLY_UNIQUE_ID_FIELD);
 
 	removeTrackingFields(const_cast<Message&>(reply));
-
-	if (status.isError())
-	{
-		throw Exception(status);
-	}
 }
 
 
@@ -884,12 +891,7 @@ Message* InternalConnection::receive(GMSEC_I32 timeout)
 
 	Message* msg = 0;
 
-	Status status = getNextMsg(msg, timeout);
-
-	if (status.isError())
-	{
-		throw Exception(status);
-	}
+	getNextMsg(msg, timeout);
 
 	return msg;
 }
@@ -1163,12 +1165,13 @@ void InternalConnection::replyCallback(ReplyCallback* rcb, const Message& reques
 }
 
 
-Status InternalConnection::issueRequestToMW(const Message& request, std::string& id)
+void InternalConnection::issueRequestToMW(const Message& request, std::string& id)
 {
 	Message requestCopy(request);
+
 	insertTrackingFields(requestCopy);
 
-	return m_connIf->mwRequest(requestCopy, id);
+	m_connIf->mwRequest(requestCopy, id);
 }
 
 
@@ -1221,15 +1224,11 @@ const TrackingDetails& InternalConnection::getTracking()
 }
 
 
-Status InternalConnection::autoDispatch()
+void InternalConnection::autoDispatch()
 {
-	Status status;
-
 	if (!m_autoDispatcher.isRunning())
 	{
-		status.set(OTHER_ERROR, OTHER_ERROR_CODE, "Auto-dispatcher is not running");
-		GMSEC_WARNING << status.get();
-		return status;
+		throw Exception(OTHER_ERROR, OTHER_ERROR_CODE, "Auto-dispatcher is not running");
 	}
 
 	// lock the InternalConnection
@@ -1239,9 +1238,10 @@ Status InternalConnection::autoDispatch()
 
 	// Get the next message
 	Message* msg = 0;
-	status = getNextMsg(msg, AUTO_DISPATCH_ms);
 
-	if (!status.isError() && msg)
+	getNextMsg(msg, AUTO_DISPATCH_ms);
+
+	if (msg)
 	{
 		std::list<Callback*> callbacks;
 
@@ -1251,21 +1251,16 @@ Status InternalConnection::autoDispatch()
 
 		delete msg;
 	}
-
-	return status;
 }
 
 
-Status InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
+void InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
 {
-    Status result;
-
-    msg = NULL;
+	msg = NULL;
 
 	if (m_state != Connection::CONNECTED)
 	{
-		result.set(CONNECTION_ERROR, INVALID_CONNECTION, "Connection has not been established");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_CONNECTION, "Connection has not been established");
 	}
 
 	if (timeout < 0 && timeout != GMSEC_WAIT_FOREVER)
@@ -1278,13 +1273,13 @@ Status InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
 
 	while (!done)
 	{
-		result = m_connIf->mwReceive(msg, timeout);
-
-		if (result.isError())
+		if (m_msgAggregationToolkitShared->hasNextMsg())
 		{
-			delete msg;
-			msg = NULL;
-			return result;
+			msg = m_msgAggregationToolkitShared->nextMsg();
+		}
+		else
+		{
+			m_connIf->mwReceive(msg, timeout);
 		}
 
 		if (msg != NULL && m_exclusionFilter->checkForExclusion(msg))
@@ -1318,6 +1313,17 @@ Status InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
 		}
 		else
 		{
+			if (msg != NULL && m_msgAggregationToolkitShared->isAggregatedMsg(msg))
+			{
+				m_msgAggregationToolkitShared->processAggregatedMsg(msg);
+
+				// If there are messages (and there should be), always return the first one.
+				if (m_msgAggregationToolkitShared->hasNextMsg())
+				{
+					msg = m_msgAggregationToolkitShared->nextMsg();
+				}
+			}
+
 			done = true;
 		}
 	}
@@ -1331,8 +1337,6 @@ Status InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
 			m_perfLoggerShared->dispatchLog(msg->getSubject(), pubTime->getValue());
 		}
 	}
-
-	return result;
 }
 
 
@@ -1374,16 +1378,13 @@ bool InternalConnection::checkExistingSubscription(const char* subject, Callback
 }
 
 
-Status InternalConnection::unsubscribeAux(SubscriptionInfo*& info)
+void InternalConnection::unsubscribeAux(SubscriptionInfo*& info)
 {
-	Status result;
-
 	Subscriptions::iterator it = m_subscriptionRegistry.find(info->getSubject());
 
 	if (it == m_subscriptionRegistry.end())
 	{
-		result.set(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject pattern");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject pattern");
 	}
 
 	if (info->getCallback() == NULL)
@@ -1412,26 +1413,21 @@ Status InternalConnection::unsubscribeAux(SubscriptionInfo*& info)
 	}
 	else
 	{
-		result = m_callbackLookup->removeCallback(info->getSubject(), info->getCallback());
+		m_callbackLookup->removeCallback(info->getSubject(), info->getCallback());
 
-		if (!result.isError())
+		it->second->removeDetails(info->getCallback());
+
+		// if we have no remaining subscriptions, then
+		// notify middleware wrapper.
+		if (it->second->numDetailsRegistered() == 0)
 		{
-			it->second->removeDetails(info->getCallback());
+			m_connIf->mwUnsubscribe(info->getSubject());
 
-			// if we have no remaining subscriptions, then
-			// notify middleware wrapper.
-			if (it->second->numDetailsRegistered() == 0)
-			{
-				m_connIf->mwUnsubscribe(info->getSubject());
+			delete it->second;
 
-				delete it->second;
-
-				m_subscriptionRegistry.erase(it);
-			}
+			m_subscriptionRegistry.erase(it);
 		}
 	}
-
-	return result;
 }
 
 
@@ -1554,6 +1550,8 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	{
 		return;
 	}
+
+	AutoTicket hold(getWriteMutex());
 
 	++m_messageCounter;
 
@@ -1730,6 +1728,46 @@ void InternalConnection::stopPerfLoggerThread()
 
 		m_perfLoggerShared->shutdown();
 		m_perfLoggerShared.reset();
+	}
+}
+
+
+void InternalConnection::startMsgAggregationToolkitThread()
+{
+	if (!m_msgAggregationToolkitThread.get())
+	{
+		m_msgAggregationToolkitShared->configure(m_config);
+
+		m_msgAggregationToolkitThread.reset(new StdThread(&MessageAggregationToolkit::runThread, m_msgAggregationToolkitShared));
+
+		GMSEC_DEBUG << "[" << this << "] is starting the Message Aggregation Toolkit Thread";
+
+		const int timeout_ms = 10000;
+		Condition& condition = m_msgAggregationToolkitShared->getCondition();
+
+		AutoMutex hold(condition.getMutex());
+
+		m_msgAggregationToolkitThread->start();
+
+		int reason = condition.wait(timeout_ms);
+
+		if (reason != MessageAggregationToolkit::MANAGED)
+		{
+			GMSEC_WARNING << "[" << this << "] MsgAggregationToolkitThread is slow starting";
+		}
+	}
+}
+
+
+void InternalConnection::stopMsgAggregationToolkitThread()
+{
+	if (m_msgAggregationToolkitThread.get())
+	{
+		GMSEC_DEBUG << "[" << this << "] is stopping the Message Aggregation Toolkit Thread";
+
+		m_msgAggregationToolkitShared->shutdown();
+
+		m_msgAggregationToolkitShared.reset();
 	}
 }
 

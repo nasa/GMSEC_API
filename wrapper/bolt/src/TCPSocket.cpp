@@ -285,7 +285,7 @@ Result TCPSocket::connect (const char *host, int port)
 		}
 		else
 		{
-			result.set(ERR_CONNECT, "nothing ready (timeout?)");
+			result.set(ERR_CONNECT, "Unable to connect");
 			goto cleanup;
 		}
 

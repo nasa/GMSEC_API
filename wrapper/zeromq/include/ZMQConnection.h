@@ -138,24 +138,24 @@ private:
 
 
 	/**
-	 * @fn CALL_TYPE mwPublishAux(const gmsec::api::Message& message, const gmsec::api::Config& config, void* socket)
+	 * @fn mwPublishAux(const gmsec::api::Message& message, const gmsec::api::Config& config, void* socket)
 	 * @brief Actual implementation of mwPublish -- Used by mwPublish and mwReply (open-resp).
 	 */
-	gmsec::api::Status mwPublishAux(const gmsec::api::Message& message, const gmsec::api::Config& config, void* socket);
+	void mwPublishAux(const gmsec::api::Message& message, const gmsec::api::Config& config, void* socket);
 
 
 	/**
-	 * @fn CALL_TYPE storeProperties(const gmsec::api::internal::ValueMap& meta, gmsec::api::util::DataBuffer& out)
+	 * @fn storeProperties(const gmsec::api::internal::ValueMap& meta, gmsec::api::util::DataBuffer& out)
 	 * @brief Encode the meta data associated with the message
 	 */
 	gmsec::api::Status storeProperties(const gmsec::api::internal::ValueMap& meta, gmsec::api::util::DataBuffer& out);
 
 
 	/**
-	 * @fn Status findLength(const gmsec::api::internal::ValueMap& meta, size_t& length)
+	 * @fn findLength(const gmsec::api::internal::ValueMap& meta, size_t& length)
 	 * @brief Determine the size of the meta blob
 	 */
-	gmsec::api::Status findLength(const gmsec::api::internal::ValueMap& meta, size_t& length);
+	void findLength(const gmsec::api::internal::ValueMap& meta, size_t& length);
 
 
 	/**
@@ -166,38 +166,38 @@ private:
 
 
 	/**
-	 * @fn CALL_TYPE parseProperties(gmsec::api::internal::ValueMap& meta, const gmsec::api::util::DataBuffer& out, gmsec::api::Message& message)
+	 * @fn parseProperties(gmsec::api::internal::ValueMap& meta, const gmsec::api::util::DataBuffer& out, gmsec::api::Message& message)
 	 * @brief Decode the meta data associated with the message
 	 */
 	gmsec::api::Status parseProperties(gmsec::api::internal::ValueMap& meta, const gmsec::api::util::DataBuffer& out, gmsec::api::Message& message);
 
 
 	/**
-	 * @fn CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout)
+	 * @fn mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout)
 	 * @brief Actual implementation of mwGetNextMsg.
 	 */
-	gmsec::api::Status mwReceiveAux(gmsec::api::Message*& msg, GMSEC_I32 timeout);
+	void mwReceiveAux(gmsec::api::Message*& msg, GMSEC_I32 timeout);
 
 
 	/**
-	 * @fn CALL_TYPE setupSocket(void* socket, int type, const std::string& providedEndpoint, bool replyListener = false)
+	 * @fn setupSocket(void* socket, int type, const std::string& providedEndpoint, bool replyListener = false)
 	 * @brief Helper function to construct and initialize ZeroMQ Socket objects
 	 */
-	gmsec::api::Status setupSocket(void** socket, int type, const std::string& providedEndpoint, bool replyListener = false);
+	void setupSocket(void** socket, int type, const std::string& providedEndpoint, bool replyListener = false);
 
 
 	/**
-	 * @fn CALL_TYPE bindSocket(void* socket, const std::string& endpoint)
+	 * @fn bindSocket(void* socket, const std::string& endpoint)
 	 * @brief Helper function to bind a ZeroMQ socket to an endpoint and handle error checking 
 	 */
-	gmsec::api::Status bindSocket(void** socket, const std::string& endpoint);
+	void bindSocket(void** socket, const std::string& endpoint);
 
 
 	/**
-	 * @fn CALL_TYPE connectSocket(void* socket, const std::string& endpoint)
+	 * @fn connectSocket(void* socket, const std::string& endpoint)
 	 * @brief Helper function to connect a ZeroMQ socket to an endpoint and handle error checking 
 	 */
-	gmsec::api::Status connectSocket(void** socket, const std::string& endpoint);
+	void connectSocket(void** socket, const std::string& endpoint);
 
 
 	/**
@@ -226,17 +226,17 @@ private:
 
 
 	/**
-	 * @fn enqueueResult(const gmsec::api::Status& status, gmsec::api::Message* message)
+	 * @fn enqueueResult(const gmsec::api::Status& status, gmsec::api::Message* message = NULL)
 	 * @brief Helper function to add a GMSEC Message to the message queue
 	 */
-	void enqueueResult(const gmsec::api::Status& status, gmsec::api::Message* message);
+	void enqueueResult(const gmsec::api::Status& status, gmsec::api::Message* message = NULL);
 
 
 	/**
 	 * @fn initReplyListener()
 	 * @brief Helper function to set up the ZeroMQ socket and MessageListener to listen for replies
 	 */
-	gmsec::api::Status initReplyListener();
+	void initReplyListener();
 
 
 	/**
@@ -247,10 +247,10 @@ private:
 
 
 	/**
-	 * @fn zmqErrorToStatus(const std::string& errorMsg, const int& errnoCode)
+	 * @fn zmqErrorToException(const std::string& errorMsg, const int errnoCode)
 	 * @brief Helper function to package ZeroMQ errno codes into a GMSEC Status object
 	 */
-	gmsec::api::Status zmqErrorToStatus(const std::string& errorMsg, const int& errnoCode);
+	void zmqErrorToException(const std::string& errorMsg, const int errnoCode);
 
 
 	/**
@@ -298,52 +298,52 @@ public:
 	 * @brief This function does nothing for ZeroMQ.
 	 * @see gmsec::Connection::Connect
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwConnect();
+	virtual void CALL_TYPE mwConnect();
 
 
 	/**
 	 * @brief Disconnect from the middleware server.
 	 * @see gmsec::Connection::Disconnect
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwDisconnect();
+	virtual void CALL_TYPE mwDisconnect();
 
 
 	/**
 	 * @brief Subscribe to @p subject (which possibly contains wildcards)
 	 * using the configuration supplied in the config object.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
 
 
 	/**
 	 * @brief Unsubscribe from @p subject (which possibly contains wildcards).
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwUnsubscribe(const char* subject);
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject);
 
 
 
 	/**
 	 * @brief Publish message @p msg using @p configuration.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
 
 
 	/**
 	 * @brief Send request message @p request filling in and returning its reply id.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string& id);
+	virtual void CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string& id);
 
 
 	/**
 	 * @brief Send @p reply in response to a @p request.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
+	virtual void CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
 
 
 	/**
 	 * @brief Wait up to @p timeout milliseconds for next message.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
+	virtual void CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
 
 
 	/**

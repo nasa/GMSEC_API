@@ -194,10 +194,10 @@ const char* InternalConfig::getValue(const char* name) const
 	return it->second.c_str();
 }
 
+
 const char* InternalConfig::getValue(const char* name, const char* defaultValue) const
 {
 	validateConfigName(name);
-	validateConfigName(defaultValue);
 
 	ConfigMapIter it = m_configs.find(name);
 
@@ -208,6 +208,7 @@ const char* InternalConfig::getValue(const char* name, const char* defaultValue)
 
 	return it->second.c_str();
 }
+
 
 bool InternalConfig::getBooleanValue(const char* name) const
 {

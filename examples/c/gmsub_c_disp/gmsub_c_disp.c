@@ -22,6 +22,7 @@ typedef struct
 	GMSEC_Status     status;
 	GMSEC_Config     config;
 	GMSEC_Connection connection;
+	GMSEC_SubscriptionInfo info;
 } gmsub_c_disp_t;
 
 
@@ -89,7 +90,7 @@ GMSEC_BOOL gmsub_c_disp_Run(gmsub_c_disp_t* this)
 
 	/* Subscribe */
 	GMSEC_INFO("Subscribing to Publisher");
-	connectionSubscribeWithCallback(this->connection, subject, onMessage, this->status);
+	this->info = connectionSubscribeWithCallback(this->connection, subject, onMessage, this->status);
   	if (!example_check("SubscribeWCallback", this->status)) return GMSEC_FALSE;
 
 	GMSEC_INFO("Starting AutoDispatch");
@@ -111,6 +112,13 @@ GMSEC_BOOL gmsub_c_disp_Run(gmsub_c_disp_t* this)
 
 void gmsub_c_disp_Cleanup(gmsub_c_disp_t* this)
 {
+	GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info));
+	connectionUnsubscribe(this->connection, &(this->info), this->status);
+	if (!example_check("Unsubscribing...", this->status))
+	{
+		GMSEC_ERROR("Problem with Unsubscribing...");
+	}
+
 	/* Destroy the connection */
 	if (this->connection != NULL)
 	{

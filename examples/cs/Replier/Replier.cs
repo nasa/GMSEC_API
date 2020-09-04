@@ -17,6 +17,8 @@
 */
 
 
+using System.Collections.Generic;
+
 namespace Replier
 {
 	using GMSEC.API;
@@ -101,7 +103,8 @@ namespace Replier
 	{
 		private Connection conn;
 		private ConfigFile cfgFile;
-
+        private List<SubscriptionInfo> info = new List<SubscriptionInfo>();
+ 
 
 		public Replier()
 		{
@@ -120,7 +123,15 @@ namespace Replier
 		{
 			if (conn != null)
 			{
-				conn.Disconnect();
+                for (int i = info.Count-1; i >= 0; i--)
+                {
+                    Log.Info("Unsubscribing from " + info[i].GetSubject());
+                    var temp = info[i];
+                    conn.Unsubscribe(ref temp);
+                    info.RemoveAt(i);
+                }
+                
+                conn.Disconnect();
 
 				Connection.Destroy(ref conn);
 			}
@@ -169,7 +180,7 @@ namespace Replier
 
 				// Create Subscriptions, using callback, from subscription subject in configFile
 				string subject = cfgFile.LookupSubscription("DIRECTIVE-REQUEST");
-				conn.Subscribe(subject, cb);
+				info.Add(conn.Subscribe(subject, cb));
 
 				// Load Heartbeat Definition
 				Message hbMessage = cfgFile.LookupMessage("C2CX-HEARTBEAT-REP");

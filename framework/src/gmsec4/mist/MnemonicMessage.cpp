@@ -15,60 +15,64 @@
 
 #include <gmsec4/mist/MnemonicMessage.h>
 
-#include <gmsec4/internal/mist/InternalMnemonicMessage.h>
+#include <gmsec4/internal/mist/message/InternalMnemonicMessage.h>
 
 #include <gmsec4/mist/Mnemonic.h>
 #include <gmsec4/mist/MnemonicIterator.h>
 
+#include <gmsec4/mist/Specification.h>
+
 #include <gmsec4/Config.h>
+
+#include <gmsec4/util/Log.h>
 
 
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::mist::message::internal;
 
 
 MnemonicMessage::MnemonicMessage(const char* subject, unsigned int version)
-	: Message(subject, Message::PUBLISH),
-	  m_internal(new InternalMnemonicMessage(subject, version))
+	: Message(new InternalMnemonicMessage(subject,
+	                                      InternalMistMessage::buildSchemaID(PUBLISH, "MVAL", NULL, version).c_str(),
+	                                      InternalMistMessage::buildSpecification(version)))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::MnemonicMessage instead.";
 }
 
 
 MnemonicMessage::MnemonicMessage(const char* subject, const Config& config, unsigned int version)
-	: Message(subject, Message::PUBLISH, config),
-	  m_internal(new InternalMnemonicMessage(subject, config, version))
+	: Message(new InternalMnemonicMessage(subject,
+	                                      InternalMistMessage::buildSchemaID(PUBLISH, "MVAL", NULL, version).c_str(),
+	                                      config,
+	                                      InternalMistMessage::buildSpecification(version)))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::MnemonicMessage instead.";
 }
 
 
 MnemonicMessage::MnemonicMessage(const MnemonicMessage& other)
-	: Message(other),
-	  m_internal(new InternalMnemonicMessage(*(other.m_internal)))
+	: Message(new InternalMnemonicMessage(dynamic_cast<InternalMnemonicMessage&>(other.getInternal())))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::MnemonicMessage instead.";
 }
 
 
 MnemonicMessage::MnemonicMessage(const char* data)
-	: Message(data),
-	  m_internal(new InternalMnemonicMessage(data))
+	: Message(new InternalMnemonicMessage(data))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::MnemonicMessage instead.";
 }
 
 
 MnemonicMessage& MnemonicMessage::operator=(const MnemonicMessage& other)
 {
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::MnemonicMessage instead.";
+
 	if (this != &other)
 	{
-		delete m_internal;
-
-		m_internal = new internal::InternalMnemonicMessage(*(other.m_internal));
-
-		registerChild(m_internal);
+		this->registerInternal(new InternalMnemonicMessage(dynamic_cast<InternalMnemonicMessage&>(other.getInternal())));
 	}
 
 	return *this;
@@ -77,37 +81,34 @@ MnemonicMessage& MnemonicMessage::operator=(const MnemonicMessage& other)
 
 MnemonicMessage::~MnemonicMessage()
 {
-	// Message parent class deletes m_internal, providing it's been registered.
 }
 
 
 void MnemonicMessage::addMnemonic(const Mnemonic& mnemonic)
 {
-	m_internal->addMnemonic(mnemonic);
+	dynamic_cast<InternalMnemonicMessage&>(getInternal()).addMnemonic(mnemonic);
 }
 
 
 const Mnemonic& MnemonicMessage::getMnemonic(size_t index) const
 {
-	return m_internal->getMnemonic(index);
+	return dynamic_cast<InternalMnemonicMessage&>(getInternal()).getMnemonic(index);
 }
 
 
 size_t MnemonicMessage::getNumMnemonics() const
 {
-	return m_internal->getNumMnemonics();
+	return dynamic_cast<InternalMnemonicMessage&>(getInternal()).getNumMnemonics();
 }
 
 
-MnemonicIterator& MnemonicMessage::getMnemonicIterator() const
+gmsec::api::mist::MnemonicIterator& MnemonicMessage::getMnemonicIterator() const
 {
-	return m_internal->getMnemonicIterator();
+	return dynamic_cast<InternalMnemonicMessage&>(getInternal()).getMnemonicIterator();
 }
 
 
 MnemonicMessage MnemonicMessage::convertMessage(const Message& message)
 {
-	MnemonicMessage mnemonic_message(message.toXML());
-
-	return mnemonic_message;
+	return MnemonicMessage(message.toXML());
 }

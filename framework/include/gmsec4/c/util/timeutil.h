@@ -27,7 +27,7 @@ extern "C"
 
 
 /**
- * @fn void timeUtilMillisleep(unsigned int milliseconds);
+ * @fn void timeUtilMillisleep(unsigned int milliseconds)
  *
  * @brief Sleeps for the specified number of milliseconds (at least 1).
  */
@@ -35,11 +35,41 @@ GMSEC_API void timeUtilMillisleep(unsigned int milliseconds);
 
 
 /**
- * @fn GMSEC_TimeSpec timeUtilGetCurrentTime();
+ * @fn GMSEC_TimeSpec timeUtilGetCurrentTime()
  *
  * @desc Returns the current time, in seconds, since Jan 1 1970 00:00:00 GMT.
  */
 GMSEC_API GMSEC_TimeSpec timeUtilGetCurrentTime();
+
+
+/**
+ * @fn double timeUtilGetCurrentTime_s(GMSEC_TimeSpec* ts)
+ *
+ * @brief Returns the current time in (real) seconds since Jan 1, 1970.
+ *
+ * @note If timespec buffer is non-NULL, it will be populated.
+ */
+GMSEC_API double timeUtilGetCurrentTime_s(GMSEC_TimeSpec* ts);
+
+
+/**
+ * @fn GMSEC_TimeSpec timeUtilGetCharTime(const char* timeString)
+ *
+ * @brief Returns the current time in seconds since Jan 1, 1970 as represented by the GMSEC String
+ *
+ * @param[in] timeString - String containing GMSEC formatted time (e.g. YYYY-DDD-HH-MM-SS[.sss])
+ */
+GMSEC_API GMSEC_TimeSpec timeUtilGetCharTime(const char* timeString);
+
+
+/**
+ * @fn GMSEC_TimeSpec timeUtilGetCharTime_s(const char* timeString)
+ *
+ * @brief Returns the current time in seconds since Jan 1, 1970 as represented by the GMSEC String
+ *
+ * @param[in] timeString - String containing GMSEC formatted time (e.g. YYYY-DDD-HH-MM-SS[.sss])
+ */
+GMSEC_API double timeUtilGetCharTime_s(const char* timeString);
 
 
 /**
@@ -53,6 +83,20 @@ GMSEC_API GMSEC_TimeSpec timeUtilGetCurrentTime();
  * @sa GMSEC_LogEntry
  */
 GMSEC_API void timeUtilFormatTime(const GMSEC_TimeSpec time, GMSEC_Time buffer);
+
+
+/**
+ * @fn void timeUtilFormatTimeSubs(const GMSEC_TimeSpec time, int subs, GMSEC_Time buffer)
+ *
+ * @brief Stores a GMSEC time string with the format of YYYY-DDD-HH-MM-SS[.s*] into the given buffer.
+ *
+ * @param[in]  time   - the time
+ * @param[in]  subs   - the number of digits to allow for subseconds [0 .. 9].
+ * @param[out] buffer - buffer where to store the string
+ *
+ * @sa GMSEC_LogEntry
+ */
+GMSEC_API void timeUtilFormatTimeSubs(const GMSEC_TimeSpec time, int subs, GMSEC_Time buffer);
 
 
 /**

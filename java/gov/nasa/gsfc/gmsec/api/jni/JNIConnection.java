@@ -323,7 +323,7 @@ public class JNIConnection
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;
@@ -366,7 +366,7 @@ public class JNIConnection
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;
@@ -379,7 +379,7 @@ public class JNIConnection
 
 		if (cPtr != 0)
 		{
-			return new JNIMessage(cPtr, true);
+			return new Message(new JNIMessage(cPtr, true));
 		}
 
 		return null;

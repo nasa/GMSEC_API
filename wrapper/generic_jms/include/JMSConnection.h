@@ -152,7 +152,7 @@ public:
 	 *
 	 * @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwConnect();
+	virtual void CALL_TYPE mwConnect();
 
 
 	/**
@@ -163,7 +163,7 @@ public:
 	 *
 	 * @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwDisconnect();
+	virtual void CALL_TYPE mwDisconnect();
 
 
 	/**
@@ -181,7 +181,7 @@ public:
 	 *
 	 * @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
 
 
 	/**
@@ -195,7 +195,7 @@ public:
 	 *
 	 * @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwUnsubscribe(const char* subject);
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject);
 
 
 	/**
@@ -210,7 +210,7 @@ public:
 	 *
 	 * @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
 
 
 	/**
@@ -223,7 +223,7 @@ public:
 	 *
 	 * @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string& id);
+	virtual void CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string& id);
 
 
 	/**
@@ -242,7 +242,7 @@ public:
 	 *
 	 * @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
+	virtual void CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
 
 
 	/**
@@ -261,7 +261,7 @@ public:
 	 *
 	 * @return status - result of the connection operation
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
+	virtual void CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
 
 
 	/**
@@ -291,7 +291,7 @@ private:
 	 *
 	 * @brief This function converts gmsec message to a bytes
 	 */
-	gmsec::api::Status prepareBytes(const gmsec::api::Message& msg, gmsec::api::util::DataBuffer& buffer);
+	void prepareBytes(const gmsec::api::Message& msg, gmsec::api::util::DataBuffer& buffer);
 
 
 	/**
@@ -305,10 +305,10 @@ private:
 	 * message.  Note that in the case of a REPLY, the Message subject
 	 * will be mapped.
 	 */
-	gmsec::api::Status unloadBytes(const gmsec::api::util::DataBuffer& buffer,
-	                               gmsec::api::Message::MessageKind kind,
-                                   gmsec::api::Message*& gmsecMessage,
-                                   std::string& rawSubject);
+	void unloadBytes(const gmsec::api::util::DataBuffer& buffer,
+	                       gmsec::api::Message::MessageKind kind,
+                           gmsec::api::Message*& gmsecMessage,
+                           std::string& rawSubject);
 
 
 	std::string generateUniqueId();
@@ -317,7 +317,7 @@ private:
 	std::string generateUniqueId(long id);
 
 
-	gmsec::api::Status resetConsumer();
+	void resetConsumer();
 
 
 	bool addPropertiesToMessage(const std::string& topic, jobject msg, JNIEnv* chosenEnv);

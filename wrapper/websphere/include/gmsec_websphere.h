@@ -36,9 +36,6 @@
 
 	#define GMSEC_WEBS_API
 
-	//DMW #include <sys/types.h>
-	//DMW #include <unistd.h>
-
 #endif
 
 #include <gmsec4/internal/ConnectionInterface.h>

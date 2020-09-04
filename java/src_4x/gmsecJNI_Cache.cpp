@@ -79,6 +79,8 @@ void Cache::initialize(JNIEnv* jenv)
 	methodLogEntryInitJZ = getMethod(jenv, clazz, "<init>", "()V");
 	fieldLogLevel_value = getFieldID(jenv, clazz, "level", "Lgov/nasa/gsfc/gmsec/api/util/LogLevel;");
 	fieldLogTime_value = getFieldID(jenv, clazz, "time", "Lgov/nasa/gsfc/gmsec/api/util/TimeSpec;");
+	fieldLogFile_value = getFieldID(jenv, clazz, "fileName", "Ljava/lang/String;");
+	fieldLogLine_value = getFieldID(jenv, clazz, "lineNumber", "I");
 	fieldLogMessage_value = getFieldID(jenv, clazz, "message", "Ljava/lang/String;");
 
 	// gov.nasa.gsfc.gmsec.api.LogLevel initialization
@@ -92,6 +94,11 @@ void Cache::initialize(JNIEnv* jenv)
     fieldLogLevelVERBOSE = jenv->GetStaticFieldID(clazz, "VERBOSE", "Lgov/nasa/gsfc/gmsec/api/util/LogLevel;");
     fieldLogLevelDEBUG   = jenv->GetStaticFieldID(clazz, "DEBUG", "Lgov/nasa/gsfc/gmsec/api/util/LogLevel;");
 
+	// gov.nasa.gsfc.gmsec.api.Message initialization
+	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/Message");
+	classMessage = clazz;
+	methodMessageInit = getMethod(jenv, clazz, "<init>", "(Lgov/nasa/gsfc/gmsec/api/jni/JNIMessage;)V");
+
 	// gov.nasa.gsfc.gmsec.api.TimeSpec initialization
 	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/util/TimeSpec");
 	classTimeSpec = clazz;
@@ -100,27 +107,31 @@ void Cache::initialize(JNIEnv* jenv)
 	fieldNanoseconds_value = getFieldID(jenv, clazz, "nanoseconds", "J");
 
 	// gov.nasa.gsfc.gmsec.api.jni.JNIConnectionManager initialization
-	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/jni/JNIConnectionManager");
+	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/jni/mist/JNIConnectionManager");
 	classJNIConnectionManager = clazz;
 	fieldConnectionManager_extConnMgr = getFieldID(jenv, clazz, "extConnMgr", "Lgov/nasa/gsfc/gmsec/api/mist/ConnectionManager;");
 	fieldConnectionManager_swigCPtr = getFieldID(jenv, clazz, "swigCPtr", "J");
 	fieldConnectionManager_swigCMemOwn = getFieldID(jenv, clazz, "swigCMemOwn", "Z");
 
-
 	// gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerCallback initialization
 	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/mist/ConnectionManagerCallback");
 	methodConnMgrCallbackOnMessage = getMethod(jenv, clazz, "onMessage", "(Lgov/nasa/gsfc/gmsec/api/mist/ConnectionManager;Lgov/nasa/gsfc/gmsec/api/Message;)V");
-    fieldCallbackJNIConnMgr = getFieldID(jenv, clazz, "m_jniConnMgr", "Lgov/nasa/gsfc/gmsec/api/jni/JNIConnectionManager;");
+    fieldCallbackJNIConnMgr = getFieldID(jenv, clazz, "m_jniConnMgr", "Lgov/nasa/gsfc/gmsec/api/jni/mist/JNIConnectionManager;");
 
 	// gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerEventCallback initialization
 	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/mist/ConnectionManagerEventCallback");
 	methodConnMgrEventCallbackOnEvent = getMethod(jenv, clazz, "onEvent", "(Lgov/nasa/gsfc/gmsec/api/mist/ConnectionManager;Lgov/nasa/gsfc/gmsec/api/Status;Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;)V");
-    fieldEventCallbackJNIConnMgr = getFieldID(jenv, clazz, "m_jniConnMgr", "Lgov/nasa/gsfc/gmsec/api/jni/JNIConnectionManager;");
+    fieldEventCallbackJNIConnMgr = getFieldID(jenv, clazz, "m_jniConnMgr", "Lgov/nasa/gsfc/gmsec/api/jni/mist/JNIConnectionManager;");
 
 	// gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerReplyCallback initialization
 	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/mist/ConnectionManagerReplyCallback");
 	methodConnMgrReplyCallbackOnReply = getMethod(jenv, clazz, "onReply", "(Lgov/nasa/gsfc/gmsec/api/mist/ConnectionManager;Lgov/nasa/gsfc/gmsec/api/Message;Lgov/nasa/gsfc/gmsec/api/Message;)V");
-    fieldReplyCallbackJNIConnMgr = getFieldID(jenv, clazz, "m_jniConnMgr", "Lgov/nasa/gsfc/gmsec/api/jni/JNIConnectionManager;");
+    fieldReplyCallbackJNIConnMgr = getFieldID(jenv, clazz, "m_jniConnMgr", "Lgov/nasa/gsfc/gmsec/api/jni/mist/JNIConnectionManager;");
+
+	// gov.nasa.gsfc.gmsec.api.U64 initialization
+	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/U64");
+    classU64 = clazz;
+    methodU64Init = getMethod(jenv, clazz, "<init>", "(Ljava/lang/String;)V");
 
 	initialized = 1;
 }

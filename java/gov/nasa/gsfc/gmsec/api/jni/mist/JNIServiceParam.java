@@ -6,15 +6,16 @@
  */
 
 
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
-package gov.nasa.gsfc.gmsec.api.jni;
+import gov.nasa.gsfc.gmsec.api.field.Field;
 
-import gov.nasa.gsfc.gmsec.api.*;
-import gov.nasa.gsfc.gmsec.api.field.*;
-import gov.nasa.gsfc.gmsec.api.mist.*;
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
+import gov.nasa.gsfc.gmsec.api.jni.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.JNIFieldConverter;
 
 
-public class JNIServiceParam extends ServiceParam
+public class JNIServiceParam
 {
 	private long      swigCPtr;
 	protected boolean swigCMemOwn;

@@ -18,7 +18,7 @@ import gov.nasa.gsfc.gmsec.api.StatusClassification;
 import gov.nasa.gsfc.gmsec.api.StatusCode;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIProductFile;
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIProductFile;
 
 
 /**

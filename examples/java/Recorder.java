@@ -38,6 +38,7 @@ import gov.nasa.gsfc.gmsec.api.field.I16Field;
 import gov.nasa.gsfc.gmsec.api.util.Log;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -58,6 +59,7 @@ public class Recorder implements Example
 	Config     config;
 	ConfigFile configFile;
 	Connection conn;
+	ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 
 	Recorder(Config config, ConfigFile configFile)
@@ -95,11 +97,11 @@ public class Recorder implements Example
 			// Subscribe with callback
 			String subject = configFile.lookupSubscription("RECEIVE-LOG");
 			Log.info("subscribing to " + subject);
-			conn.subscribe(subject, new LogCallback());
+			info.add(conn.subscribe(subject, new LogCallback()));
 
 			subject = configFile.lookupSubscription("SEND-LOG");
 			Log.info("subscribing to " + subject);
-			conn.subscribe(subject, new LogCallback());
+			info.add(conn.subscribe(subject, new LogCallback()));
 
 			// Lookup and load the config file heartbeat message definition
 			Message heartbeatMessage = configFile.lookupMessage("C2CX-HEARTBEAT-REC");
@@ -170,17 +172,31 @@ public class Recorder implements Example
 		}
 		finally
 		{
-			cleanup();
+			try
+			{
+				cleanup();
+			}
+			catch (GMSEC_Exception e)
+			{
+				Log.error("GMSEC_Exception: " + e.toString());
+				result = false;
+			}
 		}
 
 		return result;
 	}
 
 
-	public boolean cleanup()
+	public boolean cleanup() throws GMSEC_Exception
 	{
 		if (conn != null)
 		{
+			for(int i = info.size()-1; i >= 0; i-- )
+			{
+				Log.info("Unsubscribing from " + info.get(i).getSubject());
+				conn.unsubscribe(info.get(i));
+				info.remove(i);
+			}
 			Util.closeConnection(conn);
 		}
 

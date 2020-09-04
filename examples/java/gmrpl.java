@@ -15,6 +15,8 @@
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.Log;
 
+import java.util.ArrayList;
+
 
 public class gmrpl implements Example
 {
@@ -22,6 +24,7 @@ public class gmrpl implements Example
 
 	Config     config;
 	Connection connection;
+	ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 
 	gmrpl(String[] args) throws ExampleException
@@ -77,10 +80,10 @@ public class gmrpl implements Example
 			connection = Util.openConnection(config);
 
 			Log.info("Subscribing to " + subject);
-			connection.subscribe(subject);
+			info.add(connection.subscribe(subject));
 
 			Log.info("Subscribing to GMSEC.TERMINATE");
-			connection.subscribe("GMSEC.TERMINATE");
+			info.add(connection.subscribe("GMSEC.TERMINATE"));
 
 			boolean done        = false;
 			long    prevTime    = System.currentTimeMillis();
@@ -145,17 +148,29 @@ public class gmrpl implements Example
 			Log.error("GMSEC_Exception: " + e.toString());
 			result = false;
 		}
-		finally
+
+		try
 		{
 			cleanup();
+		}
+		catch (GMSEC_Exception e)
+		{
+			Log.error("GMSEC_Exception: " + e.toString());
 		}
 
 		return result;
 	}
 		
 
-	public boolean cleanup()
+	public boolean cleanup() throws GMSEC_Exception
 	{
+		for(int i = info.size()-1; i >= 0; i-- )
+		{
+			Log.info("Unsubscribing from " + info.get(i).getSubject());
+			connection.unsubscribe(info.get(i));
+			info.remove(i);
+		}
+
 		if (connection != null)
 		{
 			Util.closeConnection(connection);

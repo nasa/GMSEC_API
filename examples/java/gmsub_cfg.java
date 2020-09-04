@@ -16,6 +16,7 @@
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.Log;
@@ -92,6 +93,7 @@ public class gmsub_cfg implements Example
 	ConfigFile configFile;
 	Connection connection1 = null;
 	Connection connection2 = null;
+	ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 
 	public gmsub_cfg(Config config, ConfigFile configFile)
@@ -131,10 +133,10 @@ public class gmsub_cfg implements Example
   
 			// subscribe
 			Log.info("Subscribing to first connection's SUB1: " + subject);
-			connection1.subscribe(subject, subCallback);
+			info.add(connection1.subscribe(subject, subCallback));
 
 			Log.info("Subscribing to second connection's SUB1: " + subject);
-			connection2.subscribe(subject, subCallback);
+			info.add(connection2.subscribe(subject, subCallback));
 
 			// Register event callback
 			Log.info("Registering event callback for connection dispatcher");
@@ -173,22 +175,43 @@ public class gmsub_cfg implements Example
 		}
 		finally
 		{
-			cleanup();
+			try
+			{
+				cleanup();
+			}
+			catch (GMSEC_Exception e)
+			{
+				Log.error("GMSEC_Exception: " + e.toString());
+				result = false;
+			}
 		}
 
 		return result;
 	}
 
 
-	public boolean cleanup()
+	public boolean cleanup() throws GMSEC_Exception
 	{
 		if (connection1 != null)
 		{
+			Log.info("Unsubscribing from " + info.get(0).getSubject());
+			connection1.unsubscribe(info.get(0));
+
 			Util.closeConnection(connection1);
 		}
 		if (connection2 != null)
 		{
+			Log.info("Unsubscribing from " + info.get(1).getSubject());
+			connection2.unsubscribe(info.get(1));
+
 			Util.closeConnection(connection2);
+		}
+		if (!info.isEmpty())
+		{
+			for(int i = info.size()-1; i >= 0; i--)
+			{
+				info.remove(i);
+			}
 		}
 
 		return true;

@@ -15,8 +15,10 @@ JAVA_SOURCES_4x = gov\nasa\gsfc\gmsec\api\*.java	\
                   gov\nasa\gsfc\gmsec\api\jni\*.java \
                   gov\nasa\gsfc\gmsec\api\jni\field\*.java \
                   gov\nasa\gsfc\gmsec\api\jni\mist\*.java \
+                  gov\nasa\gsfc\gmsec\api\jni\mist\message\*.java \
                   gov\nasa\gsfc\gmsec\api\jni\util\*.java \
                   gov\nasa\gsfc\gmsec\api\mist\*.java \
+                  gov\nasa\gsfc\gmsec\api\mist\message\*.java \
                   gov\nasa\gsfc\gmsec\api\util\*.java
 
 SRCDIR_3x       = src
@@ -73,6 +75,7 @@ clean:
 	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\jni\mist\*.class
 	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\jni\util\*.class
 	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\mist\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\mist\message\*.class
 	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api\util\*.class
 	del /Q $(SRC_3x)\gmsecJNI.h
 	del /Q $(SRC_4x)\gmsecJNI.h

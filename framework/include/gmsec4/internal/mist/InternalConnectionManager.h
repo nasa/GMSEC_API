@@ -24,7 +24,6 @@
 #include <gmsec4/internal/mist/HeartbeatService.h>
 #include <gmsec4/internal/mist/MistCallbackAdapter.h>
 #include <gmsec4/internal/mist/ResourceService.h>
-#include <gmsec4/internal/mist/Specification.h>
 
 #include <gmsec4/internal/mist/MessagePopulator.h>
 
@@ -55,6 +54,7 @@ namespace mist
 	class ConnectionManagerCallback;
 	class ConnectionManagerEventCallback;
 	class ConnectionManagerReplyCallback;
+	class Specification;
 	class SubscriptionInfo;
 
 namespace internal
@@ -65,18 +65,22 @@ namespace internal
 class GMSEC_API InternalConnectionManager
 {
 public:
-	InternalConnectionManager(ConnectionManager* parent, const Config& cfg,  bool validate, unsigned int version);
+	InternalConnectionManager(gmsec::api::mist::ConnectionManager* parent, const Config& cfg, bool validate, unsigned int version);
 
 
 	~InternalConnectionManager();
 
 
-	void CALL_TYPE initialize();
+	void CALL_TYPE initialize(); 
 
 
 	void CALL_TYPE cleanup();
 
+
 	const char* CALL_TYPE getLibraryVersion() const;
+
+
+	Specification& CALL_TYPE getSpecification() const;
 
 
 	void CALL_TYPE setStandardFields(const gmsec::api::util::DataList<Field*>& standardFields);
@@ -276,7 +280,7 @@ public:
 
 
 private:
-	typedef std::list<Field*> FieldList;
+	typedef gmsec::api::util::DataList<Field*> FieldList;
 
 	// Defined, but not implemented
 	InternalConnectionManager();
@@ -289,28 +293,23 @@ private:
 
 	Message createMessage(const char* subject, Message::MessageKind kind, const FieldList& fields);
 
-	bool checkValidSpec(unsigned int specVersionInt);
-
-	Status lookupAndValidate(Message& msg);
-
 	void destroyFields(FieldList& flist);
 
 
 	typedef std::list<SubscriptionInfo*> SubscriptionList;
 
 	// member data
-	Config             m_config;
-	Connection*        m_connection;
-	bool               m_validate;
-	unsigned int       m_specVersion;
-	Specification      m_specification;
-	FieldList          m_standardHeartbeatFields;
-	FieldList          m_standardLogFields;
-	std::string        m_heartbeatSubject;
-	std::string        m_logSubject;
-	gmsec::api::util::Mutex m_cmLock;
-	size_t             m_resourceMessageCounter;
-	SubscriptionList   m_subscriptions;
+	Config                     m_config;
+	Connection*                m_connection;
+	bool                       m_validate;
+	Specification*             m_specification;
+	FieldList                  m_standardHeartbeatFields;
+	FieldList                  m_standardLogFields;
+	std::string                m_heartbeatSubject;
+	std::string                m_logSubject;
+	gmsec::api::util::Mutex    m_cmLock;
+	size_t                     m_resourceMessageCounter;
+	SubscriptionList           m_subscriptions;
 
 	std::auto_ptr<gmsec::api::util::StdThread>       m_hbThread;
 	gmsec::api::util::StdSharedPtr<HeartbeatService> m_hbService;
@@ -319,7 +318,7 @@ private:
 	gmsec::api::util::StdSharedPtr<ResourceService>  m_rsrcService;
 
 	// will be used for support of Callbacks
-	gmsec::api::mist::ConnectionManager*       m_parent;
+	gmsec::api::mist::ConnectionManager*						   m_parent;
 	MistCallbackAdapter*                       m_callbackAdapter;
 
 	MessagePopulator*                          m_messagePopulator;

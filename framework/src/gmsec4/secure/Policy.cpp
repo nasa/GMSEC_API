@@ -303,7 +303,7 @@ Status API3Policy::package (Message &message, DataBuffer &content, ValueMap &met
 
 		if (!result.isError())
 		{
-			if (result.getCustomCode() == 0)
+			if (result.getCode() == NO_ERROR_CODE)
 			{
 				meta.setBoolean("ZIP", true);
 			}
@@ -363,15 +363,25 @@ Status API3Policy::encode (Message &message, DataBuffer &out)
 	else
 	{
 		MessageEncoder encoder;
+
 		if (!fEncodeHeader)
 		{
 			encoder.setSelector(MessageFieldIterator::NON_HEADER_FIELDS);
 		}
-		status = encoder.encode(message, tmp);
+		try
+		{
+			encoder.encode(message, tmp);
+		}
+		catch (const Exception& e)
+		{
+			status = Status(e);
+		}
 	}
 
 	if (!status.isError())
+	{
 		tmp.swap(out);
+	}
 
 	return status;
 }
@@ -398,7 +408,14 @@ Status API3Policy::decode(Message &message, const DataBuffer &encoded)
 	{
 		MessageDecoder decoder;
 
-		status = decoder.decode(message, encoded);
+		try
+		{
+			decoder.decode(message, encoded);
+		}
+		catch (const Exception& e)
+		{
+			status = Status(e);
+		}
 	}
 
 	return status;

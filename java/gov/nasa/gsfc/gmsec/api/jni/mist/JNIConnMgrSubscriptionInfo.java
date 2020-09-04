@@ -6,10 +6,12 @@
  */
 
 
-package gov.nasa.gsfc.gmsec.api.jni;
+package gov.nasa.gsfc.gmsec.api.jni.mist;
 
 import gov.nasa.gsfc.gmsec.api.mist.ConnectionManagerCallback;
 import gov.nasa.gsfc.gmsec.api.mist.SubscriptionInfo;
+
+import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
 
 
 public class JNIConnMgrSubscriptionInfo

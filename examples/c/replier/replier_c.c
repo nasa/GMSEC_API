@@ -50,6 +50,7 @@ typedef struct
 	GMSEC_Config     programConfig;
 	GMSEC_Connection connection;
 	GMSEC_Message    heartbeatMessage;
+	GMSEC_SubscriptionInfo info;
 } replier_c_t;
 
 
@@ -149,7 +150,7 @@ void replier_c_cb_Run(replier_c_callback_t* this, GMSEC_Connection conn, GMSEC_M
 
 	// Publish the log message
 	connectionPublish(conn, this->logMessage, this->status);
-	if (example_check("Publish via callback", this->status));
+	if (example_check("Publish via callback", this->status))
 	{
 		GMSEC_INFO("onMessage Published log message");
 	}
@@ -327,7 +328,7 @@ GMSEC_BOOL replier_c_Run(replier_c_t* this)
 	GMSEC_INFO("Middleware version = %s", connectionGetLibraryVersion(this->connection, NULL));
 
 	/* Create subscriptions from subscription templates in the config file */
-	connectionSubscribeWithCallback(this->connection, subject, onMessageCallback, this->status);
+	this->info = connectionSubscribeWithCallback(this->connection, subject, onMessageCallback, this->status);
 	if (!example_check("connectionSubscribeWithCallback(onMessageCallback)", this->status)) return GMSEC_FALSE;
 
 
@@ -346,6 +347,13 @@ GMSEC_BOOL replier_c_Run(replier_c_t* this)
 
 void replier_c_Cleanup(replier_c_t* this)
 {
+	GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info));
+	connectionUnsubscribe(this->connection, &(this->info), this->status);
+	if (!example_check("Unsubscribing...", this->status))
+	{
+		GMSEC_ERROR("Problem with Unsubscribing...");
+	}
+	
 	/* Stop auto dispatcher and destroy the connection */
 	if (this->connection != NULL)
 	{

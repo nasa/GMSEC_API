@@ -17,6 +17,8 @@
 import gov.nasa.gsfc.gmsec.api.*;
 import gov.nasa.gsfc.gmsec.api.util.Log;
 
+import java.util.ArrayList;
+
 
 class PublishDispatcher extends Callback 
 {
@@ -33,6 +35,7 @@ public class gmsub_disp implements Example
 {
 	Config     config;
 	Connection connection;
+	ArrayList<SubscriptionInfo> info = new ArrayList<SubscriptionInfo>();
 
 	gmsub_disp(Config config) throws ExampleException
 	{
@@ -110,7 +113,7 @@ public class gmsub_disp implements Example
 			for (String subject : subjects)
 			{
 				Log.info("subscribing to '" + subject + "' with PublishDispatcher");
-				connection.subscribe(subject, new PublishDispatcher());
+				info.add(connection.subscribe(subject, new PublishDispatcher()));
 			}
 
 			Log.info("Starting Auto-Dispatch");
@@ -137,17 +140,31 @@ public class gmsub_disp implements Example
 		}
 		finally
 		{
-			cleanup();
+			try
+			{
+				cleanup();
+			}
+			catch (GMSEC_Exception e)
+			{
+				Log.error("GMSEC_Exception: " + e.toString());
+				result = false;
+			}
 		}
 
 		return result;
 	}
 
 
-	public boolean cleanup()
+	public boolean cleanup() throws GMSEC_Exception
 	{
 		if (connection != null)
 		{
+			for(int i = info.size()-1; i >= 0; i-- )
+			{
+				Log.info("Unsubscribing from " + info.get(i).getSubject());
+				connection.unsubscribe(info.get(i));
+				info.remove(i);
+			}
 			Util.closeConnection(connection);
 		}
 

@@ -52,17 +52,17 @@ public:
 
 
 	/// <summary>Returns the name of the field object</summary>
-	//  <returns>A string containing the field name</returns>
+	/// <returns>A string containing the field name</returns>
 	System::String^ GetName();
 
 
 	/// <summary>Returns the type of the field object</summary>
-	//  <returns>The field type</returns>
+	/// <returns>The field type</returns>
 	FieldType GetType();
 
 
 	/// <summary>Returns whether the field object is considered a header field</summary>
-	//  <returns>True if a header field; false otherwise</returns>
+	/// <returns>True if a header field; false otherwise</returns>
 	bool IsHeader();
 
 
@@ -72,8 +72,32 @@ public:
 
 
 	/// <summary>Converts the field object into a JSON string representation</summary>
-	//  <returns>A JSON string</returns>
+	/// <returns>A JSON string</returns>
 	virtual System::String^ ToJSON();
+
+
+	/// <summary>Attempts to convert the field value into a signed 64-bit integer number representation.</summary>
+	/// <returns>Returns the field value as a signed integer.</returns>
+	/// <exception cref="GMSEC_Exception">An exception is thrown if the field cannot be successfully converted to an integer.</exception>
+	System::Int64 GetIntegerValue();
+
+
+	/// <summary>Attempts to convert the field value into an unsigned 64-bit integer number representation.</summary>
+	/// <returns>Returns the field value as an unsigned integer.</returns>
+	/// <exception cref="GMSEC_Exception">An exception is thrown if the field cannot be successfully converted to an integer.</exception>
+	System::UInt64 GetUnsignedIntegerValue();
+
+
+	/// <summary>Attempts to convert the field value into a 64-bit floating point number representation.</summary>
+	/// <returns>Returns the field value as a floating point number.</returns>
+	/// <exception cref="GMSEC_Exception">An exception is thrown if the field cannot be successfully converted to a double.</exception>
+	double GetDoubleValue();
+
+
+	/// <summary>Attempts to convert the field value into string representation.</summary>
+	/// <returns>Returns the field value as a string.</returns>
+	/// <exception cref="GMSEC_Exception">An exception is thrown if the field cannot be successfully converted to a string.</exception>
+	System::String^ GetStringValue();
 
 
 protected:

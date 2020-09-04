@@ -17,9 +17,10 @@ package gov.nasa.gsfc.gmsec.api.mist;
 import gov.nasa.gsfc.gmsec.api.StatusClassification;
 import gov.nasa.gsfc.gmsec.api.StatusCode;
 import gov.nasa.gsfc.gmsec.api.GMSEC_Exception;
-import gov.nasa.gsfc.gmsec.api.jni.JNIServiceParam;
 
 import gov.nasa.gsfc.gmsec.api.field.Field;
+
+import gov.nasa.gsfc.gmsec.api.jni.mist.JNIServiceParam;
 
 
 /**

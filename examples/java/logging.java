@@ -28,10 +28,11 @@ class GenericHandler
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(source).append(" : ");
-		sb.append(TimeUtil.formatTime(entry.time));
-		sb.append(" [").append(Log.levelToString(entry.level)).append("] : ");
-		sb.append(entry.message);
-		sb.append("\n");
+		sb.append(TimeUtil.formatTime(entry.time)).append(" [").append(entry.level.toString()).append("] ");
+		sb.append("[").append(entry.fileName).append(":").append(entry.lineNumber).append("] ");
+		sb.append(entry.message).append("\n");
+
+		String output = sb.toString().replace("\n", "\n\t");
 
 		System.out.println(sb.toString());
 	}

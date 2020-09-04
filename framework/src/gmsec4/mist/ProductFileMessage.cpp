@@ -15,59 +15,63 @@
 
 #include <gmsec4/mist/ProductFileMessage.h>
 
-#include <gmsec4/mist/ProductFileIterator.h>
+#include <gmsec4/internal/mist/message/InternalProductFileMessage.h>
 
-#include <gmsec4/internal/mist/InternalProductFileMessage.h>
+#include <gmsec4/mist/ProductFileIterator.h>
+#include <gmsec4/mist/Specification.h>
 
 #include <gmsec4/Config.h>
+
+#include <gmsec4/util/Log.h>
 
 
 using namespace gmsec::api;
 using namespace gmsec::api::mist;
 using namespace gmsec::api::mist::internal;
+using namespace gmsec::api::mist::message::internal;
 
 
 ProductFileMessage::ProductFileMessage(const char* subject, ResponseStatus::Response responseStatus, const char* productType, const char* productSubtype, unsigned int version)
-	: Message(subject, Message::PUBLISH),
-	  m_internal(new InternalProductFileMessage(subject, responseStatus, productType, productSubtype, version))
+	: Message(new InternalProductFileMessage(subject,
+	                                         responseStatus, 
+	                                         InternalMistMessage::buildSchemaID(PUBLISH, "PROD", productType, version).c_str(),
+	                                         InternalMistMessage::buildSpecification(version)))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::ProductFileMessage instead.";
 }
 
 
 ProductFileMessage::ProductFileMessage(const char* subject, const Config& config, ResponseStatus::Response responseStatus, const char* productType, const char* productSubtype, unsigned int version)
-	: Message(subject, Message::PUBLISH, config),
-	  m_internal(new InternalProductFileMessage(subject, config, responseStatus, productType, productSubtype, version))
+	: Message(new InternalProductFileMessage(subject,
+	                                         responseStatus, 
+	                                         InternalMistMessage::buildSchemaID(PUBLISH, "PROD", productType, version).c_str(),
+	                                         config,
+	                                         InternalMistMessage::buildSpecification(version)))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::ProductFileMessage instead.";
 }
 
 
 ProductFileMessage::ProductFileMessage(const ProductFileMessage& other)
-	: Message(other),
-	  m_internal(new InternalProductFileMessage(*(other.m_internal)))
+	: Message(new InternalProductFileMessage(dynamic_cast<InternalProductFileMessage&>(other.getInternal())))
 {
-	registerChild(m_internal);
 }
 
 
 ProductFileMessage::ProductFileMessage(const char* data)
-	: Message(data),
-	  m_internal(new InternalProductFileMessage(data))
+	: Message(new InternalProductFileMessage(data))
 {
-	registerChild(m_internal);
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::ProductFileMessage instead.";
 }
 
 
 ProductFileMessage& ProductFileMessage::operator=(const ProductFileMessage& other)
 {
+	GMSEC_WARNING << "This class has been deprecated; use gmsec::api::mist::message::ProductFileMessage instead.";
+
 	if (this != &other)
 	{
-		delete m_internal;
-
-		m_internal = new internal::InternalProductFileMessage(*(other.m_internal));
-
-		registerChild(m_internal);
+		this->registerInternal(new InternalProductFileMessage(dynamic_cast<InternalProductFileMessage&>(other.getInternal())));
 	}
 
 	return *this;
@@ -76,56 +80,52 @@ ProductFileMessage& ProductFileMessage::operator=(const ProductFileMessage& othe
 
 ProductFileMessage::~ProductFileMessage()
 {
-	// Message parent class deletes m_internal, providing it's been registered.
 }
 
 
 void ProductFileMessage::addProductFile(const ProductFile& productFile)
 {
-	m_internal->addProductFile(productFile);
+	dynamic_cast<InternalProductFileMessage&>(getInternal()).addProductFile(productFile);
 }
 
 
 const ProductFile& ProductFileMessage::getProductFile(size_t index) const
 {
-	return m_internal->getProductFile(index);
+	return dynamic_cast<InternalProductFileMessage&>(getInternal()).getProductFile(index);
 }
 
 
 size_t ProductFileMessage::getNumProductFiles() const
 {
-	return m_internal->getNumProductFiles();
+	return dynamic_cast<InternalProductFileMessage&>(getInternal()).getNumProductFiles();
 }
 
 
 ResponseStatus::Response ProductFileMessage::getResponseStatus() const
 {
-	return m_internal->getResponseStatus();
+	return dynamic_cast<InternalProductFileMessage&>(getInternal()).getResponseStatus();
 }
 
 
 const char* ProductFileMessage::getProductType() const
 {
-	return m_internal->getProductType();
+	return dynamic_cast<InternalProductFileMessage&>(getInternal()).getProductType();
 }
 
 
 const char* ProductFileMessage::getProductSubtype() const
 {
-	return m_internal->getProductSubtype();
+	return dynamic_cast<InternalProductFileMessage&>(getInternal()).getProductSubtype();
 }
 
 
-ProductFileIterator& ProductFileMessage::getProductFileIterator() const
+gmsec::api::mist::ProductFileIterator& ProductFileMessage::getProductFileIterator() const
 {
-	return m_internal->getProductFileIterator();
+	return dynamic_cast<InternalProductFileMessage&>(getInternal()).getProductFileIterator();
 }
 
 
 ProductFileMessage ProductFileMessage::convertMessage(const Message& message)
 {
-	ProductFileMessage product_file_message(message.toXML());
-
-	return product_file_message;
-
+	return ProductFileMessage(message.toXML());
 }

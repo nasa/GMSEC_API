@@ -34,6 +34,18 @@ public class LogEntry
 
 
 	/**
+	 * @desc Provides the file name where the LogEntry originated.
+	 */
+	public String fileName;
+
+
+	/**
+	 * @desc Provides the line number within the file where the LogEntry originated.
+	 */
+	public int lineNumber;
+
+
+	/**
 	 * @desc Provides the log message.
 	 */
 	public String message;

@@ -38,7 +38,7 @@ namespace internal
 class GMSEC_API MessagePopulator
 {
 public:	
-	typedef std::list<Field*> FieldList;
+	typedef gmsec::api::util::DataList<Field*> FieldList;
 
 	MessagePopulator(unsigned int isdVersion);
 
@@ -65,6 +65,8 @@ public:
 	static void CALL_TYPE destroyFields(FieldList& flist);
 
 	void CALL_TYPE addStandardFields(Message& msg) const;
+
+	const gmsec::api::util::DataList<Field*>& getStandardFields() const;
 
 private:
 	unsigned int m_specVersion;

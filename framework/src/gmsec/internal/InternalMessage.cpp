@@ -195,7 +195,7 @@ Status InternalMessage::SetSubject(const char* subject)
 	}
 	catch (gmsec::api::Exception& e)
 	{
-		status.Set(GMSEC_STATUS_MESSAGE_ERROR, GMSEC_INVALID_SUBJECT_NAME, e.what());
+		status.Set(GMSEC_STATUS_MESSAGE_ERROR, GMSEC_INVALID_SUBJECT_NAME, e.getErrorMessage());
 	}
 
 	return status;
@@ -387,10 +387,12 @@ Status InternalMessage::FromXML(const char* xml)
 		delete m_adapter;
 
 		m_adapter = tmp;
+
+		m_kindUnset = false;
 	}
 	catch (gmsec::api::Exception& e)
 	{
-		status.Set(GMSEC_STATUS_MESSAGE_ERROR, GMSEC_XML_PARSE_ERROR, e.what());
+		status.Set(GMSEC_STATUS_MESSAGE_ERROR, GMSEC_XML_PARSE_ERROR, e.getErrorMessage());
 	}
 
 	return status;
@@ -414,10 +416,12 @@ Status InternalMessage::FromJSON(const char* json)
 		delete m_adapter;
 
 		m_adapter = tmp;
+
+		m_kindUnset = false;
 	}
 	catch (gmsec::api::Exception& e)
 	{
-		status.Set(GMSEC_STATUS_MESSAGE_ERROR, GMSEC_JSON_PARSE_ERROR, e.what());
+		status.Set(GMSEC_STATUS_MESSAGE_ERROR, GMSEC_JSON_PARSE_ERROR, e.getErrorMessage());
 	}
 
 	return status;

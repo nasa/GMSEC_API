@@ -8,6 +8,7 @@
 
 package gov.nasa.gsfc.gmsec.api.jni;
 
+import gov.nasa.gsfc.gmsec.api.U64;
 import gov.nasa.gsfc.gmsec.api.field.Field;
 
 
@@ -46,7 +47,7 @@ public class JNIField
 	}
 
 
-	protected static long getCPtr(JNIField obj)
+	public static long getCPtr(JNIField obj)
 	{
 		return (obj == null) ? 0 : obj.swigCPtr;
 	}
@@ -75,6 +76,30 @@ public class JNIField
 	public String toJSON()
 	{
 		return gmsecJNI.Field_ToJSON(swigCPtr, this);
+	}
+
+
+	public long getIntegerValue()
+	{
+		return gmsecJNI.Field_GetIntegerValue(swigCPtr, this);
+	}
+
+
+	public U64 getUnsignedIntegerValue()
+	{
+		return gmsecJNI.Field_GetUnsignedIntegerValue(swigCPtr, this);
+	}
+
+
+	public double getDoubleValue()
+	{
+		return gmsecJNI.Field_GetDoubleValue(swigCPtr, this);
+	}
+
+
+	public String getStringValue()
+	{
+		return gmsecJNI.Field_GetStringValue(swigCPtr, this);
 	}
 
 

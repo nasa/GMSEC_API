@@ -227,6 +227,32 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMa
 }
 
 
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1GetSpecification
+  (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr)
+{
+	jlong jSpec = 0;
+
+	ConnectionManager* connMgr = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
+
+	if (!connMgr)
+	{
+		SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
+	}
+	else
+	{
+		try
+		{
+			Specification& spec = connMgr->getSpecification();
+
+			jSpec = JNI_POINTER_TO_JLONG(&spec);
+		}
+		JNI_CATCH
+	}
+
+	return jSpec;
+}
+
+
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1SetStandardFields
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields)
 {
@@ -318,7 +344,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Subscribe__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Subscribe__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject)
 {
 	jlong jInfo = 0;
@@ -356,7 +382,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMana
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Subscribe__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2J
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Subscribe__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2J
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jlong jCallbackPtr)
 {
 	jlong jInfo = 0;
@@ -399,7 +425,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMana
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Subscribe__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Subscribe__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jlong jConfigPtr, jobject jConfig)
 {
 	jlong jInfo = 0;
@@ -442,7 +468,7 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMana
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Subscribe__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2J
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Subscribe__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2J
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jlong jConfigPtr, jobject jConfig, jlong jCallbackPtr)
 {
 	jlong jInfo = 0;
@@ -515,7 +541,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Publish__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2JLgov_nasa_gsfc_gmsec_api_jni_JNIMessage_2
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Publish__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2JLgov_nasa_gsfc_gmsec_api_jni_JNIMessage_2
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jMsgPtr, jobject jMsg)
 {
 	try
@@ -547,7 +573,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Publish__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2JLgov_nasa_gsfc_gmsec_api_jni_JNIMessage_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Publish__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2JLgov_nasa_gsfc_gmsec_api_jni_JNIMessage_2JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jMsgPtr, jobject jMsg, jlong jConfigPtr, jobject jConfig)
 {
 	try
@@ -584,7 +610,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Request__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2JLgov_nasa_gsfc_gmsec_api_jni_JNIMessage_2IJI
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Request__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2JLgov_nasa_gsfc_gmsec_api_jni_JNIMessage_2IJI
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jReqMsgPtr, jobject jReqMsg, jint jTimeout, jlong jReplyCallbackPtr, jint jRepublish_ms)
 {
 	try
@@ -621,7 +647,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Request__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2JLgov_nasa_gsfc_gmsec_api_jni_JNIMessage_2II
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1Request__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2JLgov_nasa_gsfc_gmsec_api_jni_JNIMessage_2II
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jlong jReqMsgPtr, jobject jReqMsg, jint jTimeout, jint jRepublish_ms)
 {
 	jlong jRepMsg = 0;
@@ -1291,7 +1317,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestDirective__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestDirective__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jlong jFieldPtr, jobject jField, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields)
 {
 	try
@@ -1342,7 +1368,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestDirective__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2IIJI
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestDirective__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2IIJI
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jlong jFieldPtr, jobject jField, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields, jint jTimeout, jlong jReplyCallbackPtr, jint jRepublish_ms)
 {
 	try
@@ -1398,7 +1424,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestDirective__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2III
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestDirective__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2III
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jlong jFieldPtr, jobject jField, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields, jint jTimeout, jint jRepublish_ms)
 {
 	jlong jMsg = 0;
@@ -1694,7 +1720,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestSimpleService__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIServiceParam_2I
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestSimpleService__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_mist_JNIServiceParam_2I
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jstring jOpName, jlong jOpNumFieldPtr, jobject jOpNumField, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields, jlongArray jServiceParamPtrs, jobjectArray jServiceParams, jint jNumServiceParams)
 {
 	try
@@ -1758,7 +1784,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestSimpleService__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIServiceParam_2IIJI
+JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestSimpleService__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_mist_JNIServiceParam_2IIJI
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jstring jOpName, jlong jOpNumFieldPtr, jobject jOpNumField, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields, jlongArray jServiceParamPtrs, jobjectArray jServiceParams, jint jNumServiceParams, jint jTimeout, jlong jReplyCallbackPtr, jint jRepublish_ms)
 {
 	try
@@ -1827,7 +1853,7 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 }
 
 
-JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestSimpleService__JLgov_nasa_gsfc_gmsec_api_jni_JNIConnectionManager_2Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIServiceParam_2III
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1RequestSimpleService__JLgov_nasa_gsfc_gmsec_api_jni_mist_JNIConnectionManager_2Ljava_lang_String_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api_jni_JNIField_2_3J_3Lgov_nasa_gsfc_gmsec_api_jni_JNIField_2I_3J_3Lgov_nasa_gsfc_gmsec_api_jni_mist_JNIServiceParam_2III
   (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr, jstring jSubject, jstring jOpName, jlong jOpNumFieldPtr, jobject jOpNumField, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields, jlongArray jServiceParamPtrs, jobjectArray jServiceParams, jint jNumServiceParams, jint jTimeout, jint jRepublish_ms)
 {
 	jlong jMsg = 0;

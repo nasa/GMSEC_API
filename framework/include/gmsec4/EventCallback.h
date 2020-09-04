@@ -65,7 +65,7 @@ public:
 
 
 	/** @fn onEvent(Connection& conn, const Status& status, Connection::ConnectionEvent event)
-	 * This function is called in response to a error after a call to %RegisterEventCallback().
+	 * This function is called in response to a error after a call to %registerEventCallback().
 	 *
 	 * Please note that if an EventCallback is registered to multiple connections, onEvent() can be invoked
 	 * concurrently from the different connection threads.

@@ -21,6 +21,7 @@ typedef struct
 	GMSEC_Config     config;	
 	GMSEC_Connection connection;
 	GMSEC_Message    message;
+	GMSEC_SubscriptionInfo *info;
 } gmsub_t;
 
 
@@ -108,7 +109,8 @@ GMSEC_BOOL gmsub_Run(gmsub_t* this, int subjectCount)
 
 		GMSEC_INFO("Subscribing to %s", subject);
 
-		connectionSubscribe(this->connection, subject, this->status);
+		this->info = (GMSEC_SubscriptionInfo *)malloc(sizeof(GMSEC_SubscriptionInfo));
+		this->info[0] = connectionSubscribe(this->connection, subject, this->status);
 		if (!example_check("Subscribing...", this->status))
 		{
 			return GMSEC_FALSE;
@@ -118,6 +120,7 @@ GMSEC_BOOL gmsub_Run(gmsub_t* this, int subjectCount)
 	{
 		const char* str2 = "subject.";
 		int         i    = 1;
+		this->info = (GMSEC_SubscriptionInfo *)malloc((subjectCount+1) * sizeof(GMSEC_SubscriptionInfo));
 
 		for(; i <= subjectCount; i++)
 		{
@@ -127,18 +130,17 @@ GMSEC_BOOL gmsub_Run(gmsub_t* this, int subjectCount)
 			if (example_getString(this->config, buff, &subject))
 			{
 				GMSEC_INFO("Subscribing to %s", subject);
-				connectionSubscribe(this->connection, subject, this->status);
+				this->info[i-1] = connectionSubscribe(this->connection, subject, this->status);
 				if (!example_check("Subscribing...", this->status))
 				{
 					return GMSEC_FALSE;
 				}
 			}
 		}
-
 		subject = "GMSEC.TERMINATE"; 
 
 		GMSEC_INFO("Subscribing to %s", subject);
-		connectionSubscribe(this->connection, subject, this->status);
+		this->info[i-1] = connectionSubscribe(this->connection, subject, this->status);
 		if (!example_check("Subscribing...", this->status))
 		{
 			return GMSEC_FALSE;
@@ -201,13 +203,37 @@ GMSEC_BOOL gmsub_Run(gmsub_t* this, int subjectCount)
 }
 
 
-void gmsub_Cleanup(gmsub_t* this)
+void gmsub_Cleanup(gmsub_t* this, int subjectCount)
 {
 	/* Destory Message */
 	if (this->message != NULL)
 	{
 		messageDestroy(&(this->message));
 	}
+	
+	if(subjectCount == 0)
+	{
+		GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info[0]));
+		connectionUnsubscribe(this->connection, &(this->info[0]), this->status);
+		if (!example_check("Unsubscribing...", this->status))
+		{
+			GMSEC_ERROR("Problem with Unsubscribing...");
+		}
+	}
+	else
+	{
+		int i = subjectCount;
+		for(; i >= 0; i--)
+		{
+			GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info[i]));
+			connectionUnsubscribe(this->connection, &(this->info[i]), this->status);
+			if (!example_check("Unsubscribing...", this->status))
+			{
+				GMSEC_ERROR("Problem with Unsubscribing...");
+			}
+		}
+	}
+	free(this->info);
 
 	/* Destory Connection */
 	if (this->connection != NULL)
@@ -262,7 +288,7 @@ int main(int argc, char* argv[])
 	}
 
 	gmsub_Run(&gmsub, gmsub_DetermineSubCount(argc, argv));
-	gmsub_Cleanup(&gmsub);
+	gmsub_Cleanup(&gmsub, gmsub_DetermineSubCount(argc, argv));
 
 	return 0;
 }

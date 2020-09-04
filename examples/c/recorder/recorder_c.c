@@ -44,6 +44,7 @@ typedef struct
 	GMSEC_Config     programConfig;
 	GMSEC_Connection connection;
 	GMSEC_Message    heartbeatMessage;
+	GMSEC_SubscriptionInfo* info;
 } recorder_c_t;
 
 
@@ -183,16 +184,18 @@ GMSEC_BOOL recorder_c_Run(recorder_c_t* this)
 
 
 	/* Create subscriptions from subscription templates in the configuration file using callbacks */
+	this->info = (GMSEC_SubscriptionInfo *)malloc(2 * sizeof(GMSEC_SubscriptionInfo));
+	
 	subject = configFileLookupSubscription(this->configFile, "RECEIVE-LOG", this->status);
 	if (!example_check("configFileLookupSubscription(RECEIVE-LOG)", this->status)) return GMSEC_FALSE;
 
-	connectionSubscribeWithCallback(this->connection, subject, recorder_c_logCallback, this->status);
+	this->info[0] = connectionSubscribeWithCallback(this->connection, subject, recorder_c_logCallback, this->status);
 	if (!example_check("connectionSubscribeWithCallback(logCallback)", this->status)) return GMSEC_FALSE;
 
 	subject = configFileLookupSubscription(this->configFile, "SEND-LOG", this->status);
 	if (!example_check("configFileLookupSubscription(SEND-LOG)", this->status)) return GMSEC_FALSE;
 
-	connectionSubscribeWithCallback(this->connection, subject, recorder_c_logCallback, this->status);
+	this->info[1] = connectionSubscribeWithCallback(this->connection, subject, recorder_c_logCallback, this->status);
 	if (!example_check("connectionSubscribeWithCallback(logCallback)", this->status)) return GMSEC_FALSE;
 
 
@@ -211,6 +214,18 @@ GMSEC_BOOL recorder_c_Run(recorder_c_t* this)
 
 void recorder_c_Cleanup(recorder_c_t* this)
 {
+	int i;
+	for(i = 1; i >= 0; i--)
+	{
+		GMSEC_INFO("Unsubscribing from %s", subscriptionInfoGetSubject(this->info[i]));
+		connectionUnsubscribe(this->connection, &(this->info[i]), this->status);
+		if (!example_check("Unsubscribing...", this->status))
+		{
+			GMSEC_ERROR("Problem with Unsubscribing...");
+		}
+	}
+	free(this->info);
+
 	if (this->connection != NULL)
 	{
 		/* Stop auto dispatcher */

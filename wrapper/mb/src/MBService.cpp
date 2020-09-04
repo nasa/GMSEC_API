@@ -104,6 +104,8 @@ void MBService::startNewMgr(TCPSocketServer* newSocket)
 
 			mgr->shared.reset();
 
+			mgr->thread->join();
+
 			delete mgr->thread;
 
 			delete mgr;

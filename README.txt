@@ -7,9 +7,9 @@ of each release.
 
 
 ==============================================================================
-= ADVISEMENT ALERT (for users of API 4.0 and later versions)
+= ADVISEMENT ALERT (for users of API 4.1 and later versions)
 ==============================================================================
-Version 4.0 of the GMSEC API introduces a new external interface binding for
+Version 4.1 of the GMSEC API introduces a new external interface binding for
 Java, C, C++, and C#. This new interface provides new functionality, including
 an expanded range of capabilities for the Messaging Interface Standardization
 Toolkit (MIST - please see the GMSEC API User's Guide). This new interface 
@@ -26,10 +26,18 @@ updated to handle the new data types. If this library upgrade is not
 performed, existing software written with the GMSEC API will be unable to 
 interpret messages with new data types. 
 
-Lastly, the API 4.x StatusClass' NO_ERROR has been renamed to NO_ERROR_CLASS
-so that the former declaration would not conflict with a Windows OS macro
-definition that is defined when an application includes a header file such as
-stdio.h.
+
+
+==============================================================================
+= ADVISEMENT ALERT (for users of API 4.0)
+==============================================================================
+API 4.0 has been deprecated due to various issues, some of which involve the
+refactoring of callback-related interfaces in the Java binding and changes to
+an enumerated declaration that clashed with a C/C++ NO_ERROR macro definition
+provided by Microsoft Visual Studio.
+
+It is highly recommended that users stop using API 4.0, and instead develop
+their applications using version 4.1 or greater.
 
 
 
@@ -56,6 +64,63 @@ the message loss issue is highly unlikely to occur.
 
 For additional information regarding this issue, please contact the API Team
 at gmsec-support@lists.nasa.gov.
+
+
+
+==============================================================================
+= GMSEC API 4.2 release notes (2016 October 31)
+==============================================================================
+o This release contains an additional interface for the Perl language.
+	This new interface exists in parallel with the existing one, so all
+	existing software that utilizes the GMSEC API will continue to function
+	without interruption. However, new software development should utilize
+	this new interface, as it is safer and leaner than the existing interface.
+	
+o User-defined message validation has been added to the Messaging Interface
+	Standardization Toolkit (MIST) portion of the API.  The ConnectionManager
+	and Specification classes can now be configured to validate user-defined
+	messages, as would be defined in an addendum to the GMSEC ISD.  More
+	information on this functionality is outlined in the GMSEC API User's Guide
+	in the section named, "Addendums to the ISD."
+	
+o (Fastpath) The API's internal classes have been refactored to use Exceptions
+	for error handling rather than checking on a Status object returned from
+	each step of an operation.  This has in turn improved the efficiency of
+	the API by reducing the number of instruction cycles the CPU must execute
+	to perform operations such as publishing and receiving messages.
+	
+--- Change summary -----------------------------------------------------------
+3844	Implement MIST Build 3
+3963	Add source file name and line number to the Java LogEntry
+4122	Add Perl interface for core (non-MIST) API 4.x
+4156	Refactor Core API C++ Framework
+4334	Fastpath: Streamline Connection publish() and receive() with seamless
+		enhancements
+4392	Add methods that allow users to easily get native value from a Field
+		object
+4396	Protect against concurrent access to the list of pending requests in
+		RequestThread
+4399	Prevent overwriting of EVENT-TIME field in MIST message field populator
+4400	Java binding of API fails to catch exceptions thrown by the C++ layer
+4435	Fastpath: Configurable Message Bins
+4444	Catch exceptions in StdThread and remove include statements for API 3.x
+		header files
+4481	Stop Resource Message Service when ConnectionManager is destroyed
+4490	Allow for XML or JSON data containing fields with an empty value to be
+		parsed without error
+4501	Add missing Time Utility functions to C binding of API
+4506	Implement Mnemonic addSample() within JNI-layer of Java binding
+4519	Increment COUNTER field in C2CX Heartbeat Messages
+4537	Fix Java binding to return correct StatusClassification and StatusCode
+4570	Prevent memory leak when Message class copy-constructor is called
+4571	Bolt Server should report version information that correlates with the
+		version of the API
+4582	Fix Bolt middleware wrapper so that it does not throw an exception
+		when a timeout occurs while attempting to receive a message
+4591	Fix Message class to support U64 fields
+4595	Make InternalConnection's insertTrackingFields() method thread-safe
+4606	Report correct message kind after ingesting XML or JSON data
+4607	Mitigate thread-safe issue within AMQP middleware wrapper.
 
 
 

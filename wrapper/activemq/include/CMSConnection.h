@@ -166,28 +166,25 @@ private:
 	/**
 	 * @brief Prepare a CMS Message for a GMSEC Message.
 	 */
-	gmsec::api::Status prepare(const gmsec::api::Message& msg, std::auto_ptr<cms::Message>& cmsMsg);
+	void prepare(const gmsec::api::Message& msg, std::auto_ptr<cms::Message>& cmsMsg);
 
 
 	/**
 	 * @brief Handles the conversion of a CMS message to a GMSEC message, and the delivery of such
 	 */
-	bool handleReply(const cms::Message* message);
+	void handleReply(const cms::Message* message);
 
 
 	/**
 	 * @brief Extract a GMSEC Message from a CMS Message.
 	 */
-	gmsec::api::Status unload(const cms::Message* cmsMsg, gmsec::api::Message*& gmsecMsg);
-
-
-	bool setReplyQueueName(const std::string& in, std::string& out);
+	void unload(const cms::Message* cmsMsg, gmsec::api::Message*& gmsecMsg);
 
 
 	/**
 	 * @brief Actual implementation of mwReceive
 	 */
-	gmsec::api::Status CALL_TYPE mwReceiveAux(gmsec::api::Message*& msg, GMSEC_I32 timeout);
+	void CALL_TYPE mwReceiveAux(gmsec::api::Message*& msg, GMSEC_I32 timeout);
 
 
 	SubscriptionInfo* makeSubscriptionInfo(const std::string& in, const gmsec::api::Config& config);
@@ -231,57 +228,57 @@ public:
 	/**
 	 * @brief Connect to the middleware server.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwConnect();
+	virtual void CALL_TYPE mwConnect();
 
 
 	/**
 	 * @brief Disconnect from the middleware server.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwDisconnect();
+	virtual void CALL_TYPE mwDisconnect();
 
 
 	/**
 	 * @brief Subscribe to @p subject (which possibly contains wildcards)
 	 * using the configuration supplied in the config object.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwSubscribe(const char *subject, const gmsec::api::Config &config);
+	virtual void CALL_TYPE mwSubscribe(const char *subject, const gmsec::api::Config &config);
 
 
 	/**
 	 * @brief Unsubscribe from @p subject (which possibly contains wildcards).
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwUnsubscribe(const char* subject);
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject);
 
 
 	/**
 	 * @brief Publish message @p msg using @p configuration.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwPublish(const gmsec::api::Message& msg, const gmsec::api::Config& config);
 
 
 	/**
 	 * @brief Send request message @p request filling in and returning
 	 * its reply id.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string &id);
+	virtual void CALL_TYPE mwRequest(const gmsec::api::Message& request, std::string &id);
 
 
 	/**
 	 * @brief Assists in delivering reply messages to the client.
 	 */
-	bool handleCmsReply(const cms::Message* cmsReply, bool logStackTrace);
+	void handleCmsReply(const cms::Message* cmsReply, bool logStackTrace);
 
 
 	/**
 	 * @brief Send @p reply to @p request.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
+	virtual void CALL_TYPE mwReply(const gmsec::api::Message& request, const gmsec::api::Message& reply);
 
 
 	/**
 	 * @brief Wait up to @p timeout milliseconds for next message.
 	 */
-	virtual gmsec::api::Status CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
+	virtual void CALL_TYPE mwReceive(gmsec::api::Message*& msg, GMSEC_I32 timeout);
 };
 
 }  // end namespace gmsec_amqcms

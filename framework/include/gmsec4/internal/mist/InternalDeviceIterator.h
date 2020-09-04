@@ -6,8 +6,8 @@
  */
 
 
-#ifndef GMSEC_API_INTERNAL_DEVICE_ITERATOR_H
-#define GMSEC_API_INTERNAL_DEVICE_ITERATOR_H
+#ifndef GMSEC_API_MIST_INTERNAL_DEVICE_ITERATOR_H
+#define GMSEC_API_MIST_INTERNAL_DEVICE_ITERATOR_H
 
 #include <gmsec4/util/wdllexp.h>
 
@@ -18,17 +18,22 @@ namespace api
 {
 namespace mist
 {
-class Device;
+	class Device;
 
+	namespace message
+	{
+		namespace internal
+		{
+			class InternalDeviceMessage;
+		}
+	}
+	
 namespace internal
 {
-class InternalDeviceMessage;
-
-
 class GMSEC_API InternalDeviceIterator
 {
 public:
-	InternalDeviceIterator(InternalDeviceMessage& msg);
+	InternalDeviceIterator(message::internal::InternalDeviceMessage& msg);
 
 
     ~InternalDeviceIterator();
@@ -52,9 +57,9 @@ private:
 	bool CALL_TYPE makeReady();
 
 
-	InternalDeviceMessage& m_msg;
-	bool                   m_ready;
-	const Device*          m_nextDevice;
+	message::internal::InternalDeviceMessage& m_msg;
+	bool                                      m_ready;
+	const Device*                             m_nextDevice;
 };
 
 } // namespace internal

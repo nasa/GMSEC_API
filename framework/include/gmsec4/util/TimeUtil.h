@@ -91,17 +91,23 @@ public:
 
 
 	/**
-	 * @fn void formatTime(const GMSEC_TimeSpec& time_s, char* buffer, int subs)
+	 * @fn void formatTime(const GMSEC_TimeSpec& time_s, int subs, char* buffer)
 	 *
 	 * @brief Stores a GMSEC time string with the format of YYYY-DDD-HH-MM-SS[.s*] into the given buffer.
 	 *
 	 * @param ts     - a GMSEC_TimeSpec containing time information
-	 * @param buffer - the array where to store the formatted time string.
 	 * @param subs   - the number of digits to allow for subseconds [0 .. 9].
+	 * @param buffer - the array where to store the formatted time string.
 	 *
 	 * @note buffer must be at least GMSEC_TIME_BUFSIZE characters
 	 */
+	static void CALL_TYPE formatTime(const GMSEC_TimeSpec& ts, int subs, char* buffer);
+
+
+	// @cond
+	// Deprecated since v4.2 - nevertheless we keep for binary compatibility reasons
 	static void CALL_TYPE formatTime(const GMSEC_TimeSpec& ts, char* buffer, int subs);
+	// @endcond
 
 
 	/**

@@ -117,6 +117,7 @@ private:
 	Message             m_msg;
 
 	GMSEC_I32           m_pubInterval;
+	GMSEC_U16			m_counter;
 
 	gmsec::api::util::AtomicBoolean m_alive;
 	gmsec::api::util::Mutex         m_msgMutex;

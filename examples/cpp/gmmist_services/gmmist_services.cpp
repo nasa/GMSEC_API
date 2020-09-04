@@ -59,10 +59,6 @@ bool gmmist_services::run()
 	/* output GMSEC API version */
 	GMSEC_INFO << Connection::getAPIVersion();
 
-	Field** definedFields    = NULL;
-	Field** logDefinedFields = NULL;
-	Field** hbDefinedFields  = NULL;
-
 	try
 	{
 		mist::ConnectionManager connManager(config);
@@ -112,11 +108,29 @@ bool gmmist_services::run()
 		GMSEC_INFO << "No need to add MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE for a heartbeat, we do that for you!";
 		GMSEC_INFO << "Adding general heartbeat fields";
 
-		I16Field    fieldPubRate("PUB-RATE", (GMSEC_I16) 1);
+		I16Field    i16FieldPubRate("PUB-RATE", (GMSEC_I16) 1);
+		U16Field    u16FieldPubRate("PUB-RATE", (GMSEC_U16) 1);
+		I16Field    i16FieldCounter("COUNTER",  (GMSEC_I16) 0);
+		U16Field    u16FieldCounter("COUNTER",  (GMSEC_U16) 0);
 		StringField fieldMsgId("MSG-ID", "My heartbeat identifier");
 
-		hbDefinedFields.push_back(&fieldPubRate);
 		hbDefinedFields.push_back(&fieldMsgId);
+
+		std::string specVersion = example::get(config, "gmsec-specification-version", "201600");
+
+		if (specVersion == "201400")
+		{
+			GMSEC_INFO << "Using I16Field for PUB-RATE and optional COUNTER as dictated by 201400 ISD";
+			hbDefinedFields.push_back(&i16FieldPubRate);
+			hbDefinedFields.push_back(&i16FieldCounter);
+		}
+		else
+		{
+			GMSEC_INFO << "Using U16Field for PUB-RATE and optional COUNTER as dictated by 201600 and later versions of the ISD";
+			hbDefinedFields.push_back(&u16FieldPubRate);
+			hbDefinedFields.push_back(&u16FieldCounter);
+		}
+
 
 		GMSEC_INFO << "Starting heartbeat service";
 		connManager.startHeartbeatService("GMSEC.GMSEC-MISSION.NOT-A-SPACECRAFT.MSG.C2CX.HB", hbDefinedFields);
@@ -155,10 +169,6 @@ bool gmmist_services::run()
 		GMSEC_ERROR << e.what();
 		success = false;
 	}
-
-	delete [] definedFields;
-	delete [] logDefinedFields;
-	delete [] hbDefinedFields;
 
 	return success;
 }

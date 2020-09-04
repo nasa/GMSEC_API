@@ -45,14 +45,11 @@ CallbackLookup::~CallbackLookup()
 }
 
 
-Status CallbackLookup::addCallback(const char* subject0, Callback* cb)
+void CallbackLookup::addCallback(const char* subject0, Callback* cb)
 {
-	Status result;
-
 	if (!cb)
 	{
-		result.set(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "Attempt to register a NULL Callback");
-		return result;
+		throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "Attempt to register a NULL Callback");
 	}
 
 	/* 1) if subject = "" then we store the cb here */
@@ -76,8 +73,7 @@ Status CallbackLookup::addCallback(const char* subject0, Callback* cb)
 		}
 		else
 		{
-			result.set(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "Callback has already been registered");
-			GMSEC_WARNING << result.get();
+			throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "Callback has already been registered");
 		}
 	}
 	else
@@ -110,18 +106,14 @@ Status CallbackLookup::addCallback(const char* subject0, Callback* cb)
 		}
 		if (!first.empty())
 		{
-			result = lkp->addCallback(last.c_str(), cb);
+			lkp->addCallback(last.c_str(), cb);
 		}
 	}
-
-	return result;
 }
 
 
-Status CallbackLookup::removeCallback(const char* subject0)
+void CallbackLookup::removeCallback(const char* subject0)
 {
-	Status result;
-
 	/* 1) if subject = "" then we clear cb's here */
 	if (subject0 == NULL || std::string(subject0).empty())
 	{
@@ -148,7 +140,7 @@ Status CallbackLookup::removeCallback(const char* subject0)
 		{
 			CallbackLookup* lkp = iter->second;
 
-			result = lkp->removeCallback(last.c_str());
+			lkp->removeCallback(last.c_str());
 
 			if (lkp->fCallbacks.size() && !lkp->fCallbackLkps.size())
 			{
@@ -158,19 +150,14 @@ Status CallbackLookup::removeCallback(const char* subject0)
 		}
 		else
 		{
-			result.set(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "No callback registered for subject pattern");
-			GMSEC_WARNING << result.get();
+			throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "No callback registered for subject pattern");
 		}
 	}
-
-	return result;
 }
 
 
-Status CallbackLookup::removeCallback(const char* subject0, Callback* cb)
+void CallbackLookup::removeCallback(const char* subject0, Callback* cb)
 {
-	Status result;
-
 	/* 1) if subject = "" then we clear cb's here */
 	if (subject0 == NULL || std::string(subject0).empty())
 	{
@@ -190,8 +177,7 @@ Status CallbackLookup::removeCallback(const char* subject0, Callback* cb)
 
 		if (!found)
 		{
-			result.set(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "Callback is not registered");
-			GMSEC_WARNING << result.get();
+			throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "Callback is not registered");
 		}
 	}
 	else
@@ -215,7 +201,7 @@ Status CallbackLookup::removeCallback(const char* subject0, Callback* cb)
 		{
 			CallbackLookup* lkp = iter->second;
 
-			result = lkp->removeCallback(last.c_str(), cb);
+			lkp->removeCallback(last.c_str(), cb);
 
 			if (!lkp->fCallbacks.size() && !lkp->fCallbackLkps.size())
 			{
@@ -225,12 +211,9 @@ Status CallbackLookup::removeCallback(const char* subject0, Callback* cb)
 		}
 		else
 		{
-			result.set(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "No callback registered for subject pattern");
-			GMSEC_WARNING << result.get();
+			throw Exception(CALLBACK_LOOKUP_ERROR, INVALID_CALLBACK, "No callback registered for subject pattern");
 		}
 	}
-
-	return result;
 }
 
 
@@ -289,10 +272,8 @@ void CallbackLookup::collectCallbacks(const char* subject0, callbackList& callba
 }
 
 
-Status CallbackLookup::dispatchMsg(const char* subject, const Message& msg)
+void CallbackLookup::dispatchMsg(const char* subject, const Message& msg)
 {
-	Status result;
-
 	callbackList tmpCB;
 
 	collectCallbacks(subject, tmpCB);
@@ -306,8 +287,6 @@ Status CallbackLookup::dispatchMsg(const char* subject, const Message& msg)
 			cb->onMessage(msg);
 		}
 	}
-
-	return result;
 }
 
 

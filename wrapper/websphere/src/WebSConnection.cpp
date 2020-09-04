@@ -67,8 +67,8 @@ static bool        toMQString(MQCHARV &out, const char* in);
 static std::string idFromMW(const MQCHARV& in);
 static Message*    parseProperties(ValueMap& meta, MQHCONN hcon, MQHMSG hmsg);
 static bool        getMetaFromFields(Message& message);
-static Status      storeProperty(const Value& value, const std::string& id0, MQHCONN hcon, MQHMSG hmsg);
-static Status      storeProperties(const ValueMap &in, MQHCONN hcon, MQHMSG hmsg);
+static void        storeProperty(const Value& value, const std::string& id0, MQHCONN hcon, MQHMSG hmsg);
+static void        storeProperties(const ValueMap &in, MQHCONN hcon, MQHMSG hmsg);
 
 
 MQLONG EventHandler   (MQHCONN   hConn,
@@ -328,16 +328,23 @@ void SubscriptionInfo::run()
 			{
 				mqconnection = 0;
 
-				Status result = WebSConnection::createLiveConnection(mqconnection, conn->getQueueManager(),
-					conn->getHostname(), conn->getChannel(), conn->getCipherSpec(), conn->getKeyReposStem());
-
-				if (!result.isError() && mqconnection)
+				try
 				{
-					Status tmpStatus(NO_ERROR_CLASS, CONNECTION_CONNECTED, "Connection established");
-					GMSEC_INFO << tmpStatus.get();
-					conn->getExternal().dispatchEvent(Connection::CONNECTION_SUCCESSFUL_EVENT, tmpStatus);
+					WebSConnection::createLiveConnection(mqconnection, conn->getQueueManager(),
+						conn->getHostname(), conn->getChannel(), conn->getCipherSpec(), conn->getKeyReposStem());
 
-					alive = initSubscriptionWithConn(gmo, sd, md);
+					if (mqconnection)
+					{
+						Status tmpStatus(NO_ERROR_CLASS, CONNECTION_CONNECTED, "Connection established");
+						GMSEC_INFO << tmpStatus.get();
+						conn->getExternal().dispatchEvent(Connection::CONNECTION_SUCCESSFUL_EVENT, tmpStatus);
+
+						alive = initSubscriptionWithConn(gmo, sd, md);
+					}
+				}
+				catch (const Exception& e)
+				{
+					GMSEC_ERROR << "SubscriptionInfo - " << e.what();
 				}
 
 				if (!alive)
@@ -351,7 +358,7 @@ void SubscriptionInfo::run()
 						oss << "  Tries remaining: " << triesRemaining;
 					}
 
-					GMSEC_WARNING << oss.str().c_str();
+					GMSEC_INFO << oss.str().c_str();
 				}
 			} while (!alive && (maxTries == -1 || triesRemaining-- > 0));
 
@@ -761,20 +768,13 @@ const char* WebSConnection::getMWInfo()
 }
 
 
-Status WebSConnection::mwConnect()
+void WebSConnection::mwConnect()
 {
-	Status result;
-
 	// Initialize request specifications
 	requestSpecs = getExternal().getRequestSpecs();
 
 	Hcon = 0;
-	result = WebSConnection::createLiveConnection(Hcon, qmanager, hostname, channel, pCipherSpec, pKeyReposStem);
-
-	if (result.isError() || Hcon == 0)
-	{
-		return result;
-	}
+	WebSConnection::createLiveConnection(Hcon, qmanager, hostname, channel, pCipherSpec, pKeyReposStem);
 
 	Status tmpStatus(NO_ERROR_CLASS, CONNECTION_CONNECTED, "Connection established");
 	GMSEC_INFO << tmpStatus.get();
@@ -783,12 +783,7 @@ Status WebSConnection::mwConnect()
 	if (requestSpecs.requestReplyEnabled && requestSpecs.useSubjectMapping)
 	{
 		MQHCONN RequestConn;
-		result = WebSConnection::createLiveConnection(RequestConn, qmanager, hostname, channel, pCipherSpec, pKeyReposStem);
-
-		if (result.isError() || RequestConn == 0)
-		{
-			return result;
-		}
+		WebSConnection::createLiveConnection(RequestConn, qmanager, hostname, channel, pCipherSpec, pKeyReposStem);
 
 		std::string wsSubject = fixSubject(requestSpecs.replySubject.c_str());
 
@@ -806,8 +801,7 @@ Status WebSConnection::mwConnect()
 
 			if (subscribeCondition.wait() == WebSConnection::UNABLE_TO_SUBSCRIBE)
 			{
-				result.set(MIDDLEWARE_ERROR, INITIALIZATION_ERROR, "Unable to start reply listener", WebSConnection::UNABLE_TO_SUBSCRIBE);
-				return result;
+				throw Exception(MIDDLEWARE_ERROR, INITIALIZATION_ERROR, WebSConnection::UNABLE_TO_SUBSCRIBE, "Unable to start reply listener");
 			}
 		}
 	}
@@ -826,17 +820,13 @@ Status WebSConnection::mwConnect()
 	{
 		std::ostringstream ss;
 		ss << "MQCB ended with reason code " << CReason << ".";
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, ss.str().c_str(), CReason);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, CReason, ss.str().c_str());
 	}
-
-	return result;
 }
 
 
-Status WebSConnection::mwDisconnect()
+void WebSConnection::mwDisconnect()
 {
-	Status result;
-
 	MQLONG   CompCode;
 	MQLONG   Reason;
 
@@ -866,18 +856,16 @@ Status WebSConnection::mwDisconnect()
 	{
 		std::ostringstream ss;
 		ss << "MQDISC ended with reason code " << Reason << ".";
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, ss.str().c_str(), Reason);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, Reason, ss.str().c_str());
 	}
 
 	Status tmpStatus(NO_ERROR_CLASS, CONNECTION_LOST, "Connection disconnected");
 	GMSEC_INFO << tmpStatus.get();
 	getExternal().dispatchEvent(Connection::CONNECTION_BROKEN_EVENT, tmpStatus);
-
-	return result;
 }
 
 
-Status WebSConnection::mwSubscribe(const char* subject, const Config& config)
+void WebSConnection::mwSubscribe(const char* subject, const Config& config)
 {
 	Status result;
 
@@ -886,17 +874,12 @@ Status WebSConnection::mwSubscribe(const char* subject, const Config& config)
 	if (subscriptions.count(fixedSub) > 0)
 	{
 		//Already subscribed, don't do anything
-		return result;
+		return;
 	}
 
 	MQHCONN  SubConn = 0;
-	result = WebSConnection::createLiveConnection(SubConn, qmanager, hostname, channel, pCipherSpec, pKeyReposStem);
+	WebSConnection::createLiveConnection(SubConn, qmanager, hostname, channel, pCipherSpec, pKeyReposStem);
 
-	if (result.isError() || SubConn == 0)
-	{
-		return result;
-	}
-	
 	bool allowReplies = false;
 	if (!requestSpecs.useSubjectMapping)
 	{
@@ -926,17 +909,13 @@ Status WebSConnection::mwSubscribe(const char* subject, const Config& config)
 	if (!ableToSubscribe)
 	{
 		// Unable to set up subscription
-		result.set(MIDDLEWARE_ERROR, INITIALIZATION_ERROR, "Unable to subscribe", subInfo->getReasonCode());
+		throw Exception(MIDDLEWARE_ERROR, INITIALIZATION_ERROR, subInfo->getReasonCode(), "Unable to subscribe");
 	}
-
-	return result;
 }
 
 
-Status WebSConnection::mwUnsubscribe(const char* subject)
+void WebSConnection::mwUnsubscribe(const char* subject)
 {
-	Status result;
-
 	std::string fixedSub = fixSubject(subject);
 
 	AutoMutex subMutex(subscribeCondition.getMutex());
@@ -945,8 +924,7 @@ Status WebSConnection::mwUnsubscribe(const char* subject)
 
 	if (it == subscriptions.end())
 	{
-		result.set(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_SUBJECT_NAME, "Not subscribed to subject");
 	}
 
 	SharedSubscriptionInfo subInfo = it->second;
@@ -958,15 +936,11 @@ Status WebSConnection::mwUnsubscribe(const char* subject)
 	subscriptions.erase(fixedSub);
 
 	GMSEC_DEBUG << "[Unsubscribed successfully: " << subject << "]";
-
-	return result;
 }
 
 
-Status WebSConnection::mwPublish(const Message& msg, const Config& config)
+void WebSConnection::mwPublish(const Message& msg, const Config& config)
 {
-	Status result;
-
 	std::string asyncPublish;
 	mwConfig(config, OPT_ASYNC_PUBLISH, asyncPublish);
 	bool pubAsyncPublish = (!asyncPublish.empty() && asyncPublish.compare("true") == 0);
@@ -983,12 +957,12 @@ Status WebSConnection::mwPublish(const Message& msg, const Config& config)
 	meta.setString(MW_PROP_SUBJECT, subject);
 
 	DataBuffer buffer;
-	result = getExternal().getPolicy().package(const_cast<Message&>(msg), buffer, meta);
+
+	Status result = getExternal().getPolicy().package(const_cast<Message&>(msg), buffer, meta);
 
 	if (result.isError())
 	{
-		GMSEC_WARNING << "error packaging message";
-		return result;
+		throw Exception(result);
 	}
 
 	std::string fixedSub = fixSubject(subject);
@@ -1018,11 +992,15 @@ Status WebSConnection::mwPublish(const Message& msg, const Config& config)
 			if (publishers.count(fixedSub) == 0)
 			{
 				// If object handle does not exist.
-				result = openObjectHandle(fixedSub, msgDesc, objHandle);
-
-				if (!result.isError())
+				try
 				{
+					openObjectHandle(fixedSub, msgDesc, objHandle);
+
 					publishers[fixedSub] = objHandle;
+				}
+				catch (const Exception& e)
+				{
+					result = Status(e);
 				}
 			}
 			else
@@ -1033,13 +1011,17 @@ Status WebSConnection::mwPublish(const Message& msg, const Config& config)
 
 			if (!result.isError())
 			{
-				// Step 2: Create Message Handle
-				result = createMsgHandle(meta, msgHandle, msgOpts);
-
-				if (!result.isError())
+				try
 				{
+					// Step 2: Create Message Handle
+					createMsgHandle(meta, msgHandle, msgOpts);
+
 					// Step 3: Publish the Message
-					result = publishMessage(objHandle, msgDesc, msgOpts, buffer);
+					publishMessage(objHandle, msgDesc, msgOpts, buffer);
+				}
+				catch (const Exception& e)
+				{
+					result = Status(e);
 				}
 			}
 		}
@@ -1069,8 +1051,8 @@ Status WebSConnection::mwPublish(const Message& msg, const Config& config)
 			}
 			else
 			{
-				// For all other errors, we return immediately.
-				break;
+				// For all other errors, we throw an Exception
+				throw Exception(result);
 			}
 		}
 	} while (result.isError() && (maxConnectionRetries == -1 || triesRemaining-- > 0));
@@ -1105,14 +1087,11 @@ Status WebSConnection::mwPublish(const Message& msg, const Config& config)
 		// Reset the message counter
 		messageCounter = 0;
 	}
-
-	return result;
 }
 
 
-Status WebSConnection::mwRequest(const Message& request, std::string& id)
+void WebSConnection::mwRequest(const Message& request, std::string& id)
 {
-	Status result;
 	std::string RequestID;
 
 	++requestCounter;
@@ -1131,52 +1110,37 @@ Status WebSConnection::mwRequest(const Message& request, std::string& id)
 		MessageBuddy::getInternal(request).getDetails().setBoolean(OPT_REQ_RESP, true);
 	}
 
-	result = mwPublish(request, getExternal().getConfig());
+	mwPublish(request, getExternal().getConfig());
 
-	if (!result.isError())
-	{
-		GMSEC_DEBUG << "[Request sent successfully: "<< request.getSubject() << "]";
-	}
-
-	return result;
+	GMSEC_DEBUG << "[Request sent successfully: "<< request.getSubject() << "]";
 }
 
 
-Status WebSConnection::mwReply(const Message& request, const Message& reply)
+void WebSConnection::mwReply(const Message& request, const Message& reply)
 {
-	Status result;
-
 	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(REPLY_UNIQUE_ID_FIELD));
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(WEBSPHERE_REPLY));
 
 	if (!uniqueID)
 	{
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Unique ID field");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Unique ID field");
 	}
 	if (!replyAddr)
 	{
-		result.set(CONNECTION_ERROR, INVALID_MSG, "Request does not contain WebSphere Reply field");
-		return result;
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain WebSphere Reply field");
 	}
 
 	MessageBuddy::getInternal(reply).addField(*uniqueID);
 	MessageBuddy::getInternal(reply).setSubject(replyAddr->getValue());
 
-	result = mwPublish(reply, getExternal().getConfig());
+	mwPublish(reply, getExternal().getConfig());
 
-	if (!result.isError())
-	{
-		GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() <<"]";
-	}
-
-	return result;
+	GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() <<"]";
 }
 
 
-Status WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
+void WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 {
-	Status result;
 	double start_s;
 
 	// initialize message to NULL
@@ -1190,7 +1154,7 @@ Status WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 	bool done  = false;
 	bool first = true; // if timeout > 0, ensure that a wait occurs
 
-	while (!result.isError() && !done)
+	while (!done)
 	{
 		AutoMutex inner(queueCondition.getMutex());
 		int reason = 0;
@@ -1233,7 +1197,7 @@ Status WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 		first = false;
 		if (sigMismatchFlag)
 		{
-			result.set(POLICY_ERROR, INVALID_SIGNATURE, "Signature mismatch");
+			GMSEC_DEBUG << "Signature mismatch";
 			sigMismatchFlag = false;
 			continue;
 		}
@@ -1243,12 +1207,19 @@ Status WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 			{
 				MsgSubscriptionResult* msgResult = queue.front();
 
-				result = msgResult->status;
-        
-				if (!result.isError())
-				{
-					msg = msgResult->message;
+				msg = msgResult->message;
+				Status result = msgResult->status;
 
+				queue.pop();
+				delete msgResult;
+
+				if (result.isError())
+				{
+					throw Exception(result);
+				}
+
+				if (msg != NULL)
+				{
 					const StringField* uniqueID = dynamic_cast<const StringField*>(msg->getField("UNIQUE-ID"));
 
 					if (useFilter && uniqueID)
@@ -1289,31 +1260,19 @@ Status WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 						}
 					}
 				}
-
-				queue.pop();
-
-				delete msgResult;
 			}
 		}
 	}
 
-	if (result.isError())
-	{
-		// error already assigned
-	}
-	else if (msg != NULL)
+	if (msg != NULL)
 	{
 		GMSEC_DEBUG << "[Received published message: " << msg->getSubject() << "]";
 	}
-
-	return result;
 }
 
 
 bool WebSConnection::fromMW(const DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg, bool forReplies)
 {
-	Status status;
-
 	std::auto_ptr<Message> msg;
 	ValueMap               meta;
 
@@ -1321,26 +1280,26 @@ bool WebSConnection::fromMW(const DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg,
 	{
 		msg.reset(parseProperties(meta, hcon, hmsg));
 	}
-	catch (Exception& e)
+	catch (const Exception& e)
 	{
 		GMSEC_WARNING << "Unable to extract meta-data from message -- " << e.what();
-		status.set(e.getErrorClass(), e.getErrorCode(), e.getErrorMessage(), e.getCustomCode());
-		enqueueResult(status);
+		enqueueResult(Status(e));
 		return false;
 	}
 
-	status = getExternal().getPolicy().unpackage(*msg.get(), buffer, meta);
+	Status result = getExternal().getPolicy().unpackage(*msg.get(), buffer, meta);
 
-	if (status.getCode() == INVALID_SIGNATURE)
+	if (result.isError())
 	{
-		sigMismatchFlag = true;
-		AutoMutex hold(queueCondition.getMutex());
-		queueCondition.signal(GOT_MESSAGE);
-	}
-	if (status.isError())
-	{
+		if (result.getCode() == INVALID_SIGNATURE)
+		{
+			sigMismatchFlag = true;
+			AutoMutex hold(queueCondition.getMutex());
+			queueCondition.signal(GOT_MESSAGE);
+		}
+
 		GMSEC_WARNING << "Unable to unpackage message";
-		enqueueResult(status);
+		enqueueResult(result);
 		return false;
 	}
 
@@ -1390,7 +1349,7 @@ bool WebSConnection::fromMW(const DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg,
 
 	if (enqueue)
 	{
-		enqueueResult(status, (status.isError() ? 0 : msg.release()));
+		enqueueResult(Status(), msg.release());
 	}
 
 	return true;
@@ -1405,15 +1364,13 @@ void WebSConnection::enqueueResult(const Status& status, Message* message)
 }
 
 
-Status WebSConnection::createLiveConnection(MQHCONN& subConn,
-                                            const std::string& qmanager,
-                                            const std::string& hostname, 
-                                            const std::string& channel,
-                                            const std::string& pCipherSpec,
-                                            const std::string& pKeyReposStem)
+void WebSConnection::createLiveConnection(MQHCONN& subConn,
+                                          const std::string& qmanager,
+                                          const std::string& hostname, 
+                                          const std::string& channel,
+                                          const std::string& pCipherSpec,
+                                          const std::string& pKeyReposStem)
 {
-	Status result;
-
 	// MQCONNX options
 	MQCNO ConnectOptions = {MQCNO_DEFAULT}; 
 	ConnectOptions.Options = MQCNO_HANDLE_SHARE_BLOCK | MQCNO_RECONNECT_Q_MGR;
@@ -1481,10 +1438,8 @@ Status WebSConnection::createLiveConnection(MQHCONN& subConn,
 	{
 		std::ostringstream ss;
 		ss << "MQCONNX ended with reason code " << CReason << ".";
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, ss.str().c_str(), CReason);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, CReason, ss.str().c_str());
 	}
-
-	return result;
 }
 
 
@@ -1514,12 +1469,10 @@ std::string WebSConnection::generateUniqueId(long id)
 }
 
 
-Status WebSConnection::openObjectHandle(const std::string& subject,
-                                        MQMD& md,
-                                        MQHOBJ& objHandle)
+void WebSConnection::openObjectHandle(const std::string& subject,
+                                      MQMD& md,
+                                      MQHOBJ& objHandle)
 {
-	Status result;
-
 	char* qTopic = StringUtil::stringNew(subject.c_str());
 
 	MQOD od = {MQOD_DEFAULT};    // Object description
@@ -1545,17 +1498,13 @@ Status WebSConnection::openObjectHandle(const std::string& subject,
 
 	if (compCode != MQCC_OK)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "MQOPEN internal error", reason);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, reason, "MQOPEN internal error");
 	}
-
-	return result;
 }
 
 
-Status WebSConnection::createMsgHandle(ValueMap& meta, MQHMSG& msgHandle, MQPMO& msgOptions)
+void WebSConnection::createMsgHandle(ValueMap& meta, MQHMSG& msgHandle, MQPMO& msgOptions)
 {
-	Status result;
-
 	MQLONG compCode = MQCC_OK;
 	MQLONG reason   = MQRC_NONE;
 
@@ -1586,10 +1535,8 @@ Status WebSConnection::createMsgHandle(ValueMap& meta, MQHMSG& msgHandle, MQPMO&
 	}
 	else
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "MQCRTMH internal error", reason);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, reason, "MQCRTMH internal error");
 	}
-
-	return result;
 }
 
 
@@ -1660,10 +1607,8 @@ void WebSConnection::checkAsyncPublishStatus()
 }
 
 
-Status WebSConnection::publishMessage(MQHOBJ& objHandle, MQMD& msgDesc, MQPMO& msgOpts, DataBuffer& buffer)
+void WebSConnection::publishMessage(MQHOBJ& objHandle, MQMD& msgDesc, MQPMO& msgOpts, DataBuffer& buffer)
 {
-	Status result;
-
 	MQLONG compCode = MQCC_OK;
 	MQLONG reason   = MQRC_NONE;
 
@@ -1678,23 +1623,23 @@ Status WebSConnection::publishMessage(MQHOBJ& objHandle, MQMD& msgDesc, MQPMO& m
 
 	if (compCode != MQCC_OK)
 	{
-		result.set(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, "MQPUT internal error", reason);
+		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, reason, "MQPUT internal error");
 	}
-
-	return result;
 }
 
 
 Status WebSConnection::reconnect()
 {
+	Status status;
+
 	publishers.clear();
 
 	Hcon = 0;
 
-	Status result = WebSConnection::createLiveConnection(Hcon, qmanager, hostname, channel, pCipherSpec, pKeyReposStem);
-
-	if (!result.isError())
+	try
 	{
+		WebSConnection::createLiveConnection(Hcon, qmanager, hostname, channel, pCipherSpec, pKeyReposStem);
+
 		MQLONG compCode;
 		MQLONG reason;
 		MQCBD  cbd = {MQCBD_DEFAULT};
@@ -1709,8 +1654,12 @@ Status WebSConnection::reconnect()
 			GMSEC_WARNING << "reconnect: MQCB ended with reason code " << reason << ".";
 		}
 	}
+	catch (const Exception& e)
+	{
+		status = Status(e);
+	}
 
-	return result;
+	return status;
 }
 
 
@@ -1817,8 +1766,6 @@ std::string idFromMW(const MQCHARV& in)
 
 Message* parseProperties(ValueMap& meta, MQHCONN hcon, MQHMSG hmsg)
 {
-	Status status;
-
 	MQIMPO     ipo   = { MQIMPO_DEFAULT };
 	MQPD       mqpd  = { MQPD_DEFAULT };
 	MQCHARV    iname = { MQCHARV_DEFAULT };
@@ -2087,10 +2034,8 @@ bool getMetaFromFields(Message& msg)
 }
 
 
-Status storeProperty(const Value& value, const std::string& id0, MQHCONN hcon, MQHMSG hmsg)
+void storeProperty(const Value& value, const std::string& id0, MQHCONN hcon, MQHMSG hmsg)
 {
-	Status status;
-
 	std::string id = idToMW(id0);
 
 	MQLONG type;
@@ -2143,7 +2088,7 @@ Status storeProperty(const Value& value, const std::string& id0, MQHCONN hcon, M
 	else
 	{
 		GMSEC_WARNING << "storeProperty: property " << id.c_str() << " has unexpected type";
-		return status;
+		return;
 	}
 
 	std::string mqid = MW_PROP_PREFIX + id;
@@ -2161,33 +2106,20 @@ Status storeProperty(const Value& value, const std::string& id0, MQHCONN hcon, M
 	{
 		GMSEC_WARNING << "storeProperty: property " << id.c_str() << " failed reason=" << reason;
 	}
-
-	return status;
 }
 
 
-Status storeProperties(const ValueMap& in, MQHCONN hcon, MQHMSG hmsg)
+void storeProperties(const ValueMap& in, MQHCONN hcon, MQHMSG hmsg)
 {
-	Status status;
-
 	ValueMap::Iterator i;
 	in.reset(i);
 
-	while (!status.isError())
+	const Value* v = NULL;
+
+	while ((v = i.next()) != NULL)
 	{
-		const Value* v = i.next();
-
-		if (v)
-		{
-			storeProperty(*v, i.getID(), hcon, hmsg);
-		}
-		else
-		{
-			break;
-		}
+		storeProperty(*v, i.getID(), hcon, hmsg);
 	}
-
-	return status;
 }
 
 } // end namespace gmsec_websphere

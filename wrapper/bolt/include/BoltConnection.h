@@ -39,7 +39,7 @@ public:
 
 	virtual ~BoltConnection();
 
-	virtual gmsec::api::Status setServers(const std::list<bolt::Server> &servers) = 0;
+	virtual void setServers(const std::list<bolt::Server> &servers) = 0;
 
 	virtual const char* CALL_TYPE getLibraryRootName();
 	virtual const char* CALL_TYPE getLibraryVersion();
@@ -65,15 +65,15 @@ protected:
 
 	bool updateReplyTo(const std::string& in);
 
-	gmsec::api::Status makePacket(const gmsec::api::Message& message, bolt::SharedPacket& packet, bolt::PacketType type, std::string* preID = 0);
+	void makePacket(const gmsec::api::Message& message, bolt::SharedPacket& packet, bolt::PacketType type, std::string* preID = 0);
 
-	gmsec::api::Status fromPacket(bolt::SharedPacket& packet, gmsec::api::Message*& message);
+	void fromPacket(bolt::SharedPacket& packet, gmsec::api::Message*& message);
 
-	gmsec::api::Status mwPublishAux(const gmsec::api::Message& message, bolt::SharedPacket& packet);
+	void mwPublishAux(const gmsec::api::Message& message, bolt::SharedPacket& packet);
 
-	gmsec::api::Status mwRequestAux(gmsec::api::Message& message, bolt::SharedPacket& packet, std::string& uniqueID);
+	void mwRequestAux(gmsec::api::Message& message, bolt::SharedPacket& packet, std::string& uniqueID);
 
-	gmsec::api::Status mwReplyAux(gmsec::api::Message& request, gmsec::api::Message& reply, bolt::SharedPacket& packet);
+	void mwReplyAux(gmsec::api::Message& request, gmsec::api::Message& reply, bolt::SharedPacket& packet);
 
 
 	bolt::PacketHandler* myDefaultHandler;
@@ -91,25 +91,25 @@ public:
 
 	virtual ~SingleConnection();
 
-	virtual gmsec::api::Status setServers(const std::list<bolt::Server>& servers);
+	virtual void setServers(const std::list<bolt::Server>& servers);
 
 	virtual const char* CALL_TYPE getMWInfo();
 
-	virtual gmsec::api::Status CALL_TYPE mwConnect();
+	virtual void CALL_TYPE mwConnect();
 
-	virtual gmsec::api::Status CALL_TYPE mwDisconnect();
+	virtual void CALL_TYPE mwDisconnect();
 
-	virtual gmsec::api::Status CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
 
-	virtual gmsec::api::Status CALL_TYPE mwUnsubscribe(const char* subject);
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject);
 
-	virtual gmsec::api::Status CALL_TYPE mwPublish(const gmsec::api::Message& message, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwPublish(const gmsec::api::Message& message, const gmsec::api::Config& config);
 
-	virtual gmsec::api::Status CALL_TYPE mwRequest(const gmsec::api::Message& message, std::string& uniqueID);
+	virtual void CALL_TYPE mwRequest(const gmsec::api::Message& message, std::string& uniqueID);
 
-	virtual gmsec::api::Status CALL_TYPE mwReply(const gmsec::api::Message& message, const gmsec::api::Message& reply);
+	virtual void CALL_TYPE mwReply(const gmsec::api::Message& message, const gmsec::api::Message& reply);
 
-	virtual gmsec::api::Status CALL_TYPE mwReceive(gmsec::api::Message*& message, GMSEC_I32 timeout);
+	virtual void CALL_TYPE mwReceive(gmsec::api::Message*& message, GMSEC_I32 timeout);
 
 private:
 
@@ -128,25 +128,25 @@ public:
 
 	virtual ~MultipleConnection();
 
-	virtual gmsec::api::Status setServers(const std::list<bolt::Server>& servers);
+	virtual void setServers(const std::list<bolt::Server>& servers);
 
 	virtual const char* CALL_TYPE getMWInfo();
 
-	virtual gmsec::api::Status CALL_TYPE mwConnect();
+	virtual void CALL_TYPE mwConnect();
 
-	virtual gmsec::api::Status CALL_TYPE mwDisconnect();
+	virtual void CALL_TYPE mwDisconnect();
 
-	virtual gmsec::api::Status CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwSubscribe(const char* subject, const gmsec::api::Config& config);
 
-	virtual gmsec::api::Status CALL_TYPE mwUnsubscribe(const char* subject);
+	virtual void CALL_TYPE mwUnsubscribe(const char* subject);
 
-	virtual gmsec::api::Status CALL_TYPE mwPublish(const gmsec::api::Message& message, const gmsec::api::Config& config);
+	virtual void CALL_TYPE mwPublish(const gmsec::api::Message& message, const gmsec::api::Config& config);
 
-	virtual gmsec::api::Status CALL_TYPE mwRequest(const gmsec::api::Message& message, std::string& uniqueID);
+	virtual void CALL_TYPE mwRequest(const gmsec::api::Message& message, std::string& uniqueID);
 
-	virtual gmsec::api::Status CALL_TYPE mwReply(const gmsec::api::Message& message, const gmsec::api::Message& reply);
+	virtual void CALL_TYPE mwReply(const gmsec::api::Message& message, const gmsec::api::Message& reply);
 
-	virtual gmsec::api::Status CALL_TYPE mwReceive(gmsec::api::Message*& message, GMSEC_I32 timeout);
+	virtual void CALL_TYPE mwReceive(gmsec::api::Message*& message, GMSEC_I32 timeout);
 
 	virtual void handlePacket(bolt::SharedPacket &packet);
 

@@ -1,4 +1,3 @@
- 
 <!--
    Copyright 2007-2016 United States Government as represented by the
    Administrator of The National Aeronautics and Space Administration.
@@ -6,12 +5,6 @@
    All Rights Reserved.
 -->
 
-
-
-
-
-
- 
 
 <!--
 Notes
@@ -62,30 +55,26 @@ Notes
 		<PARAMETER NAME="send-directive-rate">5</PARAMETER>
 	</CONFIG>
 
-  <!--Subscription definitions-->
-  <SUBSCRIPTION NAME="RECEIVE-LOG" PATTERN="GMSEC.TEST-MISSION-ID.SATID.MSG.LOG.GMSEC-RECEIVE-DIRECTIVE.AAA.SYS.1.TEST-USER.TEST-REFERENCE-ID"/>
-  <SUBSCRIPTION NAME="SEND-LOG" PATTERN="GMSEC.TEST-MISSION-ID.SATID.MSG.LOG.GMSEC-SEND-DIRECTIVE.AAA.SYS.1.TEST-USER.TEST-REFERENCE-ID"/>
-  <SUBSCRIPTION NAME="DIRECTIVE-REQUEST" PATTERN="GMSEC.TEST-MISSION-ID.SATID.REQ.DIR.GMSEC-RECEIVE-DIRECTIVE"/>
+<!--Subscription definitions-->
+	<SUBSCRIPTION NAME="RECEIVE-LOG" PATTERN="GMSEC.TEST-MISSION-ID.SATID.MSG.LOG.GMSEC-RECEIVE-DIRECTIVE.AAA.SYS.1.TEST-USER.TEST-REFERENCE-ID"/>
+	<SUBSCRIPTION NAME="SEND-LOG" PATTERN="GMSEC.TEST-MISSION-ID.SATID.MSG.LOG.GMSEC-SEND-DIRECTIVE.AAA.SYS.1.TEST-USER.TEST-REFERENCE-ID"/>
+	<SUBSCRIPTION NAME="DIRECTIVE-REQUEST" PATTERN="GMSEC.TEST-MISSION-ID.SATID.REQ.DIR.GMSEC-RECEIVE-DIRECTIVE"/>
 
 
-  <!--GMSEC connection configuration options-->
-    <CONFIG NAME="connection-config">
+<!--GMSEC connection configuration options-->
+	<CONFIG NAME="connection-config">
 		<PARAMETER NAME="connectiontype">gmsec_bolt</PARAMETER>
-    <PARAMETER NAME="loglevel">Info</PARAMETER>
+		<PARAMETER NAME="loglevel">Info</PARAMETER>
 	</CONFIG>
 
 <!--Generic Log Messages-->
 	<!--SUBJECT Requirement:  GMSEC.[MISSION-ID].[sat].MSG.LOG.[COMPONENT of publisher].[SUBCLASS].[OCCURRENCE-TYPE].[SEVERITY].(USER).(REFERENCE-ID)-->
-    <MESSAGE NAME="LOG-REQ" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.LOG.GMSEC-SEND-DIRECTIVE.AAA.SYS.1.TEST-USER.TEST-REFERENCE-ID" KIND="PUBLISH">
-	<!--GMSEC Information Bus Header-->	
+	<MESSAGE NAME="LOG-REQ" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.LOG.GMSEC-SEND-DIRECTIVE.AAA.SYS.1.TEST-USER.TEST-REFERENCE-ID" KIND="PUBLISH">
+		<!--GMSEC Information Bus Header-->	
 		<!--Message Information-->
 		<FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">LOG</FIELD><!--Required-->
-		<FIELD TYPE="STRING" NAME="UNIQUE-ID"></FIELD><!--API Field-->
-		<FIELD TYPE="STRING" NAME="PUBLISH-TIME"></FIELD><!--API Field-->
-		<!--Middleware Information-->
-		<FIELD TYPE="STRING" NAME="MW-INFO"></FIELD><!--API Field-->
 		<!--Mission Information-->
 		<FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
@@ -93,15 +82,11 @@ Notes
 		<FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
 		<!--Component Information-->
 		<FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
-		<FIELD TYPE="STRING" NAME="NODE"></FIELD><!--API Field-->
 		<FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-SEND-DIRECTIVE</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
-		<FIELD TYPE="I16" NAME="PROCESS-ID">0</FIELD><!--API Field-->
-		<FIELD TYPE="U32" NAME="CONNECTION-ID">0</FIELD><!--API Field-->
-		
-	<!--Log Message Contents-->
+		<!--Log Message Contents-->
 		<FIELD TYPE="F32" NAME="CONTENT-VERSION">1.0</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="SUBCLASS">AAA</FIELD><!--Required--><!--See GMSEC ISD for subclass values, section 5.1.1.1.2-->
@@ -113,63 +98,15 @@ Notes
 		<FIELD TYPE="STRING" NAME="REFERENCE-ID">TEST-REFERENCE-ID</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="MSG-TEXT">Replace this field</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="MSG-TEXT-DETAILS">This message logs the reception of a reponse message</FIELD><!--Optional-->
-		<FIELD TYPE="BIN" NAME="SPECIAL-INFO"></FIELD><!--Optional--><!--This field is in hex-->
 	</MESSAGE>
 
-  <!--SUBJECT Requirement:  GMSEC.[MISSION-ID].[sat].MSG.LOG.[COMPONENT of publisher].[SUBCLASS].[OCCURRENCE-TYPE].[SEVERITY].(USER).(REFERENCE-ID)-->
-    <MESSAGE NAME="LOG-REP" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.LOG.GMSEC-RECEIVE-DIRECTIVE.AAA.SYS.1.TEST-USER.TEST-REFERENCE-ID" KIND="PUBLISH">
-  <!--GMSEC Information Bus Header-->
-    <!--Message Information-->
-    <FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">LOG</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="UNIQUE-ID"></FIELD><!--API Field-->
-    <FIELD TYPE="STRING" NAME="PUBLISH-TIME"></FIELD><!--API Field-->
-    <!--Middleware Information-->
-    <FIELD TYPE="STRING" NAME="MW-INFO"></FIELD><!--API Field-->
-    <!--Mission Information-->
-    <FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SAT-ID-PHYSICAL">TEST-SAT-ID-PHYSICAL</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
-    <!--Component Information-->
-    <FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="NODE"></FIELD><!--API Field-->
-    <FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-RECEIVE-DIRECTIVE</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
-    <FIELD TYPE="I16" NAME="PROCESS-ID">0</FIELD><!--API Field-->
-    <FIELD TYPE="U32" NAME="CONNECTION-ID">0</FIELD><!--API Field-->
-
-    <!--Log Message Contents-->
-    <FIELD TYPE="F32" NAME="CONTENT-VERSION">1.0</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SUBCLASS">AAA</FIELD><!--Required--><!--See GMSEC ISD for subclass values, section 5.1.1.1.2-->
-    <FIELD TYPE="STRING" NAME="OCCURRENCE-TYPE">SYS</FIELD><!--Required--><!--See GMSEC ISD for occurrence type values, section 5.1.1.1.2-->
-    <FIELD TYPE="I16" NAME="SEVERITY">1</FIELD><!--Required--><!--0: Debug  1: Nominal  2: Medium  3: High  4: Critical-->
-    <FIELD TYPE="STRING" NAME="USER">TEST-USER</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SPACECRAFT-TIME">1955-309-06:00:00</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="EVENT-TIME">1955-309-06:00:00</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="REFERENCE-ID">TEST-REFERENCE-ID</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="MSG-TEXT">Replace this field</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MSG-TEXT-DETAILS">This message logs the reception of a request message</FIELD><!--Optional-->
-    <FIELD TYPE="BIN" NAME="SPECIAL-INFO"></FIELD><!--Optional--><!--This field is in hex-->
-  </MESSAGE>
-  
-  
-<!--Generic Directive Request Messages-->
-	<!--SUBJECT Requirement:  GMSEC.[mission].[sat].REQ.DIR.[component of responder]-->
-    <MESSAGE NAME="DIRECTIVE-REQUEST" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.REQ.DIR.GMSEC-RECEIVE-DIRECTIVE" KIND="REQUEST">
-	<!--GMSEC Information Bus Header-->	
+	<!--SUBJECT Requirement:  GMSEC.[MISSION-ID].[sat].MSG.LOG.[COMPONENT of publisher].[SUBCLASS].[OCCURRENCE-TYPE].[SEVERITY].(USER).(REFERENCE-ID)-->
+	<MESSAGE NAME="LOG-REP" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.LOG.GMSEC-RECEIVE-DIRECTIVE.AAA.SYS.1.TEST-USER.TEST-REFERENCE-ID" KIND="PUBLISH">
+		<!--GMSEC Information Bus Header-->
 		<!--Message Information-->
 		<FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
-		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">REQ</FIELD><!--Required-->
-		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">DIR</FIELD><!--Required-->
-		<FIELD TYPE="STRING" NAME="UNIQUE-ID"></FIELD><!--API Field-->
-		<FIELD TYPE="STRING" NAME="PUBLISH-TIME"></FIELD><!--API Field-->
-		<!--Middleware Information-->
-		<FIELD TYPE="STRING" NAME="MW-INFO"></FIELD><!--API Field-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">LOG</FIELD><!--Required-->
 		<!--Mission Information-->
 		<FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
@@ -177,76 +114,63 @@ Notes
 		<FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
 		<!--Component Information-->
 		<FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
-		<FIELD TYPE="STRING" NAME="NODE"></FIELD><!--API Field-->
+		<FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-RECEIVE-DIRECTIVE</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
+		<!--Log Message Contents-->
+		<FIELD TYPE="F32" NAME="CONTENT-VERSION">1.0</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SUBCLASS">AAA</FIELD><!--Required--><!--See GMSEC ISD for subclass values, section 5.1.1.1.2-->
+		<FIELD TYPE="STRING" NAME="OCCURRENCE-TYPE">SYS</FIELD><!--Required--><!--See GMSEC ISD for occurrence type values, section 5.1.1.1.2-->
+		<FIELD TYPE="I16" NAME="SEVERITY">1</FIELD><!--Required--><!--0: Debug  1: Nominal  2: Medium  3: High  4: Critical-->
+		<FIELD TYPE="STRING" NAME="USER">TEST-USER</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SPACECRAFT-TIME">1955-309-06:00:00</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="EVENT-TIME">1955-309-06:00:00</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="REFERENCE-ID">TEST-REFERENCE-ID</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="MSG-TEXT">Replace this field</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MSG-TEXT-DETAILS">This message logs the reception of a request message</FIELD><!--Optional-->
+	</MESSAGE>
+  
+  
+<!--Generic Directive Request Messages-->
+	<!--SUBJECT Requirement:  GMSEC.[mission].[sat].REQ.DIR.[component of responder]-->
+	<MESSAGE NAME="DIRECTIVE-REQUEST" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.REQ.DIR.GMSEC-RECEIVE-DIRECTIVE" KIND="REQUEST">
+		<!--GMSEC Information Bus Header-->	
+		<!--Message Information-->
+		<FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">REQ</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">DIR</FIELD><!--Required-->
+		<!--Mission Information-->
+		<FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SAT-ID-PHYSICAL">TEST-SAT-ID-PHYSICAL</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
+		<!--Component Information-->
+		<FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-SEND-DIRECTIVE</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
-		<FIELD TYPE="I16" NAME="PROCESS-ID">0</FIELD><!--API Field-->
-		<FIELD TYPE="U32" NAME="CONNECTION-ID">0</FIELD><!--API Field-->
-		
-	<!--Directive Request Message Contents-->
+		<!--Directive Request Message Contents-->
 		<FIELD TYPE="F32" NAME="CONTENT-VERSION">1.0</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Required-->
 		<FIELD TYPE="I16" NAME="PRIORITY">1</FIELD><!--Optional--><!--1: Nominal  2: Medium  3: High-->
 		<FIELD TYPE="STRING" NAME="USER">TEST-USER</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="DIRECTIVE-KEYWORD">TEST</FIELD><!--Optional--><!--It has to be all uppercase characters-->
 		<FIELD TYPE="STRING" NAME="DIRECTIVE-STRING">TEST STRING</FIELD><!--Required-->
-		<FIELD TYPE="BIN" NAME="SPECIAL-INFO"></FIELD><!--Optional-->
 		<FIELD TYPE="BOOL" NAME="RESPONSE">1</FIELD><!--Required--><!--0: GMSEC_FALSE or no response  1: GMSEC_TRUE or must respond-->
 		<FIELD TYPE="STRING" NAME="REQUESTED-EXECUTION-TIME">1955-309-06:00:00</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="REQUESTED-EXPIRATION-TIME">1955-309-07:00:00</FIELD><!--Optional-->
 	</MESSAGE>
 
-  <!--SUBJECT Requirement: GMSEC.[mission].[sat].RESP.DIR.[component of requestor].[MSG-ID of requestor].[status]-->
-    <MESSAGE NAME="DIRECTIVE-RESPONSE" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.RESP.DIR.TEST-COMPONENT.MSG-ID.3" KIND="REPLY">
-  <!--GMSEC Information Bus Header-->
-    <!--Message Information-->
-    <FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MESSAGE-TYPE">RESP</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">DIR</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="UNIQUE-ID"></FIELD><!--API Field-->
-    <FIELD TYPE="STRING" NAME="PUBLISH-TIME"></FIELD><!--API Field-->
-    <!--Middleware Information-->
-    <FIELD TYPE="STRING" NAME="MW-INFO"></FIELD><!--API Field-->
-    <!--Mission Information-->
-    <FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SAT-ID-PHYSICAL">TEST-SAT-ID-PHYSICAL</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
-    <!--Component Information-->
-    <FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="NODE"></FIELD><!--API Field-->
-    <FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-RECEIVE-DIRECTIVE</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
-    <FIELD TYPE="I16" NAME="PROCESS-ID">0</FIELD><!--API Field-->
-    <FIELD TYPE="U32" NAME="CONNECTION-ID">0</FIELD><!--API Field-->
-
-    <!--Directive Response Message Contents-->
-    <FIELD TYPE="F32" NAME="CONTENT-VERSION">1.0</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Required-->
-    <!--Status of Request-->
-    <FIELD TYPE="I16" NAME="RESPONSE-STATUS">3</FIELD><!--Required--><!--1: Acknowledgement  2: Working/keep alive  3: Successful completion  4: Failed completion  5: Invalid Request-->
-    <FIELD TYPE="STRING" NAME="TIME-COMPLETED">1955-309-06:00:00</FIELD><!--Optional-->
-    <FIELD TYPE="LONG" NAME="RETURN-VALUE">1</FIELD><!--Optional--><!--NOTE:  This field's value is determined and/or agreed upon by the users of the message.-->
-    <FIELD TYPE="STRING" NAME="DATA">Sample Data</FIELD><!--Optional--><!--NOTE:  This field's type and content is determined and/or agreed upon by the user of the message.  There is no specific type or value-->
-  </MESSAGE>
-
-<!--Generic C2CX Heartbeat Messages-->
-  
-	<!--SUBJECT Requirement: GMSEC.[mission].[sat].MSG.C2CX.[component name of publisher].[C2CX-SUBTYPE].(component name of recipient)-->
-    <MESSAGE NAME="C2CX-HEARTBEAT-REQ" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.C2CX.GMSEC-SEND-DIRECTIVE.HB" KIND="PUBLISH">
-	<!--GMSEC Information Bus Header-->	
+	<!--SUBJECT Requirement: GMSEC.[mission].[sat].RESP.DIR.[component of requestor].[MSG-ID of requestor].[status]-->
+	<MESSAGE NAME="DIRECTIVE-RESPONSE" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.RESP.DIR.TEST-COMPONENT.MSG-ID.3" KIND="REPLY">
+		<!--GMSEC Information Bus Header-->
 		<!--Message Information-->
 		<FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
-		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
-		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">C2CX</FIELD><!--Required-->
-		<FIELD TYPE="STRING" NAME="UNIQUE-ID"></FIELD><!--API Field-->
-		<FIELD TYPE="STRING" NAME="PUBLISH-TIME"></FIELD><!--API Field-->
-		<!--Middleware Information-->
-		<FIELD TYPE="STRING" NAME="MW-INFO"></FIELD><!--API Field-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">RESP</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">DIR</FIELD><!--Required-->
 		<!--Mission Information-->
 		<FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
@@ -254,15 +178,40 @@ Notes
 		<FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
 		<!--Component Information-->
 		<FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
-		<FIELD TYPE="STRING" NAME="NODE"></FIELD><!--API Field-->
+		<FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-RECEIVE-DIRECTIVE</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
+		<!--Directive Response Message Contents-->
+		<FIELD TYPE="F32" NAME="CONTENT-VERSION">1.0</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Required-->
+		<!--Status of Request-->
+		<FIELD TYPE="I16" NAME="RESPONSE-STATUS">3</FIELD><!--Required--><!--1: Acknowledgement  2: Working/keep alive  3: Successful completion  4: Failed completion  5: Invalid Request-->
+		<FIELD TYPE="STRING" NAME="TIME-COMPLETED">1955-309-06:00:00</FIELD><!--Optional-->
+		<FIELD TYPE="LONG" NAME="RETURN-VALUE">1</FIELD><!--Optional--><!--NOTE:  This field's value is determined and/or agreed upon by the users of the message.-->
+		<FIELD TYPE="STRING" NAME="DATA">Sample Data</FIELD><!--Optional--><!--NOTE:  This field's type and content is determined and/or agreed upon by the user of the message.  There is no specific type or value-->
+	</MESSAGE>
+
+<!--Generic C2CX Heartbeat Messages-->
+	<!--SUBJECT Requirement: GMSEC.[mission].[sat].MSG.C2CX.[component name of publisher].[C2CX-SUBTYPE].(component name of recipient)-->
+	<MESSAGE NAME="C2CX-HEARTBEAT-REQ" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.C2CX.GMSEC-SEND-DIRECTIVE.HB" KIND="PUBLISH">
+		<!--GMSEC Information Bus Header-->	
+		<!--Message Information-->
+		<FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">C2CX</FIELD><!--Required-->
+		<!--Mission Information-->
+		<FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SAT-ID-PHYSICAL">TEST-SAT-ID-PHYSICAL</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
+		<!--Component Information-->
+		<FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-SEND-DIRECTIVE</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
 		<FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
-		<FIELD TYPE="I16" NAME="PROCESS-ID">0</FIELD><!--API Field-->
-		<FIELD TYPE="U32" NAME="CONNECTION-ID">0</FIELD><!--API Field-->
-		
-	<!--C2CX Heartbeat Message Contents-->
+		<!--C2CX Heartbeat Message Contents-->
 		<FIELD TYPE="F32" NAME="CONTENT-VERSION">1.3</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Required-->
 		<FIELD TYPE="STRING" NAME="C2CX-SUBTYPE">HB</FIELD><!--Required-->
@@ -272,78 +221,59 @@ Notes
 		<FIELD TYPE="I16" NAME="COMPONENT-INFO">1</FIELD><!--Optional--><!--Component specific-->
 	</MESSAGE>
 
-  <!--SUBJECT Requirement: GMSEC.[mission].[sat].MSG.C2CX.[component name of publisher].[C2CX-SUBTYPE].(component name of recipient)-->
-    <MESSAGE NAME="C2CX-HEARTBEAT-REC" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.C2CX.GMSEC-RECORD-DIRECTIVES.HB" KIND="PUBLISH">
-  <!--GMSEC Information Bus Header-->
-    <!--Message Information-->
-    <FIELD TYPE="FLOAT" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">C2CX</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="UNIQUE-ID"></FIELD><!--API Field-->
-    <FIELD TYPE="STRING" NAME="PUBLISH-TIME"></FIELD><!--API Field-->
-    <!--Middleware Information-->
-    <FIELD TYPE="STRING" NAME="MW-INFO"></FIELD><!--API Field-->
-    <!--Mission Information-->
-    <FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SAT-ID-PHYSICAL">TEST-SAT-ID-PHYSICAL</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
-    <!--Component Information-->
-    <FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="NODE"></FIELD><!--API Field-->
-    <FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-RECORD-DIRECTIVES</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
-    <FIELD TYPE="I16" NAME="PROCESS-ID">0</FIELD><!--API Field-->
-    <FIELD TYPE="U32" NAME="CONNECTION-ID">0</FIELD><!--API Field-->
+	<!--SUBJECT Requirement: GMSEC.[mission].[sat].MSG.C2CX.[component name of publisher].[C2CX-SUBTYPE].(component name of recipient)-->
+	<MESSAGE NAME="C2CX-HEARTBEAT-REC" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.C2CX.GMSEC-RECORD-DIRECTIVES.HB" KIND="PUBLISH">
+		<!--GMSEC Information Bus Header-->
+		<!--Message Information-->
+		<FIELD TYPE="FLOAT" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">C2CX</FIELD><!--Required-->
+		<!--Mission Information-->
+		<FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SAT-ID-PHYSICAL">TEST-SAT-ID-PHYSICAL</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
+		<!--Component Information-->
+		<FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-RECORD-DIRECTIVES</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
+		<!--C2CX Heartbeat Message Contents-->
+		<FIELD TYPE="FLOAT" NAME="CONTENT-VERSION">1.3</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="C2CX-SUBTYPE">HB</FIELD><!--Required-->
+		<FIELD TYPE="I16" NAME="COUNTER">0</FIELD><!--Optional--><!--To be the number of times this message has been published, incrementing by 1-->
+		<FIELD TYPE="I16" NAME="PUB-RATE">5</FIELD><!--Optional-->
+		<FIELD TYPE="I16" NAME="COMPONENT-STATUS">1</FIELD><!--Optional--><!--0: Debug  1: Normal/Green  2: Yellow  3: Orange  4: Red-->
+		<FIELD TYPE="I16" NAME="COMPONENT-INFO">1</FIELD><!--Optional--><!--Component specific-->
+	</MESSAGE>
 
-    <!--C2CX Heartbeat Message Contents-->
-    <FIELD TYPE="FLOAT" NAME="CONTENT-VERSION">1.3</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="C2CX-SUBTYPE">HB</FIELD><!--Required-->
-    <FIELD TYPE="I16" NAME="COUNTER">0</FIELD><!--Optional--><!--To be the number of times this message has been published, incrementing by 1-->
-    <FIELD TYPE="I16" NAME="PUB-RATE">5</FIELD><!--Optional-->
-    <FIELD TYPE="I16" NAME="COMPONENT-STATUS">1</FIELD><!--Optional--><!--0: Debug  1: Normal/Green  2: Yellow  3: Orange  4: Red-->
-    <FIELD TYPE="I16" NAME="COMPONENT-INFO">1</FIELD><!--Optional--><!--Component specific-->
-  </MESSAGE>
-
-  <!--SUBJECT Requirement: GMSEC.[mission].[sat].MSG.C2CX.[component name of publisher].[C2CX-SUBTYPE].(component name of recipient)-->
-    <MESSAGE NAME="C2CX-HEARTBEAT-REP" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.C2CX.GMSEC-RECEIVE-DIRECTIVE.HB" KIND="PUBLISH">
-  <!--GMSEC Information Bus Header-->
-    <!--Message Information-->
-    <FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">C2CX</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="UNIQUE-ID"></FIELD><!--API Field-->
-    <FIELD TYPE="STRING" NAME="PUBLISH-TIME"></FIELD><!--API Field-->
-    <!--Middleware Information-->
-    <FIELD TYPE="STRING" NAME="MW-INFO"></FIELD><!--API Field-->
-    <!--Mission Information-->
-    <FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SAT-ID-PHYSICAL">TEST-SAT-ID-PHYSICAL</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
-    <!--Component Information-->
-    <FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="NODE"></FIELD><!--API Field-->
-    <FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-RECEIVE-DIRECTIVE</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
-    <FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
-    <FIELD TYPE="I16" NAME="PROCESS-ID">0</FIELD><!--API Field-->
-    <FIELD TYPE="U32" NAME="CONNECTION-ID">0</FIELD><!--API Field-->
-
-    <!--C2CX Heartbeat Message Contents-->
-    <FIELD TYPE="F32" NAME="CONTENT-VERSION">1.3</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Required-->
-    <FIELD TYPE="STRING" NAME="C2CX-SUBTYPE">HB</FIELD><!--Required-->
-    <FIELD TYPE="I16" NAME="COUNTER">0</FIELD><!--Optional--><!--To be the number of times this message has been published, incrementing by 1-->
-    <FIELD TYPE="I16" NAME="PUB-RATE">5</FIELD><!--Optional-->
-    <FIELD TYPE="I16" NAME="COMPONENT-STATUS">1</FIELD><!--Optional--><!--0: Debug  1: Normal/Green  2: Yellow  3: Orange  4: Red-->
-    <FIELD TYPE="I16" NAME="COMPONENT-INFO">1</FIELD><!--Optional--><!--Component specific-->
-  </MESSAGE>
-  
-  
-  
+	<!--SUBJECT Requirement: GMSEC.[mission].[sat].MSG.C2CX.[component name of publisher].[C2CX-SUBTYPE].(component name of recipient)-->
+	<MESSAGE NAME="C2CX-HEARTBEAT-REP" SUBJECT="GMSEC.TEST-MISSION-ID.SATID.MSG.C2CX.GMSEC-RECEIVE-DIRECTIVE.HB" KIND="PUBLISH">
+		<!--GMSEC Information Bus Header-->
+    	<!--Message Information-->
+		<FIELD TYPE="F32" NAME="HEADER-VERSION">1.3</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-TYPE">MSG</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MESSAGE-SUBTYPE">C2CX</FIELD><!--Required-->
+		<!--Mission Information-->
+		<FIELD TYPE="STRING" NAME="MISSION-ID">TEST-MISSION-ID</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="CONSTELLATION-ID">TEST-CONSTELLATION-ID</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SAT-ID-PHYSICAL">TEST-SAT-ID-PHYSICAL</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SAT-ID-LOGICAL">TEST-SAT-ID-LOGICAL</FIELD><!--Optional-->
+		<!--Component Information-->
+		<FIELD TYPE="STRING" NAME="FACILITY">TEST-FACILITY</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="CLASS">TEST-CLASS</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="COMPONENT">GMSEC-RECEIVE-DIRECTIVE</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="SUBCOMPONENT1">TEST-SUBCOMPONENT1</FIELD><!--Optional-->
+		<FIELD TYPE="STRING" NAME="SUBCOMPONENT2">TEST-SUBCOMPONENT2</FIELD><!--Optional-->
+		<!--C2CX Heartbeat Message Contents-->
+		<FIELD TYPE="F32" NAME="CONTENT-VERSION">1.3</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="MSG-ID">TEST-MSG-ID</FIELD><!--Required-->
+		<FIELD TYPE="STRING" NAME="C2CX-SUBTYPE">HB</FIELD><!--Required-->
+		<FIELD TYPE="I16" NAME="COUNTER">0</FIELD><!--Optional--><!--To be the number of times this message has been published, incrementing by 1-->
+		<FIELD TYPE="I16" NAME="PUB-RATE">5</FIELD><!--Optional-->
+		<FIELD TYPE="I16" NAME="COMPONENT-STATUS">1</FIELD><!--Optional--><!--0: Debug  1: Normal/Green  2: Yellow  3: Orange  4: Red-->
+		<FIELD TYPE="I16" NAME="COMPONENT-INFO">1</FIELD><!--Optional--><!--Component specific-->
+	</MESSAGE>
 </DEFINITIONS>

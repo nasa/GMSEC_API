@@ -1946,13 +1946,41 @@
 						>
 					</File>
 					<File
+						RelativePath=".\framework\include\gmsec4\mist\SchemaIDIterator.h"
+						>
+					</File>
+					<File
 						RelativePath=".\framework\include\gmsec4\mist\ServiceParam.h"
+						>
+					</File>
+					<File
+						RelativePath=".\framework\include\gmsec4\mist\Specification.h"
 						>
 					</File>
 					<File
 						RelativePath=".\framework\include\gmsec4\mist\SubscriptionInfo.h"
 						>
 					</File>
+					<Filter
+						Name="message"
+						>
+						<File
+							RelativePath=".\framework\include\gmsec4\mist\message\DeviceMessage.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\mist\message\MistMessage.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\mist\message\MnemonicMessage.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\mist\message\ProductFileMessage.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="field"
@@ -2131,6 +2159,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\framework\include\gmsec4\internal\MessageAggregationToolkit.h"
+					>
+				</File>
+				<File
 					RelativePath=".\framework\include\gmsec4\internal\MessageBuddy.h"
 					>
 				</File>
@@ -2258,18 +2290,6 @@
 					Name="MIST"
 					>
 					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\AbstractBaseFieldDescriptor.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\AbstractFieldDescriptor.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\CompoundFieldDescriptor.h"
-						>
-					</File>
-					<File
 						RelativePath=".\framework\include\gmsec4\internal\mist\ConnMgrCallbackCache.h"
 						>
 					</File>
@@ -2278,19 +2298,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\Context.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\DefaultMessageSchemas.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\DescriptorList.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\FieldAccessTemplate.h"
+						RelativePath=".\framework\include\gmsec4\internal\mist\FieldTemplate.h"
 						>
 					</File>
 					<File
@@ -2298,15 +2306,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\InternalCompoundFieldDescriptor.h"
-						>
-					</File>
-					<File
 						RelativePath=".\framework\include\gmsec4\internal\mist\InternalConnectionManager.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\InternalContext.h"
 						>
 					</File>
 					<File
@@ -2318,15 +2318,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\InternalDeviceMessage.h"
-						>
-					</File>
-					<File
 						RelativePath=".\framework\include\gmsec4\internal\mist\InternalDeviceParam.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\InternalMessageTemplate.h"
 						>
 					</File>
 					<File
@@ -2335,10 +2327,6 @@
 					</File>
 					<File
 						RelativePath=".\framework\include\gmsec4\internal\mist\InternalMnemonicIterator.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\InternalMnemonicMessage.h"
 						>
 					</File>
 					<File
@@ -2354,15 +2342,11 @@
 						>
 					</File>
 					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\InternalProductFileMessage.h"
+						RelativePath=".\framework\include\gmsec4\internal\mist\InternalSchemaIDIterator.h"
 						>
 					</File>
 					<File
 						RelativePath=".\framework\include\gmsec4\internal\mist\InternalServiceParam.h"
-						>
-					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\InternalSimpleFieldDescriptor.h"
 						>
 					</File>
 					<File
@@ -2398,17 +2382,33 @@
 						>
 					</File>
 					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\SimpleFieldDescriptor.h"
+						RelativePath=".\framework\include\gmsec4\internal\mist\SchemaTemplate.h"
 						>
 					</File>
 					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\Specification.h"
+						RelativePath=".\framework\include\gmsec4\internal\mist\SpecificationBuddy.h"
 						>
 					</File>
-					<File
-						RelativePath=".\framework\include\gmsec4\internal\mist\VariableFieldDescriptor.h"
+					<Filter
+						Name="message"
 						>
-					</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\internal\mist\message\InternalDeviceMessage.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\internal\mist\message\InternalMistMessage.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\internal\mist\message\InternalMnemonicMessage.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\internal\mist\message\InternalProductFileMessage.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="performance"
@@ -2463,10 +2463,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\framework\include\gmsec4\util\StdSharedPtr.h"
-					>
-				</File>
-				<File
 					RelativePath=".\framework\include\gmsec4\util\List.h"
 					>
 				</File>
@@ -2488,6 +2484,10 @@
 				</File>
 				<File
 					RelativePath=".\framework\include\gmsec4\util\Mutex.h"
+					>
+				</File>
+				<File
+					RelativePath=".\framework\include\gmsec4\util\StdSharedPtr.h"
 					>
 				</File>
 				<File
@@ -2654,9 +2654,37 @@
 						>
 					</File>
 					<File
+						RelativePath=".\framework\include\gmsec4\c\mist\schema_id_iterator.h"
+						>
+					</File>
+					<File
 						RelativePath=".\framework\include\gmsec4\c\mist\service_param.h"
 						>
 					</File>
+					<File
+						RelativePath=".\framework\include\gmsec4\c\mist\specification.h"
+						>
+					</File>
+					<Filter
+						Name="message"
+						>
+						<File
+							RelativePath=".\framework\include\gmsec4\c\mist\message\device_message.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\c\mist\message\mist_message.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\c\mist\message\mnemonic_message.h"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\include\gmsec4\c\mist\message\product_file_message.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="util"
@@ -3630,7 +3658,95 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\framework\src\gmsec4\mist\SchemaIDIterator.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation="\objects/Debug/api4/mist/"
+								ObjectFile="\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation="\objects/Debug/api4/mist/"
+								ObjectFile="\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects/Release/api4/mist/"
+								ObjectFile=".\objects/Release/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects/Release/api4/mist/"
+								ObjectFile=".\objects/Release/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
 						RelativePath=".\framework\src\gmsec4\mist\ServiceParam.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation="\objects/Debug/api4/mist/"
+								ObjectFile="\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation="\objects/Debug/api4/mist/"
+								ObjectFile="\objects/Debug/api4/mist/"
+								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects/Release/api4/mist/"
+								ObjectFile=".\objects/Release/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects/Release/api4/mist/"
+								ObjectFile=".\objects/Release/api4/mist/"
+								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\framework\src\gmsec4\mist\Specification.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -3717,6 +3833,56 @@
 							/>
 						</FileConfiguration>
 					</File>
+					<Filter
+						Name="message"
+						>
+						<File
+							RelativePath=".\framework\src\gmsec4\mist\message\DeviceMessage.cpp"
+							>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\mist\message\MistMessage.cpp"
+							>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\mist\message\MnemonicMessage.cpp"
+							>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\mist\message\ProductFileMessage.cpp"
+							>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="field"
@@ -5311,6 +5477,50 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath=".\framework\src\gmsec4\internal\MessageAggregationToolkit.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerListingLocation="\objects/Debug/api4/"
+							ObjectFile="\objects/Debug/api4/"
+							ProgramDataBaseFileName="\objects/Debug/api4/"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Debug|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerListingLocation="\objects/Debug/api4/"
+							ObjectFile="\objects/Debug/api4/"
+							ProgramDataBaseFileName="\objects/Debug/api4/"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerListingLocation="\objects/Release/api4/"
+							ObjectFile="\objects/Release/api4/"
+							ProgramDataBaseFileName="\objects/Release/api4/"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							AssemblerListingLocation="\objects/Release/api4/"
+							ObjectFile="\objects/Release/api4/"
+							ProgramDataBaseFileName="\objects/Release/api4/"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\framework\src\gmsec4\internal\Middleware.cpp"
 					>
 					<FileConfiguration
@@ -5798,138 +6008,6 @@
 					Name="MIST"
 					>
 					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\AbstractBaseFieldDescriptor.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\AbstractFieldDescriptor.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\CompoundFieldDescriptor.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
 						RelativePath=".\framework\src\gmsec4\internal\mist\ConnMgrCallbackCache.cpp"
 						>
 						<FileConfiguration
@@ -6018,51 +6096,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\Context.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\DescriptorList.cpp"
+						RelativePath=".\framework\src\gmsec4\internal\mist\FieldTemplate.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -6150,95 +6184,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\InternalCompoundFieldDescriptor.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
 						RelativePath=".\framework\src\gmsec4\internal\mist\InternalConnectionManager.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\InternalContext.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -6370,95 +6316,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\InternalDeviceMessage.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
 						RelativePath=".\framework\src\gmsec4\internal\mist\InternalDeviceParam.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\InternalMessageTemplate.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -6547,50 +6405,6 @@
 					</File>
 					<File
 						RelativePath=".\framework\src\gmsec4\internal\mist\InternalMnemonicIterator.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation="\objects/Debug/api4/mist/"
-								ObjectFile="\objects/Debug/api4/mist/"
-								ProgramDataBaseFileName="\objects/Debug/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects/Release/api4/mist/"
-								ObjectFile=".\objects/Release/api4/mist/"
-								ProgramDataBaseFileName=".\objects/Release/api4/mist/"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\InternalMnemonicMessage.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -6766,7 +6580,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\InternalProductFileMessage.cpp"
+						RelativePath=".\framework\src\gmsec4\internal\mist\InternalSchemaIDIterator.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -7206,7 +7020,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\framework\src\gmsec4\internal\mist\Specification.cpp"
+						RelativePath=".\framework\src\gmsec4\internal\mist\SchemaTemplate.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -7249,6 +7063,186 @@
 							/>
 						</FileConfiguration>
 					</File>
+					<Filter
+						Name="message"
+						>
+						<File
+							RelativePath=".\framework\src\gmsec4\internal\mist\message\InternalDeviceMessage.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\internal\mist\message\InternalMistMessage.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\internal\mist\message\InternalMnemonicMessage.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\internal\mist\message\InternalProductFileMessage.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Debug/api4/mist/message/"
+									ObjectFile=".\objects/Debug/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Debug/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects/Release/api4/mist/message/"
+									ObjectFile=".\objects/Release/api4/mist/message/"
+									ProgramDataBaseFileName=".\objects/Release/api4/mist/message/"
+								/>
+							</FileConfiguration>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="field"
@@ -9610,50 +9604,6 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\framework\src\gmsec4\c\mist\device_message.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects\Debug\api4\c\"
-								ObjectFile=".\objects\Debug\api4\c\"
-								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects\Debug\api4\c\"
-								ObjectFile=".\objects\Debug\api4\c\"
-								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects\Release\api4\c\"
-								ObjectFile=".\objects\Release\api4\c\"
-								ProgramDataBaseFileName=".\objects\Release\api4\c\"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects\Release\api4\c\"
-								ObjectFile=".\objects\Release\api4\c\"
-								ProgramDataBaseFileName=".\objects\Release\api4\c\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
 						RelativePath=".\framework\src\gmsec4\c\mist\device_param.cpp"
 						>
 						<FileConfiguration
@@ -9699,50 +9649,6 @@
 					</File>
 					<File
 						RelativePath=".\framework\src\gmsec4\c\mist\mnemonic.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects\Debug\api4\c\"
-								ObjectFile=".\objects\Debug\api4\c\"
-								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Debug|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects\Debug\api4\c\"
-								ObjectFile=".\objects\Debug\api4\c\"
-								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects\Release\api4\c\"
-								ObjectFile=".\objects\Release\api4\c\"
-								ProgramDataBaseFileName=".\objects\Release\api4\c\"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|x64"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AssemblerListingLocation=".\objects\Release\api4\c\"
-								ObjectFile=".\objects\Release\api4\c\"
-								ProgramDataBaseFileName=".\objects\Release\api4\c\"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath=".\framework\src\gmsec4\c\mist\mnemonic_message.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -9874,7 +9780,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\framework\src\gmsec4\c\mist\product_file_message.cpp"
+						RelativePath=".\framework\src\gmsec4\c\mist\schema_id_iterator.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -9961,6 +9867,230 @@
 							/>
 						</FileConfiguration>
 					</File>
+					<File
+						RelativePath=".\framework\src\gmsec4\c\mist\specification.cpp"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Debug\api4\c\"
+								ObjectFile=".\objects\Debug\api4\c\"
+								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Debug\api4\c\"
+								ObjectFile=".\objects\Debug\api4\c\"
+								ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Release\api4\c\"
+								ObjectFile=".\objects\Release\api4\c\"
+								ProgramDataBaseFileName=".\objects\Release\api4\c\"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Release|x64"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AssemblerListingLocation=".\objects\Release\api4\c\"
+								ObjectFile=".\objects\Release\api4\c\"
+								ProgramDataBaseFileName=".\objects\Release\api4\c\"
+							/>
+						</FileConfiguration>
+					</File>
+					<Filter
+						Name="message"
+						>
+						<File
+							RelativePath=".\framework\src\gmsec4\c\mist\message\device_message.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Debug\api4\c\"
+									ObjectFile=".\objects\Debug\api4\c\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Debug\api4\c\"
+									ObjectFile=".\objects\Debug\api4\c\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Release\api4\c\"
+									ObjectFile=".\objects\Release\api4\c\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Release\api4\c\"
+									ObjectFile=".\objects\Release\api4\c\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\c\mist\message\mist_message.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Debug\api4\c\"
+									ObjectFile=".\objects\Debug\api4\c\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Debug\api4\c\"
+									ObjectFile=".\objects\Debug\api4\c\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Release\api4\c\"
+									ObjectFile=".\objects\Release\api4\c\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Release\api4\c\"
+									ObjectFile=".\objects\Release\api4\c\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\c\mist\message\mnemonic_message.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Debug\api4\c\"
+									ObjectFile=".\objects\Debug\api4\c\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Debug\api4\c\"
+									ObjectFile=".\objects\Debug\api4\c\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Release\api4\c\"
+									ObjectFile=".\objects\Release\api4\c\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Release\api4\c\"
+									ObjectFile=".\objects\Release\api4\c\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+								/>
+							</FileConfiguration>
+						</File>
+						<File
+							RelativePath=".\framework\src\gmsec4\c\mist\message\product_file_message.cpp"
+							>
+							<FileConfiguration
+								Name="Debug|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Debug\api4\c\"
+									ObjectFile=".\objects\Debug\api4\c\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Debug|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Debug\api4\c\"
+									ObjectFile=".\objects\Debug\api4\c\"
+									ProgramDataBaseFileName=".\objects\Debug\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|Win32"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Release\api4\c\"
+									ObjectFile=".\objects\Release\api4\c\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+								/>
+							</FileConfiguration>
+							<FileConfiguration
+								Name="Release|x64"
+								>
+								<Tool
+									Name="VCCLCompilerTool"
+									AssemblerListingLocation=".\objects\Release\api4\c\"
+									ObjectFile=".\objects\Release\api4\c\"
+									ProgramDataBaseFileName=".\objects\Release\api4\c\"
+								/>
+							</FileConfiguration>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="util"

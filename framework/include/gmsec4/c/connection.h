@@ -56,9 +56,9 @@
  */
 typedef enum
 {
-	GMSEC_NOT_CONNECTED,    /**< Connection not established */
-	GMSEC_CONNECTED,        /**< Connection established */
-	GMSEC_RECONNECTING      /**< Connection broken and attempt is being made to re-establishe it */
+	GMSEC_NOT_CONNECTED = 0,    /**< Connection not established */
+	GMSEC_CONNECTED = 1,        /**< Connection established */
+	GMSEC_RECONNECTING = 2      /**< Connection broken and attempt is being made to re-establishe it */
 } GMSEC_ConnectionState;
 
 

@@ -11,7 +11,6 @@
 
 #include <gmsec4/internal/InternalMessage.h>
 
-
 namespace gmsec
 {
 namespace api
@@ -37,6 +36,12 @@ Message::Message(const char* fromXML)
 
 Message::Message(const Message& other)
 	: m_iMessage(new internal::InternalMessage(*other.m_iMessage))
+{
+}
+
+
+Message::Message(internal::InternalMessage* internal)
+	: m_iMessage(internal)
 {
 }
 
@@ -186,6 +191,30 @@ bool Message::clearField(const char* name)
 }
 
 
+GMSEC_I64 Message::getIntegerValue(const char* fieldName) const
+{
+	return m_iMessage->getIntegerValue(fieldName);
+}
+
+
+GMSEC_U64 Message::getUnsignedIntegerValue(const char* fieldName) const
+{
+	return m_iMessage->getUnsignedIntegerValue(fieldName);
+}
+
+
+GMSEC_F64 Message::getDoubleValue(const char* fieldName) const
+{
+	return m_iMessage->getDoubleValue(fieldName);
+}
+
+
+const char* Message::getStringValue(const char* fieldName) const
+{
+	return m_iMessage->getStringValue(fieldName);
+}
+
+
 const Field* Message::getField(const char* name) const
 {
 	return m_iMessage->getField(name);
@@ -318,10 +347,15 @@ MessageFieldIterator& Message::getFieldIterator(MessageFieldIterator::Selector s
 }
 
 
-void Message::registerChild(gmsec::api::internal::InternalMessage* child)
+void Message::registerInternal(gmsec::api::internal::InternalMessage* internal)
 {
 	delete m_iMessage;
-	m_iMessage = child;
+	m_iMessage = internal;
+}
+
+gmsec::api::internal::InternalMessage& Message::getInternal() const
+{
+	return *m_iMessage;
 }
 
 } //namespace api

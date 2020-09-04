@@ -14,6 +14,8 @@
 */
 
 
+using System.Collections.Generic;
+
 namespace Recorder
 {
 	using GMSEC.API;
@@ -34,6 +36,7 @@ namespace Recorder
 	class Recorder : GmsecExample
 	{
 		private Connection conn;
+        private List<SubscriptionInfo> info = new List<SubscriptionInfo>(); 
 
 
 		public Recorder()
@@ -53,7 +56,15 @@ namespace Recorder
 		{
 			if (conn != null)
 			{
-				conn.Disconnect();
+                for (int i = info.Count - 1; i >= 0; i--)
+                {
+                    Log.Info("Unsubscribing from " + info[i].GetSubject());
+                    var temp = info[i];
+                    conn.Unsubscribe(ref temp);
+                    info.RemoveAt(i);
+                }
+                
+                conn.Disconnect();
 
 				Connection.Destroy(ref conn);
 			}
@@ -102,8 +113,8 @@ namespace Recorder
 
 				//Subscription Callback
 				LogCallback cb = new LogCallback();
-				conn.Subscribe(subject1, cb);
-				conn.Subscribe(subject2, cb);
+				info.Add(conn.Subscribe(subject1, cb));
+				info.Add(conn.Subscribe(subject2, cb));
 
 				// Load Heartbeat Message Definition
 				Message hbMsg = cfgFile.LookupMessage("C2CX-HEARTBEAT-REC");

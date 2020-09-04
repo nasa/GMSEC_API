@@ -51,7 +51,7 @@ inline void printUsage(const std::string &programName)
 	{
 		std::cout << "\n\tsubject=<subject name>";
 	}
-	if (programName.find("gmsub") != std::string::npos || programName.compare("gmpub") == 0)
+	if (programName.find("gmsub") != std::string::npos || programName.find("gmpub") != std::string::npos)
 	{
 		if (programName.find("gmsub_disp") == std::string::npos) 
 		{
@@ -114,6 +114,13 @@ inline void printUsage(const std::string &programName)
 	    programName.find("logging") != std::string::npos)
 	{
 		std::cout << std::endl << "\tcfgfile=<config_filepath.xml>";
+	}
+
+	if (programName.find("wsmq_async") != std::string::npos)
+	{
+		std::cout << "\n\tmw-async-publish=<true | false>"
+		<< "\n\tmw-async-status-check=<true | false>"
+		<< "\n\tmw-async-status-check-message-interval=<number of publish operations before checking asynchronous put status>";
 	}
 
 	std::cout << "\n\nFor more information, see API User's Guide" << std::endl;
