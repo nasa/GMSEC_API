@@ -80,6 +80,7 @@ def main(agrv=None):
     if(len(sys.argv) <= 1):
         usageMessage =  "usage: " + sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
+        return -1
 
     config = libgmsec_python.Config()
 
@@ -110,12 +111,9 @@ def main(agrv=None):
     # interface
     # This is useful for determining which version of the API is
     # configured within the environment
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create the ConnectionManager
         connMgr = libgmsec_python.ConnectionManager(config)
 
@@ -132,7 +130,6 @@ def main(agrv=None):
         connMgr.cleanup()
         
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
         
@@ -160,11 +157,9 @@ def main(agrv=None):
     # Set logging reporting level to now allow DEBUG messages to be shown
     libgmsec_python.Log.setReportingLevel(libgmsec_python.logDEBUG)
     if (libgmsec_python.Log.getReportingLevel() == libgmsec_python.logDEBUG):
-        
         libgmsec_python.logInfo("Changed reporting level to logDEBUG")
         
     else:
-        
         libgmsec_python.logError("Failed to change reporting level to logDEBUG")
         
     # The DEBUG message below will be shown successfully, unlike the last

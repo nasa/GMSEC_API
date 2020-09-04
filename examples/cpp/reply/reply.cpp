@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -46,15 +46,17 @@ int main(int argc, char* argv[])
 	// etc.
 	Config config(argc, argv);
 
+	//o Since this example program uses an invalid message, we ensure the
+	//  validation check is disabled.
+	config.addValue("gmsec-msg-content-validate-all", "false");
+
 	// If it was not specified in the command-line arguments, set LOGLEVEL
 	// to 'INFO' and LOGFILE to 'stdout' to allow the program report output
 	// on the terminal/command line
 	initializeLogging(config);
 
 	//o Output GMSEC API version
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO << Connection::getAPIVersion();
+	GMSEC_INFO << ConnectionManager::getAPIVersion();
 
 	try
 	{
@@ -78,13 +80,13 @@ int main(int argc, char* argv[])
 		// -1 - Wait forever
 		//  0 - Return immediately
 		// >0 - Time in milliseconds before timing out
-		Message* requestMsg = connMgr.receive(5000);
+		Message* requestMsg = connMgr.receive(10000);
 
 		// Example error handling for calling receive() with a timeout
 		if (requestMsg)
 		{
 			//o Display the XML representation of the received message
-			GMSEC_INFO << "Received a message\n" << requestMsg->toXML();
+			GMSEC_INFO << "Received a message:\n" << requestMsg->toXML();
 
 			//o Double-check the Message type to ensure that it is a request
 			if (requestMsg->getKind() == Message::REQUEST)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -309,6 +309,22 @@ bool InternalMessage::addField(const char* name, GMSEC_U64 value)
 {
 	Field* field = new U64Field(name, value);
 	return addField(*field, false);
+}
+
+
+bool InternalMessage::addFields(const DataList<Field*>& fields)
+{
+	bool fieldReplaced = false;
+
+	for (DataList<Field*>::const_iterator it = fields.begin(); it != fields.end(); ++it)
+	{
+		if (*it != NULL)
+		{
+			fieldReplaced |= addField(*(*it));
+		}
+	}
+
+	return fieldReplaced;
 }
 
 
@@ -868,15 +884,15 @@ bool InternalMessage::processConfigValue(const char* name, const char* value)
 	}
 	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_MSG_FLD_STORAGE_SIZE))
 	{
-		std::stringstream ss(value);
-		int limit = 0;
-		ss >> limit;
-		if (!ss.fail() && ss.eof())
+		try
 		{
+			int limit = StringUtil::getValue<int>(value);
+
 			m_fields.setRolloverLimit(limit);
+
 			return true;
 		}
-		else
+		catch (...)
 		{
 			std::stringstream ss;
 			ss << GMSEC_MSG_FLD_STORAGE_SIZE << " value must be a number; got '" << value << "'.";
@@ -885,14 +901,14 @@ bool InternalMessage::processConfigValue(const char* name, const char* value)
 	}
 	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_SORT_MSG_FIELDS))
 	{
-        if (StringUtil::stringEqualsIgnoreCase(value, "true"))
+		if (StringUtil::stringEqualsIgnoreCase(value, "true"))
 		{
-			m_fields.setStorageType(MsgFieldMap::BINARY_TREE_MAP);
-			m_fields.setRolloverLimit(0);
+			m_fields.setFieldDisplay(MsgFieldMap::SORTED);
 			return true;
 		}
-        else if (StringUtil::stringEqualsIgnoreCase(value, "false"))
+		else if (StringUtil::stringEqualsIgnoreCase(value, "false"))
 		{
+			m_fields.setFieldDisplay(MsgFieldMap::UNSORTED);
 			return true;
 		}
 		else

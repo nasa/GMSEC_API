@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -368,6 +368,8 @@ jobject gmsec::api::jni::convertEvent(JNIEnv* jenv, gmsec::api::Connection::Conn
 	case gmsec::api::Connection::CONNECTION_EXCEPTION_EVENT:    eventString = "CONNECTION_EXCEPTION_EVENT"; break;
 	case gmsec::api::Connection::GMD_ERROR_EVENT:               eventString = "GMD_ERROR_EVENT"; break;
 	case gmsec::api::Connection::WSMQ_ASYNC_STATUS_CHECK_EVENT: eventString = "WSMQ_ASYNC_STATUS_CHECK_EVENT"; break;
+	case gmsec::api::Connection::MSG_PUBLISH_FAILURE_EVENT:     eventString = "MSG_PUBLISH_FAILURE_EVENT"; break;
+	case gmsec::api::Connection::INVALID_MESSAGE_EVENT:         eventString = "INVALID_MESSAGE_EVENT"; break;
 
 	default: eventString = "ALL_EVENTS"; break;
 	}

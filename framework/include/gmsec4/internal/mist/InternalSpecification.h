@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -16,7 +16,6 @@
 #ifndef GMSEC_MIST_INTERNAL_SPECIFICATION_H
 #define GMSEC_MIST_INTERNAL_SPECIFICATION_H
 
-#include <gmsec4/internal/mist/FieldTemplate.h>
 #include <gmsec4/internal/mist/SchemaTemplate.h>
 
 #include <gmsec4/internal/tinyxml2.h>
@@ -25,10 +24,13 @@
 
 #include <gmsec4/mist/SchemaIDIterator.h>
 
+#include <gmsec4/util/DataList.h>
+
 #include <gmsec4/Status.h>
 
 #include <map>
 #include <list>
+#include <vector>
 #include <string>
 
 
@@ -42,15 +44,28 @@ namespace api
 
 namespace mist
 {
+	// Forward declaration(s)
+	class MessageSpecification;
+
 namespace internal
 {
 	// Forward declaration(s)
+	class FieldTemplate;
 	class MessageTemplate;
+
+	const char* const DIRECTORY_FILE = ".DIRECTORY.xml";
+	const char* const HEADER_FILE = "Header.xsd";
+	const char* const DEFAULTS_FILE = "Defaults.xsd";
+	const char* const FIELDS_FILE = "Fields.xsd";
+	const char* const TRANSFORM_FILE = "Stylesheet.xsl";
 
 
 class GMSEC_API InternalSpecification
 {
 public:
+	typedef std::vector<FieldTemplate*> FieldTemplateList;
+	typedef std::list<SchemaTemplate>   SchemaTemplateList;
+
 	InternalSpecification(const Config& config);
 
 
@@ -59,8 +74,9 @@ public:
 
 	~InternalSpecification();
 
-
-	Status CALL_TYPE loadTemplate(const char* path);
+	//if m_legacyTemplates is true, source is a path to be loaded
+	//if m_legacyTemplates is false, source is an xml-formatted string to be parsed
+	Status CALL_TYPE loadTemplate(const char* source, const char* fileName);
 
 
 	void CALL_TYPE validateMessage(const Message& msg);
@@ -84,11 +100,14 @@ public:
 
 	bool checkValidSpec(unsigned int specVersionInt);
 
-	const std::list<SchemaTemplate>& getDirectory() const;
+	const SchemaTemplateList& getDirectory() const;
 	
 
 	//INTERNAL USE ONLY helper function, copy the header field templates and populate them with the expected values given the message schema
-	std::list<FieldTemplate> CALL_TYPE prepHeaders(const char* schemaID);
+	FieldTemplateList CALL_TYPE prepHeaders(const char* schemaID);
+
+
+	const util::DataList<MessageSpecification*>& getMessageSpecifications() const;
 
 
 private:
@@ -100,21 +119,27 @@ private:
 	void CALL_TYPE load();
 
 
+	void initMessageSpecifications();
+
+
 	Status CALL_TYPE parser(tinyxml2::XMLElement* xmlSchema, 
 	                        std::string& schemaID, 
-							std::list<FieldTemplate>& schemaFields);
+							FieldTemplateList& schemaFields);
 
+	//helper function, checks a given value against the types defined in the field template
+	//to make sure that the value is valid for all types given
+	bool checkValue(std::list<Field::FieldType> types, std::string value);
 
 	//helper function, get the string value from a field in a given message
 	std::string CALL_TYPE getValue(const Message& msg, const char* name) const;
 
 
 	//helper function, convert enumerated field type to string a human can actually read
-	const char* CALL_TYPE getTypeStr(Field::FieldType type);
+	std::string CALL_TYPE getTypeStr(Field::FieldType type);
 
 	//internal helper functions for checkValidation
 	std::string CALL_TYPE registerTemplate(const Message& msg, GMSEC_I64 level);
-	Status CALL_TYPE compare(const Message& msg, const std::list<FieldTemplate>& fields);
+	Status CALL_TYPE compare(const Message& msg, const FieldTemplateList& fields);
 	Status CALL_TYPE validate(const Message& msg, const FieldTemplate& fmtp);
 	std::string prepFieldName(const char* name, const std::list<std::string>& charList, const std::list<size_t>& indexList);
 
@@ -129,25 +154,32 @@ private:
 	bool CALL_TYPE hasNextID() const;
 
 
-	typedef std::map<std::string, std::string>      SchemaRegistry;   // message subject, schema ID
-	typedef std::map<std::string, MessageTemplate*> MessageTemplates; // schema ID, MessageTemplate
-	typedef std::list<FieldTemplate>                FieldTemplateList;
-	typedef std::list<SchemaTemplate>               SchemaTemplateList;
+	FieldTemplateList cloneFieldTemplates(const FieldTemplateList& fields) const;
+
+
+	typedef std::map<std::string, std::string>       SchemaRegistry;       // message subject, schema ID
+	typedef std::map<std::string, MessageTemplate*>  MessageTemplates;     // schema ID, MessageTemplate
+	typedef std::map<std::string, FieldTemplateList> HeaderFieldTemplates; // header ID, FieldTemplateList
+	typedef util::DataList<MessageSpecification*>    MessageSpecifications;
 
 	const Config&						m_config;
 	SchemaRegistry						m_registry;	
 	MessageTemplates					m_templates;
-	FieldTemplateList					m_headers;	
+	HeaderFieldTemplates				m_headers;	
 	SchemaTemplateList					m_directory;
 	std::string							m_specificationId; //version
 	unsigned int						m_validationLevel;
 	unsigned int						m_schemaLevel;
+	bool								m_legacyTemplates;
 	MessageTemplates::const_iterator	m_schemaIndex;
 	SchemaIDIterator					m_iterator;
 	std::string							m_basePath;
+	std::string							m_lastHeaderName;
+
+	MessageSpecifications               m_msgSpecs;
 
 	//holding string for getTemplateXML, without it the function produces undefined behavior
-	std::string			m_templateXML;
+	std::string							m_templateXML;
 };
 
 } //namespace internal

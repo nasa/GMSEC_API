@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,7 +31,6 @@ Status TCPSocketServer::connect(int port)
 	m_eToRead = 0;
 	m_eToWrite = 0;
 
-	/* create the socket */
 #ifdef WIN32
 	WORD wVersionRequested = MAKEWORD(1,1);
 	WSADATA wsaData;
@@ -47,11 +46,17 @@ Status TCPSocketServer::connect(int port)
 	{
 		GMSEC_WARNING << "Unable to load Windows Socket version 1.1";
 	}
-
-	m_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-#else
-	m_sock = socket(AF_INET, SOCK_STREAM, 0);
 #endif
+
+	status = fillAddress(m_pAddr, sizeof(SockAddrIn), port);
+
+	if (status.isError())
+	{
+		return status;
+	}
+
+	/* create the socket */
+	m_sock = socket(m_pAddr->sa_family, SOCK_STREAM, 0);
 
 #ifdef WIN32
 	if (m_sock == INVALID_SOCKET)
@@ -97,22 +102,19 @@ Status TCPSocketServer::connect(int port)
 		GMSEC_WARNING << "Unable to set socket SO_RCVBUF size to " << size << " bytes.";
 	}
 
-	status = fillAddress(m_pAddr, sizeof(SockAddrIn), port);
-
-	if (status.isError())
-	{
-		return status;
-	}
+	// Ideally we would use the size-of SockAddrIn, however not all OSes support this; hence we will
+	// deduce the sockaddr size based on the INET domain in use.
+	size_t sockaddr_len = (m_pAddr->sa_family == AF_INET6 ? sizeof(sockaddr_in6) : sizeof(sockaddr_in));
 
 #ifdef WIN32
-	if (bind(m_sock, m_pAddr, sizeof(SockAddrIn)) == SOCKET_ERROR)
+	if (bind(m_sock, m_pAddr, sockaddr_len) == SOCKET_ERROR)
 	{
 		PRINTERROR("bind()");
 		closesocket(m_sock);
 		return getLastSocketError();
 	}
 #else
-	if (bind(m_sock, m_pAddr, sizeof(SockAddrIn)) < 0)
+	if (bind(m_sock, m_pAddr, sockaddr_len) < 0)
 	{
 		return getLastSocketError();
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file ProductFileMessage.java
- *
- * @brief The ProductFileMessage object is an extension of MistMessage.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist.message;
@@ -33,16 +31,14 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIProductFileMessage;
 
 
 /**
- * @class ProductFileMessage
+ * The ProductFileMessage object is an extension of Message, and is used to define a GMSEC MSG PROD message.
  *
- * @brief The ProductFileMessage object is an extension of Message, and is used to define a GMSEC MSG PROD message.
- *
- * @sa Message
- * @sa MistMessage
- * @sa Config
- * @sa Specification 
- * @sa Field
- * @sa MessageFieldIterator
+ * @see Message
+ * @see MistMessage
+ * @see Config
+ * @see Specification 
+ * @see gov.nasa.gsfc.gmsec.api.field.Field
+ * @see gov.nasa.gsfc.gmsec.api.MessageFieldIterator
  */
 public class ProductFileMessage extends MistMessage
 {
@@ -53,24 +49,17 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn ProductFileMessage(String subject,
-	 *                        gmsecMIST.ResponseStatus responseStatus,
-	 *                        Message.MessageKind kind,
-	 *                        String productType,
-	 *                        String productSubtype,
-	 *                        Specification spec) throws IllegalArgumentException
+	 * Default constructor - Initializes the message instance
 	 *
-	 * @brief Default constructor - Initializes the message instance
+	 * @param subject        The subject string for the message.
+	 * @param responseStatus RESPONSE-STATUS field to insert into a MSG PROD message.
+	 * @param kind           The kind of message to instantiate.
+	 * @param productType    PROD-TYPE field to insert into a MSG PROD message.
+	 * @param productSubtype PROD-SUBTYPE field to insert into a MSG PROD message.
+	 * @param spec           A reference to the specification this message's schema will adhere to.
 	 *
-	 * @param subject        - The subject string for the message.
-	 * @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param kind           - the kind of message to instantiate.
-	 * @param productType    - PROD-TYPE field to insert into a MSG PROD message.
-	 * @param productSubtype - PROD-SUBTYPE field to insert into a MSG PROD message.
-	 * @param spec           - A reference to the specification this message's schema will adhere to.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the %Specification object is null.
+	 * @throws IllegalArgumentException Thrown if the subject string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the %Specification object is null.
 	 */
 	public ProductFileMessage(String subject,
 	                          gmsecMIST.ResponseStatus responseStatus,
@@ -103,27 +92,19 @@ public class ProductFileMessage extends MistMessage
 
 
    /**
-	 * @fn ProductFileMessage(String subject,
-	 *                        gmsecMIST.ResponseStatus responseStatus,
-	 *                        Message.MessageKind kind,
-	 *                        String productType,
-	 *                        String productSubtype,
-	 *                        Config config,
-	 *                        Specification spec) throws IllegalArgumentException
+     * Constructor - Initializes the message instance and associates a Configuration object
      *
-     * @brief constructor - Initializes the message instance and associates a Configuration object
-     *
-	 * @param subject        - The subject string for the message.
-	 * @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param kind           - the kind of message to instantiate.
-	 * @param productType    - PROD-TYPE field to insert into a MSG PROD message.
-	 * @param productSubtype - PROD-SUBTYPE field to insert into a MSG PROD message.
-     * @param config         - A configuration to associate with the message.
-	 * @param spec           - A reference to the specification this message's schema will adhere to.
+	 * @param subject        The subject string for the message.
+	 * @param responseStatus RESPONSE-STATUS field to insert into a MSG PROD message.
+	 * @param kind           The kind of message to instantiate.
+	 * @param productType    PROD-TYPE field to insert into a MSG PROD message.
+	 * @param productSubtype PROD-SUBTYPE field to insert into a MSG PROD message.
+     * @param config         A configuration to associate with the message.
+	 * @param spec           A reference to the specification this message's schema will adhere to.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the %Config object is null.
-	 * @throws An IllegalArgumentException is thrown if the %Specification object is null.
+	 * @throws IllegalArgumentException Thrown if the subject string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the %Config object is null.
+	 * @throws IllegalArgumentException Thrown if the %Specification object is null.
 	 */
 	public ProductFileMessage(String subject,
 	                          gmsecMIST.ResponseStatus responseStatus,
@@ -161,23 +142,18 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn ProductFileMessage(String subject,
-	 *                        gmsecMIST.ResponseStatus responseStatus,
-	 *                        String schemaID,
-	 *                        Specification spec)
+	 * Constructor - Initializes the message with a given schema ID
 	 *
-	 * @brief constructor - Initializes the message with a given schema ID
-	 *
-	 * @param subject        - The subject string for the message.
-	 * @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param schemaID       - the string used to identify the message schema in the GMSEC ISD. The schema ID has the
+	 * @param subject        The subject string for the message.
+	 * @param responseStatus RESPONSE-STATUS field to insert into a MSG PROD message.
+	 * @param schemaID       The string used to identify the message schema in the GMSEC ISD. The schema ID has the
 	 * format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
 	 * You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
-	 * @param spec           - A reference to the specification this message's schema will adhere to.
+	 * @param spec           A reference to the specification this message's schema will adhere to.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the schema ID string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the %Specification object is null.
+	 * @throws IllegalArgumentException Thrown if the subject string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the schema ID string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the %Specification object is null.
 	 */
 	public ProductFileMessage(String subject,
 	                          gmsecMIST.ResponseStatus responseStatus,
@@ -204,25 +180,19 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn ProductFileMessage(String subject,
-	 *                        gmsecMIST.ResponseStatus responseStatus,
-	 *                        String schemaID,
-	 *                        Config config,
-	 *                        Specification spec)
+	 * Constructor - Initializes the message with a given schema ID
 	 *
-	 * @brief constructor - Initializes the message with a given schema ID
-	 *
-	 * @param subject        - The subject string for the message.
-	 * @param responseStatus - RESPONSE-STATUS field to insert into a MSG PROD message.
-	 * @param schemaID       - the string used to identify the message schema in the GMSEC ISD.The schema ID has the
+	 * @param subject        The subject string for the message.
+	 * @param responseStatus RESPONSE-STATUS field to insert into a MSG PROD message.
+	 * @param schemaID       The string used to identify the message schema in the GMSEC ISD.The schema ID has the
 	* format of: major.minor.schemaLevelName.messageKind.messageType.messageSubtype (e.g. 2016.00.GMSEC.MSG.PROD.AUTO)
 	* You may also use the shorthand notation of messageKind.messageType.messageSubType (e.g. MSG.PROD.AUTO)
-     * @param config         - A configuration to associate with the message.
-	 * @param spec           - A reference to the specification this message's schema will adhere to.
+     * @param config         A configuration to associate with the message.
+	 * @param spec           A reference to the specification this message's schema will adhere to.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the schema ID string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the %Specification object is null.
+	 * @throws IllegalArgumentException Thrown if the subject string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the schema ID string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the %Specification object is null.
 	 */
 	public ProductFileMessage(String subject,
 	                          gmsecMIST.ResponseStatus responseStatus,
@@ -254,14 +224,12 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn ProductFileMessage(String data)
+	 * Specialized constructor that initializes the message instance using either XML or JSON text.
 	 *
-	 * @brief Specialized constructor that initializes the message instance using either XML or JSON text.
+	 * @param data The XML or JSON string that represents a GMSEC message.
 	 *
-	 * @param data - the XML or JSON string that represents a GMSEC message.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the data string is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the data string cannot be parsed.
+	 * @throws IllegalArgumentException Thrown if the data string is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the data string cannot be parsed.
 	 */
 	public ProductFileMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -277,13 +245,11 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn ProductFileMessage(ProductFileMessage other)
+	 * Copy constructor that initializes the message instance using another ProductFileMessage object.
 	 *
-	 * @brief Copy constructor that initializes the message instance using another ProductFileMessage object.
+	 * @param other The other ProductFileMessage object to copy.
 	 *
-	 * @param other - the other ProductFileMessage object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the product file message object is null.
+	 * @throws IllegalArgumentException Thrown if the product file message object is null.
 	 */
 	public ProductFileMessage(ProductFileMessage other) throws IllegalArgumentException
 	{
@@ -299,13 +265,11 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn void addProductFile(ProductFile productFile)
+	 * Adds the given ProductFile object to the internal list of product files maintained by the message.
 	 *
-	 * @brief Adds the given ProductFile object to the internal list of product files maintained by the message.
+	 * @param productFile The ProductFile object to add to the message.
 	 *
-	 * @param productFile - the ProductFile object to add to the message.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given ProductFile object is null.
+	 * @throws IllegalArgumentException Thrown if the given ProductFile object is null.
 	 */
 	public void addProductFile(ProductFile productFile) throws IllegalArgumentException
 	{
@@ -319,13 +283,11 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn int getNumProductFiles()
-	 *
-	 * @brief Returns the number of ProductFile objects associated with this ProductFileMessage.
+	 * Returns the number of ProductFile objects associated with this ProductFileMessage.
 	 *
 	 * @return The number of product files objects.
 	 *
-	 * @sa getProductFile()
+	 * @see ProductFileMessage#getProductFile(int)
 	 */
 	public int getNumProductFiles()
 	{
@@ -334,15 +296,15 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn ProductFile getProductFile(int index)
+	 * Returns ProductFile object at specified index.
 	 *
-	 * @brief Returns ProductFile object at specified index.
+	 * @param index The index of the product file to retrieve.
 	 *
 	 * @return A ProductFile object.
 	 *
-	 * @throws A GMSEC_Exception is thrown if the specified index is outside the number of product files in the message.
+	 * @throws GMSEC_Exception Thrown if the specified index is outside the number of product files in the message.
 	 *
-	 * @sa getNumProductFiles()
+	 * @see ProductFileMessage#getNumProductFiles()
 	 *
 	 * @deprecated This method has been deprecated; use ProductFileIterator instead.
 	 */
@@ -354,9 +316,9 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn gmsecMIST.ResponseStatus getResponseStatus()
+	 * Get the response status of this ProductFile message.
 	 *
-	 * @brief Get the response status of this ProductFile message.
+	 * @return A ResponseStatus.
 	 */
 	public gmsecMIST.ResponseStatus getResponseStatus()
 	{
@@ -365,9 +327,9 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn String getProductType()
+	 * Get the PROD-TYPE of this ProductFile message.
 	 *
-	 * @brief Get the PROD-TYPE of this ProductFile message.
+	 * @return A product type string.
 	 */
 	public String getProductType()
 	{
@@ -376,9 +338,9 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn String getProductSubtype()
+	 * Get the PROD-SUBTYPE of this ProductFile message.
 	 *
-	 * @brief Get the PROD-SUBTYPE of this ProductFile message.
+	 * @return A product subtype string.
 	 */
 	public String getProductSubtype()
 	{
@@ -387,15 +349,13 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn ProductFileIterator getProductFileIterator()
-	 *
-	 * @brief Method that allows the callee to get the ProductFileIterator associated with the %ProductFileMessage.
-	 * This iterator will allow for applications to iterate over the ProductFile objects stored within the %ProductFileMessage.
-	 * The iterator is reset each time getProductFileIterator() is called.  The iterator itself is destroyed when the
-	 * %ProductFileMessage object is destroyed.
-	 *
-	 * @note Only one ProductFileIterator object is associated with a %ProductFileMessage object; multiple calls to
-	 * getProductFileIterator() will return a reference to the same ProductFileIterator object.  Each call will reset the iterator.
+	 * Method that allows the callee to get the ProductFileIterator associated with the ProductFileMessage.
+	 * This iterator will allow for applications to iterate over the ProductFile objects stored within the ProductFileMessage.
+	 * The iterator is reset each time getProductFileIterator() is called. The iterator itself is destroyed when the
+	 * ProductFileMessage object is destroyed.
+	 * <p>
+	 * Note: Only one ProductFileIterator object is associated with a ProductFileMessage object; multiple calls to
+	 * getProductFileIterator() will return a reference to the same ProductFileIterator object. Each call will reset the iterator.
 	 *
 	 * @return A reference to a ProductFileIterator object.
 	 */
@@ -406,13 +366,13 @@ public class ProductFileMessage extends MistMessage
 
 
 	/**
-	 * @fn ProductFileMessage convertMessage(Message msg)
+	 * Constructs and returns a ProductFileMessage that is created using the given Message.
 	 *
-	 * @brief Constructs and returns a ProductFileMessage that is created using the given Message.
+	 * @param msg The Message to convert.
 	 *
 	 * @return A ProductFileMessage object.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given Message object is null.
+	 * @throws IllegalArgumentException Thrown if the given Message object is null.
 	 */
 	public static ProductFileMessage convertMessage(Message msg) throws IllegalArgumentException
 	{

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,13 +41,13 @@ class TCPSocket
 {
 public:
 #ifdef WIN32
-	typedef SOCKET      Socket;
-	typedef SOCKADDR    SockAddr;
-	typedef SOCKADDR_IN SockAddrIn;
+	typedef SOCKET           Socket;
+	typedef SOCKADDR         SockAddr;
+	typedef SOCKADDR_STORAGE SockAddrIn;
 #else
-	typedef int         Socket;
-	typedef sockaddr    SockAddr;
-	typedef sockaddr_in SockAddrIn;
+	typedef int              Socket;
+	typedef sockaddr         SockAddr;
+	typedef sockaddr_storage SockAddrIn;
 #endif
 
 private:

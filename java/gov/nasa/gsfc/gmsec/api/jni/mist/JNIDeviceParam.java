@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,8 +13,8 @@ import gov.nasa.gsfc.gmsec.api.field.*;
 import gov.nasa.gsfc.gmsec.api.mist.*;
 
 import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
-import gov.nasa.gsfc.gmsec.api.jni.JNIField;
-import gov.nasa.gsfc.gmsec.api.jni.JNIFieldConverter;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIFieldConverter;
 
 
 public class JNIDeviceParam

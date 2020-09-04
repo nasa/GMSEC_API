@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -69,10 +69,12 @@ int main(int argc, char* argv[])
 	//o Ensure that the open-response is enabled
 	configAddValue(config, "GMSEC-REQ-RESP", "OPEN-RESP", status);
 
+	//o Since this example program uses an invalid message, we ensure the
+	//  validation check is disabled.
+	configAddValue(config, "gmsec-msg-content-validate-all", "false", NULL);
+
 	//o Output GMSEC API version
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	//o Create the Connection
 	connMgr = connectionManagerCreateUsingValidation(config, GMSEC_FALSE, status);

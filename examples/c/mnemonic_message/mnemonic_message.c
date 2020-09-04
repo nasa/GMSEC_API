@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -72,9 +72,7 @@ int main(int argc, char* argv[])
 	//o Enable Message validation.  This parameter is "false" by default.
 	configAddValue(config, "GMSEC-MSG-CONTENT-VALIDATE", "true", status);
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	connManager = connectionManagerCreate(config, status);
 	checkStatus(status);

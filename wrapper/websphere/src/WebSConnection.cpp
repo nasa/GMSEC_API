@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,6 +41,7 @@ static int DEFAULT_ASYNC_STATUS_MESSAGE_INTERVAL = 100;
 
 static int DEFAULT_MAX_CONN_RETRIES    = 1000;
 static int DEFAULT_CONN_RETRY_INTERVAL = 5000;  // 5 seconds
+static int DEFAULT_MESSAGE_WAIT_PERIOD = 2000;  // 2 seconds
 
 static int MQINQMP_SPACE               = 1000;
 static int MIN_MQINQMP_SPACE           = sizeof(GMSEC_F64);
@@ -232,7 +233,7 @@ bool SubscriptionInfo::initSubscriptionWithConn(MQGMO& gmo, MQSD& sd, MQMD& md)
 		}
 	}
 
-	gmo.WaitInterval = 2000;        //Need to come back from waiting on the topic periodically
+	gmo.WaitInterval = conn->getMessageWaitPeriod();   //Need to come back from waiting on the topic periodically
 	gmo.Options = MQGMO_WAIT | MQGMO_NO_SYNCPOINT;
 
 	{
@@ -568,6 +569,7 @@ WebSConnection::WebSConnection(const Config& config)
 	requestCounter(0),
 	checkAsyncStatusMessageInterval(DEFAULT_ASYNC_STATUS_MESSAGE_INTERVAL),
 	messageCounter(0),
+	messageWaitPeriod(DEFAULT_MESSAGE_WAIT_PERIOD),
 	sigMismatchFlag(false),
 	maxConnectionRetries(DEFAULT_MAX_CONN_RETRIES),
 	connectionRetryInterval(DEFAULT_CONN_RETRY_INTERVAL),
@@ -590,6 +592,7 @@ WebSConnection::WebSConnection(const Config& config)
 
 	int tmpint;
 	std::string tmp;
+
 	mwConfig(config, OPT_ASYNC_STATUS_CHECK_MESSAGE_INTERVAL, tmp);
 	if (tmp.length())
 	{
@@ -606,9 +609,12 @@ WebSConnection::WebSConnection(const Config& config)
 		}
 		else
 		{
-			GMSEC_WARNING << "ignoring invalid " << OPT_MAX_CONN_RETRIES << ": " << tmp.c_str();
+			GMSEC_WARNING << "ignoring non-numeric value for " << OPT_ASYNC_STATUS_CHECK_MESSAGE_INTERVAL << ": " << tmp.c_str();
 		}
 	}
+
+	messageWaitPeriod = config.getIntegerValue(OPT_MESSAGE_WAIT_PERIOD, messageWaitPeriod);
+	messageWaitPeriod = (messageWaitPeriod < 100 ? 100 : messageWaitPeriod);
 
 	tmp = "";
 	mwConfig(config, "MQINQMP-SPACE", tmp, true);
@@ -671,28 +677,32 @@ WebSConnection::WebSConnection(const Config& config)
 		}
 	}
 
+	bool error = false;
 	tmp = "";
 	mwConfig(config, OPT_MAX_TOPIC_HANDLES, tmp, false);
-	if (tmp.length() > 0)
+	if (!tmp.empty())
 	{
-		if (StringUtil::str2int(tmpint, tmp.c_str()) == StringUtil::STR2NUM_SUCCESS)
+		try
 		{
-			if (tmpint >= 0)
+			int handles = StringUtil::getValue<int>(tmp.c_str());
+
+			if (handles <= 0)
 			{
-				maxTopicHandles = tmpint;
+				error = true;
 			}
 			else
 			{
-				GMSEC_WARNING << "ignoring invalid value for " << OPT_MAX_TOPIC_HANDLES << ": " << tmp.c_str();
+				maxTopicHandles = (size_t) handles;
 			}
 		}
-		else
+		catch (...)
 		{
-			GMSEC_WARNING << "ignoring invalid " << OPT_MAX_TOPIC_HANDLES << ": " << tmp.c_str();
+			error = true;
 		}
 	}
-	else
+	if (error)
 	{
+		GMSEC_WARNING << "Ignoring invalid value for " << OPT_MAX_TOPIC_HANDLES << ": " << tmp.c_str();
 		//Default maximum number of handles to 100
 		maxTopicHandles = 100;		
 	}
@@ -1101,10 +1111,10 @@ void WebSConnection::mwRequest(const Message& request, std::string& id)
 
 void WebSConnection::mwReply(const Message& request, const Message& reply)
 {
-	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
+	std::string        uniqueID  = getExternal().getReplyUniqueID(request);
 	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(WEBSPHERE_REPLY));
 
-	if (!uniqueID)
+	if (uniqueID.empty())
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain Unique ID field");
 	}
@@ -1113,10 +1123,12 @@ void WebSConnection::mwReply(const Message& request, const Message& reply)
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain WebSphere Reply field");
 	}
 
-	MessageBuddy::getInternal(reply).addField(*uniqueID);
+	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
 	MessageBuddy::getInternal(reply).setSubject(replyAddr->getValue());
 
 	mwPublish(reply, getExternal().getConfig());
+
+	MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 
 	GMSEC_DEBUG << "[Reply sent successfully: " << reply.getSubject() <<"]";
 }

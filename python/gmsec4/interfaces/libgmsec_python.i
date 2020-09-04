@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,8 +39,65 @@
 %include field/U64Field.i
 
 %inline %{
+        /* This method is deprecated */
         gmsec::api::BinaryField* CastToBinaryField(gmsec::api::Field* field) {
                 return static_cast<gmsec::api::BinaryField*>(field);
+        }
+
+        gmsec::api::BinaryField* to_BinaryField(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::BinaryField*>(field);
+        }
+
+        gmsec::api::BooleanField* to_BooleanField(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::BooleanField*>(field);
+        }
+
+        gmsec::api::CharField* to_CharField(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::CharField*>(field);
+        }
+
+        gmsec::api::F32Field* to_F32Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::F32Field*>(field);
+        }
+
+        gmsec::api::F64Field* to_F64Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::F64Field*>(field);
+        }
+
+        gmsec::api::I16Field* to_I16Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::I16Field*>(field);
+        }
+
+        gmsec::api::I32Field* to_I32Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::I32Field*>(field);
+        }
+
+        gmsec::api::I64Field* to_I64Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::I64Field*>(field);
+        }
+
+        gmsec::api::I8Field* to_I8Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::I8Field*>(field);
+        }
+
+        gmsec::api::U16Field* to_U16Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::U16Field*>(field);
+        }
+
+        gmsec::api::U32Field* to_U32Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::U32Field*>(field);
+        }
+
+        gmsec::api::U64Field* to_U64Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::U64Field*>(field);
+        }
+
+        gmsec::api::U8Field* to_U8Field(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::U8Field*>(field);
+        }
+
+        gmsec::api::StringField* to_StringField(gmsec::api::Field* field) {
+                return dynamic_cast<gmsec::api::StringField*>(field);
         }
 %}
 
@@ -68,6 +125,8 @@
 %include mist/Device.i
 %include mist/DeviceIterator.i
 %include mist/DeviceParam.i
+%include mist/FieldSpecification.i
+%include mist/MessageSpecification.i
 %include mist/mist_defs.i
 %include mist/Mnemonic.i
 %include mist/MnemonicIterator.i

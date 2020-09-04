@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,9 +8,6 @@
 
 /**
  * @file MnemonicMessage.java
- *
- * @brief The MnemonicMessage object is an extension of MistMessage, and serves as a container
- * for mnemonic messages.
  */
 
 package gov.nasa.gsfc.gmsec.api.mist.message;
@@ -32,18 +29,16 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.message.JNIMnemonicMessage;
 
 
 /**
- * @class MnemonicMessage
- *
- * @brief The Message object contains a mnemonic value message with one of 3 schema definitions:
+ * The Message object contains a mnemonic value message with one of 3 schema definitions:
  * MSG.MVAL, REQ.MVAL, RESP.MVAL
  *
- * @sa Message
- * @sa MistMessage
- * @sa Config
- * @sa Specification 
- * @sa Field
- * @sa MessageFieldIterator
- * @sa MnemonicIterator
+ * @see Message
+ * @see MistMessage
+ * @see Config
+ * @see Specification 
+ * @see gov.nasa.gsfc.gmsec.api.field.Field
+ * @see gov.nasa.gsfc.gmsec.api.MessageFieldIterator
+ * @see MnemonicIterator
  */
 public class MnemonicMessage extends MistMessage
 {
@@ -54,19 +49,17 @@ public class MnemonicMessage extends MistMessage
 
 
 	/**
-	 * @fn MnemonicMessage(String subject, String schemaID, Specification spec)
+	 * Default constructor - Initializes the message instance
 	 *
-	 * @brief Default constructor - Initializes the message instance
-	 *
-	 * @param subject - The subject string for the message.
-	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+	 * @param subject The subject string for the message.
+	 * @param schemaID the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
 	 * format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). You may also
 	 * use the shorthand notation of messageKind.messageType (e.g. MSG.MVAL).
-	 * @param spec    - A reference to the specification this message's schema will adhere to.
+	 * @param spec    A reference to the specification this message's schema will adhere to.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the schema ID string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the %Specification object is null.
+	 * @throws IllegalArgumentException Thrown if the subject string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the schema ID string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the %Specification object is null.
 	 */
 	public MnemonicMessage(String subject, String schemaID, Specification spec) throws IllegalArgumentException
 	{
@@ -90,21 +83,19 @@ public class MnemonicMessage extends MistMessage
 
 
    /**
-     * @fn MnemonicMessage(String subject, String schemaID, Config config, Specification spec)
+     * Constructor - Initializes the message instance and associates a Configuration object
      *
-     * @brief constructor - Initializes the message instance and associates a Configuration object
-     *
-     * @param subject - The subject string for the message.
-	 * @param schemaID - the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
+     * @param subject The subject string for the message.
+	 * @param schemaID the string used to identify the message schema in the GMSEC ISD.  The schema ID has the
 	 * format of: major.minor.schemaLevelName.messageKind.messageType (e.g. 2016.00.GMSEC.MSG.MVAL). You may also
 	 * use the shorthand notation of messageKind.messageType (e.g. MSG.MVAL).
-     * @param config  - A configuration to associate with the message.
-     * @param spec    - A reference to the specification this message's schema will adhere to.
+     * @param config  A configuration to associate with the message.
+     * @param spec    A reference to the specification this message's schema will adhere to.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the subject string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the schema ID string is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the %Config object is null.
-	 * @throws An IllegalArgumentException is thrown if the %Specification object is null.
+	 * @throws IllegalArgumentException Thrown if the subject string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the schema ID string is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the %Config object is null.
+	 * @throws IllegalArgumentException Thrown if the %Specification object is null.
 	 */
 	public MnemonicMessage(String subject, String schemaID, Config config, Specification spec) throws IllegalArgumentException
 	{
@@ -132,14 +123,12 @@ public class MnemonicMessage extends MistMessage
 
 
 	/**
-	 * @fn MnemonicMessage(String data)
+	 * Specialized constructor that initializes the message instance using either XML or JSON text.
 	 *
-	 * @brief Specialized constructor that initializes the message instance using either XML or JSON text.
+	 * @param data The XML or JSON string that represents a GMSEC message.
 	 *
-	 * @param data - the XML or JSON string that represents a GMSEC message.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the data string is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the data string cannot be parsed.
+	 * @throws IllegalArgumentException Thrown if the data string is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the data string cannot be parsed.
 	 */
 	public MnemonicMessage(String data) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -155,13 +144,11 @@ public class MnemonicMessage extends MistMessage
 
 
 	/**
-	 * @fn MnemonicMessage(MnemonicMessage other)
+	 * Copy constructor that initializes the message instance using another MnemonicMessage object.
 	 *
-	 * @brief Copy constructor that initializes the message instance using another MnemonicMessage object.
+	 * @param other The other MnemonicMessage object to copy.
 	 *
-	 * @param other - the other MnemonicMessage object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the mnemonic message object is null.
+	 * @throws IllegalArgumentException Thrown if the mnemonic message object is null.
 	 */
 	public MnemonicMessage(MnemonicMessage other) throws IllegalArgumentException
 	{
@@ -177,11 +164,9 @@ public class MnemonicMessage extends MistMessage
 
 
 	/**
-	 * @fn void addMnemonic(Mnemonic mnemonic)
+	 * @param mnemonic The Mnemonic object to add to the message.
 	 *
-	 * @param mnemonic - the Mnemonic object to add to the message.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given Mnemonic object is null.
+	 * @throws IllegalArgumentException Thrown if the given Mnemonic object is null.
 	 */
 	public void addMnemonic(Mnemonic mnemonic) throws IllegalArgumentException
 	{
@@ -195,13 +180,11 @@ public class MnemonicMessage extends MistMessage
 
 
 	/**
-	 * @fn int getNumMnemonics()
-	 *
-	 * @brief Returns the number of Mnemonic objects associated with this MnemonicMessage.
+	 * Returns the number of Mnemonic objects associated with this MnemonicMessage.
 	 *
 	 * @return The number of mnemonic objects.
 	 *
-	 * @sa getMnemonic()
+	 * @see MnemonicMessage#getMnemonic(int)
 	 */
 	public int getNumMnemonics()
 	{
@@ -210,15 +193,15 @@ public class MnemonicMessage extends MistMessage
 
 
 	/**
-	 * @fn Mnemonic getMnemonic(int index)
+	 * Returns Mnemonic object at specified index.
 	 *
-	 * @brief Returns Mnemonic object at specified index.
+	 * @param index The index of the Mnemonic object to retrieve.
 	 *
 	 * @return A Mnemonic object.
 	 *
-	 * @throws A GMSEC_Exception is thrown if the specified index is outside the number of mnemonics in the message.
+	 * @throws GMSEC_Exception Thrown if the specified index is outside the number of mnemonics in the message.
 	 *
-	 * @sa getNumMnemonics()
+	 * @see MnemonicMessage#getNumMnemonics()
 	 *
 	 * @deprecated This method has been deprecated; use MnemonicIterator instead.
 	 */
@@ -230,15 +213,13 @@ public class MnemonicMessage extends MistMessage
 
 
 	/**
-	 * @fn MnemonicIterator getMnemonicIterator()
-	 *
-	 * @brief Method that allows the callee to get the MnemonicIterator associated with the %MnemonicMessage.
-	 * This iterator will allow for applications to iterate over the Mnemonic objects stored within the %MnemonicMessage.
-	 * The iterator is reset each time getMnemonicIterator() is called.  The iterator itself is destroyed when the
-	 * %MnemonicMessage object is destroyed.
-	 *
-	 * @note Only one MnemonicIterator object is associated with a %MnemonicMessage object; multiple calls to
-	 * getMnemonicIterator() will return a reference to the same MnemonicIterator object.  Each call will reset the iterator.
+	 * Method that allows the callee to get the MnemonicIterator associated with the MnemonicMessage.
+	 * This iterator will allow for applications to iterate over the Mnemonic objects stored within the MnemonicMessage.
+	 * The iterator is reset each time getMnemonicIterator() is called. The iterator itself is destroyed when the
+	 * MnemonicMessage object is destroyed.
+	 * <p>
+	 * Note: Only one MnemonicIterator object is associated with a MnemonicMessage object; multiple calls to
+	 * getMnemonicIterator() will return a reference to the same MnemonicIterator object. Each call will reset the iterator.
 	 *
 	 * @return A reference to a MnemonicIterator object.
 	 */
@@ -249,13 +230,13 @@ public class MnemonicMessage extends MistMessage
 
 
 	/**
-	 * @fn MnemonicMessage convertMessage(Message msg)
+	 * Constructs and returns a MnemonicMessage that is created using the given Message.
 	 *
-	 * @brief Constructs and returns a MnemonicMessage that is created using the given Message.
+	 * @param msg The message to convert.
 	 *
 	 * @return A MnemonicMessage object.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the given Message object is null.
+	 * @throws IllegalArgumentException Thrown if the given Message object is null.
 	 */
 	public static MnemonicMessage convertMessage(Message msg) throws IllegalArgumentException
 	{

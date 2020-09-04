@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file ConfigFile.java
- *
- * @brief Class that can be used to manage standard configuration files.
  */
 
 package gov.nasa.gsfc.gmsec.api;
@@ -20,22 +18,23 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIMessageEntry;
 import gov.nasa.gsfc.gmsec.api.jni.JNISubscriptionEntry;
 
 
-/** @class ConfigFile
- *
- * @brief This class is used to manage standard configuration files.
- *
+/**
+ * This class is used to manage standard configuration files.
+ * <p>
  * Example configuration file format:
- *
- * @code
+ * <pre>{@code
  * <?xml version="1.0" encoding="UTF-8"?>
  * <DEFINITIONS>
  *        <SUBSCRIPTION NAME="events" PATTERN="GMSEC.MISSION.CONST.SAT.EVT.MSG.>"/>
+ *
  *        <SUBSCRIPTION NAME="custom1" PATTERN="CUSTOM.MESSAGE.SUBJECTS.*"/>
+ *
  *        <CONFIG NAME="config1">
  *                <PARAMETER NAME="connectiontype">gmsec_icsswb</PARAMETER>
  *                <PARAMETER NAME="hostname">localhost</PARAMETER>
  *                <PARAMETER NAME="port">10005</PARAMETER>
  *        </CONFIG>
+ *
  *        <CONFIG NAME="config2">
  *                <PARAMETER NAME="connectiontype">gmsec_ss</PARAMETER>
  *                <PARAMETER NAME="server">tcp:10.1.2.159</PARAMETER>
@@ -43,6 +42,7 @@ import gov.nasa.gsfc.gmsec.api.jni.JNISubscriptionEntry;
  *                <PARAMETER NAME="isthreaded">true</PARAMETER>
  *                <PARAMETER NAME="compress">true</PARAMETER>
  *        </CONFIG>
+ *
  *        <MESSAGE NAME="msg1" SUBJECT="GMSEC.MISSION.CONST.SAT.EVT.MSG" KIND="PUBLISH">
  *                <CONFIG NAME="msg_config">
  *                        <PARAMETER NAME="KIND">GMSEC_MSG_PUBLISH</PARAMETER>
@@ -59,8 +59,8 @@ import gov.nasa.gsfc.gmsec.api.jni.JNISubscriptionEntry;
  *                <FIELD TYPE="BIN" NAME="bin_field">4a4c4d4e4f5051</FIELD>
  *        </MESSAGE>
  * </DEFINITIONS>
- * @endcode
- *
+ * }</pre>
+ * <p>
  * A ConfigFile object has a one-to-many mapping to connection configurations. If a user
  * wishes to maintain only one connection per object, the use of a Config object is suggested. 
  */
@@ -69,12 +69,21 @@ public class ConfigFile
 	private JNIConfigFile m_jniConfigFile = null;
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param obj Object to reference for acquiring internal JNIConfigFile
+	 * @return Internal JNIConfigFile object
+	 */
 	public static JNIConfigFile getInternal(ConfigFile obj)
 	{
 		return (obj == null ? null : obj.m_jniConfigFile);
 	}
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param jCfgFile Internal JNIConfigFile object
+	 */
 	public ConfigFile(JNIConfigFile jCfgFile)
 	{
 		m_jniConfigFile = jCfgFile;
@@ -82,21 +91,26 @@ public class ConfigFile
 
 
 	/**
-	 * @class ConfigEntry
-	 * @brief This class provides access to the attributes associated with a ConfigFile's %Config entry.
+	 * This class provides access to the attributes associated with a ConfigFile's
+	 * {@link Config} entry.
 	 */
 	public static class ConfigEntry
 	{
 		private JNIConfigEntry m_jniEntry = null;
 
+		/**
+		 * This method is for internal GMSEC API use only.
+		 * @param entry Internal JNIConfigEntry object
+		 */
 		public ConfigEntry(JNIConfigEntry entry)
 		{
 			m_jniEntry = entry;
 		}
 
 		/**
-		 * @fn String getName()
-		 * @desc Returns the name associated with the %Config entry.
+		 * Returns the name associated with the entry.
+		 *
+		 * @return The name of the entry.
 		 */
 		public String getName()
 		{
@@ -104,8 +118,9 @@ public class ConfigFile
 		}
 
 		/**
-		 * @fn Config getConfig()
-		 * @desc Returns the Config object associated with the %Config entry.
+		 * Returns the {@link Config} object associated with the entry.
+		 *
+		 * @return A Config object.
 		 */
 		public Config getConfig()
 		{
@@ -115,21 +130,26 @@ public class ConfigFile
 
 
 	/**
-	 * @class MessageEntry
-	 * @brief This class provides access to the attributes associated with a ConfigFile's %Message entry.
+	 * This class provides access to the attributes associated with a ConfigFile's
+	 * {@link Message} entry.
 	 */
 	public static class MessageEntry
 	{
 		private JNIMessageEntry m_jniEntry = null;
 
+		/**
+		 * This method is for internal GMSEC API use only.
+		 * @param entry Internal JNIMessageEntry object
+		 */
 		public MessageEntry(JNIMessageEntry entry)
 		{
 			m_jniEntry = entry;
 		}
 
 		/**
-		 * @fn String getName()
-		 * @desc Returns the name associated with the %Message entry.
+		 * Returns the name associated with the entry.
+		 *
+		 * @return The name of the entry.
 		 */
 		public String getName()
 		{
@@ -137,8 +157,9 @@ public class ConfigFile
 		}
 
 		/**
-		 * @fn Message getMessage()
-		 * @desc Returns the Message object associated with the %Message entry.
+		 * Returns the {@link Message} object associated with the entry.
+		 *
+		 * @return A Message object.
 		 */
 		public Message getMessage()
 		{
@@ -148,21 +169,26 @@ public class ConfigFile
 
 
 	/**
-	 * @class SubscriptionEntry
-	 * @brief This class provides access to the attributes associated with a ConfigFile's Subscription entry.
+	 * This class provides access to the attributes associated with a ConfigFile's
+	 * subscription entry.
 	 */
 	public static class SubscriptionEntry
 	{
 		private JNISubscriptionEntry m_jniEntry = null;
 
+		/**
+		 * This method is for internal GMSEC API use only.
+		 * @param entry Internal JNISubscriptionEntry object
+		 */
 		public SubscriptionEntry(JNISubscriptionEntry entry)
 		{
 			m_jniEntry = entry;
 		}
 
 		/**
-		 * @fn String getName()
-		 * @desc Returns the name associated with the Subscription entry.
+		 * Returns the name associated with the subscription entry.
+		 *
+		 * @return The subscription name.
 		 */
 		public String getName()
 		{
@@ -170,18 +196,22 @@ public class ConfigFile
 		}
 
 		/**
-		 * @fn String getSubject()
-		 * @desc Returns the subject/topic associated with the Subscription entry.
-		 * @note This function has been deprecated; use getPattern() instead.
+		 * Returns the subject/topic associated with the subscription entry.
+		 *
+		 * @return A subject/topic string.
+		 *
+		 * @see SubscriptionEntry#getPattern()
 		 */
+		@Deprecated
 		public String getSubject()
 		{
-			return m_jniEntry.getSubject();
+			return m_jniEntry.getPattern();
 		}
 
 		/**
-		 * @fn String getPattern()
-		 * @desc Returns the pattern associated with the Subscription entry.
+		 * Returns the subject/topic associated with the subscription entry.
+		 *
+		 * @return A subject/topic string.
 		 */
 		public String getPattern()
 		{
@@ -189,8 +219,10 @@ public class ConfigFile
 		}
 		
 		/**
-		 * @fn boolean hasNextExcludedPattern()
-		 * @desc Returns whether there is a next escluded pattern associated with the Subscription entry
+		 * Returns true if there is a next excluded pattern associated with the subscription entry;
+		 * false otherwise.
+		 *
+		 * @return A boolean.
 		 */
 		public boolean hasNextExcludedPattern()
 		{
@@ -198,8 +230,9 @@ public class ConfigFile
 		}
 
 		/**
-		 * @fn String nextExcludedPattern()
-		 * @desc Returns the next excluded pattern associated with the Subscription entry. 
+		 * Returns the next excluded pattern associated with the subscription entry. 
+		 *
+		 * @return A string containing the excluded pattern.
 		 */
 		public String nextExcludedPattern()
 		{
@@ -209,14 +242,12 @@ public class ConfigFile
 
 
 	/**
-	 * @fn ConfigFile()
-	 *
-	 * @description Once the ConfigFile object has been created, use
-	 * load(String filepath) to load a configuration file, or if
+	 * Basic constructor that creates an empty configuration file object.
+	 * <p>
+	 * Once the ConfigFile object has been created, use
+	 * {@link ConfigFile#load(String)} to load a configuration file, or if
 	 * the plan is to add elements to the empty ConfigFile object, then
-	 * use save(String filepath, boolean compact) to save any changes.
-	 *
-	 * @brief Basic constructor that creates an empty configuration file object.
+	 * use {@link ConfigFile#save(String, boolean)} to save any changes.
 	 */
 	public ConfigFile()
 	{
@@ -225,15 +256,13 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void load(String filePath)
-	 *
-	 * @brief This function opens the configuration file and parses the XML
+	 * This function opens the configuration file and parses the XML
 	 * It will return errors explaining what, if anything, went wrong.
 	 *
-	 * @param filePath - The absolute or relative path of the file to be loaded.
+	 * @param filePath The absolute or relative path of the file to be loaded.
 	 *
-	 * @throws An IllegalArgumentException if the given file path is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if file parsing error occur.
+	 * @throws IllegalArgumentException Thrown if the given file path is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if file parsing error occur.
 	 */
 	public void load(String filePath) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -247,12 +276,10 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void save()
-	 *
-	 * @brief This function saves the currently open configuration file to
+	 * This function saves the currently open configuration file to
 	 * the file path specified when load() was called.
 	 *
-	 * @throws A GMSEC_Exception is thrown if an error occurs while attempting to write to the file
+	 * @throws GMSEC_Exception Thrown if an error occurs while attempting to write to the file
 	 */
 	public void save() throws GMSEC_Exception
 	{
@@ -261,16 +288,14 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void save(String filePath)
-	 *
-	 * @brief This function saves the currently open configuration file to
+	 * This function saves the currently open configuration file to
 	 * the file location specified.
 	 *
-	 * @param filePath - The location to which the file will be saved; if the specified path is null,
+	 * @param filePath The location to which the file will be saved; if the specified path is null,
 	 * then the file path used when load() was called will be used.
 	 *
-	 * @throws An IllegalArgumentException if the given file path contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if an error occurs while attempting to write to the file
+	 * @throws IllegalArgumentException Thrown if the given file path contains an empty string.
+	 * @throws GMSEC_Exception Thrown if an error occurs while attempting to write to the file
 	 */
 	public void save(String filePath) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -279,17 +304,15 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void save(String filePath, boolean compact)
-	 *
-	 * @brief This function saves the currently open configuration file to
+	 * This function saves the currently open configuration file to
 	 * the file location specified.
 	 *
-	 * @param filePath - The location to which the file will be saved; if the specified path is null,
-	 * then the file path used when load() was called will be used.
-	 * @param compact  - used to indicate whether the XML written to the file should be compacted or not
+	 * @param filePath The location to which the file will be saved; if the specified path is null,
+	 *                 then the file path used when load() was called will be used.
+	 * @param compact  used to indicate whether the XML written to the file should be compacted or not
 	 *
-	 * @throws An IllegalArgumentException if the given file path contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the filePath string is null, or if an error occurs while
+	 * @throws IllegalArgumentException Throw if the given file path contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the filePath string is null, or if an error occurs while
 	 * attempting to write to the file
 	 */
 	public void save(String filePath, boolean compact) throws IllegalArgumentException, GMSEC_Exception
@@ -304,12 +327,12 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void fromXML(String xml)
+	 * This function parses the given XML string to fill in the contents of the ConfigFile object.
 	 *
-	 * @brief This function parses the given XML string to fill in the contents of the ConfigFile object.
+	 * @param xml The XML string to parse.
 	 *
-	 * @throws An IllegalArgumentException if the given XML string is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if an error occurs while parsing the XML string
+	 * @throws IllegalArgumentException Thrown if the given XML string is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if an error occurs while parsing the XML string
 	 */
 	public void fromXML(String xml) throws GMSEC_Exception
 	{
@@ -323,9 +346,7 @@ public class ConfigFile
 
 
 	/**
-	 * @fn String toXML()
-	 *
-	 * @brief This method converts the ConfigFile object to an XML string representation.
+	 * This method converts the ConfigFile object to an XML string representation.
 	 *
 	 * @return The XML string representation of the ConfigFile object
 	 */
@@ -336,9 +357,7 @@ public class ConfigFile
 
 
 	/**
-	 * @fn boolean isLoaded()
-	 *
-	 * @brief This method indicates whether a configuration file has been loaded into the ConfigFile object.
+	 * This method indicates whether a configuration file has been loaded into the ConfigFile object.
 	 *
 	 * @return Returns true if configuration file loaded; false otherwise.
 	 */
@@ -349,13 +368,11 @@ public class ConfigFile
 
 
 	/**
-	 * @fn Config lookupConfig(String name)
-	 *
-	 * @brief This function will attempt to locate within the ConfigFile a Config object associated
+	 * This function will attempt to locate within the ConfigFile a Config object associated
 	 * with the given name.
-	 *
+	 * <p>
 	 * Example config file load and get config:
-	 * @code
+	 * <pre>{@code
 	 * try {
 	 *     ConfigFile cfgFile = new ConfigFile();
 	 *
@@ -370,14 +387,14 @@ public class ConfigFile
 	 * catch (IllegalArgumentException | GMSEC_Exception e) {
 	 *     // handle error
 	 * }
-	 * @endcode
+	 * }</pre>
 	 *
-	 * @param name - name of the Config object to retrieve.
+	 * @param name name of the Config object to retrieve.
 	 *
 	 * @return Config object that correlates with the given name
 	 *
-	 * @throws An IllegalArgumentException if the given Config name is null or contains an empty string.
-	 * @throw A GMSEC_Exception is thrown if the named Config object does not exist.
+	 * @throws IllegalArgumentException Thrown if the given Config name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the named Config object does not exist.
 	 */
 	public Config lookupConfig(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -391,13 +408,11 @@ public class ConfigFile
 
 
 	/**
-	 * @fn Message lookupMessage(String name)
-	 *
-	 * @brief This function will attempt to locate within the ConfigFile a Message object associated
+	 * This function will attempt to locate within the ConfigFile a Message object associated
 	 * with the given name.
-	 *
+	 * <p>
 	 * Example config file load and get message:
-	 * @code
+	 * <pre>{@code
 	 * try {
 	 *     ConfigFile cfgFile = new ConfigFile();
 	 *
@@ -412,14 +427,14 @@ public class ConfigFile
 	 * catch (IllegalArgumentException | GMSEC_Exception e) {
 	 *     // handle error
 	 * }
-	 * @endcode
+	 * }</pre>
 	 * 
-	 * @param name - name of the Message object to retrieve
+	 * @param name name of the Message object to retrieve
 	 *
 	 * @return Message object that correlates with the given name
 	 *
-	 * @throws An IllegalArgumentException if the given Message name is null or contains an empty string.
-	 * @throw A GMSEC_Exception is thrown if the name is null, or if the named Message object does not exist
+	 * @throws IllegalArgumentException Thrown if the given Message name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the name is null, or if the named Message object does not exist
 	 */
 	public Message lookupMessage(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -433,15 +448,11 @@ public class ConfigFile
 
 
 	/**
-	 * @fn String lookupSubscription(String name)
-	 *
-	 * @brief This function will attempt to locate within the ConfigFile a Subscription entry associated
+	 * This function will attempt to locate within the ConfigFile a Subscription entry associated
 	 * with the given name, and return the subject/topic associated with such.
-	 * 
-	 * @note This function has been deprecated; use lookupSubscriptionEntry instead
-	 *
+	 * <p>
 	 * Example
-	 * @code
+	 * <pre>{@code
 	 * try {
 	 *     ConfigFile cfgFile = new ConfigFile();
 	 *
@@ -461,15 +472,18 @@ public class ConfigFile
 	 * catch (IllegalArgumentException | GMSEC_Exception e) {
 	 *     // handle error
 	 * }
-	 * @endcode
+	 * }</pre>
 	 *
-	 * @param name - name of the Subscription entry
+	 * @param name Name of the Subscription entry
 	 *
-	 * @return subject pattern topic associated with SUBSCRIPTION block, or NULL if not found
+	 * @return Subject pattern topic associated with SUBSCRIPTION block, or NULL if not found
 	 *
-	 * @throws An IllegalArgumentException if the given Subscription name is null or contains an empty string.
-	 * @throw A GMSEC_Exception is thrown if the name is null.
+	 * @throws IllegalArgumentException Thrown if the given Subscription name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the name is null.
+	 * 
+	 * @see ConfigFile#lookupSubscriptionEntry(String)
 	 */
+	@Deprecated
 	public String lookupSubscription(String name) throws IllegalArgumentException, GMSEC_Exception
 	{
 		if (name == null || name.isEmpty())
@@ -482,13 +496,11 @@ public class ConfigFile
 
 
 	/**
-	 * @fn SubscriptionEntry lookupSubscriptionEntry(String name)
-	 *
-	 * @brief This function will attempt to locate within the ConfigFile a Subscription entry associated
+	 * This function will attempt to locate within the ConfigFile a Subscription entry associated
 	 * with the given name, and return the subject/topic associated with such.
-	 *
+	 * <p>
 	 * Example
-	 * @code
+	 * <pre>{@code
 	 * try {
 	 *     ConfigFile cfgFile = new ConfigFile();
 	 *
@@ -508,12 +520,14 @@ public class ConfigFile
 	 * catch (IllegalArgumentException | GMSEC_Exception e) {
 	 *     // handle error
 	 * }
-	 * @endcode
+	 * }</pre>
 	 *
-	 * @param name - name of the Subscription entry
+	 * @param name name of the Subscription entry
 	 *
-	 * @throws An IllegalArgumentException if the given Subscription name is null or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if the Subscription Entry cannot be returned.
+	 * @return A SubscriptionEntry object.
+	 *
+	 * @throws IllegalArgumentException Thrown if the given Subscription name is null or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if the Subscription Entry cannot be returned.
 	 */ 
 	public SubscriptionEntry lookupSubscriptionEntry(String name)
 		throws IllegalArgumentException, GMSEC_Exception
@@ -528,18 +542,17 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void addSubscription(String name, String subject)
-	 *
-	 * @brief Adds a Subscription definition to the ConfigFile object.
-	 *
-	 * @note Adding a subscription with a name that currently exists will overwrite the current subscription.
-	 * @note Adding a subscription definition to a newly instantiated ConfigFile object that has not been
+	 * Adds a Subscription definition to the ConfigFile object.
+	 * <p>
+	 * Note 1: Adding a subscription with a name that currently exists will overwrite the current subscription.
+	 * <p>
+	 * Note 2: Adding a subscription definition to a newly instantiated ConfigFile object that has not been
 	 * loaded will create a new XML document.
 	 *
-	 * @param name    - name to be associated with the subscription definition
-	 * @param subject - subject/topic to associate with the subscription definition
+	 * @param name    name to be associated with the subscription definition
+	 * @param subject subject/topic to associate with the subscription definition
 	 *
-	 * @throws An IllegalArgumentException is thrown if either name or subject parameters are null, or if either contains
+	 * @throws IllegalArgumentException Thrown if either name or subject parameters are null, or if either contains
 	 * an empty string
 	 */
 	public void addSubscription(String name, String subject) throws IllegalArgumentException
@@ -558,19 +571,18 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void addConfig(String name, Config config)
-	 *
-	 * @brief Adds a Config definition to the ConfigFile object.
-	 *
-	 * @note Adding a Config with a name that currently exists will overwrite the current
+	 * Adds a Config definition to the ConfigFile object.
+	 * <p>
+	 * Note 1: Adding a Config with a name that currently exists will overwrite the current
 	 * configuration definition.
-	 * @note Adding a Config to a newly instantiated ConfigFile object that has not been loaded
+	 * <p>
+	 * Note 2: Adding a Config to a newly instantiated ConfigFile object that has not been loaded
 	 * will create a new XML document.
 	 *
-	 * @param name   - name to be associated with the configuration definition
-	 * @param config - the configuration object
+	 * @param name   name to be associated with the configuration definition
+	 * @param config the configuration object
 	 *
-	 * @throws An IllegalArgumentException is thrown if name is null or contains an empty string,
+	 * @throws IllegalArgumentException Thrown if name is null or contains an empty string,
 	 * of if the Config object is null.
 	 */
 	public void addConfig(String name, Config config) throws IllegalArgumentException
@@ -589,19 +601,18 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void addMessage(String name, Message message)
-	 *
-	 * @brief Adds a Message definition to the ConfigFile object.
-	 *
-	 * @note Adding a message with a name that currently exists will overwrite the current
+	 * Adds a Message definition to the ConfigFile object.
+	 * <p>
+	 * Note 1: Adding a message with a name that currently exists will overwrite the current
 	 * message definition.
-	 * @note Adding a Message to a newly instantiated ConfigFile object that has not been loaded
+	 * <p>
+	 * Note 2: Adding a Message to a newly instantiated ConfigFile object that has not been loaded
 	 * will create a new XML document.
 	 *
-	 * @param name    - name to be associated with the message definition
-	 * @param message - the message object
+	 * @param name    name to be associated with the message definition
+	 * @param message the message object
 	 *
-	 * @throws An IllegalArgumentException is thrown if name is null or contains an empty string,
+	 * @throws IllegalArgumentException Thrown if name is null or contains an empty string,
 	 * of if the Message object is null.
 	 */
 	public void addMessage(String name, Message message) throws IllegalArgumentException
@@ -620,17 +631,15 @@ public class ConfigFile
 
 
 	/**
-	 * @fn void addCustomXML(String xml)
-	 *
-	 * @brief Adds a custom XML string to the ConfigFile.
-	 *
-	 * @note Adding a custom XML to a newly instantiated ConfigFile object that has not loaded
+	 * Adds a custom XML string to the ConfigFile.
+	 * <p>
+	 * Note: Adding a custom XML to a newly instantiated ConfigFile object that has not loaded
 	 * will create a new XML document.
 	 *
-	 * @param xml - a custom, user-created XML string
+	 * @param xml a custom, user-created XML string
 	 *
-	 * @throws An IllegalArgumentException is thrown if the XML string is null, or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if an XML parsing error occurs.
+	 * @throws IllegalArgumentException Thrown if the XML string is null, or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if an XML parsing error occurs.
 	 */
 	public void addCustomXML(String xml) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -644,15 +653,13 @@ public class ConfigFile
 
 
 	/**
-	 * @fn boolean removeSubscription(String name)
+	 * Removes the Subscription definition which is associated with the given name.
 	 *
-	 * @brief Removes the Subscription definition which is associated with the given name.
-	 *
-	 * @param name - name associated with the subscription definition
+	 * @param name name associated with the subscription definition
 	 *
 	 * @return Returns true if the subscription definition was removed; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the subscription name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the subscription name is null, or contains an empty string.
 	 */
 	public boolean removeSubscription(String name) throws IllegalArgumentException
 	{
@@ -666,15 +673,13 @@ public class ConfigFile
 
 
 	/**
-	 * @fn boolean removeConfig(String name)
+	 * Removes the configuration definition which is associated with the given name.
 	 *
-	 * @brief Removes the configuration definition which is associated with the given name.
-	 *
-	 * @param name - name associated with the configuration definition
+	 * @param name name associated with the configuration definition
 	 *
 	 * @return Returns true if the configuration definition was removed; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the Config name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the Config name is null, or contains an empty string.
 	 */
 	public boolean removeConfig(String name) throws IllegalArgumentException
 	{
@@ -688,15 +693,13 @@ public class ConfigFile
 
 
 	/**
-	 * @fn boolean removeMessage(String name)
+	 * Removes the message definition which is associated with the given name.
 	 *
-	 * @brief Removes the message definition which is associated with the given name.
-	 *
-	 * @param name - name associated with the message definition
+	 * @param name name associated with the message definition
 	 *
 	 * @return Returns true if the message definition was removed; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the Message name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the Message name is null, or contains an empty string.
 	 */
 	public boolean removeMessage(String name) throws IllegalArgumentException
 	{
@@ -710,16 +713,14 @@ public class ConfigFile
 
 
 	/**
-	 * @fn boolean removeCustomXML(String xml)
+	 * Removes the given XML string from the ConfigFile.
 	 *
-	 * @brief Removes the given XML string from the ConfigFile.
-	 *
-	 * @param xml - XML string containing the custom XML definition
+	 * @param xml XML string containing the custom XML definition
 	 *
 	 * @return Returns true if the custom XML definition was removed; false otherwise.
 	 *
-	 * @throws An IllegalArgumentException is thrown if the XML string is null, or contains an empty string.
-	 * @throws A GMSEC_Exception is thrown if an XML parsing error occurs.
+	 * @throws IllegalArgumentException Thrown if the XML string is null, or contains an empty string.
+	 * @throws GMSEC_Exception Thrown if an XML parsing error occurs.
 	 */
 	public boolean removeCustomXML(String xml) throws IllegalArgumentException, GMSEC_Exception
 	{
@@ -733,9 +734,9 @@ public class ConfigFile
 
 
 	/**
-	 * @fn ConfigFileIterator getIterator()
+	 * Returns the {@link ConfigFileIterator} that may be used to iterate over the entries of the ConfigFile.
 	 *
-	 * @desc Returns the ConfigFileIterator that may be used to iterate over the entries of the ConfigFile.
+	 * @return A ConfigFileIterator object.
 	 */
 	public ConfigFileIterator getIterator()
 	{

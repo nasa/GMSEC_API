@@ -15,7 +15,7 @@
 	<FIELD  NAME="RESPONSE-STATUS"
 	        MODE="REQUIRED"
 	        FIELD_CLASS="STANDARD"
-	        VALUE="6"
+	        VALUE=""
 	        TYPE="I16"
 	        DESCRIPTION="Identifies the status of the Directive being processed"/>
 	<FIELD  NAME="TIME-COMPLETED"

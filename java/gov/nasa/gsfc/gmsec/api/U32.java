@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,17 +8,13 @@
 
 /**
  * @file U32.java
- *
- * @brief This is a container class for the GMSEC unsigned 32-bit integer field type.
  */
 
 package gov.nasa.gsfc.gmsec.api;
 
 
 /**
- * @class U32
- *
- * @brief This is a container class for the GMSEC unsigned 32-bit integer field type.
+ * This is a container class for the GMSEC unsigned 32-bit integer field type.
  */
 public class U32
 {
@@ -26,19 +22,19 @@ public class U32
 
 
 	/**
-	 * @desc Minimum value (0) allowed for U32 type.
+	 * Minimum value (0) allowed for U32 type.
 	 */
 	public static final long MIN_VALUE = 0L;
 
 
 	/**
-	 * @desc Maximum value (2^32 - 1) allowed for U32 type.
+	 * Maximum value (2^32 - 1) allowed for U32 type.
 	 */
 	public static final long MAX_VALUE = 4294967295L;
 
 
 	/**
-	 * @desc Enforce allowable range for U32 values.
+	 * Enforce allowable range for U32 values.
 	 */
 	private long checkRange(long arg) throws IllegalArgumentException
 	{
@@ -55,9 +51,7 @@ public class U32
 
 
 	/**
-	 * @fn U32()
-	 *
-	 * @brief construct with value equal to MIN_VALUE
+	 * Construct U32 object with value equal to MIN_VALUE
 	 */
 	public U32()
 	{
@@ -66,13 +60,11 @@ public class U32
 
 
 	/**
-	 * @fn U32(long value)
+	 * Construct U32 object with the given value
 	 *
-	 * @brief construct with given value
+	 * @param value The value to assign to the U32 object.
 	 *
-	 * @param value - the value to assign to the U32 object.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
+	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
 	public U32(long value)
 	{
@@ -81,11 +73,9 @@ public class U32
 
 
 	/**
-	 * @fn U32(U32 other)
+	 * Copy constructor
 	 *
-	 * @brief Copy constructor
-	 *
-	 * @param other - the U32 object to copy
+	 * @param other The U32 object to copy
 	 */
 	public U32(U32 other)
 	{
@@ -94,13 +84,11 @@ public class U32
 
 
 	/**
-	 * @fn set(long value)
+	 * Set U32 object with the given value.
 	 *
-	 * @brief Set U32 object with given value.
+	 * @param value The value to assign to the U32 object.
 	 *
-	 * @param value - the value to assign to the U32 object.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
+	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
 	public void set(long value)
 	{
@@ -109,9 +97,7 @@ public class U32
 
 
 	/*
-	 * @fn long get()
-	 *
-	 * @desc Returns the underlying value within the U32 object.
+	 * Returns the underlying value within the U32 object.
 	 */
 	public long get()
 	{
@@ -120,9 +106,7 @@ public class U32
 
 
 	/**
-	 * @fn String toString()
-	 *
-	 * @desc Returns the U32 value as a printable string.
+	 * Returns the U32 value as a printable string.
 	 */
 	public String toString()
 	{

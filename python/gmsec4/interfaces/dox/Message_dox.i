@@ -714,6 +714,21 @@
     If found, a pointer to the field; otherwise NULL.
 ";
 
+%feature("docstring") gmsec::api::Message::addFields "
+
+    addFields(self, fields)
+
+    This function will add the fields in the given list to the message.
+
+    Parameters
+    ----------
+    fields: the list of Field objects
+
+    Returns
+    -------
+    Returns true if any existing field in the Message has been replaced; false otherwise.
+";
+
 %feature("docstring") gmsec::api::Message::clearFields "
 
     clearFields(self)

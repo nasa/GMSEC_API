@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -38,6 +38,7 @@ namespace internal
 MsgFieldMap::MsgFieldMap(StorageType type, size_t rolloverLimit)
 	: m_type(type),
 	  m_rolloverLimit(rolloverLimit),
+	  m_fieldDisplay(DEFAULT),
 	  m_binTreeMap(),
 	  m_hashMap(),
 	  m_binTreeMapIter(m_binTreeMap.begin()),
@@ -89,18 +90,22 @@ void MsgFieldMap::setStorageType(StorageType type)
 		if (oldType == BINARY_TREE_MAP)
 		{
 			// We're moving to a HASH tree
-			for (BinaryTreeMap::const_iterator it = m_binTreeMap.begin(); it != m_binTreeMap.end(); ++it)
-			{
-				this->addField(*it->second, false);
-			}
+			m_hashMap.insert(m_binTreeMap.begin(), m_binTreeMap.end());
+
+			m_binTreeMap.clear();
 		}
 		else
 		{
 			// We're moving to a BINARY tree
-			for (HashMap::const_iterator it = m_hashMap.begin(); it != m_hashMap.end(); ++it)
-			{
-				this->addField(*it->second, false);
-			}
+			m_binTreeMap.insert(m_hashMap.begin(), m_hashMap.end());
+
+			m_hashMap.clear();
+
+			// Note: If additional fields are added to a Message,
+			// there is no guarantee that a binary tree map will
+			// continue to be used. To ensure that a binary tree
+			// map is always used, then set the rollover limit
+			// to 0 (zero).
 		}
 	}
 }
@@ -121,6 +126,12 @@ void MsgFieldMap::setRolloverLimit(size_t limit)
 size_t MsgFieldMap::getRolloverLimit() const
 {
 	return m_rolloverLimit;
+}
+
+
+void MsgFieldMap::setFieldDisplay(FieldDisplay display)
+{
+	m_fieldDisplay = display;
 }
 
 
@@ -321,16 +332,55 @@ const char* MsgFieldMap::toXML() const
 {
 	std::ostringstream oss;
 
-	if (m_type == BINARY_TREE_MAP)
+	if (m_fieldDisplay == DEFAULT)
 	{
-		for (BinaryTreeMap::const_iterator it = m_binTreeMap.begin(); it != m_binTreeMap.end(); ++it)
+		if (m_type == BINARY_TREE_MAP)
+		{
+			for (BinaryTreeMap::const_iterator it = m_binTreeMap.begin(); it != m_binTreeMap.end(); ++it)
+			{
+				oss << "\t" << it->second->toXML() << "\n";
+			}
+		}
+		else
+		{
+			for (HashMap::const_iterator it = m_hashMap.begin(); it != m_hashMap.end(); ++it)
+			{
+				oss << "\t" << it->second->toXML() << "\n";
+			}
+		}
+	}
+	else if (m_fieldDisplay == SORTED)
+	{
+		BinaryTreeMap tmpMap;
+
+		if (m_type == BINARY_TREE_MAP)
+		{
+			tmpMap.insert(m_binTreeMap.begin(), m_binTreeMap.end());
+		}
+		else
+		{
+			tmpMap.insert(m_hashMap.begin(), m_hashMap.end());
+		}
+
+		for (BinaryTreeMap::const_iterator it = tmpMap.begin(); it != tmpMap.end(); ++it)
 		{
 			oss << "\t" << it->second->toXML() << "\n";
 		}
 	}
-	else
+	else // UNSORTED
 	{
-		for (HashMap::const_iterator it = m_hashMap.begin(); it != m_hashMap.end(); ++it)
+		HashMap tmpMap;
+
+		if (m_type == BINARY_TREE_MAP)
+		{
+			tmpMap.insert(m_binTreeMap.begin(), m_binTreeMap.end());
+		}
+		else
+		{
+			tmpMap.insert(m_hashMap.begin(), m_hashMap.end());
+		}
+
+		for (HashMap::const_iterator it = tmpMap.begin(); it != tmpMap.end(); ++it)
 		{
 			oss << "\t" << it->second->toXML() << "\n";
 		}
@@ -346,16 +396,55 @@ const char* MsgFieldMap::toJSON() const
 {
 	std::ostringstream oss;
 
-	if (m_type == BINARY_TREE_MAP)
+	if (m_fieldDisplay == DEFAULT)
 	{
-		for (BinaryTreeMap::const_iterator it = m_binTreeMap.begin(); it != m_binTreeMap.end(); ++it)
+		if (m_type == BINARY_TREE_MAP)
+		{
+			for (BinaryTreeMap::const_iterator it = m_binTreeMap.begin(); it != m_binTreeMap.end(); ++it)
+			{
+				oss << it->second->toJSON() << ",";
+			}
+		}
+		else
+		{
+			for (HashMap::const_iterator it = m_hashMap.begin(); it != m_hashMap.end(); ++it)
+			{
+				oss << it->second->toJSON() << ",";
+			}
+		}
+	}
+	else if (m_fieldDisplay == SORTED)
+	{
+		BinaryTreeMap tmpMap;
+
+		if (m_type == BINARY_TREE_MAP)
+		{
+			tmpMap.insert(m_binTreeMap.begin(), m_binTreeMap.end());
+		}
+		else
+		{
+			tmpMap.insert(m_hashMap.begin(), m_hashMap.end());
+		}
+
+		for (BinaryTreeMap::const_iterator it = tmpMap.begin(); it != tmpMap.end(); ++it)
 		{
 			oss << it->second->toJSON() << ",";
 		}
 	}
-	else
+	else // UNSORTED
 	{
-		for (HashMap::const_iterator it = m_hashMap.begin(); it != m_hashMap.end(); ++it)
+		HashMap tmpMap;
+
+		if (m_type == BINARY_TREE_MAP)
+		{
+			tmpMap.insert(m_binTreeMap.begin(), m_binTreeMap.end());
+		}
+		else
+		{
+			tmpMap.insert(m_hashMap.begin(), m_hashMap.end());
+		}
+
+		for (HashMap::const_iterator it = tmpMap.begin(); it != tmpMap.end(); ++it)
 		{
 			oss << it->second->toJSON() << ",";
 		}

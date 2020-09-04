@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,7 +27,13 @@ public enum class GMSECWaitDefs
 	NO_WAIT = 0,
 
 	/// <summary>timeout "wait forever" constant - causes methods with timeouts to block</summary>
-	WAIT_FOREVER = -1
+	WAIT_FOREVER = -1,
+
+	/// <summary>
+	/// Value to indicate that a request message should only be issued once
+	/// should a response message not be received.
+	/// </summary>
+	REQUEST_REPUBLISH_NEVER = -1
 };
 
 }

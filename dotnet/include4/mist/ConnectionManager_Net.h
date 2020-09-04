@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -52,6 +52,10 @@ ref class SubscriptionInfo;
 public ref class ConnectionManager
 {
 public:
+	/// <summary>Identifies the version of the API.</summary>
+	static System::String^ GetAPIVersion();
+
+
 	/// <summary>
 	/// Creates a new ConnectionManager object with the given configuration.
 	/// </summary>
@@ -65,6 +69,11 @@ public:
 	/// </note>
 	///
 	/// <param name="config">The configuration object that specifies the type of connection object to create</param>
+	///
+	/// <exception cref="GMSEC_Exception">
+	/// An Exception is thrown if the configuration information cannot be used to deduce
+	/// a Connection type, or if an anomaly occurs while loading schemas for the specified ISD.
+	/// </exception>
 	ConnectionManager(Config^ config);
 
 
@@ -80,6 +89,11 @@ public:
 	///
 	/// <param name="config">The configuration object that specifies the type of connection object to create</param>
 	/// <param name="validate">Used to indicate whether ConnectionManager should validate messages that are produced</param>
+	///
+	/// <exception cref="GMSEC_Exception">
+	/// An Exception is thrown if the configuration information cannot be used to deduce
+	/// a Connection type, or if an anomaly occurs while loading schemas for the specified ISD.
+	/// </exception>
 	ConnectionManager(Config^ config, bool validate);
 
 
@@ -91,6 +105,11 @@ public:
 	/// <param name="validate">Used to indicate whether ConnectionManager should validate messages that are produced</param>
 	/// <param name="version">The version of the GMSEC Interface Specification Document (ISD) to use when producing messages</param>
 	///
+	/// <exception cref="GMSEC_Exception">
+	/// An Exception is thrown if the configuration information cannot be used to deduce
+	/// a Connection type, or if an anomaly occurs while loading schemas for the specified ISD.
+	/// </exception>
+	///
 	/// <seealso cref="MIST_Defs_Net.h"/>
 	ConnectionManager(Config^ config, bool validate, unsigned int version);
 
@@ -100,15 +119,12 @@ public:
 
 
 	/// <summary>
-	/// Uses the config object supplied in the constructor to establish a connection with the defined GMSEC
-	/// middleware server.  The underlying connection object is created and connected in one operation,
-	/// returning an error status if either operation is a failure. Once this call successfully returns,
-	/// the ConnectionManager is ready for message operations.
+	/// Establishes a connection with the GMSEC middleware server.
+	/// Once this call successfully returns, the ConnectionManager is ready for message operations.
 	/// </summary>
 	///
 	/// <exception cref="GMSEC_Exception">
-	/// An exception is thrown if the configuration information cannot be used to deduce a Connection type,
-	/// or if an anomaly occurs while connecting to the middleware server.
+	/// An Exception is thrown if an anomaly occurs while attempting to connect to the middleware server.
 	/// </exception>
 	void Initialize();
 
@@ -116,6 +132,15 @@ public:
 	/// <summary>This function disconnects and destroys the underlying Connection object.</summary>
 	/// <exception cref="GMSEC_Exception">If an anomaly occurs while disconnecting</exception>
 	void Cleanup();
+
+
+	/// <summary>Returns the current state of the connection to the middleware.</summary>
+	/// <seealso cref="Connection::ConnectionState"/>
+	Connection::ConnectionState GetState();
+
+
+	/// <summary>Identifies the root library name and therefore the connection type that this connection is associated with.</summary>
+	System::String^ GetLibraryRootName();
 
 
 	/// <summary>Identifies the version information for this connection's associated middleware.</summary>
@@ -291,10 +316,10 @@ public:
 	/// <param name="msg">The request message to issue</param>
 	/// <param name="timeout">maximum time (in milliseconds) to wait for reply/param>
 	/// <param name="rcb">callback to call when reply is received</param>
-	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1)
-	///                            it will never republish a request message.  If set to 0, the period will default to 60000ms,
-	///                            unless the user has provided an alternate time period via the Config object used to create
-	///                            the ConnectionManager object.  The minimum republish period allowed is 100ms.</param>
+	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
+	///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	///                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	///                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.</param>
 	///
 	/// <exception cref="GMSEC_Exception">An exception is thrown if a middleware error occurs.</exception>
 	void Request(Message^ requestMsg, System::Int32 timeout, ConnectionManagerReplyCallback^ rcb, System::Int32 republish_ms);
@@ -308,10 +333,10 @@ public:
 	///
 	/// <param name="msg">The request message to issue</param>
 	/// <param name="timeout">maximum time (in milliseconds) to wait for reply/param>
-	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1)
-	///                            it will never republish a request message.  If set to 0, the period will default to 60000ms,
-	///                            unless the user has provided an alternate time period via the Config object used to create
-	///                            the ConnectionManager object.  The minimum republish period allowed is 100ms.</param>
+	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
+	///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	///                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	///                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.</param>
 	///
 	/// <returns>A reply message, or null if a timeout occurs.</returns>
 	///
@@ -412,6 +437,28 @@ public:
 	void RemoveExcludedSubject(System::String^ subject);
 
 
+	/// <summary>Returns the name of the connection manager, automatically generated or user specified.</summary>
+	System::String^ GetName();
+
+
+	/// <summary>Sets the logical name of this connection manager. This can be used for identifying connections withing
+	/// a client program. If a name is not given, one will be automatically generated.</summary>
+	/// <param name="name">The connection name.</param>
+	void SetName(System::String^ name);
+
+
+	/// <summary>Get the string ID for this connection manager.</summary>
+	System::String^ GetID();
+
+
+	/// <summary>Get the middleware information for this connection manager.</summary>
+	System::String^ GetMWInfo();
+
+
+	/// <summary>Retrieves the number of messages queued for asynchronous publish operations.</summary>
+	System::UInt64 GetPublishQueueMessageCount();
+
+
 	/// <summary>
 	/// This method creates a message and passes ownership to the user. This message is populated with
 	/// the standard set of required and optional heartbeat fields, as well as the required common fields defined
@@ -437,6 +484,9 @@ public:
 	/// the message will be published at an interval supplied by the "PUB-RATE" field regardless of validation
 	/// results. If no "PUB-RATE" has been defined, the service will default to the GMSEC standard 30 second
 	/// heartbeat interval.
+	///
+	/// If users would like to have a COUNTER field added to the published heartbeat message, then the Heartbeat
+	/// Service should be provided with this field within the list of field provided to this method.
 	/// </summary>
 	///
 	/// <param name="subject">The topic (subject) that will be applied to the returned messages</param>
@@ -531,7 +581,7 @@ public:
 	/// <summary>
 	/// This method creates a Log Message and passes ownership to the user. This message is populated
 	/// with the standard set of required and optional log fields, as well as the required common fields
-	/// defined in setStandardFields. The message is not validated at this time, as MSG-TEXT and SEVERITY
+	/// defined in SetStandardFields. The message is not validated at this time, as MSG-TEXT and SEVERITY
 	/// fields must be set by the user at the time the message is to be sent.
 	/// 
 	/// This message automatically is generated with MESSAGE-TYPE and MESSAGE-SUBTYPE
@@ -612,10 +662,10 @@ public:
 	/// <param name="fields">list of supplemental fields that the user wishes to include with the directive message</param>
 	/// <param name="timeout">time (in milliseconds) to wait for a response message</param>
 	/// <param name="rcb">the callback to be invoked upon reception of a response message</param>
-	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1)
-	///                            it will never republish a request message.  If set to 0, the period will default to 60000ms,
-	///                            unless the user has provided an alternate time period via the Config object used to create
-	///                            the ConnectionManager object.  The minimum republish period allowed is 100ms.</param>
+	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
+	///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	///                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	///                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.</param>
 	///
 	/// <exception cref="GMSEC_Exception">
 	/// An exception is thrown if the request Message cannot be validated, or if a middleware error occurs.
@@ -638,10 +688,10 @@ public:
 	/// <param name="directiveString">a field containing the string directive that this message is intended to convey</param>
 	/// <param name="fields">list of supplemental fields that the user wishes to include with the directive message</param>
 	/// <param name="timeout">time (in milliseconds) to wait for a response message</param>
-	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1)
-	///                            it will never republish a request message.  If set to 0, the period will default to 60000ms,
-	///                            unless the user has provided an alternate time period via the Config object used to create
-	///                            the ConnectionManager object.  The minimum republish period allowed is 100ms.</param>
+	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
+	///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	///                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	///                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.</param>
 	///
 	/// <returns>A response message, or null if a timeout occurs.</returns>
 	///
@@ -754,10 +804,10 @@ public:
 	/// <param name="params">a list of the ServiceParam objects providing meta data for this service invocation</param>
 	/// <param name="timeout">the maximum time period (in milliseconds) to wait for a response</param>
 	/// <param name="rcb">the callback to be invoked upon reception of a response message</param>
-	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1)
-	///                            it will never republish a request message.  If set to 0, the period will default to 60000ms,
-	///                            unless the user has provided an alternate time period via the Config object used to create
-	///                            the ConnectionManager object.  The minimum republish period allowed is 100ms.</param>
+	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
+	///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	///                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	///                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.</param>
 	///
 	/// <exception cref="GMSEC_Exception">
 	/// An exception is thrown if the request Message cannot be validated, or if a middleware error occurs.
@@ -783,10 +833,10 @@ public:
 	/// <param name="fields">list of supplemental fields that the user wishes to include with the directive message</param>
 	/// <param name="params">a list of the ServiceParam objects providing meta data for this service invocation</param>
 	/// <param name="timeout">the maximum time period (in milliseconds) to wait for a response</param>
-	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1)
-	///                            it will never republish a request message.  If set to 0, the period will default to 60000ms,
-	///                            unless the user has provided an alternate time period via the Config object used to create
-	///                            the ConnectionManager object.  The minimum republish period allowed is 100ms.</param>
+	/// <param name="republish_ms">request message resubmission interval (in milliseconds). If set to a negative
+	///                            value (eg. REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	///                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	///                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.</param>
 	///
 	/// <returns>A response Message, or null if a timeout occurs.</returns>
 	///
@@ -815,6 +865,10 @@ public:
 	/// </exception>
 	void AcknowledgeSimpleService(System::String^ subject, Message^ request, ResponseStatus status,
 	                              System::Collections::Generic::List<Field^>^ fields);
+
+
+	/// <summary>Calls shutdown routines for each middleware that has a shutdown routine registered.</summary>
+	static void ShutdownAllMiddlewares();
 
 
 protected:

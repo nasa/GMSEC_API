@@ -1,10 +1,9 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
 
 
 /** 
@@ -17,7 +16,7 @@
  * 
  */
 
-#include "../example.h"
+#include "../Utility.h"
 
 #include <gmsec4/util/TimeUtil.h>
 
@@ -28,11 +27,15 @@ using namespace gmsec::api;
 using namespace gmsec::api::util;
 
 
-class gmsub
+class GMSEC_Subscriber : public Utility
 {
 public:
-	gmsub(Config& config);
-	~gmsub();
+	GMSEC_Subscriber(const Config& config);
+
+	~GMSEC_Subscriber();
+
+	void usage(const std::string& programName);
+
 	bool run();
 
 private:
@@ -40,52 +43,73 @@ private:
 	typedef std::vector<SubscriptionInfo*> Subscriptions;
 
 
-	Config&       config;
 	Connection*   connection;
 	Subjects      subjects;
 	Subscriptions subscriptions;
 };
 
 
-gmsub::gmsub(Config &c)
-	: config(c),
+GMSEC_Subscriber::GMSEC_Subscriber(const Config& c)
+	: Utility(c),
 	  connection(0),
 	  subjects(),
 	  subscriptions()
 {
-	// Initialize config
-	example::initialize(c);
+	// Initialize utility
+	initialize();
 }
 
 
-gmsub::~gmsub()
+GMSEC_Subscriber::~GMSEC_Subscriber()
 {
-	if (connection)
+	try
 	{
-		for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
+		if (connection)
 		{
-			SubscriptionInfo* info = *it;
+			for (Subscriptions::iterator it = subscriptions.begin(); it != subscriptions.end(); ++it)
+			{
+				SubscriptionInfo* info = *it;
 
-			GMSEC_INFO << "Unsubscribing from " << info->getSubject();
-			connection->unsubscribe(info);
-		}
+				GMSEC_INFO << "Unsubscribing from " << info->getSubject();
+				connection->unsubscribe(info);
+			}
 
-		try
-		{
 			connection->disconnect();
+
+			Connection::destroy(connection);
 		}
-		catch (Exception& e)
-		{
-			GMSEC_ERROR << e.what();
-		}
-		Connection::destroy(connection);
+	}
+	catch (const Exception& e)
+	{
+		GMSEC_ERROR << e.what();
 	}
 
 	Connection::shutdownAllMiddlewares();
 }
 
 
-bool gmsub::run()
+void GMSEC_Subscriber::usage(const std::string& programName)
+{
+	Utility::usage(programName);
+
+	std::cerr << "\n\t\t* subject[.N]=<subscription pattern>"
+	          << "\n"
+	          << "\n\t\t\tNote: N, if provided, must be 1 or greater."
+	          << "\n\t\t\tFor example, subject.1=GMSEC.A subject.2=GMSEC.B"
+	          << "\n"
+	          << "\n\t\t* iterations=<number of messages to receive>"
+	          << "\n"
+	          << "\n\t\t* msg-timeout-ms=<timeout period (milliseconds)>"
+	          << "\n"
+	          << "\n\t\t* prog-timeout-s=<timeout period (seconds)>"
+	          << "\n"
+	          << "\n\t\t\tNote: msg-timeout-ms must be defined to use prog-timeout-s"
+	          << "\n"
+	          << std::endl;
+}
+
+
+bool GMSEC_Subscriber::run()
 {
 	bool success = true;
 
@@ -95,18 +119,18 @@ bool gmsub::run()
 	try
 	{
 		//o Create the Connection
-		connection = Connection::create(config);
+		connection = Connection::create(getConfig());
 
 		//o Connect
 		connection->connect();
 
 		//o Determine the subjects to listen to
-		example::determineSubjects(config, subjects);
+		determineSubjects(subjects);
 
 		//o Determine runtime settings
-		int iterations     = example::get(config, "ITERATIONS", 0);
-		int msg_timeout_ms = example::get(config, "MSG_TIMEOUT_MS", GMSEC_WAIT_FOREVER);
-		int prog_timeout_s = example::get(config, "PROG_TIMEOUT_S", GMSEC_WAIT_FOREVER);
+		int iterations     = get("ITERATIONS", 0);
+		int msg_timeout_ms = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
+		int prog_timeout_s = get("PROG-TIMEOUT-S", GMSEC_WAIT_FOREVER);
 
 		if (iterations > 0)
 		{
@@ -184,13 +208,15 @@ int main(int argc, char* argv[])
 {
 	Config config(argc, argv);
 
-	example::addToConfigFromFile(config);
+	GMSEC_Subscriber gmsub(config);
 
-	if (example::isOptionInvalid(config, argc, "gmsub"))
+	gmsub.addToConfigFromFile();
+
+	if (gmsub.isOptionInvalid(argc, "gmsub"))
 	{
-		example::printUsage("gmsub");
-		return -1;
+		gmsub.usage("gmsub");
+		return 1;
 	}
 
-	gmsub(config).run();
+	gmsub.run();
 }

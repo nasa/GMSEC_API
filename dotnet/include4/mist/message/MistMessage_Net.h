@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -23,6 +23,8 @@ namespace API
 {
 	// Forward declaration(s)
 	ref class Config;
+	ref class Field;
+	ref class Message;
 
 namespace MIST
 {
@@ -84,7 +86,7 @@ public:
 	MistMessage(System::String^ subject, System::String^ schemaID, Config^ config, Specification^ spec);
 
 
-	/// <summary>Copy constructor - initializes the message instance using the other given MistMessage.<summary>
+	/// <summary>Copy constructor - initializes the message instance using the other given MistMessage</summary>
 	///
 	/// <param name="other">The message to be copied.</param>
 	///
@@ -92,6 +94,28 @@ public:
 	/// An exception is thrown if the given MistMessage is null.
 	/// </exception>
 	MistMessage(MistMessage^ other);
+
+
+	/// <summary>Special constructor that constructs a MistMessage using a simple Message</summary>
+	///
+	/// <param name="msg">The simple Message to reference while building the MistMessage</param>
+	///
+	/// <exception cref="GMSEC_Exception">
+	/// An exception is thrown if the given Message object is null, or if the given Message does not house sufficient information to construct a MistMessage.
+	/// </exception>
+	MistMessage(Message^ msg);
+
+
+	/// <summary>Special constructor that constructs a MistMessage using a simple Message</summary>
+	///
+	/// <param name="msg">The simple Message to reference while building the MistMessage</param>
+	///
+	/// <param name="specConfig">The specification configuration to apply when constructing the MistMessage</param>
+	///
+	/// <exception cref="GMSEC_Exception">
+	/// An exception is thrown if either the given Message or Config object is null, or if the given Message does not house sufficient information to construct a MistMessage.
+	/// </exception>
+	MistMessage(Message^ msg, Config^ specConfig);
 
 
 	/// <summary>Initializes a MistMessage using an XML or JSON string.</summary>
@@ -106,6 +130,22 @@ public:
 
 	/// <summary>Destructor</summary>
 	~MistMessage();
+
+
+	/// <summary>
+	/// Sets the internal list of fields which are to be automatically placed in all
+	/// MistMessage objects that are created.  Internal copies of the Fields are made, and
+	/// thus ownership of the fields that are provided are not retained by MistMessage.
+	/// </summary>
+	///
+	/// <param name="standardFields">The list of fields to set as standard fields</param>
+	static void SetStandardFields(System::Collections::Generic::List<Field^>^ standardFields);
+
+
+	/// <summary>
+	/// Destroys the lists of standard fields that are included with MistMessage objects.
+	/// </summary>
+	static void ClearStandardFields();
 
 
 	/// <summary>Returns a string that identifies the schema that the Message is based off of.</summary>

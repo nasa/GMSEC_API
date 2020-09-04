@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -117,9 +117,35 @@ void InternalConfigFile::load(const char* filePath)
 	}
 	else
 	{
+		std::string error = "Error: ";
+
+		switch (code)
+		{
+			case tinyxml2::XML_NO_ATTRIBUTE:                    error += "No attribute"; break;
+			case tinyxml2::XML_WRONG_ATTRIBUTE_TYPE:            error += "Wrong attribute type"; break;
+			case tinyxml2::XML_ERROR_FILE_NOT_FOUND:            error += "File not found"; break;
+			case tinyxml2::XML_ERROR_FILE_COULD_NOT_BE_OPENED:  error += "File could not be opened"; break;
+			case tinyxml2::XML_ERROR_FILE_READ_ERROR:           error += "File could not be read"; break;
+			case tinyxml2::XML_ERROR_ELEMENT_MISMATCH:          error += "Element mismatch"; break;
+			case tinyxml2::XML_ERROR_PARSING_ELEMENT:           error += "Cannot parse element"; break;
+			case tinyxml2::XML_ERROR_PARSING_ATTRIBUTE:         error += "Cannot parse attribute"; break;
+			case tinyxml2::XML_ERROR_IDENTIFYING_TAG:           error += "Cannot identify tag"; break;
+			case tinyxml2::XML_ERROR_PARSING_TEXT:              error += "Cannot parse text"; break;
+			case tinyxml2::XML_ERROR_PARSING_CDATA:             error += "Cannot parse CDATA"; break;
+			case tinyxml2::XML_ERROR_PARSING_COMMENT:           error += "Cannot parse comment"; break;
+			case tinyxml2::XML_ERROR_PARSING_DECLARATION:       error += "Cannot parse declaration"; break;
+			case tinyxml2::XML_ERROR_PARSING_UNKNOWN:           error += "Unknown parsing issue"; break;
+			case tinyxml2::XML_ERROR_EMPTY_DOCUMENT:            error += "Empty document"; break;
+			case tinyxml2::XML_ERROR_MISMATCHED_ELEMENT:        error += "Mismatched element"; break;
+			case tinyxml2::XML_ERROR_PARSING:                   error += "Cannot parse file"; break;
+			case tinyxml2::XML_CAN_NOT_CONVERT_TEXT:            error += "Cannot convert text"; break;
+			case tinyxml2::XML_NO_TEXT_NODE:                    error += "No text node"; break;
+			default:                                            error += "Unknown cause"; break;
+		}
+
 		delete m_xmlDoc;
 		m_xmlDoc = NULL;
-		throw Exception(CONFIGFILE_ERROR, XML_PARSE_ERROR, "Failed to parse XML file");
+		throw Exception(CONFIGFILE_ERROR, XML_PARSE_ERROR, code, error.c_str());
 	}
 }
 

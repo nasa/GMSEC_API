@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -59,6 +59,12 @@ SchemaIDIterator& Specification::getSchemaIDIterator()
 unsigned int Specification::getVersion() const
 {
 	return m_iSpec->getVersion();
+}
+
+
+const util::DataList<MessageSpecification*>& Specification::getMessageSpecifications() const
+{
+	return m_iSpec->getMessageSpecifications();
 }
 
 

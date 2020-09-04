@@ -1,24 +1,28 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
-
 
 
 GMSEC_HOME = ../..
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
-DIRS = gmpub gmsub gmreq gmrpl \
-       gmconfig_edit gm_msg_config \
-       throughput_pub throughput_sub
+DIRS = gmconfig_edit gm_msg_config gmpub gmreq gmrpl gmsub throughput_pub throughput_sub
 
 
-.PHONE: default all clean
+.PHONY: default all clean
 
 
 default all:
 	@ for d in $(DIRS); do \
+		echo ; \
+		echo ; \
+		echo "###########################################################" ; \
+		echo "#" ; \
+		echo "#  Building $$d" ; \
+		echo "#" ; \
+		echo "###########################################################" ; \
 		$(MAKE) -C $$d || exit 1; \
 	done
 

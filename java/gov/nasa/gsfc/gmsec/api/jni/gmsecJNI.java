@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,8 +15,29 @@ import gov.nasa.gsfc.gmsec.api.mist.message.*;
 
 import gov.nasa.gsfc.gmsec.api.util.*;
 
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIBinaryField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIBooleanField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNICharField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII16Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII32Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII64Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNII8Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIF32Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIF64Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIStringField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU16Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU32Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU64Field;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIU8Field;
+
+import gov.nasa.gsfc.gmsec.api.jni.util.JNILogHandler;
+import gov.nasa.gsfc.gmsec.api.jni.util.JNITimeSpec;
+
 import gov.nasa.gsfc.gmsec.api.jni.mist.*;
 import gov.nasa.gsfc.gmsec.api.jni.mist.message.*;
+
+import java.util.List;
 
 
 /** @class gmsecJNI
@@ -44,26 +65,8 @@ public class gmsecJNI
 
 		initialize();
 		
-		// Get java version 
-		String version = System.getProperty("java.version");
-		if (version != null)
-		{
-			int major = 0, minor = 0;
-			int firstDot = version.indexOf('.');
-			try
-			{
-				major = Integer.parseInt(version.substring(0, firstDot));
-				minor = Integer.parseInt(version.substring((firstDot + 1), version.indexOf('.', (firstDot + 1))));
-			}
-			catch (NumberFormatException e)
-			{
-				// commented out for Fortify
-				// e.printStackTrace();
-			}
-
-			// If version is greater than 1.4, then enable thread detach in JNI
-			setEnableDetach((major > 1 || minor > 4));
-		}
+		// Enable thread detach in JNI
+		setEnableDetach(true);
 	}
 
 	private final static native void initialize();
@@ -104,6 +107,7 @@ public class gmsecJNI
 
 	// ConfigEntry native class functions
 	//
+	public final static native void delete_ConfigEntry(long jarg1, JNIConfigEntry entry);
 	public final static native String ConfigEntry_GetName(long jarg1, JNIConfigEntry entry);
 	public final static native long ConfigEntry_GetConfig(long jarg1, JNIConfigEntry entry);
 
@@ -249,6 +253,7 @@ public class gmsecJNI
 
 	// MessageEntry native class functions
 	//
+	public final static native void delete_MessageEntry(long jarg1, JNIMessageEntry entry);
 	public final static native String MessageEntry_GetName(long jarg1, JNIMessageEntry entry);
 	public final static native long MessageEntry_GetMessage(long jarg1, JNIMessageEntry entry);
 
@@ -290,6 +295,7 @@ public class gmsecJNI
 
 	// SubscriptionEntry native class functions
 	//
+	public final static native void delete_SubscriptionEntry(long jarg1, JNISubscriptionEntry entry);
 	public final static native String SubscriptionEntry_GetName(long jarg1, JNISubscriptionEntry entry);
 	public final static native String SubscriptionEntry_GetSubject(long jarg1, JNISubscriptionEntry entry);
 	public final static native String SubscriptionEntry_GetPattern(long jarg1, JNISubscriptionEntry entry);
@@ -416,6 +422,8 @@ public class gmsecJNI
 	public final static native void delete_ConnectionManager(long jarg1, JNIConnectionManager connMgr);
 	public final static native void ConnectionManager_Initialize(long jarg1, JNIConnectionManager connMgr);
 	public final static native void ConnectionManager_Cleanup(long jarg1, JNIConnectionManager connMgr);
+	public final static native int ConnectionManager_GetState(long jarg1, JNIConnectionManager connMgr);
+	public final static native String ConnectionManager_GetLibraryRootName(long jarg1, JNIConnectionManager connMgr);
 	public final static native String ConnectionManager_GetLibraryVersion(long jarg1, JNIConnectionManager connMgr);
 	public final static native long ConnectionManager_GetSpecification(long jarg1, JNIConnectionManager connMgr);
 	public final static native void ConnectionManager_SetSpecification(long jarg1, JNIConnectionManager connMgr, long jarg2, JNISpecification jspec, Specification spec);
@@ -440,6 +448,11 @@ public class gmsecJNI
 	public final static native boolean ConnectionManager_StopAutoDispatch(long jarg1, JNIConnectionManager connMgr, boolean waitForCompletion);
 	public final static native void ConnectionManager_ExcludeSubject(long jarg1, JNIConnectionManager connMgr, String subject);
 	public final static native void ConnectionManager_RemoveExcludedSubject(long jarg1, JNIConnectionManager connMgr, String subject);
+	public final static native String ConnectionManager_GetName(long jarg1, JNIConnectionManager connMgr);
+	public final static native void ConnectionManager_SetName(long jarg1, JNIConnectionManager connMgr, String name);
+	public final static native String ConnectionManager_GetID(long jarg1, JNIConnectionManager connMgr);
+	public final static native String ConnectionManager_GetMWInfo(long jarg1, JNIConnectionManager connMgr);
+	public final static native long ConnectionManager_GetPublishQueueMessageCount(long jarg1, JNIConnectionManager connMgr);
 	public final static native long ConnectionManager_CreateHeartbeatMessage(long jarg1, JNIConnectionManager connMgr, String subject, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_StartHeartbeatService(long jarg1, JNIConnectionManager connMgr, String subject, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_StopHeartbeatService(long jarg1, JNIConnectionManager connMgr);
@@ -550,7 +563,10 @@ public class gmsecJNI
 	public final static native long new_MistMessageWithConfig(String subject, String schemaID, long jarg1, JNIConfig jConfig, long jarg2, JNISpecification jSpec);
 	public final static native long new_MistMessageWithData(String data);
 	public final static native long new_MistMessageCopy(long jarg1, JNIMistMessage jOther);
+	public final static native long new_MistMessageFromMessage(long jarg1, JNIMessage jMsg, long jarg2, JNIConfig jConfig);
 	public final static native void delete_MistMessage(long jarg1, JNIMistMessage jMistMsg);
+	public final static native void MistMessageSetStandardFields(long[] fldPtrs, JNIField[] flds, int numFields);
+	public final static native void MistMessageClearStandardFields();
 	public final static native String MistMessageGetSchemaID(long jarg1, JNIMistMessage jMistMsg);
 	public final static native void MistMessageSetValueString(long jarg1, JNIMistMessage jMistMsg, String fieldName, String value);
 	public final static native void MistMessageSetValueLong(long jarg1, JNIMistMessage jMistMsg, String fieldName, long value);
@@ -689,5 +705,6 @@ public class gmsecJNI
 	public final static native void Specification_ValidateMessage(long jarg1, JNISpecification jSpec, long jarg2, JNIMessage msg);
 	public final static native long Specification_GetSchemaIDIterator(long jarg1, JNISpecification jSpec);
 	public final static native int Specification_GetVersion(long jarg1, JNISpecification jSpec);
+	public final static native List<MessageSpecification> Specification_GetMessageSpecifications(long jarg1, JNISpecification jSpec);
 	public final static native String Specification_GetTemplateXML(long jarg1, JNISpecification jSpec, String subject, String schemaID);
 }

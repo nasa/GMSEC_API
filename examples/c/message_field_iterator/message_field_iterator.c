@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -95,9 +95,7 @@ int main(int argc, char* argv[])
 	// interface
 	// This is useful for determining which version of the API is
 	// configured within the environment
-	// TODO: Once available, replace field statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	connMgr = connectionManagerCreate(config, status);
 	checkStatus(status);

@@ -1,16 +1,14 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-
-/** @file ServiceParam.java
- *
- *  @brief This file contains declarations for Simple Service containers
-**/
+/**
+ * @file ServiceParam.java
+ */
 
 package gov.nasa.gsfc.gmsec.api.mist;
 
@@ -24,26 +22,32 @@ import gov.nasa.gsfc.gmsec.api.jni.mist.JNIServiceParam;
 
 
 /**
- * @class ServiceParam
- *
- * @brief This class is a container for holding information
+ * This class is a container for holding information
  * on a Simple Service parameter, and used to generate GMSEC Simple Service
- * messages by the ConnectionManager class
+ * messages by the ConnectionManager class.
  *
- * @sa ConnectionManager @n
- *		
-*/
+ * @see ConnectionManager
+ */
 public class ServiceParam
 {
 	private JNIServiceParam m_jniParam = null;
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param param Object to reference for acquiring internal JNIServiceParam.
+	 * @return Internal JNIServiceParam object.
+	 */
 	public static JNIServiceParam getInternal(ServiceParam param)
 	{
 		return (param == null ? null : param.m_jniParam);
 	}
 
 
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param jParam Internal JNIServiceParam object.
+	 */
 	public ServiceParam(JNIServiceParam jParam)
 	{
 		m_jniParam = jParam;
@@ -56,16 +60,13 @@ public class ServiceParam
 
 
 	/**
-	 * @fn ServiceParam(String name, Field field)
+	 * Constructor - Initializes the ServiceParam object with a name and a Field object.
 	 *
-	 * @brief Constructor - Initializes the ServiceParam object with 
-	 * a name and a Field object
+	 * @param name  The name of the ServiceParam.
+	 * @param field The field to store within the ServiceParam.
 	 *
-	 * @param name  - The name of the ServiceParam
-	 * @param field - The field to store within the ServiceParam
-	 *
-	 * @throws An IllegalArgumentException is thrown if the Service Parameter name is null or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the Field object is null.
+	 * @throws IllegalArgumentException Thrown if the Service Parameter name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the Field object is null.
 	 */
 	public ServiceParam(String name, Field field) throws IllegalArgumentException
 	{
@@ -83,14 +84,11 @@ public class ServiceParam
 
 
 	/**
-	 * @fn ServiceParam(ServiceParam other)
+	 * Constructor - Initializes the ServiceParam object from another ServiceParam.
 	 *
-	 * @brief Constructor - Initializes the ServiceParam object from another
-	 * ServiceParam
+	 * @param other The other ServiceParam to copy.
 	 *
-	 * @param other - The other ServiceParam to inherit values from
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given ServiceParam object is null.
+	 * @throws IllegalArgumentException Thrown if the given ServiceParam object is null.
 	 */
 	public ServiceParam(ServiceParam other) throws IllegalArgumentException
 	{
@@ -104,11 +102,9 @@ public class ServiceParam
 
 
 	/**
-	 * @fn String getName()
+	 * Retrieves the name of the ServiceParam.
 	 *
-	 * @brief Retrieves the name of the ServiceParam
-	 *
-	 * @return The name of the ServiceParam
+	 * @return The name of the ServiceParam.
 	 */
 	public String getName()
 	{
@@ -117,11 +113,9 @@ public class ServiceParam
 
 
 	/**
-	 * @fn Field getValue()
+	 * Retrieves the Field value associated with the ServiceParam.
 	 *
-	 * @brief Retrieves the Field value associated with the ServiceParam
-	 *
-	 * @return The Field value of the ServiceParam
+	 * @return The Field object held by the ServiceParam.
 	 */
 	public Field getValue()
 	{

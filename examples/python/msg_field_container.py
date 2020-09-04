@@ -27,6 +27,8 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " + sys.argv[0] + " <config-file>" + "\nPlease see the GMSEC_API/example/cpp/message_field_container directory for an example xml configuration file." 
         print usageMessage
+        return -1
+
 
     # If it was not specified in the command-line arguments, set LOGLEVEL
     # to 'INFO' and LOGFILE to 'stdout' to allow the program report output
@@ -34,7 +36,6 @@ def main():
     initializeLogging()
 
     try:
-        
         # Demonstration of setting the configuration options via
         # configuration file
         createMsgUsingConfigFile(sys.argv[1])
@@ -44,7 +45,6 @@ def main():
         createMsgUsingConfigObject()
         
     except libgmsec_python.Exception as e:
-        
         libgmsec_python.logError(e.what())
         return -1
         

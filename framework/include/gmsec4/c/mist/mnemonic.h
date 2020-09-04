@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -44,6 +44,22 @@ extern "C"
 	 * @sa mnemonicDestroy
 	 */
 	GMSEC_API GMSEC_Mnemonic mnemonicCreate(const char* name, const GMSEC_MnemonicSample samples[], size_t numSamples, GMSEC_Status status);
+
+
+    /**
+     * @fn GMSEC_Mnemonic mnemonicCreateWithNoSamples(const char* name, GMSEC_Status status)
+     *
+     * @brief Constructs a MnemonicSample object with no samples.
+     *
+	 * @param[in]  name       - the name of the Mnemonic
+	 * @param[out] status     - result of the operation
+	 *
+	 * @return A handle to a Mnemonic object, or NULL in case of an error.  In case of the latter, examine the status.
+	 *
+	 * @sa mnemonicDestroy
+     */
+	GMSEC_API GMSEC_Mnemonic mnemonicCreateWithNoSamples(const char* name, GMSEC_Status status);
+
 
 
 	/**

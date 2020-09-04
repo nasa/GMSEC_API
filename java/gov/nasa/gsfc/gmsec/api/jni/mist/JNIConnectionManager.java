@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -34,10 +34,11 @@ import gov.nasa.gsfc.gmsec.api.util.Log;
 
 import gov.nasa.gsfc.gmsec.api.jni.gmsecJNI;
 import gov.nasa.gsfc.gmsec.api.jni.JNIConfig;
-import gov.nasa.gsfc.gmsec.api.jni.JNIField;
 import gov.nasa.gsfc.gmsec.api.jni.JNIMessage;
 import gov.nasa.gsfc.gmsec.api.jni.JNIStatus;
-import gov.nasa.gsfc.gmsec.api.jni.JNIFieldConverter;
+
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIFieldConverter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,6 +101,12 @@ public class JNIConnectionManager
 	}
 
 
+	public static String getAPIVersion()
+	{
+		return gmsecJNI.Connection_GetAPIVersion();
+	}
+
+
 	public JNIConnectionManager(ConnectionManager connMgr, Config cfg) throws GMSEC_Exception
 	{
 		this(gmsecJNI.new_ConnectionManager(JNIConfig.getCPtr(Config.getInternal(cfg)), Config.getInternal(cfg)), true);
@@ -136,7 +143,21 @@ public class JNIConnectionManager
 	}
 
 
-	public String getLibraryVersion() throws GMSEC_Exception
+	public Connection.ConnectionState getState()
+	{
+        int state = gmsecJNI.ConnectionManager_GetState(swigCPtr, this);
+
+        return Connection.ConnectionState.values()[state];
+	}
+
+
+	public String getLibraryRootName()
+	{
+		return gmsecJNI.ConnectionManager_GetLibraryRootName(swigCPtr, this);
+	}
+
+
+	public String getLibraryVersion()
 	{
 		return gmsecJNI.ConnectionManager_GetLibraryVersion(swigCPtr, this);
 	}
@@ -417,6 +438,36 @@ public class JNIConnectionManager
 	}
 
 
+	public String getName()
+	{
+		return gmsecJNI.ConnectionManager_GetName(swigCPtr, this);
+	}
+
+
+	public void setName(String name)
+	{
+		gmsecJNI.ConnectionManager_SetName(swigCPtr, this, name);
+	}
+
+
+	public String getID()
+	{
+		return gmsecJNI.ConnectionManager_GetID(swigCPtr, this);
+	}
+
+
+	public String getMWInfo()
+	{
+		return gmsecJNI.ConnectionManager_GetMWInfo(swigCPtr, this);
+	}
+
+
+	public long getPublishQueueMessageCount()
+	{
+		return gmsecJNI.ConnectionManager_GetPublishQueueMessageCount(swigCPtr, this);
+	}
+
+
 	/***************Start Heartbeat Section************************************************/
 
 
@@ -675,5 +726,11 @@ public class JNIConnectionManager
 		}
 
 		return null;
+	}
+
+
+	public static void shutdownAllMiddlewares()
+	{
+		gmsecJNI.Connection_ShutdownAllMiddlewares();
 	}
 }

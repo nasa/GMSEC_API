@@ -20,7 +20,7 @@
 	        DESCRIPTION="Identifies the type of information being transferred between the Components"/>
 	<FIELD  NAME="CNTL-KEYWORD"
 	        MODE="OPTIONAL"
-	        FIELD_CLASS="HEADER"
+	        FIELD_CLASS="STANDARD"
 	        VALUE=""
 	        TYPE="STRING"
 	        DESCRIPTION="Keyword extracted from the CNTL-STRING. Useful for routing/processing."/>

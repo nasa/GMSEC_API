@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -207,6 +207,16 @@ If the object is configured to validate messages, all messages sent from this Co
 
 =head2 Public Member Subroutines
 
+=head3 getAPIVersion()
+
+C<libgmsec_perl::ConnectionManager-E<gt>getAPIVersion()>
+
+    This function identifies the version of the API.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+    API version information
+
 =head3 new
 
 C<libgmsec_perl::ConnectionManager-E<gt>new($cfg, $validate, $version)>
@@ -223,6 +233,10 @@ C<libgmsec_perl::ConnectionManager-E<gt>new($cfg, $validate, $version)>
 
     A ConnectionManager object configured using the specified config object and additional parameters
 
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    An Exception is thrown if the configuration information cannot be used to deduce a Connection type, or if an anomaly occurs while loading schemas for the specified ISD.
+
 =head3 DESTROY
 
 C<libgmsec_perl::ConnectionManager-E<gt>DESTROY()>
@@ -233,11 +247,11 @@ C<libgmsec_perl::ConnectionManager-E<gt>DESTROY()>
 
 C<libgmsec_perl::ConnectionManager-E<gt>initialize()>
 
-    Uses the config object supplied in the constructor to establish a connection with the defined GMSEC middleware server.  The underlying connection object is created and connected in one operation, returning an error status if either operation is a failure.  Once this call successfully returns, the ConnectionManager is ready for message operations.
+    Establishes a connection with the GMSEC middleware server.  Once this call successfully returns, the ConnectionManager is ready for message operations.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-    An Exception is thrown if the configuration information cannot be used to deduce a Connection type, or if an anomaly occurs while connecting to the middleware server
+    An Exception is thrown if an anomaly occurs while connecting to the middleware server
 
 =head3 cleanup
 
@@ -248,6 +262,16 @@ C<libgmsec_perl::ConnectionManager-E<gt>cleanup()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
     An Exception is thrown if an anomaly occurs while disconnecting
+
+=head3 getLibraryRootName()
+
+C<libgmsec_perl::ConnectionManager-E<gt>getLibraryRootName()>
+
+    This function identifies the root library name and therefore the connection type that this connection is associated with.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+    root library name
 
 =head3 getLibraryVersion()
 
@@ -302,6 +326,8 @@ C<libgmsec_perl::ConnectionManager-E<gt>unsubscribe($info)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
     Exception if ConnectionManager has not been initialized
+    Exception if SubscriptionInfo object originated from a different ConnectionManager
+    Exception if error occurs at the middleware level
 
 =head3 publish
 
@@ -344,7 +370,7 @@ C<libgmsec_perl::ConnectionManager-E<gt>request($request, $timeout, $republish_m
 
     $request - request message to be sent
     $timeout - maximum timeout to wait for reply (in milliseconds).
-    $republish_ms - request message resubmission interval (in milliseconds).  If set to a negative value (eg. -1, it will never republish a request message.  If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the ConnectionManager object.  The minimum republish period allowed is 100ms. (optional)
+    $republish_ms - request message resubmission interval (in milliseconds). If set to a negative value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
@@ -459,6 +485,44 @@ C<libgmsec_perl::ConnectionManager-E<gt>removeExcludedSubject($subject)>
 
     Exception if ConnectionManager has not been initialized
 
+=head3 getName
+
+C<libgmsec_perl::ConnectionManager-E<gt>getName()>
+
+    Returns the name of the connection, automatically generated or user specified.
+
+=head3 setName
+
+C<libgmsec_perl::ConnectionManager-E<gt>setName($name)>
+
+    Set the logical name of this connection. This can be used for Identifying connections withing a client program. If a name is not given, one will be automatically generated.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+    $name - the name of this connection
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+    Exception if ConnectionManager has not been initialized, or if the name string is NULL.
+
+=head3 getID
+
+C<libgmsec_perl::ConnectionManager-E<gt>getID()>
+
+    Returns the string ID for this connection.
+
+=head3 getMWInfo
+
+C<libgmsec_perl::ConnectionManager-E<gt>getMWInfo()>
+
+    Returns a string containing middleware information.
+
+=head3 getPublishQueueMessageCount
+
+C<libgmsec_perl::ConnectionManager-E<gt>getPublishQueueMessageCount()>
+
+    Retrieves the number of messages queued for asynchronous publish operations.
+
 =head3 createHeartbeatmessage
 
 C<libgmsec_perl::ConnectionManager-E<gt>createHeartbeatmessage($subject, $heartbeatFields)>
@@ -488,6 +552,9 @@ C<libgmsec_perl::ConnectionManager-E<gt>createHeartbeatmessage($subject, $heartb
 C<libgmsec_perl::ConnectionManager-E<gt>starthearbeatService($subject, $heartbeatFields)>
 
     Creates a archetypal heartbeat message from the concatenation of the standard fields applied globally to this ConnectionManager and to this function.  This message will then be validated, if the "validate" flag is set.  If there is an error, an Exception will be thrown.  If it has not been set, the message will be published at an interval supplied by the "PUB-RATE" field regardless of validation results.  If no "PUB-RATE" has been defined, the service will default to the GMSEC standard of 30 second heartbeat interval.
+
+    If users would like to have a COUNTER field added to the published heartbeat message, then the Heartbeat
+    Service should be provided with this field within the list of field provided to this method.
 
     MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and added to the message automatically, according to the GMSEC Message Standard
 
@@ -677,7 +744,7 @@ C<libgmsec_perl::ConnectionManager-E<gt>requestDirective($subject, $directiveStr
     $directiveString - a field containing the string directive that this message is intended to convey
     $fields - a FieldList object containing supplemental fields that the user wishes to include with the directive message.
     $timeout - the time to wait before a response to the message will no longer be routed to the supplied callback
-    $republish_ms - request message resubmission interval (in milliseconds).  If set to a negative value (eg. -1) it will never republish a request message.  If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the ConnectionManager object.  The minimum replublish period allowed is 100ms.
+    $republish_ms - request message resubmission interval (in milliseconds). If set to a negative value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
@@ -812,7 +879,7 @@ C<libgmsec_perl::ConnectionManager-E<gt>requestSimpleService($subject, $opName, 
     $opNumber - a Field object containing the operation number for the service
     $fields - a FieldList object containing supplemental fields that the user wishes to include with the directive message
     $param - a ServiceParamList object containing the ServiceParam objects providing meta data for this service invocation
-    $republish_ms - request message resubmission interval (in milliseconds).  If set to a negative value (eg. -1) it will never republish a request message.  If set to 0, the period will default to 60000ms, unless the user has provided an alternative time period via the Config object used to create the ConnectionManager object.  The minimum republish period allowed is 100ms.
+    $republish_ms - request message resubmission interval (in milliseconds). If set to a negative value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
 =cut
 %}

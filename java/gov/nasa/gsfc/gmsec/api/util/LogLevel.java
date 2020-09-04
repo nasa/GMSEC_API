@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,31 +8,44 @@
 
 /**
  * @file LogLevel.java
- *
- * @brief Log level definition
  */
 
 package gov.nasa.gsfc.gmsec.api.util;
 
 
 /** 
- * @enum LogLevel
- * @brief Log level definitions
+ * Log level definitions
  */
 public enum LogLevel
 {
-	NONE(0),       ///< No logging enabled
-	ERROR(1),      ///< Error level logging
-	SECURE(2),     ///< Secure level logging
-	WARNING(3),    ///< Warning level logging
-	INFO(4),       ///< Info level logging
-	VERBOSE(5),    ///< Verbose level logging
-	DEBUG(6);      ///< Debug level logging
+	/** No logging enabled */
+	NONE(0),
+
+	/** Error level logging */
+	ERROR(1),
+
+	/** Secure level logging */
+	SECURE(2),
+
+	/** Warning level logging */
+	WARNING(3),
+
+	/** Info level logging */
+	INFO(4),
+
+	/** Verbose level logging */
+	VERBOSE(5),
+
+	/** Debug level logging */
+	DEBUG(6);
 
 
 	private int value;
 	private LogLevel(int value) { this.value = value; }
 
+	/**
+	 * Displays the log level held by the LogLevel object as a string.
+	 */
 	public String toString()
 	{
 		switch (value)

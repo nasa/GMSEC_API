@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -73,9 +73,11 @@ sub main
 	# GMSEC-SCHEMA-PATH)
 	$config->addValue("GMSEC-SCHEMA-PATH", "templates");
 
-	# TODO: Once available, replace this statement with usage of
-	# ConnectionManager::getAPIVersion (See RTC 4798)
-	libgmsec_perl::LogInfo(libgmsec_perl::Connection::getAPIVersion());
+	#o Since this example relies on the 2016.00 version of the templates,
+	# we indicate such within the configuration object.
+	$config->addValue("GMSEC-SPECIFICATION-VERSION", "201600");
+
+	libgmsec_perl::LogInfo(libgmsec_perl::ConnectionManager::getAPIVersion());
 
 	eval
 	{
@@ -128,7 +130,7 @@ sub main
 		};
 		if (isa($@, 'libgmsec_perl::Exception'))
 		{
-			libgmsec_perl::LogInfo($@->what());
+			libgmsec_perl::LogInfo("This error is expected:\n" . $@->what());
 		}
 
 		#o Disconnect from the middleware and clean up the Connection

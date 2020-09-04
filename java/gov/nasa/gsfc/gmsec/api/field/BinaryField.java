@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,23 +8,23 @@
 
 /**
  * @file BinaryField.java
- *
- * @brief Specialized Field class that can be used to retain raw data.
  */
 
 package gov.nasa.gsfc.gmsec.api.field;
 
-import gov.nasa.gsfc.gmsec.api.jni.JNIBinaryField;
+import gov.nasa.gsfc.gmsec.api.jni.field.JNIBinaryField;
 
 
 
 /**
- * @class BinaryField
- *
- * @brief Specialized Field class that can be used to retain raw data.
+ * Specialized Field class that can be used to retain raw data.
  */
 public class BinaryField extends Field
 {
+	/**
+	 * This constructor is for internal GMSEC API use only.
+	 * @param field A JNIBinaryField object.
+	 */
 	public BinaryField(JNIBinaryField field)
 	{
 		setInternal(field);
@@ -32,15 +32,13 @@ public class BinaryField extends Field
 
 
 	/**
-	 * @fn BinaryField(String name, byte[] data)
+	 * Default constructor.
 	 *
-	 * @brief Default constructor.
+	 * @param name Name of the field.
+	 * @param data Raw data to associate with the field.
 	 *
-	 * @param name - name of the field.
-	 * @param data - raw data to associate with the field.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the field name string is null, or contains an empty string.
-	 * @throws An IllegalArgumentException is thrown if the byte array is null.
+	 * @throws IllegalArgumentException Thrown if the field name string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the byte array is null.
 	 */
 	public BinaryField(String name, byte[] data) throws IllegalArgumentException
 	{
@@ -56,13 +54,11 @@ public class BinaryField extends Field
 
 
 	/**
-	 * @fn BinaryField(BinaryField other)
+	 * Copy constructor.
 	 *
-	 * @brief Copy constructor.
+	 * @param other The other BinaryField object to copy.
 	 *
-	 * @param other - the other BinaryField object to copy.
-	 *
-	 * @throws An IllegalArgumentException is thrown if the given BinaryField object is null.
+	 * @throws IllegalArgumentException Thrown if the given BinaryField object is null.
 	 */
 	public BinaryField(BinaryField other) throws IllegalArgumentException
 	{
@@ -76,9 +72,9 @@ public class BinaryField extends Field
 
 
 	/**
-	 * @fn getValue()
+	 * Returns the data stored within the BinaryField.
 	 *
-	 * @return Returns the data stored within the BinaryField.
+	 * @return A byte array.
 	 */
 	public byte[] getValue()
 	{

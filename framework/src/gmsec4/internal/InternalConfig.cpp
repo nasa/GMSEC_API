@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -292,14 +292,18 @@ bool InternalConfig::getBooleanValue(const char* name) const
 
 	if (it == m_configs.end())
 	{
-		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, "Config entry does not exist");
+		std::ostringstream oss;
+		oss << "Config entry '" << name << "' does not exist";
+		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, oss.str().c_str());
 	}
 
 	const char* value = it->second.c_str();
 
 	if (!StringUtil::stringEqualsIgnoreCase(value, "true") && !StringUtil::stringEqualsIgnoreCase(value, "false"))
 	{
-		throw Exception(CONFIG_ERROR, INVALID_CONFIG_VALUE, "Config entry does not represent a boolean value");
+		std::ostringstream oss;
+		oss << "Config entry '" << name << "' does not represent a boolean value";
+		throw Exception(CONFIG_ERROR, INVALID_CONFIG_VALUE, oss.str().c_str());
 	}
 
 	return StringUtil::stringEqualsIgnoreCase(value, "true");
@@ -331,7 +335,9 @@ int InternalConfig::getIntegerValue(const char* name) const
 
 	if (it == m_configs.end())
 	{
-		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, "Config entry does not exist");
+		std::ostringstream oss;
+		oss << "Config entry '" << name << "' does not exist";
+		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, oss.str().c_str());
 	}
 
 	std::istringstream iss(it->second.c_str());
@@ -342,7 +348,9 @@ int InternalConfig::getIntegerValue(const char* name) const
 
 	if (iss.fail())
 	{
-		throw Exception(CONFIG_ERROR, INVALID_CONFIG_VALUE, "Config entry does not represent an integer value");
+		std::ostringstream oss;
+		oss << "Config entry '" << name << "' does not represent an integer value";
+		throw Exception(CONFIG_ERROR, INVALID_CONFIG_VALUE, oss.str().c_str());
 	}
 
 	return value;
@@ -374,7 +382,9 @@ double InternalConfig::getDoubleValue(const char* name) const
 
 	if (it == m_configs.end())
 	{
-		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, "Config entry does not exist");
+		std::ostringstream oss;
+		oss << "Config entry '" << name << "' does not exist";
+		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, oss.str().c_str());
 	}
 
 	std::istringstream iss(it->second.c_str());
@@ -385,7 +395,9 @@ double InternalConfig::getDoubleValue(const char* name) const
 
 	if (iss.fail())
 	{
-		throw Exception(CONFIG_ERROR, INVALID_CONFIG_VALUE, "Config entry does not represent a double value");
+		std::ostringstream oss;
+		oss << "Config entry '" << name << "' does not represent a double value";
+		throw Exception(CONFIG_ERROR, INVALID_CONFIG_VALUE, oss.str().c_str());
 	}
 
 	return value;
@@ -474,7 +486,9 @@ const char* InternalConfig::toXML() const
 
 	while (havePair)
 	{
-		oss << "\t" << "<PARAMETER NAME=\"" << name << "\">" << value << "</PARAMETER>" << "\n";
+		oss << "\t" << "<PARAMETER NAME=\"" << name << "\">"
+		    << StringUtil::toXML(value)
+		    << "</PARAMETER>" << "\n";
 
 		havePair = getNext(name, value);
 	}
@@ -574,7 +588,10 @@ const char* InternalConfig::toJSON(bool standalone) const
 
 		while (hasConfig)
 		{
-			oss << "{\"NAME\":\"" << name << "\",\"VALUE\":\"" << value << "\"}";
+			oss << "{\"NAME\":\"" << name
+			    << "\",\"VALUE\":"
+			    << StringUtil::toJSON(value)
+			    << "}";
 
 			hasConfig = getNext(name, value);
 

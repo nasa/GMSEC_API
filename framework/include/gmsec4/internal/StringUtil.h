@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -24,7 +24,8 @@
 
 #include <cstdarg>
 #include <cstdio>
-#include <string.h>
+#include <cctype>
+#include <cstring>
 
 
 namespace gmsec
@@ -145,10 +146,38 @@ public:
 
 
 	/**
+	* @fn split(std::string str, char delimiter)
+	* @brief Splits a string and returns a vector of resulting strings.
+	*/
+	static std::vector<std::string> CALL_TYPE split(const std::string& str, const std::string& delimiter);
+
+
+	/**
+	 * @fn ltrim(const std::string& str)
+	 * @brief Strips the the left side of the given string of any white-space characters (spaces, \f, \n, \r, \t and \v).
+	 */
+	static std::string ltrim(const std::string& str);
+
+
+	/**
+	 * @fn rtrim(const std::string& str)
+	 * @brief Strips the the right side of the given string of any white-space characters (spaces, \f, \n, \r, \t and \v).
+	 */
+	static std::string rtrim(const std::string& str);
+
+
+	/**
+	 * @fn trim(const std::string& str)
+	 * @brief Strips both sides of the given string of any white-space characters (spaces, \f, \n, \r, \t and \v).
+	 */
+	static std::string trim(const std::string& str);
+
+
+	/**
 	 * @fn trim(std::string str, char trim)
 	 * @brief Trims leading and trailing instances of a character from a string and returns the result.
 	 */
-	static std::string CALL_TYPE trim(const std::string& str, const char trim = ' ');
+	static std::string CALL_TYPE trim(const std::string& str, const char trim);
 
 
 	/**
@@ -184,6 +213,8 @@ public:
 	 * @fn stringParseI32(const char* in, GMSEC_I32& out)
 	 * @brief Parses an I32 from the input.
 	 * Returns true if successful.
+	 *
+	 * @deprecated - Use getSignedValue() instead.
 	 */
 	static bool CALL_TYPE stringParseI32(const char* in, GMSEC_I32& out);
 
@@ -192,6 +223,8 @@ public:
 	 * \fn stringParseF32(const char* in, GMSEC_F32& out)
 	 * \brief Parses an F32 from the input.
 	 * Returns true if successful.
+	 *
+	 * @deprecated - Use getFloat() instead.
 	 */
 	static bool CALL_TYPE stringParseF32(const char* in, GMSEC_F32& out);
 
@@ -200,6 +233,8 @@ public:
 	 * \fn stringParseF64(const char* in, GMSEC_F64& out)
 	 * \brief Parses an F64 from the input.
 	 * Returns true if successful.
+	 *
+	 * @deprecated - Use getDouble() instead.
 	 */
 	static bool CALL_TYPE stringParseF64(const char* in, GMSEC_F64& out);
 
@@ -226,8 +261,10 @@ public:
 
 
 	/**
-	 * \fn str2int(int& i, const char* s, int base)
-	 * \brief Convert a c-style string to an int
+	 * @fn str2int(int& i, const char* s, int base)
+	 * @brief Convert a c-style string to an int
+	 *
+	 * @deprecated - Use getSignedValue() instead.
 	 */
 	static StringUtil::STR2NUM_ERROR str2int(int& i, char const* s, int base = 0);
 
@@ -235,6 +272,8 @@ public:
 	/**
 	 * @fn str2longlong(long long& l, const char* s, int base)
 	 * @brief Convert a c-style string to a long long
+	 *
+	 * @deprecated - Use getUnsignedValue() instead.
 	 */
 	static StringUtil::STR2NUM_ERROR str2longlong(long long& l, char const* s, int base = 0);
 
@@ -282,6 +321,15 @@ public:
 
 
 	/**
+	 * @fn getBoolean(const char* value)
+	 * @brief Validates and converts (if possible) the given value to a bool value.
+	 * @throws An Exception is thrown if the value is NULL, or if it does not represent a bool
+	 * value.
+	 */
+	static bool getBoolean(const char* value);
+
+
+	/**
 	 * @fn getValue(const char* value)
 	 * @brief Converts the given value, if possible, into the desired type T.
 	 * @throws An Exception is thrown if the data value cannot be converted.
@@ -301,13 +349,27 @@ public:
 
 			iss >> result;    // attempt to convert string to desired type T
 
-			if (iss.peek() != EOF)
+			if (iss.fail())
 			{
-				// Failed to convert; check if we are dealing with a bool type,
-				// and if so, handle as a special case.
-				if (typeid(T) == typeid(bool))
+				throw Exception(OTHER_ERROR, PARSE_ERROR, "Unable to convert value");
+			}
+
+			if (!iss.eof())
+			{
+				// Failed to convert; check if we are dealing with a GMSEC_CHAR type.
+				// If so, handle as special case.
+				if (typeid(T) == typeid(GMSEC_CHAR))
 				{
-					result = stringIsTrue(iss.str().c_str());
+					iss.unget();
+
+					if (iss.str().length() == 1)
+					{
+						result = iss.str()[0];
+					}
+					else
+					{
+						throw Exception(OTHER_ERROR, PARSE_ERROR, "Unable to convert value");
+					}
 				}
 				else
 				{
@@ -318,6 +380,24 @@ public:
 			return result;
 		}
 	}
+
+
+	/**
+	 * @fn std::string toXML(const char* data)
+	 * @brief Converts the data string to a legal XML representation.
+	 * @param data - null-terminated string containing raw data
+	 * @throws An Exception is thrown if the data value is NULL.
+	 */
+	static std::string toXML(const char* data);
+
+
+	/**
+	 * @fn std::string toJSON(const char* data)
+	 * @brief Converts the data string to a legal JSON representation.
+	 * @param data - null-terminated string containing raw data
+	 * @throws An Exception is thrown if the data value is NULL.
+	 */
+	static std::string toJSON(const char* data);
 };
 
 

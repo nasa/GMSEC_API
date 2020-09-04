@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -58,7 +58,8 @@ MBConnection::MBConnection(const Config& config)
 	m_subscribeLatch(NULL),
 	m_subscribeTimeout_ms(3000),
 	m_readerThread(NULL),
-	m_readerThreadShared(NULL)
+	m_readerThreadShared(NULL),
+	m_messageCounter(0)
 {
 
 #ifndef WIN32
@@ -366,10 +367,9 @@ void MBConnection::mwPublish(const Message& msg, const Config& config)
 
 	MBWire::serialize(msg, buffer, bufferSize);
 
-	std::ostringstream strm;
-	strm << getExternal().getID() << "_" << getExternal().getMessageCounter();
+	std::string uniqueID = generateUniqueId();
 
-	Status status = m_sock->write(buffer, bufferSize, strm.str().c_str());
+	Status status = m_sock->write(buffer, bufferSize, uniqueID.c_str());
 
 	delete [] buffer;
 
@@ -382,11 +382,7 @@ void MBConnection::mwPublish(const Message& msg, const Config& config)
 
 void MBConnection::mwRequest(const Message& request, std::string& id)
 {
-	long thisID = getExternal().getMessageCounter() + 1;
-
-	std::ostringstream os;
-	os << thisID;
-	id = os.str();
+	id = generateUniqueId();
 
 	// Add an id for identifying the reply
 	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
@@ -400,10 +396,10 @@ void MBConnection::mwRequest(const Message& request, std::string& id)
 
 void MBConnection::mwReply(const Message& request, const Message& reply)
 {
-	const StringField* uniqueID  = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
+	std::string uniqueID = getExternal().getReplyUniqueID(request);
 	const StringField* mySubject = dynamic_cast<const StringField*>(request.getField(MB_MY_SUBJECT_FIELD_NAME));
 
-	if (!uniqueID)
+	if (uniqueID.empty())
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain unique ID field");
 	}
@@ -413,10 +409,12 @@ void MBConnection::mwReply(const Message& request, const Message& reply)
 	}
 
 	// set the UNIQUE ID and the ROUTING SUBJECT within the reply message
-	MessageBuddy::getInternal(reply).addField(*uniqueID);
+	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
 	MessageBuddy::getInternal(reply).setSubject(mySubject->getValue());
 
 	mwPublish(reply, getExternal().getConfig());
+
+	MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 }
 
 
@@ -491,4 +489,14 @@ void MBConnection::ackSubscription()
 void MBConnection::runReaderThread(ReaderThreadShared shared)
 {
 	shared->run();
+}
+
+
+std::string MBConnection::generateUniqueId()
+{
+	GMSEC_U32 counter = ++m_messageCounter;
+
+	std::ostringstream uniqueId;
+	uniqueId << getExternal().getID() << "_" << SystemUtil::getProcessID() << "_" << counter;
+	return uniqueId.str();
 }

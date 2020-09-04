@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -110,9 +110,7 @@ public class validation_custom
 		//o Enable Message validation.  This parameter is "false" by default.
 		config.addValue("GMSEC-MSG-CONTENT-VALIDATE", "true");
 
-		// TODO: Once available, replace this statement with usage of
-		// ConnectionManager::getAPIVersion (See RTC 4798)
-		Log.info(Connection.getAPIVersion());
+		Log.info(ConnectionManager.getAPIVersion());
 
 		try
 		{
@@ -193,6 +191,15 @@ public class validation_custom
 		definedFields.add(facilityField);
 		definedFields.add(componentField);
 
+		if (connMgr.getSpecification().getVersion() >= gmsecMIST.GMSEC_ISD_2018_00)
+		{
+			StringField domain1 = new StringField("DOMAIN1", "MY-DOMAIN-1");
+			StringField domain2 = new StringField("DOMAIN2", "MY-DOMAIN-2");
+
+			definedFields.add(domain1);
+			definedFields.add(domain2);
+		}
+
 		connMgr.setStandardFields(definedFields);
 	}
 
@@ -200,7 +207,20 @@ public class validation_custom
 	{
 		ProductFile externalFile = new ProductFile("External File", "External File Description", "1.0.0", "TXT", filePath);
 
-		ProductFileMessage productMessage = new ProductFileMessage(PROD_MESSAGE_SUBJECT, gmsecMIST.ResponseStatus.SUCCESSFUL_COMPLETION, Message.MessageKind.PUBLISH, "AUTO", "DM", connMgr.getSpecification());
+		ProductFileMessage productMessage;
+
+		if (connMgr.getSpecification().getVersion() <= gmsecMIST.GMSEC_ISD_2016_00)
+		{
+			productMessage = new ProductFileMessage(PROD_MESSAGE_SUBJECT, gmsecMIST.ResponseStatus.SUCCESSFUL_COMPLETION, "MSG.PROD.AUTO", connMgr.getSpecification());
+		}
+		else
+		{
+			productMessage = new ProductFileMessage(PROD_MESSAGE_SUBJECT, gmsecMIST.ResponseStatus.SUCCESSFUL_COMPLETION, "MSG.PROD", connMgr.getSpecification());
+
+			productMessage.addField("PROD-TYPE", "AUTO");
+			productMessage.addField("PROD-SUBTYPE", "DM");
+		}
+
 		productMessage.addProductFile(externalFile);
 
 		connMgr.addStandardFields(productMessage);

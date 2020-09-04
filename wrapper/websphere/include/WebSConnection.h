@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -189,6 +189,7 @@ private:
 	bool        connCheckAsyncStatus;
 	int         checkAsyncStatusMessageInterval;
 	int         messageCounter;
+	int         messageWaitPeriod;
 
 	std::string mwInfo;
 	bool        sigMismatchFlag;
@@ -396,6 +397,7 @@ public:
 	std::string getKeyReposStem(){ return pKeyReposStem; }
 	int getMaxConnectionRetries() { return maxConnectionRetries; }
 	int getConnectionRetryInterval() { return connectionRetryInterval; }
+	int getMessageWaitPeriod() { return messageWaitPeriod; }
 
 
 	/** @fn createLiveConnection

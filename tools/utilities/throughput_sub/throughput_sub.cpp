@@ -1,10 +1,9 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
-
 
 
 /** 
@@ -16,26 +15,23 @@
  * 
  */
 
-#include "../example.h"
 #include "throughput_sub.h"
 #include "status_reporter.h"
-
-#include <string>
 
 using namespace gmsec::api;
 using namespace gmsec::api::util;
 
 
-throughput_sub::throughput_sub(Config &c)
-	: config(c),
+throughput_sub::throughput_sub(const Config& config)
+	: Utility(config),
 	  connection(0),
 	  reportingThread(0),
 	  bytesReceived(0),
 	  droppedMsgCount(0),
 	  mutex()
 {
-	/* Initialize config */
-	example::initialize(c);
+	/* Initialize utility */
+	initialize();
 }
 
 
@@ -59,6 +55,18 @@ throughput_sub::~throughput_sub()
 }
 
 
+void throughput_sub::usage(const std::string& programName)
+{
+	Utility::usage(programName);
+
+	std::cerr << "\n\t\t* subject=<message subject>"
+	          << "\n"
+	          << "\n\t\t* monitor-rate=<period of time (milliseconds) to report monitored throughput>"
+	          << "\n"
+	          << std::endl;
+}
+
+
 bool throughput_sub::run()
 {
 	bool success = true;
@@ -69,14 +77,14 @@ bool throughput_sub::run()
 	try
 	{
 		//o Create the Connection
-		connection = Connection::create(config);
+		connection = Connection::create(getConfig());
 
 		//o Connect
 		connection->connect();
 
 		//o Get information from the command line
-		std::string subject = example::get(config, "SUBJECT", "GMSEC.TEST.PUBLISH");
-		int monitorRate  = example::get(config, "MONITOR-RATE", 1000); // Time to wait between reporting the achieved throughput
+		std::string subject     = get("SUBJECT", "GMSEC.TEST.PUBLISH");
+		int         monitorRate = get("MONITOR-RATE", 1000); // Time to wait between reporting the achieved throughput
 
 		//o Output middleware version
 		GMSEC_INFO << "Middleware version = " << connection->getLibraryVersion();
@@ -142,15 +150,17 @@ int main(int argc, char* argv[])
 {
 	Config config(argc, argv);
 
-	example::addToConfigFromFile(config);
+	throughput_sub tps(config);
 
-	if (example::isOptionInvalid(config, argc))
+	tps.addToConfigFromFile();
+
+	if (tps.isOptionInvalid(argc))
 	{
-		example::printUsage("throughput_sub");
-		return -1;
+		tps.usage("throughput_sub");
+		return 1;
 	}
 
-	throughput_sub(config).run();
+	return tps.run() ? 0 : 1;
 }
 
 

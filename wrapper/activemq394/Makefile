@@ -1,4 +1,4 @@
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -11,9 +11,11 @@ GMSEC_HOME	 = ../..
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
-LIBROOTNAME  = gmsec_activemq394
+LIBROOTNAME  = gmsec_activemq39
 
 TARGET       = lib$(LIBROOTNAME).$(SHLIB_EXT)
+
+ALT_TARGET   = lib$(LIBROOTNAME)4.$(SHLIB_EXT)
 
 OBJDIR       = ../activemq/src
 
@@ -48,10 +50,12 @@ clean:
 	$(RM) $(OBJECTS)
 	$(RM) $(OBJDIR)/*.gcda $(OBJDIR)/*.gcno
 	$(RM) $(BINDIR)/$(TARGET)
+	$(RM) $(BINDIR)/$(ALT_TARGET)
 
 
 $(BINDIR)/$(TARGET): $(OBJECTS)
 	$(DLINK) $(OBJECTS) $(LDFLAGS) -o $@
+	@ln -s $(TARGET) $(BINDIR)/$(ALT_TARGET)
 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp

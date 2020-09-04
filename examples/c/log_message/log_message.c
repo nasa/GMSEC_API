@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -46,6 +46,7 @@ int main(int argc, char* argv[])
 	size_t numFields = 4;
 	GMSEC_Field* definedFields;
 	GMSEC_Message logMsg;
+	char eventTimeBuf[GMSEC_TIME_BUFSIZE];
 
 	if (argc <= 1)
 	{
@@ -62,9 +63,7 @@ int main(int argc, char* argv[])
 	// construction of MistMessages
 	configAddValue(config, "GMSEC-SPECIFICATION-VERSION", GMSEC_SPEC_VERSION, status);
 
-	// TODO: Once available, replace this statement with usage of
-	// ConnectionManager::getAPIVersion (See RTC 4798)
-	GMSEC_INFO(connectionGetAPIVersion());
+	GMSEC_INFO(connectionManagerGetAPIVersion());
 
 	connManager = connectionManagerCreateUsingValidation(config, GMSEC_FALSE, status);
 	checkStatus(status);
@@ -124,6 +123,8 @@ int main(int argc, char* argv[])
 	// Note: Since these Fields contain variable values which are
 	// based on the context in which they are used, they cannot be
 	// automatically populated using MistMessage.
+	timeUtilFormatTime(timeUtilGetCurrentTime(), eventTimeBuf);
+
 	messageAddI16Field(logMsg, "SEVERITY", (GMSEC_I16) 1, status);
 	checkStatus(status);
 	mistMessageSetValue(logMsg, "MSG-TEXT", "Creating an example GMSEC LOG Message", status);
@@ -131,6 +132,8 @@ int main(int argc, char* argv[])
 	mistMessageSetValue(logMsg, "OCCURRENCE-TYPE", "SYS", status);
 	checkStatus(status);
 	mistMessageSetValue(logMsg, "SUBCLASS", "AST", status);
+	checkStatus(status);
+	mistMessageSetValue(logMsg, "EVENT-TIME", eventTimeBuf, status);
 	checkStatus(status);
 
 	//o Add the standard fields to the LOG message

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,8 +8,6 @@
 
 /**
  * @file MessageFieldIterator.java
- *
- * @brief A class that can be used to iterate over the Fields contained within a Message.
  */
 
 package gov.nasa.gsfc.gmsec.api;
@@ -19,12 +17,10 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIMessageFieldIterator;
 
 
 /**
- * @class MessageFieldIterator
- *
- * @brief A class that can be used to iterate over the Fields contained within a Message.
- *
+ * A class that can be used to iterate over the Fields contained within a Message.
+ * <p>
  * An example usage is:
- * @code
+ * <pre>{@code
  * MessageFieldIterator iter = msg.getFieldIterator()
  *
  * while (iter.hasNext())
@@ -33,7 +29,7 @@ import gov.nasa.gsfc.gmsec.api.jni.JNIMessageFieldIterator;
  *
  *     System.out.println(field.toXML() + "\n");
  * }
- * @endcode
+ * }</pre>
  */
 public class MessageFieldIterator
 {
@@ -45,12 +41,21 @@ public class MessageFieldIterator
 	}
 
 
+	/** 
+	 * This method is for internal GMSEC API use only.
+	 * @param iter Object to reference for acquiring internal JNIMessageFieldIterator
+	 * @return Internal JNIMessageFieldIterator object
+	 */
 	public static JNIMessageFieldIterator getInternal(MessageFieldIterator iter)
 	{
 		return (iter == null ? null : iter.m_jniIter);
 	}
 
 
+	/**
+	 * This method is for internal GMSEC API use only.
+	 * @param jIter Internal JNIMessageFieldIterator object
+	 */
 	public MessageFieldIterator(JNIMessageFieldIterator jIter)
 	{
 		m_jniIter = jIter;
@@ -58,22 +63,29 @@ public class MessageFieldIterator
 
 
 	/**
-	 * @enum Selector
-	 *
-	 * @desc The type of MessageFieldIterator to employ.
+	 * The type of MessageFieldIterator to employ.
 	 */
 	public enum Selector
 	{
-		ALL_FIELDS,          ///< Used for iterating over all available Fields in a Message.
-		HEADER_FIELDS,       ///< Used for iterating only over header Fields.
-		NON_HEADER_FIELDS    ///< Used for iterating only over non-header Fields.
+		/**
+		 * Used for iterating over all available Fields in a Message.
+		 */
+		ALL_FIELDS,
+
+		/**
+		 * Used for iterating only over header Fields.
+		 */
+		HEADER_FIELDS,
+
+		/**
+		 * Used for iterating only over non-header Fields.
+		 */
+		NON_HEADER_FIELDS
 	}
 
 
 	/**
-	 * @fn boolean hasNext()
-	 *
-	 * @brief Indicates whether there are additional Fields that can be accessed
+	 * Indicates whether there are additional Fields that can be accessed
 	 * using this iterator.
 	 *
 	 * @return Returns true if more fields are accessible; otherwise returns false.
@@ -85,11 +97,11 @@ public class MessageFieldIterator
 
 
 	/**
-	 * @fn Field next()
+	 * Returns the next Field accessible using this iterator.
 	 *
-	 * @brief Returns the next Field accessible using this iterator.
+	 * @return A Field object.
 	 *
-	 * @throw A GMSEC_Exception is thrown if this method is called and there are no
+	 * @throws GMSEC_Exception Thrown if this method is called and there are no
 	 * more Fields accessible using this iterator.
 	 */
 	public Field next() throws GMSEC_Exception
@@ -99,9 +111,7 @@ public class MessageFieldIterator
 
 
 	/**
-	 * @fn void reset()
-	 *
-	 * @desc Resets this iterator so that it can be used again to iterate over the
+	 * Resets this iterator so that it can be used again to iterate over the
 	 * fields.
 	 */
 	public void reset()

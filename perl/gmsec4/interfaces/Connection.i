@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -310,6 +310,11 @@ C<libgmsec_perl::Connection-E<gt>unsubscribe($subscriptionInfo)>
 
         $subscriptionInfo - SubscriptionInfo handle returned by calling subscribe()
 
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+        Exception if SubscriptionInfo object originated from a different ConnectionManager
+        Exception if error occurs at the middleware level
+
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br><br>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Connection.html#subscribe">subscribe()</a><br>
@@ -378,7 +383,7 @@ C<libgmsec_perl::Connection-E<gt>request($message, $timeout, $callback, $republi
         $message - request message to be sent
         $timeout - maximum time to wait for reply (in milliseconds)
         $callback - ReplyCallback to invoke when reply is received
-        $republish_ms - request message resubmission interval (in milliseconds). If set to a negative value (eg. -1) it will never republish a request message. If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the Connection object. The minimum republish period allowed is 100ms.
+        $republish_ms - request message resubmission interval (in milliseconds). If set to a negative value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
@@ -400,7 +405,7 @@ C<libgmsec_perl::Connection-E<gt>request($message, $timeout, $republish_ms = 0)>
 
         $message - request message to be sent
         $timeout - maximum time to wait for reply (in milliseconds)
-        $republish_ms - request message resubmission interval (in milliseconds). If set to a negative value (eg. -1) it will never republish a request message. If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the Connection object. The minimum republish period allowed is 100ms.
+        $republish_ms - request message resubmission interval (in milliseconds). If set to a negative value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 

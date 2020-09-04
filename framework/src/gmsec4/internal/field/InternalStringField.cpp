@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -7,17 +7,15 @@
 
 
 #include <gmsec4/internal/field/InternalStringField.h>
+#include <gmsec4/internal/StringUtil.h>
 #include <gmsec4/Exception.h>
 
 #include <sstream>
 
 
-namespace gmsec
-{
-namespace api
-{
-namespace internal
-{
+using namespace gmsec::api::internal;
+using namespace gmsec::api::util;
+
 
 InternalStringField::InternalStringField(const char* name, const char* value)
 	: InternalField(name, Field::STRING_TYPE),
@@ -25,8 +23,7 @@ InternalStringField::InternalStringField(const char* name, const char* value)
 {
 	if (!value)
 	{
-        throw Exception(FIELD_ERROR, INVALID_FIELD_VALUE,
-				"StringField value cannot be NULL");
+        throw Exception(FIELD_ERROR, INVALID_FIELD_VALUE, "StringField value cannot be NULL");
 	}
 
 	m_value = value;
@@ -50,9 +47,11 @@ const char* InternalStringField::toXML() const
 	{
 		std::ostringstream oss;
 
-		oss << "<FIELD NAME=\"" << getName() << "\" TYPE=\"STRING\"" << (isHeader() ? " HEAD=\"T\"" : "") << ">"
-			<< getValue()
-			<< "</FIELD>";
+		oss << "<FIELD NAME=\"" << getName()
+		    << "\" TYPE=\"STRING\""
+		    << (isHeader() ? " HEAD=\"T\"" : "") << ">"
+		    << StringUtil::toXML(getValue())
+		    << "</FIELD>";
 
 		m_xml = oss.str();
 	}
@@ -70,14 +69,12 @@ const char* InternalStringField::toJSON() const
 		oss << "{\"NAME\":\"" << getName() << "\","
 			<< (isHeader() ? "\"HEAD\":\"T\"," : "")
 			<< "\"TYPE\":\"STRING\","
-			<< "\"VALUE\":\"" << getValue() << "\"}";
+			<< "\"VALUE\":"
+		    << StringUtil::toJSON(getValue())
+		    << "}";
 
 		m_json = oss.str();
 	}
 
 	return m_json.c_str();
 }
-
-} //namespace internal
-} //namespace api
-} //namespace gmsec

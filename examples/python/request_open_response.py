@@ -39,6 +39,8 @@ def main():
     if(len(sys.argv) <= 1):
         usageMessage = "usage: " + sys.argv[0] + " mw-id=<middleware ID>"
         print usageMessage
+        return -1
+
 
     # Load the command-line input into a GMSEC Config object
     # A Config object is basically a key-value pair map which is used to
@@ -50,6 +52,10 @@ def main():
     for arg in sys.argv[1:]:
         value = arg.split('=')
         config.addValue(value[0], value[1])
+
+    # Since this example program uses an invalid message, we ensure the
+    # validation check is disabled.
+    config.addValue("gmsec-msg-content-validate-all", "false")
 
 
     # Ensure that the open-response is enabled
@@ -68,14 +74,12 @@ def main():
     # interface
     # This is useful for determining which version of the API is
     # configured within the environment
-    # TODO: Once available, replace this statement with usage of
-    # ConnectionManager::getAPIVersion (See RTC 4798)
-    libgmsec_python.logInfo(libgmsec_python.Connection.getAPIVersion())
+    libgmsec_python.logInfo(libgmsec_python.ConnectionManager.getAPIVersion())
 
     try:
-        
         # Create the ConnectionManager
         connMgr = libgmsec_python.ConnectionManager(config)
+
         # Open the connection to the middleware
         connMgr.initialize()
 
@@ -102,35 +106,30 @@ def main():
         # Display XML representation of request message
         libgmsec_python.logInfo("Sending request message:\n" + requestMsg.toXML())
 
-        # Send Request Message -- Since we are using open response,
-        # we will have to receive the message using receive().  As such
-        # we will tell request() to return immediately.
+        # Send Request Message
         # Timeout periods:
         # -1 - Wait forever
         #  0 - Return immediately
         # >0 - Time in milliseconds before timing out
-        connMgr.request(requestMsg, 0)
-        replyMsg = connMgr.receive(-1)
+        replyMsg = connMgr.request(requestMsg, 1000, libgmsec_python.GMSEC_REQUEST_REPUBLISH_NEVER)
 
         # Example error handling for calling request() with a timeout
         if (replyMsg):
-                    
             # Display the XML string representation of the reply
             libgmsec_python.logInfo("Received replyMsg:\n" + replyMsg.toXML())
 
             # Destroy the replyMsg message
             connMgr.release(replyMsg)
-                
 
         # Disconnect from the middleware and clean up the Connection
         connMgr.cleanup()
         
     except libgmsec_python.Exception as e:
-            
         libgmsec_python.logError(e.what())
         return -1
         
     return 0
+
 
 def initializeLogging(config):
 

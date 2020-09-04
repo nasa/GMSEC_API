@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -58,7 +58,13 @@ public:
 
 	/// <summary>Returns the type of the field object</summary>
 	/// <returns>The field type</returns>
+	[System::Obsolete("GetType is deprecated; use GetFieldType instead.")]
 	FieldType GetType();
+
+
+	/// <summary>Returns the type of the field object</summary>
+	/// <returns>The field type</returns>
+	FieldType GetFieldType();
 
 
 	/// <summary>Returns whether the field object is considered a header field</summary>

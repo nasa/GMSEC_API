@@ -1,5 +1,5 @@
  
-# Copyright 2007-2017 United States Government as represented by the
+# Copyright 2007-2018 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -125,7 +125,20 @@ sub getGMSEC
 	my $version = $in[0];
 	$version =~ s/^\s*(.*?)\s*$/$1/g;
 
+	my @t = split(/\./, $version);
+	my $x = @t;
+
+	my $api_version = "0x";
+
+	for (my $i=0; $i < $x; $i++) {
+		$api_version .= sprintf("%02X", @t[$i]);
+	}
+	if ($x == 2) {
+		$api_version .= "00";
+	}
+
 	$ref->{API} = $version;
+	$ref->{API_VERSION} = $api_version;
 
 } # getGMSEC
 
@@ -302,6 +315,7 @@ print FH qq(
 
 #define GMSEC_VERSION	"GMSEC API v$ref->{API} [$ref->{DATESTAMP}]"
 #define GMSEC_VERSION_NUMBER "$ref->{API}"
+#define GMSEC_API_VERSION $ref->{API_VERSION}
 #define GMSEC_OS	"$ref->{OS}"
 #define GMSEC_CXX	"$ref->{CXX}"
 #define GMSEC_JAVA	"$ref->{JAVA}"
@@ -342,6 +356,9 @@ public class ApiVersion {
 	public final static String MB = "$ref->{API} [$ref->{DATESTAMP}]";
 
 	public final static String GMSEC_VERSION = "$ref->{API} [$ref->{DATESTAMP}]";
+	public final static String GMSEC_VERSION_NUMBER = "$ref->{API}";
+	public final static int    GMSEC_API_VERSION = $ref->{API_VERSION};
+
 	public final static String JAVA_VERSION = "$ref->{JAVA}";
 	public final static String C_PLUS_PLUS_VERSION = "$ref->{CXX}";
 	public final static String GMSEC_MB_VERSION = "MB v$ref->{API} [$ref->{DATESTAMP}]";
@@ -393,7 +410,8 @@ sub updateDoxygen
 			if ($line =~ $reRelease) {
 				if ($1 ne $ref->{API}) {
 					++$update;
-					$line =~ s/$reRelease/Release $ref->{API}/g;
+					my @a = split('-', $ref->{API});
+					$line =~ s/$reRelease/Release $a[0]/g;
 					print "updateDoxygen: $line\n";
 				}
 			}

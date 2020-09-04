@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -252,6 +252,13 @@ typedef GMSEC_F64 GMSEC_DOUBLE;
  * @brief timeout "wait forever" constant - causes methods with timeouts to block
  */
 #define GMSEC_WAIT_FOREVER	-1
+
+
+/** @def GMSEC_REQUEST_REPUBLISH_NEVER
+ * @brief Value to indicate that a request message should only be issued once
+ * should a response message not be received.
+ */
+#define GMSEC_REQUEST_REPUBLISH_NEVER	-1
 /**@}*/
 
 
@@ -299,7 +306,8 @@ typedef enum
 	// @cond
 	MSG_PUBLISH_FAILURE_EVENT = 9,           /* Deprecated; use GMSEC_MSG_PUBLISH_FAILURE_EVENT instead */
 	// @endcond
-	GMSEC_MSG_PUBLISH_FAILURE_EVENT = 9      /**< Failure occurred while attempting to asynchronously publish a message. */
+	GMSEC_MSG_PUBLISH_FAILURE_EVENT = 9,     /**< Failure occurred while attempting to asynchronously publish a message. */
+	GMSEC_INVALID_MESSAGE_EVENT = 10         /**< Message failed validation */
 } GMSEC_ConnectionEvent;
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -224,7 +224,7 @@ extern "C"
 	 * @param[in]  subject - the subject/topic to subscribe to
 	 * @param[out] status  - out parameter operation result status
 	 *
-	 * @return A handle to a SubcriptionInfo object.
+	 * @return A handle to a GMSEC_SubscriptionInfo object.
 	 *
 	 * @sa connectionReceive
 	 * @sa connectionUnsubscribe
@@ -245,7 +245,7 @@ extern "C"
 	 * @param[in]  cb      - the address of the callback function.
 	 * @param[out] status  - out parameter operation result status
 	 *
-	 * @return A handle to a SubcriptionInfo object.
+	 * @return A handle to a GMSEC_SubscriptionInfo object.
 	 *
 	 * @sa connectionUnsubscribe
 	 */
@@ -263,7 +263,7 @@ extern "C"
 	 * @param[in]  config  - the handle to a configuration object
 	 * @param[out] status  - out parameter operation result status
 	 *
-	 * @return A handle to a SubcriptionInfo object.
+	 * @return A handle to a GMSEC_SubscriptionInfo object.
 	 *
 	 * @sa connectionUnsubscribe
 	 */
@@ -282,7 +282,7 @@ extern "C"
 	 * @param[in]  cb      - the address of the callback function.
 	 * @param[out] status  - out parameter operation result status
 	 *
-	 * @return A handle to a SubcriptionInfo object.
+	 * @return A handle to a GMSEC_SubscriptionInfo object.
 	 *
 	 * @sa connectionUnsubscribe
 	 */
@@ -296,7 +296,7 @@ extern "C"
 	 * match this pattern. It will also remove the registration of any callbacks with this subject pattern.
 	 *
 	 * @param[in]     conn   - the handle to the Connection object
-	 * @param[in,out] info   - the handle to a SubscriptionInfo object
+	 * @param[in,out] info   - the handle to a GMSEC_SubscriptionInfo object
 	 * @param[out]    status - out parameter operation result status
 	 */
 	GMSEC_API void connectionUnsubscribe(GMSEC_Connection conn, GMSEC_SubscriptionInfo* info, GMSEC_Status status);
@@ -376,9 +376,10 @@ extern "C"
 	 * @param[in]  timeout      - the maximum time to wait for reply (in milliseconds)
 	 * @param[in]  rcb          - the address of the reply callback function to call when a reply is received.
 	 * @param[in]  ecb          - the address of the event callback function to call if/when an event is issued.
-	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1) it will never republish a request message.
-	 *                            If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create
-	 *                            the Connection object.  The minimum republish period allowed is 100ms.
+	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 *                            value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 *                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 *                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 * @param[out] status       - out parameter operation result status
 	 */
 	GMSEC_API void connectionRequestWithCallback(GMSEC_Connection conn, GMSEC_Message request, GMSEC_I32 timeout, GMSEC_ReplyCallback* rcb, GMSEC_EventCallback* ecb, GMSEC_I32 republish_ms, GMSEC_Status status);
@@ -396,9 +397,10 @@ extern "C"
 	 * @param[in]  conn         - the handle to the Connection object
 	 * @param[in]  request      - the handle to a request Message object
 	 * @param[in]  timeout      - the maximum time to wait for reply (in milliseconds)
-	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set  to a negative value (eg. -1) it will never republish a request message.
-	 *                            If set to 0, the period will default to 60000ms, unless the user has provided an alternate time period via the Config object used to create
-	 *                            the Connection object.  The minimum republish period allowed is 100ms.
+	 * @param[in]  republish_ms - request message resubmission interval (in milliseconds). If set to a negative
+	 *                            value (eg. GMSEC_REQUEST_REPUBLISH_NEVER) it will never republish a request message.  If set to 0,
+	 *                            the period will default to 60000ms, unless the user has provided an alternate time period via the
+	 *                            Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 * @param[out] status       - out parameter operation result status
 	 *
 	 * @return A handle to the received reply Message, or NULL if a timeout or an error occurs.  If the status indicates no error, then it is

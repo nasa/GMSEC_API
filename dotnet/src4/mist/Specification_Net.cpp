@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2017 United States Government as represented by the
+ * Copyright 2007-2018 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,6 +9,8 @@
 // C# managed
 #include <mist/Specification_Net.h>
 
+#include <mist/FieldSpecification_Net.h>
+#include <mist/MessageSpecification_Net.h>
 #include <mist/SchemaIDIterator_Net.h>
 
 #include <Config_Net.h>
@@ -20,6 +22,9 @@
 
 
 // C++ API native
+#include <gmsec4/mist/FieldSpecification.h>
+#include <gmsec4/mist/MessageSpecification.h>
+#include <gmsec4/util/DataList.h>
 #include <gmsec4/Exception.h>
 #include <iostream>
 
@@ -27,6 +32,7 @@
 using namespace GMSEC::API;
 using namespace GMSEC::API::MIST;
 using namespace System;
+using namespace System::Collections::Generic;
 using namespace System::Runtime::InteropServices;
 
 
@@ -163,6 +169,49 @@ SchemaIDIterator^ Specification::GetSchemaIDIterator()
 unsigned int Specification::GetVersion()
 {
 	return m_impl->getVersion();
+}
+
+
+List<MessageSpecification^>^ Specification::GetMessageSpecifications()
+{
+	typedef gmsec::api::util::DataList<gmsec::api::mist::FieldSpecification*>   FieldSpecifications;
+	typedef gmsec::api::util::DataList<gmsec::api::mist::MessageSpecification*> MessageSpecifications;
+
+	const MessageSpecifications& cppMsgSpecs = m_impl->getMessageSpecifications();
+
+	List<MessageSpecification^>^ msgSpecs = gcnew List<MessageSpecification^>((int) cppMsgSpecs.size());
+
+	for (MessageSpecifications::const_iterator it = cppMsgSpecs.begin(); it != cppMsgSpecs.end(); ++it)
+	{
+		const gmsec::api::mist::MessageSpecification* cppMsgSpec = *it;
+
+		const FieldSpecifications& cppFldSpecs = cppMsgSpec->getFieldSpecifications();
+
+		List<FieldSpecification^>^ fldSpecs = gcnew List<FieldSpecification^>((int) cppFldSpecs.size());
+
+		for (FieldSpecifications::const_iterator it2 = cppFldSpecs.begin(); it2 != cppFldSpecs.end(); ++it2)
+		{
+			const gmsec::api::mist::FieldSpecification* cppFldSpec = *it2;
+
+			String^ name  = gcnew String(cppFldSpec->getName());
+			String^ type  = gcnew String(cppFldSpec->getType());
+			String^ mode  = gcnew String(cppFldSpec->getMode());
+			String^ clazz = gcnew String(cppFldSpec->getClassification());
+			String^ value = gcnew String(cppFldSpec->getValue());
+			String^ desc  = gcnew String(cppFldSpec->getDescription());
+
+			FieldSpecification^ fldSpec = gcnew FieldSpecification(name, type, mode, clazz, value, desc);
+
+			fldSpecs->Add(fldSpec);
+		}
+
+		String^ schemaID = gcnew String(cppMsgSpec->getSchemaID());
+		MessageSpecification^ msgSpec = gcnew MessageSpecification(schemaID, fldSpecs);
+
+		msgSpecs->Add(msgSpec);
+	}
+
+	return msgSpecs;
 }
 
 
