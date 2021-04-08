@@ -603,6 +603,17 @@ extern "C"
 	GMSEC_API const char* connectionGetMWInfo(const GMSEC_Connection conn, GMSEC_Status status);
 
 
+    /**
+     * @fn const char* connectionGetConnectionEndpoint(const GMSEC_Connection conn, GMSEC_Status status)
+     *
+     * @desc Returns middleware broker connection information.
+	 *
+	 * @param[in]  conn   - the handle to the Connection object
+	 * @param[out] status - out parameter operation result status
+     */
+    GMSEC_API const char* connectionGetConnectionEndpoint(const GMSEC_Connection conn, GMSEC_Status status);
+
+
 	/**
 	 * @fn GMSEC_U64 connectionGetPublishQueueMessageCount(const GMSEC_Connection conn, GMSEC_Status status)
 	 *
@@ -619,7 +630,9 @@ extern "C"
 	/**
 	 * @fn void connectionShutdownAllMiddlewares(void)
 	 *
-	 * @desc Calls shutdown routines for each middleware that has a shutdown routine registered.
+	 * @desc Calls shutdown routines for each middleware that has a shutdown routine registered. 
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 */
 	GMSEC_API void connectionShutdownAllMiddlewares(void);
 
@@ -628,6 +641,8 @@ extern "C"
 	 * @fn void connectionShutdownMiddleware(const char* name)
 	 *
 	 * @brief Calls the shutdown routine for the middleware with the given name.
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 *
 	 * @param[in] name - the name of the middleware
 	 */

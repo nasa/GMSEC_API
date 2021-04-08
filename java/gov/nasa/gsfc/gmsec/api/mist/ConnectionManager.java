@@ -874,6 +874,17 @@ public class ConnectionManager
 
 
 	/**
+	 * Returns middleware broker connection information.
+	 *
+	 * @return The middleware broker connection information.
+	 */
+	public String getConnectionEndpoint()
+	{
+		return m_jniConnMgr.getConnectionEndpoint();
+	}
+
+
+	/**
 	 * Retrieves the number of messages queued for asynchronous publish operations
 	 *
 	 * @return The number of messages remaining in the queue.
@@ -887,9 +898,7 @@ public class ConnectionManager
 	/**
 	 * This method creates a message and passes ownership to the user. This message is populated with
 	 * the standard set of required and optional heartbeat fields, as well as the required common fields defined
-	 * in setStandardFields(). If validation is enabled for this ConnectionManager and neither the common fields
-	 * from setStandardFields(), nor the fields supplied in the first argument of this function are sufficient to
-	 * complete a set of fields required by validation, an error will be returned.
+	 * in setStandardFields().
 	 * <p>
 	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard
@@ -1615,6 +1624,8 @@ public class ConnectionManager
 
 	/**
 	 * Calls shutdown routines for each middleware that has a shutdown routine registered.
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 */
 	public static void shutdownAllMiddlewares()
 	{

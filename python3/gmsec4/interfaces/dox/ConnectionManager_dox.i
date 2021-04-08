@@ -172,18 +172,11 @@
     This method creates a message and passes ownership to the user.
     This message is populated with the standard set of required and
     optional heartbeat fields, as well as the required common fields
-    defined in set_standard_fields(). If validation is enabled for this
-    ConnectionManager and neither the common fields from
-    set_standard_fields(), nor the fields supplied in the first argument
-    of this method are sufficient to complete a set of fields
-    required by validation, an error will be returned.
+    defined in set_standard_fields().
 
     MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be
     generated and added to the message automatically, according to the
     C2MS message standard.
-
-    Note: When the user done with the message, they should destroy it
-    using release.
 
     Parameters
     ----------
@@ -868,9 +861,6 @@
     time which this method was invoked; the user may override this
     time once the message has been returned.
 
-    Note: When the user done with the message, they should destroy it
-    using release.
-
     Parameters
     ----------
     subject   : The topic (subject) to apply to the returned message.
@@ -1079,6 +1069,13 @@
     Returns a string containing the middleware information for the underlying Connection.
 ";
 
+%feature("docstring") gmsec::api::mist::ConnectionManager::getConnectionEndpoint "
+
+    get_connection_endpoint(self) -> str
+
+    Returns middleware broker connection information.
+";
+
 %feature("docstring") gmsec::api::mist::ConnectionManager::getID "
 
     get_id(self) -> str
@@ -1152,4 +1149,6 @@
     shutdown_all_middlewares(self)
 
     Calls shutdown routines for each middleware that has a shutdown routine registered.
+	This method should only be called once, typically just before an application terminates. 
+	Note the calling of this method is optional.
 ";

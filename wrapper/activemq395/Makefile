@@ -12,12 +12,14 @@ GMSEC_HOME	 = ../..
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
 LIBROOTNAME  = gmsec_activemq
+
 MAJOR_VER    = 3
 MINOR_VER    = 9
 PATCH_VER    = 5
 
 TARGET       = lib$(LIBROOTNAME)$(MAJOR_VER)$(MINOR_VER)$(PATCH_VER).$(SHLIB_EXT)
 LINK_TARGET  = lib$(LIBROOTNAME)$(MAJOR_VER)$(MINOR_VER).$(SHLIB_EXT)
+
 
 OBJDIR       = ../activemq/src
 

@@ -77,6 +77,7 @@ public:
 
 	jclass classConnectionFactory;
 	jmethodID methodCreateConnection;
+	jmethodID methodCreateConnectionCreds;
 
 	jclass classConnection;
 	jmethodID methodCreateSession;

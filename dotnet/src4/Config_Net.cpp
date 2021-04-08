@@ -187,33 +187,7 @@ bool Config::ClearValue(String^ name)
 
 String^ Config::GetValue(String^ name)
 {
-	char* nameStr = nullptr;
-
-	try
-	{
-		nameStr = static_cast<char*>(Marshal::StringToHGlobalAnsi(name).ToPointer());
-
-		const char* value = m_impl->getValue(nameStr);
-
-		if (value != nullptr)
-		{
-			return gcnew String(value);
-		}
-
-		return nullptr;
-	}
-	catch (gmsec::api::Exception& e)
-	{
-		throw gcnew GMSEC_Exception(e);
-	}
-	catch (...)
-	{
-		throw gcnew GMSEC_Exception(StatusClass::CONFIG_ERROR, StatusCode::OUT_OF_MEMORY, "Config::getValue is unable to process name string");
-	}
-	finally
-	{
-		FREE_HGLOBAL_IF_NOT_NULLPTR(nameStr);
-	}
+	return GetValue(name, nullptr);
 }
 
 

@@ -75,20 +75,20 @@ InternalConfigFile::~InternalConfigFile()
 
 void InternalConfigFile::load(const char* filePath)
 {
-	if (!filePath || std::string(filePath).empty())
-	{
-		throw Exception(CONFIGFILE_ERROR, XML_PARSE_ERROR, "Invalid or missing config file path.");
-	}
-
 	if (m_xmlDoc || m_docLoaded)
 	{
 		clearDoc();
 
 		delete m_xmlDoc;
 
-		m_xmlDoc    = NULL;
+		m_xmlDoc = NULL;
 		m_docLoaded = false;
-		m_filePath  = "";
+		m_filePath = "";
+	}
+
+	if (!filePath || *filePath == '\0')
+	{
+		throw Exception(CONFIGFILE_ERROR, XML_PARSE_ERROR, "Invalid or missing config file path.");
 	}
 
 	m_filePath = std::string(filePath);
@@ -171,12 +171,18 @@ void InternalConfigFile::save(const char* filePath, bool compact)
 
 void InternalConfigFile::fromXML(const char* xml)
 {
-	if (m_docLoaded)
+	if (m_xmlDoc || m_docLoaded)
 	{
-		throw Exception(CONFIGFILE_ERROR, XML_PARSE_ERROR, "Config file already loaded");
+		clearDoc();
+
+		delete m_xmlDoc;
+
+		m_xmlDoc = NULL;
+		m_docLoaded = false;
+		m_filePath = "";
 	}
 
-	if (!xml || std::string(xml).empty())
+	if (!xml || *xml == '\0')
 	{
 		throw Exception(CONFIGFILE_ERROR, XML_PARSE_ERROR, "Invalid XML string");
 	}
@@ -818,7 +824,7 @@ bool InternalConfigFile::nameOrAliasMatches(const char* searchName, const char* 
 	//        occur within a an XML parsing tree, such as
 	//        specifically in attributes, element names, etc...
 	//
-	if (!StringUtil::stringEquals(searchName, name))
+	if (!StringUtil::stringEqualsIgnoreCase(searchName, name))
 	{
 		std::string lowerSearchName = searchName;
 		std::transform(lowerSearchName.begin(), lowerSearchName.end(), lowerSearchName.begin(), ::tolower);
@@ -876,7 +882,7 @@ void InternalConfigFile::parseDoc()
 	{
 		//CONFIG
 		const char* cname = element->Name();
-		if (cname && StringUtil::stringEquals(cname, "CONFIG"))
+		if (cname && StringUtil::stringEqualsIgnoreCase(cname, "CONFIG"))
 		{
 			const char* name = getNameAttr(element);
 			if (name)
@@ -890,7 +896,7 @@ void InternalConfigFile::parseDoc()
 		}
 
 		// MESSAGE
-		else if (cname && StringUtil::stringEquals(cname, "MESSAGE"))
+		else if (cname && StringUtil::stringEqualsIgnoreCase(cname, "MESSAGE"))
 		{
 			const char* name = getNameAttr(element);
 			if (name)
@@ -904,7 +910,7 @@ void InternalConfigFile::parseDoc()
 		}
 
 		// SUBSCRIPTION
-		else if (cname && StringUtil::stringEquals(cname, "SUBSCRIPTION"))
+		else if (cname && StringUtil::stringEqualsIgnoreCase(cname, "SUBSCRIPTION"))
 		{
 			const char* name = getNameAttr(element);
 			if (name)

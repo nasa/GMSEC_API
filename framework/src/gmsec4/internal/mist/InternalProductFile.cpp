@@ -148,12 +148,19 @@ void InternalProductFile::init(const char* pName,
 
 	if (pData && pFileSize > 0)
 	{
-		m_data     = new unsigned char[pFileSize];
-		m_fileSize = pFileSize;
-
-		for (size_t idx = 0; idx < m_fileSize; idx++)
+		try
 		{
-			m_data[idx] = pData[idx];
+			m_data     = new unsigned char[pFileSize];
+			m_fileSize = pFileSize;
+
+			for (size_t idx = 0; idx < m_fileSize; idx++)
+			{
+				m_data[idx] = pData[idx];
+			}
+		}
+		catch (...)
+		{
+			throw Exception(MIST_ERROR, OUT_OF_MEMORY, "Unable to allocate memory for Product File contents");
 		}
 	}
 	else

@@ -18,18 +18,15 @@
 //
 ConfigOption ws_client_opt1 =
 {
-" *  connectionType=<string>",
+" *  mw-id=<string>",
 
-"        <string> must be either gmsec_websphere75 or gmsec_websphere80.\n"
-"        [required]",
+"        <string> must be websphere80 [required]",
 
-"        Used to specify the type of connection object to set up.  For WebSphere\n"
-"        clients, this must be set to either gmsec_websphere75 or\n"
-"        gmsec_websphere80.",
+"        Used to specify the type of connection object to set up. For WebSphere\n"
+"        clients, this must be set to websphere80.",
 
 "        Examples:\n"
-"            connectionType=gmsec_websphere75\n"
-"            connectionType=gmsec_websphere80\n"
+"            mw-id=websphere80\n"
 "        \n"
 "        Note: For information regarding using the GMSEC Generic JMS wrapper\n"
 "        with WebSphere, run 'gmhelp generic_jms websphere'."
@@ -41,8 +38,8 @@ ConfigOption ws_client_opt2 =
 
 "        The server name or IP address and optional port number. [optional]",
 
-"        Comma-delimited list of server names or IP addresses.  The default\n"
-"        default server is 'localhost'.  The default port is 1414.",
+"        Comma-delimited list of server names or IP addresses. The default\n"
+"        default server is 'localhost'. The default port is 1414.",
 
 "        Examples:\n"
 "            server=10.1.2.123\n"
@@ -58,7 +55,7 @@ ConfigOption ws_client_opt3 =
 "        The channel name string. [required]",
 
 "        Used to specify the channel the client will use to connect to the\n"
-"        server.  This value is required for network communication.",
+"        server. This value is required for network communication.",
 
 "        Example:\n"
 "            mw-channel=GMSEC.TEST.CHANNEL"
@@ -71,7 +68,7 @@ ConfigOption ws_client_opt4 =
 "        Queue manager name string. [optional]",
 
 "        Used to specify the queue manager to which the user desires to\n"
-"        connect.  The server's default queue manager is automatically used\n"
+"        connect. The server's default queue manager is automatically used\n"
 "        in the event that this value is not specified.",
 
 "        Example:\n"
@@ -85,7 +82,7 @@ ConfigOption ws_client_opt5 =
 "        Retain queue manager after the client has disconnected. [optional]",
 
 "        Used to specify whether the queue manager should be retained after\n"
-"        the client has disconnected from the server.  The default setting is\n"
+"        the client has disconnected from the server. The default setting is\n"
 "        to not retain the queue manager.",
 
 "        Examples:\n"
@@ -100,7 +97,7 @@ ConfigOption ws_client_opt6 =
 "        Filter duplicate messages. [optional]",
 
 "        This option can be used to specify whether to filter duplicate\n"
-"        messages or not.  The default is 'yes'.",
+"        messages or not. The default is 'yes'.",
 
 "        Examples:\n"
 "            mw-filter-dups=yes\n"

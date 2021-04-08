@@ -220,8 +220,9 @@ void TCPReconnector::run(void)
 					}
 					reconnector->internalReconnect();
 				}
-				else
+				else if (haveError)
 				{
+					GMSEC_INFO << "Reconnected!";
 					haveError = false;
 				}
 			}

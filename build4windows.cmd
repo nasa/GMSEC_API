@@ -10,7 +10,7 @@ rem This batch file builds everything for Microsoft Windows
 
 rem Build the main part of the API
 
-set BUILD=gmsecapi gmsec_java gmsec_jni generic_jms bolt mb MBServer dotnet libgmsec_python3 libgmsec_perl libgmsec_csharp gmhelp
+set BUILD=gmsecapi gmsec_java gmsec_jni generic_jms bolt mb MBServer dotnet libgmsec_csharp libgmsec_perl libgmsec_python3 libgmsec_ruby gmhelp
 
 IF DEFINED WRAPPERS (
 	set BUILD=%BUILD% %WRAPPERS%

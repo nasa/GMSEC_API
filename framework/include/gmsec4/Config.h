@@ -165,9 +165,7 @@ public:
 	 * @param name - name of value to get
 	 * @param defaultValue - default value to be returned if no value exist for name parameter
 	 *
-	 * @return If the key entry is found, then the associated value is returned; otherwise defaultValue is returned.
-	 *
-	 * @throws Exception if name is NULL
+	 * @return value of named item, or default value if it does not exist
 	 */
 	const char* CALL_TYPE getValue(const char* name, const char* defaultValue) const;
 
@@ -184,7 +182,7 @@ public:
 	 * 
 	 * @return value of named item
 	 *
-	 * @throws Exception if name is NULL
+	 * @throws Exception if name is NULL or contains empty string
 	 */
 	bool CALL_TYPE getBooleanValue(const char* name) const;
 
@@ -198,9 +196,7 @@ public:
 	 *
 	 * @param name - name of value to get
 	 *
-	 * @return value of named item
-	 *
-	 * @throws Exception if name is NULL
+	 * @return value of named item, or default value if it does not exist
 	 */
 	bool CALL_TYPE getBooleanValue(const char* name, bool defaultValue) const;
 
@@ -216,7 +212,7 @@ public:
 	 *
 	 * @return value of named item
 	 *
-	 * @throws Exception if name is NULL
+	 * @throws Exception if name is NULL or contains empty string
 	 */
 	int CALL_TYPE getIntegerValue(const char* name) const;
 
@@ -231,9 +227,7 @@ public:
 	 * @param name - name of value to get
 	 * @param defaultValue - default value to be returned if no value exist for name parameter
 	 *
-	 * @return value of named item
-	 *
-	 * @throws Exception if name is NULL
+	 * @return value of named item, or default value if it does not exist
 	 */
 	int CALL_TYPE getIntegerValue(const char* name, int defaultValue) const;
 
@@ -249,7 +243,7 @@ public:
 	 *
 	 * @return value of named item
 	 *
-	 * @throws Exception if name is NULL
+	 * @throws Exception if name is NULL or contains empty string
 	 */
 	double CALL_TYPE getDoubleValue(const char* name) const;
 
@@ -264,9 +258,7 @@ public:
 	 * @param name - name of value to get
 	 * @param defaultValue - default value to be returned if no value exist for name parameter
 	 *
-	 * @return value of named item
-	 *
-	 * @throws Exception if name is NULL
+	 * @return value of named item, or default value if it does not exist
 	 */
 	double CALL_TYPE getDoubleValue(const char* name, double defaultValue) const;
 

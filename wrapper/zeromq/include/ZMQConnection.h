@@ -32,6 +32,7 @@
 #include <gmsec4/util/StdUniquePtr.h>
 
 #include <queue>
+#include <string>
 
 
 namespace gmsec_zeromq
@@ -254,10 +255,10 @@ private:
 
 
 	/**
-	 * @fn hostnameToIpv4(const char* hostname, char* ip)
+	 * @fn hostnameToIpv4(const std::string& hostname, std::string& ip)
 	 * @brief Helper function to translate the provided hostname into an IP
 	 */
-	bool hostnameToIpv4(const char* hostname, char* ip);
+	bool hostnameToIpv4(const std::string& hostname, std::string& ip);
 
 
 public:

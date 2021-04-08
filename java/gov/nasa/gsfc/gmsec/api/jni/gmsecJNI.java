@@ -91,7 +91,6 @@ public class gmsecJNI
 	public final static native void Config_Clear(long jarg1, JNIConfig config);
 	public final static native String[] Config_KeySet(long cfg, JNIConfig config);
 	public final static native String[] Config_Values(long cfg, JNIConfig config);
-	public final static native String Config_GetValue(long jarg1, JNIConfig config, String jarg2);
 	public final static native String Config_GetValue(long jarg1, JNIConfig config, String jarg2, String jarg3);	
 	public final static native boolean Config_GetBooleanValue(long jarg1, JNIConfig config, String jarg2);
 	public final static native boolean Config_GetBooleanValue(long jarg1, JNIConfig config, String jarg2, boolean jarg3);
@@ -181,6 +180,7 @@ public class gmsecJNI
 	public final static native void Connection_SetName(long jarg1, JNIConnection connection, String name);
 	public final static native String Connection_GetID(long jarg1, JNIConnection connection);
 	public final static native String Connection_GetMWInfo(long jarg1, JNIConnection connection);
+	public final static native String Connection_GetConnectionEndpoint(long jarg1, JNIConnection connection);
 	public final static native long Connection_GetPublishQueueMessageCount(long jarg1, JNIConnection connection);
 	public final static native void Connection_ShutdownAllMiddlewares();
 	public final static native void Connection_ShutdownMiddleware(String name);
@@ -236,6 +236,16 @@ public class gmsecJNI
 	public final static native void Message_SetSubject(long jarg1, JNIMessage msg, String subject);
 	public final static native int Message_GetKind(long jarg1, JNIMessage msg);
 	public final static native boolean Message_AddField(long jarg1, JNIMessage msg, long fieldPtr, JNIField field);
+	public final static native boolean Message_AddFieldByteArray(long jarg1, JNIMessage msg, String name, byte[] value);
+	public final static native boolean Message_AddFieldBoolean(long jarg1, JNIMessage msg, String name, boolean value);
+	public final static native boolean Message_AddFieldChar(long jarg1, JNIMessage msg, String name, char value);
+	public final static native boolean Message_AddFieldByte(long jarg1, JNIMessage msg, String name, byte value);
+	public final static native boolean Message_AddFieldShort(long jarg1, JNIMessage msg, String name, short value);
+	public final static native boolean Message_AddFieldInt(long jarg1, JNIMessage msg, String name, int value);
+	public final static native boolean Message_AddFieldLong(long jarg1, JNIMessage msg, String name, long value);
+	public final static native boolean Message_AddFieldFloat(long jarg1, JNIMessage msg, String name, float value);
+	public final static native boolean Message_AddFieldDouble(long jarg1, JNIMessage msg, String name, double value);
+	public final static native boolean Message_AddFieldString(long jarg1, JNIMessage msg, String name, String value);
 	public final static native void Message_ClearFields(long jarg1, JNIMessage msg);
 	public final static native boolean Message_ClearField(long jarg1, JNIMessage msg, String name);
 	public final static native long Message_GetIntegerValue(long jarg1, JNIMessage msg, String fieldName);
@@ -468,6 +478,7 @@ public class gmsecJNI
 	public final static native void ConnectionManager_SetName(long jarg1, JNIConnectionManager connMgr, String name);
 	public final static native String ConnectionManager_GetID(long jarg1, JNIConnectionManager connMgr);
 	public final static native String ConnectionManager_GetMWInfo(long jarg1, JNIConnectionManager connMgr);
+	public final static native String ConnectionManager_GetConnectionEndpoint(long jarg1, JNIConnectionManager connMgr);
 	public final static native long ConnectionManager_GetPublishQueueMessageCount(long jarg1, JNIConnectionManager connMgr);
 	public final static native long ConnectionManager_CreateHeartbeatMessage(long jarg1, JNIConnectionManager connMgr, String subject, long[] fldPtrs, JNIField[] flds, int numFields);
 	public final static native void ConnectionManager_StartHeartbeatService(long jarg1, JNIConnectionManager connMgr, String subject, long[] fldPtrs, JNIField[] flds, int numFields);

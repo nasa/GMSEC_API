@@ -90,12 +90,6 @@ void GMSEC_Reply::usage(const std::string& programName)
 	          << "\n"
 	          << "\n\t\t* msg-file=<file with message definition>"
 	          << "\n"
-	          << "\n\t\t* cfg-file=<configuration file>"
-	          << "\n"
-	          << "\n\t\t\tNote: msg-name must be defined when using cfg-file"
-	          << "\n"
-	          << "\n\t\t* msg-name=<name of message within configuration file>"
-	          << "\n"
 	          << "\n\t\t* msg-timeout-ms=<timeout period (milliseconds)>"
 	          << "\n"
 	          << "\n\t\t* prog-timeout-s=<timeout period (seconds)>"
@@ -361,13 +355,13 @@ int main(int argc, char* argv[])
 
 	GMSEC_Reply gmrpl(config);
 
-	gmrpl.addToConfigFromFile();
-
-	if (gmrpl.isOptionInvalid(argc, "gmrpl"))
+	if (!gmrpl.areOptionsValid(argc, "gmrpl"))
 	{
 		gmrpl.usage("gmrpl");
 		return 1;
 	}
+
+	gmrpl.addToConfigFromFile();
 
 	return gmrpl.run() ? 0 : 1;
 }

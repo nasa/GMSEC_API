@@ -161,8 +161,11 @@ void ConnectionMgr::run()
 
 		case CMD_SUB:
 			// subscribe to a new subject
-			doSubscribe(inBuff + 1);
-			m_sock->write(acksub, StringUtil::stringLength(acksub) + 1);
+			{
+				std::string topic(inBuff + 1, buffLen - 1);
+				doSubscribe(topic.c_str());
+				m_sock->write(acksub, StringUtil::stringLength(acksub) + 1);
+			}
 			break;
 
 		case CMD_DISC:
@@ -209,7 +212,10 @@ void ConnectionMgr::run()
 
 		case CMD_USUB:
 			// unsubscribe from a subject
-			doUnsubscribe(inBuff + 1);
+			{
+				std::string topic(inBuff + 1, buffLen - 1);
+				doUnsubscribe(topic.c_str());
+			}
 			break;
 
 		case CMD_NLOOP:

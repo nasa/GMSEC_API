@@ -62,6 +62,8 @@
     shutdown_all_middlewares()
 
     Calls shutdown routines for each middleware that has a shutdown routine registered.
+	This method should only be called once, typically just before an application terminates. 
+	Note the calling of this method is optional.
 ";
 
 %feature("docstring") gmsec::api::Connection::excludeSubject "
@@ -369,6 +371,8 @@
     shutdown_middleware(name: str)
 
     Calls the shutdown routine for the middleware with the given name.
+	This method should only be called once, typically just before an application terminates. 
+	Note the calling of this method is optional.
 
     Parameters
     ----------
@@ -472,6 +476,13 @@
     get_MW_info(self) -> str
 
     Returns a string containing middleware information.
+";
+
+%feature("docstring") gmsec::api::Connection::getConnectionEndpoint "
+
+    get_connection_endpoint(self) -> str
+
+    Returns middleware broker connection information.
 ";
 
 %feature("docstring") gmsec::api::Connection::receive "

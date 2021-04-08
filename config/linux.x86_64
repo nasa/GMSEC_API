@@ -28,11 +28,15 @@ PYTHON_HOME = /usr
 endif
 
 ifndef PYTHON3_HOME
-PYTHON3_HOME = $(SUPPORT)/python-3.6.5
+PYTHON3_HOME = $(SUPPORT)/python-3.8.5
 endif
 
+ifeq ($(CXX),)
 CXX	      = g++
+endif
+ifeq ($(CC),)
 CC        = gcc
+endif
 
 LINK      = $(CXX)
 DLINK     = $(CXX) -shared

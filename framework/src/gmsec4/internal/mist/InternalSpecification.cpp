@@ -575,7 +575,7 @@ InternalSpecification::FieldTemplateList InternalSpecification::parseXSD(const t
 			}
 
 			content = content->LastChildElement("xs:element");
-			if (content == NULL && StringUtil::stringEquals(content->FirstAttribute()->Value(), "CONTENT"))
+			if (content == NULL || !StringUtil::stringEquals(content->FirstAttribute()->Value(), "CONTENT"))
 			{
 				std::string err = schemaID;
 				err.append("missing <xs:element> named CONTENT");
@@ -597,20 +597,20 @@ InternalSpecification::FieldTemplateList InternalSpecification::parseXSD(const t
 				err.append(": content missing <xs:all> tag");
 				throw Exception(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, err.c_str());
 			}
+
+			//review field elements and create fieldTemplates
+			for (const tinyxml2::XMLElement* element = content->FirstChildElement("xs:element");
+				element != NULL;
+				element = element->NextSiblingElement("xs:element"))
+			{
+				fields.push_back(parseField(schema, schemaID, included, element, errorList));
+			}
 		}
 		else
 		{
 			std::string err = schemaID;
 			err.append(": last <xs:element> found is not named \"").append(schemaID.c_str()).append("\"");
 			throw Exception(MIST_ERROR, SCHEMA_FAILED_TO_PARSE, err.c_str());
-		}
-
-		//review field elements and create fieldTemplates
-		for (const tinyxml2::XMLElement* element = content->FirstChildElement("xs:element");
-			element != NULL;
-			element = element->NextSiblingElement("xs:element"))
-		{
-			fields.push_back(parseField(schema, schemaID, included, element, errorList));
 		}
 
 		return fields;

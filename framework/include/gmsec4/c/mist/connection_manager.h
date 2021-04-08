@@ -735,6 +735,17 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 
 
 	/**
+	 * @fn const char* connectionManagerGetConnectionEndpoint(const GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+	 *
+	 * @desc Returns middleware broker connection information.
+	 *
+	 * @param[in]  connMgr - the handle to the ConnectionManager object
+	 * @param[out] status  - out parameter operation result status
+	 */
+	GMSEC_API const char* connectionManagerGetConnectionEndpoint(const GMSEC_ConnectionMgr connMgr, GMSEC_Status status);
+
+
+	/**
 	 * @fn GMSEC_U64 connectionManagerGetPublishQueueMessageCount(GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
 	 *
 	 * @brief Retrieves the number of messages queued for asynchronous publish operations
@@ -752,15 +763,10 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 *
 	 * @brief Creates a message and passes ownership to the user. This message is populated with
 	 * the standard set of required and optional heartbeat fields, as well as the required common fields defined
-	 * in connectionManagerSetStandardFields(). If validation is enabled for this ConnectionManager and neither
-	 * the common fields from connectionManagerSetStandardFields(), nor the fields supplied in the first argument
-	 * of this function are sufficient to complete a set of fields required by validation, an error will be returned.
+	 * in connectionManagerSetStandardFields().
 	 *
 	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE, fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard.
-	 *
-	 * @note When the user done with the message, they should destroy it using messageDestroy() or
-	 * connectionManagerRelease().
 	 *
 	 * @param[in]  connMgr   - the handle to the ConnectionManager object
 	 * @param[in]  subject   - the subject pattern to remove
@@ -1223,6 +1229,8 @@ GMSEC_API void connectionManagerRequestWithCallback(GMSEC_ConnectionMgr connMgr,
 	 * @fn void connectionManagerShutdownAllMiddlewares(void)
 	 *
 	 * @desc Calls shutdown routines for each middleware that has a shutdown routine registered.
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 */
 	GMSEC_API void connectionManagerShutdownAllMiddlewares(void);
 

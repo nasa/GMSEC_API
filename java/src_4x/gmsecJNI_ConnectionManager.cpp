@@ -326,20 +326,23 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManag
 		}
 		else
 		{
-			DataList<Field*> fields;
-			size_t           numFields = (size_t) jNumFields;
+			size_t numFields = (size_t) jNumFields;
 
 			if (numFields > 0)
 			{
+				DataList<Field*> fields;
+
 				jlong* fldptrs = jenv->GetLongArrayElements(jFieldPtrs, JNI_FALSE);
 
 				for (size_t i = 0; i < numFields; ++i)
 				{
 					fields.push_back(JNI_JLONG_TO_FIELD(fldptrs[i]));
 				}
-			}
 
-			connMgr->setStandardFields(fields);
+				connMgr->setStandardFields(fields);
+
+				jenv->ReleaseLongArrayElements(jFieldPtrs, fldptrs, 0);
+			}
 		}
 	}
 	JNI_CATCH
@@ -1193,6 +1196,34 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionMa
 	JNI_CATCH
 
 	return jInfo;
+}
+
+
+JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_ConnectionManager_1GetConnectionEndpoint
+  (JNIEnv *jenv, jclass jcls, jlong jConnMgrPtr, jobject jConnMgr)
+{
+	jstring jEndpoint = NULL;
+
+	try
+	{
+		ConnectionManager* connMgr = JNI_JLONG_TO_CONNECTION_MANAGER(jConnMgrPtr);
+
+		if (!connMgr)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConnectionManager reference is null");
+		}
+		else
+		{
+			const char* endpoint = connMgr->getConnectionEndpoint();
+
+			jEndpoint = makeJavaString(jenv, endpoint);
+
+			jvmOk(jenv, "ConnectionManager.getConnectionEndpoint");
+		}
+	}
+	JNI_CATCH
+
+	return jEndpoint;
 }
 
 
