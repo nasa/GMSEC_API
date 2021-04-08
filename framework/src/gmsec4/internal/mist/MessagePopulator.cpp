@@ -212,12 +212,6 @@ void MessagePopulator::populateDirective(Message &msg, const Field& directiveStr
 
 void MessagePopulator::setStandardFields(const DataList<Field*>& standardFields)
 {
-	if (standardFields.size() == 0)
-	{
-		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT,
-			"DataList of standard Fields count is zero");
-	}
-
 	destroyFields(m_standardFieldsAllMsgs);
 
 	for (DataList<Field*>::const_iterator it = standardFields.begin(); it != standardFields.end(); ++it)

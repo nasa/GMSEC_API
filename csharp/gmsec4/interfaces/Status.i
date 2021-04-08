@@ -14,9 +14,10 @@ using namespace gmsec::api;
 
 %ignore gmsec::api::Status::Status(const Exception&);
 %ignore gmsec::api::Status::operator=(const Status&);
+%ignore gmsec::api::Status::get();
 
 %rename("IsError") isError;
-%rename("Get") get;
+//DMW %rename("Get") get;
 %rename("Set") set;
 %rename("GetClass") getClass;
 %rename("SetClass") setClass;
@@ -28,6 +29,24 @@ using namespace gmsec::api;
 %rename("SetCustomCode") setCustomCode;
 %rename("Reset") reset;
 
+
+%typemap(cscode) gmsec::api::Status %{
+    public Status(GmsecException e)
+        : this(e.GetErrorClass(), e.GetErrorCode(), e.GetErrorMessage(), e.GetCustomCode())
+    {
+    }
+
+
+    public string Get()
+    {
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+
+        sb.Append("[").Append(this.GetClass()).Append(",").Append(this.GetCode()).Append(",").Append(this.GetCustomCode()).Append("]: ").Append(this.GetReason());
+
+        return sb.ToString();
+    }
+
+%}
+
 %include <gmsec4/util/wdllexp.h>
 %include <gmsec4/Status.h>
-

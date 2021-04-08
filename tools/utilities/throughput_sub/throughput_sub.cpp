@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
 
 	tps.addToConfigFromFile();
 
-	if (tps.isOptionInvalid(argc))
+	if (!tps.areOptionsValid(argc))
 	{
 		tps.usage("throughput_sub");
 		return 1;

@@ -261,17 +261,10 @@ public class Config
 	 * @param key key of value to get
 	 *
 	 * @return If the key entry is found, then the associated value is returned; otherwise null is returned.
-	 *
-	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
 	 */
-	public String getValue(String key) throws IllegalArgumentException
+	public String getValue(String key)
 	{
-		if (key == null || key.isEmpty())
-		{
-			throw new IllegalArgumentException("Key is null or contains an empty string");
-		}
-
-		return m_jniConfig.getValue(key);
+		return m_jniConfig.getValue(key, null);
 	}
 
 	
@@ -282,16 +275,9 @@ public class Config
 	 * @param defaultValue Value to return if the configuration element does not exist.
      *
      * @return If the key entry is found, then the associated value is returned; otherwise defaultValue is returned.
-     *
-     * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
      */
-	public String getValue(String key, String defaultValue) throws IllegalArgumentException
+	public String getValue(String key, String defaultValue)
 	{
-		if (key == null || key.isEmpty())
-		{
-			throw new IllegalArgumentException("Key is null or contains an empty string");
-		}
-
 		return m_jniConfig.getValue(key, defaultValue);
 	}	
 	
@@ -301,7 +287,7 @@ public class Config
 	 *
 	 * @param key key of value to get
 	 *
-	 * @return Boolean value of the keyd configuration element.
+	 * @return Boolean value of the configuration element.
 	 *
 	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
 	 * @throws GMSEC_Exception Thrown if the value associated with the configuration element cannot be interpreted as a boolean value.
@@ -326,17 +312,10 @@ public class Config
 	 * @param key key of value to get
 	 * @param defaultValue Value to return if the configuration element does not exist.
 	 *
-	 * @return Boolean value of the keyd configuration element, or possibly the default value.
-	 *
-	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
+	 * @return Boolean value of the configuration element, or possibly the default value.
 	 */
-	public boolean getBooleanValue(String key, boolean defaultValue) throws IllegalArgumentException
+	public boolean getBooleanValue(String key, boolean defaultValue)
 	{
-		if (key == null || key.isEmpty())
-		{
-			throw new IllegalArgumentException("Key is null or contains an empty string");
-		}
-
 		return m_jniConfig.getBooleanValue(key, defaultValue);
 	}
 
@@ -371,17 +350,10 @@ public class Config
 	 * @param key Key of value to get
 	 * @param defaultValue Value to return if the configuration element does not exist.
 	 *
-	 * @return integer value of the keyd configuration element, or possibly the default value.
-	 *
-	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
+	 * @return integer value of the configuration element, or possibly the default value.
 	 */
-	public int getIntegerValue(String key, int defaultValue) throws IllegalArgumentException
+	public int getIntegerValue(String key, int defaultValue)
 	{
-		if (key == null || key.isEmpty())
-		{
-			throw new IllegalArgumentException("Key is null or contains an empty string");
-		}
-
 		return m_jniConfig.getIntegerValue(key, defaultValue);
 	}
 
@@ -391,7 +363,7 @@ public class Config
 	 *
 	 * @param key Key of value to get
 	 *
-	 * @return double value of the keyd configuration element.
+	 * @return double value of the configuration element.
 	 *
 	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
 	 * @throws GMSEC_Exception Thrown if the value associated with the configuration element cannot be interpreted as a double value.
@@ -416,17 +388,10 @@ public class Config
 	 * @param key Key of value to get
 	 * @param defaultValue Value to return if the configuration element does not exist.
 	 *
-	 * @return double value of the keyd configuration element, or possibly the default value.
-	 *
-	 * @throws IllegalArgumentException Thrown if the key string is null, or contains an empty string.
+	 * @return double value of the configuration element, or possibly the default value.
 	 */
-	public double getDoubleValue(String key, double defaultValue) throws IllegalArgumentException
+	public double getDoubleValue(String key, double defaultValue)
 	{
-		if (key == null || key.isEmpty())
-		{
-			throw new IllegalArgumentException("Key is null or contains an empty string");
-		}
-
 		return m_jniConfig.getDoubleValue(key, defaultValue);
 	}
 

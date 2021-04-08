@@ -260,6 +260,10 @@ public class Connection : global::System.IDisposable {
   public string GetMWInfo() {
   }
 
+  /// <summary>Returns middleware broker connection information.</summary>
+  public string GetConnectionEndpoint() {
+  }
+
   /// <summary>Retrieves the number of messages queued for asynchronous publish operations.</summary>
   public ulong GetPublishQueueMessageCount() {
   }

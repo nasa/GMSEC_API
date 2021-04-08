@@ -539,6 +539,12 @@ C<libgmsec_perl::ConnectionManager-E<gt>getMWInfo()>
 
     Returns a string containing middleware information.
 
+=head3 getConnectionEndpoint
+
+C<libgmsec_perl::ConnectionManager-E<gt>getConnectionEndpoint()>
+
+    Returns middleware broker connection information.
+
 =head3 getPublishQueueMessageCount
 
 C<libgmsec_perl::ConnectionManager-E<gt>getPublishQueueMessageCount()>
@@ -549,11 +555,9 @@ C<libgmsec_perl::ConnectionManager-E<gt>getPublishQueueMessageCount()>
 
 C<libgmsec_perl::ConnectionManager-E<gt>createHeartbeatmessage($subject, $heartbeatFields)>
 
-    Creates a message and passes ownership to the user.  This message is populated with the standard set of required and optional heartbeat fields, as well as the required common fields defined in setStandardFields().  If validation is enabled for this ConnectionManager and neither the common fields from setStandardFields(), nor the fields supplied in the first argument of this function are sufficient to complete a set of fields required by validation, an error will be returned.
+    Creates a message and passes ownership to the user.  This message is populated with the standard set of required and optional heartbeat fields, as well as the required common fields defined in setStandardFields().  
 
     MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and added to the message automatically, according to the C2MS Message Standard.
-
-    Note that when the user is done with the message, they should destroy it using release.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
@@ -688,8 +692,6 @@ C<libgmsec_perl::ConnectionManager-E<gt>createLogMessage($subject, $logFields)>
     Creates a Log Message and passes ownership to the User.  This message is populated with the standard set of required and optional log fields, as well as the required common fields defined in setStandardFields.  The message is not validated at this time, as MSG-TEXT and SEVERITY fields mist be set by the user at the time the message is to be sent.
 
     This message automatically is generated with MESSAGE-TYPE and MESSAGE-SYBTYPE correctly set to the GMSEC Message Standard requirements, regardless of user input.  EVENT-TIME defaults to the time which this function was invoked; the user may override this time once the message has been returned.
-
-    Note that when the user is done with the message, they should destroy it using release()
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 

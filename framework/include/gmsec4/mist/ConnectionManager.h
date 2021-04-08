@@ -595,6 +595,14 @@ public:
 
 
 	/**
+	 * @fn const char* getConnectionEndpoint() const
+	 *
+	 * @desc Returns middleware broker connection information.
+	 */
+	const char* CALL_TYPE getConnectionEndpoint() const;
+
+
+	/**
 	 * @fn getPublishQueueMessageCount() const
 	 *
 	 * @brief Retrieves the number of messages queued for asynchronous publish operations
@@ -609,14 +617,10 @@ public:
 	 *
 	 * @brief This method creates a message and passes ownership to the user. This message is populated with
 	 * the standard set of required and optional heartbeat fields, as well as the required common fields defined
-	 * in setStandardFields(). If validation is enabled for this ConnectionManager and neither the common fields
-	 * from setStandardFields(), nor the fields supplied in the first argument of this function are sufficient to
-	 * complete a set of fields required by validation, an error will be returned.
+	 * in setStandardFields().
 	 *
 	 * MESSAGE-TYPE, MESSAGE-SUBTYPE, and if applicable, C2CX-SUBTYPE fields will all be generated and
 	 * added to the message automatically, according to the GMSEC Message Standard
-	 *
-	 * @note When the user done with the message, they should destroy it using release.
 	 *
 	 * @param subject         - the topic (subject) that will be applied to the returned messages.
 	 * @param heartbeatFields - list of fields to be added to the heartbeat
@@ -760,8 +764,6 @@ public:
 	 * correctly set to the GMSEC Message Standard requirements, regardless of user
 	 * input. EVENT-TIME defaults to the time which this function was invoked; the user
 	 * may override this time once the message has been returned.
-	 *
-	 * @note When the user done with the message, they should destroy it using release.
 	 *
 	 * @param subject   - the topic (subject) to apply to the returned message.
 	 * @param logFields - list of fields to be added to the log message. 
@@ -1179,6 +1181,8 @@ public:
 	 * @fn void shutdownAllMiddlewares()
 	 *
 	 * @desc Calls shutdown routines for each middleware that has a shutdown routine registered.
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 */
 	static void shutdownAllMiddlewares();
 

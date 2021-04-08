@@ -21,8 +21,9 @@
 
 #include <zmq.h>
 
-#include <stdlib.h>
-#include <string.h>
+#include <vector>
+#include <cstdlib>
+#include <cstring>
 
 
 using namespace gmsec_zeromq;
@@ -92,18 +93,15 @@ void ZMQMessageListener::run()
 		}
 
 		// Extract the subject from the ZeroMQ message
-		char* header = (char*) malloc(size + 1);
-		memcpy(header, zmq_msg_data(&message), size);
+		std::vector<char> header(size + 1);
+		memcpy(header.data(), zmq_msg_data(&message), size);
 		header[size] = 0;
 
 		// Clean up the zmq_msg_t before moving on
 		zmq_msg_close(&message);
 
 		// Otherwise, process the message received
-		recvMessage(header);
-
-		// Clean up 
-		free(header);
+		recvMessage(header.data());
 	}
 
 	m_deathLatch->countDown();

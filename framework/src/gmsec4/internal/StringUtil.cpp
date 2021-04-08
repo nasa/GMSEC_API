@@ -93,7 +93,7 @@ StringConverter& StringConverter::instance()
 
 
 StringConverter::StringConverter()
-	: m_mode(TO_UPPERCASE)
+	: m_mode(NO_CONVERSION)
 {
 }
 
@@ -104,27 +104,32 @@ void StringConverter::setMode(Mode mode)
 }
 
 
-std::string StringConverter::convertString(const std::string& str)
+StringConverter::Mode StringConverter::getMode() const
+{
+	return m_mode;
+}
+
+
+std::string StringConverter::convertString(const std::string& str) const
 {
 	return convertString(str.c_str());
 }
 
 
-std::string StringConverter::convertString(const char* str)
+std::string StringConverter::convertString(const char* str) const
 {
 	std::string data;
 
 	switch (m_mode)
 	{
+	case NO_CONVERSION:
+		data = str;
+		break;
 	case TO_UPPERCASE:
 		std::transform(str, str + strlen(str), std::back_inserter(data), ::toupper);
 		break;
 	case TO_LOWERCASE:
 		std::transform(str, str + strlen(str), std::back_inserter(data), ::tolower);
-		break;
-	case NO_CONVERSION:
-	default:
-		data = str;
 		break;
 	}
 
@@ -1065,6 +1070,236 @@ bool StringUtil::isValidIpAddress(const std::string& address)
 	return valid;
 }
 
+
+StringUtil::Data StringUtil::removeLeadingZeros(const Data& data)
+{
+	Data::const_iterator it = data.begin();
+	size_t i = 0;
+
+	for (; it != data.end(); ++it, ++i)
+	{
+		if (*it != 0) break;
+	}
+
+	// If the data only contains zeros, preserve at least one of them.
+	if (i == data.length()) --i;
+
+	return Data(data.begin() + i, data.end());
+}
+
+
+StringUtil::Data StringUtil::padWithLeadingZeros(const Data& data, size_t numZeros)
+{
+	Data padded = data;
+
+	if (numZeros > padded.length())
+	{
+		for (size_t i = 0; i < numZeros; ++i)
+		{
+			padded.insert((size_t) 0, (size_t) 1, 0x00);
+		}
+	}
+
+	return padded;
+}
+
+
+StringUtil::Data StringUtil::string_toBinary(const char* value)
+{
+	if (value == NULL)
+	{
+		throw Exception(OTHER_ERROR, INVALID_STRING_PARAM, "Value cannot be NULL");
+	}
+
+	return StringUtil::Data((const unsigned char*) value, std::string(value).length());
+}
+
+
+StringUtil::Data StringUtil::binaryString_toBinary(const char* value)
+{
+	StringUtil::Data blob;
+
+	size_t blob_len = std::string(value).length();
+
+	for (size_t i = 0; i < blob_len; i += 2)
+	{
+		unsigned int ch;
+		char hex[3] = { value[i], value[i+1], 0 };
+#ifndef WIN32
+		std::sscanf(hex, "%02X", &ch);
+#else
+		sscanf_s(hex, "%02X", &ch);
+#endif
+
+		blob.push_back((unsigned char) ch);
+	}
+
+	return blob;
+}
+
+
+StringUtil::Data StringUtil::I8_toBinary(GMSEC_I8 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putI8(&value, bytesTmp);
+
+	return Data((GMSEC_BIN) bytes, sizeof(bytes));
+}
+
+
+StringUtil::Data StringUtil::I16_toBinary(GMSEC_I16 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putI16(&value, bytesTmp);
+
+	return removeLeadingZeros( Data((GMSEC_BIN) bytes, sizeof(bytes)) );
+}
+
+
+StringUtil::Data StringUtil::I32_toBinary(GMSEC_I32 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putI32(&value, bytesTmp);
+
+	return removeLeadingZeros( Data((GMSEC_BIN) bytes, sizeof(bytes)) );
+}
+
+
+StringUtil::Data StringUtil::I64_toBinary(GMSEC_I64 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putI64(&value, bytesTmp);
+
+	return removeLeadingZeros( Data((GMSEC_BIN) bytes, sizeof(bytes)) );
+}
+
+
+StringUtil::Data StringUtil::U8_toBinary(GMSEC_U8 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putU8(&value, bytesTmp);
+
+	return Data((GMSEC_BIN) bytes, sizeof(bytes));
+}
+
+
+StringUtil::Data StringUtil::U16_toBinary(GMSEC_U16 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putU16(&value, bytesTmp);
+
+	return removeLeadingZeros( Data((GMSEC_BIN) bytes, sizeof(bytes)) );
+}
+
+
+StringUtil::Data StringUtil::U32_toBinary(GMSEC_U32 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putU32(&value, bytesTmp);
+
+	return removeLeadingZeros( Data((GMSEC_BIN) bytes, sizeof(bytes)) );
+}
+
+
+StringUtil::Data StringUtil::U64_toBinary(GMSEC_U64 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putU64(&value, bytesTmp);
+
+	return removeLeadingZeros( Data((GMSEC_BIN) bytes, sizeof(bytes)) );
+}
+
+
+StringUtil::Data StringUtil::F32_toBinary(GMSEC_F32 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putF32(&value, bytesTmp);
+
+	return Data((GMSEC_BIN) bytes, sizeof(bytes));
+}
+
+
+StringUtil::Data StringUtil::F64_toBinary(GMSEC_F64 value)
+{
+	unsigned char bytes[sizeof(value)];
+	char* bytesTmp = reinterpret_cast<char*>(bytes);
+
+	Encoder::getEncoder()->putF64(&value, bytesTmp);
+
+	return Data((GMSEC_BIN) bytes, sizeof(bytes));
+}
+
+
+GMSEC_I64 StringUtil::I64_fromBinary(const Data& data)
+{
+	Data temp = data;
+
+	if (data.length() < sizeof(GMSEC_I64))
+	{
+		temp = padWithLeadingZeros(data, sizeof(GMSEC_I64) - data.length());
+	}
+
+	const char* blob = (const char*) temp.data();
+	GMSEC_I64   value;
+
+	Decoder::getDecoder()->getI64(blob, &value);
+
+	return value;
+}
+
+
+GMSEC_U64 StringUtil::U64_fromBinary(const Data& data)
+{
+	Data temp = data;
+
+	if (data.length() < sizeof(GMSEC_U64))
+	{
+		temp = padWithLeadingZeros(data, sizeof(GMSEC_U64) - data.length());
+	}
+
+	const char* blob = (const char*) temp.data();
+	GMSEC_U64   value;
+
+	Decoder::getDecoder()->getU64(blob, &value);
+
+	return value;
+}
+
+
+GMSEC_F64 StringUtil::F64_fromBinary(const Data& data)
+{
+	Data temp = data;
+
+	if (data.length() < sizeof(GMSEC_F64))
+	{
+		temp = padWithLeadingZeros(data, sizeof(GMSEC_F64) - data.length());
+	}
+
+	const char* blob = (const char*) temp.data();
+	GMSEC_F64   value;
+
+	Decoder::getDecoder()->getF64(blob, &value);
+
+	return value;
+}
 
 } // namespace util
 } // namespace api

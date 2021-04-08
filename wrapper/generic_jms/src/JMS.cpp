@@ -49,6 +49,7 @@ JMSCache::JMSCache()
 
 	  classConnectionFactory(0),
 	  methodCreateConnection(0),
+	  methodCreateConnectionCreds(0),
 
 	  classConnection(0),
 	  methodCreateSession(0),
@@ -132,6 +133,9 @@ bool JMSCache::_initialize(JNIEnv *env, bool global, int bits)
 		classConnectionFactory = lookup.getClass("javax/jms/ConnectionFactory");
 		methodCreateConnection = lookup.getMethod(classConnectionFactory,
 				"createConnection", "()Ljavax/jms/Connection;");
+
+		methodCreateConnectionCreds = lookup.getMethod(classConnectionFactory,
+				"createConnection", "(Ljava/lang/String;Ljava/lang/String;)Ljavax/jms/Connection;");
 
 		classConnection = lookup.getClass("javax/jms/Connection");
 		methodConnectionStart = lookup.getMethod(classConnection, "start", "()V");

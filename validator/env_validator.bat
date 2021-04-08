@@ -6,9 +6,6 @@ rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
 
 
-
-
-
 setlocal EnableDelayedExpansion
 setlocal EnableExtensions
 
@@ -130,6 +127,11 @@ if !errorlevel! == 0 (
 	goto endhere
 )
 
+echo %mw_type% | findstr "gmsec_artemis" 1>NUL
+if !errorlevel! == 0 (
+	call:CheckArtemis
+	goto endhere
+)
 
 echo %mw_type% | findstr "gmsec_apollo" 1>NUL
 if !errorlevel! == 0 (
@@ -161,18 +163,6 @@ if !errorlevel! == 0 (
 	goto endhere
 )
 
-echo %mw_type% | findstr "gmsec_ss" 1>NUL
-if !errorlevel! == 0 (
-	call:CheckSmartSockets
-	goto endhere
-)
-
-echo %mw_type% | findstr "gmsec_weblogic" 1>NUL
-if !errorlevel! == 0 (
-	call:CheckWeblogic
-	goto endhere
-)
-
 echo %mw_type% | findstr "gmsec_websphere" 1>NUL
 if !errorlevel! == 0 (
 	call:CheckWebsphere
@@ -193,10 +183,10 @@ echo.
 echo.          -----------------------------------------------------
 echo.
 if %system_setup% == 0 (
-	call:Ok "Congratulations!  Your system is properly configured."
+	call:Ok "Your system is properly configured."
 	echo.
-	call:Ok "However, if there are any WARNING(s) listed above, carefully consider"
-	call:Ok "whether they need to be corrected for your operational needs."
+	call:Ok "If there are any WARNING(s) listed above, carefully consider"
+	call:Ok "whether they need to be corrected for your system needs."
 ) else (
 	call:Error "Please correct the FAILURE(s) and optionally any WARNING(s) shown above"
 	call:Error "before proceeding to use the GMSEC API."
@@ -228,18 +218,16 @@ echo.Usage: env_validator.bat ^<middleware^> [check_JMS]
 echo.
 echo.where ^<middleware^> is one of the following:
 echo.
-echo.       activemq383
-echo.		apollo383
+echo.       activemq38, activemq39
 echo.		amqp
+echo.		artemis
 echo.       bolt
 echo.       ibmmq90
 echo.       mb
-echo.       ss66, ss67, ss68, ss681, ss682 (for TIBCO Smart Sockets)
-echo.       weblogic11
-echo.       websphere71, websphere75, websphere80
+echo.       websphere80
 echo.
 echo.Note: It is also acceptable to preface any of the above middleware types
-echo.      with 'gmsec_'.  For example, 'gmsec_activemq383'.
+echo.      with 'gmsec_'.  For example, 'gmsec_activemq39'.
 echo.
 echo.
 echo.The [check_JMS] is an optional argument that can be used to check if the
@@ -737,6 +725,27 @@ goto:eof
 
 REM ##########################################################################
 REM ##
+REM ## CheckArtemis
+REM ##
+REM ##########################################################################
+:CheckArtemis
+echo.
+call:Header "Checking middleware dependencies for Artemis..."
+
+if exist %GMSEC_BIN%\%mw_type%.dll (
+	call:Success "Found %mw_type%.dll"
+	echo.
+	call:Header "Checking dependencies for %mw_type%.dll..."
+	call:CheckDependencies %GMSEC_BIN%\%mw_type%.dll 1
+
+) else (
+	call:Failure "Unable to reference %mw_type%.dll"
+)
+goto:eof
+
+
+REM ##########################################################################
+REM ##
 REM ## CheckApollo
 REM ##
 REM ##########################################################################
@@ -840,72 +849,6 @@ if %check_jms% == 1 (
 	call:Warning "GMSEC JMS support not available for GMSEC OpenDDS"
 )
 call:CheckEnvironmentVariables OpenDDS
-goto:eof
-
-
-REM ##########################################################################
-REM ##
-REM ## CheckSmartSockets
-REM ##
-REM ##########################################################################
-:CheckSmartSockets
-echo.
-call:Header "Checking middleware dependencies for SmartSockets..."
-
-if exist %GMSEC_BIN%\%mw_type%.dll (
-	call:Success "Found %mw_type%.dll"
-	echo.
-	call:Header "Checking dependencies for %mw_type%.dll..."
-	call:CheckDependencies %GMSEC_BIN%\%mw_type%.dll 1
-
-) else (
-	call:Failure "Unable to reference %mw_type%.dll"
-)
-if %check_jms% == 1 (
-	echo.
-	call:Header "Checking GMSEC JMS support for Smart Sockets..."
-	call:Warning "GMSEC JMS support not available for Smart Sockets"
-)
-goto:eof
-
-
-REM ##########################################################################
-REM ##
-REM ## CheckWeblogic
-REM ##
-REM ##########################################################################
-:CheckWeblogic
-echo.
-call:Header "Checking middleware dependencies for WebLogic..."
-
-if exist %GMSEC_BIN%\%mw_type%.dll (
-	call:Success "Found %mw_type%.dll"
-	echo.
-	call:Header "Checking dependencies for %mw_type%.dll..."
-	call:CheckDependencies %GMSEC_BIN%\%mw_type%.dll 1
-
-) else (
-	call:Failure "Unable to reference %mw_type%.dll"
-)
-
-for %%j in ( wlfullclient.jar ) do (
-
-	call:FindInClassPath %%j
-
-	if not !result! == "" (
-		call:Success "Reference to %%j JAR file found in CLASSPATH"
-	) else (
-		call:Failure "Reference to %%j JAR file not found in CLASSPATH"
-		set system_setup=1
-	)
-)
-
-if %check_jms% == 1 (
-	echo.
-	call:Header "Checking GMSEC JMS support for WebLogic..."
-	call:CheckJMSCompatibility
-)
-call:CheckEnvironmentVariables weblogic
 goto:eof
 
 

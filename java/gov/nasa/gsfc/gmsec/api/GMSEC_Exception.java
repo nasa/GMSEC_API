@@ -112,6 +112,22 @@ public class GMSEC_Exception extends Exception
 
 
 	/**
+	 * Constructor that accepts Status object.
+	 *
+	 * @param status Status object to convert to an exception
+	 */
+	public GMSEC_Exception(Status status)
+	{
+		super(generateDetails(status.getClassification(), status.getCode(), status.getCustomCode(), status.getReason()));
+
+		m_errorClass = status.getClassification();
+		m_errorCode  = status.getCode();
+		m_customCode = status.getCustomCode();
+		m_errorMsg   = status.getReason();
+	}
+
+
+	/**
 	 * Returns the error class associated with the exception.
 	 *
 	 * @return An StatusClassification value.

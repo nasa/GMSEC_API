@@ -89,7 +89,10 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 	  m_connectionAlive(false),
 	  m_connName(),
 	  m_connID(),
-	  m_userName(),
+	  m_hostName(),
+	  m_lowercaseUserName(),
+	  m_uppercaseUserName(),
+	  m_processID(0),
 	  m_mwInfo(),
 	  m_autoDispatcher(this, m_readMutex, m_writeMutex),
 	  m_defaultRepublish_ms(DEFAULT_REPUBLISH_ms),
@@ -123,25 +126,26 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 
 
 	// Generate Connection ID
-	int pid = SystemUtil::getProcessID();
+	m_processID = SystemUtil::getProcessID();
 
-	std::string user;
-	int code = SystemUtil::getUserName(user);
-	if (code || user.empty())
+	int code = SystemUtil::getUserName(m_lowercaseUserName);
+	if (code || m_lowercaseUserName.empty())
 	{
 		GMSEC_WARNING << "Error acquiring user name [code = " << code << "]";
+		m_lowercaseUserName = "unknown";
 	}
+	m_uppercaseUserName = StringUtil::stringToUpper(m_lowercaseUserName);
 
-	std::string host;
-	code = SystemUtil::getHostName(host);
-	if (code || host.empty())
+	code = SystemUtil::getHostName(m_hostName);
+	if (code || m_hostName.empty())
 	{
 		GMSEC_WARNING << "Error acquiring host name [code = " << code << "]";
-		host = "unknown";
+		m_hostName = "unknown";
 	}
+	m_hostName = StringUtil::stringToUpper(m_hostName);
 
 	std::ostringstream oss;
-	oss << "GMSEC_" << StringUtil::stringToUpper(host) << "_";
+	oss << "GMSEC_" << m_hostName << "_";
 	{
 		// apply timestamp <seconds:x><subseconds:04x>
 		double tmp    = TimeUtil::getCurrentTime_s();
@@ -152,10 +156,9 @@ InternalConnection::InternalConnection(const Config& config, ConnectionInterface
 		StringUtil::stringFormat(buffer, sizeof(buffer), "%X%04X", sec, subs);
 		oss << buffer;
 	}
-	oss << '_' << pid << '_' << m_connectionID;
+	oss << '_' << m_processID << '_' << m_connectionID;
 
 	m_connID   = oss.str();
-	m_userName = user;
 
 
 	// Set up policy
@@ -1152,6 +1155,12 @@ const char* InternalConnection::getMWInfo() const
 }
 
 
+const char* InternalConnection::getConnectionEndpoint() const
+{
+	return (m_connectionEndpoint.empty() ? "unknown" : m_connectionEndpoint.c_str());
+}
+
+
 GMSEC_U64 InternalConnection::getPublishQueueMessageCount() const
 {
 	return (m_asyncQueue ? (GMSEC_U64) m_asyncQueue->queuedElements() : 0);
@@ -1401,17 +1410,24 @@ void InternalConnection::autoDispatch()
 	// Get the next message
 	Message* msg = 0;
 
-	getNextMsg(msg, AUTO_DISPATCH_ms);
-
-	if (msg)
+	try
 	{
-		std::list<Callback*> callbacks;
+		getNextMsg(msg, AUTO_DISPATCH_ms);
 
-		m_callbackLookup->collectCallbacks(msg->getSubject(), callbacks);
+		if (msg)
+		{
+			std::list<Callback*> callbacks;
 
-		dispatchMsgToCallbacks(*msg, callbacks);
+			m_callbackLookup->collectCallbacks(msg->getSubject(), callbacks);
 
-		delete msg;
+			dispatchMsgToCallbacks(*msg, callbacks);
+
+			delete msg;
+		}
+	}
+	catch (const Exception& e)
+	{
+		dispatchEvent(Connection::DISPATCHER_ERROR_EVENT, Status(e));
 	}
 }
 
@@ -1719,52 +1735,44 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	if ((addTracking || connTracking.getNode() == ON || msgTracking.getNode() == ON) &&
 	    (connTracking.getNode() != OFF && msgTracking.getNode() != OFF))
 	{
-		std::string hostname;
-		SystemUtil::getHostName(hostname);
-		if (m_specVersion >= GMSEC_ISD_2018_00)
-		{
-			hostname = StringConverter::instance().convertString(hostname);
-		}
-		StringField field("NODE", hostname.c_str());
-		field.isHeader(true);
-		msg.addField(field);
+		Field* field = new StringField("NODE", m_hostName.c_str());
+		field->isHeader(true);
+		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	if ((addTracking || connTracking.getProcessId() == ON || msgTracking.getProcessId() == ON) &&
 	    (connTracking.getProcessId() != OFF && msgTracking.getProcessId() != OFF))
 	{
-		if (getSpecVersion() == gmsec::api::mist::GMSEC_ISD_2014_00 || getSpecVersion() == gmsec::api::mist::GMSEC_ISD_2016_00)
+		if (getSpecVersion() == GMSEC_ISD_2014_00 || getSpecVersion() == GMSEC_ISD_2016_00)
 		{
-			I16Field field("PROCESS-ID", (GMSEC_I16) SystemUtil::getProcessID());
-			field.isHeader(true);
-			msg.addField(field);
+			Field* field = new I16Field("PROCESS-ID", (GMSEC_I16) m_processID);
+			field->isHeader(true);
+			MessageBuddy::getInternal(msg).addField(*field, false);
 		}
 		else
 		{
-			U32Field field("PROCESS-ID", (GMSEC_U16) SystemUtil::getProcessID());
-			field.isHeader(true);
-			msg.addField(field);
+			Field* field = new U32Field("PROCESS-ID", (GMSEC_U32) m_processID);
+			field->isHeader(true);
+			MessageBuddy::getInternal(msg).addField(*field, false);
 		}
 	}
 
 	if ((addTracking || connTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
 	    (connTracking.getUserName() != OFF && msgTracking.getUserName() != OFF))
 	{
-		if (m_specVersion >= GMSEC_ISD_2018_00)
-		{
-			m_userName = StringConverter::instance().convertString(m_userName);
-		}
-		StringField field("USER-NAME", m_userName.c_str());
-		field.isHeader(true);
-		msg.addField(field);
+		const char* userName = (getSpecVersion() < GMSEC_ISD_2018_00 ? m_lowercaseUserName.c_str() : m_uppercaseUserName.c_str());
+
+		Field* field = new StringField("USER-NAME", userName);
+		field->isHeader(true);
+		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	if ((addTracking || connTracking.getConnectionId() == ON || msgTracking.getConnectionId() == ON) &&
 	    (connTracking.getConnectionId() != OFF && msgTracking.getConnectionId() != OFF))
 	{
-		U32Field field("CONNECTION-ID", (GMSEC_U32) m_connectionID);
-		field.isHeader(true);
-		msg.addField(field);
+		Field* field = new U32Field("CONNECTION-ID", (GMSEC_U32) m_connectionID);
+		field->isHeader(true);
+		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	if (m_usePerfLogger || ((addTracking || connTracking.getPublishTime() == ON || msgTracking.getPublishTime() == ON) &&
@@ -1775,9 +1783,9 @@ void InternalConnection::insertTrackingFields(Message& msg)
 
 		TimeUtil::formatTime(ts, curTime);
 
-		StringField field("PUBLISH-TIME", curTime);
-		field.isHeader(true);
-		msg.addField(field);
+        Field* field = new StringField("PUBLISH-TIME", curTime);
+		field->isHeader(true);
+        MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	if ((addTracking || connTracking.getUniqueId() == ON || msgTracking.getUniqueId() == ON) &&
@@ -1788,17 +1796,17 @@ void InternalConnection::insertTrackingFields(Message& msg)
 		std::ostringstream oss;
 		oss << m_connID << "_" << counter;
 
-		StringField field("UNIQUE-ID", oss.str().c_str());
-		field.isHeader(true);
-		msg.addField(field);
+		Field* field = new StringField("UNIQUE-ID", oss.str().c_str());
+		field->isHeader(true);
+		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	if ((addTracking || connTracking.getMwInfo() == ON || msgTracking.getMwInfo() == ON) &&
 	    (connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
 	{
-		StringField field("MW-INFO", getMWInfo());
-		field.isHeader(true);
-		msg.addField(field);
+        Field* field = new StringField("MW-INFO", getMWInfo());
+		field->isHeader(true);
+        MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	// We only add NUM-OF-SUBSCRIPTIONS, SUBSCRIPTION.n.SUBJECT-PATTERN, and MW-CONNECTION-ENDPOINT
@@ -1807,12 +1815,12 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	//
 	// If the user has not indicated which ISD to work with, then these tracking fields will be
 	// included in the message.
-	if (getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
+	if (getSpecVersion() >= GMSEC_ISD_2018_00)
 	{
 		// We only include subscription subject-pattern field(s) within Heartbeat Messages.
 		const Field* c2cxSubtype = NULL;
 
-		if (getSpecVersion() < gmsec::api::mist::GMSEC_ISD_2019_00)
+		if (getSpecVersion() < GMSEC_ISD_2019_00)
 		{
 			c2cxSubtype = msg.getField("C2CX-SUBTYPE");
 		}
@@ -1916,11 +1924,11 @@ void InternalConnection::removeTrackingFields(Message& msg)
 		msg.clearField("MW-INFO");
 	}
 
-	if (getSpecVersion() >= gmsec::api::mist::GMSEC_ISD_2018_00)
+	if (getSpecVersion() >= GMSEC_ISD_2018_00)
 	{
 		const Field* c2cxSubtype = NULL;
 
-		if (getSpecVersion() < gmsec::api::mist::GMSEC_ISD_2019_00)
+		if (getSpecVersion() < GMSEC_ISD_2019_00)
 		{
 			c2cxSubtype = msg.getField("C2CX-SUBTYPE");
 		}

@@ -213,13 +213,13 @@ int main(int argc, char* argv[])
 
 	GMSEC_Subscriber gmsub(config);
 
-	gmsub.addToConfigFromFile();
-
-	if (gmsub.isOptionInvalid(argc, "gmsub"))
+	if (!gmsub.areOptionsValid(argc, "gmsub"))
 	{
 		gmsub.usage("gmsub");
 		return 1;
 	}
+
+	gmsub.addToConfigFromFile();
 
 	gmsub.run();
 }

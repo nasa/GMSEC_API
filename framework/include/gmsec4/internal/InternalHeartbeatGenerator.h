@@ -82,16 +82,16 @@ private:
 
 	struct ActionInfo
 	{
-		ActionInfo(double interval);
+		ActionInfo(long interval);
 
 		bool tryNow();
 
-		void setInterval(double interval);
+		void setInterval(long interval);
 
 	private:
-		double          last_s;
-		volatile double interval_s;
-		volatile bool   actNow;
+		double                          last_s;
+		gmsec::api::util::AtomicLong    interval_s;
+		gmsec::api::util::AtomicBoolean actNow;
 	};
 
 	typedef gmsec::api::util::StdThread      Service;
@@ -101,7 +101,7 @@ private:
 	Config                                         m_config;
 	gmsec::api::mist::ConnectionManager            m_connMgr;
 	HBMessage                                      m_hbMsg;
-	GMSEC_U16                                      m_pubRate;
+	GMSEC_I64                                      m_pubRate;
 	GMSEC_U16                                      m_counter;
 
 	gmsec::api::util::StdUniquePtr<ActionInfo>     m_publishAction;

@@ -144,7 +144,7 @@ Field* InternalField::fromXML(tinyxml2::XMLElement* element)
 
 	// verify that our root node is "FIELD"
 	const char* mename = element->Name();
-	if (!mename || !StringUtil::stringEquals(mename, "FIELD"))
+	if (!mename || !StringUtil::stringEqualsIgnoreCase(mename, "FIELD"))
 	{
 		throw Exception(FIELD_ERROR, XML_PARSE_ERROR,
 			"Invalid XML -- not a FIELD");
@@ -166,19 +166,19 @@ Field* InternalField::fromXML(tinyxml2::XMLElement* element)
 		{
 			// no attribute
 		}
-		else if (StringUtil::stringEquals(caname, "TYPE"))
+		else if (StringUtil::stringEqualsIgnoreCase(caname, "TYPE"))
 		{
 			type = cavalue;
 		}
-		else if (StringUtil::stringEquals(caname, "NAME"))
+		else if (StringUtil::stringEqualsIgnoreCase(caname, "NAME"))
 		{
 			name = cavalue;
 		}
-		else if (StringUtil::stringEquals(caname, "HEAD"))
+		else if (StringUtil::stringEqualsIgnoreCase(caname, "HEAD"))
 		{
 			head = cavalue;
 		}
-		else if (StringUtil::stringEquals(caname, "BITS"))
+		else if (StringUtil::stringEqualsIgnoreCase(caname, "BITS"))
 		{
 			bits = cavalue;
 		}
@@ -211,9 +211,9 @@ Field* InternalField::fromJSON(const Json::Value& root)
 
 	std::ostringstream oss;
 
-	if (root.isMember(std::string("NAME")))
+	if (root.isMember("NAME") || root.isMember("name"))
 	{
-		name = root["NAME"].asCString();
+		name = (root.isMember("NAME") ? root["NAME"].asCString() : root["name"].asCString());
 	}
 	else
 	{
@@ -221,9 +221,9 @@ Field* InternalField::fromJSON(const Json::Value& root)
 			"Invalid JSON Field format - no NAME provided");
 	}
 
-	if (root.isMember(std::string("TYPE")))
+	if (root.isMember("TYPE") || root.isMember("type"))
 	{
-		type = root["TYPE"].asCString();
+		type = (root.isMember("TYPE") ? root["TYPE"].asCString() : root["type"].asCString());
 	}
 	else
 	{
@@ -231,15 +231,15 @@ Field* InternalField::fromJSON(const Json::Value& root)
 			"Invalid JSON Field format - no TYPE provided");
 	}
 
-	if (root.isMember(std::string("VALUE")))
+	if (root.isMember("VALUE") || root.isMember("value"))
 	{
 		try
 		{
-			value = root["VALUE"].asCString();
+			value = (root.isMember("VALUE") ? root["VALUE"].asCString() : root["value"].asCString());
 		}
 		catch (...)
 		{
-			double tmpValue = root["VALUE"].asDouble();
+			double tmpValue = (root.isMember("VALUE") ? root["VALUE"].asDouble() : root["value"].asDouble());
 			oss.str("");
 			oss << tmpValue;
 			value = oss.str();
@@ -254,14 +254,14 @@ Field* InternalField::fromJSON(const Json::Value& root)
 		}
 	}
 
-	if (root.isMember(std::string("HEAD")))
+	if (root.isMember("HEAD") || root.isMember("head"))
 	{
-		head = root["HEAD"].asCString();
+		head = (root.isMember("HEAD") ? root["HEAD"].asCString() : root["head"].asCString());
 	}
 
-	if (root.isMember(std::string("BITS")))
+	if (root.isMember("BITS") || root.isMember("bits"))
 	{
-		bits = root["BITS"].asCString();
+		bits = (root.isMember("BITS") ? root["BITS"].asCString() : root["bits"].asCString());
 	}
 
 	return createField(name.c_str(), type.c_str(), value.c_str(), bits.c_str(), head.c_str());
@@ -274,16 +274,25 @@ GMSEC_I64 InternalField::getIntegerValue() const
 
 	try
 	{
-		value = getDoubleValue();
+		if (this->getType() == Field::BIN_TYPE)
+		{
+			StringUtil::Data blob( dynamic_cast<const InternalBinaryField*>(this)->getValue(), dynamic_cast<const InternalBinaryField*>(this)->getLength() );
+
+			value = (GMSEC_F64) StringUtil::I64_fromBinary(blob);
+		}
+		else
+		{
+			value = getDoubleValue();
+		}
 	}
 	catch (...)
 	{
-		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an integer");
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to a GMSEC_I64");
 	}
 
 	if ((value < GMSEC_F64(std::numeric_limits<GMSEC_I64>::min())) || (value > GMSEC_F64(std::numeric_limits<GMSEC_I64>::max())))
 	{
-		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an integer");
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to a GMSEC_I64");
 	}
 
 	return (GMSEC_I64) value;
@@ -296,16 +305,25 @@ GMSEC_U64 InternalField::getUnsignedIntegerValue() const
 
 	try
 	{
-		value = getDoubleValue();
+		if (this->getType() == Field::BIN_TYPE)
+		{
+			StringUtil::Data blob( dynamic_cast<const InternalBinaryField*>(this)->getValue(), dynamic_cast<const InternalBinaryField*>(this)->getLength() );
+
+			value = (GMSEC_F64) StringUtil::U64_fromBinary(blob);
+		}
+		else
+		{
+			value = getDoubleValue();
+		}
 	}
 	catch (...)
 	{
-		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an unsigned integer");
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to a GMSEC_U64");
 	}
 
 	if ((value < GMSEC_F64(std::numeric_limits<GMSEC_U64>::min())) || (value > GMSEC_F64(std::numeric_limits<GMSEC_U64>::max())))
 	{
-		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to an unsigned integer");
+		throw Exception(FIELD_ERROR, INVALID_FIELD, "Field cannot be converted to a GMSEC_U64");
 	}
 
 	return (GMSEC_U64) value;
@@ -387,6 +405,14 @@ GMSEC_F64 InternalField::getDoubleValue() const
 				{
 					converted = false;
 				}
+			}
+			break;
+
+		case Field::BIN_TYPE:
+			{
+				StringUtil::Data blob( dynamic_cast<const InternalBinaryField*>(this)->getValue(), dynamic_cast<const InternalBinaryField*>(this)->getLength() );
+				value = StringUtil::F64_fromBinary(blob);
+				converted = true;
 			}
 			break;
 
@@ -899,60 +925,60 @@ Field::FieldType InternalField::lookupType(const char* typeString)
 
 	Field::FieldType type;
 
-	if (StringUtil::stringEquals(typeString, "BOOL") || StringUtil::stringEquals(typeString, "BOOLEAN"))
+	if (StringUtil::stringEqualsIgnoreCase(typeString, "BOOL") || StringUtil::stringEqualsIgnoreCase(typeString, "BOOLEAN"))
 	{
 		type = Field::BOOL_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "BIN") || StringUtil::stringEquals(typeString, "BINARY") ||
-	         StringUtil::stringEquals(typeString, "BLOB"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "BIN") || StringUtil::stringEqualsIgnoreCase(typeString, "BINARY") ||
+	         StringUtil::stringEqualsIgnoreCase(typeString, "BLOB"))
 	{
 		type = Field::BIN_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "CHAR"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "CHAR"))
 	{
 		type = Field::CHAR_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "I8"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "I8"))
 	{
 		type = Field::I8_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "I16") || StringUtil::stringEquals(typeString, "SHORT"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "I16") || StringUtil::stringEqualsIgnoreCase(typeString, "SHORT"))
 	{
 		type = Field::I16_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "I32") || StringUtil::stringEquals(typeString, "LONG"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "I32") || StringUtil::stringEqualsIgnoreCase(typeString, "LONG"))
 	{
 		type = Field::I32_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "I64"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "I64"))
 	{
 		type = Field::I64_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "F32") || StringUtil::stringEquals(typeString, "FLOAT"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "F32") || StringUtil::stringEqualsIgnoreCase(typeString, "FLOAT"))
 	{
 		type = Field::F32_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "F64") || StringUtil::stringEquals(typeString, "DOUBLE"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "F64") || StringUtil::stringEqualsIgnoreCase(typeString, "DOUBLE"))
 	{
 		type = Field::F64_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "STRING"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "STRING"))
 	{
 		type = Field::STRING_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "U8"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "U8"))
 	{
 		type = Field::U8_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "U16") || StringUtil::stringEquals(typeString, "USHORT"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "U16") || StringUtil::stringEqualsIgnoreCase(typeString, "USHORT"))
 	{
 		type = Field::U16_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "U32") || StringUtil::stringEquals(typeString, "ULONG"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "U32") || StringUtil::stringEqualsIgnoreCase(typeString, "ULONG"))
 	{
 		type = Field::U32_TYPE;
 	}
-	else if (StringUtil::stringEquals(typeString, "U64"))
+	else if (StringUtil::stringEqualsIgnoreCase(typeString, "U64"))
 	{
 		type = Field::U64_TYPE;
 	}

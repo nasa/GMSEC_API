@@ -89,7 +89,7 @@ public:
 
 	const gmsec::api::mist::internal::MessageTemplate& getTemplate() const;
 
-	void setValue(const char* fieldName, const char* value);
+	void setValue(const char* fieldName, const char* value, bool convert = true);
 	void setValue(const char* fieldName, GMSEC_I64 value);
 	void setValue(const char* fieldName, GMSEC_F64 value);
 

@@ -9,13 +9,12 @@
 #include "gmhelp.h"
 
 #include "AMQ_help.h"
+#include "Artemis_help.h"
 #include "Bolt_help.h"
 #include "IBMMQ_help.h"
 #include "JMS_help.h"
 #include "MB_help.h"
 #include "OpenDDS_help.h"
-#include "SS_help.h"
-#include "WL_help.h"
 #include "WS_help.h"
 #include "ZeroMQ_help.h"
 
@@ -45,6 +44,12 @@ MiddlewareHelp::MiddlewareHelp()
     amq.client.insert(amq_client_opt2);
     amq.client.insert(amq_client_opt3);
     amq.server.insert(amq_server_opt1);
+
+    MiddlewareOptions art;
+    art.client.insert(art_client_opt1);
+    art.client.insert(art_client_opt2);
+    art.client.insert(art_client_opt3);
+    art.server.insert(art_server_opt1);
 
     MiddlewareOptions bolt;
     bolt.client.insert(bolt_client_opt1);
@@ -79,42 +84,7 @@ MiddlewareHelp::MiddlewareHelp()
     opendds.client.insert(opendds_client_opt2);
     opendds.client.insert(opendds_client_opt3);
     opendds.client.insert(opendds_client_opt4);
-    opendds.client.insert(opendds_client_opt5);
     opendds.server.insert(opendds_server_opt1);
-
-#if 0
-    MiddlewareOptions ss;
-    ss.client.insert(ss_client_opt1);
-    ss.client.insert(ss_client_opt2);
-    ss.client.insert(ss_client_opt3);
-    ss.client.insert(ss_client_opt4);
-    ss.client.insert(ss_client_opt5);
-    ss.client.insert(ss_client_opt6);
-    ss.client.insert(ss_client_opt7);
-    ss.client.insert(ss_client_opt8);
-    ss.client.insert(ss_client_opt9);
-    ss.client.insert(ss_client_opt10);
-    ss.client.insert(ss_client_opt11);
-    ss.client.insert(ss_client_opt12);
-    ss.client.insert(ss_client_opt13);
-    ss.client.insert(ss_client_opt14);
-    ss.client.insert(ss_client_opt15);
-    ss.client.insert(ss_client_opt16);
-    ss.client.insert(ss_client_opt17);
-    ss.client.insert(ss_client_opt18);
-    ss.client.insert(ss_client_opt19);
-    ss.server.insert(ss_server_opt1);
-#endif
-
-#if 0
-    MiddlewareOptions wl;
-    wl.client.insert(wl_client_opt1);
-    wl.client.insert(wl_client_opt2);
-    wl.client.insert(wl_client_opt3);
-    wl.client.insert(wl_client_opt4);
-    wl.client.insert(wl_client_opt5);
-    wl.server.insert(wl_server_opt1);
-#endif
 
     MiddlewareOptions ws;
     ws.client.insert(ws_client_opt1);
@@ -137,6 +107,8 @@ MiddlewareHelp::MiddlewareHelp()
     jms_amq.client.insert(jms_amq_client_opt3);
     jms_amq.client.insert(jms_amq_client_opt4);
     jms_amq.client.insert(jms_amq_client_opt5);
+    jms_amq.client.insert(jms_amq_client_opt6);
+    jms_amq.client.insert(jms_amq_client_opt7);
 
     MiddlewareOptions jms_ibmmq;
     jms_ibmmq.client.insert(jms_ws_client_opt1);
@@ -144,18 +116,6 @@ MiddlewareHelp::MiddlewareHelp()
     jms_ibmmq.client.insert(jms_ws_client_opt3);
     jms_ibmmq.client.insert(jms_ws_client_opt4);
     jms_ibmmq.client.insert(jms_ws_client_opt5);
-
-#if 0
-    MiddlewareOptions jms_wl;
-    jms_wl.client.insert(jms_wl_client_opt1);
-    jms_wl.client.insert(jms_wl_client_opt2);
-    jms_wl.client.insert(jms_wl_client_opt3);
-    jms_wl.client.insert(jms_wl_client_opt4);
-    jms_wl.client.insert(jms_wl_client_opt5);
-    jms_wl.client.insert(jms_wl_client_opt6);
-    jms_wl.client.insert(jms_wl_client_opt7);
-    jms_wl.client.insert(jms_wl_client_opt8);
-#endif
 
     MiddlewareOptions jms_ws;
     jms_ws.client.insert(jms_ws_client_opt1);
@@ -167,18 +127,16 @@ MiddlewareHelp::MiddlewareHelp()
 
     // Setup look-up mapping.
     m_helpMap["activemq"] = amq;
+    m_helpMap["artemis"] = art;
     m_helpMap["bolt"] = bolt;
     m_helpMap["ibmmq"] = ibmmq;
     m_helpMap["mb"] = mb;
     m_helpMap["opendds"] = opendds;
-    //m_helpMap["ss"] = ss;
-    //m_helpMap["weblogic"] = wl;
     m_helpMap["websphere"] = ws;
     m_helpMap["zeromq"] = zmq;
 
     m_helpMap["generic_jms_activemq"] = jms_amq;
     m_helpMap["generic_jms_ibmmq"] = jms_ibmmq;
-    //m_helpMap["generic_jms_weblogic"] = jms_wl;
     m_helpMap["generic_jms_websphere"] = jms_ws;
 }
 
@@ -215,7 +173,6 @@ MiddlewareHelp::processUserRequest(int argc, char** argv) const
             jms_mw = StringUtil::stringToLower(argv[2]);
 
             if (jms_mw != "activemq" &&
-                //jms_mw != "weblogic" &&
                 jms_mw != "ibmmq" &&
                 jms_mw != "websphere")
             {
@@ -275,14 +232,13 @@ MiddlewareHelp::showUsage(std::string progName) const
          << "\n"
          << "    Must be one of the following middlewares:\n"
          << "\n"
-         << "      gmsec_activemq384, gmsec_activemq394\n"
+         << "      gmsec_activemq38, gmsec_activemq39\n"
+         << "      gmsec_artemis\n"
          << "      gmsec_bolt\n"
          << "      gmsec_ibmmq90\n"
          << "      gmsec_mb\n"
          << "      gmsec_opendds312\n"
-         //<< "      gmsec_ss682, gmsec_ss681, gmsec_ss68, gmsec_ss\n"
-         //<< "      gmsec_weblogic11\n"
-         << "      gmsec_websphere75, gmsec_websphere80\n"
+         << "      gmsec_websphere80\n"
          << "      gmsec_zeromq413\n"
          << "      gmsec_generic_jms\n"
          << "\n"
@@ -300,7 +256,6 @@ MiddlewareHelp::showUsage(std::string progName) const
          << "    of the following:\n"
          << "\n"
          << "      activemq\n"
-         //<< "      weblogic\n"
          << "      websphere\n"
          << "\n"
          << endl;

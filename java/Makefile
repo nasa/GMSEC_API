@@ -215,6 +215,6 @@ $(SRCDIR_4x)/%.o: $(SRCDIR_4x)/%.cpp
 
 
 gen-doc:
-	-$(JAVADOC) -public -quiet -d $(JAVADOC_DIR) -sourcepath . $(JAVADOC_4x)
+	-$(JAVADOC) -public -quiet -d $(JAVADOC_DIR) --no-module-directories -sourcepath . $(JAVADOC_4x)
 	$(JAR) cf $(BINDIR)/gmsecapi-javadoc.jar $(JAVADOC_DIR)
 	$(JAR) uf $(BINDIR)/gmsecapi.jar $(JAVADOC_DIR)

@@ -172,6 +172,9 @@ public:
 	const char* CALL_TYPE getMWInfo() const;
 
 
+	const char* CALL_TYPE getConnectionEndpoint() const;
+
+
 	GMSEC_U64 CALL_TYPE getPublishQueueMessageCount() const;
 
 
@@ -346,35 +349,37 @@ private:
 	};
 
 	// member data
-	Config                               m_config;
-	Connection*                          m_connection;
-	ValidateLevel                        m_validate;
-	Specification*                       m_specification;
+	Config                                        m_config;
+	gmsec::api::util::StdUniquePtr<Connection>    m_connection;
 
-	std::string                          m_heartbeatServiceSubject;
-	FieldList                            m_heartbeatServiceFields;
+	ValidateLevel                                 m_validate;
+	gmsec::api::util::StdUniquePtr<Specification> m_specification;
 
-	std::string                          m_logSubject;
-	FieldList                            m_standardLogFields;
+	std::string  m_heartbeatServiceSubject;
+	FieldList    m_heartbeatServiceFields;
 
-	gmsec::api::util::AtomicInteger      m_msgIdCounter;
-	gmsec::api::util::AtomicInteger      m_requestIdCounter;
-	gmsec::api::util::AtomicInteger      m_resourceMessageCounter;
-	SubscriptionList                     m_subscriptions;
-	MessagePopulator*                    m_messagePopulator;
-	mutable gmsec::api::util::Mutex      m_cmLock;
+	std::string  m_logSubject;
+	FieldList    m_standardLogFields;
+
+	gmsec::api::util::AtomicInteger                   m_msgIdCounter;
+	gmsec::api::util::AtomicInteger                   m_requestIdCounter;
+	gmsec::api::util::AtomicInteger                   m_resourceMessageCounter;
+
+	SubscriptionList                                  m_subscriptions;
+	gmsec::api::util::StdUniquePtr<MessagePopulator>  m_messagePopulator;
+	mutable gmsec::api::util::Mutex                   m_cmLock;
 
 	// will be used for support of Callbacks
-	gmsec::api::mist::ConnectionManager* m_parent;
-	MistCallbackAdapter*                 m_callbackAdapter;
+	gmsec::api::mist::ConnectionManager*                 m_parent;
+	gmsec::api::util::StdUniquePtr<MistCallbackAdapter>  m_callbackAdapter;
 
-	gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> m_hbThread;
-	gmsec::api::util::StdSharedPtr<HeartbeatService>            m_hbService;
+	gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread>  m_hbThread;
+	gmsec::api::util::StdSharedPtr<HeartbeatService>             m_hbService;
 
-	gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread> m_rsrcThread;
-	gmsec::api::util::StdSharedPtr<ResourceService>             m_rsrcService;
+	gmsec::api::util::StdUniquePtr<gmsec::api::util::StdThread>  m_rsrcThread;
+	gmsec::api::util::StdSharedPtr<ResourceService>              m_rsrcService;
 
-	CustomMessageValidator* m_ceeMessageValidator;
+	gmsec::api::util::StdUniquePtr<CustomMessageValidator>  m_ceeMessageValidator;
 };
 
 

@@ -22,10 +22,10 @@ GMSEC_HOME = .
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
-.PHONY: check_support build library perl_api perl_api_3x perl_api_4x python3_api python3_api_4x env_val api_docs mw_wrapper clean install tools
+.PHONY: check_support build library csharp_api csharp_api_4x perl_api perl_api_3x perl_api_4x python3_api python3_api_4x ruby_api env_val api_docs mw_wrapper clean install tools
 
 
-default: check_support build library mw_wrappers java_api perl_api python3_api csharp_api env_val tools patch-mac
+default: check_support build library mw_wrappers csharp_api java_api perl_api python3_api ruby_api env_val tools patch-mac
 
 
 check_support:
@@ -54,6 +54,42 @@ library:
 	$(MAKE) -C framework
 
 
+csharp_api:
+# Note: C# binding for API 4.x is currently only supported on Linux and macOS distros.
+ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
+	$(MAKE) csharp_api_4x
+endif
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+	$(MAKE) csharp_api_4x
+endif
+
+
+csharp_api_4x:
+ifdef SWIG_HOME
+ifneq (, $(shell which mcs))
+	$(MAKE) -C csharp/gmsec4
+else
+	@echo
+	@echo
+	@echo "###########################################################"
+	@echo "#"
+	@echo "#  mcs (from Mono Development package) not found"
+	@echo "#  Skipping build of C# binding of the GMSEC API 4.x"
+	@echo "#"
+	@echo "###########################################################"
+endif
+else
+	@echo
+	@echo
+	@echo "###########################################################"
+	@echo "#"
+	@echo "#  SWIG_HOME is not defined"
+	@echo "#  Skipping build of C# binding of the GMSEC API 4.x"
+	@echo "#"
+	@echo "###########################################################"
+endif
+
+
 java_api:
 ifdef JDK_HOME
 	$(MAKE) -C java
@@ -70,7 +106,7 @@ endif
 
 
 perl_api: perl_api_3x
-# Note: Perl binding for API 4.x is currently only supported on RHEL7 64-bit and MacOSX distros.
+# Note: Perl binding for API 4.x is currently only supported on Linux and macOS distros.
 ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
 	$(MAKE) perl_api_4x
 endif
@@ -80,9 +116,7 @@ endif
 
 
 perl_api_3x:
-# Note: Perl binding for API 3.x is not supported for RHEL7 32-bit distros.
 ifneq ($(wildcard $(PERL5_LIB)/CORE/perl.h),)
-ifneq ($(findstring linux.x86_64-32bit,$(GMSEC_PLATFORM)), linux.x86_64-32bit)
 	@echo
 	@echo
 	@echo "###########################################################"
@@ -93,13 +127,12 @@ ifneq ($(findstring linux.x86_64-32bit,$(GMSEC_PLATFORM)), linux.x86_64-32bit)
 	cd ./perl/gmsec; \
 		PERL_CC=$(PERL_CC) perl -Iextra Makefile.PL PREFIX=../../bin ; \
 		$(MAKE) ; $(MAKE) install;
-endif
 else
 	@echo
 	@echo
 	@echo "###########################################################"
 	@echo "#"
-	@echo "#  PERL5_LIB is not defined, or Perl tools not available"
+	@echo "#  PERL5_LIB is not defined."
 	@echo "#  Skipping build of Perl 3.x binding of the GMSEC API"
 	@echo "#"
 	@echo "###########################################################"
@@ -133,11 +166,9 @@ endif
 
 
 python3_api:
-# Note: Python3 binding for API 4.x is currently only supported on RHEL7 64-bit and MacOSX distros.
+# Note: Python3 binding for API 4.x is currently only supported on Linux and macOS distros.
 ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
-ifneq ($(findstring linux.x86_64-32bit,$(GMSEC_PLATFORM)), linux.x86_64-32bit)
 	$(MAKE) python3_api_4x
-endif
 endif
 ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
 	$(MAKE) python3_api_4x
@@ -154,7 +185,7 @@ else
 	@echo "###########################################################"
 	@echo "#"
 	@echo "#  PYTHON3_HOME is not defined"
-	@echo "#  Skipping build of Python 3 binding of the GMSEC API 4.x"
+	@echo "#  Skipping build of Python3 binding of the GMSEC API 4.x"
 	@echo "#"
 	@echo "###########################################################"
 endif
@@ -164,38 +195,25 @@ else
 	@echo "###########################################################"
 	@echo "#"
 	@echo "#  SWIG_HOME is not defined"
-	@echo "#  Skipping build of Python 3 binding of the GMSEC API 4.x"
+	@echo "#  Skipping build of Python3 binding of the GMSEC API 4.x"
 	@echo "#"
 	@echo "###########################################################"
 endif
 
 
-csharp_api:
-# Note: C# binding for API 4.x is currently only supported on RHEL7 64-bit and MacOSX distros.
+ruby_api:
+# Note: Ruby binding for API 4.x is currently only supported on Linux and macOS distros.
 ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
-ifneq ($(findstring linux.x86_64-32bit,$(GMSEC_PLATFORM)), linux.x86_64-32bit)
-	$(MAKE) csharp_api_4x
-endif
+	$(MAKE) ruby_api_4x
 endif
 ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
-	$(MAKE) csharp_api_4x
+	$(MAKE) ruby_api_4x
 endif
 
 
-csharp_api_4x:
+ruby_api_4x:
 ifdef SWIG_HOME
-ifneq (, $(shell which mcs))
-	$(MAKE) -C csharp/gmsec4
-else
-	@echo
-	@echo
-	@echo "###########################################################"
-	@echo "#"
-	@echo "#  mcs (from Mono Development package) not found"
-	@echo "#  Skipping build of C# binding of the GMSEC API 4.x"
-	@echo "#"
-	@echo "###########################################################"
-endif
+	@cd ruby/gmsec4 && $(MAKE) -f MakeRuby
 else
 	@echo
 	@echo
@@ -250,10 +268,11 @@ clean: clean-gcov
 		$(MAKE) -C $$dir $@ ; \
 	done
 	- @ [ -f perl/gmsec/Makefile ] && $(MAKE) -C perl/gmsec veryclean
+	- @ $(MAKE) -C csharp/gmsec4 clean
 	- @ $(MAKE) -C perl/gmsec4 clean
 	- @ $(MAKE) -C python3/gmsec4 clean
-	- @ $(MAKE) -C csharp/gmsec4 clean
-	$(RM) $(BINDIR)/*
+	- @ $(MAKE) -C ruby/gmsec4 clean
+	$(RM) -r $(BINDIR)/*
 	$(RM) c.ver os.ver java.ver
 
 

@@ -53,6 +53,7 @@ using namespace gmsec::api;
 %rename("SetName") setName;
 %rename("GetID") getID;
 %rename("GetMWInfo") getMWInfo;
+%rename("GetConnectionEndpoint") getConnectionEndpoint;
 %rename("GetPublishQueueMessageCount") getPublishQueueMessageCount;
 /*
 %rename("ShutdownAllMiddlewares") shutdownAllMiddlewares;

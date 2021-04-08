@@ -124,11 +124,6 @@
     If the key entry is found, then the associated value is returned;
     otherwise None is returned.
 
-    Exceptions
-    ----------
-    A GmsecError is thrown if name is None.
-
-
 
     get_value(self, name: str, defaultValue: str) -> str
 
@@ -145,10 +140,6 @@
     Returns
     -------
     Value of named item, or the default value if item is not found.
-
-    Exceptions
-    ----------
-    A GmsecError is thrown if name is None.
 ";
 
 %feature("docstring") gmsec::api::Config::getBooleanValue "
@@ -169,8 +160,7 @@
 
     Exceptions
     ----------
-    A GmsecError is thrown if name is None.
-
+    A GmsecError is thrown if name is None or contains an empty string.
 
 
     get_boolean_value(self, name: str, defaultValue: bool) -> bool
@@ -187,10 +177,6 @@
     Returns
     -------
     Value of named item, or the default value if item is not found.
-
-    Exceptions
-    ----------
-    A GmsecError is thrown if name is None
 ";
 
 %feature("docstring") gmsec::api::Config::getIntegerValue "
@@ -211,8 +197,7 @@
 
     Exceptions
     ----------
-    A GmsecError is thrown if name is None
-
+    A GmsecError is thrown if name is None or contains an empty string
 
 
     get_integer_value(self, name: str, defaultValue: int) -> int
@@ -229,10 +214,6 @@
     Returns
     -------
     Value of named item, or the default value if item is not found.
-
-    Exceptions
-    ----------
-    A GmsecError is thrown if name is None
 ";
 
 %feature("docstring") gmsec::api::Config::getDoubleValue "
@@ -253,8 +234,7 @@
 
     Exceptions
     ----------
-    A GmsecError is thrown if name is None
-
+    A GmsecError is thrown if name is None or contains an empty string
 
 
     get_double_value(self, name: str, defaultValue: double) -> double
@@ -271,10 +251,6 @@
     Returns
     -------
     Value of named item, or the default value if item is not found.
-
-    Exceptions
-    ----------
-    A GmsecError is thrown if name is None
 ";
 
 %feature("docstring") gmsec::api::Config::clear "

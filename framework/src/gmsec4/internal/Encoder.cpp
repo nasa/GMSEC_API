@@ -425,7 +425,7 @@ size_t MessageEncoder::findLength(const Message &message)
 		length += updateLength(field);
 	}
 
-	if (length > size_t(GMSEC_ENCODED_LIMIT))
+	if (length > static_cast<size_t>(GMSEC_ENCODED_LIMIT))
 	{
 		setError("MessageEncoder::findLength : Encoded content too large");
 	}
@@ -633,7 +633,7 @@ size_t MessageEncoder::updateLength(const Field& field)
 		const StringField& strField = dynamic_cast<const StringField&>(field);
 		const size_t       count    = StringUtil::stringLength(strField.getValue());
 
-		if (count > size_t(GMSEC_STRING_LIMIT))
+		if (count > static_cast<size_t>(GMSEC_STRING_LIMIT))
 		{
 			setError("MessageEncoder::updateLength : Excessive string length");
 		}
@@ -648,7 +648,7 @@ size_t MessageEncoder::updateLength(const Field& field)
 		const BinaryField& binField = dynamic_cast<const BinaryField&>(field);
 		const GMSEC_U64    count    = binField.getLength();
 
-		if (count > GMSEC_U64(GMSEC_BIN_LIMIT))
+		if (count > static_cast<GMSEC_U64>(GMSEC_BIN_LIMIT))
 		{
 			setError("MessageEncoder::updateLength : Excessive binary data");
 		}
@@ -1193,7 +1193,7 @@ bool Decoder::getCountedBytes(MessageDecoder &owner,
 		return false;
 
 	getU32(pi, &count);
-	if (count > size_t(GMSEC_BIN_LIMIT))
+	if (count > GMSEC_BIN_LIMIT)
 		return false;
 
 	if (!owner.checkAvailable(count))
@@ -1212,7 +1212,7 @@ bool Decoder::getString(MessageDecoder &owner,
 		return false;
 
 	getU32(pi, &count);
-	if (count > size_t(GMSEC_STRING_LIMIT))
+	if (count > GMSEC_STRING_LIMIT)
 		return false;
 
 	if (count < 1)
@@ -1234,7 +1234,7 @@ bool Decoder::getString(MessageDecoder &owner,
 bool Decoder::getString(const char *&pi, GMSEC_U32 &count, const char *&po)
 {
     getU32(pi, &count);
-    if (count > size_t(GMSEC_STRING_LIMIT))
+    if (count > GMSEC_STRING_LIMIT)
         return false;
 
     if (count < 1)
@@ -1486,7 +1486,7 @@ void MessageDecoder::decode(Message &message, GMSEC_U64 count, const char *data)
 	{
 		setError("Null pointer to data to decode");
 	}
-	else if (count >= GMSEC_U32(GMSEC_ENCODED_LIMIT))
+	else if (count >= static_cast<GMSEC_U64>(GMSEC_ENCODED_LIMIT))
 	{
 		setError("Data length exceeded limit");
 	}
@@ -1538,14 +1538,14 @@ void MessageDecoder::decode(Message &message, const DataBuffer &in)
 	}
 	else
 	{
-		setError("Not enough data for encoding");
+		setError("Not enough data for decoding");
 	}
 }
 
 
-bool MessageDecoder::checkAvailable(int count)
+bool MessageDecoder::checkAvailable(GMSEC_U32 count)
 {
-	return GMSEC_U64(current - buffer + count) <= length;
+	return static_cast<GMSEC_U64>(current - buffer + count) <= length;
 }
 
 

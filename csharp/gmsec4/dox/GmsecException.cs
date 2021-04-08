@@ -29,6 +29,12 @@ public class GmsecException : global::System.ApplicationException
   public GmsecException(StatusClass clazz, StatusCode code, string reason, int custom) {
   }
 
+  /// <summary>Constructor using Status object</summary>
+  ///
+  /// <param name="status">Status object</param>
+  public GmsecException(Status status) {
+  }
+
   /// <summary>Copy Constructor</summary>
   ///
   /// <param name="other">The other GMSEC_Exception object to copy</param>

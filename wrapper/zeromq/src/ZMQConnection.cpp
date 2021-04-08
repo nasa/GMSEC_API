@@ -27,7 +27,6 @@
 #include <arpa/inet.h> // For inet_ntoa() in hostnameToIpv4()
 
 #include <sstream>
-#include <string>
 #include <stdlib.h>
 
 using namespace gmsec::api;
@@ -660,10 +659,15 @@ void ZMQConnection::mwRequest(const Message& request, std::string& id)
 
 void ZMQConnection::mwReply(const Message& request, const Message& reply)
 {
+	std::string        replyAddr;
+	Status             status    = MessageBuddy::getInternal(request).getDetails().getString(ZEROMQ_REPLY_ADDRESS, replyAddr);
 	std::string        uniqueID  = getExternal().getReplyUniqueID(request);
 	const StringField* replySubj = dynamic_cast<const StringField*>(request.getField(GMSEC_REPLY_SUBJECT));
-	const StringField* replyAddr = dynamic_cast<const StringField*>(request.getField(ZEROMQ_REPLY_ADDRESS));
 
+	if (status.isError())
+	{
+		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain REPLY-ADDRESS field");
+	}
 	if (uniqueID.empty())
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain reply unique id");
@@ -672,16 +676,10 @@ void ZMQConnection::mwReply(const Message& request, const Message& reply)
 	{
 		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain MW-REPLY-SUBJECT field");
 	}
-	if (!replyAddr)
-	{
-		throw Exception(CONNECTION_ERROR, INVALID_MSG, "Request does not contain REPLY-ADDRESS field");
-	}
 
 	// Set up the reply socket
-	const char* rAddr = replyAddr->getValue();
-
 	void* repSocket = NULL;
-	setupSocket(&repSocket, ZMQ_PUB, rAddr);
+	setupSocket(&repSocket, ZMQ_PUB, replyAddr.c_str());
 
 	MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
 	MessageBuddy::getInternal(reply).setSubject(replySubj->getValue());
@@ -815,37 +813,6 @@ void ZMQConnection::mwReceive(Message*& message, GMSEC_I32 timeout)
 						// Either tracking is turned off on the publisher (No UNIQUE-ID field), or filtering is turned off
 						// on the subscriber, so return the message.
 						done = true;
-					}
-
-					// For Request Messages: Check subject mapping and handle accordingly.
-					if (!m_requestSpecs.useSubjectMapping)
-					{
-						ValueMap& meta = MessageBuddy::getInternal(*message).getDetails();
-
-						meta.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
-						
-						if (message->getKind() == Message::REQUEST)
-						{
-							// Extract and remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message (if it exists)
-							const StringField* idField = dynamic_cast<const StringField*>(message->getField(GMSEC_REPLY_UNIQUE_ID_FIELD));
-
-							if (idField != NULL)
-							{
-								meta.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, idField->getValue());
-
-								message->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
-							}
-
-							// Extract and remove the REPLY-ADDRESS field from the message (if it exists)
-							const StringField* replyAddr = dynamic_cast<const StringField*>(message->getField(ZEROMQ_REPLY_ADDRESS));
-
-							if (replyAddr != NULL)
-							{
-								meta.setString(ZEROMQ_REPLY_ADDRESS, replyAddr->getValue());
-
-								message->clearField(ZEROMQ_REPLY_ADDRESS);
-							}
-						}
 					}
 				}
 				else
@@ -1069,6 +1036,41 @@ void ZMQConnection::handleMessage(zmq_msg_t* zmqMessage, int zmqMsgSize, zmq_msg
 			}
 		}
 	}
+	else if (message->getKind() == Message::REQUEST)
+	{
+		ValueMap& details = MessageBuddy::getInternal(*message.get()).getDetails();
+
+		if (m_requestSpecs.useSubjectMapping)
+		{
+			// Extract and remove GMSEC_REPLY_UNIQUE_ID_FIELD from the message (if it exists)
+			try
+			{
+				getExternal().setReplyUniqueID(*message.get(), message->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
+
+				message->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+			}
+			catch (...)
+			{
+				GMSEC_WARNING << "GMSEC_REPLY_UNIQUE_ID_FIELD is missing!";
+			}
+
+			// Extract and remove the REPLY-ADDRESS field from the message (if it exists)
+			try
+			{
+				details.setString(ZEROMQ_REPLY_ADDRESS, message->getStringValue(ZEROMQ_REPLY_ADDRESS));
+
+				message->clearField(ZEROMQ_REPLY_ADDRESS);
+			}
+			catch (...)
+			{
+				GMSEC_WARNING << "ZEROMQ_REPLY_ADDRESS field is missing!";
+			}
+		}
+		else
+		{
+			details.setBoolean(GMSEC_REQ_RESP_BEHAVIOR, true);
+		}
+	}
 	
 	if (enqueue)
 	{
@@ -1085,17 +1087,14 @@ void ZMQConnection::initReplyListener()
 	{
 		// Determine if the user supplied an endpoint for the Reply Listener
 		bool userSuppliedEndpoint = m_repListenEndpoint.length() > 0;
-		char ipv4[16]             = {0};
 		bool socketIsGood         = false;
-
-		GMSEC_INFO << "Scanning for a port to set up the ReplyListener on because an endpoint"
-		              " was not provided in the " << ZEROMQ_REPLYLISTEN_ENDPOINT << " parameter";
+		std::string ipv4;
 
 		if (!userSuppliedEndpoint)
 		{
 			std::string hostname;
 			SystemUtil::getHostName(hostname);
-			hostnameToIpv4(hostname.c_str(), ipv4);
+			hostnameToIpv4(hostname, ipv4);
 		}
 
 		while (!socketIsGood)
@@ -1107,6 +1106,9 @@ void ZMQConnection::initReplyListener()
 
 			if (!userSuppliedEndpoint)
 			{
+				GMSEC_INFO << "Scanning for a port to set up the ReplyListener on because an endpoint"
+				              " was not provided in the " << ZEROMQ_REPLYLISTEN_ENDPOINT << " parameter";
+
 				std::ostringstream endpoint;
 				endpoint << "tcp://" << ipv4 << ":" << m_repListenPort;
 				m_repListenEndpoint = endpoint.str();
@@ -1179,7 +1181,7 @@ void ZMQConnection::zmqErrorToException(const std::string& errorMsg, const int e
 }
 
 
-bool ZMQConnection::hostnameToIpv4(const char* hostname, char* ip)
+bool ZMQConnection::hostnameToIpv4(const std::string& hostname, std::string& ip)
 {
 	Status result;
 
@@ -1191,7 +1193,7 @@ bool ZMQConnection::hostnameToIpv4(const char* hostname, char* ip)
 	hints.ai_family = AF_UNSPEC; // us AF_INET6 to force IPv6
 	hints.ai_socktype = SOCK_STREAM;
 
-	if ((rv = getaddrinfo(hostname, NULL, &hints, &servinfo)) != 0)
+	if ((rv = getaddrinfo(hostname.c_str(), NULL, &hints, &servinfo)) != 0)
 	{
 		GMSEC_ERROR << "getaddrinfo: " << gai_strerror(rv);
 		return false;
@@ -1201,10 +1203,11 @@ bool ZMQConnection::hostnameToIpv4(const char* hostname, char* ip)
 	for (p = servinfo; p != NULL; p = p->ai_next)
 	{
 		h = (struct sockaddr_in *) p->ai_addr;
-		strcpy(ip, inet_ntoa(h->sin_addr));
+		ip = inet_ntoa(h->sin_addr);
 	}
 
 	freeaddrinfo(servinfo); // Clean up this structure
+
 	return true;
 }
 

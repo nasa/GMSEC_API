@@ -102,6 +102,6 @@ clean:
 
 
 gen-doc:
-	-$(JDK_JAVA_DOC) -public -quiet -d $(JAVADOC_DIR) -sourcepath . $(JAVADOC_4x)
+	-$(JDK_JAVA_DOC) -public -quiet -d $(JAVADOC_DIR) --no-module-directories -sourcepath . $(JAVADOC_4x)
 	$(JDK_JAVA_JAR) cf ..\bin\gmsecapi-javadoc.jar $(JAVADOC_DIR)
 	$(JDK_JAVA_JAR) uf ..\bin\gmsecapi.jar $(JAVADOC_DIR)

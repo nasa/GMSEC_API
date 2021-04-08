@@ -999,6 +999,34 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1
 }
 
 
+JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1GetConnectionEndpoint
+  (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
+{
+	jstring jEndpoint = NULL;
+
+	try
+	{
+		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
+		if (conn == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
+		}
+		else
+		{
+			const char* endpoint = conn->getConnectionEndpoint();
+
+			jEndpoint = makeJavaString(jenv, endpoint);
+
+			jvmOk(jenv, "Connection.getConnectionEndpoint");
+		}
+	}
+	JNI_CATCH
+
+	return jEndpoint;
+}
+
+
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Connection_1GetPublishQueueMessageCount
 	(JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {

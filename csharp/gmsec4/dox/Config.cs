@@ -88,8 +88,6 @@ public class Config : global::System.IDisposable {
   /// <param name="name">name of value to get</param>
   ///
   /// <returns>The value associated with the name, or null if name does not exist.</returns>
-  ///
-  /// <exception cref="GmsecException">Null or empty name string given.</exception>
   public string GetValue(string name) {
   }
 
@@ -101,8 +99,6 @@ public class Config : global::System.IDisposable {
   /// <param name="defaultValue">return value if value does not exist</param>
   ///
   /// <returns>The value associated with the name, or defaultValue if name does not exist.</returns>
-  ///
-  /// <exception cref="GmsecException">Null or empty name string given.</exception>
   public string GetValue(string name, string defaultValue) {
   }
 
@@ -126,8 +122,6 @@ public class Config : global::System.IDisposable {
   /// <param name="defaultValue">default value describe above</param>
   ///
   /// <returns>value of named item, or default value if necessary</returns>
-  ///
-  /// <exception cref="GmsecException">Null or empty string given.</exception>
   public bool GetBooleanValue(string name, bool defaultValue) {
   }
 
@@ -150,8 +144,6 @@ public class Config : global::System.IDisposable {
   /// <param name="defaultValue">default value describe above</param>
   ///
   /// <returns>value of named item, or default value if necessary</returns>
-  ///
-  /// <exception cref="GmsecException">Null or empty string given.</exception>
   public int GetIntegerValue(string name, int defaultValue) {
   }
 
@@ -171,8 +163,6 @@ public class Config : global::System.IDisposable {
   /// <param name="defaultValue">default value describe above</param>
   ///
   /// <returns>value of named item, or default value if necessary</returns>
-  ///
-  /// <exception cref="GmsecException">Null or empty string given.</exception>
   public double GetDoubleValue(string name, double defaultValue) {
   }
 

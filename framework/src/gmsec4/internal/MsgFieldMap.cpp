@@ -467,6 +467,8 @@ void MsgFieldMap::rollover()
 		m_hashMap.insert(m_binTreeMap.begin(), m_binTreeMap.end());
 
 		m_binTreeMap.clear();
+
+		initIterator();
 	}
 }
 

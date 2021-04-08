@@ -166,10 +166,6 @@ C<libgmsec_perl::Config-E<gt>getValue($name)>
 
         If the key entry is found, then the associated value is returned; otherwise NULL is returned.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-
-        Exception if name is NULL
-
 C<libgmsec_perl::Config-E<gt>getValue($name, $defaultValue)>
 
         This function gets a value by name and if there is no value assigned to will return the defaultValue parameter. defaultValue can be NULL or empty. The scope of the value is the life of the Config object.
@@ -182,10 +178,6 @@ C<libgmsec_perl::Config-E<gt>getValue($name, $defaultValue)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         If the key entry is found, then the associated value is returned; otherwise $defaultValue is returned.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-
-        Exception if name is NULL
 
 =head3 getBooleanValue()
 
@@ -203,7 +195,7 @@ C<libgmsec_perl::Config-E<gt>getBooleanValue($name)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-        Exception if name is NULL
+        Exception if name is NULL or contains empty string
 
 C<libgmsec_perl::Config-E<gt>getBooleanValue($name, $defaultValue)>
 
@@ -217,10 +209,6 @@ C<libgmsec_perl::Config-E<gt>getBooleanValue($name, $defaultValue)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         If the key entry is found, then the associated value is returned; otherwise $defaultValue is returned.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-
-        Exception if name is NULL
 
 =head3 getIntegerValue()
 
@@ -238,7 +226,7 @@ C<libgmsec_perl::Config-E<gt>getIntegerValue($name)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-        Exception if name is NULL
+        Exception if name is NULL or contains empty string
 
 C<libgmsec_perl::Config-E<gt>getIntegerValue($name, $defaultValue)>
 
@@ -252,10 +240,6 @@ C<libgmsec_perl::Config-E<gt>getIntegerValue($name, $defaultValue)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         If the key entry is found, then the associated value is returned; otherwise $defaultValue is returned.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-
-        Exception if name is NULL
 
 =head3 getDoubleValue()
 
@@ -273,7 +257,7 @@ C<libgmsec_perl::Config-E<gt>getDoubleValue($name)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-        Exception if name is NULL
+        Exception if name is NULL or contains empty string
 
 C<libgmsec_perl::Config-E<gt>getDoubleValue($name, $defaultValue)>
 
@@ -287,10 +271,6 @@ C<libgmsec_perl::Config-E<gt>getDoubleValue($name, $defaultValue)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
         If the key entry is found, then the associated value is returned; otherwise $defaultValue is returned.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-
-        Exception if name is NULL
 
 =head3 clear()
 

@@ -572,7 +572,7 @@ void FieldTemplate::checkDependencies(const Message& message)
 
 			case Field::F32_TYPE:
 			case Field::F64_TYPE:
-				if (dependency->checkConditions(message.getUnsignedIntegerValue(fieldName.c_str())))
+				if (dependency->checkConditions(message.getDoubleValue(fieldName.c_str())))
 				{
 					applyDependency(dependency);
 				}

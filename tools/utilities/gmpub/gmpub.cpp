@@ -88,12 +88,6 @@ void GMSEC_Publisher::usage(const std::string& programName)
 	          << "\n"
 	          << "\n\t\t* msg-file=<file with message definition>"
 	          << "\n"
-	          << "\n\t\t* cfg-file=<configuration file>"
-	          << "\n"
-	          << "\n\t\t\tNote: msg-name must be defined when using cfg-file"
-	          << "\n"
-	          << "\n\t\t* msg-name=<name of message within configuration file>"
-	          << "\n"
 	          << "\n\t\t* iterations=<number of messages to publish, or -1 to publish indefinitely>"
 	          << "\n"
 	          << "\n\t\t* interval-ms=<publish interval (milliseconds)>"
@@ -327,13 +321,13 @@ int main(int argc, char* argv[])
 
 	GMSEC_Publisher gmpub(config);
 
-	gmpub.addToConfigFromFile();
-
-	if (gmpub.isOptionInvalid(argc))
+	if (!gmpub.areOptionsValid(argc))
 	{
 		gmpub.usage("gmpub");
 		return 1;
 	}
+
+	gmpub.addToConfigFromFile();
 
 	gmpub.run();
 }

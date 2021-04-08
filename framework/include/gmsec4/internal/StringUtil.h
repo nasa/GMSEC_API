@@ -12,10 +12,10 @@
 #include <gmsec4_defs.h>
 #include <gmsec4/Exception.h>
 #include <gmsec4/Status.h>
-#include <gmsec4/util/wdllexp.h>
 
 #include <gmsec4/util/Mutex.h>
 #include <gmsec4/util/Buffer.h>
+#include <gmsec4/util/wdllexp.h>
 
 #include <string>
 #include <sstream>
@@ -26,6 +26,7 @@
 #include <cstdio>
 #include <cctype>
 #include <cstring>
+#include <cmath>
 
 
 namespace gmsec
@@ -45,21 +46,20 @@ class GMSEC_API StringConverter
 public:
 	enum Mode
 	{
+		NO_CONVERSION,
 		TO_UPPERCASE,
-		TO_LOWERCASE,
-		NO_CONVERSION
+		TO_LOWERCASE
 	};
 
 	static StringConverter& CALL_TYPE instance();
 
-
 	void CALL_TYPE setMode(Mode mode);
 
+	Mode CALL_TYPE getMode() const;
 
-	std::string CALL_TYPE convertString(const std::string& str);
+	std::string CALL_TYPE convertString(const std::string& str) const;
 
-
-	std::string CALL_TYPE convertString(const char* str);
+	std::string CALL_TYPE convertString(const char* str) const;
 
 private:
 	StringConverter();
@@ -349,6 +349,13 @@ public:
 
 			iss >> result;    // attempt to convert string to desired type T
 
+#if defined(__APPLE__)
+			if ((typeid(T) == typeid(GMSEC_F32) || typeid(T) == typeid(GMSEC_F64)) && !std::isfinite(result))
+			{
+				throw Exception(OTHER_ERROR, PARSE_ERROR, "Unable to convert value");
+			}
+#endif
+
 			if (iss.fail())
 			{
 				throw Exception(OTHER_ERROR, PARSE_ERROR, "Unable to convert value");
@@ -429,6 +436,149 @@ public:
 	 * @param value - the string to check
 	 */
 	static bool isValidIpAddress(const std::string& value);
+
+
+	/**
+	 * @brief Typedef to represent raw data.
+	 */
+	typedef std::basic_string<unsigned char> Data;
+
+
+	/**
+	 * @fn Data removeLeadingZeros(const Data& data)
+	 * @brief Removes leading zeros (at the byte boundary) from the given data.
+	 * @param data - the data from which to strip leading zero byte values.
+	 */
+	static Data removeLeadingZeros(const Data& data);
+
+
+	/**
+	 * @fn Data padWithLeadingZeros(const Data& data, size_t numZeros)
+	 * @brief Places leading zeros (at the byte boundary) within a copy of the given data.
+	 * @param data - the original data to which to add zeros
+	 * @param numZeros - the number of zeros to add
+	 */
+	static Data padWithLeadingZeros(const Data& data, size_t numZeros);
+
+
+	/**
+	 * @fn Data string_toBinary(const char* value)
+	 * @brief Converts string value to raw data blob.
+	 * @param value - string to convert
+	 */
+	static Data string_toBinary(const char* value);
+
+
+	/**
+	 * @fn Data binaryString_toBinary(const char* value)
+	 * @brief Converts string representing a binary value to raw data blob.
+	 * @param value - binary string to convert
+	 */
+	static Data binaryString_toBinary(const char* value);
+
+
+	/**
+	 * @fn Data I8_toBinary(GMSEC_I8 value)
+	 * @brief Converts a GMSEC_I8 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data I8_toBinary(GMSEC_I8 value);
+
+
+	/**
+	 * @fn Data I16_toBinary(GMSEC_I16 value)
+	 * @brief Converts a GMSEC_I16 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data I16_toBinary(GMSEC_I16 value);
+
+
+	/**
+	 * @fn Data I32_toBinary(GMSEC_I32 value)
+	 * @brief Converts a GMSEC_I32 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data I32_toBinary(GMSEC_I32 value);
+
+
+	/**
+	 * @fn Data I64_toBinary(GMSEC_I64 value)
+	 * @brief Converts a GMSEC_I64 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data I64_toBinary(GMSEC_I64 value);
+
+
+	/**
+	 * @fn Data U8_toBinary(GMSEC_U8 value)
+	 * @brief Converts a GMSEC_U8 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data U8_toBinary(GMSEC_U8 value);
+
+
+	/**
+	 * @fn Data U16_toBinary(GMSEC_U16 value)
+	 * @brief Converts a GMSEC_U16 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data U16_toBinary(GMSEC_U16 value);
+
+
+	/**
+	 * @fn Data U32_toBinary(GMSEC_U32 value)
+	 * @brief Converts a GMSEC_U32 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data U32_toBinary(GMSEC_U32 value);
+
+
+	/**
+	 * @fn Data U64_toBinary(GMSEC_U64 value)
+	 * @brief Converts a GMSEC_U64 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data U64_toBinary(GMSEC_U64 value);
+
+
+	/**
+	 * @fn Data F32_toBinary(GMSEC_F32 value)
+	 * @brief Converts a GMSEC_F32 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data F32_toBinary(GMSEC_F32 value);
+
+
+	/**
+	 * @fn Data F64_toBinary(GMSEC_F64 value)
+	 * @brief Converts a GMSEC_F64 value to raw data blob.
+	 * @param value - number to convert
+	 */
+	static Data F64_toBinary(GMSEC_F64 value);
+
+
+	/**
+	 * @fn GMSEC_I64 I64_fromBinary(const Data& data)
+	 * @brief Converts the given data blob into a GMSEC_I64 value.
+	 * @param data - Binary data blob
+	 */
+	static GMSEC_I64 I64_fromBinary(const Data& data);
+
+
+	/**
+	 * @fn GMSEC_U64 U64_fromBinary(const Data& data)
+	 * @brief Converts the given data blob into a GMSEC_U64 value.
+	 * @param data - Binary data blob
+	 */
+	static GMSEC_U64 U64_fromBinary(const Data& data);
+
+
+	/**
+	 * @fn GMSEC_F64 F64_fromBinary(const Data& data)
+	 * @brief Converts the given data blob into a GMSEC_F64 value.
+	 * @param data - Binary data blob
+	 */
+	static GMSEC_F64 F64_fromBinary(const Data& data);
 };
 
 
