@@ -95,7 +95,7 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 	  m_subscriptions(),
 	  m_messagePopulator(0),
 	  m_parent(parent),
-	  m_callbackAdapter(new MistCallbackAdapter),
+	  m_callbackAdapter(new MistCallbackAdapter()),
 	  m_hbService(0),
 	  m_rsrcService(0),
 	  m_ceeMessageValidator(0)
@@ -139,8 +139,7 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 	if (m_config.getValue(GMSEC_MESSAGE_SPEC_VERSION, NULL))
 	{
 		// Yep, found it!
-
-		m_specification = new Specification(m_config);
+		m_specification.reset(new Specification(m_config));
 	}
 	else
 	{
@@ -152,7 +151,7 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 
 			m_config.addValue("GMSEC-SPECIFICATION-VERSION", oss.str().c_str());
 
-			m_specification = new Specification(m_config);
+			m_specification.reset(new Specification(m_config));
 		}
 		catch (...)
 		{
@@ -163,26 +162,14 @@ InternalConnectionManager::InternalConnectionManager(gmsec::api::mist::Connectio
 
 			m_config.addValue("GMSEC-SPECIFICATION-VERSION", oss.str().c_str());
 
-			m_specification = new Specification(m_config);
+			m_specification.reset(new Specification(m_config));
 		}
 	}
 
-	m_messagePopulator = new MessagePopulator(m_specification->getVersion());
+	m_messagePopulator.reset(new MessagePopulator(m_specification->getVersion()));
 
 	// Finally, attempt to create the connection object.
-	// If anything goes wrong, handle it here, clean up and then report the exception.
-	try
-	{
-		m_connection = Connection::create(m_config);
-	}
-	catch (const Exception& e)
-	{
-		delete m_callbackAdapter;
-		delete m_messagePopulator;
-		delete m_specification;
-
-		throw e;
-	}
+	m_connection.reset(Connection::create(m_config));
 }
 
 
@@ -201,12 +188,11 @@ InternalConnectionManager::~InternalConnectionManager()
 		GMSEC_ERROR << e.what();
 	}
 
-	Connection::destroy(m_connection);
-
-	delete m_callbackAdapter;
-	delete m_messagePopulator;
-	delete m_specification;
-	delete m_ceeMessageValidator;
+	if (m_connection.get())
+	{
+		Connection* conn = m_connection.release();
+		Connection::destroy(conn);
+	}
 }
 
 
@@ -268,8 +254,9 @@ void InternalConnectionManager::cleanup()
 	}
 	if (mwID && std::string(mwID).find("generic_jms") != std::string::npos)
 	{
-		Connection::destroy(m_connection);
-		m_connection = Connection::create(m_config);
+		Connection* conn = m_connection.release();
+		Connection::destroy(conn);
+		m_connection.reset(Connection::create(m_config));
 	}
 }
 
@@ -397,7 +384,7 @@ void InternalConnectionManager::unsubscribe(SubscriptionInfo*& mistInfo)
 	{
 		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "The SubscriptionInfo object is null.");
 	}
-	if (m_connection != mistInfo->getInfo()->getConnection())
+	if (m_connection.get() != mistInfo->getInfo()->getConnection())
 	{
 		throw Exception(MIST_ERROR, OTHER_ERROR_CODE,
 			"The given SubscriptionInfo object is not associated with this ConnectionManager");
@@ -676,6 +663,12 @@ const char* InternalConnectionManager::getID() const
 const char* InternalConnectionManager::getMWInfo() const
 {
 	return m_connection->getMWInfo();
+}
+
+
+const char* InternalConnectionManager::getConnectionEndpoint() const
+{
+	return m_connection->getConnectionEndpoint();
 }
 
 
@@ -1118,7 +1111,7 @@ Message InternalConnectionManager::createResourceMessage(const char* subject, si
 
 	try
 	{
-		ResourceInfoGenerator::addNetworkStats(msg, getSpecification().getVersion(), averageInterval/sampleInterval);
+		ResourceInfoGenerator::addNetworkStats(msg, sampleInterval, averageInterval/sampleInterval);
 	}
 	catch (const Exception& e)
 	{
@@ -1392,11 +1385,9 @@ void InternalConnectionManager::registerMessageValidator(GMSEC_MessageValidator*
 		throw Exception(MIST_ERROR, UNINITIALIZED_OBJECT, "MessageValidator cannot be null.");
 	}
 
-	delete m_ceeMessageValidator;
+	m_ceeMessageValidator.reset(new CustomMessageValidator(validator));
 
-	m_ceeMessageValidator = new CustomMessageValidator(validator);
-
-	getSpecification().registerMessageValidator(m_ceeMessageValidator);
+	getSpecification().registerMessageValidator(m_ceeMessageValidator.get());
 }
 
 

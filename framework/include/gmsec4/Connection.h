@@ -145,6 +145,13 @@ public:
 
 
 	/**
+	 * @fn ~Connection()
+	 * @brief Class destructor.
+	 */
+	~Connection();
+
+
+	/**
 	 * @fn const char* getAPIVersion()
 	 * @brief This function identifies the version of the API.
 	 * @return String containing API version information.
@@ -549,19 +556,18 @@ public:
 
 	/**
 	 * @fn excludeSubject( const char *subject )
-	 *  @desc Exclude any incoming messages with the specified subject.
+	 * @desc Exclude any incoming messages with the specified subject.
 	 *
-	 *  @param subject - The subject pattern to look for in incoming messages.
+	 * @param subject - The subject pattern to look for in incoming messages.
 	 */
 	void excludeSubject(const char *subject);
 
 
 	/**
 	 * @fn removeExcludedSubject( const char *subject )
-	 *  @desc Remove an excluded subject, allowing incoming messages with the matching
-	 *  subject to once again be received.
+	 * @desc Remove an excluded subject, allowing incoming messages with the matching subject to once again be received.
 	 *
-	 *  @param subject - The subject pattern to remove.
+	 * @param subject - The subject pattern to remove.
 	 */
 	void removeExcludedSubject(const char *subject);
 
@@ -602,6 +608,14 @@ public:
 
 
 	/**
+	 * @fn const char* getConnectionEndpoint() const
+	 *
+	 * @desc Returns middleware broker connection information.
+	 */
+	const char* CALL_TYPE getConnectionEndpoint() const;
+
+
+	/**
 	 * @fn getPublishQueueMessageCount() const
 	 *
 	 * @brief Retrieves the number of messages queued for asynchronous publish operations
@@ -615,6 +629,8 @@ public:
 	 * @fn void shutdownAllMiddlewares()
 	 *
 	 * @desc Calls shutdown routines for each middleware that has a shutdown routine registered.
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 */
 	static void shutdownAllMiddlewares();
 
@@ -622,6 +638,8 @@ public:
 	/**
 	 * @fn void shutdownMiddleware(const char* name)
 	 * @brief Calls the shutdown routine for the middleware with the given name.
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 * @param name A string representing the library name of the gmsec wrapper for
 	 * the middleware to shutdown; e.g., "gmsec_mb".
 	 */
@@ -646,21 +664,17 @@ public:
 
 
 private:
-	// defined, but not implemented
-	Connection &operator=(const Connection &);
-	Connection(const Connection &);
-
-
-	/** @fn Connection(InternalConnection* iConn)
+	/**
+	 * @fn Connection(InternalConnection* iConn)
 	 * @brief Default constructor.
 	 */
 	Connection(gmsec::api::internal::InternalConnection* iConn);
 
 
-	/** @fn ~Connection()
-	 * @brief base class deconstructor
-	 */
-	~Connection();
+	// Defined, but not implemented
+	Connection();
+	Connection(const Connection&);
+	Connection& operator=(const Connection&);
 
 
 	// Member data

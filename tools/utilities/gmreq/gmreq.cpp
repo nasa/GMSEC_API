@@ -86,12 +86,6 @@ void GMSEC_Request::usage(const std::string& programName)
 	          << "\n"
 	          << "\n\t\t* msg-file=<file with message definition>"
 	          << "\n"
-	          << "\n\t\t* cfg-file=<configuration file>"
-	          << "\n"
-	          << "\n\t\t\tNote: msg-name must be defined when using cfg-file"
-	          << "\n"
-	          << "\n\t\t* msg-name=<name of message within configuration file>"
-	          << "\n"
 	          << "\n\t\t* msg-timeout-ms=<timeout period (milliseconds)>"
 	          << "\n"
 	          << "\n\t\t* req-republish-timeout-ms=<timeout period (milliseconds)>"
@@ -341,13 +335,13 @@ int main(int argc, char* argv[])
 
 	GMSEC_Request gmreq(config);
 
-	gmreq.addToConfigFromFile();
-
-	if (gmreq.isOptionInvalid(argc))
+	if (!gmreq.areOptionsValid(argc))
 	{
 		gmreq.usage("gmreq");
 		return 1;
 	}
+
+	gmreq.addToConfigFromFile();
 
 	gmreq.run();
 }

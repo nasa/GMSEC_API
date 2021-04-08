@@ -10,6 +10,7 @@
 #include <gmsec4/internal/InternalConfig.h>
 
 #include <gmsec4/Config.h>
+#include <gmsec4/ConfigOptions.h>
 #include <gmsec4/Exception.h>
 #include <gmsec4/util/Log.h>
 
@@ -35,15 +36,14 @@ using namespace gmsec::api::util;
 
 InternalConfig::InternalConfig()
 	: m_configs(),
-	  m_configIter(),
 	  m_xml()
 {
+	m_configIter = m_configs.begin();
 }
 
 
 InternalConfig::InternalConfig(int argc, char* argv[])
 	: m_configs(),
-	  m_configIter(),
 	  m_xml()
 {
 	for (int i = 0; i < argc; ++i)
@@ -71,7 +71,6 @@ InternalConfig::InternalConfig(int argc, char* argv[])
 
 InternalConfig::InternalConfig(const char* data)
 	: m_configs(),
-	  m_configIter(),
 	  m_xml()
 {
 	if (!data || std::string(data).empty())
@@ -145,34 +144,21 @@ InternalConfig::InternalConfig(const char* data)
 		dataParsed = (pairs.size() > 0);
 	}
 
-	if (dataParsed)
-	{
-		m_configIter = m_configs.begin();
-	}
-	else
+	if (!dataParsed)
 	{
 		throw Exception(CONFIG_ERROR, PARSE_ERROR,
 			"Unable to parse configuration data string; it must contain valid XML data, JSON data, or key=pair values");
 	}
+
+	m_configIter = m_configs.begin();
 }
 
 
 InternalConfig::InternalConfig(const InternalConfig& cfg)
 	: m_configs(),
-	  m_configIter(),
 	  m_xml()
 {
-	const char* name  = 0;
-	const char* value = 0;
-
-	bool hasNext = cfg.getFirst(name, value);
-
-	while (hasNext)
-	{
-		addValue(name, value);
-
-		hasNext = cfg.getNext(name, value);
-	}
+	m_configs.insert(cfg.m_configs.begin(), cfg.m_configs.end());
 
 	m_configIter = m_configs.begin();
 }
@@ -201,22 +187,22 @@ void InternalConfig::addValue(const char* name, const char* value)
 	m_configs[name] = value;
 
 	// special handling of log parameters
-	std::string lowername = StringUtil::stringToLower(name);
+	std::string uc_name = StringUtil::stringToUpper(name);
 
-	if (lowername == "loglevel")
+	if (uc_name == LOG_LEVEL)
 	{
 		LogLevel level = Log::fromString(value);
 		Log::setReportingLevel(level);
 	}
-	else if (lowername == "logfile")
+	else if (uc_name == LOG_FILE)
 	{
 		std::ostream* out = 0;
 
-		if (StringUtil::stringEqualsIgnoreCase(value, "STDOUT"))
+		if (StringUtil::stringEqualsIgnoreCase(value, LOG_STDOUT))
 		{
 			out = &std::cout;
 		}
-		else if (StringUtil::stringEqualsIgnoreCase(value, "STDERR"))
+		else if (StringUtil::stringEqualsIgnoreCase(value, LOG_STDERR))
 		{
 			out = &std::cerr;
 		}
@@ -227,13 +213,32 @@ void InternalConfig::addValue(const char* name, const char* value)
 			// Evaluate that the file stream is valid (using the operator!() method of ostream).
 			if (!*out)
 			{
-				GMSEC_ERROR << "Failed to open log file: " << value;
 				delete out;
 				out = &std::cerr;
+
+				LogLevel level = Log::getReportingLevel();
+				Log::setReportingLevel(logERROR);
+				GMSEC_ERROR << "Failed to open log file: " << value;
+				Log::setReportingLevel(level);
 			}
 		}
 
 		InternalLog::setDefaultStream(out);
+	}
+	else if (uc_name == GMSEC_CONVERT_FIELD_NAMES)
+	{
+		if (StringUtil::stringEqualsIgnoreCase(value, "uppercase"))
+		{
+			StringConverter::instance().setMode(StringConverter::TO_UPPERCASE);
+		}
+		else if (StringUtil::stringEqualsIgnoreCase(value, "lowercase"))
+		{
+			StringConverter::instance().setMode(StringConverter::TO_LOWERCASE);
+		}
+		else
+		{
+			StringConverter::instance().setMode(StringConverter::NO_CONVERSION);
+		}
 	}
 }
 
@@ -250,37 +255,32 @@ bool InternalConfig::clearValue(const char* name)
 	}
 
 	m_configs.erase(name);
+
 	return true;
 }
 
 
 const char* InternalConfig::getValue(const char* name) const
 {
-	validateConfigName(name);
-
-	ConfigMapIter it = m_configs.find(name);
-
-	if (it == m_configs.end())
-	{
-		return NULL;
-	}
-
-	return it->second.c_str();
+	return getValue(name, NULL);
 }
 
 
 const char* InternalConfig::getValue(const char* name, const char* defaultValue) const
 {
-	validateConfigName(name);
+	const char* value = defaultValue;
 
-	ConfigMapIter it = m_configs.find(name);
-
-	if (it == m_configs.end())
+	if (name != NULL && *name != '\0')
 	{
-		return defaultValue;
+		ConfigMapIter it = m_configs.find(name);
+
+		if (it != m_configs.end())
+		{
+			value = it->second.c_str();
+		}
 	}
 
-	return it->second.c_str();
+	return value;
 }
 
 
@@ -297,34 +297,48 @@ bool InternalConfig::getBooleanValue(const char* name) const
 		throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME, oss.str().c_str());
 	}
 
-	const char* value = it->second.c_str();
+	const char* cfgValue = it->second.c_str();
+	bool value;
 
-	if (!StringUtil::stringEqualsIgnoreCase(value, "true") && !StringUtil::stringEqualsIgnoreCase(value, "false"))
+	if (StringUtil::stringEqualsIgnoreCase(cfgValue, "true") || StringUtil::stringEquals(cfgValue, "1"))
+	{
+		value = true;
+	}
+	else if (StringUtil::stringEqualsIgnoreCase(cfgValue, "false") || StringUtil::stringEquals(cfgValue, "0"))
+	{
+		value = false;
+	}
+	else
 	{
 		std::ostringstream oss;
 		oss << "Config entry '" << name << "' does not represent a boolean value";
 		throw Exception(CONFIG_ERROR, INVALID_CONFIG_VALUE, oss.str().c_str());
 	}
 
-	return StringUtil::stringEqualsIgnoreCase(value, "true");
+	return value;
 }
 
 
 bool InternalConfig::getBooleanValue(const char* name, bool defaultValue) const
 {
-	validateConfigName(name);
-
 	bool value = defaultValue;
 
-	ConfigMapIter it = m_configs.find(name);
-
-	if (it != m_configs.end())
+	if (name != NULL && *name != '\0')
 	{
-		const char* cfgValue = it->second.c_str();
+		ConfigMapIter it = m_configs.find(name);
 
-		if (StringUtil::stringEqualsIgnoreCase(cfgValue, "true") || StringUtil::stringEqualsIgnoreCase(cfgValue, "false"))
+		if (it != m_configs.end())
 		{
-			value = StringUtil::stringEqualsIgnoreCase(cfgValue, "true");
+			const char* cfgValue = it->second.c_str();
+
+			if (StringUtil::stringEqualsIgnoreCase(cfgValue, "true") || StringUtil::stringEquals(cfgValue, "1"))
+			{
+				value = true;
+			}
+			else if (StringUtil::stringEqualsIgnoreCase(cfgValue, "false") || StringUtil::stringEquals(cfgValue, "0"))
+			{
+				value = false;
+			}
 		}
 	}
 
@@ -364,21 +378,22 @@ int InternalConfig::getIntegerValue(const char* name) const
 
 int InternalConfig::getIntegerValue(const char* name, int defaultValue) const
 {
-	validateConfigName(name);
-
 	int value = defaultValue;
 
-	ConfigMapIter it = m_configs.find(name);
-
-	if (it != m_configs.end())
+	if (name != NULL && *name != '\0')
 	{
-		try
+		ConfigMapIter it = m_configs.find(name);
+
+		if (it != m_configs.end())
 		{
-			value = StringUtil::getValue<int>(it->second.c_str());
-		}
-		catch (...)
-		{
-			GMSEC_WARNING << "Config entry '" << name << "' does not represent an integer value; returning default value";
+			try
+			{
+				value = StringUtil::getValue<int>(it->second.c_str());
+			}
+			catch (...)
+			{
+				GMSEC_WARNING << "Config entry '" << name << "' does not represent an integer value; returning default value";
+			}
 		}
 	}
 
@@ -418,21 +433,22 @@ double InternalConfig::getDoubleValue(const char* name) const
 
 double InternalConfig::getDoubleValue(const char* name, double defaultValue) const
 {
-	validateConfigName(name);
-
 	double value = defaultValue;
 
-	ConfigMapIter it = m_configs.find(name);
-
-	if (it != m_configs.end())
+	if (name != NULL && *name != '\0')
 	{
-		try
+		ConfigMapIter it = m_configs.find(name);
+
+		if (it != m_configs.end())
 		{
-			value = StringUtil::getValue<double>(it->second.c_str());
-		}
-		catch (...)
-		{
-			GMSEC_WARNING << "Config entry '" << name << "' does not represent a double value; returning default value";
+			try
+			{
+				value = StringUtil::getValue<double>(it->second.c_str());
+			}
+			catch (...)
+			{
+				GMSEC_WARNING << "Config entry '" << name << "' does not represent a double value; returning default value";
+			}
 		}
 	}
 
@@ -558,7 +574,7 @@ void InternalConfig::fromXML(tinyxml2::XMLElement* element)
 	}
 
 	const char* mename = element->Name();
-	if (!mename || std::string(mename) != "CONFIG")
+	if (!mename || !StringUtil::stringEqualsIgnoreCase(mename, "CONFIG"))
 	{
 		throw Exception(CONFIG_ERROR, XML_PARSE_ERROR,
 			"Invalid XML -- CONFIG element not found");
@@ -571,10 +587,15 @@ void InternalConfig::fromXML(tinyxml2::XMLElement* element)
 		//field nodes only
 		const char* caname = attr->Name();
 
-		if (caname && std::string(caname) == "PARAMETER")
+		if (caname && StringUtil::stringEqualsIgnoreCase(caname, "PARAMETER"))
 		{
 			const char* name  = attr->Attribute("NAME");
 			const char* value = attr->GetText();
+
+			if (name == NULL)
+			{
+				name  = attr->Attribute("name");
+			}
 
 			if (name && value)
 			{
@@ -582,8 +603,6 @@ void InternalConfig::fromXML(tinyxml2::XMLElement* element)
 			}
 		}
 	}
-
-	m_configIter = m_configs.begin();
 }
 
 
@@ -639,19 +658,19 @@ void InternalConfig::fromJSON(const Json::Value& origRoot)
 {
 	Json::Value root;
 
-	if (origRoot.isMember("CONFIG"))
+	if (origRoot.isMember("CONFIG") || origRoot.isMember("config"))
 	{
-		root = origRoot["CONFIG"];
+		root = (origRoot.isMember("CONFIG") ? origRoot["CONFIG"] : origRoot["config"]);
 	}
 	else
 	{
 		throw Exception(MSG_ERROR, JSON_PARSE_ERROR,
-			"Invalid JSON Config format -- no root element");
+			"Invalid JSON Config format -- no CONFIG root element");
 	}
 
-	if (root.isMember("PARAMETER"))
+	if (root.isMember("PARAMETER") || root.isMember("parameter"))
 	{
-		const Json::Value params = root["PARAMETER"];
+		const Json::Value params = (root.isMember("PARAMETER") ? root["PARAMETER"] : root["parameter"]);
 
 		for (unsigned int i = 0; i < params.size(); ++i)
 		{
@@ -660,30 +679,30 @@ void InternalConfig::fromJSON(const Json::Value& origRoot)
 			std::string name;
 			std::string value;
 
-			if (param.isMember("NAME"))
+			if (param.isMember("NAME") || param.isMember("name"))
 			{
 				try
 				{
-					name = param["NAME"].asCString();
+					name = (param.isMember("NAME") ? param["NAME"].asCString() : param["name"].asCString());
 				}
 				catch (...)
 				{
-					double tmpName = param["NAME"].asDouble();
+					double tmpName = (param.isMember("NAME") ? param["NAME"].asDouble() : param["name"].asDouble());
 					std::ostringstream oss;
 					oss << tmpName;
 					name = oss.str();
 				}
 			}
 
-			if (param.isMember("VALUE"))
+			if (param.isMember("VALUE") || param.isMember("value"))
 			{
 				try
 				{
-					value = param["VALUE"].asCString();
+					value = (param.isMember("VALUE") ? param["VALUE"].asCString() : param["value"].asCString());
 				}
 				catch (...)
 				{
-					double tmpValue = param["VALUE"].asDouble();
+					double tmpValue = (param.isMember("VALUE") ? param["VALUE"].asDouble() : param["value"].asDouble());
 					std::ostringstream oss;
 					oss << tmpValue;
 					value = oss.str();
@@ -701,7 +720,7 @@ void InternalConfig::fromJSON(const Json::Value& origRoot)
 
 void InternalConfig::validateConfigName(const char* name) const
 {
-    if (!name || std::string(name).empty())
+    if (!name || *name == '\0')
     {
         throw Exception(CONFIG_ERROR, INVALID_CONFIG_NAME,
                 "Config name cannot be NULL, nor an empty string");

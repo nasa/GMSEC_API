@@ -30,6 +30,12 @@ const char* const GMSEC_SCHEMA_LEVEL			= "GMSEC-SCHEMA-LEVEL";
 const char* const GMSEC_LEGACY_SCHEMA_FILES		= "GMSEC-LEGACY-SCHEMA-FILES";
 
 
+const char* const LOG_LEVEL				= "LOGLEVEL";
+const char* const LOG_FILE				= "LOGFILE";
+const char* const LOG_STDOUT				= "STDOUT";
+const char* const LOG_STDERR				= "STDERR";
+
+
 const char* const GMSEC_TRACKING			= "TRACKING";
 const char* const GMSEC_TRACKING_NODE			= "TRACKING-NODE";
 const char* const GMSEC_TRACKING_PROCESS_ID		= "TRACKING-PROCESS-ID";
@@ -65,6 +71,7 @@ const char* const GMSEC_MSG_BIN_TIMEOUT        		= "GMSEC-MSG-BIN-TIMEOUT";
 const char* const GMSEC_MSG_FLD_STORAGE_TYPE		= "GMSEC-MSGFLD-STORE-TYPE";
 const char* const GMSEC_MSG_FLD_STORAGE_SIZE		= "GMSEC-MSGFLD-STORE-SIZE";
 const char* const GMSEC_SORT_MSG_FIELDS			= "GMSEC-SORT-MSG-FIELDS";
+const char* const GMSEC_CONVERT_FIELD_NAMES		= "GMSEC-CONVERT-FIELD-NAMES";
 
 
 namespace secure

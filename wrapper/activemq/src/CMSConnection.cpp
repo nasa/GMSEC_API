@@ -552,19 +552,19 @@ public:
 	{
 		activemq::library::ActiveMQCPP::initializeLibrary();
 
-		GMSEC_INFO << "Initialized ActiveMQ CMS";
+		//GMSEC_INFO << "Initialized ActiveMQ CMS";
 	}
 
 	~CMSMiddleware()
 	{
-		GMSEC_INFO << "Finalizing ActiveMQ CMS";
+		//GMSEC_INFO << "Finalizing ActiveMQ CMS";
 		try
 		{
 			activemq::library::ActiveMQCPP::shutdownLibrary();
 		}
-		catch (decaf::lang::Exception &e)
+		catch (const decaf::lang::Exception &e)
 		{
-			GMSEC_ERROR << "Unable to finalize ActiveMQ CPP library : " << e.what();
+			GMSEC_ERROR << "Unable to finalize ActiveMQ CPP library: " << e.what();
 		}
 	}
 };
@@ -1639,6 +1639,9 @@ void CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMessag
 
 		gmsecMessage->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
 	}
+
+	// The following field appears courtesy of Apache Artemis; remove it!
+	gmsecMessage->clearField("__AMQ_CID");
 }
 
 

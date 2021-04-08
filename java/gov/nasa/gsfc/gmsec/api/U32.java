@@ -66,7 +66,7 @@ public class U32
 	 *
 	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
-	public U32(long value)
+	public U32(long value) throws IllegalArgumentException
 	{
 		this.value = checkRange(value);
 	}
@@ -76,9 +76,16 @@ public class U32
 	 * Copy constructor
 	 *
 	 * @param other The U32 object to copy
+	 *
+	 * @throws IllegalArgumentException Thrown if the given U32 object is null.
 	 */
-	public U32(U32 other)
+	public U32(U32 other) throws IllegalArgumentException
 	{
+		if (other == null)
+		{
+			throw new IllegalArgumentException("U32 object is null");
+		}
+
 		this.value = other.get();
 	}
 
@@ -90,9 +97,9 @@ public class U32
 	 *
 	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
-	public void set(long value)
+	public void set(long value) throws IllegalArgumentException
 	{
-		this.value = value;
+		this.value = checkRange(value);
 	}
 
 

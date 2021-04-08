@@ -73,6 +73,28 @@ public class Status
 
 
 	/**
+	 * Constructs a Status object with info from the given GMSEC_Exception object.
+	 *
+	 * @param e GMSEC_Exception object indicating source/reason for the error
+	 *
+	 * @throws IllegalArgumentException Thrown if the exception object is null.
+	 */
+	public Status(GMSEC_Exception e)
+		throws IllegalArgumentException
+	{
+		if (e == null)
+		{
+			throw new IllegalArgumentException("GMSEC_Exception object is null");
+		}
+
+		m_class      = e.getErrorClassification();
+		m_code       = e.getErrorCode();
+		m_reason     = e.getErrorMessage();
+		m_customCode = e.getCustomCode();
+	}
+
+
+	/**
 	 * Construct Status object using values from an existing Status object.
 	 *
 	 * @param other Status object to copy.

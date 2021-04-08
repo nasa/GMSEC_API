@@ -95,11 +95,8 @@ public:
 	/// is the life of the Config object, or until the next %GetValue() call.</summary>
 	///
 	/// <param name="name">name of value to get</param>
-	/// <param name="value">output parameter value</param>
 	///
 	/// <returns>The value associated with the name, or nullptr if name key does not exist.</returns>
-	///
-	/// <exception cref="GMSEC_Exception">Null or empty name string given.</exception>
 	System::String^ GetValue(System::String^ name);
 	
 	/// <summary>This function gets a value by name and value or will return a default 
@@ -108,11 +105,8 @@ public:
 	///
 	/// <param name="name">name of value to get</param>
 	/// <param name="defaultValue">return value if value does not exist</param>
-	/// <param name="value">output parameter value</param>
 	///
 	/// <returns>The value associated with the name, or defaultValue if name key does not exist.</returns>
-	///
-	/// <exception cref="GMSEC_Exception">Null or empty name string given.</exception>
 	System::String^ GetValue(System::String^ name,System::String^ defaultValue);
 
 
@@ -121,7 +115,6 @@ public:
 	/// is thrown.</summary>
 	///
 	/// <param name="name">name of value to get</param>
-	/// <param name="defaultValue">default value describe above</param>
 	///
 	/// <returns>value of named item</returns>
 	///
@@ -137,8 +130,6 @@ public:
 	/// <param name="defaultValue">default value describe above</param>
 	///
 	/// <returns>value of named item, or default value if necessary</returns>
-	///
-	/// <exception cref="GMSEC_Exception">Null or empty string given.</exception>
 	bool GetBooleanValue(System::String^ name, bool defaultValue);
 
 
@@ -147,7 +138,6 @@ public:
 	/// is thrown.</summary>
 	///
 	/// <param name="name">name of value to get</param>
-	/// <param name="defaultValue">default value describe above</param>
 	///
 	/// <returns>value of named item</returns>
 	///
@@ -162,15 +152,12 @@ public:
 	/// <param name="defaultValue">default value describe above</param>
 	///
 	/// <returns>value of named item, or default value if necessary</returns>
-	///
-	/// <exception cref="GMSEC_Exception">Null or empty string given.</exception>
 	System::Int32 GetIntegerValue(System::String^ name, System::Int32 defaultValue);
 
 
 	/// <summary>This function attempts to get a named value as a 64-bit floating point number.</summary>
 	///
 	/// <param name="name">name of value to get</param>
-	/// <param name="defaultValue">default value describe above</param>
 	///
 	/// <returns>value of named item</returns>
 	///
@@ -184,8 +171,6 @@ public:
 	/// <param name="defaultValue">default value describe above</param>
 	///
 	/// <returns>value of named item, or default value if necessary</returns>
-	///
-	/// <exception cref="GMSEC_Exception">Null or empty string given.</exception>
 	System::Double GetDoubleValue(System::String^ name, System::Double defaultValue);
 
 

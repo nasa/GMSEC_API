@@ -133,6 +133,11 @@ public class JNIFieldConverter
 					break;
 				}
 			}
+
+			if (field != null)
+			{
+				field.isHeader( gmsecJNI.Field_IsHeader(cPtr, null) );
+			}
 		}
 
 		return field;

@@ -48,6 +48,12 @@ public class Status : global::System.IDisposable {
   public Status(StatusClass eclass, StatusCode code) {
   }
 
+  /// <summary>Create a status object using info from the given GmsecException object</summary>
+  ///
+  /// <param name="e">GmsecException object</param>
+  public Status(GmsecException e) {
+  }
+
   /// <summary>Copy constructor.</summary>
   public Status(Status other) {
   }

@@ -295,6 +295,302 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1Ad
 }
 
 
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldByteArray
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jbyteArray jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, blob)"))
+			{
+				jbyte* fieldValue    = jenv->GetByteArrayElements(jFieldValue, NULL);
+				jsize  fieldValueLen = jenv->GetArrayLength(jFieldValue);
+
+				result = (msg->addField(fieldName.c_str(), (GMSEC_BIN) fieldValue, (size_t) fieldValueLen) ? JNI_TRUE : JNI_FALSE);
+
+				jenv->ReleaseByteArrayElements(jFieldValue, fieldValue, JNI_ABORT);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldBoolean
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jboolean jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, bool)"))
+			{
+				result = (msg->addField(fieldName.c_str(), (jFieldValue == JNI_TRUE)) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldChar
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jchar jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, char)"))
+			{
+				result = (msg->addField(fieldName.c_str(), (GMSEC_CHAR) jFieldValue) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldByte
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jbyte jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, byte)"))
+			{
+				result = (msg->addField(fieldName.c_str(), (GMSEC_I8) jFieldValue) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldShort
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jshort jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, short)"))
+			{
+				result = (msg->addField(fieldName.c_str(), (GMSEC_I16) jFieldValue) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldInt
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jint jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, int)"))
+			{
+				result = (msg->addField(fieldName.c_str(), (GMSEC_I32) jFieldValue) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldLong
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jlong jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, long)"))
+			{
+				result = (msg->addField(fieldName.c_str(), (GMSEC_I64) jFieldValue) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldFloat
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jfloat jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, float)"))
+			{
+				result = (msg->addField(fieldName.c_str(), (GMSEC_F32) jFieldValue) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldDouble
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jdouble jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+
+			if (jvmOk(jenv, "Message.addField(string, double)"))
+			{
+				result = (msg->addField(fieldName.c_str(), (GMSEC_F64) jFieldValue) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1AddFieldString
+  (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg, jstring jFieldName, jstring jFieldValue)
+{
+	jboolean result = JNI_FALSE;
+
+	try
+	{
+		Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
+		if (msg == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
+		}
+		else
+		{
+			JStringManager fieldName(jenv, jFieldName);
+			JStringManager fieldValue(jenv, jFieldValue, true);
+
+            if (jvmOk(jenv, "Message.addField(string, string)") && fieldName.c_str() && fieldValue.c_str())
+			{
+				result = (msg->addField(fieldName.c_str(), fieldValue.c_str()) ? JNI_TRUE : JNI_FALSE);
+			}
+		}
+	}
+	JNI_CATCH
+
+	return result;
+}
+
+
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Message_1ClearFields
   (JNIEnv *jenv, jclass jcls, jlong jMsgPtr, jobject jMsg)
 {

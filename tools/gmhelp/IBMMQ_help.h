@@ -15,16 +15,14 @@
 //
 ConfigOption ibmmq_client_opt1 =
 {
-" *  connectionType=<string>",
+" *  mw-id=<string>",
 
-"        <string> must be gmsec_ibmmq90.\n"
-"        [required]",
+"        <string> must be ibmmq90. [required]",
 
-"        Used to specify the type of connection object to set up.  For IBM MQ\n"
-"        clients, this must be set to gmsec_ibmmq90.",
+"        Used to specify the type of connection object to set up. For IBM MQ\n"
+"        clients, this must be set to ibmmq90.",
 
 "        Examples:\n"
-"            connectionType=gmsec_ibmmq90\n"
 "            mw-id=ibmmq90\n"
 "        \n"
 "        Note: For information regarding using the GMSEC Generic JMS wrapper\n"
@@ -37,8 +35,8 @@ ConfigOption ibmmq_client_opt2 =
 
 "        The server name or IP address and optional port number. [optional]",
 
-"        Comma-delimited list of server names or IP addresses.  The default\n"
-"        default server is 'localhost'.  The default port is 1414.",
+"        Comma-delimited list of server names or IP addresses. The default\n"
+"        default server is 'localhost'. The default port is 1414.",
 
 "        Examples:\n"
 "            server=10.1.2.123\n"
@@ -54,7 +52,7 @@ ConfigOption ibmmq_client_opt3 =
 "        The channel name string. [required]",
 
 "        Used to specify the channel the client will use to connect to the\n"
-"        server.  This value is required for network communication.",
+"        server. This value is required for network communication.",
 
 "        Example:\n"
 "            mw-channel=GMSEC.TEST.CHANNEL"
@@ -67,7 +65,7 @@ ConfigOption ibmmq_client_opt4 =
 "        Queue manager name string. [optional]",
 
 "        Used to specify the queue manager to which the user desires to\n"
-"        connect.  The server's default queue manager is automatically used\n"
+"        connect. The server's default queue manager is automatically used\n"
 "        in the event that this value is not specified.",
 
 "        Example:\n"
@@ -81,7 +79,7 @@ ConfigOption ibmmq_client_opt5 =
 "        Retain queue manager after the client has disconnected. [optional]",
 
 "        Used to specify whether the queue manager should be retained after\n"
-"        the client has disconnected from the server.  The default setting is\n"
+"        the client has disconnected from the server. The default setting is\n"
 "        to not retain the queue manager.",
 
 "        Examples:\n"
@@ -96,7 +94,7 @@ ConfigOption ibmmq_client_opt6 =
 "        Filter duplicate messages. [optional]",
 
 "        This option can be used to specify whether to filter duplicate\n"
-"        messages or not.  The default is 'yes'.",
+"        messages or not. The default is 'yes'.",
 
 "        Examples:\n"
 "            mw-filter-dups=yes\n"

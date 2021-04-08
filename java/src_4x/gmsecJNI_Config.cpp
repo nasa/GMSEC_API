@@ -338,43 +338,6 @@ JNIEXPORT jobjectArray JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_
 }
 
 
-JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_1GetValue__JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2Ljava_lang_String_2
-  (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig, jstring jName)
-{
-	jstring result = NULL;
-
-	try
-	{
-		Status status;
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			JStringManager name(jenv, jName);
-
-			if (jvmOk(jenv, "Config.GetValue"))
-			{
-				const char* value = config->getValue(name.c_str());
-
-				if (value)
-				{
-					result = makeJavaString(jenv, value);
-
-					jvmOk(jenv, "Config.GetValue");
-				}
-			}
-		}
-	}
-	JNI_CATCH
-
-	return result;
-}
-
-
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_1GetValue__JLgov_nasa_gsfc_gmsec_api_jni_JNIConfig_2Ljava_lang_String_2Ljava_lang_String_2
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig, jstring jName, jstring jDefaultValue)
 {
@@ -581,9 +544,9 @@ JNIEXPORT jdouble JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_Config_1GetD
 			{
 				try
 				{
-					result = config->getIntegerValue(name.c_str());
+					result = config->getDoubleValue(name.c_str());
 				}
-				catch (Exception& e)
+				catch (const Exception& e)
 				{
 					ThrowGmsecException(jenv, e.what());
 				}

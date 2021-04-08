@@ -18,15 +18,15 @@
 //
 ConfigOption bolt_client_opt1 =
 {
-" *  connectionType=<string>",
+" *  mw-id=<string>",
 
-"        <string> must be gmsec_bolt. [required]",
+"        <string> must be bolt. [required]",
 
-"        Used to specify the type of connection object to set up.  For Bolt\n"
-"        clients, this must be set to gmsec_bolt.",
+"        Used to specify the type of connection object to set up. For Bolt\n"
+"        clients, this must be set to bolt.",
 
 "        Example:\n"
-"            connectionType=gmsec_bolt"
+"            mw-id=bolt"
 };
 
 ConfigOption bolt_client_opt2 =
@@ -35,7 +35,7 @@ ConfigOption bolt_client_opt2 =
 
 "        Used to specify server address(es). [optional]", 
 
-"        Comma-delimited list of server names or IP addresses.  If not specified,\n"
+"        Comma-delimited list of server names or IP addresses. If not specified,\n"
 "        the default server is 'localhost', and the default port is 9100.",
 
 "        Examples:\n"
@@ -56,7 +56,7 @@ ConfigOption bolt_server_opt1 =
 
 "        This integer parameter specifies what port Bolt should be listening on\n"
 "        other than the default port of 9100.\n\n"
-"        Ports 1-65535 are available (unless already in use).  Certain systems\n"
+"        Ports 1-65535 are available (unless already in use). Certain systems\n"
 "        require administrative privileges for using ports 1-1023.",
 
 "        Example:\n"

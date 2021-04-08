@@ -25,6 +25,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_csharp", "csharp\g
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_python3", "python3\gmsec4\libgmsec_python3.vcxproj", "{56908689-E380-45F4-9DEA-FD4F8279A812}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_ruby", "ruby\gmsec4\libgmsec_ruby.vcxproj", "{D661F65B-577C-4102-ABAD-83202B45D85D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -166,6 +168,18 @@ Global
 		{56908689-E380-45F4-9DEA-FD4F8279A812}.Release-SNK|Win32.Build.0 = Release|Win32
 		{56908689-E380-45F4-9DEA-FD4F8279A812}.Release-SNK|x64.ActiveCfg = Release|x64
 		{56908689-E380-45F4-9DEA-FD4F8279A812}.Release-SNK|x64.Build.0 = Release|x64
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Debug|Win32.Build.0 = Debug|Win32
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Debug|x64.ActiveCfg = Debug|x64
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Debug|x64.Build.0 = Debug|x64
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release|Win32.ActiveCfg = Release|Win32
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release|Win32.Build.0 = Release|Win32
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release|x64.ActiveCfg = Release|x64
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release|x64.Build.0 = Release|x64
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release-SNK|Win32.ActiveCfg = Release|Win32
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release-SNK|Win32.Build.0 = Release|Win32
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release-SNK|x64.ActiveCfg = Release|x64
+		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release-SNK|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

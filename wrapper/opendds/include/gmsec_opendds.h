@@ -61,11 +61,29 @@ extern "C"
 	//	That way, I can make a string which has the value of the macro,
 	//	as opposed to a string which has the value of the macro name.
 	//	No more "" in Makefiles and/or mak/dsw files.
-	#define OPENDDS_VERSION_STRING makeStringFromValue(GMSEC_LIBROOTNAME)
+	#define OPENDDS_LIBROOTNAME makeStringFromValue(GMSEC_LIBROOTNAME)
 
 #else
 
-	#define OPENDDS_VERSION_STRING "gmsec_opendds"
+	#define OPENDDS_LIBROOTNAME "gmsec_opendds"
+
+#endif
+
+//	GMSEC_LIBVERSION is defined in the building Makefile or mak/dsp file.
+#ifdef GMSEC_LIBVERSION
+
+	//	This makes a "" string from the given symbol.
+#define makeString(s) (#s)
+//	This evaluates the symbol before making a string out of it.
+#define makeStringFromValue(s) makeString(s)
+//	That way, I can make a string which has the value of the macro,
+//	as opposed to a string which has the value of the macro name.
+//	No more "" in Makefiles and/or mak/dsw files.
+#define OPENDDS_VERSION_STRING makeStringFromValue(GMSEC_LIBVERSION)
+
+#else
+
+#define OPENDDS_VERSION_STRING "gmsec_opendds"
 
 #endif
 

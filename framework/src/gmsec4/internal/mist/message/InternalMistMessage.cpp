@@ -17,6 +17,7 @@
 #include <gmsec4/internal/field/InternalField.h>
 
 #include <gmsec4/internal/StringUtil.h>
+#include <gmsec4/internal/Encoder.h>
 
 #include <gmsec4/mist/Specification.h>
 #include <gmsec4/mist/mist_defs.h>
@@ -226,6 +227,7 @@ InternalMistMessage::InternalMistMessage(const Specification& spec, const char* 
 
 	const MessageFieldIterator& iter = getFieldIterator();
 
+	DataList<const Field*> fields;
 	while (iter.hasNext())
 	{
 		const Field& field = iter.next();
@@ -234,13 +236,24 @@ InternalMistMessage::InternalMistMessage(const Specification& spec, const char* 
 			const FieldTemplate& ftmp = findFieldTemplate(field.getName());
 
 			if (ftmp.hasExplicitType()) {
-				// Convert field, if necessary, for the given Specification.
-				setValue(field.getName(), field.getStringValue());
+				// Found existing field with an explicit type; stow the field
+				// and apply potentially new field type later after iterating
+				// over existing fields. This will mitigate unexpected behavior
+				// should the addition of a field cause a rollover to occur.
+				fields.push_back(&field);
 			}
 		}
 		catch (...) {
 			// Ignore error
 		}
+	}
+
+	for (DataList<const Field*>::iterator it = fields.begin(); it != fields.end(); ++it)
+	{
+		const Field* field = *it; 
+
+		// Convert field, if necessary, for the given Specification.
+		setValue(field->getName(), field->getStringValue(), (field->getType() != Field::BIN_TYPE ? true : false));
 	}
 
 	// If necessary, remove old-style field.
@@ -366,7 +379,7 @@ const MessageTemplate& InternalMistMessage::getTemplate() const
 }
 
 
-void InternalMistMessage::setValue(const char* fieldName, const char* value)
+void InternalMistMessage::setValue(const char* fieldName, const char* value, bool convert)
 {
 	if(!fieldName || std::string(fieldName).empty())
 	{
@@ -376,7 +389,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 	{
 		throw Exception(MSG_ERROR, INVALID_FIELD_VALUE, "Field value cannot be NULL");
 	}
-
+	
 	const FieldTemplate* fieldTemp = NULL;
 
 	try
@@ -394,7 +407,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 
 	StdUniquePtr<Field> field;
 
-	if(type == "CHAR")
+	if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "CHAR"))
 	{//we can convert string to char, but we'll only accept it if it's one character long
 		try
 		{
@@ -409,7 +422,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "BOOLEAN" || type == "BOOL")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "BOOLEAN") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "BOOL"))
 	{//We can accept 4 values here: "0", "1", "true", "false"
 		try
 		{
@@ -444,7 +457,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "I8")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I8"))
 	{
 		try
 		{
@@ -469,7 +482,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "I16")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I16"))
 	{
 		try
 		{
@@ -501,7 +514,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "I32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I32"))
 	{
 		try
 		{
@@ -526,7 +539,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "I64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I64"))
 	{
 		try
 		{
@@ -541,7 +554,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "U8")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U8"))
 	{
 		if (std::string(value).find("-") != std::string::npos)
 		{//we cannot allow negative numbers
@@ -573,7 +586,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "U16")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U16"))
 	{
 		if (std::string(value).find("-") != std::string::npos)
 		{//we cannot allow negative numbers
@@ -605,7 +618,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "U32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U32"))
 	{
 		try
 		{
@@ -645,7 +658,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "U64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U64"))
 	{
 		if (std::string(value).find("-") != std::string::npos)
 		{//we cannot allow negative numbers
@@ -667,7 +680,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "F32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "F32"))
 	{
 		try
 		{
@@ -682,7 +695,7 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "F64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "F64"))
 	{
 		try
 		{
@@ -697,11 +710,26 @@ void InternalMistMessage::setValue(const char* fieldName, const char* value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "STRING")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "STRING"))
 	{//a string value can very easily be converted to a string value
 		field.reset(new StringField(fieldName, value));
 	}
-	else if(type.empty() || type == "UNSET" || type == "VARIABLE")
+	else if (StringUtil::stringEqualsIgnoreCase(type.c_str(), "BLOB") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "BIN") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "BINARY"))
+	{
+		StringUtil::Data blob;
+
+		if (convert)
+		{
+			blob = StringUtil::string_toBinary(value);
+		}
+		else
+		{
+			blob = StringUtil::binaryString_toBinary(value);
+		}
+
+		field.reset(new BinaryField(fieldName, const_cast<GMSEC_BIN>(blob.data()), blob.length()));
+	}
+	else if(type.empty() || StringUtil::stringEqualsIgnoreCase(type.c_str(), "UNSET") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "VARIABLE"))
 	{
 		GMSEC_WARNING << "setValue() is setting variable type field '" << fieldName << "' as a string field within the message";
 		field.reset(new StringField(fieldName, value));
@@ -743,7 +771,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 
 	StdUniquePtr<Field> field;
 
-	if(type == "BOOLEAN" || type == "BOOL")
+	if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "BOOLEAN") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "BOOL"))
 	{//we'll only accept 0 or 1 as values
 		if(value == 0)
 		{
@@ -760,7 +788,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "I8")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I8"))
 	{
 		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_I8>::min()) && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_I8>::max()))
@@ -774,7 +802,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "I16")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I16"))
 	{
 		// Handle special case.
 		if (StringUtil::stringEqualsIgnoreCase(fieldName, "PROCESS-ID") && (value > std::numeric_limits<GMSEC_I16>::max()))
@@ -795,7 +823,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "I32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I32"))
 	{
 		if(value >= GMSEC_I64(std::numeric_limits<GMSEC_I32>::min()) && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_I32>::max()))
@@ -809,11 +837,11 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "I64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I64"))
 	{
 		field.reset(new I64Field(fieldName, value));
 	}
-	else if(type == "U8")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U8"))
 	{
 		if(value >= 0 && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_U8>::max()))
@@ -827,7 +855,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "U16")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U16"))
 	{
 		if(value >= 0 && 
 		   value <= GMSEC_I64(std::numeric_limits<GMSEC_U16>::max()))
@@ -841,7 +869,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "U32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U32"))
 	{
 		// Handle special case.
 		if (StringUtil::stringEqualsIgnoreCase(fieldName, "PROCESS-ID") && (value < 0))
@@ -863,34 +891,40 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_I64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "U64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U64"))
 	{
-		if(value >= 0)
-		{
-			field.reset(new U64Field(fieldName, (GMSEC_U64) value));
-		}
-		else
-		{//can't cast because it's outside the limits
-			std::ostringstream err;
-			err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U64, but value " << value << " is outside limits";
-			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-		}
+		field.reset(new U64Field(fieldName, static_cast<GMSEC_U64>(value)));
 	}
-	else if(type == "F32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "F32"))
 	{
 		field.reset(new F32Field(fieldName, (GMSEC_F32) value));
 	}
-	else if(type == "F64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "F64"))
 	{
 		field.reset(new F64Field(fieldName, (GMSEC_F64) value));
 	}
-	else if(type == "STRING")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "STRING"))
 	{
 		std::ostringstream oss;
 		oss << value;
 		field.reset(new StringField(fieldName, oss.str().c_str()));
 	}
-	else if(type.empty() || type == "UNSET" || type == "VARIABLE")
+	else if (StringUtil::stringEqualsIgnoreCase(type.c_str(), "BIN") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "BINARY"))
+	{
+		try
+		{
+			StringUtil::Data blob = StringUtil::I64_toBinary(value);
+
+			field.reset(new BinaryField(fieldName, const_cast<GMSEC_BIN>(blob.data()), blob.length()));
+		}
+		catch (...)
+		{
+			std::ostringstream err;
+			err << "Field template \"" << fieldName << "\" calls for field type GMSEC_BIN, but value \"" << value << "\" cannot be converted to GMSEC_BIN";
+			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
+		}
+	}
+	else if(type.empty() || StringUtil::stringEqualsIgnoreCase(type.c_str(), "UNSET") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "VARIABLE"))
 	{
 		GMSEC_WARNING << "setValue() is setting variable type field '" << fieldName << "' as an I64 field within the message";
 		field.reset(new I64Field(fieldName, value));
@@ -932,7 +966,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 
 	StdUniquePtr<Field> field;
 
-	if(type == "BOOLEAN" || type == "BOOL")
+	if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "BOOLEAN") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "BOOL"))
 	{//we'll only accept 0 or 1 as values
 		//TODO: Fix this. Comparing F64 to an integer!
 		if(value == 0)
@@ -950,7 +984,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 		}
 	}
-	else if(type == "I8")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I8"))
 	{
 		if(value >= GMSEC_F64(std::numeric_limits<GMSEC_I8>::min()) && 
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I8>::max()))
@@ -965,7 +999,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "I16")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I16"))
 	{
 		// Handle special case.
 		if (StringUtil::stringEqualsIgnoreCase(fieldName, "PROCESS-ID") && (value > std::numeric_limits<GMSEC_I16>::max()))
@@ -987,7 +1021,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "I32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I32"))
 	{
 		if(value >= GMSEC_F64(std::numeric_limits<GMSEC_I32>::min()) && 
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I32>::max()))
@@ -1002,7 +1036,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "I64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "I64"))
 	{
 		if(value >= GMSEC_F64(std::numeric_limits<GMSEC_I64>::min()) && 
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_I64>::max()))
@@ -1017,7 +1051,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "U8")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U8"))
 	{
 		if(value >= 0 && 
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U8>::max()))
@@ -1032,7 +1066,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "U16")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U16"))
 	{
 		if(value >= 0 && 
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U16>::max()))
@@ -1047,7 +1081,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "U32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U32"))
 	{
 		// Handle special case.
 		if (StringUtil::stringEqualsIgnoreCase(fieldName, "PROCESS-ID") && (value < 0))
@@ -1070,7 +1104,7 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "U64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "U64"))
 	{
 		if(value >= 0 && 
 		   value <= GMSEC_F64(std::numeric_limits<GMSEC_U64>::max()))
@@ -1085,21 +1119,27 @@ void InternalMistMessage::setValue(const char* fieldName, GMSEC_F64 value)
 			throw Exception(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 		}
 	}
-	else if(type == "F32")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "F32"))
 	{
 		field.reset(new F32Field(fieldName, (GMSEC_F32) value));
 	}
-	else if(type == "F64")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "F64"))
 	{
 		field.reset(new F64Field(fieldName, value));
 	}
-	else if(type == "STRING")
+	else if(StringUtil::stringEqualsIgnoreCase(type.c_str(), "STRING"))
 	{
 		std::ostringstream oss;
 		oss << value;
 		field.reset(new StringField(fieldName, oss.str().c_str()));
 	}
-	else if(type.empty() || type == "UNSET" || type == "VARIABLE")
+	else if (StringUtil::stringEqualsIgnoreCase(type.c_str(), "BIN") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "BINARY"))
+	{
+		StringUtil::Data blob = StringUtil::F64_toBinary(value);
+
+		field.reset(new BinaryField(fieldName, const_cast<GMSEC_BIN>(blob.data()), blob.length()));
+	}
+	else if(type.empty() || StringUtil::stringEqualsIgnoreCase(type.c_str(), "UNSET") || StringUtil::stringEqualsIgnoreCase(type.c_str(), "VARIABLE"))
 	{
 		GMSEC_WARNING << "setValue() is setting variable type field '" << fieldName << "' as an F64 field within the message";
 		field.reset(new F64Field(fieldName, value));
@@ -1493,7 +1533,7 @@ void InternalMistMessage::convertMessage(const Message& msg, const Config& specC
 			(void) findFieldTemplate(field.getName());
 
 			// Set field (where conversion of field type may take place)
-			setValue(field.getName(), field.getStringValue());
+			setValue(field.getName(), field.getStringValue(), false);
 		}
 		catch (...)
 		{

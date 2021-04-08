@@ -53,7 +53,7 @@ public:
 	// Determines the middleware wrapper tag.
 	virtual const char* CALL_TYPE getLibraryRootName()
 	{
-		return "gmsec_opendds";
+		return OPENDDS_LIBROOTNAME;
 	}
 	
 	// Determines the middleware version string.

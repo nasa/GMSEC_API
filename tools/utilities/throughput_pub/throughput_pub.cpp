@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
 
 	tpp.addToConfigFromFile();
 
-	if (tpp.isOptionInvalid(argc))
+	if (!tpp.areOptionsValid(argc))
 	{
 		tpp.usage("throughput_pub");
 		return 1;

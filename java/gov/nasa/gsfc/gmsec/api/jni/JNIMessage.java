@@ -255,61 +255,61 @@ public class JNIMessage
 
 	public boolean addField(String name, byte[] data)
 	{
-		return addField(new BinaryField(name, data));
+		return gmsecJNI.Message_AddFieldByteArray(swigCPtr, this, name, data);
 	}
 
 
 	public boolean addField(String name, boolean data)
 	{
-		return addField(new BooleanField(name, data));
+		return gmsecJNI.Message_AddFieldBoolean(swigCPtr, this, name, data);
 	}
 
 
 	public boolean addField(String name, char data)
 	{
-		return addField(new CharField(name, data));
+		return gmsecJNI.Message_AddFieldChar(swigCPtr, this, name, data);
 	}
 
 
 	public boolean addField(String name, byte data)
 	{
-		return addField(new I8Field(name, data));
+		return gmsecJNI.Message_AddFieldByte(swigCPtr, this, name, data);
 	}
 
 
 	public boolean addField(String name, short data)
 	{
-		return addField(new I16Field(name, data));
+		return gmsecJNI.Message_AddFieldShort(swigCPtr, this, name, data);
 	}
 
 
 	public boolean addField(String name, int data)
 	{
-		return addField(new I32Field(name, data));
+		return gmsecJNI.Message_AddFieldInt(swigCPtr, this, name, data);
 	}
 
 
 	public boolean addField(String name, long data)
 	{
-		return addField(new I64Field(name, data));
+		return gmsecJNI.Message_AddFieldLong(swigCPtr, this, name, data);
 	}
 
 
 	public boolean addField(String name, float data)
 	{
-		return addField(new F32Field(name, data));
+		return gmsecJNI.Message_AddFieldFloat(swigCPtr, this, name, data);
 	}
 
 
 	public boolean addField(String name, double data)
 	{
-		return addField(new F64Field(name, data));
+		return gmsecJNI.Message_AddFieldDouble(swigCPtr, this, name, (double) data);
 	}
 
 
 	public boolean addField(String name, String data)
 	{
-		return addField(new StringField(name, data));
+		return gmsecJNI.Message_AddFieldString(swigCPtr, this, name, data);
 	}
 
 

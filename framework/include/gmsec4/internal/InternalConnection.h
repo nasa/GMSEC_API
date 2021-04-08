@@ -186,6 +186,9 @@ public:
 	virtual const char* CALL_TYPE getMWInfo() const;
 
 
+	const char* CALL_TYPE getConnectionEndpoint() const;
+
+
 	virtual GMSEC_U64 CALL_TYPE getPublishQueueMessageCount() const;
 
 
@@ -345,7 +348,10 @@ private:
 	gmsec::api::util::AtomicBoolean         m_connectionAlive;
 	std::string                             m_connName;
 	std::string                             m_connID;
-	std::string                             m_userName;
+	std::string                             m_hostName;
+	std::string                             m_lowercaseUserName;
+	std::string                             m_uppercaseUserName;
+	int                                     m_processID;
 	mutable std::string                     m_mwInfo;
 	InternalAutoDispatcher                  m_autoDispatcher;
 	GMSEC_I32                               m_defaultRepublish_ms;

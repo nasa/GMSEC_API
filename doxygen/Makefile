@@ -42,7 +42,11 @@ PERL_4X_API_CLASSES = Config ConfigFile ConfigFileIterator Connection Errors Exc
                       mist/message/MnemonicMessage mist/message/ProductFileMessage
 
 
-all: py3_doc doxygen perl_4x_docs perl_3x_docs
+all: ruby_doc py3_doc doxygen perl_4x_docs perl_3x_docs
+
+
+ruby_doc:
+	@ ./gen_ruby_doc.sh
 
 
 py3_doc:

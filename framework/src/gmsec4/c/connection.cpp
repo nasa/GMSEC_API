@@ -994,6 +994,31 @@ const char* CALL_TYPE connectionGetMWInfo(const GMSEC_Connection conn, GMSEC_Sta
 }
 
 
+const char* CALL_TYPE connectionGetConnectionEndpoint(const GMSEC_Connection conn, GMSEC_Status status)
+{
+	const char* endpoint = NULL;
+	Status      result;
+
+	const Connection* c = reinterpret_cast<const Connection*>(conn);
+
+	if (!c)
+	{
+		result = Status(CONNECTION_ERROR, UNINITIALIZED_OBJECT, "Connection handle is NULL");
+	}
+	else
+	{
+		endpoint = c->getConnectionEndpoint();
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return endpoint;
+}
+
+
 GMSEC_U64 CALL_TYPE connectionGetPublishQueueMessageCount(const GMSEC_Connection conn, GMSEC_Status status)
 {
 	GMSEC_U64 count = 0;

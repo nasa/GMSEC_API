@@ -90,8 +90,6 @@ public class JNIHeartbeatGenerator
 		JNIField[] jFields    = ArrayListConverter.listToJNIFields(new ArrayList<Field>(fields));
 		int        numFields  = (fields == null ? 0 : fields.size());
 
-        gmsecJNI.MistMessageSetStandardFields(jFieldPtrs, jFields, numFields);
-
 		swigCPtr = gmsecJNI.new_HeartbeatGenerator(JNIConfig.getCPtr(Config.getInternal(config)), Config.getInternal(config),
 		                                           hbMsgSubject, hbPubRate, jFieldPtrs, jFields, numFields);
 

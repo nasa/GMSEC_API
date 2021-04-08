@@ -97,8 +97,17 @@ public class GmsecException : global::System.ApplicationException
         this.custom = custom;
     }
 
+    public GmsecException(Status status)
+        : base(BuildMessage(status.GetClass(), status.GetCode(), status.GetReason(), status.GetCustomCode()))
+    {
+        this.clazz  = status.GetClass();
+        this.code   = status.GetCode();
+        this.reason = status.GetReason();
+        this.custom = status.GetCustomCode();
+    }
+
     public GmsecException(GmsecException other)
-        : base(other.ToString())
+        : base(BuildMessage(other.clazz, other.code, other.reason, other.custom))
     {
         this.clazz  = other.clazz;
         this.code   = other.code;

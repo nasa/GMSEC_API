@@ -467,9 +467,7 @@ public:
 	/// <summary>
 	/// This method creates a message and passes ownership to the user. This message is populated with
 	/// the standard set of required and optional heartbeat fields, as well as the required common fields defined
-	/// in SetStandardFields(). If validation is enabled for this ConnectionManager and neither the common fields
-	/// from SetStandardFields(), nor the fields supplied in the first argument of this function are sufficient to
-	/// complete a set of fields required by validation, an error will be returned.
+	/// in SetStandardFields().
 	///
 	/// MESSAGE-TYPE, MESSAGE-SUBTYPE, and C2CX-SUBTYPE fields will all be generated and
 	/// added to the message automatically, according to the GMSEC Message Standard

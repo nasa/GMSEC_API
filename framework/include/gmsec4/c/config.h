@@ -213,7 +213,7 @@ extern "C"
 	 * @param[in]  name   - name of field to retrieve
 	 * @param[out] status - out parameter operation status
 	 *
-	 * @return Value of field (if available)
+	 * @return Value of field (if available), or otherwise NULL
 	 */
 	GMSEC_API const char* configGetValue(const GMSEC_Config cfg, const char* name, GMSEC_Status status);
 
@@ -231,7 +231,7 @@ extern "C"
 	 * @param[in]  defaultValue - value to return if name does not exist
 	 * @param[out] status 		- out parameter operation status
 	 *
-	 * @return Value of field (if available) or defaultValue
+	 * @return Value of field (if available), or otherwise the given default value
 	 */
 	GMSEC_API const char* configGetValueWithDefault(const GMSEC_Config cfg, const char* name, const char* defaultValue, GMSEC_Status status);
 

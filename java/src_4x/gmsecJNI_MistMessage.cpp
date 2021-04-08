@@ -238,6 +238,8 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api_jni_gmsecJNI_MistMessageSetS
 			}
 
 			MistMessage::setStandardFields(fields);
+
+			jenv->ReleaseLongArrayElements(jFieldPtrs, fldptrs, 0);
 		}
 	}
 	JNI_CATCH

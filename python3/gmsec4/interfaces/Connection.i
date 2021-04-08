@@ -42,6 +42,7 @@ using namespace gmsec::api;
 %rename("set_name") setName;
 %rename("get_id") getID;
 %rename("get_MW_info") getMWInfo;
+%rename("get_connection_endpoint") getConnectionEndpoint;
 %rename("get_publish_queue_message_count") getPublishQueueMessageCount;
 
 
