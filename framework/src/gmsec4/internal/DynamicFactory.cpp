@@ -91,21 +91,23 @@ void * DynamicFactory::findSymbol(Status &result, const char *libname, const cha
 	{
 		// lookup the address for the standard connection allocation method
 		proc = dlsym(mod, procname);
-	}
 
-	if (!proc)
-	{
-		const char * s = dlerror();
-		if (s)
-			errstr = s;
-		else
-			errstr = "Unable to find procname";
+		if (!proc)
+		{
+			const char* s = dlerror();
+
+			errstr = (s != NULL ? s : "Unable to find procname");
+
+			dlclose(mod);
+		}
 	}
 
 #endif /* WIN32 */
 
-	if (errstr.size())
+	if (!errstr.empty())
+	{
 		result.set(FACTORY_ERROR, LIBRARY_LOAD_FAILURE, errstr.c_str());
+	}
 
 	if (result.isError())
 	{

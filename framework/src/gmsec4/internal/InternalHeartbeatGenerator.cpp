@@ -43,7 +43,7 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 	: m_config(config),
 	  m_connMgr(config),
 	  m_hbMsg(0),
-	  m_pubRate(hbPubRate),
+	  m_pubRate(static_cast<GMSEC_I64>(hbPubRate)),
 	  m_counter(1),
 	  m_publishAction(0),
 	  m_alive(false),
@@ -60,7 +60,7 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 		m_hbMsg.reset(new MistMessage(hbMsgSubject, "MSG.C2CX.HB", m_connMgr.getSpecification()));
 	}
 
-	m_hbMsg->setValue("PUB-RATE", (GMSEC_I64) m_pubRate);
+	m_hbMsg->setValue("PUB-RATE", m_pubRate);
 
 	if (m_connMgr.getSpecification().getVersion() == GMSEC_ISD_2014_00)
 	{
@@ -82,7 +82,7 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 	: m_config(config),
 	  m_connMgr(config),
 	  m_hbMsg(0),
-	  m_pubRate(hbPubRate),
+	  m_pubRate(static_cast<GMSEC_I64>(hbPubRate)),
 	  m_counter(1),
 	  m_publishAction(0),
 	  m_alive(false),
@@ -99,7 +99,7 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 		m_hbMsg.reset(new MistMessage(hbMsgSubject, "MSG.C2CX.HB", m_connMgr.getSpecification()));
 	}
 
-	m_hbMsg->setValue("PUB-RATE", (GMSEC_I64) m_pubRate);
+	m_hbMsg->setValue("PUB-RATE", m_pubRate);
 
 	for (DataList<Field*>::const_iterator it = fields.begin(); it != fields.end(); ++it)
 	{
@@ -179,7 +179,7 @@ bool InternalHeartbeatGenerator::stop()
 
 	m_alive.set(false);
 
-	return m_shutdownLatch->await((m_pubRate == 0 ? 3000 : m_pubRate * 1000));
+	return m_shutdownLatch->await(static_cast<int>(m_pubRate == 0 ? 3000 : m_pubRate * 1000));
 }
 
 
@@ -212,9 +212,9 @@ bool InternalHeartbeatGenerator::setField(const Field& field)
 
 			if (StringUtil::stringEquals(field.getName(), "PUB-RATE"))
 			{
-				m_pubRate = (GMSEC_U16) value;
+				m_pubRate = value;
 
-				m_publishAction->setInterval(m_pubRate);
+				m_publishAction->setInterval( static_cast<long>(value) );
 			}
 			else
 			{
@@ -367,7 +367,7 @@ void InternalHeartbeatGenerator::run()
 
 	m_startupLatch->countDown();
 
-	m_publishAction.reset(new ActionInfo(m_pubRate));
+	m_publishAction.reset(new ActionInfo( static_cast<long>(m_pubRate) ));
 
 	// Flag that will be used to indicate that we should publish
 	// first heartbeat message immediately upon starting the
@@ -458,7 +458,7 @@ bool InternalHeartbeatGenerator::validateMessage()
 }
 
 
-InternalHeartbeatGenerator::ActionInfo::ActionInfo(double interval)
+InternalHeartbeatGenerator::ActionInfo::ActionInfo(long interval)
 	: last_s(gmsec::api::util::TimeUtil::getCurrentTime_s(0)),
 	  interval_s(interval),
 	  actNow(false)
@@ -470,11 +470,11 @@ bool InternalHeartbeatGenerator::ActionInfo::tryNow()
 {
 	bool flag = false;
 
-	if (interval_s > 0)
+	if (interval_s.get() > 0)
 	{
 		double now_s = gmsec::api::util::TimeUtil::getCurrentTime_s(0);
 
-		if ((now_s - last_s) >= interval_s)
+		if ((now_s - last_s) >= interval_s.doubleValue())
 		{
 			flag = true;
 			last_s = now_s;
@@ -483,20 +483,20 @@ bool InternalHeartbeatGenerator::ActionInfo::tryNow()
 
 	if (flag == false)
 	{
-		flag   = actNow;
-		actNow = false;
+		flag = actNow.get();
+		actNow.set(false);
 	}
 
 	return flag;
 }
 
 
-void InternalHeartbeatGenerator::ActionInfo::setInterval(double interval)
+void InternalHeartbeatGenerator::ActionInfo::setInterval(long interval)
 {
-	interval_s = interval;
+	interval_s.set(interval);
 
 	if (interval == 0)
 	{
-		actNow = true;
+		actNow.set(true);
 	}
 }

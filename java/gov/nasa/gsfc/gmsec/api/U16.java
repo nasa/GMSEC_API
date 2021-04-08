@@ -66,7 +66,7 @@ public class U16
 	 *
 	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
-	public U16(int value)
+	public U16(int value) throws IllegalArgumentException
 	{
 		this.value = checkRange(value);
 	}
@@ -76,9 +76,16 @@ public class U16
 	 * Copy constructor
 	 *
 	 * @param other The U16 object to copy
+	 *
+	 * @throws IllegalArgumentException Thrown if the given U16 object is null.
 	 */
-	public U16(U16 other)
+	public U16(U16 other) throws IllegalArgumentException
 	{
+		if (other == null)
+		{
+			throw new IllegalArgumentException("U16 object is null");
+		}
+
 		this.value = other.get();
 	}
 
@@ -90,9 +97,9 @@ public class U16
 	 *
 	 * @throws IllegalArgumentException Thrown if the given value is not in the range of [MIN_VALUE, MAX_VALUE].
 	 */
-	public void set(int value)
+	public void set(int value) throws IllegalArgumentException
 	{
-		this.value = value;
+		this.value = checkRange(value);
 	}
 
 

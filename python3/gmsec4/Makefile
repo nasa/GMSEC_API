@@ -22,6 +22,10 @@ GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I$(CXX_INCS)
 API_CXXFLAGS   += $(shell $(PYTHON3_HOME)/bin/python3-config --includes)
 LDFLAGS        += $(shell $(PYTHON3_HOME)/bin/python3-config --ldflags)
 
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+LDFLAGS        += -lpython3.8
+endif
+
 COREOBJDIR      = $(FRAMEWORK_DIR)/src/gmsec4
 INTERNALOBJDIR  = $(FRAMEWORK_DIR)/src/gmsec4/internal
 INTERFACEDIR    = interfaces

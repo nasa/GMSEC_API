@@ -100,6 +100,7 @@ using namespace gmsec::api::mist;
 %rename("SetName") setName;
 %rename("GetID") getID;
 %rename("GetMWInfo") getMWInfo;
+%rename("GetConnectionEndpoint") getConnectionEndpoint;
 %rename("GetPublishQueueMessageCount") getPublishQueueMessageCount;
 %rename("CreateHeartbeatMessage") createHeartbeatMessage;
 %rename("StartHeartbeatService") startHeartbeatService;

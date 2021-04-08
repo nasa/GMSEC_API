@@ -660,8 +660,8 @@ Status BaseSpecification::parser(tinyxml2::XMLElement* xmlSchema, std::string& i
 
 	std::string field_name;
 	std::string field_value;
-	FieldMode   field_mode;
-	FieldClass  field_class;
+	FieldMode   field_mode = F_OPTIONAL;
+	FieldClass  field_class = F_NONE;
 	std::string field_desc;
 	AbstractFieldDescriptor* field_ptr = 0;
 

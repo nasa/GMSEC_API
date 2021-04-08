@@ -18,15 +18,15 @@
 //
 ConfigOption mb_client_opt1 =
 {
-" *  connectionType=<string>",
+" *  mw-id=<string>",
 
-"        <string> must be gmsec_mb. [required]",
+"        <string> must be mb. [required]",
 
-"        Used to specify the type of connection object to set up.  For MessageBus\n"
-"        clients, this must be set to gmsec_mb.",
+"        Used to specify the type of connection object to set up. For MessageBus\n"
+"        clients, this must be set to mb.",
 
 "        Example:\n"
-"            connectionType=gmsec_mb"
+"            mw-id=mb"
 };
 
 ConfigOption mb_client_opt2 =
@@ -35,7 +35,7 @@ ConfigOption mb_client_opt2 =
 
 "        Used to specify server address(es). [optional]", 
 
-"        Comma-delimited list of server names or IP addresses.  If not specified,\n"
+"        Comma-delimited list of server names or IP addresses. If not specified,\n"
 "        the default server is 'localhost', and the default port is 9000.",
 
 "        Examples:\n"
@@ -52,7 +52,7 @@ ConfigOption mb_client_opt3 =
 "        Sets the flag for compressing MessageBus messages. [optional]",
 
 "        This option can be used to specify that messages sent via MessageBus\n"
-"        are compressed.  The default is no compression.",
+"        are compressed. The default is no compression.",
 
 "        Examples:\n"
 "            mw-compress=true\n"
@@ -66,7 +66,7 @@ ConfigOption mb_client_opt4 =
 "        Enables MessageBus debug information to be written to a file. [optional]",
 
 "        This option can be used to specify that debug information of the\n"
-"        MessageBus be written to a file.  This file will have the name TBD.\n"
+"        MessageBus be written to a file. This file will have the name TBD.\n"
 "        The default setting is 'false'.",
 
 "        Examples:\n"
@@ -81,7 +81,7 @@ ConfigOption mb_client_opt5 =
 "        Enables echoing of published messages back to client.",
 
 "        This option can be used to request MessageBus to echo to clients\n"
-"        any message that is published by the client.  The default setting is\n"
+"        any message that is published by the client. The default setting is\n"
 "        'false'.",
 
 "        Examples:\n"

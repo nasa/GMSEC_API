@@ -216,6 +216,12 @@ const char* Connection::getMWInfo() const
 }
 
 
+const char* Connection::getConnectionEndpoint() const
+{
+	return m_internal->getConnectionEndpoint();
+}
+
+
 GMSEC_U64 Connection::getPublishQueueMessageCount() const
 {
 	return m_internal->getPublishQueueMessageCount();

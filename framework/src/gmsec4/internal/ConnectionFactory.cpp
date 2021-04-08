@@ -232,9 +232,12 @@ void* ConnectionFactory::lookupDLL(const std::string& libname0, const char* func
 
 		if (proc == NULL)
 		{
-			GMSEC_ERROR << "Unable to locate function " << functionName << " within " << libname.c_str();
+			dlclose(mod);
 
-			throw Exception(FACTORY_ERROR, LIBRARY_LOAD_FAILURE, dlerror());
+			std::ostringstream oss;
+			oss << "Unable to locate function " << functionName << " within " << libname.c_str();
+
+			throw Exception(FACTORY_ERROR, LIBRARY_LOAD_FAILURE, oss.str().c_str());
 		}
 	}
 	else

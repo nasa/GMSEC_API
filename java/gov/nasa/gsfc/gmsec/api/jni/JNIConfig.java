@@ -34,7 +34,7 @@ public class JNIConfig
 		swigCPtr    = cPtr;
 		swigCMemOwn = cMemoryOwn;
 
-		initLogging(gmsecJNI.Config_GetValue(swigCPtr, this, "logfile"));
+		initLogging(gmsecJNI.Config_GetValue(swigCPtr, this, "logfile", null));
 	}
 
 
@@ -154,12 +154,6 @@ public class JNIConfig
 	}
 
 
-	public String getValue(String name)
-	{
-		return gmsecJNI.Config_GetValue(swigCPtr, this, name);
-	}
-
-	
 	public String getValue(String name, String defaultValue)
 	{
 		return gmsecJNI.Config_GetValue(swigCPtr, this, name, defaultValue);

@@ -44,7 +44,7 @@ src_dir=./manual
 dest_dir=../../GMSEC_API_DOCS
 man_dir=$dest_dir/docs/manual
 
-doc_dirs=( c_3x c_4x cpp_3x cpp_4x csharp_4x java_3x java_4x perl_3x perl_4x python3_4x )
+doc_dirs=( c_3x c_4x cpp_3x cpp_4x csharp_4x java_3x java_4x perl_3x perl_4x python3_4x ruby_4x )
 
 
 if [ ! -d $src_dir ]; then

@@ -17,9 +17,8 @@ distribution. The steps in this file assume the user has:
 * For Windows systems: Visual Studio 2017
 
 * For all other systems: make and the GNU Compiler Collection
-        * Red Hat Enterprise Linux 6: gcc 4.4.6, GNU make 3.81 [1]
         * Red Hat Enterprise Linux 7: gcc 4.8.5, GNU make 3.82 [1]
-        * Mac OS X (Intel): gcc LLVM 5.1 (clang-503.0.40), GNU make 3.81
+        * MacOS (Intel): gcc Apple LLVM version 10.0.1 (clang-1001.0.46.4), GNU make 3.81
 
 * For Java: Oracle JDK version 1.8 or higher
 
@@ -34,7 +33,7 @@ distribution. The steps in this file assume the user has:
           or later
 
 * For Python3:
-        * Python 3.6 or later
+        * Python 3.8.5 or later
 		* SWIG 3.0.10 or later
 		* (non-Windows): python36u package, available through IUS 
 						(https://centos7.iuscommunity.org/ius-release.rpm)
@@ -87,7 +86,7 @@ client interface and libraries for mwx. Soft-links (or junctions) are useful
 when populating the GMSEC_SUPPORT directory since those links can refer to
 standard installation locations on the system.
 
-Supported Operating Systems (OSes) include: RHEL6, RHEL7, Ubuntu18.04, MacOS,
+Supported Operating Systems (OSes) include: RHEL7, Ubuntu18.04, MacOS,
 and Windows10.
 
 
@@ -99,7 +98,7 @@ Note:
 --------------
 When building from the Open-Source distribution, the GMSEC_API folder
 referenced in the instructions below will actually contain the version
-number; for example, GMSEC_API-4.7. Edit the instructions below accordingly.
+number; for example, GMSEC_API-4.8. Edit the instructions below accordingly.
 
 
 Environment Variable Settings:
@@ -114,6 +113,9 @@ Define an environment variable named PERL5_HOME:
 
 Define an environment variable named PYTHON_HOME:
 * Set to your Python installation directory (not the bin directory)
+
+Define an environment variable named RUBY_HOME:
+* Set to your Ruby installation directory (not the bin directory)
 
 Define an environment variable named SWIG_HOME:
 * Set to your SWIG installation directory (not the bin directory)
@@ -131,6 +133,7 @@ For example:
 set JDK_HOME=C:\Program Files\Java\jdk1.8.0_131
 set PERL5_HOME=C:\Perl64
 set PYTHON3_HOME=C:\Python3
+set RUBY_HOME=C:\Ruby
 set SWIG_HOME=C:\swig-3.0.10
 set PATH=%PATH%;C:\GMSEC_API\bin;C:\Perl\bin;C:\Program Files\Java\jdk1.8.131\bin;
 set PATH=%PATH%;C:\Windows\Microsoft.NET\Framework\v3.5
@@ -151,7 +154,7 @@ Any open process (e.g. command prompt, cygwin, or Visual Studio) will need to
 be restarted if environment variables have been added or modified.
 
 
-Building the C++, C#, Java, Perl, and Python3 APIs:
+Building the C++, C#, Java, Perl, Python3, and Ruby APIs:
 ---------------------------------------------------
 Open GMSEC_API\gmsecapi_opensource.sln in Visual Studio 2017.
 
@@ -188,7 +191,7 @@ Utilities (e.g. gmpub, gmsub, etc.):
 Open GMSEC_API\tools\utilities\utilities.sln in Visual Studio. Choose the 
 Release configuration. In the Solution Explorer, right-click the solution
 and select "Rebuild Solution". (Requires that the C++ API be built.) The
-executables will be placed in the GMSEC_API/bin directory.
+executables will be placed in the GMSEC_API\bin directory.
 
 
 C++ Examples:
@@ -196,15 +199,15 @@ C++ Examples:
 Open GMSEC_API\examples\cpp\cpp.sln in Visual Studio. Choose the Release
 configuration. In the Solution Explorer, right-click the solution and
 select "Rebuild Solution". (Requires that the C++ API be built.) The
-executables will be placed in the GMSEC_API/bin directory.
+executables will be placed in the GMSEC_API\bin directory.
 
 
 C Examples:
 ---------------------
-Open GMSEC_API\examples\c\c.sln in Visual Studio 2008 Express. Choose the
+Open GMSEC_API\examples\c\c.sln in Visual Studio. Choose the
 Release configuration. In the Solution Explorer, right-click the solution
 and select "Rebuild Solution". (Requires that the C++ API be built.) The
-executables will be placed in the GMSEC_API/bin directory.
+executables will be placed in the GMSEC_API\bin directory.
 
 
 C# Examples:
@@ -212,7 +215,7 @@ C# Examples:
 Open GMSEC_API\examples\csharp\csharp.sln in Visual Studio. Choose the
 Release configuration. In the Solution Explorer, right-click the solution
 and select "Rebuild Solution". (Requires that the C++ API be built.) The
-executables will be placed in the GMSEC_API/bin directory.
+executables will be placed in the GMSEC_API\bin directory.
 
 
 C#/CLI Examples:
@@ -220,7 +223,7 @@ C#/CLI Examples:
 Open GMSEC_API\examples\csharp-dotnet\cs.sln in Visual Studio. Choose the
 Release configuration. In the Solution Explorer, right-click the solution
 and select "Rebuild Solution". (Requires that the C++ API be built.) The
-executables will be placed in the GMSEC_API/bin directory.
+executables will be placed in the GMSEC_API\bin directory.
 
 
 Java Examples:
@@ -235,14 +238,14 @@ Proceed to the section "Testing the Build" below.
 
 
 =========================================================================
-                        Linux/macOS systems
+                        Linux/MacOS systems
 =========================================================================
 
 Note:
 --------------
 When building from the Open-Source distribution, the GMSEC_API folder
 referenced in the instructions below will actually contain the version
-number; for example, GMSEC_API-4.7. Edit the instructions below accordingly.
+number; for example, GMSEC_API-4.8. Edit the instructions below accordingly.
 
 
 Environment Variable Settings:
@@ -253,30 +256,32 @@ GMSEC_PLATFORM
 Set the GMSEC_PLATFORM environment variable based on the platform to one
 of the following:
 
- Platform     Setting
----------     -------
-Linux         linux.x86_64
-macOS         macosx.x86_64
+        Platform     Setting
+        ---------    -------
+        Linux         linux.x86_64
+        MacOS         macosx.x86_64
+
+e.g.  export GMSEC_PLATFORM=linux.x86_64
 
 
 JDK PATH:
 ---------
 Set the JDK_HOME environment variable to your JDK installation
-e.g.  export JDK_HOME=/usr/java/jdk1.8.0_131
+e.g.  export JDK_HOME=$HOME/tools/jdk-11.0.7+10
 
-For macOS users, here's an example of setting JDK_HOME
-e.g.  export JDK_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.131.jdk/Contents/Home/
+For MacOS users, here's an example of setting JDK_HOME
+e.g.  export JDK_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_261.jdk/Contents/Home
 
 
 PATH :
 ------
-Ensure that the path to the Perl, Python3, and SWIG executables are set in the
+Ensure that the path to the Perl, Python3, Ruby, and SWIG executables are set in the
 PATH environment variable so that they can be readily accessed via command
 line.
 
-Note that if Python, Perl, and SWIG were installed as a default package with the
+Note that if Perl and SWIG were installed as a default package with the
 operating system, then these are already included in /usr/bin and nothing
-needs to be done here.
+with respect to these needs to be done here.
 
 
 PERL5 LIBRARIES:
@@ -298,6 +303,13 @@ GMSEC API libraries.
 
 e.g.  export PYTHON3_HOME=/usr/local/python3
       export PYTHONPATH=/home/user/GMSEC_API/bin:/home/user/GMSEC_API/bin/lib/GMSECAPI4:.
+
+
+RUBY DEVELOPMENT:
+----------------------------
+For Ruby support, set RUBYLIB to reference the appropriate GMSEC API libraries.
+
+e.g.  export RUBYLIB=/home/user/GMSEC_API/bin:.
 
 
 SWIG HOME :
@@ -355,7 +367,7 @@ Platform              Environment Variable
 -------------         ----------------------
 Windows               PATH
 Linux                 LD_LIBRARY_PATH
-macOS                 DYLD_LIBRARY_PATH
+MacOS                 DYLD_LIBRARY_PATH
 
 Update the environment variable corresponding to the platform to include
 the fully qualified GMSEC_API/bin directory.
@@ -363,20 +375,21 @@ the fully qualified GMSEC_API/bin directory.
 For example:
 Windows   set PATH=C:\GMSEC\release\GMSEC_API\bin;%PATH%
 Linux     export LD_LIBRARY_PATH=/home/me/GMSEC/release/GMSEC_API/bin
-macOS     export DYLD_LIBRARY_PATH=/Users/me/GMSEC/release/GMSEC_API/bin
+MacOS     export DYLD_LIBRARY_PATH=/Users/me/GMSEC/release/GMSEC_API/bin
 
 
-Linux and macOS users may also wish to include GMSEC_API/bin in their PATH
+Linux and MacOS users may also wish to include GMSEC_API/bin in their PATH
 environment variable; although this is optional, it is highly recommended.
 For example:
 
 Linux     export PATH=/home/me/GMSEC/release/GMSEC_API/bin:$PATH
-macOS     export PATH=/Users/me/GMSEC/release/GMSEC_API/bin:$PATH
+
+MacOS     export PATH=/Users/me/GMSEC/release/GMSEC_API/bin:$PATH
 
 
 NOTE:
 -----
-For macOS users whose system has System Integrity Protection (SIP) enabled,
+For MacOS users whose system has System Integrity Protection (SIP) enabled,
 setting DYLD_LIBRARY_PATH may prove to be moot. Instead, create soft-links
 of the GMSEC API libraries in /usr/local/lib and the GMSEC API message templates
 one level above.
@@ -393,8 +406,10 @@ $ sudo ln -s /Users/me/GMSEC_API/templates .
 Start the Bolt server:
 ----------------------
 Windows   java -jar C:\GMSEC\release\GMSEC_API\bin\bolt.jar
+
 Linux     java -jar /home/me/GMSEC\release\GMSEC_API\bin\bolt.jar
-macOS     java -jar /Users/me/GMSEC\release\GMSEC_API\bin\bolt.jar
+
+MacOS     java -jar /Users/me/GMSEC\release\GMSEC_API\bin\bolt.jar
 
 The Bolt server should indicate that it is listening for a connection, with a
 an output message similar to:
@@ -475,7 +490,7 @@ C++ Examples:
 C++ example programs reside in GMSEC_API/examples/cpp. These are not compiled
 as part of the top level API build process, therefore each example program will
 need to be compiled by the user using Visual Studio (Windows) or using 'make'
-(Linux and macOS).
+(Linux and MacOS).
 
 
 C Examples:
@@ -483,7 +498,7 @@ C Examples:
 C example programs reside in GMSEC_API/examples/c. These are not compiled
 as part of the top level API build process, therefore each example program will
 need to be compiled by the user using Visual Studio (Windows) or using 'make'
-(Linux and macOS).
+(Linux and MacOS).
 
 
 C# Examples:
@@ -521,6 +536,12 @@ Python3 example programs reside in GMSEC_API/examples/python3. The example
 programs are scripts, thus they do not need to be compiled.
 
 
+Ruby Examples:
+-----------------
+Ruby example programs reside in GMSEC_API/examples/ruby. The example
+programs are scripts, thus they do not need to be compiled.
+
+
 =========================================================================
                        Runtime Environment
 =========================================================================
@@ -535,44 +556,58 @@ or
 
 Java Programs:
 ------------------
-In order to run programs with the Java API, the gmsecapi.jar file must be
+In order to run programs with the Java binding, the gmsecapi.jar file must be
 present in the CLASSPATH.
 
 For example:
-Windows    set CLASSPATH=<ROOT-DIR>/GMSEC_API/bin/gmsecapi.jar
+Windows    set CLASSPATH=<ROOT-DIR>\GMSEC_API/bin\gmsecapi.jar
+
 Linux      export CLASSPATH=<ROOT-DIR>/GMSEC_API/bin/gmsecapi.jar
-macOS      export CLASSPATH=<ROOT-DIR>/GMSEC_API/bin/gmsecapi.jar
+
+MacOS      export CLASSPATH=<ROOT-DIR>/GMSEC_API/bin/gmsecapi.jar
 
 
 Perl Programs:
 --------------
-In order to run programs with the Perl API, the GMSEC_API/bin and
+In order to run programs with the Perl binding, the GMSEC_API/bin and
 GMSEC_API/bin/lib/GMSECAPI4 directories must be set in the PERL5LIB
 environment variable.
 
-NOTE that this is not the same as the PERL5_LIB variable used
-for building the API.
+NOTE: This is not the same as the PERL5_LIB variable used for building the API.
 
 For example:
-Windows    set PERL5LIB=<ROOT-DIR>/GMSEC_API/bin;<ROOT-DIR>/GMSEC_API/bin/lib/GMSECAPI4
+Windows    set PERL5LIB=<ROOT-DIR>\GMSEC_API\bin;<ROOT-DIR>\GMSEC_API\bin\lib\GMSECAPI4
 
 Linux      export PERL5LIB=<ROOT-DIR>/GMSEC_API/bin:<ROOT-DIR>/GMSEC_API/bin/lib/GMSECAPI4
 
-macOS      export PERL5LIB=<ROOT-DIR>/GMSEC_API/bin:<ROOT-DIR>/GMSEC_API/bin/lib/GMSECAPI4
+MacOS      export PERL5LIB=<ROOT-DIR>/GMSEC_API/bin:<ROOT-DIR>/GMSEC_API/bin/lib/GMSECAPI4
 
 
 Python3 Programs:
 -----------------
-In order to run programs with the Python3 API, the GMSEC_API/bin and
+In order to run programs with the Python3 binding, the GMSEC_API/bin and
 GMSEC_API/bin/lib/GMSECAPI4 directories must be set in the PYTHONPATH
 environment variable.
 
 For example:
-Windows    set PYTHONPATH=<ROOT-DIR>/GMSEC_API/bin;<ROOT-DIR>/GMSEC_API/bin/lib/GMSECAPI4
+Windows    set PYTHONPATH=<ROOT-DIR>\GMSEC_API\bin;<ROOT-DIR>\GMSEC_API\bin\lib\GMSECAPI4
 
 Linux      export PYTHONPATH=<ROOT-DIR>/GMSEC_API/bin:<ROOT-DIR>/GMSEC_API/bin/lib/GMSECAPI4
 
-macOS      export PYTHONPATH=<ROOT-DIR>/GMSEC_API/bin:<ROOT-DIR>/GMSEC_API/bin/lib/GMSECAPI4
+MacOS      export PYTHONPATH=<ROOT-DIR>/GMSEC_API/bin:<ROOT-DIR>/GMSEC_API/bin/lib/GMSECAPI4
+
+
+Ruby Programs:
+-----------------
+In order to run programs with the Ruby binding, the GMSEC_API/bin directory must be set in
+the RUBYLIB environment variable.
+
+For example:
+Windows    set RUBYLIB=<ROOT-DIR>\GMSEC_API\bin
+
+Linux      export RUBYLIB=<ROOT-DIR>/GMSEC_API/bin
+
+MacOS      export RUBYLIB=<ROOT-DIR>/GMSEC_API/bin
 
 
 =========================================================================

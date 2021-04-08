@@ -18,33 +18,18 @@
 //
 ConfigOption opendds_client_opt1 =
 {
-" *  connectionType=<string>",
-
-"        <string> must be gmsec_opendds312. [required]",
-
-"        Used to specify the type of connection object to set up. For OpenDDS\n"
-"        clients, this must be set to gmsec_opendds312.\n\n"
-"        Note: Option should not be used if mw-id is specified.",
-
-"        Example:\n"
-"            connectionType=gmsec_opendds312"
-};
-
-ConfigOption opendds_client_opt2 =
-{
 " *  mw-id=<string>",
 
 "        <string> must be opendds312. [required]",
 
 "        Used to specify the type of connection object to set up. For OpenDDS\n"
-"        clients, this must be set to opendds312.\n\n"
-"        Note: Option should not be used if connectionType is specified.",
+"        clients, this must be set to opendds312.",
 
 "        Example:\n"
 "            mw-id=opendds312"
 };
 
-ConfigOption opendds_client_opt3 =
+ConfigOption opendds_client_opt2 =
 {
 " *  server=<string>",
 
@@ -61,7 +46,7 @@ ConfigOption opendds_client_opt3 =
 "            server=127.0.0.1:12345"
 };
 
-ConfigOption opendds_client_opt4 =
+ConfigOption opendds_client_opt3 =
 {
 " *  mw-opendds-config-file=<string>",
 
@@ -75,7 +60,7 @@ ConfigOption opendds_client_opt4 =
 "            mw-opendds-config-file=$GMSEC_HOME/bin/opendds/dds_conf.ini"
 };
 
-ConfigOption opendds_client_opt5 =
+ConfigOption opendds_client_opt4 =
 {
 " *  mw-domain-id=<integer>",
 

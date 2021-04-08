@@ -18,20 +18,16 @@
 //
 ConfigOption amq_client_opt1 =
 {
-" *  connectionType=<string>",
+" *  mw-id=<string>",
 
-"        <string> must be gmsec_activemq323, gmsec_activemq340,\n"
-"        or gmsec_activemq383. [required]",
+"        <string> must be activemq38 or activemq39. [required]",
 
-"        Used to specify the type of connection object to set up.  For ActiveMQ\n"
-"        clients, this must be set to either gmsec_activemq323 or\n"
-"        gmsec_activemq340.\n",
+"        Used to specify the type of connection object to set up. For ActiveMQ\n"
+"        clients, this must be set to either activemq38 or activemq39.\n",
 
 "        Example:\n"
-"            connectionType=gmsec_activemq323\n"
-"            connectionType=gmsec_activemq340\n"
-"            connectionType=gmsec_activemq381\n"
-"            connectionType=gmsec_activemq383\n"
+"            mw-id=activemq38\n"
+"            mw-id=activemq39\n"
 "        \n"
 "        Note: For information regarding using the GMSEC Generic JMS wrapper\n"
 "        with ActiveMQ, run 'gmhelp generic_jms activemq'."
@@ -44,7 +40,7 @@ ConfigOption amq_client_opt2 =
 "        Filter duplicate messages. [optional]", 
 
 "        This option can be used to specify whether to filter duplicate\n"
-"        messages or not.  The default is 'yes'.",
+"        messages or not. The default is 'yes'.",
 
 "        Examples:\n"
 "            mw-filter-dups=yes\n"
@@ -58,7 +54,7 @@ ConfigOption amq_client_opt3 =
 "        Comma-delimited list of server(s) and server options. [optional]",
 
 "        This option can be used to specify the addresses and ports\n"
-"        of ActiveMQ Server that the client should connect to.  If not\n"
+"        of ActiveMQ Server that the client should connect to. If not\n"
 "        specified, localhost and port 61616 are assumed."
 "        \n\n"
 "        The option is used in the form of:\n\n"
@@ -92,14 +88,6 @@ ConfigOption amq_client_opt3 =
 "                server=tcp://10.1.123:61616&connection.SendTimeout=2000\n"
 "            \n"
 "            For multiple servers employing failover:\n"
-/*
-"            server=failover:(tcp://<primary>:61616?wireFormat.MaxInactivity\n"
-"            Duration=3000&wireFormat.MaxInactivityDurationInitalDelay=2000&\n"
-"            soConnectTimeout=1500,tcp://<backup>:61616?wireFormat.MaxInactivity\n"
-"            Duration=3000&wireFormat.MaxInactivityDurationInitalDelay=2000&\n"
-"            soConnectTimeout=1500)?useExponentialBackOff=false&initial\n"
-"            ReconnectDelay=5000\n"
-*/
 "                server=failover:(tcp://<primary>:61616?wireFormat.MaxInactivityDuration=3000&wireFormat.MaxInactivityDurationInitalDelay=2000&soConnectTimeout=1500,tcp://<backup>:61616?wireFormat.MaxInactivityDuration=3000&wireFormat.MaxInactivityDurationInitalDelay=2000&soConnectTimeout=1500)?useExponentialBackOff=false&initialReconnectDelay=5000\n"
 "            \n"
 "            where <primary> and <backup> are the primary and backup middleware\n"

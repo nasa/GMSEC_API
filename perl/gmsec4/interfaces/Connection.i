@@ -558,6 +558,12 @@ C<libgmsec_perl::Connection-E<gt>getMWInfo()>
 
         Returns a string containing middleware information.
 
+=head3 getConnectionEndpoint
+
+C<libgmsec_perl::Connection-E<gt>getConnectionEndpoint()>
+
+        Returns middleware broker connection information.
+
 =head3 getPublishQueueMessageCount
 
 C<libgmsec_perl::Connection-E<gt>getPublishQueueMessageCount()>
@@ -573,12 +579,16 @@ C<libgmsec_perl::Connection-E<gt>getPublishQueueMessageCount()>
 C<libgmsec_perl::Connection-E<gt>shutdownAllMiddlewares()>
 
         Calls shutdown routines for each middleware that has a shutdown routine registered.
+		This method should only be called once, typically just before an application terminates. 
+		Note the calling of this method is optional.
 
 =head3 shutdownMiddleware
 
 C<libgmsec_perl::Connection-E<gt>shutdownMiddleware($name)>
 
         Calls the shutdown routine for the middleware with the given name.
+		This method should only be called once, typically just before an application terminates. 
+		Note the calling of this method is optional.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 

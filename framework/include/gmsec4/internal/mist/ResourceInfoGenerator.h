@@ -1,3 +1,17 @@
+/*
+ * Copyright 2007-2020 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
+ * No copyright is claimed in the United States under Title 17, U.S. Code.
+ * All Rights Reserved.
+ */
+
+
+/** @file ResourceInfoGenerator.h
+ *
+ *  @brief The ResourceInfoGenerator encapsulates common API functions for
+ *  gathering system resource information and adding them to a GMSEC message
+ */
+
 #ifndef GMSEC_MIST_INTERNAL_RESOURCEINFOGENERATOR_H
 #define GMSEC_MIST_INTERNAL_RESOURCEINFOGENERATOR_H
 
@@ -12,35 +26,40 @@ namespace gmsec
 {
 namespace api
 {
-	// Forward declaration(s)
-	class Message;
-
 namespace mist
 {
+	namespace message
+	{
+		// Forward declaration(s)
+		class MistMessage;
+	}
+
 namespace internal
 {
 
 class ResourceInfoGenerator
 {
 public:
-	static void addMainMemoryStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
+	static void addMainMemoryStats(message::MistMessage& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
 
-	static void addDiskStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
+	static void addDiskStats(message::MistMessage& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
 
-	static void addCPUStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
+	static void addCPUStats(message::MistMessage& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
 
-	static void addNetworkStats(Message& msg, unsigned int specVersion, size_t movingAverageSamples = 1);
+	static void addNetworkStats(message::MistMessage& msg, size_t samplePeriod, size_t movingAverageSamples = 1);
 
 	static std::string getOSVersion();
 
 private:
-	static void pipeStreamToInputStream(std::istringstream& iss, FILE* pStream);
-#ifdef __hpux
-	static const char* normalizeMacAddressStr(const char* macAddrStr);
-#endif
-
 	struct CPUTickStruct
 	{
+		CPUTickStruct()
+			: user_mode_ticks(0),
+			  nice_mode_ticks(0),
+			  system_mode_ticks(0),
+			  idle_mode_ticks(0)
+		{}
+
 		long unsigned int user_mode_ticks;
 		long unsigned int nice_mode_ticks;
 		long unsigned int system_mode_ticks;
@@ -49,6 +68,14 @@ private:
 
 	struct MainMemoryStats
 	{
+		MainMemoryStats()
+			: memory_percent_utilized(0),
+			  total_physical_memory(0),
+			  available_physical_memory(0),
+			  total_virtual_memory(0),
+			  available_virtual_memory(0)
+		{}
+
 		GMSEC_F32 memory_percent_utilized;
 		GMSEC_I64 total_physical_memory;
 		GMSEC_I64 available_physical_memory;
@@ -58,6 +85,11 @@ private:
 
 	struct StatsForOneDisk
 	{
+		StatsForOneDisk()
+			: disk_size(0),
+			  disk_util(0)
+		{}
+
 		std::string disk_name;
         GMSEC_F32   disk_size;
         GMSEC_F32   disk_util;
@@ -65,31 +97,56 @@ private:
 
 	struct DiskStats
 	{
+		DiskStats()
+			: num_of_disks(0)
+		{}
+
 		GMSEC_I16                    num_of_disks;
 		std::vector<StatsForOneDisk> stats;
 	};
 
 	struct CPUStats
 	{
-		GMSEC_I16                    num_cpus;
-		GMSEC_F32                    cpu_total_util;
-		std::vector<GMSEC_F32>       cpu_utils;
-		std::vector<GMSEC_U32>       util_ticks;
-		std::vector<GMSEC_U32>       total_ticks;
+		CPUStats()
+			: num_cpus(0),
+			  cpu_total_util(0)
+		{}
+
+		GMSEC_I16              num_cpus;
+		GMSEC_F32              cpu_total_util;
+		std::vector<GMSEC_F32> cpu_utils;
+		std::vector<GMSEC_U32> util_ticks;
+		std::vector<GMSEC_U32> total_ticks;
 	};
 
 	struct StatsForOneNet
 	{
-		std::string net_port_name;
-		std::string net_port_ip_addr;
-		std::string net_port_eu_addr;
-		std::string net_port_desc;
+		StatsForOneNet()
+			: bytesRX(0),
+			  bytesTX(0),
+			  errorsRX(0),
+			  errorsTX(0),
+			  bandwidth(0)
+		{}
+
+		std::string if_name;
+		std::string ip_addr;
+		std::string eui_addr;
+		GMSEC_U64   bytesRX;
+		GMSEC_U64   bytesTX;
+		GMSEC_U32   errorsRX;
+		GMSEC_U32   errorsTX;
+		GMSEC_U32   bandwidth;
 	};
 
 	struct NetworkStats
 	{
-		GMSEC_I16                    num_net_ports;
-		std::vector<StatsForOneNet>  stats;
+		NetworkStats()
+			: num_net_ports(0)
+		{}
+
+		GMSEC_I16                   num_net_ports;
+		std::vector<StatsForOneNet> stats;
 	};
 
 
@@ -99,8 +156,9 @@ private:
 	static std::deque<NetworkStats>    m_networkStatsQueue;
 };
 
-}
-}
-}
-}
+}  // end namespace internal
+}  // end namespace mist
+}  // end namespace api
+}  // end namespace gmsec
+
 #endif

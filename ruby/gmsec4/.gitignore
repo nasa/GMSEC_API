@@ -1,0 +1,12 @@
+Makefile
+
+libgmsec_ruby-x64-mswin64_140.def
+libgmsec_ruby-x64-mswin64_140.exp
+libgmsec_ruby-x64-mswin64_140.lib
+libgmsec_ruby-x64-mswin64_140.pdb
+libgmsec_ruby_wrap.obj
+mkmf.log
+vc140.pdb
+
+interfaces/libgmsec_ruby_wrap.cxx.bak
+interfaces/libgmsec_ruby_wrap.h.bak

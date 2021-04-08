@@ -21,6 +21,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -62,18 +63,44 @@ public:
 		          << "\nUsage:\t" << programName << " <config option>=<value>"
 		          << "\n"
 		          << "\n"
-		          << "\tRequired configuration option(s):"
+		          << "\tRequired configuration option(s) must include one of the following groups:"
+		          << "\n"
+		          << "\n"
+		          << "\t1. A choice of middleware:"
 		          << "\n"
 		          << "\n\t\t* mw-id=<middleware>"
 		          << "\n"
 		          << "\n"
-		          << "\tOptional configuration options:"
+		          << "\t2. A config option and optional cfg-name:"
+		          << "\n"
+		          << "\n\t\t* config=<file with one or more CONFIG entries>"
+		          << "\n\t\t* cfg-name=<name of the configuration within the config file>"
+		          << "\n"
+		          << "\n";
+
+		if (programName.compare("gmrpl") == 0 || programName.compare("gmsub") == 0 || programName.compare("gmsub_cb") == 0)
+		{
+			std::cerr << "\t3. A cfg-file and cfg-name:"
+		              << "\n"
+		              << "\n\t\t* cfg-file=<file with additional configuration option(s)>"
+		              << "\n\t\t* cfg-name=<name of the configuration within the cfg-file>";
+		}
+		else
+		{
+			std::cerr << "\t3. A cfg-file and cfg-name and/or msg-name:"
+		              << "\n"
+		              << "\n\t\t* cfg-file=<file with additional configuration option(s)>"
+		              << "\n\t\t* cfg-name=<name of the configuration within the cfg-file>"
+		              << "\n\t\t* msg-name=<name of the message within the cfg-file>";
+		}
+
+		std::cerr << "\n"
+		          << "\n"
+		          << "\tThe following configuration options are optional:"
 		          << "\n"
 		          << "\n\t\t* server=<hostname or IP address as recognized by middleware>"
 		          << "\n"
 		          << "\n\t\t* loglevel=<level>"
-		          << "\n"
-		          << "\n\t\t* config=<file with additional configuration option(s)>"
 		          << std::endl;
 	}
 
@@ -170,8 +197,6 @@ public:
 					subjects.push_back("C2MS-11B.>");
 					break;
 				case mist::Specification::LEVEL_2:
-					subjects.push_back("GMSEC.>");
-					break;
 				default:
 					subjects.push_back("GMSEC.>");
 					break;
@@ -185,8 +210,6 @@ public:
 					subjects.push_back("C2MS.>");
 					break;
 				case mist::Specification::LEVEL_1:
-					subjects.push_back("GMSEC.>");
-					break;
 				default:
 					subjects.push_back("GMSEC.>");
 					break;
@@ -204,89 +227,113 @@ public:
 			bool foundTerminate = false;
 			for (std::vector<std::string>::iterator it = subjects.begin(); it != subjects.end() && !foundTerminate; ++it)
 			{
-				foundTerminate = (*it == "GMSEC.TERMINATE");
+				foundTerminate = ((*it).find(".TERMINATE") != std::string::npos);
 			}
 			if (!foundTerminate)
 			{
-				if (schemaLevel == 1)
+				if (specVersion >= mist::GMSEC_ISD_2019_00)
 				{
-					subjects.push_back("GMSEC.TERMINATE");
+					switch (schemaLevel)
+					{
+					case mist::Specification::LEVEL_0:
+						subjects.push_back("C2MS.TERMINATE");
+						break;
+					case mist::Specification::LEVEL_1:
+						subjects.push_back("C2MS-11B.TERMINATE");
+						break;
+					case mist::Specification::LEVEL_2:
+					default:
+						subjects.push_back("GMSEC.TERMINATE");
+						break;
+					}
+				}
+				else if (specVersion == mist::GMSEC_ISD_2018_00)
+				{
+					switch (schemaLevel)
+					{
+					case mist::Specification::LEVEL_0:
+						subjects.push_back("C2MS.TERMINATE");
+						break;
+					case mist::Specification::LEVEL_1:
+					default:
+						subjects.push_back("GMSEC.TERMINATE");
+						break;
+					}
 				}
 				else
 				{
-					subjects.push_back("C2MS.TERMINATE");
+					subjects.push_back("GMSEC.TERMINATE");
 				}
 			}
 		}
 	}
 
 
-	inline void addToConfigFromFile()
-	{
-		std::string cfgFilename = get("CONFIG"); // This assumes, now, that there is
-		                                         // only _one_ CONFIG=filename.xml arg
-		                                         // specified.
+    inline void addMultipleConfigsFromFile()
+    {
+		std::string cfgFilename = get("config");
+		std::string cfgName     = get("cfg-name");
 
 		if (!cfgFilename.empty())
 		{
-			std::ifstream fileStream(cfgFilename.c_str());
-			std::string   contents;
+			std::ifstream ifs(cfgFilename.c_str(), std::ios::in);
 
-			if (fileStream)
+			if (ifs)
 			{
+				std::string data;
 				std::string line;
+				bool        keepLine = cfgName.empty();
 
-				while (std::getline(fileStream, line))
+				while (std::getline(ifs, line))
 				{
-					if (!line.empty())
+					if (line.find("NAME=\"" + cfgName +"\"") != std::string::npos)
 					{
-						contents += (line + "\n");
-						GMSEC_DEBUG << line.c_str();
+						keepLine = true;
+					}
+
+					if (keepLine)
+					{
+						data += line + "\n";
+					}
+
+					if (keepLine && line.find("</CONFIG>") != std::string::npos)
+					{
+						break;
 					}
 				}
 
-				fileStream.close();
-
-				gmsec::api::Config configFromFile;
-
-				configFromFile.fromXML(contents.c_str());
-
-				//
-				// name and value C strings are allocated,
-				// and are supposed to be memory-handled in
-				// general, in  GetFirst(), GetNext(),
-				// and the destructor of the BaseConfig class.
-				//
-				const char* name  = NULL;
-				const char* value = NULL;
-
-				//
-				// Read all the config file name, value pairs
-				// and add them to the current base
-				// configuration (which can have its
-				// (name, value) pairs from both command-line
-				// pairs and from the input current config 
-				// file that was read).
-				//
-				bool foundEntry = configFromFile.getFirst(name,  value);
-
-				while (foundEntry)
-				{
-					GMSEC_DEBUG << "Adding ("
-					            << name << ", " << value
-					            << ") from config file "
-					            << cfgFilename.c_str();
-					config.addValue(name, value);
-
-					foundEntry = configFromFile.getNext(name, value);
-				}
+				gmsec::api::Config configFromFile(data.c_str());
+				config.merge(configFromFile);
 			}
 			else
 			{
-				GMSEC_WARNING << "Non-valid-filepath config "
-				              << "argument " << cfgFilename.c_str()
-				              << " seen; ignoring it.";
+				throw Exception(CONFIG_ERROR, OTHER_ERROR_CODE, "Config File could not be found or could not be opened");
 			}
+		}
+    }
+
+
+	inline void addToConfigFromFile()
+	{
+        addMultipleConfigsFromFile();
+
+        std::string cfgFilename  = get("cfg-file");
+        std::string cfgEntryName = get("cfg-name");
+
+		if (!cfgFilename.empty() && !cfgEntryName.empty())
+		{
+            try
+            {
+                gmsec::api::ConfigFile configFile;
+                configFile.load(cfgFilename.c_str());
+                config.merge(configFile.lookupConfig(cfgEntryName.c_str()));
+            }
+            catch (const gmsec::api::Exception& e)
+            {
+                GMSEC_WARNING << "Ignoring the contents of "
+                              << cfgEntryName.c_str() << " in "
+                              << cfgFilename.c_str() << ": " << e.what();
+            }
 		}
 	}
 
@@ -300,38 +347,75 @@ public:
 	}
 
 
-	bool isOptionInvalid(int numArgs)
+	inline bool areOptionsValid(int numArgs)
 	{
-		std::string connType = get("connectionType");
-		std::string mwID     = get("mw-id");
-
-		return (numArgs <= 1 || (connType.empty() && mwID.empty()));
-	}
-
-
-	bool isOptionInvalid(int numArgs, const std::string& programName)
-	{
-		if (isOptionInvalid(numArgs))
+		if (numArgs < 2)
 		{
-			return true;
+			GMSEC_ERROR << "Missing argument(s)";
+            return false;
 		}
 
-		if (programName.find("gmrpl") != std::string::npos ||
-			programName.compare("gmsub") == 0 || 
-			programName.compare("gmsub_cb") == 0)
+		std::string mwId    = get("mw-id");
+		std::string config  = get("config");
+		std::string cfgFile = get("cfg-file");
+		std::string cfgName = get("cfg-name");
+		std::string msgName = get("msg-name");
+
+		if (mwId.empty() && config.empty() && cfgFile.empty())
 		{
-			if (get("MSG_TIMEOUT_MS", GMSEC_WAIT_FOREVER) == GMSEC_WAIT_FOREVER &&
-				get("PROG_TIMEOUT_S", GMSEC_WAIT_FOREVER) != GMSEC_WAIT_FOREVER)
+			GMSEC_ERROR << "Need to specify mw-id, config, or cfg-file";
+			return false;
+		}
+
+		if (!mwId.empty() && !config.empty())
+		{
+			GMSEC_ERROR << "Cannot specify mw-id and config";
+			return false;
+		}
+
+		if (!mwId.empty() && !cfgFile.empty() && msgName.empty())
+		{
+			GMSEC_ERROR << "Cannot specify mw-id and cfg-file, unless msg-name is specified";
+			return false;
+		}
+
+		if (!config.empty() && !cfgFile.empty() && msgName.empty())
+		{
+			GMSEC_ERROR << "Cannot specify config and cfg-file";
+			return false;
+		}
+
+		if (!cfgFile.empty() && cfgName.empty() && msgName.empty())
+		{
+			GMSEC_ERROR << "Usage of cfg-file requires cfg-name and/or msg-name";
+			return false;
+		}
+
+		return true;
+	}
+
+	inline bool areOptionsValid(int numArgs, const std::string& programName)
+	{
+		if (!areOptionsValid(numArgs))
+		{
+			return false;
+		}
+
+		if (programName.compare("gmrpl") == 0 || programName.compare("gmsub") == 0 || programName.compare("gmsub_cb") == 0)
+		{
+			if (get("msg-timeout-ms", GMSEC_WAIT_FOREVER) == GMSEC_WAIT_FOREVER &&
+				get("prog-timeout-s", GMSEC_WAIT_FOREVER) != GMSEC_WAIT_FOREVER)
 			{
-				return true;
+				GMSEC_ERROR << "prog-timeout-s should not be used when msg-timeout-ms is -1";
+				return false;
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 
-	Message* readMessageFile(const std::string& msgFileName)
+	inline Message* readMessageFile(const std::string& msgFileName)
 	{
 		std::ifstream ifs(msgFileName.c_str(), std::ios::in);
 
@@ -361,7 +445,7 @@ public:
 	}
 
 
-	Message* readConfigFile(const std::string& cfgFileName, const std::string& msgName)
+	inline Message* readConfigFile(const std::string& cfgFileName, const std::string& msgName)
 	{
 		ConfigFile cfgFile;
 
@@ -371,7 +455,7 @@ public:
 	}
 
 
-	std::vector<std::string> split(const std::string& str, const std::string& delimiter)
+	inline std::vector<std::string> split(const std::string& str, const std::string& delimiter)
 	{
 		std::vector<std::string> ret;
 

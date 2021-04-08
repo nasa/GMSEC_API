@@ -471,6 +471,12 @@ public class JNIConnectionManager
 	}
 
 
+	public String getConnectionEndpoint()
+	{
+		return gmsecJNI.ConnectionManager_GetConnectionEndpoint(swigCPtr, this);
+	}
+
+
 	public long getPublishQueueMessageCount()
 	{
 		return gmsecJNI.ConnectionManager_GetPublishQueueMessageCount(swigCPtr, this);

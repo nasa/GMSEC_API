@@ -576,7 +576,17 @@ void JMSConnection::mwConnect()
 
 	try
 	{
-		jobject tmp = envLocal->CallObjectMethod(connectionFactory, cache->methodCreateConnection);
+		jobject tmp = 0;
+		if (!username.empty() && !password.empty())
+		{
+			tmp = envLocal->CallObjectMethod(connectionFactory, cache->methodCreateConnectionCreds,
+				envLocal->NewStringUTF(username.c_str()),
+				envLocal->NewStringUTF(password.c_str()));
+		}
+		else
+		{
+			tmp = envLocal->CallObjectMethod(connectionFactory, cache->methodCreateConnection);
+		}
 		checkJVM(envLocal, "ConnectionFactory.createConnection");
 
 		connection = makeGlobalRef(envLocal, tmp);

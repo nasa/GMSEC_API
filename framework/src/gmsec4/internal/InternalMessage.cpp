@@ -964,7 +964,7 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 
 	/* verify that our root node is "MESSAGE" */
 	const char* mename = element->Name();
-	if (!mename || std::string(mename) != "MESSAGE")
+	if (!mename || !StringUtil::stringEqualsIgnoreCase(mename, "MESSAGE"))
 	{
 		throw Exception(MSG_ERROR, XML_PARSE_ERROR, "Invalid XML -- MESSAGE element not found");
 	}
@@ -976,15 +976,15 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 	{
 		const char* caname = attr->Name();
 
-		if (caname && std::string(caname) == "SUBJECT")
+		if (caname && StringUtil::stringEqualsIgnoreCase(caname, "SUBJECT"))
 		{
 			subject = attr->Value();
 		}
-		else if (caname && (std::string(caname) == "KIND"))
+		else if (caname && StringUtil::stringEqualsIgnoreCase(caname, "KIND"))
 		{
 			mtype = attr->Value();
 		}
-		else if (caname && (std::string(caname) == "TYPE") && (mtype == NULL))
+		else if (caname && StringUtil::stringEqualsIgnoreCase(caname, "TYPE") && (mtype == NULL))
 		{
 			mtype = attr->Value();
 		}
@@ -1003,18 +1003,15 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 	// set kind
 	if (mtype)
 	{
-		std::string upperMsgType = mtype;
-		std::transform(upperMsgType.begin(), upperMsgType.end(), upperMsgType.begin(), ::toupper);
-
-		if (upperMsgType == "PUBLISH")
+		if (StringUtil::stringEqualsIgnoreCase(mtype, "PUBLISH"))
 		{
 			m_kind = Message::PUBLISH;
 		}
-		else if (upperMsgType == "REQUEST")
+		else if (StringUtil::stringEqualsIgnoreCase(mtype, "REQUEST"))
 		{
 			m_kind = Message::REQUEST;
 		}
-		else if (upperMsgType == "REPLY")
+		else if (StringUtil::stringEqualsIgnoreCase(mtype, "REPLY"))
 		{
 			m_kind = Message::REPLY;
 		}
@@ -1035,18 +1032,17 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 	{
 		//field nodes only
 		const char* cnname = node->Name();
-		if (cnname && std::string(cnname) == "FIELD")
+		if (cnname && StringUtil::stringEqualsIgnoreCase(cnname, "FIELD"))
 		{
 			Field* field = InternalField::fromXML(node);
 
 			if (field)
 			{
-				addField(*field);
-				delete field;
+				addField(*field, false);
 			}
 		}
 		// configuration node(s)
-		else if (cnname && std::string(cnname) == "CONFIG")
+		else if (cnname && StringUtil::stringEqualsIgnoreCase(cnname, "CONFIG"))
 		{
 			try
 			{
@@ -1072,20 +1068,20 @@ void InternalMessage::fromXML(tinyxml2::XMLElement* element)
 void InternalMessage::fromJSON(const Json::Value& origRoot)
 {
 	Json::Value root;
-	if (origRoot.isMember(std::string("MESSAGE")))
+	if (origRoot.isMember("MESSAGE") || origRoot.isMember("message"))
 	{
-		root = origRoot["MESSAGE"];
+		root = (origRoot.isMember("MESSAGE") ? origRoot["MESSAGE"] : origRoot["message"]);
 	}
 	else
 	{
 		throw Exception(MSG_ERROR, JSON_PARSE_ERROR,
-			"Invalid JSON Message format -- no root element");
+			"Invalid JSON Message format -- no MESSAGE root element");
 	}
 
 	const char* subject = NULL;
-	if (root.isMember(std::string("SUBJECT")))
+	if (root.isMember("SUBJECT") || root.isMember("subject"))
 	{
-		subject = root["SUBJECT"].asCString();
+		subject = (root.isMember("SUBJECT") ? root["SUBJECT"].asCString() : root["subject"].asCString());
 	}
 	else
 	{
@@ -1094,9 +1090,9 @@ void InternalMessage::fromJSON(const Json::Value& origRoot)
 	}
 
 	const char* kind = NULL;
-	if (root.isMember(std::string("KIND")))
+	if (root.isMember("KIND") || root.isMember("kind"))
 	{
-		kind = root["KIND"].asCString();
+		kind = (root.isMember("KIND") ? root["KIND"].asCString() : root["kind"].asCString());
 	}
 	else
 	{
@@ -1110,18 +1106,15 @@ void InternalMessage::fromJSON(const Json::Value& origRoot)
 	// Set kind
 	if (kind != NULL)
 	{
-		std::string upperMsgType = kind;
-		std::transform(upperMsgType.begin(), upperMsgType.end(), upperMsgType.begin(), ::toupper);
-
-		if (upperMsgType == "PUBLISH")
+		if (StringUtil::stringEqualsIgnoreCase(kind, "PUBLISH"))
 		{
 			m_kind = Message::PUBLISH;
 		}
-		else if (upperMsgType == "REQUEST")
+		else if (StringUtil::stringEqualsIgnoreCase(kind, "REQUEST"))
 		{
 			m_kind = Message::REQUEST;
 		}
-		else if (upperMsgType == "REPLY")
+		else if (StringUtil::stringEqualsIgnoreCase(kind, "REPLY"))
 		{
 			m_kind = Message::REPLY;
 		}
@@ -1132,10 +1125,9 @@ void InternalMessage::fromJSON(const Json::Value& origRoot)
 		}
 	}
 
-	if (root.isMember(std::string("FIELD")))
+	if (root.isMember("FIELD") || root.isMember("field"))
 	{
-		kind = root["KIND"].asCString();
-		const Json::Value fields = root["FIELD"];
+		const Json::Value fields = (root.isMember("FIELD") ? root["FIELD"] : root["field"]);
 
 		// Fields
 		for (unsigned int i = 0; i < fields.size(); i++)
@@ -1143,13 +1135,12 @@ void InternalMessage::fromJSON(const Json::Value& origRoot)
 			Field* field = InternalField::fromJSON(fields[i]); 
 			if (field)
 			{
-				addField(*field);
-				delete field;
+				addField(*field, false);
 			}
 		}
 	}
 
-	if (root.isMember("CONFIG"))
+	if (root.isMember("CONFIG") || root.isMember("config"))
 	{
 		// only the InternalConfig has the means to ingest a JSON Value object
 		InternalConfig internalConfig;

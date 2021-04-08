@@ -1210,7 +1210,7 @@ const char* CALL_TYPE connectionManagerGetMWInfo(GMSEC_ConnectionMgr connMgr, GM
 	else
 	{
 		info = mgr->getMWInfo();
-	}    
+	}
 
 	if (status)
 	{
@@ -1218,6 +1218,30 @@ const char* CALL_TYPE connectionManagerGetMWInfo(GMSEC_ConnectionMgr connMgr, GM
 	}
 
 	return info;
+}
+
+
+const char* CALL_TYPE connectionManagerGetConnectionEndpoint(const GMSEC_ConnectionMgr connMgr, GMSEC_Status status)
+{
+	Status             result;
+	const char*        endpoint = NULL;
+	ConnectionManager* mgr = reinterpret_cast<ConnectionManager*>(connMgr);
+
+	if (!mgr)
+	{
+		result = Status(MIST_ERROR, UNINITIALIZED_OBJECT, "ConnectionManager handle is NULL");
+	}
+	else
+	{
+		endpoint = mgr->getConnectionEndpoint();
+	}
+
+	if (status)
+	{
+		*((Status*) status) = result;
+	}
+
+	return endpoint;
 }
 
 

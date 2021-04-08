@@ -320,12 +320,13 @@ void SubscriptionInfo::run()
 
 		if (Reason == MQRC_CONNECTION_BROKEN)
 		{
-			int  maxTries = conn->getMaxConnectionRetries();
-			int  triesRemaining = maxTries;
-			bool alive = false;
+			int  maxRetries     = conn->getMaxConnectionRetries();
+			int  triesRemaining = maxRetries;
+			bool alive          = false;
 
 			//Connection and all object handles now invalidated, need to re-establish
-			do
+			//connection broker, but only if configured to do so.
+			while (!alive && (maxRetries == -1 || --triesRemaining >= 0))
 			{
 				mqconnection = 0;
 
@@ -354,18 +355,21 @@ void SubscriptionInfo::run()
 
 					std::ostringstream oss;
 					oss << "SubscriptionInfo - Attempting to reconnect.";
-					if (maxTries != -1)
+					if (maxRetries != -1)
 					{
-						oss << "  Tries remaining: " << triesRemaining;
+						oss << " Tries remaining: " << triesRemaining;
 					}
 
 					GMSEC_INFO << oss.str().c_str();
 				}
-			} while (!alive && (maxTries == -1 || triesRemaining-- > 0));
+			}
 
 			if (!alive)
 			{
-				GMSEC_ERROR << "SubscriptionInfo - Unable to re-establish connection to server.";
+				if (maxRetries > 0)
+				{
+					GMSEC_ERROR << "SubscriptionInfo - Unable to re-establish connection to server.";
+				}
 				doneWithLife = true;
 			}
 
@@ -688,11 +692,14 @@ WebSConnection::WebSConnection(const Config& config)
 		}
 	}
 
-	bool error = false;
+	//Default maximum number of handles to 100
+	maxTopicHandles = 100;
 	tmp = "";
 	mwConfig(config, OPT_MAX_TOPIC_HANDLES, tmp, false);
 	if (!tmp.empty())
 	{
+		bool error = false;
+
 		try
 		{
 			int handles = StringUtil::getValue<int>(tmp.c_str());
@@ -710,12 +717,11 @@ WebSConnection::WebSConnection(const Config& config)
 		{
 			error = true;
 		}
-	}
-	if (error)
-	{
-		GMSEC_WARNING << "Ignoring invalid value for " << OPT_MAX_TOPIC_HANDLES << ": " << tmp.c_str();
-		//Default maximum number of handles to 100
-		maxTopicHandles = 100;		
+
+		if (error)
+		{
+			GMSEC_WARNING << "Ignoring invalid value for " << OPT_MAX_TOPIC_HANDLES << ": " << tmp.c_str();
+		}
 	}
 
 	useFilter = filterToggle.empty() || StringUtil::stringEqualsIgnoreCase(filterToggle.c_str(), "yes");
@@ -982,7 +988,8 @@ void WebSConnection::mwPublish(const Message& msg, const Config& config)
 		msgOpts.Options |= MQPMO_ASYNC_RESPONSE;
 	}
 
-	int triesRemaining = maxConnectionRetries;
+	int maxRetries     = getMaxConnectionRetries();
+	int triesRemaining = maxRetries;
 	do
 	{
 		if (!result.isError())
@@ -1036,20 +1043,23 @@ void WebSConnection::mwPublish(const Message& msg, const Config& config)
 
 			MQLONG reason = result.getCustomCode();
 
-			if (reason == MQRC_CONNECTION_BROKEN ||        // 2009
-			    reason == MQRC_HCONN_ERROR ||              // 2018
-			    reason == MQRC_Q_MGR_NOT_AVAILABLE ||      // 2059
-			    reason == MQRC_Q_MGR_QUIESCING ||          // 2161
-			    reason == MQRC_HOST_NOT_AVAILABLE ||       // 2538
-			    reason == MQRC_RECONNECT_FAILED)           // 2548
+			// If we're configured to retry, and we have hit one of the specific errors we can handle,
+			// attempt to reconnect. Otherwise, we're done... throw an exception.
+			if ((maxRetries == -1 || maxRetries > 0) &&
+			    (  reason == MQRC_CONNECTION_BROKEN   // 2009
+			    || reason == MQRC_HCONN_ERROR         // 2018
+			    || reason == MQRC_Q_MGR_NOT_AVAILABLE // 2059
+			    || reason == MQRC_Q_MGR_QUIESCING     // 2161
+			    || reason == MQRC_HOST_NOT_AVAILABLE  // 2538
+			    || reason == MQRC_RECONNECT_FAILED))  // 2548
 			{
 				TimeUtil::millisleep(connectionRetryInterval);
 
 				std::ostringstream oss;
 				oss << "mwPublish - Attempting to reconnect.";
-				if (maxConnectionRetries != -1)
+				if (triesRemaining > 0)
 				{
-					oss << "  Tries remaining: " << triesRemaining;
+					oss << " Tries remaining: " << triesRemaining;
 				}
 				GMSEC_WARNING << oss.str().c_str();
 
@@ -1057,15 +1067,16 @@ void WebSConnection::mwPublish(const Message& msg, const Config& config)
 			}
 			else
 			{
-				// For all other errors, we throw an Exception
 				throw Exception(result);
 			}
 		}
-	} while (result.isError() && (maxConnectionRetries == -1 || triesRemaining-- > 0));
+	} while (result.isError() && (maxRetries == -1 || --triesRemaining >= 0));
 
-	if (result.isError() && triesRemaining == 0)
+	if (result.isError() && triesRemaining <= 0)
 	{
 		GMSEC_ERROR << "mwPublish - Unable to re-establish connection to server; result = " << result.get();
+
+		throw Exception(result);
 	}
 	else
 	{
@@ -1084,8 +1095,7 @@ void WebSConnection::mwPublish(const Message& msg, const Config& config)
 		}
 	}
 
-	//if (pubCheckAsyncStatus || (connCheckAsyncStatus && messageCounter > "MW-ASYNC-CHECK-STATUS-COUNT"))
-	if (pubCheckAsyncStatus || (connCheckAsyncStatus && ++messageCounter > checkAsyncStatusMessageInterval - 1))
+	if (pubCheckAsyncStatus || (connCheckAsyncStatus && (++messageCounter > (checkAsyncStatusMessageInterval - 1))))
 	{
 		// Check and log the status of previous Asynchronous Put calls
 		checkAsyncPublishStatus();

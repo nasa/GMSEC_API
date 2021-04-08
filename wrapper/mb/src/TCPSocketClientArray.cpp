@@ -468,6 +468,8 @@ Status TCPSocketClientArray::write(const char *buffer, int len, const char *uniq
 	{
 		if (!m_sock[i]->isConnected())
 		{
+			result = Status(CONNECTION_ERROR, CONNECTION_LOST, "Connection to the broker was lost");
+			is_good_result = false;
 			continue;
 		}
 
@@ -489,7 +491,7 @@ Status TCPSocketClientArray::write(const char *buffer, int len, const char *uniq
 			}
 		}
 
-		is_good_result |= (result.getClass() == NO_ERROR_CLASS);
+		is_good_result = (result.getClass() == NO_ERROR_CLASS);
 	}
 
 	if (unique_id != NULL)

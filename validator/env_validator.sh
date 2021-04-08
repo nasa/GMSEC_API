@@ -12,17 +12,17 @@ function ShowUsage
 	echo
 	echo "where <mw> is one of the following:"
 	echo
-	echo "    activemq383, activemq384"
+	echo "    activemq38, activemq39"
 	echo "    amqp"
+	echo "    artemis"
 	echo "    bolt"
 	echo "    ibmmq90"
 	echo "    mb"
-	echo "    ss66, ss67, ss681, ss682 (for TIBCO Smart Sockets)"
-	echo "    websphere71, websphere75, websphere80"
+	echo "    websphere80"
 	echo "    zeromq413"
 	echo
 	echo "Note: It is also acceptable to preface any of the above middleware types with"
-	echo "      'gmsec_'.  For example, 'gmsec_activemq383'."
+	echo "      'gmsec_'.  For example, 'gmsec_activemq39'."
 	echo
 	echo
 	echo "The [check_JMS] argument is optional and can be used to check if the"
@@ -115,7 +115,7 @@ function CheckDependencies
 		echo "${txtcyn}Checking dependencies for $baselib...${txtrst}"
 
 		case "$sys_type" in
-			Linux | SunOS | Solaris)
+			Linux)
 				IFS=$'\n'
 				for entry in ${ldd_out[@]}; do
 					echo $entry | grep "not found" > /dev/null
@@ -189,44 +189,6 @@ function CheckDependencies
 				unset IFS
 				;;
 
-			HP-UX)
-				IFS=$'\n'
-				for entry in ${ldd_out[@]}; do
-					tmp=$(echo $entry | grep dynamic | grep -v "shared library")
-					if [ $? -eq 0 ]; then
-						lib_file=$(echo $tmp | awk -F " " '{print $2}')
-
-						# check for existence of dependency file
-						found=false
-						dep_file=$(basename $lib_file)
-						IFS=":"
-						for dir in $SHLIB_PATH; do
-							if [ -e $dir/$dep_file ]; then
-								found=true
-								dep_file=$dir/$dep_file
-								break
-							fi
-						done
-						unset IFS
-
-						if $found; then
-							CheckArchitecture $dep_file
-						else
-							if [[ ( ${lib_file:0:4} != "/usr" ) && ( ${lib_file:0:4} != "/lib" ) ]]; then
-								if [[ $critical == true ]]; then
-									Failure "Unable to locate $lib_file using SHLIB_PATH"
-									result=1
-								else
-									Warning "Unable to locate $lib_file using SHLIB_PATH"
-								fi
-							fi
-						fi
-						IFS=$'\n'
-					fi
-               	done
-               	unset IFS
-				;;
-
 			*)
 				echo "Unknown system $sys_type; unable to check for dependencies."
 				result=1
@@ -267,19 +229,6 @@ function CheckArchitecture
 				sys_arch=i386
 			fi
 			pattern=$sys_arch
-			;;
-
-		SunOS | Solaris)
-			if [ "$sys_arch" == "sparc" -o "$sys_arch" == "i386" ]; then
-				pattern="32-bit"
-			else
-				pattern="64-bit"
-			fi
-			;;
-
-		HP-UX)
-			sys_arch="PA-RISC"
-			pattern="PA-RISC"
 			;;
 
 		*)
@@ -568,6 +517,20 @@ function CheckAMQP
 	fi
 }
 
+function CheckArtemis
+{
+	echo
+	echo "${txtcyn}Checking middleware dependencies for Artemis...${txtrst}"
+
+	# Check if all dependencies are satisfied for mw_type
+	#
+	CheckDependencies ${gmsec_api_bin}/lib${mw}.${lib_ext} true
+
+	# Check for environment variables
+	#
+	CheckEnvironmentVariables ActiveMQ
+}
+
 function CheckApollo
 {
 	echo
@@ -655,64 +618,6 @@ function CheckOpenDDS
 	# Check for environment variables
 	#
 	CheckEnvironmentVariables OpenDDS
-}
-
-function CheckSmartSocket
-{
-	echo
-	echo "${txtcyn}Checking middleware dependencies for TIBCO SmartSockets...${txtrst}"
-
-	# Check if all dependencies are satisfied for mw_type
-	#
-	CheckDependencies ${gmsec_api_bin}/lib${mw}.${lib_ext} true
-
-	# Check if using JMS wrappers
-	#
-	if [ $check_jms == true ]; then
-		echo
-		echo "${txtcyn}Checking JMS support for TIBCO SmartSockets...${txtrst}"
-		Warning "Not supported"
-	fi
-
-	# Check for environment variables
-	#
-	CheckEnvironmentVariables SmartSockets
-}
-
-function CheckWebLogic
-{
-	echo
-	echo "${txtcyn}Checking middleware dependencies for WebLogic...${txtrst}"
-
-	# Check if all dependencies are satisfied for mw_type
-	#
-	CheckDependencies ${gmsec_api_bin}/lib${mw}.${lib_ext} true
-
-	# Check for JAR file(s) in CLASSPATH
-	#
-	jars=( wlfullclient.jar )
-	for jar in "${jars[@]}"; do
-		echo $CLASSPATH | grep $jar > /dev/null
-		if [ $? -eq 0 ]; then
-			Success "Reference to $jar JAR file found in CLASSPATH"
-			break
-		else
-			Failure "Reference to $jar JAR file not found in CLASSPATH"
-			result=1
-		fi
-	done
-
-	# Check if using JMS wrappers
-	#
-	if [ $check_jms == true ]; then
-		echo
-		echo "${txtcyn}Checking JMS support for WebLogic...${txtrst}"
-		CheckJMS
-	fi
-
-	# Check for environment variables
-	#
-	CheckEnvironmentVariables WebLogic
 }
 
 function CheckWebSphere
@@ -863,11 +768,11 @@ fi
 case $mw_type in
 	*"activemq"*)   check_mwtype=amq     ;;
 	*"amqp")        check_mwtype=amqp    ;;
+	*"artemis")     check_mwtype=art     ;;
 	*"bolt")        check_mwtype=bolt    ;;
 	*"ibmmq"*)      check_mwtype=ibmmq   ;;
 	*"mb")          check_mwtype=mb      ;;
 	*"opendds"*)    check_mwtype=opendds ;;
-	*"ss"*)         check_mwtype=ss      ;;
 	*"websphere"*)  check_mwtype=ws      ;;
 	*"zeromq"*)     check_mwtype=zeromq  ;;
 	*)
@@ -906,7 +811,7 @@ fi
 # Determine our system type
 sys_type=$(uname -s)
 case "$sys_type" in
-	Linux | SunOS | Solaris)
+	Linux)
 		ld_lib_path=$LD_LIBRARY_PATH
 		ld_lib_path_type="LD_LIBRARY_PATH"
 		ldd_cmd=/usr/bin/ldd
@@ -925,24 +830,9 @@ case "$sys_type" in
 		jnilib_ext="jnilib"
 		;;
 
-	HP-UX)
-		# TODO: Verify if the following assumption is valid.
-		if [ -z $LD_LIBRARY_PATH ]; then
-			ld_lib_path=$SHLIB_PATH
-			ld_lib_path_type="SHLIB_PATH"
-		else
-			ld_lib_path=$LD_LIBRARY_PATH
-			ld_lib_path_type="LD_LIBRARY_PATH"
-		fi
-		ldd_cmd=/usr/bin/chatr
-		ldd_opt=
-		lib_ext="sl"
-		jnilib_ext=$lib_ext
-		;;
-
 	*)
 		echo "${txtred}ERROR: Unable to determine system type; found '$sys_type'.  Supported systems are:"
-		echo "       Linux, Solaris, HP-UX and Mac${txtrst}"
+		echo "       Linux and MacOS${txtrst}"
 		exit 1
 esac
 
@@ -951,23 +841,21 @@ echo
 echo "${txtcyn}Starting GMSEC System Environment Validator Tool (version $version)...${txtrst}"
 
 CheckGMSEC
+CheckJava
+CheckPerl
 
-#if [ $result -eq 0 ]; then
-	CheckJava
-	CheckPerl
+case $check_mwtype in
+	"amq")		CheckActiveMQ;;
+	"amqp")		CheckAMQP;;
+	"art")		CheckArtemis;;
+	"bolt")		CheckBolt;;
+	"ibmmq")	CheckWebSphere;;
+	"mb")		CheckMessageBus;;
+	"opendds")	CheckOpenDDS;;
+	"ws")		CheckWebSphere;;
+	"zeromq")	CheckZeroMQ;;
+esac
 
-	case $check_mwtype in
-		"amq")		CheckActiveMQ;;
-		"amqp")		CheckAMQP;;
-		"bolt")		CheckBolt;;
-		"ibmmq")	CheckWebSphere;;
-		"mb")		CheckMessageBus;;
-		"opendds")	CheckOpenDDS;;
-		"ss")		CheckSmartSocket;;
-		"ws")		CheckWebSphere;;
-		"zeromq")	CheckZeroMQ;;
-	esac
-#fi
 
 # Report test summary
 #
@@ -975,12 +863,12 @@ echo
 echo "${txtcyn}         -----------------------------------------------------${txtrst}"
 echo
 if [ $result -eq 0 ]; then
-	echo "${txtgrn}Congratulations!  Your system is properly configured.${txtrst}"
+	echo "${txtgrn}Your system is properly configured!${txtrst}"
 	echo
-	echo "${txtgrn}However, if there are any WARNING(s) listed above, carefully consider${txtrst}"
-	echo "${txtgrn}whether they need to be corrected for your operational needs.${txtrst}"
+	echo "${txtgrn}If there are any WARNING(s) listed above, carefully consider${txtrst}"
+	echo "${txtgrn}whether they need to be corrected for your system needs.${txtrst}"
 else
-	echo "${txtred}Please correct the FAILURE(s) and optionally any WARNING(s) shown above${txtrst}"
+	echo "${txtred}Please correct FAILURE(s) and optionally any WARNING(s) shown above${txtrst}"
 	echo "${txtred}before proceeding to use the GMSEC API.${txtrst}"
 	echo
 	echo "${txtred}Refer to the GMSEC API Installation Guide and/or the Installation and${txtrst}"

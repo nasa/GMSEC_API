@@ -83,104 +83,30 @@ ConfigOption jms_amq_client_opt5 =
 "            mw-lookup-topic=dynamicTopics/AnyTopic"
 };
 
-
-// JMS WebLogic Client Options
-//
-ConfigOption jms_wl_client_opt1 =
+ConfigOption jms_amq_client_opt6 =
 {
-" *  connectionType=<string>",
+" *  username=<string>",
 
-"        Must be gmsec_generic_jms. [required]",
+"        The username to use when authenticating with the ActiveMQ broker. [optional]",
 
-"        Used to specify the type of connection object to set up.  For Generic\n"
-"        JMS clients, this must be set to gmsec_generic_jms.",
+"        The username to use when authenticating with the ActiveMQ broker.\n"
+"        Use this option in conjunction with the password option.",
 
 "        Example:\n"
-"            connectionType=gmsec_generic_jms"
+"            username=bond007"
 };
 
-ConfigOption jms_wl_client_opt2 =
+ConfigOption jms_amq_client_opt7 =
 {
-" *  mw-initial-context-factory=<string>",
+" *  password=<string>",
 
-"        WebLogic initial context factory. [required]",
+"        The password to use when authenticating with the ActiveMQ broker. [optional]",
 
-"        No additional details available.",
+"        The password to use when authenticating with the ActiveMQ broker.\n"
+"        Use this option in conjunction with the username option.",
 
 "        Example:\n"
-"            mw-initial-context-factory=weblogic.jndi.WLInitialContextFactory"
-};
-
-ConfigOption jms_wl_client_opt3 =
-{
-" *  mw-provider-url=<string>",
-
-"        The server URL using T3S protocol. [required]",
-
-"        No additional details available.",
-
-"        Example:\n"
-"            mw-provider-url=t3s://10.1.2.123:7002"
-};
-
-ConfigOption jms_wl_client_opt4 =
-{
-" *  mw-lookup-connection-factory=<string>",
-
-"        The name of the WebLogic connection factory. [required]",
-
-"        No additional details available.",
-
-"        Example:\n"
-"            mw-lookup-connection-factory=weblogic.jms.ConnectionFactory"
-};
-
-ConfigOption jms_wl_client_opt5 =
-{
-" *  mw-lookup-topic=<string>",
-
-"        The name of the JMS topic. [optional]",
-
-"        The name of the JMS topic as defined in the JNDI definition.",
-
-"        Example:\n"
-"            mw-lookup-topic=GMSEC/TEST/PUBLISH"
-};
-
-ConfigOption jms_wl_client_opt6 =
-{
-" *  weblogic.security.CustomTrustKeyStoreFileName=<string>",
-
-"        The path (file name) to the Trust Key Store file. [optional]",
-
-"        No additional details available.",
-
-"        Example:\n"
-"            weblogic.security.CustomTrustKeyStoreFileName=MyKeys.ts"
-};
-
-ConfigOption jms_wl_client_opt7 =
-{
-" *  weblogic.security.CustomTrustKeyStoreType=<string>",
-
-"        The Custom Trust Key Store type. [optional]",
-
-"        No additional details available.",
-
-"        Example:\n"
-"            <none available>"
-};
-
-ConfigOption jms_wl_client_opt8 =
-{
-" *  weblogic.security.CustomTrustKeyStorePassPhrase=<string>",
-
-"        The Custom Trust Key Store passphrase. [optional]",
-
-"        No additional details available.",
-
-"        Example:\n"
-"            <none available>"
+"            password=secret"
 };
 
 

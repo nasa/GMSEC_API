@@ -907,6 +907,17 @@ public class Connection
 
 
 	/**
+	 * Returns middleware broker connection information.
+	 *
+	 * @return The middleware broker connection information.
+	 */
+	public String getConnectionEndpoint()
+	{
+		return m_jniConnection.getConnectionEndpoint();
+	}
+
+
+	/**
 	 * Retrieves the number of messages queued for asynchronous publish operation.
 	 *
 	 * @return The number of messages remaining in the queue.
@@ -919,6 +930,8 @@ public class Connection
 
 	/**
 	 * Calls shutdown routines for each middleware that has a shutdown routine registered.
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 */
 	public static void shutdownAllMiddlewares()
 	{
@@ -931,6 +944,8 @@ public class Connection
 	 *
 	 * @param name A string representing the library name of the gmsec wrapper for
 	 * the middleware to shutdown; e.g., "gmsec_mb".
+	 * This method should only be called once, typically just before an application terminates. 
+	 * Note the calling of this method is optional.
 	 *
 	 * @throws IllegalArgumentException Thrown if the given name string is null or contains an empty string.
 	 */

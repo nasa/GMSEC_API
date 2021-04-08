@@ -496,7 +496,7 @@ public:
 	 * @brief This function checks to see if there is enough memory available for
 	 * provided number of bytes
 	 **/
-	bool checkAvailable(int count);
+	bool checkAvailable(GMSEC_U32 count);
 
 private:
 	MessageDecoder(MessageDecoder &decoder);
@@ -516,29 +516,28 @@ private:
 const char GMSEC_ENCODED_CONTENT_FIELD[] = "GMSEC_CONTENT";
 
 /* largest encoded blob (2GB) */
-const int GMSEC_ENCODED_LIMIT = 0x80000000;
-
+const GMSEC_U32 GMSEC_ENCODED_LIMIT = 0x80000000;
 
 /* largest blob of data (1GB) */
-const int GMSEC_BIN_LIMIT = 0x40000000;
+const GMSEC_U32 GMSEC_BIN_LIMIT = 0x40000000;
 
 /* maximum length of GMSEC_STRING (16MB) */
-const int GMSEC_STRING_LIMIT = 0x01000000;
+const GMSEC_U32 GMSEC_STRING_LIMIT = 0x01000000;
 
 /* how many bytes are used to indicate the encoding */
-const int GMSEC_ENCODING_BYTES = 2;
+const GMSEC_U32 GMSEC_ENCODING_BYTES = 2;
 
 /* how many bytes are used to indicate the field type */
-const int GMSEC_TYPE_BYTES = 2;
+const GMSEC_U32 GMSEC_TYPE_BYTES = 2;
 
 /* how many bytes are used to indicate the number of fields */
-const int GMSEC_FIELD_COUNT_BYTES = 4;
+const GMSEC_U32 GMSEC_FIELD_COUNT_BYTES = 4;
 
 /* how many bytes are used to store a string/blob length */
-const int GMSEC_LENGTH_BYTES = 4;
+const GMSEC_U32 GMSEC_LENGTH_BYTES = 4;
 
 /* how many bytes are used to store a COMPOUND_FIELD count */
-const int GMSEC_COMPOUND_BYTES = 4;
+const GMSEC_U32 GMSEC_COMPOUND_BYTES = 4;
 
 /* header fields have this bit applied to their type */
 const GMSEC_U16 GMSEC_FLAG_HEADER_FIELD = 0x8000;
