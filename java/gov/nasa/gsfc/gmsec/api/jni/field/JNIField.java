@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,12 +31,8 @@ public class JNIField
 
 	protected void finalize() throws Throwable
 	{
-		try {
-			delete();
-		}
-		finally {
-			super.finalize();
-		}
+		delete();
+		super.finalize();
 	}
 
 
@@ -45,9 +41,10 @@ public class JNIField
 		if (swigCPtr != 0 && swigCMemOwn)
 		{
 			gmsecJNI.delete_Field(swigCPtr, this);
-			swigCMemOwn = false;
 		}
-		swigCPtr = 0;
+
+		swigCPtr    = 0;
+		swigCMemOwn = false;
 	}
 
 

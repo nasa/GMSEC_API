@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -256,6 +256,9 @@ private:
 jobject createJavaMessage(JNIEnv* jenv, const gmsec::api::Message& message);
 
 
+jobject createJavaStatus(JNIEnv* jenv, const gmsec::api::Status& status);
+
+
 int messageKindToJava(JNIEnv* jenv, gmsec::api::Message::MessageKind msgKind);
 
 
@@ -265,7 +268,7 @@ gmsec::api::Message::MessageKind messageKindToNative(JNIEnv* jenv, jint msgKind)
 int fieldTypeToJava(JNIEnv* jenv, gmsec::api::Field::FieldType fieldType);
 
 
-jobject convertEvent(JNIEnv* jenv, gmsec::api::Connection::ConnectionEvent event);
+jobject lookupEvent(gmsec::api::Connection::ConnectionEvent event);
 
 
 /*

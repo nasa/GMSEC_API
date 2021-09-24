@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2020 United States Government as represented by the
+# Copyright 2007-2021 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -20,7 +20,7 @@ if [[ "$systype" == "Darwin" || "$systype" == "Mac" ]]; then
     pushd bin > /dev/null
 
     products=( libgmsec_ruby.bundle _libgmsec_python.so _libgmsec_python3.so \
-               libgmsec_activemq384.dylib libgmsec_activemq394.dylib libgmsec_activemq395.dylib libgmsec_amqp.dylib \
+               libgmsec_activemq395.dylib libgmsec_amqp.dylib \
                libgmsec_artemis.dylib \
                libgmsec_bolt.dylib libgmsec_c2.dylib libgmsec_generic_jms.dylib libgmsec_jni.jnilib libgmsec_mb.dylib libgmsec_perl.dylib \
                MBServer gm_msg_config gmconfig_edit gmhelp gmpub gmreq gmrpl gmsub throughput_pub throughput_sub )
@@ -34,20 +34,6 @@ if [[ "$systype" == "Darwin" || "$systype" == "Mac" ]]; then
     old_support1="/Users/nightrun/dave"
     old_support2="/Users/gsfc-580-nightrun/build"
     new_support="/Users/gsfc-580-nightrun/nightrun/API/GMSEC_SUPPORT"
-
-
-    # libgmsec_activemq384.dylib
-    if [ -f libgmsec_activemq384.dylib ]; then
-        install_name_tool -change "${old_support1}/activemq/lib/libactivemq-cpp.18.dylib" "${new_support}/activemq384/lib/libactivemq-cpp.18.dylib" libgmsec_activemq384.dylib
-        install_name_tool -change "${old_support1}/activemq/lib/libapr-1.0.dylib" "${new_support}/activemq384/lib/libapr-1.0.dylib" libgmsec_activemq384.dylib
-    fi
-
-
-    # libgmsec_activemq394.dylib
-    if [ -f libgmsec_activemq394.dylib ]; then
-        install_name_tool -change "${old_support1}/activemq/lib/libactivemq-cpp.19.dylib" "${new_support}/activemq394/lib/libactivemq-cpp.19.dylib" libgmsec_activemq394.dylib
-        install_name_tool -change "${old_support1}/activemq/lib/libapr-1.0.dylib" "${new_support}/activemq394/lib/libapr-1.0.dylib" libgmsec_activemq394.dylib
-    fi
 
 
     # libgmsec_activemq395.dylib
