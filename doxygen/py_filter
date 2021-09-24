@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-$PYTHON3_HOME/bin/doxypypy -a -c $1
