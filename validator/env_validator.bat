@@ -1,6 +1,6 @@
 @echo off
 
-rem Copyright 2007-2020 United States Government as represented by the
+rem Copyright 2007-2021 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -163,12 +163,6 @@ if !errorlevel! == 0 (
 	goto endhere
 )
 
-echo %mw_type% | findstr "gmsec_websphere" 1>NUL
-if !errorlevel! == 0 (
-	call:CheckWebsphere
-	goto endhere
-)
-
 call:UnknownMiddleware
 
 :endhere
@@ -218,13 +212,12 @@ echo.Usage: env_validator.bat ^<middleware^> [check_JMS]
 echo.
 echo.where ^<middleware^> is one of the following:
 echo.
-echo.       activemq38, activemq39
+echo.       activemq39
 echo.		amqp
 echo.		artemis
 echo.       bolt
 echo.       ibmmq90
 echo.       mb
-echo.       websphere80
 echo.
 echo.Note: It is also acceptable to preface any of the above middleware types
 echo.      with 'gmsec_'.  For example, 'gmsec_activemq39'.

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2020 United States Government as represented by the
+# Copyright 2007-2021 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -23,7 +23,9 @@ if [[ "$GMSEC_PLATFORM" == "linux"* ]]; then
 	sed -i 's/<gmsec4\/Exception.h>/<gmsec4\/Exception.h>\n\n\#include <gmsec4\/util\/Deprecated.h>\nGMSEC_DISABLE_DEPRECATED_WARNINGS\n/g' $WRAPPED_SRC
     echo GMSEC_ENABLE_DEPRECATED_WARNINGS >> $WRAPPED_SRC
 
+    # Depending on the version of SWIG, the generated code varies
     sed -i 's/class GmsecError(_object)/class GmsecError(Exception)/g' $PYTHON_SRC
+    sed -i 's/class GmsecError(object)/class GmsecError(Exception)/g' $PYTHON_SRC
 
 elif [[ "$GMSEC_PLATFORM" == "macosx"* ]]; then
 
@@ -42,7 +44,9 @@ elif [[ "$GMSEC_PLATFORM" == "macosx"* ]]; then
 
     echo GMSEC_ENABLE_DEPRECATED_WARNINGS >> $WRAPPED_SRC
 
+    # Depending on the version of SWIG, the generated code varies
     sed -i '' 's/class GmsecError(_object)/class GmsecError(Exception)/g' $PYTHON_SRC
+    sed -i '' 's/class GmsecError(object)/class GmsecError(Exception)/g' $PYTHON_SRC
 
 else
 

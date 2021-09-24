@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -61,30 +61,21 @@ void CxxEventCallbackProxy::onEvent(Connection& conn, const Status& status, Conn
 		return;
 	}
 
-	jstring statusString = makeJavaString(jenv, status.getReason());
+	jobject jStatus = createJavaStatus(jenv, status);
+	jobject jEvent  = lookupEvent(event);
 
-	if (!jvmOk(jenv, "CxxEventCallbackProxy.onEvent: makeJavaString(jenv, status)") || !statusString)
+	if (jStatus != 0 && jEvent != 0)
 	{
-		GMSEC_WARNING << "CxxEventCallbackProxy::onEvent() -- Unable to create status jstring.";
-		return;
+		jenv->CallVoidMethod(jCallback, callbackMethod, jConnection, jStatus, jEvent);
+
+		jvmOk(jenv, "CxxEventCallbackProxy.onEvent");
 	}
-
-	jobject jStatus = jenv->NewObject(Cache::getCache().classJNIStatus,
-			Cache::getCache().methodStatusInitIJString,
-			(jint) status.getClass(), (jint) status.getCode(), statusString, status.getCustomCode());
-
-	if (!jvmOk(jenv, "CxxEventCallbackProxy.onEvent: create JNIStatus") || jStatus == NULL)
+	else
 	{
-		GMSEC_WARNING << "CxxEventCallbackProxy::onEvent() -- Unable to create JNIStatus.";
-		return;
+		GMSEC_ERROR << "Unable to call EventCallback onEvent() method";
 	}
-
-	jenv->CallVoidMethod(jCallback, callbackMethod, jConnection, jStatus, convertEvent(jenv, event));
-
-	jvmOk(jenv, "CxxEventCallbackProxy.onEvent");
 
 	jenv->DeleteLocalRef(jStatus);
-	jenv->DeleteLocalRef(statusString);
 }
 
 

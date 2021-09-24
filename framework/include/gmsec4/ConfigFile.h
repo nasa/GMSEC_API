@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -59,7 +59,7 @@ namespace api
  *     <SUBSCRIPTION NAME="custom1" PATTERN="CUSTOM.MESSAGE.SUBJECTS.*"/>
  *
  *     <CONFIG NAME="config1">
- *         <PARAMETER NAME="connectionType">gmsec_activemq394</PARAMETER>
+ *         <PARAMETER NAME="connectionType">gmsec_activemq39</PARAMETER>
  *         <PARAMETER NAME="server">tcp://myserver:61616</PARAMETER>
  *     </CONFIG>
  *

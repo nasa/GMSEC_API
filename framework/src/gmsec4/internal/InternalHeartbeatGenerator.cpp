@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -45,7 +45,7 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 	  m_hbMsg(0),
 	  m_pubRate(static_cast<GMSEC_I64>(hbPubRate)),
 	  m_counter(1),
-	  m_publishAction(0),
+	  m_publishAction(new ActionInfo( static_cast<long>(m_pubRate) )),
 	  m_alive(false),
 	  m_startupLatch(0),
 	  m_shutdownLatch(0),
@@ -84,7 +84,7 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 	  m_hbMsg(0),
 	  m_pubRate(static_cast<GMSEC_I64>(hbPubRate)),
 	  m_counter(1),
-	  m_publishAction(0),
+	  m_publishAction(new ActionInfo( static_cast<long>(m_pubRate) )),
 	  m_alive(false),
 	  m_startupLatch(0),
 	  m_shutdownLatch(0),
@@ -366,8 +366,6 @@ void InternalHeartbeatGenerator::run()
 	m_alive.set(true);
 
 	m_startupLatch->countDown();
-
-	m_publishAction.reset(new ActionInfo( static_cast<long>(m_pubRate) ));
 
 	// Flag that will be used to indicate that we should publish
 	// first heartbeat message immediately upon starting the

@@ -69,7 +69,7 @@ Any inconsistancies or problems should be sent to gmsec-support@lists.nasa.gov
     </CONFIG>
 
     <CONFIG NAME="ActiveMQ Configuration">
-        <PARAMETER NAME="mw-id">activemq394</PARAMETER>
+        <PARAMETER NAME="mw-id">activemq39</PARAMETER>
         <PARAMETER NAME="server">tcp://localhost:61616</PARAMETER>
         <PARAMETER NAME="gmsec-specification-version">201600</PARAMETER>
         <PARAMETER NAME="gmsec-validation-level">3</PARAMETER>

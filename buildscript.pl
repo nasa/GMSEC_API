@@ -1,12 +1,7 @@
- 
-# Copyright 2007-2020 United States Government as represented by the
+# Copyright 2007-2021 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
-
-
-
-
 
  
 ######################################################################
@@ -30,23 +25,33 @@ eval
 	my $java_file_4x = 'java/gov/nasa/gsfc/gmsec/api/ApiVersion.java';
 	my $bolt_file    = 'wrapper/bolt/java/bolt/Version.java';
 
-	my %info;
+	if ( ($#ARGV == 0) && ($ARGV[0] eq "clean") )
+	{
+		unlink($cxx_file);
+		unlink($java_file);
+		unlink($java_file_4x);
+		unlink($bolt_file);
+	}
+	else
+	{
+		my %info;
 
-	getTimestamp(\%info);
-	# getBuild(\%info);
-	getGMSEC(\%info);
-	getOS(\%info);
-	getCxx(\%info);
-	getJava(\%info);
-	getPerl(\%info);
-	getMagic(\%info);
+		getTimestamp(\%info);
+		# getBuild(\%info);
+		getGMSEC(\%info);
+		getOS(\%info);
+		getCxx(\%info);
+		getJava(\%info);
+		getPerl(\%info);
+		getMagic(\%info);
 
-	writeCxx($cxx_file, \%info);
-	writeJava($java_file, "gmsecapi", \%info);
-	writeJava($java_file_4x, "gmsec.api", \%info);
-	writeBolt($bolt_file, "bolt", \%info);
+		writeCxx($cxx_file, \%info);
+		writeJava($java_file, "gmsecapi", \%info);
+		writeJava($java_file_4x, "gmsec.api", \%info);
+		writeBolt($bolt_file, "bolt", \%info);
 
-	updateDoxygen(\%info, glob('doxygen/*_4x_*.html'));
+		updateDoxygen(\%info, glob('doxygen/*_4x_*.html'));
+	}
 
 	print "done\n";
 };

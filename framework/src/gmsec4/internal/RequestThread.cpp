@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,6 +19,10 @@
 #include <gmsec4/internal/InternalMessage.h>
 #include <gmsec4/internal/InternalStatus.h>
 
+#include <gmsec4/internal/mist/ConnMgrCallbacks.h>
+#include <gmsec4/internal/mist/ConnMgrCallbackCache.h>
+#include <gmsec4/mist/mist_defs.h>
+
 #include <gmsec4/Connection.h>
 #include <gmsec4/Callback.h>
 #include <gmsec4/Message.h>
@@ -31,6 +35,7 @@
 
 
 using namespace gmsec::api::util;
+using namespace gmsec::api::mist::internal;
 
 namespace gmsec {
 namespace api {
@@ -343,8 +348,8 @@ static bool allowMoreResponses(PendingRequest* pending, Message* reply)
 		RESPONSE_FAILED  = 4,
 		RESPONSE_INVALID = 5,
 		RESPONSE_FINAL   = 6
-	};
-
+	}; 
+	
 	return (responseStatus == RESPONSE_ACK || responseStatus == RESPONSE_WORKING);
 }
 
@@ -353,6 +358,7 @@ void RequestShared::deliverReply(Message* reply)
 {
 	std::string replyID;
 
+	//get unique reply ID from field in reply message
 	try
 	{
 		const StringField& field = reply->getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
@@ -368,6 +374,7 @@ void RequestShared::deliverReply(Message* reply)
 		return;
 	}
 
+	//look up corresponding pending request
 	PendingRequest* pending = findPending(replyID);
 
 	if (!pending)
@@ -377,15 +384,29 @@ void RequestShared::deliverReply(Message* reply)
 		return;
 	}
 
+	//check for muli-response, false if multi-response config is false or not configured
 	bool allowMore = allowMoreResponses(pending, reply);
 
 	if (pending->isDone)
 	{
+		//pending request indicates done, do nothing
 		GMSEC_DEBUG << "RequestShared::deliverReply: " << replyID.c_str() << " already isDone";
 	}
 	else if (pending->replyCallback)
 	{
 		m_connection->replyCallback(pending->replyCallback, *pending->request, *reply);
+
+		//delete callback if multi-response is disabled or RESPONSE-STATUS indicates no more responses
+		if (!allowMore || !reply->hasField("RESPONSE-STATUS") || reply->getIntegerValue("RESPONSE-STATUS") != mist::ResponseStatus::WORKING_KEEP_ALIVE)
+		{
+			CMReplyCallback* cm_rcb = dynamic_cast<CMReplyCallback*>(pending->replyCallback);
+			if (cm_rcb != NULL)
+			{
+				ConnMgrCallbackCache::getCache().getAndRemoveReplyCallback(cm_rcb->getCallback());
+
+				delete cm_rcb;
+			}
+		}
 
 		delete reply;
 	}
@@ -397,6 +418,7 @@ void RequestShared::deliverReply(Message* reply)
 		m_condition.broadcast(DELIVER_REPLY);
 	}
 
+	//set pending request to done if multi-response is disabled
 	if (!allowMore)
 	{
 		pending->isDone = true;

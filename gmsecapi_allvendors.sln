@@ -25,13 +25,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "c2_nss", "wrapper\c2_nss\c2
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmhelp", "tools\gmhelp\gmhelp.vcxproj", "{D4A09817-D688-4F3B-AA00-C77A2ACC1676}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "activemq384", "wrapper\activemq384\activemq384.vcxproj", "{B2654EBC-C0A9-43C4-98A3-EA42A2D8A91C}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "activemq394", "wrapper\activemq394\activemq394.vcxproj", "{5D534130-EE57-4A23-BC29-EE0E9347FD05}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "activemq395", "wrapper\activemq395\activemq395.vcxproj", "{29BE00D5-DDB4-44D3-BEC0-A9904FDB4435}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "websphere80", "wrapper\websphere80\websphere80.vcxproj", "{62A948D2-876B-4F8C-8C75-C3BED86A81E4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_perl", "perl\gmsec4\libgmsec_perl.vcxproj", "{8D4F2C8C-A403-4242-9C02-58DC93306D38}"
 EndProject
