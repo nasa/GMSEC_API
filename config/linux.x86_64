@@ -1,4 +1,4 @@
-# Copyright 2007-2020 United States Government as represented by the
+# Copyright 2007-2021 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -17,6 +17,10 @@ ifeq ($(findstring openjdk,$(OPEN_JDK)), openjdk)
 JAVA_LIBS = -L$(JDK_HOME)/lib/server -ljvm
 else
 JAVA_LIBS = -L$(JDK_HOME)/jre/lib/amd64/server -ljvm
+endif
+
+ifndef PERL5_INC
+PERL5_INC = /usr/lib64/perl5
 endif
 
 ifndef PERL5_LIB

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,13 +20,12 @@ ConfigOption amq_client_opt1 =
 {
 " *  mw-id=<string>",
 
-"        <string> must be activemq38 or activemq39. [required]",
+"        <string> must be activemq39. [required]",
 
 "        Used to specify the type of connection object to set up. For ActiveMQ\n"
-"        clients, this must be set to either activemq38 or activemq39.\n",
+"        clients, this must be set to activemq39.\n",
 
 "        Example:\n"
-"            mw-id=activemq38\n"
 "            mw-id=activemq39\n"
 "        \n"
 "        Note: For information regarding using the GMSEC Generic JMS wrapper\n"

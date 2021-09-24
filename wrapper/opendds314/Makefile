@@ -69,9 +69,9 @@ all default: clean gen-srcs library config
 
 
 gen-srcs:
-	@ LD_LIBRARY_PATH=$(SUPDIR)/lib $(TAO_IDL) $(GMSEC_IDL_FILE) -o $(OBJDIR)
-	@ LD_LIBRARY_PATH=$(SUPDIR)/lib $(OPENDDS_IDL) $(GMSEC_IDL_FILE) -o $(OBJDIR)
-	@ LD_LIBRARY_PATH=$(SUPDIR)/lib $(TAO_IDL) -I$(SRCDIR) -I$(SUPDIR)/include $(OPENDDS_IDL_FILE) -o $(OBJDIR)
+	@ LD_LIBRARY_PATH=$(SUPDIR)/lib $(TAO_IDL) $(GMSEC_IDL_FILE) -o $(OBJDIR) --idl-version 4
+	@ LD_LIBRARY_PATH=$(SUPDIR)/lib $(OPENDDS_IDL) $(GMSEC_IDL_FILE) -o $(OBJDIR) --idl-version 4
+	@ LD_LIBRARY_PATH=$(SUPDIR)/lib $(TAO_IDL) -I$(SRCDIR) -I$(SUPDIR)/include $(OPENDDS_IDL_FILE) -o $(OBJDIR) --idl-version 4
 
 
 library: $(BINDIR)/$(TARGET)

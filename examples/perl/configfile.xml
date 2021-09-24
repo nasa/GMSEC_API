@@ -12,7 +12,7 @@
 	</CONFIG>		
 
 	<CONFIG NAME="config1">
-		<PARAMETER NAME="mw-id">activemq394</PARAMETER>
+		<PARAMETER NAME="mw-id">activemq39</PARAMETER>
 		<PARAMETER NAME="server">tcp://myserver:61616</PARAMETER>
 		<PARAMETER NAME="tracking">false</PARAMETER>
 	</CONFIG>

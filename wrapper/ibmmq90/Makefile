@@ -1,4 +1,4 @@
-# Copyright 2007-2020 United States Government as represented by the
+# Copyright 2007-2021 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -27,7 +27,7 @@ LOCAL_INCS	= -I$(SUPDIR)/include -I$(GLUE)/include
 
 CXXFLAGS	+= $(LOCAL_DEFS) $(LOCAL_INCS)
 
-LDFLAGS		+= -L$(SUPDIR)/lib -lmqic_r
+LDFLAGS		+= -L$(SUPDIR)/lib64 -lmqic_r
 
 SRCDIR		= $(GLUE)/src
 OBJDIR		= ../websphere/src

@@ -7,15 +7,15 @@ module OpenDDSMessage
 #  define KEY
 #endif
 
+
+	typedef sequence<octet> OctetSeq;
+
 #ifdef __OPENDDS_IDL_HAS_ANNOTATIONS
 @topic
 #else
 #  pragma DCPS_DATA_TYPE "OpenDDSMessage::Message"
 #  pragma DCPS_DATA_KEY  "OpenDDSMessage::Message subject_id"
 #endif
-
-	typedef sequence<octet> OctetSeq;
-
 	struct Message
 	{
 		KEY string 	subject_id;

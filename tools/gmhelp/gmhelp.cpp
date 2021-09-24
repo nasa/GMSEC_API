@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,7 +15,6 @@
 #include "JMS_help.h"
 #include "MB_help.h"
 #include "OpenDDS_help.h"
-#include "WS_help.h"
 #include "ZeroMQ_help.h"
 
 #include <gmsec4/internal/StringUtil.h>
@@ -86,15 +85,6 @@ MiddlewareHelp::MiddlewareHelp()
     opendds.client.insert(opendds_client_opt4);
     opendds.server.insert(opendds_server_opt1);
 
-    MiddlewareOptions ws;
-    ws.client.insert(ws_client_opt1);
-    ws.client.insert(ws_client_opt2);
-    ws.client.insert(ws_client_opt3);
-    ws.client.insert(ws_client_opt4);
-    ws.client.insert(ws_client_opt5);
-    ws.client.insert(ws_client_opt6);
-    ws.server.insert(ws_server_opt1);
-
 	MiddlewareOptions zmq;
 	zmq.client.insert(zmq_client_opt1);
 	zmq.client.insert(zmq_client_opt2);
@@ -117,14 +107,6 @@ MiddlewareHelp::MiddlewareHelp()
     jms_ibmmq.client.insert(jms_ws_client_opt4);
     jms_ibmmq.client.insert(jms_ws_client_opt5);
 
-    MiddlewareOptions jms_ws;
-    jms_ws.client.insert(jms_ws_client_opt1);
-    jms_ws.client.insert(jms_ws_client_opt2);
-    jms_ws.client.insert(jms_ws_client_opt3);
-    jms_ws.client.insert(jms_ws_client_opt4);
-    jms_ws.client.insert(jms_ws_client_opt5);
-
-
     // Setup look-up mapping.
     m_helpMap["activemq"] = amq;
     m_helpMap["artemis"] = art;
@@ -132,12 +114,10 @@ MiddlewareHelp::MiddlewareHelp()
     m_helpMap["ibmmq"] = ibmmq;
     m_helpMap["mb"] = mb;
     m_helpMap["opendds"] = opendds;
-    m_helpMap["websphere"] = ws;
     m_helpMap["zeromq"] = zmq;
 
     m_helpMap["generic_jms_activemq"] = jms_amq;
     m_helpMap["generic_jms_ibmmq"] = jms_ibmmq;
-    m_helpMap["generic_jms_websphere"] = jms_ws;
 }
 
 
@@ -173,8 +153,7 @@ MiddlewareHelp::processUserRequest(int argc, char** argv) const
             jms_mw = StringUtil::stringToLower(argv[2]);
 
             if (jms_mw != "activemq" &&
-                jms_mw != "ibmmq" &&
-                jms_mw != "websphere")
+                jms_mw != "ibmmq")
             {
                 cerr << "ERROR: unknown jms-mw of '" << jms_mw << "' found.\n" << endl;
                 showUsage(progName);
@@ -232,13 +211,12 @@ MiddlewareHelp::showUsage(std::string progName) const
          << "\n"
          << "    Must be one of the following middlewares:\n"
          << "\n"
-         << "      gmsec_activemq38, gmsec_activemq39\n"
+         << "      gmsec_activemq39\n"
          << "      gmsec_artemis\n"
          << "      gmsec_bolt\n"
          << "      gmsec_ibmmq90\n"
          << "      gmsec_mb\n"
          << "      gmsec_opendds312\n"
-         << "      gmsec_websphere80\n"
          << "      gmsec_zeromq413\n"
          << "      gmsec_generic_jms\n"
          << "\n"
@@ -252,11 +230,10 @@ MiddlewareHelp::showUsage(std::string progName) const
 
     cerr << " *  [jms-mw]\n"
          << "\n"
-         << "    The type of middleware server being used by the JMS wrapper.  Must be one\n"
-         << "    of the following:\n"
+         << "    The type of middleware server being used by the JMS wrapper.  Must be the\n"
+         << "    following:\n"
          << "\n"
          << "      activemq\n"
-         << "      websphere\n"
          << "\n"
          << endl;
 

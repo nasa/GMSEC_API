@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -64,30 +64,21 @@ void CxxConnMgrReplyCallbackProxy::onEvent(ConnectionManager& connMgr, const Sta
 		return;
 	}
 
-	jstring jStatusString = makeJavaString(jenv, status.getReason());
+	jobject jStatus = createJavaStatus(jenv, status);
+	jobject jEvent  = lookupEvent(event);
 
-	if (!jvmOk(jenv, "JNIMistReplyCallbackProxy.onEvent") || !jStatusString)
+	if (jStatus != 0 && jEvent != 0)
 	{
-		GMSEC_WARNING << "JNIMistReplyCallbackProxy::onEvent() -- Unable to create status jstring.";
-		return;
+		jenv->CallVoidMethod(jCallback, callbackMethod, jConnMgr, jStatus, jEvent);
+
+		jvmOk(jenv, "CxxConnMgrReplyCallbackProxy.onEvent");
 	}
-
-	jobject jStatus = jenv->NewObject(Cache::getCache().classJNIStatus,
-		Cache::getCache().methodStatusInitIJString,
-		(jint) status.getClass(), (jint) status.getCode(), jStatusString, (jint) status.getCustomCode());
-
-	if (!jvmOk(jenv, "JNIMistReplyCallbackProxy.onEvent") || !jStatus)
+	else
 	{
-		GMSEC_WARNING << "JNIMistReplyCallbackProxy::onEvent() -- Unable to create status jstring.";
-		return;
+		GMSEC_ERROR << "Unable to call ConnectionManagerReplyCallback onEvent() method";
 	}
-
-	jenv->CallVoidMethod(jCallback, callbackMethod, jConnMgr, jStatus, convertEvent(jenv, event));
-
-	jvmOk(jenv, "CxxConnMgrReplyCallbackProxy.onEvent");
 
 	jenv->DeleteLocalRef(jStatus);
-	jenv->DeleteLocalRef(jStatusString);
 }
 
 

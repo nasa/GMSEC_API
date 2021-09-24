@@ -1,5 +1,5 @@
  
-# Copyright 2007-2020 United States Government as represented by the
+# Copyright 2007-2021 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -17,8 +17,9 @@ ifndef GMSEC_PLATFORM
 
 else
 
-RELEASE    = ../release
-GMSEC_HOME = .
+GMSEC_HOME      = .
+RELEASE_DIR     = ../release
+GMSEC_API_DEST := $(RELEASE_DIR)/GMSEC_API
 
 include $(GMSEC_HOME)/config/$(GMSEC_PLATFORM)
 
@@ -37,7 +38,7 @@ check_support:
 
 build:
 ifneq (, $(shell which perl))
-	CXX=$(CXX) perl buildscript.pl	
+	CXX="$(CXX)" perl buildscript.pl
 else
 	@echo
 	@echo
@@ -116,7 +117,7 @@ endif
 
 
 perl_api_3x:
-ifneq ($(wildcard $(PERL5_LIB)/CORE/perl.h),)
+ifdef PERL5_LIB
 	@echo
 	@echo
 	@echo "###########################################################"
@@ -141,8 +142,19 @@ endif
 
 perl_api_4x:
 ifdef SWIG_HOME
-ifneq ($(wildcard $(PERL5_LIB)/CORE/perl.h),)
+ifdef PERL5_LIB
+ifdef PERL5_INC
 	$(MAKE) -C perl/gmsec4
+else
+	@echo
+	@echo
+	@echo "###########################################################"
+	@echo "#"
+	@echo "#  PERL5_INC is not defined, or Perl tools not available"
+	@echo "#  Skipping build of Perl binding of the GMSEC API 4.x"
+	@echo "#"
+	@echo "###########################################################"
+endif
 else
 	@echo
 	@echo
@@ -261,6 +273,9 @@ all_examples:
 
 
 clean: clean-gcov
+ifneq (, $(shell which perl))
+	CXX="$(CXX)" perl buildscript.pl $@
+endif
 	$(RM) -r $(BINDIR)/amqp
 	$(RM) -r $(BINDIR)/lib
 	$(RM) -r $(BINDIR)/validator
@@ -290,14 +305,12 @@ install:
 	@ echo "# Installing the GMSEC API"
 	@ echo "#"
 	@ echo "###########################################################"
-	if [ -d $(RELEASE) ] ; then rm -rf $(RELEASE) ; fi
-	mkdir -p $(RELEASE)/GMSEC_API
+	mkdir -p $(RELEASE_DIR)
+	$(RM) -r $(GMSEC_API_DEST) && mkdir $(GMSEC_API_DEST)
 	find . -type d -name '\?' | xargs -n 20 rm -rf   # remove oracle_jre_usage info (if any)
-	tar cf - *.txt bin config templates examples -C framework include \
-		--exclude='.svn' --exclude=vendor \
-		--exclude=secure --exclude=internal \
-		| tar xf - -C $(RELEASE)/GMSEC_API
-	(cd $(RELEASE); tar zcf GMSEC_API.tgz GMSEC_API)
+	cp -a README.txt bin config templates examples framework/include $(GMSEC_API_DEST)
+	$(RM) -r $(GMSEC_API_DEST)/include/gmsec/internal
+	$(RM) -r $(GMSEC_API_DEST)/include/gmsec4/internal
 
 install_docs:
 	$(MAKE) install -C doxygen

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -11,6 +11,7 @@
 
 #include "gov_nasa_gsfc_gmsec_api_jni_gmsecJNI.h"
 
+#include <gmsec4/Connection.h>
 #include <gmsec4/util/Mutex.h>
 
 #include <map>
@@ -23,7 +24,6 @@ namespace gmsec
 namespace api
 {
 	class Callback;
-	class Connection;
 	class EventCallback;
 	class ReplyCallback;
 
@@ -65,7 +65,7 @@ public:
 
 	void initialize(JNIEnv* jenv);
 
-	void addGlobalReference(jobject o);
+	jobject addGlobalReference(JNIEnv* jenv, jobject o);
 
 	void putConnection(gmsec::api::Connection* conn, jobject jConnection);
 
@@ -176,6 +176,9 @@ public:
 	// U64 references
 	jclass classU64;
 	jmethodID methodU64Init;
+
+	// ConnectionEvent references
+	std::map<gmsec::api::Connection::ConnectionEvent, jobject> connectionEvents;
 
 	// for detaching thread of JVM version is greater than 1.4
 	jboolean enableDetach;

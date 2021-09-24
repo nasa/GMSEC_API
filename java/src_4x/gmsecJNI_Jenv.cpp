@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -294,6 +294,32 @@ jobject gmsec::api::jni::createJavaMessage(JNIEnv* jenv, const gmsec::api::Messa
 }
 
 
+jobject gmsec::api::jni::createJavaStatus(JNIEnv* jenv, const gmsec::api::Status& status)
+{
+    jstring statusString = makeJavaString(jenv, status.getReason());
+
+    if (!jvmOk(jenv, "makeJavaString(jenv, status)") || !statusString)
+    {
+		GMSEC_WARNING << "Unable to create Java Status";
+        return 0;
+    }
+
+    jobject jStatus = jenv->NewObject(Cache::getCache().classJNIStatus,
+            Cache::getCache().methodStatusInitIJString,
+            (jint) status.getClass(), (jint) status.getCode(), statusString, status.getCustomCode());
+
+    if (!jvmOk(jenv, "createJavaStatus") || jStatus == NULL)
+    {
+		GMSEC_WARNING << "Unable to create Java Status object";
+        return 0;
+    }
+
+	jenv->DeleteLocalRef(statusString);
+
+	return jStatus;
+}
+
+
 int gmsec::api::jni::messageKindToJava(JNIEnv* jenv, gmsec::api::Message::MessageKind msgKind)
 {
     switch (msgKind)
@@ -353,31 +379,9 @@ int gmsec::api::jni::fieldTypeToJava(JNIEnv* jenv, gmsec::api::Field::FieldType 
 }
 
 
-jobject gmsec::api::jni::convertEvent(JNIEnv* jenv, gmsec::api::Connection::ConnectionEvent event)
+jobject gmsec::api::jni::lookupEvent(gmsec::api::Connection::ConnectionEvent event)
 {
-	jclass      clazz  = jenv->FindClass("gov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent");
-	const char* eventString = NULL;
-
-	switch (event)
-	{
-	case gmsec::api::Connection::DISPATCHER_ERROR_EVENT:        eventString = "DISPATCHER_ERROR_EVENT"; break;
-	case gmsec::api::Connection::REQUEST_TIMEOUT_EVENT:         eventString = "REQUEST_TIMEOUT_EVENT"; break;
-	case gmsec::api::Connection::CONNECTION_SUCCESSFUL_EVENT:   eventString = "CONNECTION_SUCCESSFUL_EVENT"; break;
-	case gmsec::api::Connection::CONNECTION_BROKEN_EVENT:       eventString = "CONNECTION_BROKEN_EVENT"; break;
-	case gmsec::api::Connection::CONNECTION_RECONNECT_EVENT:    eventString = "CONNECTION_RECONNECT_EVENT"; break;
-	case gmsec::api::Connection::CONNECTION_EXCEPTION_EVENT:    eventString = "CONNECTION_EXCEPTION_EVENT"; break;
-	case gmsec::api::Connection::GMD_ERROR_EVENT:               eventString = "GMD_ERROR_EVENT"; break;
-	case gmsec::api::Connection::WSMQ_ASYNC_STATUS_CHECK_EVENT: eventString = "WSMQ_ASYNC_STATUS_CHECK_EVENT"; break;
-	case gmsec::api::Connection::MSG_PUBLISH_FAILURE_EVENT:     eventString = "MSG_PUBLISH_FAILURE_EVENT"; break;
-	case gmsec::api::Connection::INVALID_MESSAGE_EVENT:         eventString = "INVALID_MESSAGE_EVENT"; break;
-
-	default: eventString = "ALL_EVENTS"; break;
-	}
-
-	jfieldID jField = jenv->GetStaticFieldID(clazz, eventString, "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
-	jobject  jEvent = jenv->GetStaticObjectField(clazz, jField);
-
-	return jEvent;
+	return Cache::getCache().connectionEvents[ event ];
 }
 
 
@@ -398,7 +402,7 @@ jclass gmsec::api::jni::getClass(JNIEnv* jenv, const std::string& name)
 	// done with the local reference
 	jenv->DeleteLocalRef(localRef);
 
-	Cache::getCache().addGlobalReference(globalRef);
+	Cache::getCache().addGlobalReference(jenv, globalRef);
 	gmsec::api::jni::jvmOk(jenv, "getClass");
 
 	return (jclass) globalRef;
