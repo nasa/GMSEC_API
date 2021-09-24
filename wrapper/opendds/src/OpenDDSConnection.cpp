@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -258,14 +258,13 @@ void OpenDDSConnection::mwDisconnect()
 {
 	try
 	{
-		if (m_requestSpecs.requestReplyEnabled && m_requestSpecs.useSubjectMapping)
-		{
-			mwUnsubscribe(m_requestSpecs.replySubject.c_str());
-		}
-
 		for (OpenDDSSubscriptions::iterator it = m_subscriptions.begin(); it != m_subscriptions.end(); ++it)
 		{
-			mwUnsubscribe(it->first.c_str());
+			OpenDDSSubscriber* sub = it->second;
+
+			(void) sub->subscriber->delete_datareader(sub->reader.in());
+
+			delete sub;
 		}
 		m_subscriptions.clear();
 

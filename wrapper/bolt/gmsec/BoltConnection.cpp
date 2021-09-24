@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -521,14 +521,16 @@ void BoltConnection::handleReply(SharedPacket& packet)
 		return;
 	}
 
-	getExternal().onReply(message);
+	if (!getExternal().onReply(message) && getExternal().getRequestSpecs().exposeReplies)
+	{
+		handlePacket(packet);
+	}
 }
 
 
 void BoltConnection::handlePacket(SharedPacket &packet)
 {
-	GMSEC_WARNING << "BoltConnection.handlePacket: should not be called";
-	packet->put(std::cout);
+	// no-op
 }
 
 

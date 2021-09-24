@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -144,11 +144,6 @@ InternalSpecification::InternalSpecification(const Config& config)
 		}
 		catch (...) {
 			throw Exception(MIST_ERROR, INVALID_CONFIG_VALUE, "\"GMSEC-SPECIFICATION-VERSION\" contains invalid value");
-		}
-
-		if (!checkValidSpec(m_specVersion))
-		{
-			throw Exception(MIST_ERROR, INVALID_CONFIG_VALUE, "\"GMSEC-SPECIFICATION-VERSION\" contains invalid version");
 		}
 
 		m_specVersionStr = version;
@@ -1454,7 +1449,7 @@ Status InternalSpecification::compare(const Message& msg, const FieldTemplateLis
 	std::list<size_t> arrayStartList;
 
 	//iterating through all the fields to make sure they are all in the message and correct
-	for (size_t fieldIndex = 0; (fieldIndex < fields.size()) && (status.isError() == false); ++fieldIndex)
+	for (size_t fieldIndex = 0; (fieldIndex < fields.size()); ++fieldIndex)
 	{
 		//the current iteration's field template we will be validating against
 		FieldTemplate* temp = fields[fieldIndex];
@@ -3586,28 +3581,19 @@ Specification::SchemaLevel InternalSpecification::getSchemaLevel() const
 
 void InternalSpecification::setVersion(unsigned int version)
 {
-	if(checkValidSpec(version))
-	{
-		std::ostringstream oss;
-		oss << version;
-		m_specVersionStr = oss.str();
+	std::ostringstream oss;
+	oss << version;
+	m_specVersionStr = oss.str();
 
-		//the templates need to be reloaded since the spec has been changed
-		cleanup();
+	//the templates need to be reloaded since the spec has been changed
+	cleanup();
 
-		try {
-			load();
-		}
-		catch (const Exception& e) {
-			cleanup();
-			throw e;
-		}
+	try {
+		load();
 	}
-	else
-	{
-		std::ostringstream oss;
-		oss << "Supplied specification version [" << version << "] is not valid.";
-		throw Exception(MIST_ERROR, INVALID_CONFIG, oss.str().c_str());
+	catch (const Exception& e) {
+		cleanup();
+		throw e;
 	}
 }
 
@@ -3638,21 +3624,6 @@ const char* InternalSpecification::getTemplateXML(const char* subject, const cha
 {
 	m_templateXML = findTemplate(schemaID).toXML(subject);
 	return m_templateXML.c_str();
-}
-
-
-bool InternalSpecification::checkValidSpec(unsigned int specVersionInt)
-{
-	switch(specVersionInt)
-	{
-		case GMSEC_ISD_2014_00:
-		case GMSEC_ISD_2016_00:
-		case GMSEC_ISD_2018_00:
-		case GMSEC_ISD_2019_00:
-			return true;
-		default:
-			return false;
-	}
 }
 
 

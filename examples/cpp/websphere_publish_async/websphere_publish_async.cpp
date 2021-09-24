@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 
 	if (mwID == NULL || std::string(mwID).find("websphere") == std::string::npos)
 	{
-		GMSEC_ERROR << "This example program will only run an mw-id set to a websphere wrapper (e.g. mw-id=websphere80)";
+		GMSEC_ERROR << "This example program will only run an mw-id set to a websphere wrapper (e.g. mw-id=ibmmq90)";
 		return -1;
 	}
 

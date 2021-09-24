@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -369,6 +369,7 @@ void SubscriptionInfo::run()
 				if (maxRetries > 0)
 				{
 					GMSEC_ERROR << "SubscriptionInfo - Unable to re-establish connection to server.";
+					conn->enqueueResult( Status(CONNECTION_ERROR, CONNECTION_LOST, "Unable to re-establish connection to server") );
 				}
 				doneWithLife = true;
 			}
@@ -828,7 +829,7 @@ void WebSConnection::mwConnect()
 	{
 		std::ostringstream ss;
 		ss << "MQCB ended with reason code " << CReason << ".";
-		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, CReason, ss.str().c_str());
+		GMSEC_WARNING << ss.str().c_str();
 	}
 
 	getExternal().setConnectionEndpoint(hostname);
@@ -866,7 +867,7 @@ void WebSConnection::mwDisconnect()
 	{
 		std::ostringstream ss;
 		ss << "MQDISC ended with reason code " << Reason << ".";
-		throw Exception(MIDDLEWARE_ERROR, CUSTOM_ERROR_CODE, Reason, ss.str().c_str());
+		GMSEC_WARNING << ss.str().c_str();
 	}
 
 	Status tmpStatus(NO_ERROR_CLASS, CONNECTION_LOST, "Connection disconnected");

@@ -9,7 +9,34 @@ contact the API Team at gmsec-support@lists.nasa.gov.
 
 
 ==============================================================================
-= GMSEC API 4.8 release notes (October 2020)
+= GMSEC API 4.9 release notes (March 2021)
+==============================================================================
+o Minor bug fixes
+o Removed middleware wrappers for ActiveMQ 3.8.4/3.9.4 and WebSphere 8.0
+
+
+--- Change summary -----------------------------------------------------------
+* API-5419 : API needs to deallocate proxy ReplyCallback object used by ConnectionManager when asynchronous request is employed
+* API-5420 : Add OpenDDS m/w wrapper support on RHEL/CentOS 8
+* API-5446 : Bolt does not handle open-response when multiple connections are in use
+* API-5448 : Removed loop condition that caused validation to prematurely stop
+* API-5450 : Setting PUB-RATE in HeartbeatGenerator can lead to a seg-fault
+* API-5453 : IBM MQ m/w wrapper subscriber thread does not report error when reconnect fails
+* API-5454 : A 'make clean' does not remove all generated files
+* API-5459 : Updated C# documentation to include reference to 2019 C2MS
+* API-5461 : Header file climits not needed to build SWIG-generated bindings
+* API-5463 : OpenDDS crashes (sometimes) when connection is disconnected
+* API-5472 : AMQP wrapper is attempting to publish a message with an illegal subject
+* API-5480 : Scan GMSEC API 4.9 using Fortify
+* API-5481 : Connection getMWInfo() should always report middleware information
+* API-5482 : A ReplyCallback cannot be used with Connection registerEventCallback() in the Java binding
+* API-5483 : Translating C++ ConnectionEvent to comparable Java event can fail
+* API-5489 : API should allow for custom specification version
+
+
+
+==============================================================================
+= GMSEC API 4.8 release notes (November 2020)
 ==============================================================================
 o A Ruby binding for the GMSEC API is now offered
 

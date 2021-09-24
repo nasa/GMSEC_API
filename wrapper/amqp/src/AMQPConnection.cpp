@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,6 +32,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include <cstring>   // for strlen()
 
@@ -1486,39 +1487,30 @@ void AMQPConnection::publishTestMessage(const char* subject0)
 		return;
 	}
 
+	// TODO: Why are we using a subscription topic for a message subject?
+	//       Now we have to convert the topic, which may contain wildcards,
+	//       to a legal message subject using dubious code.
 	std::string subject(subject0);
 
-	size_t i = 1;
+	const char* wc[] = { "*", ">", "+" };
+	std::vector<std::string> wildcards( wc, std::end(wc) );
 
-	while (true)
+	for (std::vector<std::string>::const_iterator it = wildcards.begin(); it != wildcards.end(); ++it)
 	{
-		i = subject.find("*", i);
-		if (i != std::string::npos)
-		{
-			subject.replace(i, 1, "INITTEST");
-		}
-		else
-		{
-			break;
-		}
-	}
+		size_t i = 0;
 
-	i = 1;
-	while (true)
-	{
-		i = subject.find(">", i);
-		if (i != std::string::npos)
+		while (i != std::string::npos)
 		{
-			subject.replace(i, 1, "INITTEST");
-		}
-		else
-		{
-			break;
+			i = subject.find(*it, i);
+
+			if (i != std::string::npos)
+			{
+				subject.replace(i, 1, "INITTEST");
+			}
 		}
 	}
 
 	Message msg(subject.c_str(), Message::PUBLISH);
-
 	msg.addField("TESTIDENTIFIER", "CONNECTIONTEST");
 
 	mwPublish(msg, getExternal().getConfig());

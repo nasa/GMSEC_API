@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2020 United States Government as represented by the
+# Copyright 2007-2021 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -12,13 +12,12 @@ function ShowUsage
 	echo
 	echo "where <mw> is one of the following:"
 	echo
-	echo "    activemq38, activemq39"
+	echo "    activemq39"
 	echo "    amqp"
 	echo "    artemis"
 	echo "    bolt"
 	echo "    ibmmq90"
 	echo "    mb"
-	echo "    websphere80"
 	echo "    zeromq413"
 	echo
 	echo "Note: It is also acceptable to preface any of the above middleware types with"
@@ -773,7 +772,6 @@ case $mw_type in
 	*"ibmmq"*)      check_mwtype=ibmmq   ;;
 	*"mb")          check_mwtype=mb      ;;
 	*"opendds"*)    check_mwtype=opendds ;;
-	*"websphere"*)  check_mwtype=ws      ;;
 	*"zeromq"*)     check_mwtype=zeromq  ;;
 	*)
 		echo

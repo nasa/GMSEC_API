@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -157,14 +157,66 @@ void Cache::initialize(JNIEnv* jenv)
     classU64 = clazz;
     methodU64Init = getMethod(jenv, clazz, "<init>", "(Ljava/lang/String;)V");
 
+	// gov.nasa.gsfc.gmsec.api.Connection$ConnectionEvent
+	clazz = getClass(jenv, "gov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent");
+
+    jfieldID jField = 0;
+	jobject  jEvent = 0;
+
+    jField = jenv->GetStaticFieldID(clazz, "DISPATCHER_ERROR_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::DISPATCHER_ERROR_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "REQUEST_TIMEOUT_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::REQUEST_TIMEOUT_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "CONNECTION_SUCCESSFUL_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::CONNECTION_SUCCESSFUL_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "CONNECTION_BROKEN_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::CONNECTION_BROKEN_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "CONNECTION_RECONNECT_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::CONNECTION_RECONNECT_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "CONNECTION_EXCEPTION_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::CONNECTION_EXCEPTION_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "GMD_ERROR_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::GMD_ERROR_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "WSMQ_ASYNC_STATUS_CHECK_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::WSMQ_ASYNC_STATUS_CHECK_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "MSG_PUBLISH_FAILURE_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::MSG_PUBLISH_FAILURE_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "INVALID_MESSAGE_EVENT", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::INVALID_MESSAGE_EVENT] = addGlobalReference(jenv, jEvent);
+
+    jField = jenv->GetStaticFieldID(clazz, "ALL_EVENTS", "Lgov/nasa/gsfc/gmsec/api/Connection$ConnectionEvent;");
+	jEvent = jenv->GetStaticObjectField(clazz, jField);
+    connectionEvents[Connection::ALL_EVENTS] = addGlobalReference(jenv, jEvent);
+
 	initialized = 1;
 }
 
 
-void Cache::addGlobalReference(jobject o)
+jobject Cache::addGlobalReference(JNIEnv* jenv, jobject o)
 {
 	AutoMutex hold(mutex);
-	globalReferences.push_back(o);
+	jobject global = jenv->NewGlobalRef(o);
+	globalReferences.push_back(global);
+	return global;
 }
 
 

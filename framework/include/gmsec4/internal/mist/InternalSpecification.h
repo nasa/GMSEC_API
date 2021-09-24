@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020 United States Government as represented by the
+ * Copyright 2007-2021 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -109,8 +109,6 @@ public:
 	//INTERNAL USE ONLY helper function, look up the MessageTemplate with the matching schemaID
 	MessageTemplate& findTemplate(const char* schemaID);
 
-
-	bool checkValidSpec(unsigned int specVersionInt);
 
 	const SchemaTemplateList& getDirectory() const;
 	
