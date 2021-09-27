@@ -43,7 +43,6 @@ eval
 		getCxx(\%info);
 		getJava(\%info);
 		getPerl(\%info);
-		getMagic(\%info);
 
 		writeCxx($cxx_file, \%info);
 		writeJava($java_file, "gmsecapi", \%info);
