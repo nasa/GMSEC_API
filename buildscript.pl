@@ -285,23 +285,6 @@ sub getOS
 } # getOS
 
 
-##############################################################
-# Get the Message Bus version number
-sub getMagic
-{
-	my ($ref) = @_;
-
-	my @in = slurp('mb.ver');
-
-	my $mb = join(' ', @in);
-
-	$mb =~ s/^\s*(.*?)\s*$/$1/g;
-
-	$ref->{MAGIC} = $mb;
-
-} # getMagic
-	
-
 sub writeCxx
 {
 	my ($path, $ref) = @_;
