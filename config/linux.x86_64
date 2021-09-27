@@ -19,13 +19,26 @@ else
 JAVA_LIBS = -L$(JDK_HOME)/jre/lib/amd64/server -ljvm
 endif
 
+
+ifeq (,$(wildcard /etc/lsb-release))
+	# RHEL
 ifndef PERL5_INC
-PERL5_INC = /usr/lib64/perl5
+	PERL5_INC := /usr/lib64/perl5
+endif
+ifndef PERL5_LIB
+	PERL5_LIB := /usr/lib64/perl5
+endif
+else
+	# Ubuntu
+	PERL_VERSION := $(shell perl -e 'printf "%vd", $$^V')
+ifndef PERL5_INC
+    PERL5_INC := /usr/lib/x86_64-linux-gnu/perl/$(PERL_VERSION)
+endif
+ifndef PERL5_LIB
+    PERL5_LIB := /usr/lib/x86_64-linux-gnu/perl/$(PERL_VERSION)
+endif
 endif
 
-ifndef PERL5_LIB
-PERL5_LIB = /usr/lib64/perl5
-endif
 
 ifndef PYTHON_HOME
 PYTHON_HOME = /usr
