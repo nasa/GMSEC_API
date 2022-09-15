@@ -9,6 +9,26 @@ contact the API Team at gmsec-support@lists.nasa.gov.
 
 
 ==============================================================================
+= GMSEC API 4.9.1 release notes (August 2022)
+==============================================================================
+o Minor bug fixes
+
+
+--- Change summary -----------------------------------------------------------
+* API-5587: Bolt middleware wrapper can deadlock
+* API-5614: Fix logger so that carriage return is not literally interpreted
+* API-5618: Very long log messages are truncated when using the C binding
+* API-5692: C# binding should output log messages to standard-error
+* API-5783: Fix errors in DBQUERY templates
+* API-5785: Add RESPONSE field to REQ.DBQUERY message specification and template
+* API-5787: Python binding should not be dependent on python3.lib
+* API-5835: Heartbeat message custom field, regardless of type, is included a a STRING field
+* API-5836: Fix logic used to handle multiple responses
+* API-5837: Updated project files to function with Visual Studio 2019
+* API-5838: Update Perl binding to build with Strawberry Perl 5.32
+
+
+==============================================================================
 = GMSEC API 4.9 release notes (March 2021)
 ==============================================================================
 o Minor bug fixes
