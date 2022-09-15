@@ -248,8 +248,6 @@ Result Shared::write(const ByteBuffer &buffer)
 	const int max_no_progress = 3;
 	int no_progress = 0;
 
-	AutoMutex lock(getMutex());
-
 	while (position < buffer.size() && getState() == STATE_CONNECTED)
 	{
 		int pending = buffer.size() - position;

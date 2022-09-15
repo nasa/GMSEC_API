@@ -31,6 +31,8 @@
 #include <sys/varargs.h>
 #endif
 
+#include <vector>
+
 using namespace gmsec::api::util;
 
 
@@ -78,12 +80,13 @@ GMSEC_LogLevel CALL_TYPE logLevelFromString(const char* level)
 
 void CALL_TYPE logPrint(const char* file, int line, GMSEC_LogLevel level, const char* fmt, ...)
 {
-	char buffer[4092];
+	const size_t      bufSize = 8 * 1024;   // 8Kb
+	std::vector<char> buffer(bufSize);
 
 	va_list args;
 	va_start(args, fmt);
-	StringUtil::stringFormatV(buffer, sizeof(buffer), fmt, args);
+	StringUtil::stringFormatV(buffer.data(), bufSize, fmt, args);
 	va_end(args);
 
-	LoggerStream(file, line).get(level) << buffer;
+	LoggerStream(file, line).get(level) << buffer.data();
 }

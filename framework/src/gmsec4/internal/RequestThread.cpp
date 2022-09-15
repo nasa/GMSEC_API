@@ -397,7 +397,10 @@ void RequestShared::deliverReply(Message* reply)
 		m_connection->replyCallback(pending->replyCallback, *pending->request, *reply);
 
 		//delete callback if multi-response is disabled or RESPONSE-STATUS indicates no more responses
-		if (!allowMore || !reply->hasField("RESPONSE-STATUS") || reply->getIntegerValue("RESPONSE-STATUS") != mist::ResponseStatus::WORKING_KEEP_ALIVE)
+		if (!allowMore
+		    || !reply->hasField("RESPONSE-STATUS")
+		    || reply->getIntegerValue("RESPONSE-STATUS") == mist::ResponseStatus::SUCCESSFUL_COMPLETION
+		    || reply->getIntegerValue("RESPONSE-STATUS") == mist::ResponseStatus::FINAL_MESSAGE)
 		{
 			CMReplyCallback* cm_rcb = dynamic_cast<CMReplyCallback*>(pending->replyCallback);
 			if (cm_rcb != NULL)

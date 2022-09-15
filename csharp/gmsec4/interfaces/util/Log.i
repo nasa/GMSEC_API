@@ -36,7 +36,7 @@ using namespace gmsec::api;
             sb.Append(" [").Append(entry.file).Append(":").Append(entry.line).Append("] ");
             sb.Append(entry.message).Append("\n");
 
-            System.Console.WriteLine(sb.ToString().Replace("\n", "\n\t"));
+            System.Console.Error.WriteLine(sb.ToString().Replace("\n", "\n\t"));
 
             m_mutex.LeaveMutex();
         }

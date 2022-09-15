@@ -7,7 +7,7 @@
 # All Rights Reserved.
 
 
-PY_DOC3=../../GMSEC_SUPPORT/python-3.6.5/bin/pydoc3
+PY_DOC3=../../GMSEC_SUPPORT/python-3.8.5/bin/pydoc3
 
 if [ ! -f ${PY_DOC3} ]; then
 	echo "Error: ${PY_DOC3} not found."
