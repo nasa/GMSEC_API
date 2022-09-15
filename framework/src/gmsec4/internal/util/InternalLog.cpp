@@ -216,6 +216,14 @@ std::string InternalLog::prepareLogMessage(const LogEntry& entry)
 		pos = msg.find("\n", pos+2);
 	}
 
+	pos = msg.find("\r");
+	while (pos != std::string::npos)
+	{
+		msg.replace(pos, 1, "\n\t");
+
+		pos = msg.find("\r", pos+2);
+	}
+
 	os << timeBuffer
 	   << " [" << Log::toString(entry.level) << "]"
 	   << " [" << file << ":" << entry.line << "] "

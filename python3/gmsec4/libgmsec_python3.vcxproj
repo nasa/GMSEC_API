@@ -26,26 +26,26 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -148,7 +148,7 @@ copy .\interfaces\libgmsec_python3.py .\..\..\bin\lib\GMSECAPI4\libgmsec_python3
       <UndefinePreprocessorDefinitions>connect;wait;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gmsecapi.lib;python3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmsecapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\bin\_libgmsec_python3.pyd</OutputFile>
       <AdditionalLibraryDirectories>..\..\objects\$(Configuration);$(PYTHON3_HOME)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs />
@@ -191,7 +191,7 @@ copy .\interfaces\libgmsec_python3.py .\..\..\bin\lib\GMSECAPI4\libgmsec_python3
       <UndefinePreprocessorDefinitions>connect;wait;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gmsecapi.lib;python3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmsecapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\bin\_libgmsec_python3.pyd</OutputFile>
       <AdditionalLibraryDirectories>..\..\objects\$(Configuration);$(PYTHON3_HOME)\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs />
