@@ -107,7 +107,7 @@ InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, con
 
 		if (field != NULL)
 		{
-			m_hbMsg->setValue(field->getName(), field->getStringValue());
+			m_hbMsg->addField(*field);
 		}
 	}
 
