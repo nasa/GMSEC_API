@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+
+<!-- This template defines the Ack-Page Request Directive used by the GMSEC ANSR Component. -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Defaults.xsd"/>
+	<xs:include schemaLocation="Fields.xsd"/>
+	<xs:include schemaLocation="Subjects.xsd"/>
+
+	<xs:simpleType name="CONTENT-VERSION_Type">
+		<xs:restriction base="xs:float">
+			<xs:enumeration value="2019"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="DIRECTIVE-KEYWORD_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ACK"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="REQ.DIR.ACK">
+		<xs:complexType>
+			<xs:all>
+
+				<xs:element name="SUBJECT" type="C2MS_REQ_DIR_SUBJECT_Type"/>
+				<xs:element name="CONTENT">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="CONTENT-VERSION">
+								<xs:annotation>
+									<xs:documentation>Version Number for this message content description</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="CONTENT-VERSION_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="F32"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="REQUEST-ID">
+								<xs:annotation>
+									<xs:documentation>ID to identify the request message - if different request the request is a replacement; else it is a new request.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:unsignedShort">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="DIRECTIVE-KEYWORD">
+								<xs:annotation>
+									<xs:documentation>Keyword extracted from the DIRECTIVE-STRING field</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="DIRECTIVE-KEYWORD_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="DIRECTIVE-STRING">
+								<xs:annotation>
+									<xs:documentation>Directive string that includes ACK: pageID</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="RESPONSE">
+								<xs:annotation>
+									<xs:documentation>Indicates if a response is required.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:boolean">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="BOOLEAN"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ACKED-BY" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Name to identify user or system that is issuing this directive.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ORIGINATION" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>If ACKED-BY is being used to convey a user (or target) name, then use this field to convey the name of the system or component that is issuing this directive.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

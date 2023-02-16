@@ -1,0 +1,62 @@
+project(opendds) : acelib {
+
+  sharedname = gmsec_opendds312
+
+  libout     = ../../bin
+
+  prebuild  += prebuild.cmd
+  postbuild += postbuild.cmd
+
+  includes  += ./include
+  includes  += ./src
+  includes  += ../../framework/include
+
+  includes  += $(ACE_ROOT)
+  includes  += $(ACE_ROOT)/ACE_wrappers
+  includes  += $(ACE_ROOT)/ACE_wrappers/TAO
+
+  libs      += gmsecapi
+  libs      += OpenDDS_Dcps
+  libs      += OpenDDS_FACE
+  libs      += OpenDDS_Federator
+  libs      += OpenDDS_InfoRepoDiscovery
+  libs      += OpenDDS_InfoRepoLib
+  libs      += OpenDDS_InfoRepoServ
+  libs      += OpenDDS_Model
+  libs      += OpenDDS_monitor
+  libs      += OpenDDS_Multicast
+  libs      += OpenDDS_Rtps
+  libs      += OpenDDS_Rtps_Udp
+  libs      += OpenDDS_Shmem
+  libs      += OpenDDS_Tcp
+  libs      += OpenDDS_Udp
+  libs      += TAO
+  libs      += TAO_AnyTypeCode
+
+  libpaths  += $(ACE_ROOT)/ACE_wrappers/lib
+  libpaths  += ../../objects/Release
+
+  macros    += _WINSOCK_DEPRECATED_NO_WARNINGS
+  macros    += WIN32_LEAN_AND_MEAN=1
+  macros    += GMSEC_OPENDDS_EXPORTS
+  macros    += ;GMSEC_LIBROOTNAME=gmsec_opendds312
+
+  Header_Files {
+    include/gmsec_opendds.h
+    include/OpenDDSConnection.h
+    include/OpenDDSMessageListener.h
+    include/Queue.h
+  }
+
+  Source_Files {
+    src/gmsec_opendds.cpp
+    src/OpenDDSConnection.cpp
+    src/OpenDDSMessageListener.cpp
+    src/Queue.cpp
+    src/OpenDDSMessageTypeSupportImpl.cpp
+    src/OpenDDSMessageC.cpp
+    src/OpenDDSMessageS.cpp
+    src/OpenDDSMessageTypeSupportC.cpp
+    src/OpenDDSMessageTypeSupportS.cpp
+  }
+}

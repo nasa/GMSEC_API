@@ -1,0 +1,60 @@
+/*
+ * Copyright 2007-2022 United States Government as represented by the
+ * Administrator of The National Aeronautics and Space Administration.
+ * No copyright is claimed in the United States under Title 17, U.S. Code.
+ * All Rights Reserved.
+ */
+
+/* This file is used for generating Doxygen documentation; it only contains
+   stubs of constructors and methods associated with the class.
+*/
+
+
+namespace GMSEC.API5 {
+
+/// <summary>
+/// This class is used to access elements of a configuration file (ConfigFile) object.
+/// </summary>
+
+public class ConfigFileIterator : global::System.IDisposable {
+
+  /// <summary>Reports back whether additional configuration is available</summary>
+  /// <returns>True if an additional configuration is available; false otherwise.</returns>
+  public bool HasNextConfig() {
+  }
+
+  /// <summary>Reports back whether additional message is available</summary>
+  /// <returns>True if an additional message is available; false otherwise.</returns>
+  public bool HasNextMessage() {
+  }
+
+  /// <summary>Reports back whether additional subscription is available</summary>
+  /// <returns>True if an additional subscriptions is available; false otherwise.</returns>
+  public bool HasNextSubscription() {
+  }
+
+  /// <summary>Reports back the next available configuration.</summary>
+  /// <returns>The next available ConfigEntry.</returns>
+  /// <exception cref="GmsecException">Thrown if there is not an additional configuration entry.</exception>
+  public ConfigEntry NextConfig() {
+  }
+
+  /// <summary>Reports back the next available message.</summary>
+  /// <returns>The next available MessageEntry.</returns>
+  /// <exception cref="GmsecException">Thrown if there is not an additional message entry.</exception>
+  public MessageEntry NextMessage() {
+  }
+
+  /// <summary>Reports back the next available subscription.</summary>
+  /// <returns>The next available SubscriptionEntry.</returns>
+  /// <exception cref="GmsecException">Thrown if there is not an additional subscription entry.</exception>
+  public SubscriptionEntry NextSubscription() {
+  }
+
+  /// <summary>Resets all iterators to the beginning of the respective lists that are maintained by the ConfigFile.</summary>
+  public void Reset() {
+  }
+
+}
+
+}

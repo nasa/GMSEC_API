@@ -1,0 +1,59 @@
+158a159,162
+> #if 1
+> // GMSEC: moved header to miniz.h
+> #include <miniz.h>
+> #else
+695a700
+> #if 0
+704a710
+> #endif
+926a933
+> #endif
+931a939
+> #if 0
+934a943
+> #endif
+938a948,949
+> namespace gmsec_miniz {
+> 
+952c963
+< #define MZ_MIN(a,b) (((a)<(b))?(a):(b))
+---
+> #define MZ_MIN(a,b) ((((int)a)<((int) b))?((int)a):((int)b))
+971,974d981
+< #ifdef __cplusplus
+<   extern "C" {
+< #endif
+< 
+1012c1019
+< static void *def_realloc_func(void *opaque, void *address, size_t items, size_t size) { (void)opaque, (void)address, (void)items, (void)size; return MZ_REALLOC(address, items * size); }
+---
+> // static void *def_realloc_func(void *opaque, void *address, size_t items, size_t size) { (void)opaque, (void)address, (void)items, (void)size; return MZ_REALLOC(address, items * size); }
+1047,1051c1054,1056
+<   if (tdefl_init(pComp, NULL, NULL, comp_flags) != TDEFL_STATUS_OKAY)
+<   {
+<     mz_deflateEnd(pStream);
+<     return MZ_PARAM_ERROR;
+<   }
+---
+>   //MEH - tdefl_init cannot return a status other other OKAY, therefore this
+>   //is safe. Change made to address Fortify findings
+>   tdefl_init(pComp, NULL, NULL, comp_flags);
+1699a1705
+> #if 0
+1727a1734
+> #endif
+2741a2749
+> #if 0
+2773a2782
+> #endif
+2798a2808
+> #if 0
+2835a2846
+> #endif
+4885,4887c4896
+< #ifdef __cplusplus
+< }
+< #endif
+---
+> } // namespace gmsec_miniz
