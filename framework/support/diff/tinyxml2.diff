@@ -1,0 +1,635 @@
+diff -u -w -r tinyxml2-1.0.11/include/tinyxml2.h GMSEC_API/framework/support/include/tinyxml2.h
+--- tinyxml2-1.0.11/include/tinyxml2.h	2014-02-14 08:24:31.714970743 -0800
++++ GMSEC_API/framework/support/include/tinyxml2.h	2014-02-14 07:53:37.943016778 -0800
+@@ -19,26 +19,22 @@
+ 
+ 3. This notice may not be removed or altered from any source
+ distribution.
++
++---------------------------------------------------------------------
++The GMSEC API tweaks the namespace of TinyXML2.
++Modified the #includes and usage of std functions for portability.
++See tinyxml2.diff for details.
++---------------------------------------------------------------------
+ */
+ 
+ #ifndef TINYXML2_INCLUDED
+ #define TINYXML2_INCLUDED
+ 
+-#if defined(ANDROID_NDK) || defined(__BORLANDC__)
+-#   include <ctype.h>
+-#   include <limits.h>
+-#   include <stdio.h>
+-#   include <stdlib.h>
+-#   include <string.h>
+-#   include <stdarg.h>
+-#else
+-#   include <cctype>
++
+ #   include <climits>
+-#   include <cstdio>
+-#   include <cstdlib>
+-#   include <cstring>
+-#   include <cstdarg>
+-#endif
++#include <cstring>	// strcpy
++#include <cstdio>	// FILE
++
+ 
+ /*
+    TODO: intern strings instead of allocation.
+@@ -73,37 +69,20 @@
+ #endif
+ 
+ 
+-#if defined(_MSC_VER) && (_MSC_VER >= 1400 )
+-// Microsoft visual studio, version 2005 and higher.
+-/*int _snprintf_s(
+-   char *buffer,
+-   size_t sizeOfBuffer,
+-   size_t count,
+-   const char *format [,
+-	  argument] ...
+-);*/
+-inline int TIXML_SNPRINTF( char* buffer, size_t size, const char* format, ... )
+-{
+-    va_list va;
+-    va_start( va, format );
+-    int result = vsnprintf_s( buffer, size, _TRUNCATE, format, va );
+-    va_end( va );
+-    return result;
+-}
+-#define TIXML_SSCANF   sscanf_s
+-#else
+-// GCC version 3 and higher
+-//#warning( "Using sn* functions." )
+-#define TIXML_SNPRINTF snprintf
+-#define TIXML_SSCANF   sscanf
+-#endif
+-
+ static const int TIXML2_MAJOR_VERSION = 1;
+ static const int TIXML2_MINOR_VERSION = 0;
+ static const int TIXML2_PATCH_VERSION = 11;
+ 
++
++/* The GMSEC API tweak to TinyXML2 changes the tinyxml2 namespace */
++#define tinyxml2 gmsec_tinyxml2
++
+ namespace tinyxml2
+ {
++
++using std::size_t;
++using std::FILE;
++
+ class XMLDocument;
+ class XMLElement;
+ class XMLAttribute;
+@@ -346,10 +325,8 @@
+         chunk->next = _root;
+         _root = chunk;
+     }
+-    void Trace( const char* name ) {
+-        printf( "Mempool %s watermark=%d [%dk] current=%d size=%d nAlloc=%d blocks=%d\n",
+-                name, _maxAllocs, _maxAllocs*SIZE/1024, _currentAllocs, SIZE, _nAllocs, _blockPtrs.Size() );
+-    }
++
++    void Trace( const char* name );
+ 
+     void SetTracked() {
+         _nUntracked--;
+@@ -450,85 +427,6 @@
+ };
+ 
+ 
+-/*
+-	Utility functionality.
+-*/
+-class XMLUtil
+-{
+-public:
+-    // Anything in the high order range of UTF-8 is assumed to not be whitespace. This isn't
+-    // correct, but simple, and usually works.
+-    static const char* SkipWhiteSpace( const char* p )	{
+-        while( !IsUTF8Continuation(*p) && isspace( *reinterpret_cast<const unsigned char*>(p) ) ) {
+-            ++p;
+-        }
+-        return p;
+-    }
+-    static char* SkipWhiteSpace( char* p )				{
+-        while( !IsUTF8Continuation(*p) && isspace( *reinterpret_cast<unsigned char*>(p) ) )		{
+-            ++p;
+-        }
+-        return p;
+-    }
+-    static bool IsWhiteSpace( char p )					{
+-        return !IsUTF8Continuation(p) && isspace( static_cast<unsigned char>(p) );
+-    }
+-    
+-    inline static bool IsNameStartChar( unsigned char ch ) {
+-        return ( ( ch < 128 ) ? isalpha( ch ) : 1 )
+-               || ch == ':'
+-               || ch == '_';
+-    }
+-    
+-    inline static bool IsNameChar( unsigned char ch ) {
+-        return IsNameStartChar( ch )
+-               || isdigit( ch )
+-               || ch == '.'
+-               || ch == '-';
+-    }
+-
+-    inline static bool StringEqual( const char* p, const char* q, int nChar=INT_MAX )  {
+-        int n = 0;
+-        if ( p == q ) {
+-            return true;
+-        }
+-        while( *p && *q && *p == *q && n<nChar ) {
+-            ++p;
+-            ++q;
+-            ++n;
+-        }
+-        if ( (n == nChar) || ( *p == 0 && *q == 0 ) ) {
+-            return true;
+-        }
+-        return false;
+-    }
+-    
+-    inline static int IsUTF8Continuation( const char p ) {
+-        return p & 0x80;
+-    }
+-
+-    static const char* ReadBOM( const char* p, bool* hasBOM );
+-    // p is the starting location,
+-    // the UTF-8 value of the entity will be placed in value, and length filled in.
+-    static const char* GetCharacterRef( const char* p, char* value, int* length );
+-    static void ConvertUTF32ToUTF8( unsigned long input, char* output, int* length );
+-
+-    // converts primitive types to strings
+-    static void ToStr( int v, char* buffer, int bufferSize );
+-    static void ToStr( unsigned v, char* buffer, int bufferSize );
+-    static void ToStr( bool v, char* buffer, int bufferSize );
+-    static void ToStr( float v, char* buffer, int bufferSize );
+-    static void ToStr( double v, char* buffer, int bufferSize );
+-
+-    // converts strings to primitive types
+-    static bool	ToInt( const char* str, int* value );
+-    static bool ToUnsigned( const char* str, unsigned* value );
+-    static bool	ToBool( const char* str, bool* value );
+-    static bool	ToFloat( const char* str, float* value );
+-    static bool ToDouble( const char* str, double* value );
+-};
+-
+-
+ /** XMLNode is a base class for every object that is in the
+ 	XML Document Object Model (DOM), except XMLAttributes.
+ 	Nodes have siblings, a parent, and children which can
+@@ -1937,7 +1835,11 @@
+     void SealElement();
+     void PrintSpace( int depth );
+     void PrintString( const char*, bool restrictedEntitySet );	// prints out, after detecting entities.
+-    void Print( const char* format, ... );
++    void Putc( char c);
++    void Puts( const char* s) {
++        Puts(s, std::strlen(s));
++    }
++    void Puts( const char* s, size_t len);
+ 
+     bool _elementJustOpened;
+     bool _firstElement;
+@@ -1966,3 +1868,4 @@
+ 
+ 
+ #endif // TINYXML2_INCLUDED
++
+diff -u -w -r tinyxml2-1.0.11/src/tinyxml2.cpp GMSEC_API/framework/support/src/tinyxml2.cpp
+--- tinyxml2-1.0.11/src/tinyxml2.cpp	2014-02-14 08:24:31.710970762 -0800
++++ GMSEC_API/framework/support/src/tinyxml2.cpp	2014-02-11 15:19:08.973235420 -0800
+@@ -19,17 +19,67 @@
+ 
+ 3. This notice may not be removed or altered from any source
+ distribution.
++
++-------------------------------------------------------------
++GMSEC API has a copy of TinyXML in the gmsec namespace to
++avoid conflicts
++-------------------------------------------------------------
+ */
+ 
+-#include "tinyxml2.h"
++#include <tinyxml2.h>
+ 
+ #include <new>		// yes, this one new style header, is in the Android SDK.
+ #   ifdef ANDROID_NDK
+ #   include <stddef.h>
++#   include <ctype.h>
++#   include <limits.h>
++#   include <stdio.h>
++#   include <stdlib.h>
++#   include <string.h>
+ #else
++#   include <cctype>
++#   include <climits>
++#   include <cstdio>
++#   include <cstdlib>
++#   include <cstring>
+ #   include <cstddef>
++using namespace std;
++#endif
++
++#ifdef __SUNPRO_CC
++#   include <stdio.h>
+ #endif
+ 
++
++#if defined(_MSC_VER) && (_MSC_VER >= 1400 )
++// Microsoft visual studio, version 2005 and higher.
++/*int _snprintf_s(
++   char *buffer,
++   size_t sizeOfBuffer,
++   size_t count,
++   const char *format [,
++	  argument] ...
++);*/
++
++#include <stdarg.h>
++
++inline int TIXML_SNPRINTF( char* buffer, size_t size, const char* format, ... )
++{
++    va_list va;
++    va_start( va, format );
++    int result = vsnprintf_s( buffer, size, _TRUNCATE, format, va );
++    va_end( va );
++    return result;
++}
++#define TIXML_SSCANF   sscanf_s
++#else
++// GCC version 3 and higher
++//#warning( "Using sn* functions." )
++#define TIXML_SNPRINTF snprintf
++#define TIXML_SSCANF   sscanf
++#endif
++
++
+ static const char LINE_FEED				= (char)0x0a;			// all line endings are normalized to LF
+ static const char LF = LINE_FEED;
+ static const char CARRIAGE_RETURN		= (char)0x0d;			// CR gets filtered out
+@@ -61,8 +111,7 @@
+         }										\
+     }
+ 
+-namespace tinyxml2
+-{
++namespace tinyxml2 {
+ 
+ struct Entity {
+     const char* pattern;
+@@ -80,6 +129,85 @@
+ };
+ 
+ 
++/*
++	Utility functionality.
++*/
++class XMLUtil
++{
++public:
++    // Anything in the high order range of UTF-8 is assumed to not be whitespace. This isn't
++    // correct, but simple, and usually works.
++    static const char* SkipWhiteSpace( const char* p )	{
++        while( !IsUTF8Continuation(*p) && isspace( *reinterpret_cast<const unsigned char*>(p) ) ) {
++            ++p;
++        }
++        return p;
++    }
++
++    static char* SkipWhiteSpace( char* p )				{
++        while( !IsUTF8Continuation(*p) && isspace( *reinterpret_cast<unsigned char*>(p) ) )		{
++            ++p;
++        }
++        return p;
++    }
++
++    static bool IsWhiteSpace( char p )					{
++        return !IsUTF8Continuation(p) && isspace( static_cast<unsigned char>(p) );
++    }
++    
++    inline static bool IsNameStartChar( unsigned char ch ) {
++        return ( ( ch < 128 ) ? isalpha( ch ) : 1 )
++               || ch == ':'
++               || ch == '_';
++    }
++    
++    inline static bool IsNameChar( unsigned char ch ) {
++        return IsNameStartChar( ch )
++               || isdigit( ch )
++               || ch == '.'
++               || ch == '-';
++    }
++
++    inline static bool StringEqual( const char* p, const char* q, int nChar=INT_MAX )  {
++        int n = 0;
++        if ( p == q ) {
++            return true;
++        }
++        while( *p && *q && *p == *q && n<nChar ) {
++            ++p;
++            ++q;
++            ++n;
++        }
++        if ( (n == nChar) || ( *p == 0 && *q == 0 ) ) {
++            return true;
++        }
++        return false;
++    }
++    
++    inline static int IsUTF8Continuation( const char p ) {
++        return p & 0x80;
++    }
++
++    static const char* ReadBOM( const char* p, bool* hasBOM );
++    // p is the starting location,
++    // the UTF-8 value of the entity will be placed in value, and length filled in.
++    static const char* GetCharacterRef( const char* p, char* value, int* length );
++    static void ConvertUTF32ToUTF8( unsigned long input, char* output, int* length );
++
++    // converts primitive types to strings
++    static void ToStr( int v, char* buffer, int bufferSize );
++    static void ToStr( unsigned v, char* buffer, int bufferSize );
++    static void ToStr( bool v, char* buffer, int bufferSize );
++    static void ToStr( float v, char* buffer, int bufferSize );
++    static void ToStr( double v, char* buffer, int bufferSize );
++
++    // converts strings to primitive types
++    static bool	ToInt( const char* str, int* value );
++    static bool ToUnsigned( const char* str, unsigned* value );
++    static bool	ToBool( const char* str, bool* value );
++    static bool	ToFloat( const char* str, float* value );
++    static bool ToDouble( const char* str, double* value );
++};
+ StrPair::~StrPair()
+ {
+     Reset();
+@@ -260,6 +388,12 @@
+ }
+ 
+ 
++template <int SIZE> void MemPoolT<SIZE>::Trace( const char* name )
++{
++    std::printf( "Mempool %s watermark=%d [%dk] current=%d size=%d nAlloc=%d blocks=%d\n",
++            name, _maxAllocs, _maxAllocs*SIZE/1024, _currentAllocs, SIZE, _nAllocs, _blockPtrs.Size() );
++}
++
+ 
+ 
+ // --------- XMLUtil ----------- //
+@@ -1603,9 +1737,19 @@
+ {
+     Clear();
+ 
+-    fseek( fp, 0, SEEK_END );
++    int check = fseek( fp, 0, SEEK_END );
++    if (check < 0) {
++        SetError( XML_ERROR_FILE_READ_ERROR, "fseek/SEEK_END", 0 );
++        return _errorID;
++    }
++
+     size_t size = ftell( fp );
+-    fseek( fp, 0, SEEK_SET );
++
++    check = fseek( fp, 0, SEEK_SET );
++    if (check < 0) {
++        SetError( XML_ERROR_FILE_READ_ERROR, "fseek/SEEK_SET", 0 );
++        return _errorID;
++    }
+ 
+     if ( size == 0 ) {
+         SetError( XML_ERROR_EMPTY_DOCUMENT, 0, 0 );
+@@ -1754,46 +1898,34 @@
+ }
+ 
+ 
+-void XMLPrinter::Print( const char* format, ... )
++void XMLPrinter::Puts(const char* s, size_t len)
+ {
+-    va_list     va;
+-    va_start( va, format );
+-
+     if ( _fp ) {
+-        vfprintf( _fp, format, va );
++        fputs( s, _fp);
+     }
+     else {
+-        // This seems brutally complex. Haven't figured out a better
+-        // way on windows.
+-#ifdef _MSC_VER
+-        int len = -1;
+-        int expand = 1000;
+-        while ( len < 0 ) {
+-            len = vsnprintf_s( _accumulator.Mem(), _accumulator.Capacity(), _TRUNCATE, format, va );
+-            if ( len < 0 ) {
+-                expand *= 3/2;
+-                _accumulator.PushArr( expand );
++        char* p = _buffer.PushArr( len ) - 1;
++        memcpy(p, s, len);
+             }
+         }
+-        char* p = _buffer.PushArr( len ) - 1;
+-        memcpy( p, _accumulator.Mem(), len+1 );
+-#else
+-        int len = vsnprintf( 0, 0, format, va );
+-        // Close out and re-start the va-args
+-        va_end( va );
+-        va_start( va, format );
+-        char* p = _buffer.PushArr( len ) - 1;
+-        vsnprintf( p, len+1, format, va );
+-#endif
++
++
++void XMLPrinter::Putc(char c)
++{
++    if ( _fp ) {
++        fputc( c, _fp);
++    }
++    else {
++        char* p = _buffer.PushArr( 1 ) - 1;
++        *p = c;
+     }
+-    va_end( va );
+ }
+ 
+ 
+ void XMLPrinter::PrintSpace( int depth )
+ {
+     for( int i=0; i<depth; ++i ) {
+-        Print( "    " );
++        Puts("    ");
+     }
+ }
+ 
+@@ -1813,12 +1945,14 @@
+                 // entity, and keep looking.
+                 if ( flag[(unsigned)(*q)] ) {
+                     while ( p < q ) {
+-                        Print( "%c", *p );
++                        Putc(*p);
+                         ++p;
+                     }
+                     for( int i=0; i<NUM_ENTITIES; ++i ) {
+                         if ( entities[i].value == *q ) {
+-                            Print( "&%s;", entities[i].pattern );
++                            Putc('&');
++                            Puts( entities[i].pattern );
++                            Putc(';');
+                             break;
+                         }
+                     }
+@@ -1831,7 +1965,7 @@
+     // Flush the remaining string. This will be the entire
+     // string if an entity wasn't found.
+     if ( !_processEntities || (q-p > 0) ) {
+-        Print( "%s", p );
++        Puts( p );
+     }
+ }
+ 
+@@ -1840,7 +1974,7 @@
+ {
+     static const unsigned char bom[] = { TIXML_UTF_LEAD_0, TIXML_UTF_LEAD_1, TIXML_UTF_LEAD_2, 0 };
+     if ( writeBOM ) {
+-        Print( "%s", bom );
++        Puts(reinterpret_cast<const char *>(&bom[0]));
+     }
+     if ( writeDec ) {
+         PushDeclaration( "xml version=\"1.0\"" );
+@@ -1856,11 +1990,12 @@
+     _stack.Push( name );
+ 
+     if ( _textDepth < 0 && !_firstElement && !_compactMode ) {
+-        Print( "\n" );
++        Putc('\n');
+         PrintSpace( _depth );
+     }
+ 
+-    Print( "<%s", name );
++    Putc('<');
++    Puts(name);
+     _elementJustOpened = true;
+     _firstElement = false;
+     ++_depth;
+@@ -1870,9 +2005,9 @@
+ void XMLPrinter::PushAttribute( const char* name, const char* value )
+ {
+     TIXMLASSERT( _elementJustOpened );
+-    Print( " %s=\"", name );
++    Putc(' '); Puts(name); Putc('='); Putc('"'); 
+     PrintString( value, false );
+-    Print( "\"" );
++    Putc('"'); 
+ }
+ 
+ 
+@@ -1914,21 +2049,25 @@
+     const char* name = _stack.Pop();
+ 
+     if ( _elementJustOpened ) {
+-        Print( "/>" );
++	Putc('/');
++	Putc('>');
+     }
+     else {
+         if ( _textDepth < 0 && !_compactMode) {
+-            Print( "\n" );
++            Putc('\n');
+             PrintSpace( _depth );
+         }
+-        Print( "</%s>", name );
++	Putc('<');
++	Putc('/');
++	Puts(name);
++	Putc('>');
+     }
+ 
+     if ( _textDepth == _depth ) {
+         _textDepth = -1;
+     }
+     if ( _depth == 0 && !_compactMode) {
+-        Print( "\n" );
++        Putc( '\n' );
+     }
+     _elementJustOpened = false;
+ }
+@@ -1937,7 +2076,7 @@
+ void XMLPrinter::SealElement()
+ {
+     _elementJustOpened = false;
+-    Print( ">" );
++    Putc( '>' );
+ }
+ 
+ 
+@@ -1949,9 +2088,9 @@
+         SealElement();
+     }
+     if ( cdata ) {
+-        Print( "<![CDATA[" );
+-        Print( "%s", text );
+-        Print( "]]>" );
++        Puts( "<![CDATA[" );
++        Puts( text );
++        Puts( "]]>" );
+     }
+     else {
+         PrintString( text, true );
+@@ -2004,11 +2143,13 @@
+         SealElement();
+     }
+     if ( _textDepth < 0 && !_firstElement && !_compactMode) {
+-        Print( "\n" );
++        Putc( '\n' );
+         PrintSpace( _depth );
+     }
+     _firstElement = false;
+-    Print( "<!--%s-->", comment );
++    Puts( "<!--");
++    Puts(comment );
++    Puts("-->");
+ }
+ 
+ 
+@@ -2018,11 +2159,13 @@
+         SealElement();
+     }
+     if ( _textDepth < 0 && !_firstElement && !_compactMode) {
+-        Print( "\n" );
++        Putc( '\n' );
+         PrintSpace( _depth );
+     }
+     _firstElement = false;
+-    Print( "<?%s?>", value );
++    Puts( "<?");
++    Puts(value);
++    Puts( "?>");
+ }
+ 
+ 
+@@ -2032,11 +2175,13 @@
+         SealElement();
+     }
+     if ( _textDepth < 0 && !_firstElement && !_compactMode) {
+-        Print( "\n" );
++        Putc( '\n' );
+         PrintSpace( _depth );
+     }
+     _firstElement = false;
+-    Print( "<!%s>", value );
++    Puts( "<!" );
++    Puts( value);
++    Putc( '>' );
+ }
+ 
+ 
+@@ -2096,3 +2241,4 @@
+ 
+ }   // namespace tinyxml2
+ 
++

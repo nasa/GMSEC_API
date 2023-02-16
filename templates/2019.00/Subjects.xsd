@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- File: Subjects.xsd -->
+<!-- Purpose: XML-Schema defining the variable portion of subjects in messages -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xs:complexType name="C2MS_REQ_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="DESTINATION-COMPONENT"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_RESP_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="DESTINATION-COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="RESPONSE-STATUS"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_LOG_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="SUBCLASS"/>
+			<xs:element name="ME3" type="xs:string" fixed="OCCURRENCE-TYPE"/>
+			<xs:element name="ME4" type="xs:string" fixed="SEVERITY"/>
+			<xs:element name="ME5" type="xs:string" fixed="USER" minOccurs="0"/>
+			<xs:element name="ME6" type="xs:string" fixed="REFERENCE-ID" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_REQ_DIR_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="DESTINATION-COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="DIRECTIVE-KEYWORD" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_CFG_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="DESTINATION-COMPONENT" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" minOccurs="0"/>
+			<xs:element name="ME4" type="xs:string" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_CNTL_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="DESTINATION-COMPONENT" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME4" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME5" type="xs:string" fixed="CNTL-KEYWORD" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_DEV_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="DESTINATION-COMPONENT" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME4" type="xs:string" fixed="" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_HB_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="DESTINATION-COMPONENT" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME4" type="xs:string" fixed="" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_RSRC_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="DESTINATION-COMPONENT" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME4" type="xs:string" fixed="" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_TLMPKT_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="STREAM-MODE"/>
+			<xs:element name="ME3" type="xs:string" fixed="VCID"/>
+			<xs:element name="ME4" type="xs:string" fixed=""/>
+			<xs:element name="ME5" type="xs:string" fixed="COLLECTION-POINT" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_TLMFRAME_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="STREAM-MODE"/>
+			<xs:element name="ME3" type="xs:string" fixed="VCID"/>
+			<xs:element name="ME4" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME5" type="xs:string" fixed="COLLECTION-POINT" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_TLMTDM_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="STREAM-MODE"/>
+			<xs:element name="ME3" type="xs:string" fixed="VCID" minOccurs="0"/>
+			<xs:element name="ME4" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME5" type="xs:string" fixed="COLLECTION-POINT" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_TLMPROC_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="STREAM-MODE"/>
+			<xs:element name="ME3" type="xs:string" fixed="VCID" minOccurs="0"/>
+			<xs:element name="ME4" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME5" type="xs:string" fixed="COLLECTION-POINT" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_MVAL_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="REQUEST-ID" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_AMVAL_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="REQUEST-ID" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_CMDECHO_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="CMD-ECHO-RESULT"/>
+			<xs:element name="ME3" type="xs:string" fixed="REQUEST-ID" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_PROD_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="PROD-NAME"/>
+			<xs:element name="ME3" type="xs:string" fixed="PROD-TYPE"/>
+			<xs:element name="ME4" type="xs:string" fixed="PROD-SUBTYPE"/>
+			<xs:element name="ME5" type="xs:string" fixed="PROD-SUBTYPE.1.NAME" minOccurs="0"/>
+			<xs:element name="ME6" type="xs:string" fixed="PROD-SUBTYPE.2.NAME" minOccurs="0"/>
+			<xs:element name="ME7" type="xs:string" fixed="REQUEST-ID" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_REQ_SERV_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="DESTINATION-COMPONENT,SERVICE-NAME"/>
+			<xs:element name="ME2" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" fixed="OPERATION-NAME" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_RESP_SERV_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="DESTINATION-COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="RESPONSE-STATUS"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS_MSG_NDM_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="STREAM-MODE"/>
+			<xs:element name="ME3" type="xs:string" fixed="NDM-TYPE"/>
+			<xs:element name="ME4" type="xs:string" fixed="NDM-SUBTYPE" minOccurs="0"/>
+			<xs:element name="ME5" type="xs:string" fixed="ACTIVITY-ID" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="C2MS-PIPE_REQ_DBQUERY_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="DESTINATION-COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="COMPONENT" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" fixed="QUERY-SEARCH-OPERATION" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="GMSEC_MSG_LOG_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="SUBCLASS"/>
+			<xs:element name="ME3" type="xs:string" fixed="OCCURRENCE-TYPE"/>
+			<xs:element name="ME4" type="xs:string" fixed="SEVERITY"/>
+			<xs:element name="ME5" type="xs:string" fixed="USER" minOccurs="0"/>
+			<xs:element name="ME6" type="xs:string" fixed="REFERENCE-ID" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="GMSEC_REQ_DIR_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="DESTINATION-COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="DIRECTIVE-KEYWORD" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="GMSEC_REQ_SERV_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="DESTINATION-COMPONENT,SERVICE-NAME"/>
+			<xs:element name="ME2" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" fixed="OPERATION-NAME" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+	
+</xs:schema>
