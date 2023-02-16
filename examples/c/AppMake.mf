@@ -1,0 +1,32 @@
+# Copyright 2007-2022 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
+
+GMSEC_API_HOME=../../..
+
+include $(GMSEC_API_HOME)/config/$(GMSEC_PLATFORM)
+
+CFLAGS += -I$(GMSEC_API_HOME)/include
+
+
+.PHONY: default all checkDefs clean
+
+
+default all: checkDefs $(TARGET)
+
+
+clean: checkDefs
+	$(RM) $(TARGET)
+
+
+checkDefs:
+	@ if [ -z $(TARGET) ]; then \
+		echo "TARGET is not defined"; \
+		exit 1; \
+	fi
+
+
+$(TARGET): $(SRCS)
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@

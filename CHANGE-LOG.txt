@@ -1,0 +1,32 @@
+﻿This GMSEC API file contains technical notes and the change summary for the current release and historical releases.
+
+See the associated Version Description Document (VDD) for further details of each release.
+
+For technical support regarding this release, or any previous version, please contact the API Team at gmsec-support@lists.nasa.gov.
+
+
+==============================================================================
+= GMSEC API 5.0 release notes (October 2022)
+==============================================================================
+o This release contains a different API compared to the previous GMSEC API 4.x releases
+
+o Functionality offered by MIST-related classes have been either removed or collapsed into core API classes
+
+o The default message specification is C2MS (was NASA/GMSEC Addendum to C2MS)
+
+o Message validation levels are no longer supported; either a message is valid (ergo, compliant), or it is not
+
+o The Closed-Response request/reply paradigm is no longer offered; all request/reply transactions will use the Open-Response paradigm.
+
+o Message Queue support is offered by the Artemis middleware wrapper
+
+o Default logging level is WARNING (previously was NONE)
+
+
+--- Change summary -----------------------------------------------------------
+* New release
+
+
+For details regarding porting existing software to GMSEC API 5.x, refer to the GMSEC API User's Guide (including Appendix F).
+
+===

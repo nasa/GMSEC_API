@@ -1,0 +1,83 @@
+# Copyright 2007-2022 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
+GMSEC_API_HOME = ../..
+
+include $(GMSEC_API_HOME)/config/$(GMSEC_PLATFORM)
+
+TARGET	        = libgmsec_ruby.so 
+MAC_TARGET      = $(TARGET:.so=.bundle)
+
+SWIG            = $(SWIG_HOME)/bin/swig
+SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
+SWIG_SWG        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/ruby -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
+SWIG_OPTS       = -c++ -ruby $(SWIG_SWG) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
+
+FRAMEWORK_DIR   = ../../framework
+
+GMSEC_INCS      = -I$(FRAMEWORK_DIR)/include -I/usr/include/c++/$(shell $(CXX) -dumpversion)
+
+COREOBJDIR      = $(FRAMEWORK_DIR)/src/gmsec5
+
+INTERFACEDIR    = interfaces
+
+WRAPPED_SRC    := $(INTERFACEDIR)/libgmsec_ruby_wrap.cxx
+
+default: check_swig message $(WRAPPED_SRC) $(TARGET)
+
+
+check_swig:
+	@if [ -z $(SWIG_HOME) ]; then \
+		echo; \
+		echo; \
+		echo "###########################################################"; \
+		echo "#"; \
+		echo "# SWIG_HOME is not defined"; \
+		echo "#"; \
+		echo "# Skipping build of Ruby binding for GMSEC API 5.x"; \
+		echo "#"; \
+		echo "###########################################################"; \
+		exit 1; \
+	fi
+
+
+message:
+	@echo
+	@echo
+	@echo "###########################################################"
+	@echo "#"
+	@echo "#  Building Ruby binding for GMSEC API 5.x"
+	@echo "#"
+	@echo "###########################################################"
+
+
+$(INTERFACEDIR)/%_wrap.cxx: $(INTERFACEDIR)/%.i
+	$(SWIG) $(SWIG_OPTS) $(GMSEC_INCS) $<
+	@ ./patch.sh
+
+
+$(TARGET):
+	ruby extconf.rb
+	$(MAKE) -f Makefile
+ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
+	mv $(TARGET) $(BINDIR)
+endif
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+	mv $(MAC_TARGET) $(BINDIR)
+endif
+
+
+clean:
+	find $(INTERFACEDIR) \( -name '*.gcno' -o -name '*.gcda' \) -exec rm -rf {} \;
+	find $(INTERFACEDIR) \( -name '*.cxx' -o -name '*.o' -o -name '*.h' \) -exec rm -rf {} \;
+	$(RM) *.o
+	$(RM) Makefile
+	$(RM) mkmf.log
+ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
+	$(RM) $(BINDIR)/$(TARGET)
+endif
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+	$(RM) $(BINDIR)/$(MAC_TARGET)
+endif

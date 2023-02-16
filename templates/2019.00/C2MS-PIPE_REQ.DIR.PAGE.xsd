@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+
+<!-- This template defines the Page Alert Request Directive used by the GMSEC ANSR Component. -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Defaults.xsd"/>
+	<xs:include schemaLocation="Fields.xsd"/>
+	<xs:include schemaLocation="Subjects.xsd"/>
+
+	<xs:simpleType name="CONTENT-VERSION_Type">
+		<xs:restriction base="xs:float">
+			<xs:enumeration value="2019"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="DIRECTIVE-KEYWORD_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PAGE"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="ATTACHMENT">
+		<xs:complexType>
+			<xs:all>
+				<xs:element name="FILE-NAME">
+					<xs:annotation>
+						<xs:documentation>The name of the attachment which is expected to identify the context and data format (e.g. powerTrend.jpg).</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+
+				<xs:element name="FILE-CONTENTS">
+					<xs:annotation>
+						<xs:documentation>The binary data of the attachment.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:hexBinary">
+								<xs:attribute name="TYPE" type="DATA_Type"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+			<xs:attribute name="INDEX" type="xs:unsignedShort" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="REQ.DIR.PAGE">
+		<xs:complexType>
+			<xs:all>
+
+				<xs:element name="SUBJECT" type="C2MS_REQ_DIR_SUBJECT_Type"/>
+				<xs:element name="CONTENT">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="CONTENT-VERSION">
+								<xs:annotation>
+									<xs:documentation>Version Number for this message content description</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="CONTENT-VERSION_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="F32"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="REQUEST-ID">
+								<xs:annotation>
+									<xs:documentation>ID to identify the request message - if different request the request is a replacement; else it is a new request.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:unsignedShort">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="DIRECTIVE-KEYWORD">
+								<xs:annotation>
+									<xs:documentation>Must be set to PAGE</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="DIRECTIVE-KEYWORD_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="DIRECTIVE-STRING">
+								<xs:annotation>
+									<xs:documentation>Full directive string that includes the PAGE keyword</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="RESPONSE">
+								<xs:annotation>
+									<xs:documentation>Indicates if a response is required.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:boolean">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="BOOLEAN"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="MSG-TEXT">
+								<xs:annotation>
+									<xs:documentation>The desired message to include with the Page Alert</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="PAGE-CATEGORY" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Indicates a pre-configured timing to use for this page (e.g. ANSR may have defined a “low pri” category that waits longer before sending the page and only goes once through the call chain. Invoke that behavior by specifying “low pri” in this field.) If not specified, the default timing is used.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="PAGE-ID" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Unique string that may contain alphanumeric characters.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="NUM-OF-ATTACHMENTS" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Number of attachments to be submitted with the Page Alert.</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:unsignedShort">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+
+							<xs:element name="ATTACHMENTS" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element ref="ATTACHMENT" minOccurs="0" maxOccurs="100"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

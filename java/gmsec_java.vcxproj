@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="gov\nasa\gsfc\gmsec\api5\ApiVersion.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\Callback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\Config.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\ConfigFile.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\ConfigFileIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\Connection.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\EventCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\FieldSpecification.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\BinaryField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\BooleanField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\CharField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\F32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\F64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\I16Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\I32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\I64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\I8Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\StringField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\U16Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\U32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\U64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\U8Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\Gmsec.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\GmsecException.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\HeartbeatGenerator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\ArrayListConverter.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIBinaryField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIBooleanField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNICharField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIF32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIF64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIFieldConverter.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNII16Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNII32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNII64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNII8Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIStringField.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIU16Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIU32Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIU64Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIU8Field.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\gmsecJNI.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNICallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConfig.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConfigEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConfigFile.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConfigFileIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConnection.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIEventCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIHeartbeatGenerator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessage.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessageEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessageFactory.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessageFieldIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessageValidator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIReplyCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIResourceGenerator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNISchemaIDIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNISpecification.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIStatus.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNISubscriptionEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNISubscriptionInfo.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\util\JNILog.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\util\JNILogHandler.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\util\JNITimeSpec.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\util\JNITimeUtil.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\Message.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\MessageFactory.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\MessageFieldIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\MessageSpecification.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\MessageValidator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\ReplyCallback.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\ResourceGenerator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\SchemaIDIterator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\Specification.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\Status.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\StatusClassification.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\StatusCode.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\SubscriptionInfo.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\U16.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\U32.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\U64.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\U8.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\Log.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\LogEntry.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\LogHandler.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\LogLevel.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\SystemValidator.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\TimeSpec.java" />
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\TimeUtil.java" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1207C278-BBEE-466B-A69C-43C6840AEF5F}</ProjectGuid>
+    <RootNamespace>gmsec_java_mb</RootNamespace>
+    <Keyword>MakeFileProj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.27428.2015</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+    <NMakeBuildCommandLine>nmake /f "Makefile.nt"</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake /f "Makefile.nt" /a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine />
+    <NMakeOutput>..\bin\gmsecapi.jar</NMakeOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine>nmake /f "Makefile.nt"</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake /f "Makefile.nt" /a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine />
+    <NMakeOutput>..\bin\gmsecapi.jar</NMakeOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+    <NMakeBuildCommandLine>nmake /f "Makefile.nt"</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake /f "Makefile.nt" /a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine />
+    <NMakeOutput>..\bin\gmsecapi.jar</NMakeOutput>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine>nmake /f "Makefile.nt"</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>nmake /f "Makefile.nt" /a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine />
+    <NMakeOutput>..\bin\gmsecapi.jar</NMakeOutput>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
