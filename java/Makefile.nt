@@ -1,0 +1,80 @@
+# Copyright 2007-2022 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
+
+# Java commands
+#
+JDK_JAVA_JAVAC  = $(JDK_HOME)\bin\javac
+JDK_JAVA_JAR    = $(JDK_HOME)\bin\jar
+JDK_JAVA_RMIC   = $(JDK_HOME)\bin\rmic
+JDK_JAVA        = $(JDK_HOME)\bin\java
+JDK_JAVA_DOC    = $(JDK_HOME)\bin\javadoc
+
+BIN_DIR         = ..\bin
+JAR_FILE        = $(BIN_DIR)\gmsecapi.jar
+JAVA_DOC_FILE   = $(BIN_DIR)\gmsecapi-javadoc.jar
+
+JAVA_OUTPUT_DIR = classes
+JAVA_CLASS_PATH = $(JAVA_OUTPUT_DIR)
+JAVADOC_DIR     = docs
+JAVA_OPTS       = --release 8
+
+
+# Java stuff
+#
+JNI_SOURCES  = gov\nasa\gsfc\gmsec\api5\jni\*.java \
+               gov\nasa\gsfc\gmsec\api5\jni\field\*.java \
+               gov\nasa\gsfc\gmsec\api5\jni\util\*.java
+
+JAVA_SOURCES = gov\nasa\gsfc\gmsec\api5\*.java	\
+               gov\nasa\gsfc\gmsec\api5\field\*.java \
+               gov\nasa\gsfc\gmsec\api5\util\*.java \
+               $(JNI_SOURCES)
+
+JAVA_DOCS    = gov.nasa.gsfc.gmsec.api5 \
+               gov.nasa.gsfc.gmsec.api5.field \
+               gov.nasa.gsfc.gmsec.api5.util
+
+
+# C++ stuff
+#
+SRCDIR       = src
+
+
+default: version javac jar gen-doc
+
+
+debug: default
+
+
+version: 
+	-$(JDK_JAVA_JAVAC) -version
+ 
+
+javac: $(JAVA_SOURCES) 
+	$(JDK_JAVA_JAVAC) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $(JAVA_OPTS) $?
+	$(JDK_JAVA_JAVAC) -h $(SRCDIR) -d $(JAVA_OUTPUT_DIR) -classpath $(JAVA_CLASS_PATH) $(JAVA_OPTS) $(JNI_SOURCES)
+
+
+jar:
+	$(JDK_JAVA_JAR) cvf $(JAR_FILE) -C $(JAVA_OUTPUT_DIR) gov
+
+
+clean:
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api5\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api5\field\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api5\jni\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api5\jni\field\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api5\jni\util\*.class
+	del /Q $(JAVA_CLASS_PATH)\gov\nasa\gsfc\gmsec\api5\util\*.class
+	del /Q $(SRCDIR)\gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI.h
+	del /Q $(JAR_FILE)
+	del /Q $(JAVA_DOC_FILE)
+
+
+gen-doc:
+	-$(JDK_JAVA_DOC) -public -quiet -d $(JAVADOC_DIR) --no-module-directories -sourcepath . $(JAVA_DOCS)
+	$(JDK_JAVA_JAR) cf $(JAVA_DOC_FILE) $(JAVADOC_DIR)
+	$(JDK_JAVA_JAR) uf $(JAR_FILE) $(JAVADOC_DIR)

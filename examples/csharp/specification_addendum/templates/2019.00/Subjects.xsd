@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- File: Subjects.xsd -->
+<!-- Purpose: XML-Schema defining the variable portion of subjects in messages -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xs:complexType name="C2MS_MSG_LOG_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+			<xs:element name="ME2" type="xs:string" fixed="SUBCLASS"/>
+			<xs:element name="ME3" type="xs:string" fixed="OCCURRENCE-TYPE"/>
+			<xs:element name="ME4" type="xs:string" fixed="SEVERITY"/>
+			<xs:element name="ME5" type="xs:string" fixed="USER" minOccurs="0"/>
+			<xs:element name="ME6" type="xs:string" fixed="REFERENCE-ID" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="EXAMPLE_MSG_LOG_SUBJECT_Type">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="COMPONENT"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="">
+		<xs:all>
+			<xs:element name="ME1" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME2" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME3" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME4" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME5" type="xs:string" fixed="" minOccurs="0"/>
+			<xs:element name="ME6" type="xs:string" fixed="" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TEXT" type="xs:string" use="required"/>
+	</xs:complexType>
+	
+</xs:schema>

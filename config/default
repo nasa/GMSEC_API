@@ -1,0 +1,43 @@
+# Copyright 2007-2022  United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+ 
+#
+# GMSEC API - Build macros
+#
+
+MAKEFILE      = Makefile
+
+SUPPORT       = $(GMSEC_API_HOME)/../GMSEC_SUPPORT
+
+BASE_WRAPPERS = mb
+
+ifdef JDK_HOME
+BASE_WRAPPERS += bolt
+
+JAVA_BIN      = $(JDK_HOME)/bin
+JAVA_OPTS     = --release 8
+
+OPEN_JDK  = $(shell $(JDK_HOME)/bin/java -version 2>&1 | grep -m 1 openjdk | cut -d' ' -f1)
+
+ifeq ($(findstring openjdk,$(OPEN_JDK)), openjdk)
+JAVA_LIBS = -L$(JDK_HOME)/lib/server -ljvm
+else
+JAVA_LIBS = -L$(JDK_HOME)/jre/lib/amd64/server -ljvm
+endif
+endif
+
+WRAPPERS      = $(BASE_WRAPPERS) $(MW_WRAPPERS) $(USER_WRAPPERS)
+
+SHLIB_EXT     = so
+JSHLIB_EXT    = so
+
+
+# Typical location of C++ header files; on MacOSX this varies.
+CXX_INCS      = /usr/include/c++/$(shell $(CXX) -dumpversion)
+
+
+# Uncomment the definition below if debugging of the API is required.
+#
+#DEBUG_FLAGS   = -g -O0

@@ -1,0 +1,1509 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3FC0A670-E49C-4B59-B286-99137DF463BB}</ProjectGuid>
+    <RootNamespace>gmsecapi</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.27625.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\objects/Debug/gmsecapi.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GMSECAPI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>.\objects/Debug/gmsecapi.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\objects/Debug\</AssemblerListingLocation>
+      <ObjectFileName>.\objects/Debug\</ObjectFileName>
+      <ProgramDataBaseFileName>.\objects/Debug\</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;Advapi32.lib;pdh.lib;iphlpapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>bin/gmsec_api_d.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <IgnoreSpecificDefaultLibraries>msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\objects/Debug/gmsec_api_d.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>.\objects/Debug/gmsec_api_d.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\objects/Debug/gmsecapi.bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>set PATH=%25WINDOWS%25\system32%3b%25PATH%25
+for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x86\" ^| $(SystemRoot)\system32\FIND.exe /I "CRT" `) DO copy "%25%25A\*" "$(ProjectDir)\bin\"
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>X64</TargetEnvironment>
+      <TypeLibraryName>.\objects/Release/gmsecapi.tlb</TypeLibraryName>
+      <HeaderFileName />
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>./framework/include;./framework/support/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GMSECAPI_EXPORTS;__USE_PTYPES_INSTEAD_OF_COMMONCPP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>.\objects/Release/gmsecapi.pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>.\objects/Release/</AssemblerListingLocation>
+      <ObjectFileName>.\objects/Release/</ObjectFileName>
+      <ProgramDataBaseFileName>.\objects/Release/</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>ws2_32.lib;Advapi32.lib;IPHlpApi.Lib;Pdh.Lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>bin/gmsec_api.dll</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ProgramDatabaseFile>.\objects/Release/gmsec_api.pdb</ProgramDatabaseFile>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>.\objects/Release/gmsec_api.lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\objects/Release/gmsecapi.bsc</OutputFile>
+    </Bscmake>
+    <PostBuildEvent>
+      <Command>for /f "usebackq tokens=*" %25%25A IN (`dir /b /a:d /s "$(VCInstallDir)\redist\x86\" ^| $(SystemRoot)\system32\FIND.exe /I "CRT" `) DO copy "%25%25A\*" "$(ProjectDir)\bin\" 
+</Command>
+    </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="framework\src\gmsec5\Config.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\ConfigFile.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\ConfigFileIterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\Connection.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\config.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\config_file.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\config_file_iterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\connection.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\binary_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\boolean_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\char_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\f32_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\f64_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\i16_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\i32_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\i64_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\i8_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\string_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\u16_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\u32_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\u64_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\field\u8_field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\heartbeat_generator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\message.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\message_factory.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\message_field_iterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\resource_generator.cpp" />
+    <ClCompile Include="framework\src\gmsec5\c\schema_id_iterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\specification.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\status.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\subscription_info.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\util\log.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\c\util\timeutil.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/c/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/c/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\FieldSpecification.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\BinaryField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\BooleanField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\CharField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\F32Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\F64Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\I16Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\I32Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\I64Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\I8Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\StringField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\U16Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\U32Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\U64Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\field\U8Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\GmsecException.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\HeartbeatGenerator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\ActiveSubscriptions.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\AsyncPublisher.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\AutoDispatcher.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\CallbackAdapter.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\CallbackLookup.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\ComplianceValidator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\ConnectionCallback.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\ConnectionCallbackCache.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\ConnectionFactory.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\CustomMessageValidator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\Dispatcher.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\DynamicFactory.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\Encoder.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\ExclusionFilter.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\FieldTemplate.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\FieldTemplateDependency.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalBinaryField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalBooleanField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalCharField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalF32Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalF64Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalI16Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalI32Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalI64Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalI8Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalStringField.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalU16Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalU32Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalU64Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\field\InternalU8Field.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\FileUtil.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalAtomics.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalConfig.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalConfigFile.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalConfigFileIterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalConnection.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalFieldSpecification.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalGmsecException.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalHeartbeatGenerator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalMessage.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalMessageFactory.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalMessageFieldIterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalMessageSpecification.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalResourceGenerator.cpp" />
+    <ClCompile Include="framework\src\gmsec5\internal\InternalSchemaIDIterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalSpecification.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalStatus.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\InternalSubscriptionInfo.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\MathUtil.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\MessageAggregationToolkit.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\MessageTemplate.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\Middleware.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\MsgFieldMap.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\PerformanceLogger.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\RequestThread.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\ResourceInfoCollector.cpp" />
+    <ClCompile Include="framework\src\gmsec5\internal\SchemaTemplate.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\StringUtil.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\Subject.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\SystemUtil.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\TicketMutex.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\TrackingDetails.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\UniqueFilter.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\util\InternalCondition.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\util\InternalLog.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\util\InternalLoggerStream.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\util\InternalLogStream.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\util\InternalMutex.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\internal\Value.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\Message.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\MessageFactory.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\MessageFieldIterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\MessageSpecification.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\ResourceGenerator.cpp" />
+    <ClCompile Include="framework\src\gmsec5\SchemaIDIterator.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\secure\Access.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\secure\Cipher.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\secure\MersenneTwister.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\secure\Policy.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\secure\Random.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\secure\Signer.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\Specification.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\Status.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\SubscriptionInfo.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\Atomics.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\Condition.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\CountDownLatch.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\Log.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\LoggerStream.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\LogStream.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\Mutex.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\StdThread.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\src\gmsec5\util\TimeUtil.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\support\src\jsoncpp.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\support\src\miniz.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+    <ClCompile Include="framework\support\src\tinyxml2.cpp">
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\objects/Release/api5/</ProgramDataBaseFileName>
+      <AssemblerListingLocation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</AssemblerListingLocation>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ObjectFileName>
+      <ProgramDataBaseFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\objects/Debug/api5/</ProgramDataBaseFileName>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework\include\gmsec4\internal\ActiveSubscriptions.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\AsyncPublisher.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\CallbackAdapter.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\CallbackLookup.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\ci_less.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\ConnectionBuddy.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\ConnectionFactory.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\Dispatcher.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\DynamicFactory.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\Encoder.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\ExclusionFilter.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\FileUtil.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\GMSECadapter.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalAtomics.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalAutoDispatcher.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalConfig.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalConfigFile.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalConfigFileIterator.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalConnection.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalException.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalHeartbeatGenerator.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalMessage.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalMessageFieldIterator.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalStatus.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\InternalSubscriptionInfo.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\json-forwards.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\MathUtil.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\MessageAggregationToolkit.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\MessageBuddy.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\Middleware.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\MsgFieldMap.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\Rawbuf.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\RequestSpecs.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\RequestThread.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\StringUtil.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\Subject.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\SystemUtil.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\TicketMutex.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\tinyxml2.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\TrackingDetails.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\UniqueFilter.h" />
+    <ClInclude Include="framework\include\gmsec4\internal\Value.h" />
+    <ClInclude Include="framework\include\gmsec5\Callback.h" />
+    <ClInclude Include="framework\include\gmsec5\Config.h" />
+    <ClInclude Include="framework\include\gmsec5\ConfigFile.h" />
+    <ClInclude Include="framework\include\gmsec5\ConfigFileIterator.h" />
+    <ClInclude Include="framework\include\gmsec5\ConfigOptions.h" />
+    <ClInclude Include="framework\include\gmsec5\Connection.h" />
+    <ClInclude Include="framework\include\gmsec5\c\config.h" />
+    <ClInclude Include="framework\include\gmsec5\c\config_file.h" />
+    <ClInclude Include="framework\include\gmsec5\c\config_file_iterator.h" />
+    <ClInclude Include="framework\include\gmsec5\c\connection.h" />
+    <ClInclude Include="framework\include\gmsec5\c\errors.h" />
+    <ClInclude Include="framework\include\gmsec5\c\fields.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\binary_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\boolean_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\char_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\f32_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\f64_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\i16_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\i32_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\i64_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\i8_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\string_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\u16_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\u32_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\u64_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\field\u8_field.h" />
+    <ClInclude Include="framework\include\gmsec5\c\heartbeat_generator.h" />
+    <ClInclude Include="framework\include\gmsec5\c\message.h" />
+    <ClInclude Include="framework\include\gmsec5\c\message_factory.h" />
+    <ClInclude Include="framework\include\gmsec5\c\message_field_iterator.h" />
+    <ClInclude Include="framework\include\gmsec5\c\message_specification.h" />
+    <ClInclude Include="framework\include\gmsec5\c\resource_generator.h" />
+    <ClInclude Include="framework\include\gmsec5\c\schema_id_iterator.h" />
+    <ClInclude Include="framework\include\gmsec5\c\specification.h" />
+    <ClInclude Include="framework\include\gmsec5\c\status.h" />
+    <ClInclude Include="framework\include\gmsec5\c\subscription_info.h" />
+    <ClInclude Include="framework\include\gmsec5\c\util\log.h" />
+    <ClInclude Include="framework\include\gmsec5\c\util\timeutil.h" />
+    <ClInclude Include="framework\include\gmsec5\Errors.h" />
+    <ClInclude Include="framework\include\gmsec5\EventCallback.h" />
+    <ClInclude Include="framework\include\gmsec5\Fields.h" />
+    <ClInclude Include="framework\include\gmsec5\FieldSpecification.h" />
+    <ClInclude Include="framework\include\gmsec5\field\BinaryField.h" />
+    <ClInclude Include="framework\include\gmsec5\field\BooleanField.h" />
+    <ClInclude Include="framework\include\gmsec5\field\CharField.h" />
+    <ClInclude Include="framework\include\gmsec5\field\F32Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\F64Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\I16Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\I32Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\I64Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\I8Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\StringField.h" />
+    <ClInclude Include="framework\include\gmsec5\field\U16Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\U32Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\U64Field.h" />
+    <ClInclude Include="framework\include\gmsec5\field\U8Field.h" />
+    <ClInclude Include="framework\include\gmsec5\GmsecException.h" />
+    <ClInclude Include="framework\include\gmsec5\HeartbeatGenerator.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalBinaryField.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalBooleanField.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalCharField.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalF32Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalF64Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalField.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalI16Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalI32Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalI64Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalI8Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalStringField.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalU16Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalU32Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalU64Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\field\InternalU8Field.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\InternalResourceGenerator.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\MiddlewareInfo.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\ResourceInfoCollector.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\util\InternalCondition.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\util\InternalLog.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\util\InternalLoggerStream.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\util\InternalLogStream.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\util\InternalMutex.h" />
+    <ClInclude Include="framework\include\gmsec5\internal\util\MutexBuddy.h" />
+    <ClInclude Include="framework\include\gmsec5\Message.h" />
+    <ClInclude Include="framework\include\gmsec5\MessageFactory.h" />
+    <ClInclude Include="framework\include\gmsec5\MessageFieldIterator.h" />
+    <ClInclude Include="framework\include\gmsec5\MessageSpecification.h" />
+    <ClInclude Include="framework\include\gmsec5\MessageValidator.h" />
+    <ClInclude Include="framework\include\gmsec5\ReplyCallback.h" />
+    <ClInclude Include="framework\include\gmsec5\ResourceGenerator.h" />
+    <ClInclude Include="framework\include\gmsec5\SchemaIDIterator.h" />
+    <ClInclude Include="framework\include\gmsec5\secure\Access.h" />
+    <ClInclude Include="framework\include\gmsec5\secure\Cipher.h" />
+    <ClInclude Include="framework\include\gmsec5\secure\Policy.h" />
+    <ClInclude Include="framework\include\gmsec5\secure\Random.h" />
+    <ClInclude Include="framework\include\gmsec5\secure\Signer.h" />
+    <ClInclude Include="framework\include\gmsec5\Specification.h" />
+    <ClInclude Include="framework\include\gmsec5\Status.h" />
+    <ClInclude Include="framework\include\gmsec5\SubscriptionInfo.h" />
+    <ClInclude Include="framework\include\gmsec5\util\Atomics.h" />
+    <ClInclude Include="framework\include\gmsec5\util\BoundedQueue.h" />
+    <ClInclude Include="framework\include\gmsec5\util\Buffer.h" />
+    <ClInclude Include="framework\include\gmsec5\util\Condition.h" />
+    <ClInclude Include="framework\include\gmsec5\util\CountDownLatch.h" />
+    <ClInclude Include="framework\include\gmsec5\util\cxx.h" />
+    <ClInclude Include="framework\include\gmsec5\util\Deprecated.h" />
+    <ClInclude Include="framework\include\gmsec5\util\List.h" />
+    <ClInclude Include="framework\include\gmsec5\util\Log.h" />
+    <ClInclude Include="framework\include\gmsec5\util\LoggerStream.h" />
+    <ClInclude Include="framework\include\gmsec5\util\LogHandler.h" />
+    <ClInclude Include="framework\include\gmsec5\util\LogStream.h" />
+    <ClInclude Include="framework\include\gmsec5\util\Mutex.h" />
+    <ClInclude Include="framework\include\gmsec5\util\StdSharedPtr.h" />
+    <ClInclude Include="framework\include\gmsec5\util\StdThread.h" />
+    <ClInclude Include="framework\include\gmsec5\util\StdUniquePtr.h" />
+    <ClInclude Include="framework\include\gmsec5\util\TimeUtil.h" />
+    <ClInclude Include="framework\include\gmsec5\util\wdllexp.h" />
+    <ClInclude Include="framework\support\include\json.h" />
+    <ClInclude Include="framework\support\include\miniz.h" />
+    <ClInclude Include="framework\support\include\tinyxml2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="buildscript.pl">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">perl.exe "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">bogus.out;./include/gmsec_version.h;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
