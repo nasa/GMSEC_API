@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:api="GMSEC_API" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:include schemaLocation="Defaults.xsd"/>
+	<xs:include schemaLocation="Fields.xsd"/>
+
+	<xs:simpleType name="VALUE_Type">
+		<xs:restriction base="xs:float">
+			<xs:enumeration value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="VALUE-1_type">
+		<xs:restriction base="xs:float">
+			<xs:enumeration value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="VALUE-2_type">
+		<xs:restriction base="xs:float">
+			<xs:enumeration value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:element name="MSG.8">
+		<xs:complexType>
+			<xs:all>
+
+				<xs:element name="SUBJECT" type="C2MS_SUBJECT_Type"/>
+
+				<xs:element name="CONTENT">
+					<xs:complexType>
+						<xs:all>
+
+							<xs:element name="FIELD">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="VALUE_Type">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="I16"/>
+											<api:dependency name="DEPENDENCY" valueEquals="1" base="VALUE-1_type"/>
+											<api:dependency name="DEPENDENCY" valueEquals="2" base="VALUE-2_type"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+								<xs:annotation>
+									<xs:documentation></xs:documentation>
+								</xs:annotation>
+							</xs:element>
+
+							<xs:element name="DEPENDENCY" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="TYPE" type="FIELD_Type" fixed="I16"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+								<xs:annotation>
+									<xs:documentation></xs:documentation>
+								</xs:annotation>
+							</xs:element>
+
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
