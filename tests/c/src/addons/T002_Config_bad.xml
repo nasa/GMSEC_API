@@ -1,0 +1,3 @@
+<CONFIG NAME="Bolt">
+    <PARAMETER NAME="mw-id">bolt</PARAMETER>
+    <PARAMETER NAME="server">localhost</PARAMETER>

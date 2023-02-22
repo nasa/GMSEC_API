@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- File: Defaults.xsd -->
+<!-- Purpose: XML-Schema for the values of selected fields in Messages -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+
+	<xs:simpleType name="BAD-CHAR_Type">
+		<xs:restriction base="xs:char">
+			<xs:enumeration value="LOL"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="BAD-BOOL_Type">
+		<xs:restriction base="xs:char">
+			<xs:enumeration value="BOOLEAN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="HIGH-I16_Type">
+		<xs:restriction base="xs:short">
+			<xs:enumeration value="40000"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="LOW-I16_Type">
+		<xs:restriction base="xs:short">
+			<xs:enumeration value="-40000"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="HIGH-U16_Type">
+		<xs:restriction base="xs:unsignedShort">
+			<xs:enumeration value="70000"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="LOW-U16_Type">
+		<xs:restriction base="xs:unsignedShort">
+			<xs:enumeration value="-1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="BAD-U16_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="LOL"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="BAD-BIN_Type">
+		<xs:restriction base="xs:hexBinary">
+			<xs:enumeration value="LOL"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>
