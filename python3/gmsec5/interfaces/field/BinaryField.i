@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -52,6 +52,7 @@ using namespace gmsec::api5;
         return PyByteArray_FromStringAndSize((const char*) self->getValue(), (Py_ssize_t) self->getLength());
     }
 
+    /* Obsolete as of API 5.1, but leave in place to preserve binary compatibility */
     static BinaryField* CALL_TYPE cast_field(Field* field)
     {
         BinaryField* casted = dynamic_cast<BinaryField*>(field);

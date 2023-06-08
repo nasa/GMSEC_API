@@ -826,23 +826,22 @@ int testDriver(int argc, char* argv[], int (*pf)())
 }
 
 
+int vargsLength(const char* format, va_list pargs)
+{
+	va_list argcopy;
+	va_copy(argcopy, pargs);
+	int len = vsnprintf(NULL, 0, format, argcopy);
+	va_end(argcopy);
+	return len;
+}
+
 int printToString(char* destination, const char* format, ...)
 {
-#ifdef WIN32
-	int len    = 0;
-#endif
-	int result = 0;
-
-	va_list  args;
+	va_list args;
 	va_start(args, format);
-#ifdef WIN32
-	len    = _vscprintf(format, args) + 1;   // an extra byte for the terminating null-byte
-	result = vsprintf_s(destination, len, format, args);
-#else
-	result = vsprintf(destination, format, args);
-#endif
+	int len = vargsLength(format, args);
+	int result = vsnprintf(destination, len+1, format, args);
 	va_end(args);
-
 	return result;
 }
 

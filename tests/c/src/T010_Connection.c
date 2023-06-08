@@ -357,6 +357,27 @@ void test_connectionGetLibraryVersion()
 	statusDestroy(&status);
 }
 
+void test_connectionGetConfig()
+{
+	GMSEC_INFO("Test connectionGetConfig()");
+
+	GMSEC_Status	 status = statusCreate();
+	GMSEC_Config	 config = testGetConfig();
+	GMSEC_Connection conn = connectionCreate(config, status);
+
+	testRequireBool(statusGet(status), statusHasError(status) == GMSEC_FALSE);
+
+	// Nominal test
+	testCheckBool("Expected to get Config", connectionGetConfig(conn, NULL) != NULL);
+
+	// Off-nominal test
+	(void) connectionGetConfig(NULL, status);
+	testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
+
+	connectionDestroy(&conn);
+	statusDestroy(&status);
+}
+
 
 void test_connectionGetMessageFactory()
 {
@@ -1791,6 +1812,7 @@ int test_Connection()
 	test_connectionDisconnect();
 	test_connectionGetLibraryName();
 	test_connectionGetLibraryVersion();
+	test_connectionGetConfig();
 	test_connectionGetMessageFactory();
 	test_connectionRegisterEventCallback();
 	test_connectionSubscribe();

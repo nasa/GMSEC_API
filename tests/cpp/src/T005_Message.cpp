@@ -177,6 +177,8 @@ void test_is_compliant(Test& test)
 
 		set_standard_fields(msgFactory1);
 
+		//o Check field compliancy
+		//
 		Message msg1 = msgFactory1.createMessage("HB");
 		Message msg2 = msgFactory2.createMessage("HB");      // this message lacks standard fields
 		Message msg3;                                        // homemade message

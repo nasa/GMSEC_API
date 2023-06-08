@@ -167,7 +167,7 @@ int test_ArtemisFQQN(Test& test)
 	// Elements to conjure unique message subjects and subscription topics
 	std::stringstream id1, id2;
 	id1 << (test.getProcessID() & 0xFFFF);
-	id2 << (test.getProcessID() & 0x0FFF);
+	id2 << (test.getProcessID() & 0x00FF);
 
 	std::string norm_topic1 = msgSubject1.str();
 	std::string norm_topic2 = msgSubject2.str();

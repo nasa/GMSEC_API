@@ -1,4 +1,4 @@
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -14,6 +14,12 @@ SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_SWG        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/ruby -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
 SWIG_OPTS       = -c++ -ruby $(SWIG_SWG) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
+
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+RUBY            = /usr/local/opt/ruby/bin/ruby
+else
+RUBY            = /usr/bin/ruby
+endif
 
 FRAMEWORK_DIR   = ../../framework
 
@@ -59,8 +65,11 @@ $(INTERFACEDIR)/%_wrap.cxx: $(INTERFACEDIR)/%.i
 
 
 $(TARGET):
-	ruby extconf.rb
+	$(RUBY) extconf.rb
 	$(MAKE) -f Makefile
+ifeq ($(findstring aarch64,$(GMSEC_PLATFORM)), aarch64)
+	mv $(TARGET) $(BINDIR)
+endif
 ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
 	mv $(TARGET) $(BINDIR)
 endif
@@ -75,6 +84,9 @@ clean:
 	$(RM) *.o
 	$(RM) Makefile
 	$(RM) mkmf.log
+ifeq ($(findstring aarch64,$(GMSEC_PLATFORM)), aarch64)
+	$(RM) $(BINDIR)/$(TARGET)
+endif
 ifeq ($(findstring linux,$(GMSEC_PLATFORM)), linux)
 	$(RM) $(BINDIR)/$(TARGET)
 endif

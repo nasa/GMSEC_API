@@ -20,34 +20,35 @@ namespace T010
 		{
 			try
 			{
-				Test_Constructor();
-				Test_GetAPIVersion();
-				Test_Connect();
-				Test_Disconnect();
-				Test_GetLibraryName();
-				Test_GetLibraryVersion();
-				Test_GetMessageFactory();
-				Test_RegisterEventCallback();
-				Test_Subscribe();
-				Test_SubscribeWithCallback();    // also calls on startAutoDispatch/stopAutoDispatch
-				Test_Unsubscribe();
-				Test_StartAutoDispatch();
-				Test_StopAutoDispatch();
-				Test_Publish();                  // also calls on subscribe() and receive()
-				Test_PublishWithMwConfig();
-				Test_RequestWithCallback();      // also calls on reply()
-				Test_Request();                  // also calls on reply()
-				Test_Reply();
-				Test_Dispatch();
-				Test_Receive();
-				Test_ExcludeSubject();           // also tests removeExcludedSubject()
-				Test_RemoveExcludedSubject();
-				Test_GetSetName();
-				Test_GetID();
-				Test_GetMWInfo();
-				Test_GetConnectionEndpoint();
-				Test_GetPublishQueueMessageCount();
-			}
+                Test_Constructor();
+                Test_GetAPIVersion();
+                Test_Connect();
+                Test_Disconnect();
+                Test_GetLibraryName();
+                Test_GetLibraryVersion();
+                Test_GetConfig();
+                Test_GetMessageFactory();
+                Test_RegisterEventCallback();
+                Test_Subscribe();
+                Test_SubscribeWithCallback();    // also calls on startAutoDispatch/stopAutoDispatch
+                Test_Unsubscribe();
+                Test_StartAutoDispatch();
+                Test_StopAutoDispatch();
+                Test_Publish();                  // also calls on subscribe() and receive()
+                Test_PublishWithMwConfig();
+                Test_RequestWithCallback();      // also calls on reply()
+                Test_Request();                  // also calls on reply()
+                Test_Reply();
+                Test_Dispatch();
+                Test_Receive();
+                Test_ExcludeSubject();           // also tests removeExcludedSubject()
+                Test_RemoveExcludedSubject();
+                Test_GetSetName();
+                Test_GetID();
+                Test_GetMWInfo();
+                Test_GetConnectionEndpoint();
+                Test_GetPublishQueueMessageCount();
+            }
 			catch (GmsecException e)
 			{
 				Require(e.ToString(), false);
@@ -207,6 +208,24 @@ namespace T010
 				using (Connection conn = new Connection( GetConfig() ))
 				{
 					Check("Expected to get a library version", null != conn.GetLibraryVersion());
+				}
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), false);
+			}
+		}
+
+
+		private void Test_GetConfig()
+        {
+			Log.Info("Test GetConfig()");
+
+            try
+			{
+				using (Connection conn = new Connection(GetConfig()))
+				{
+					Check("Expected to get a library version", null != conn.GetConfig());
 				}
 			}
 			catch (GmsecException e)

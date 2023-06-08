@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -87,11 +87,11 @@ public class ConfigFileIterator
 
 
 	/**
-	 * Reports back the next available Config object in the ConfigFile.
+	 * Reports back the next available ConfigFile.ConfigEntry in the ConfigFile.
 	 *
-	 * @return Returns a Config object.
+	 * @return Returns the next ConfigFile.ConfigEntry.
 	 *
-	 * @throws GmsecException Thrown if no more Config objects are available.
+	 * @throws GmsecException Thrown if no more ConfigFile.ConfigEntry objects are available.
 	 *
 	 * @see ConfigFileIterator#hasNextConfig()
 	 */
@@ -102,11 +102,11 @@ public class ConfigFileIterator
 
 
 	/**
-	 * Reports back the next available Message object in the ConfigFile.
+	 * Reports back the next available ConfigFile.MessageEntry in the ConfigFile.
 	 *
-	 * @return Returns a Message object.
+	 * @return Returns the next ConfigFile.MessageEntry.
 	 *
-	 * @throws GmsecException Thrown if no more Message objects are available.
+	 * @throws GmsecException Thrown if no more ConfigFile.MessageEntry objects are available.
 	 *
 	 * @see ConfigFileIterator#hasNextMessage()
 	 */
@@ -117,11 +117,11 @@ public class ConfigFileIterator
 
 
 	/**
-	 * Reports the next available subscription subject/topic in the ConfigFile.
+	 * Reports the next available ConfigFile.SubscriptionEntry in the ConfigFile.
 	 *
-	 * @return Returns subscription subject/topic.
+	 * @return Returns the next ConfigFile.SubscriptionEntry.
 	 *
-	 * @throws GmsecException Thrown if no more subscription subject/topics are available.
+	 * @throws GmsecException Thrown if no more ConfigFile.SubscriptionEntry objects are available.
 	 *
 	 * @see ConfigFileIterator#hasNextSubscription()
 	 */

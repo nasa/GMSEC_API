@@ -40,6 +40,19 @@ sub test_create
 	libgmsec_perl::HeartbeatGenerator::destroy($hbgen1);
 	libgmsec_perl::HeartbeatGenerator::destroy($hbgen2);
 	libgmsec_perl::HeartbeatGenerator::destroy($hbgen3);
+
+    # Off-nominal test(s)
+    eval
+    {
+        my $config = libgmsec_perl::Config->new($test->getConfig());
+        $config->addValue("mw-id", "bogus-mw");
+    	my $hbgen = libgmsec_perl::HeartbeatGenerator::create($config, 5, $emptyFieldArray);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Unable to load") != -1);
+	}
 }
 
 
@@ -49,7 +62,7 @@ sub test_start
 
 	my ($test) = @_;
 
-	my $config = $test->getConfig();
+	my $config = libgmsec_perl::Config->new($test->getConfig());
 
 	my $hbgen = libgmsec_perl::HeartbeatGenerator::create($config, 1, $test->getStandardFields());
 
@@ -65,6 +78,66 @@ sub test_start
 	$hbgen->stop();
 
 	libgmsec_perl::HeartbeatGenerator::destroy($hbgen);
+
+	# Off-nominal tests
+	libgmsec_perl::logInfo("Off-nominal cases...");
+	$config->addValue("gmsec-msg-content-validate", "true");
+
+	my $hbgen2 = libgmsec_perl::HeartbeatGenerator::create($config, 1, $test->getStandardFields());
+
+	# Add bogus field using a Field
+	eval
+	{
+		$hbgen2->setField( libgmsec_perl::U16Field->new("BOGUS-FIELD", 2) );
+        $hbgen2->start();
+		$test->check("An expection was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
+	}
+
+	# Add bogus field using a long value
+	eval
+	{
+		$hbgen2->setField("BOGUS-FIELD", 2);
+        $hbgen2->start();
+		$test->check("An expection was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
+	}
+
+	# Add bogus field using a double value
+	eval
+	{
+		$hbgen2->setField("BOGUS-FIELD", 2.0);
+        $hbgen2->start();
+		$test->check("An expection was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
+	}
+
+	# Add bogus field using a string value
+	eval
+	{
+		$hbgen2->setField("BOGUS-FIELD", "2");
+        $hbgen2->start();
+		$test->check("An expection was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
+	}
+
+	libgmsec_perl::HeartbeatGenerator::destroy($hbgen2);
 }
 
 
@@ -213,60 +286,6 @@ sub test_setField
 	verifyHeartbeatMessage($test, $config, 3);
 
 	$hbgen->stop();
-
-	# Off-nominal tests
-	libgmsec_perl::logInfo("Off-nominal cases...");
-	$config->addValue("gmsec-msg-content-validate", "true");
-
-	my $hbgen2 = libgmsec_perl::HeartbeatGenerator::create($config, $pubRate, $test->getStandardFields());
-
-	# Add bogus field using a Field
-	eval
-	{
-		$hbgen2->setField( libgmsec_perl::U16Field->new("BOGUS-FIELD", 2) );
-		$test->check("An expection was expected", 0);
-	};
-	if (isa($@, 'libgmsec_perl::GmsecException'))
-	{
-		my $error = $@;
-		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
-	}
-
-	# Add bogus field using a long value
-	eval
-	{
-		$hbgen2->setField("BOGUS-FIELD", 2);
-		$test->check("An expection was expected", 0);
-	};
-	if (isa($@, 'libgmsec_perl::GmsecException'))
-	{
-		my $error = $@;
-		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
-	}
-
-	# Add bogus field using a double value
-	eval
-	{
-		$hbgen2->setField("BOGUS-FIELD", 2.0);
-		$test->check("An expection was expected", 0);
-	};
-	if (isa($@, 'libgmsec_perl::GmsecException'))
-	{
-		my $error = $@;
-		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
-	}
-
-	# Add bogus field using a string value
-	eval
-	{
-		$hbgen2->setField("BOGUS-FIELD", "2");
-		$test->check("An expection was expected", 0);
-	};
-	if (isa($@, 'libgmsec_perl::GmsecException'))
-	{
-		my $error = $@;
-		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
-	}
 
 	libgmsec_perl::logInfo("Cleanup...");
 	libgmsec_perl::HeartbeatGenerator::destroy($hbgen);

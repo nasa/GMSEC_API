@@ -279,6 +279,21 @@ void test_get_library_version(Test& test)
 	}
 }
 
+void test_get_config(Test& test)
+{
+	GMSEC_INFO << "Test getConfig()";
+
+	try
+	{
+		Connection conn(test.getConfig());
+		test.check("Unexpected config returned", StringUtil::stringEquals(conn.getConfig().toXML(), test.getConfig().toXML()));
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), false);
+	}
+}
+
 
 void test_get_message_factory(Test& test)
 {
@@ -1369,6 +1384,7 @@ int test_Connection(Test& test)
 	test_disconnect(test);
 	test_get_library_name(test);
 	test_get_library_version(test);
+	test_get_config(test);
 	test_get_message_factory(test);
 	test_register_event_callback(test);
 	test_subscribe(test);

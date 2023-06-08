@@ -1,4 +1,4 @@
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -163,6 +163,19 @@ module Libgmsec_ruby #:nodoc: don't document this
 		# A string with the middleware version information.
 		#
 		def get_library_version
+		end
+
+
+		##
+		# Returns the Config object associated with the Connection.
+		#
+		# Note: The returned Config object is for reference purposes only. Changing the config object will not affect the Connection
+		#
+		# ==== Returns
+		#
+		# A handle to a Config object.
+		#
+		def get_config
 		end
 
 

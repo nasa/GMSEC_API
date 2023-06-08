@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <vector>
@@ -2278,7 +2279,7 @@ std::string InternalMessage::buildSubject(bool forTopic, bool useWildcards) cons
 			{
 				std::ostringstream oss;
 				oss << "Subject element " << elements[i].first.c_str() <<  " missing; requires field(s): " << element;
-				GMSEC_WARNING << oss.str().c_str();
+				GMSEC_DEBUG << oss.str().c_str();
 			}
 
 			subject += value;

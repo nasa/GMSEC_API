@@ -43,6 +43,20 @@ namespace T016
 			{
 				Check("ResourceGenerator should not be running", rsrcgen.IsRunning() == false);
 			}
+
+			//o Off-nominal test(s)
+			try
+			{
+				// Bogus middleware
+				Config config = new Config(GetConfig());
+				config.AddValue("mw-id", "bogus-mw");
+				new ResourceGenerator(config, 5, 1, 10);
+				Check("An exception was expected", false);
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), e.ToString().Contains("Unable to load"));
+			}
 		}
 
 
@@ -63,6 +77,20 @@ namespace T016
 			{
 				Check("ResourceGenerator should not be running", rsrcgen.IsRunning() == false);
 			}
+
+			//o Off-nominal test(s)
+			try
+			{
+				// Bogus middleware
+				Config config = new Config(GetConfig());
+				config.AddValue("mw-id", "bogus-mw");
+				new ResourceGenerator(config, 5, 1, 10, standardFields);
+				Check("An exception was expected", false);
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), e.ToString().Contains("Unable to load"));
+			}
 		}
 
 
@@ -70,7 +98,7 @@ namespace T016
 		{
 			Log.Info("Test Start()");
 
-			Config config  = GetConfig();
+			Config config  = new Config(GetConfig());
 			ushort pubRate = 1;
 
 			using (ResourceGenerator rsrcgen = new ResourceGenerator(config, pubRate, 1, 10, GetStandardFields()))
@@ -88,6 +116,22 @@ namespace T016
 
 				/* Allow time for the RSRC-gen thread to stop */
 				TimeUtil.Millisleep(2000);
+			}
+
+			// Off-nominal test(s)
+			config.AddValue("gmsec-msg-content-validate", "true");
+
+			using (ResourceGenerator rsrcgen = new ResourceGenerator(config, pubRate, 1, 10, GetStandardFields()))
+			{
+				try {
+					// Add bogus field
+					rsrcgen.SetField( new StringField("BOGUS-FIELD", "2") );
+					rsrcgen.Start();
+					Check("An exception was expected", false);
+				}
+				catch (GmsecException e) {
+					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
+				}
 			}
 		}
 
@@ -162,21 +206,6 @@ namespace T016
 
 				/* Allow time for the RSRC-gen thread to stop */
 				TimeUtil.Millisleep(2000);
-			}
-
-			//o Off-nominal tests
-			config.AddValue("gmsec-msg-content-validate", "true");
-
-			using (ResourceGenerator rsrcgen = new ResourceGenerator(config, pubRate, 1, 10, standardFields))
-			{
-				// Add bogus field using a Field
-				try {
-					rsrcgen.SetField(new U16Field("BOGUS-FIELD", (ushort) 2));
-					Check("An exception was expected", false);
-				}
-				catch (GmsecException e) {
-					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
-				}
 			}
 		}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -62,6 +62,11 @@ public class Connection : global::System.IDisposable {
   /// <summary>Identifies the version information for this connection's associated middleware.</summary>
   /// <returns>A string containing the middleware library version number.</returns>
   public string GetLibraryVersion() {
+  }
+
+  /// <summary>Returns the Config object associated with the Connection. Note that the returned Config object is for reference purposes only. Changing the config object will not affect the Connection</summary>
+  /// <returns>A handle to a Config object.</returns>
+  public Config GetConfig() {
   }
 
   /// <summary>Returns the MessageFactory object associated with the Connection which can be used to construct messages.</summary>

@@ -67,6 +67,20 @@ public class T016_ResourceGenerator extends TestCase
 			ResourceGenerator.destroy(rsrcgen1);
 			ResourceGenerator.destroy(rsrcgen2);
 			ResourceGenerator.destroy(rsrcgen3);
+
+			// Off-nominal test(s)
+			try
+			{
+				// Bogus middleware
+				Config config = new Config(getConfig());
+				config.addValue("mw-id", "bogus-mw");
+				ResourceGenerator.create(config, 5, 1, 10, null);
+				check("Expected an exception", false);
+			}
+			catch (GmsecException e)
+			{
+				check(e.getMessage(), e.getMessage().contains("Unable to load"));
+			}
 		}
 	}
 
@@ -76,7 +90,7 @@ public class T016_ResourceGenerator extends TestCase
 	{
 		Log.info("Test start()");
 
-		Config config  = getConfig();
+		Config config  = new Config(getConfig());
 		int    pubRate = 1;
 
 		ResourceGenerator rsrcgen = ResourceGenerator.create(config, pubRate, 1, 10, getStandardFields());
@@ -96,6 +110,20 @@ public class T016_ResourceGenerator extends TestCase
 		TimeUtil.millisleep(2000);
 
 		ResourceGenerator.destroy(rsrcgen);
+
+		// Off-nominal test(s)
+		config.addValue("gmsec-msg-content-validate", "true");
+
+		ResourceGenerator rsrcgen2 = ResourceGenerator.create(config, pubRate, 1, 10, getStandardFields());
+
+		try {
+			rsrcgen2.setField(new U16Field("BOGUS-FIELD", new U16(2)));
+			rsrcgen2.start();
+			check("An expection was expected", false);
+		}
+		catch (GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
+		}
 	}
 
 
@@ -182,23 +210,6 @@ public class T016_ResourceGenerator extends TestCase
 		TimeUtil.millisleep(2000);
 
 		ResourceGenerator.destroy(rsrcgen);
-
-		//o Off-nominal tests
-		config.addValue("gmsec-msg-content-validate", "true");
-
-		ResourceGenerator rsrcgen2 = ResourceGenerator.create(config, pubRate, 1, 10, getStandardFields());
-
-		// Add bogus field using a Field
-		try {
-			rsrcgen2.setField(new U16Field("BOGUS-FIELD", new U16(2)));
-
-			check("An exception was expected", false);
-		}
-		catch (GmsecException e) {
-			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
-		}
-
-		ResourceGenerator.destroy(rsrcgen2);
 	}
 
 

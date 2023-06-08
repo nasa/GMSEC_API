@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -218,6 +218,21 @@ C<libgmsec_perl::Connection-E<gt>getLibraryVersion()>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
     Library version
+
+
+=head3 getConfig
+
+C<libgmsec_perl::Connection-E<gt>getConfig()>
+
+    Returns the config object associated with the connection
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Note:</b><br>
+
+    The returned Config object is for reference purposes only. Changing the config object will not affect the Connection
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+    A handle to a Config object
 
 
 =head3 subscribe

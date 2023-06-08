@@ -883,6 +883,121 @@ sub test_Field
 		my $error = $@;
 		$test->check($error->what(), index($error->what(), "Field cannot be converted to a GMSEC_F64") != -1);
 	}
+
+	# Call on down-cast methods
+	my $value = "";
+	for (my $i = 0; $i < 4; $i++)
+	{
+		$value = $value . $i;
+	}
+
+	my $msg = libgmsec_perl::Message->new();
+	$msg->addField(libgmsec_perl::BinaryField->new("FIELD-1", $value, length $value));
+	$msg->addField(libgmsec_perl::BooleanField->new("FIELD-2", 1));
+	$msg->addField(libgmsec_perl::CharField->new("FIELD-3", 'c'));
+	$msg->addField(libgmsec_perl::F32Field->new("FIELD-4", 2));
+	$msg->addField(libgmsec_perl::F64Field->new("FIELD-5", 2.1));
+	$msg->addField(libgmsec_perl::I16Field->new("FIELD-6", 1));
+	$msg->addField(libgmsec_perl::I32Field->new("FIELD-7", 2));
+	$msg->addField(libgmsec_perl::I64Field->new("FIELD-8", 3));
+	$msg->addField(libgmsec_perl::I8Field->new("FIELD-9", 4));
+	$msg->addField(libgmsec_perl::StringField->new("FIELD-10", "Hello World"));
+	$msg->addField(libgmsec_perl::U16Field->new("FIELD-11", 1));
+	$msg->addField(libgmsec_perl::U32Field->new("FIELD-12", 2));
+	$msg->addField(libgmsec_perl::U64Field->new("FIELD-13", 3));
+	$msg->addField(libgmsec_perl::U8Field->new("FIELD-14", 4));
+
+	my $field = libgmsec_perl::Field::toBinaryField($msg->getField("FIELD-1"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_BINARY);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-1");
+	my $blob = $field->getValue();
+	for (my $i = 0; $i < $field->getLength(); $i++)
+	{
+		if (! substr($blob, $i, 1) eq substr($value, $i, 1))
+		{
+			libgmsec_perl::logInfo("BinaryField value at position $i is wrong");
+			$test->check("BinaryField value is wrong", 0);
+		}
+	}
+
+	$field = libgmsec_perl::Field::toBooleanField($msg->getField("FIELD-2"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_BOOL);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-2");
+	$test->check("Unexpected field value", $field->getValue() == 1);
+
+	$field = libgmsec_perl::Field::toCharField($msg->getField("FIELD-3"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_CHAR);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-3");
+	$test->check("Unexpected field value", $field->getValue() == 'c');
+
+	$field = libgmsec_perl::Field::toF32Field($msg->getField("FIELD-4"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_F32);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-4");
+	$test->check("Unexpected field value", $field->getValue() == 2);
+
+	$field = libgmsec_perl::Field::toF64Field($msg->getField("FIELD-5"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_F64);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-5");
+	$test->check("Unexpected field value", $field->getValue() == 2.1);
+
+	$field = libgmsec_perl::Field::toI16Field($msg->getField("FIELD-6"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_I16);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-6");
+	$test->check("Unexpected field value", $field->getValue() == 1);
+
+	$field = libgmsec_perl::Field::toI32Field($msg->getField("FIELD-7"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_I32);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-7");
+	$test->check("Unexpected field value", $field->getValue() == 2);
+
+	$field = libgmsec_perl::Field::toI64Field($msg->getField("FIELD-8"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_I64);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-8");
+	$test->check("Unexpected field value", $field->getValue() == 3);
+
+	$field = libgmsec_perl::Field::toI8Field($msg->getField("FIELD-9"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_I8);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-9");
+	$test->check("Unexpected field value", $field->getValue() == 4);
+
+	$field = libgmsec_perl::Field::toStringField($msg->getField("FIELD-10"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_STRING);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-10");
+	$test->check("Unexpected field value", $field->getValue() == "Hello World");
+
+	$field = libgmsec_perl::Field::toU16Field($msg->getField("FIELD-11"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_U16);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-11");
+	$test->check("Unexpected field value", $field->getValue() == 1);
+
+	$field = libgmsec_perl::Field::toU32Field($msg->getField("FIELD-12"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_U32);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-12");
+	$test->check("Unexpected field value", $field->getValue() == 2);
+
+	$field = libgmsec_perl::Field::toU64Field($msg->getField("FIELD-13"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_U64);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-13");
+	$test->check("Unexpected field value", $field->getValue() == 3);
+
+	$field = libgmsec_perl::Field::toU8Field($msg->getField("FIELD-14"));
+	$test->require("Unexpected field reference", $field != undef);
+	$test->check("Unexpected field type", $field->getType() == $libgmsec_perl::Field::Type_U8);
+	$test->check("Unexpected field name", $field->getName() == "FIELD-14");
+	$test->check("Unexpected field value", $field->getValue() == 4);
 }
 
 

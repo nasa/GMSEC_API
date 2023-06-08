@@ -1,4 +1,4 @@
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -47,7 +47,7 @@ endif
 # Python3 stuff
 #
 ifndef PYTHON3_HOME
-PYTHON3_HOME = $(SUPPORT)/python-3.8.5
+PYTHON3_HOME = $(SUPPORT)/python-3.10.7
 endif
 
 ifndef CXX
@@ -72,12 +72,14 @@ ifeq ($(COVERAGE),1)
 endif
 
 # define C/C++ compiler flags
+GCC_VERSION := $(shell $(CXX) -dumpversion) 
+CXX11_SUPPORTED := $(shell echo "$(GCC_VERSION) - 4.5 >= 0" | /usr/bin/bc -l) 
+
 CXXFLAGS   = $(DEBUG_FLAGS) $(COVERAGE) -Wall -D_REENTRANT $(INCS)
 CFLAGS    := $(CXXFLAGS)
 
-GCC_VERSION := $(shell $(CXX) -dumpversion)
-ifeq ($(shell expr $(GCC_VERSION) '>=' 4.5), 1)
-CXXFLAGS  += -std=c++11
+ifeq ($(shell expr $(CXX11_SUPPORTED) '==' 1), 1) 
+CXXFLAGS  += -std=c++11 
 endif
 
 # define api/example/test applications LDFLAGS

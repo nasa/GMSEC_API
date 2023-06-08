@@ -1,5 +1,5 @@
  
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -7,7 +7,7 @@
 
 ifndef GMSEC_PLATFORM
 
-default check_support build library mw_wrappers tools env_val java_api csharp_api perl_api python3_api ruby_api patch-mac api_docs clean install:
+default check_support build library mw_wrappers tools env_val java_api csharp_api nodejs_api perl_api python3_api ruby_api patch-mac api_docs clean install:
 	@ echo "Error: GMSEC_PLATFORM is not defined."
 	@ echo
 	@ echo "Please refer to the 'INSTALL.txt' file for reference"
@@ -26,7 +26,7 @@ include $(GMSEC_API_HOME)/config/$(GMSEC_PLATFORM)
 .PHONY: check_support build library env_val api_docs mw_wrapper clean install tools
 
 
-default: check_support build library mw_wrappers tools env_val java_api csharp_api perl_api python3_api ruby_api patch-mac
+default: check_support build library mw_wrappers tools env_val java_api csharp_api nodejs_api perl_api python3_api ruby_api patch-mac
 
 
 check_support:
@@ -93,6 +93,32 @@ else
 	@echo "#  Skipping build of C# binding for GMSEC API 5.x"
 	@echo "#"
 	@echo "###########################################################"
+endif
+
+
+nodejs_api:
+ifdef SWIG_HOME
+ifneq (, $(shell which node))
+	$(MAKE) -C nodejs/gmsec5
+else
+	@echo
+	@echo
+	@echo "#################################################################"
+	@echo "#"
+	@echo "#  node not found"
+	@echo "#  Skipping build of NodeJS/Javascript binding for GMSEC API 5.x"
+	@echo "#"
+	@echo "#################################################################"
+endif
+else
+	@echo
+	@echo
+	@echo "#################################################################"
+	@echo "#"
+	@echo "#  SWIG_HOME is not defined"
+	@echo "#  Skipping build of NodeJS/Javascript binding for GMSEC API 5.x"
+	@echo "#"
+	@echo "#################################################################"
 endif
 
 
@@ -219,7 +245,7 @@ ifneq (, $(shell which perl))
 endif
 	$(RM) -r $(BINDIR)/lib
 	$(RM) -r $(BINDIR)/validator
-	@ for dir in framework examples wrapper java csharp/gmsec5 perl/gmsec5 python3/gmsec5 doxygen tests tools; do \
+	@ for dir in framework examples wrapper java csharp/gmsec5 nodejs/gmsec5 perl/gmsec5 python3/gmsec5 doxygen tests tools; do \
 		$(MAKE) -C $$dir $@ ; \
 	done
 	@ cd ruby/gmsec5 && $(MAKE) -f MakeRuby $@

@@ -28,12 +28,12 @@ namespace T013
 			Log.Info("Test HasNext() and Next()");
 
 			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_0, 73);
-			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_1, 104);
-			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_2, 107);
+			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_1, 103);
+			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_2, 106);
 
 			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_0, 73);
-			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_1, 104);
-			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_2, 107);
+			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_1, 103);
+			Test_SchemaIdIteratorAux(Gmsec.GMSEC_MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_2, 106);
 		}
 
 

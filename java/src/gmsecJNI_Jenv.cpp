@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -205,8 +205,9 @@ AutoJEnv::AutoJEnv()
 	{
 		std::stringstream ss;
 		ss << "AutoJEnv: JNI_GetJavaVMs failed: " << x;
+		std::string str = ss.str();
 
-		LogEntry warning = { __FILE__, __LINE__, LogLevel::logWARNING, TimeUtil::getCurrentTime(), ss.str().c_str() };
+		LogEntry warning = { __FILE__, __LINE__, LogLevel::logWARNING, TimeUtil::getCurrentTime(), str.c_str() };
 
 		std::cerr << InternalLog::prepareLogMessage(warning) << std::endl;
 	}
@@ -228,8 +229,9 @@ AutoJEnv::AutoJEnv()
 			{
 				std::stringstream ss;
 				ss << "AutoJEnv: AttachCurrentThread failed: " << x;
+				std::string str = ss.str();
 
-				LogEntry warning = { __FILE__, __LINE__, LogLevel::logWARNING, TimeUtil::getCurrentTime(), ss.str().c_str() };
+				LogEntry warning = { __FILE__, __LINE__, LogLevel::logWARNING, TimeUtil::getCurrentTime(), str.c_str() };
 
 				std::cerr << InternalLog::prepareLogMessage(warning) << std::endl;
 			}
@@ -238,8 +240,9 @@ AutoJEnv::AutoJEnv()
 		{
 			std::stringstream ss;
 			ss << "AutoJEnv: GetEnv failed: " << x;
+			std::string str = ss.str();
 
-			LogEntry warning = { __FILE__, __LINE__, LogLevel::logWARNING, TimeUtil::getCurrentTime(), ss.str().c_str() };
+			LogEntry warning = { __FILE__, __LINE__, LogLevel::logWARNING, TimeUtil::getCurrentTime(), str.c_str() };
 
 			std::cerr << InternalLog::prepareLogMessage(warning) << std::endl;
 		}
@@ -256,8 +259,9 @@ AutoJEnv::~AutoJEnv()
 		{
 			std::stringstream ss;
 			ss << "AutoJEnv: Unable to DetachCurrentThread: " << x;
+			std::string str = ss.str();
 
-			LogEntry warning = { __FILE__, __LINE__, LogLevel::logWARNING, TimeUtil::getCurrentTime(), ss.str().c_str() };
+			LogEntry warning = { __FILE__, __LINE__, LogLevel::logWARNING, TimeUtil::getCurrentTime(), str.c_str() };
 
 			std::cerr << InternalLog::prepareLogMessage(warning) << std::endl;
 		}
