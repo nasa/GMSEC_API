@@ -82,13 +82,30 @@ void test_constructor_1(Test& test)
 {
 	GMSEC_INFO << "Test constructor 1...";
 
-	HeartbeatGenerator hbgen(test.getConfig(), static_cast<GMSEC_U16>(5));
+	Config config(test.getConfig());  // make a copy!
+	config.addValue("gmsec-msg-content-validate", "true");
+
+	HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(5));
 
 	hbgen.setField("MISSION-ID", "MY-MISSION");
 	hbgen.setField("SAT-ID-PHYSICAL", "MY-SAT-ID");
 	hbgen.setField("COMPONENT", "HB-GEN");
+	hbgen.setField("BOGUS", "FOOBAR");
 
 	test.check("HeartbeatGenerator should not be running", false == hbgen.isRunning());
+
+	// Off-nominal test(s)
+	try
+	{
+		// Bogus middleware
+		config.addValue("mw-id", "bogus-mw");
+		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(5));
+		test.check("An exception was expected", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Unable to load") != std::string::npos);
+	}
 }
 
 
@@ -96,24 +113,39 @@ void test_constructor_2(Test& test)
 {
 	GMSEC_INFO << "Test constructor 2...";
 
+	Config config(test.getConfig());  // make a copy!
+	config.addValue("gmsec-msg-content-validate", "true");
+
 	List<Field*> standardFields;
 	List<Field*> emptyFieldList;
 
 	get_standard_fields(standardFields);
 
 	// Nominal test -- no extra fields
-	HeartbeatGenerator hbgen1(test.getConfig(), static_cast<GMSEC_U16>(5), emptyFieldList);
-
+	HeartbeatGenerator hbgen1(config, static_cast<GMSEC_U16>(5), emptyFieldList);
 	hbgen1.setField("MISSION-ID", "MY-MISSION");
 	hbgen1.setField("SAT-ID-PHYSICAL", "MY-SAT-ID");
 	hbgen1.setField("COMPONENT", "HB-GEN");
-
+	hbgen1.setField("BOGUS", "FOOBAR");
 	test.check("HeartbeatGenerator should not be running", false == hbgen1.isRunning());
 
 	// Nominal test -- with extra fields
-	HeartbeatGenerator hbgen2(test.getConfig(), static_cast<GMSEC_U16>(5), standardFields);
-
+	HeartbeatGenerator hbgen2(config, static_cast<GMSEC_U16>(5), standardFields);
+	hbgen2.setField("BOGUS", "FOOBAR");
 	test.check("HeartbeatGenerator should not be running", false == hbgen2.isRunning());
+
+	// Off-nominal test(s)
+	try
+	{
+		// Bogus middleware
+		config.addValue("mw-id", "bogus-mw");
+		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(5));
+		test.check("An exception was expected", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Unable to load") != std::string::npos);
+	}
 
 	// Cleanup
 	destroy_standard_fields(standardFields);
@@ -124,7 +156,7 @@ void test_start(Test& test)
 {
 	GMSEC_INFO << "Test start()...";
 
-	Config& config = test.getConfig();
+	Config config = test.getConfig();  // make a copy!
 
 	List<Field*> fields;
 	get_standard_fields(fields);
@@ -153,6 +185,76 @@ void test_start(Test& test)
 	catch (const GmsecException& e)
 	{
 		test.check(e.what(), false);
+	}
+
+	// Off-nominal cases
+	GMSEC_INFO << "Performing off-nominal tests...";
+
+	config.addValue("gmsec-msg-content-validate", "true");
+
+	//o Add bogus field using a U16Field
+	try
+	{
+		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), fields);
+		hbgen.setField( U16Field("BOGUS-FIELD", static_cast<GMSEC_U16>(2)) );
+		hbgen.start();
+		test.check("Expected an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
+	}
+
+	//o Add bogus field using a GMSEC_I64 value
+	try
+	{
+		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), fields);
+		hbgen.setField("BOGUS-FIELD", static_cast<GMSEC_I64>(2));
+		hbgen.start();
+		test.check("Expected an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
+	}
+
+	//o Add bogus field using a GMSEC_F64 value
+	try
+	{
+		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), fields);
+		hbgen.setField("BOGUS-FIELD", static_cast<GMSEC_F64>(2));
+		hbgen.start();
+		test.check("Expected an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
+	}
+
+	//o Add bogus field using a String value
+	try
+	{
+		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), fields);
+		hbgen.setField("BOGUS-FIELD", "2");
+		hbgen.start();
+		test.check("Expected an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
+	}
+
+	//o Add legit field but with illegal value
+	try
+	{
+		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), fields);
+		hbgen.setField( F32Field("CONTENT-VERSION", static_cast<GMSEC_F32>(1776)) );
+		hbgen.start();
+		test.check("Expected an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
 	}
 
 	destroy_standard_fields(fields);
@@ -338,82 +440,6 @@ void test_set_field(Test& test)
 	catch (const GmsecException& e)
 	{
 		test.check(e.what(), false);
-	}
-
-	// Off-nominal cases
-	GMSEC_INFO << "Performing off-nominal tests...";
-
-	config.addValue("gmsec-msg-content-validate", "true");
-
-	//o Add bogus field using a U16Field
-	try
-	{
-
-		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), standardFields);
-
-		hbgen.setField( U16Field("BOGUS-FIELD", static_cast<GMSEC_U16>(2)) );
-
-		test.check("Expected an exception", false);
-	}
-	catch (const GmsecException& e)
-	{
-		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
-	}
-
-	//o Add bogus field using a GMSEC_I64 value
-	try
-	{
-		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), standardFields);
-
-		hbgen.setField("BOGUS-FIELD", static_cast<GMSEC_I64>(2));
-
-		test.check("Expected an exception", false);
-	}
-	catch (const GmsecException& e)
-	{
-		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
-	}
-
-	//o Add bogus field using a GMSEC_F64 value
-	try
-	{
-		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), standardFields);
-
-		hbgen.setField("BOGUS-FIELD", static_cast<GMSEC_F64>(2));
-
-		test.check("Expected an exception", false);
-	}
-	catch (const GmsecException& e)
-	{
-		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
-	}
-
-	//o Add bogus field using a String value
-	try
-	{
-		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), standardFields);
-
-		hbgen.setField("BOGUS-FIELD", "2");
-
-		test.check("Expected an exception", false);
-	}
-	catch (const GmsecException& e)
-	{
-		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
-	}
-
-	//o Add legit field but with illegal value
-	try
-	{
-		HeartbeatGenerator hbgen(config, static_cast<GMSEC_U16>(1), standardFields);
-
-		hbgen.setField( F32Field("CONTENT-VERSION", static_cast<GMSEC_F32>(1776)) );
-
-		test.check("Expected an exception", false);
-	}
-	catch (const GmsecException& e)
-	{
-		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
 	}
 
 	destroy_standard_fields(standardFields);

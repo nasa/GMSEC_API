@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -293,6 +293,21 @@ public class Connection
 	public String getLibraryVersion()
 	{
 		return m_jniConnection.getLibraryVersion();
+	}
+
+
+	/**
+	 * Returns the Config object that is associated with the Connection.
+	 *
+	 * Note:
+	 * The returned Config object is for reference purposes only. 
+	 * Changing the config object will not affect the Connection
+	 *
+	 * @return A Config object.
+	 */
+	public Config getConfig()
+	{
+		return m_jniConnection.getConfig();
 	}
 
 

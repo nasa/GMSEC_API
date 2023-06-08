@@ -603,16 +603,21 @@ static int testDriver(int argc, char** argv, int (*pf)(Test &))
 }
 
 
+int vargsLength(const char* format, va_list pargs)
+{
+	va_list argcopy;
+	va_copy(argcopy, pargs);
+	int len = std::vsnprintf(NULL, 0, format, argcopy);
+	va_end(argcopy);
+	return len;
+}
+
 int printToString(char* destination, const char* format, ...)
 {
-	std::va_list args;
+	va_list args;
 	va_start(args, format);
-#ifdef WIN32
-	int len    = _vscprintf(format, args) + 1;   // an extra byte for the terminating null-byte
-	int result = vsprintf_s(destination, len, format, args);
-#else
-	int result = std::vsprintf(destination, format, args);
-#endif
+	int len = vargsLength(format, args);
+	int result = std::vsnprintf(destination, len+1, format, args);
 	va_end(args);
 	return result;
 }

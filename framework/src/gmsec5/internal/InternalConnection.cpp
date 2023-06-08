@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -308,7 +308,7 @@ SubscriptionInfo* InternalConnection::subscribe(const char* subject0, const Conf
 	}
 
 	std::string subject = subject0;
-	size_t pos = subject.find("::");
+	size_t pos = subject.find(ARTEMIS_MQ_TOPIC_DELIMITER);
 	if (pos != std::string::npos)
 	{
 		// We have a subject with a queue name
@@ -1661,7 +1661,7 @@ void InternalConnection::unsubscribeAux(SubscriptionInfo*& info)
 	if (info->getInternal()->getCallback() != NULL)
 	{
 		std::string pattern = info->getSubjectPattern();
-		size_t p = pattern.find("::");
+		size_t p = pattern.find(ARTEMIS_MQ_TOPIC_DELIMITER);
 		if (p != std::string::npos)
 		{
 			pattern = pattern.substr(0, p);

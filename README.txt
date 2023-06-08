@@ -8,11 +8,11 @@ supported middleware, and example programs.
    Government version) for the following OSes:
 
       * Windows 10
-      * RHEL/CentOS 7
+      * Windows 11
       * RHEL 8
-      * Ubuntu 18.04 LTS
       * Ubuntu 20.04 LTS
-      * MacOS Big Sur
+      * Ubuntu 20.04 ARM/Aarch64 LTS
+      * MacOS
 
    Binaries and source code for the Open-Source version is available on NASA
    GitHub. See here for further details: https://github.com/nasa/GMSEC_API
@@ -155,6 +155,7 @@ supported middleware, and example programs.
       * C++
       * C#
       * Java
+      * NodeJS
       * Perl
       * Python
       * Ruby
@@ -164,10 +165,11 @@ supported middleware, and example programs.
 
    Notes:
 
-      1. Mono is required to use C# under Linux
+      1. Mono is required to use C# under Linux and MacOS
       2. Strawberry Perl 5.32.1 is required use Perl under Windows
       3. Python 3.10.7 (or later 3.10.x) is required to use Python
       4. Ruby 3.0.2 is required to use Ruby under Windows
+      5. Node 18.15.0 (or later) is required for NodeJS
 
 
 

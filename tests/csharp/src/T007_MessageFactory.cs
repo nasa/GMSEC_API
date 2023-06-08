@@ -112,7 +112,7 @@ namespace T007
 				Check("Expected an exception", false);
 			}
 			catch (ArgumentNullException e) {
-				Check(e.ToString(), e.ToString().Contains("gmsec::api5::Config const & type is null"));
+				Check(e.ToString(), e.ToString().Contains("System.ArgumentNullException: gmsec::api5::Config const & is null"));
 			}
 		}
 

@@ -37,12 +37,12 @@ public class T013_SchemaIDIterator extends TestCase
 		Log.info("Test hasNext() and next()");
 
 		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_0, 73);
-		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_1, 104);
-		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_2, 107);
+		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_1, 103);
+		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_CURRENT, Specification.SchemaLevel.LEVEL_2, 106);
 
 		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_0, 73);
-		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_1, 104);
-		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_2, 107);
+		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_1, 103);
+		test_schema_id_iterator_aux(Gmsec.MSG_SPEC_2019_00, Specification.SchemaLevel.LEVEL_2, 106);
 	}
 
 

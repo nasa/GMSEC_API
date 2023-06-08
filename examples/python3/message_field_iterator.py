@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -79,46 +79,46 @@ class FieldIterationCallback(lp.Callback):
     #
     def get_field_value(self, field):
         if field.get_type() == lp.Field.Type_BINARY:
-            return lp.to_BinaryField(field).get_value()
+            return lp.Field.toBinaryField(field).get_value()
 
         elif field.get_type() == lp.Field.Type_BOOL:
-            return lp.to_BooleanField(field).get_value()
+            return lp.Field.toBooleanField(field).get_value()
 
         elif field.get_type() == lp.Field.Type_CHAR:
-            return lp.to_CharField(field).get_value()
+            return lp.Field.toCharField(field).get_value()
 
         elif field.get_type() == lp.Field.Type_I16:
-            return lp.to_I16Field(field).get_value()
+            return lp.Field.toI16Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_I32:
-            return lp.to_I32Field(field).get_value()
+            return lp.Field.toI32Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_I64:
-            return lp.to_I64Field(field).get_value()
+            return lp.Field.toI64Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_I8:
-            return lp.to_I8Field(field).get_value()
+            return lp.Field.toI8Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_F32:
-            return lp.to_F32Field(field).get_value()
+            return lp.Field.toF32Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_F64:
-            return lp.to_F64Field(field).get_value()
+            return lp.Field.toF64Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_STRING:
-            return lp.to_StringField(field).get_value()
+            return lp.Field.toStringField(field).get_value()
 
         elif field.get_type() == lp.Field.Type_U16:
-            return lp.to_U16Field(field).get_value()
+            return lp.Field.toU16Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_U32:
-            return lp.to_U32Field(field).get_value()
+            return lp.Field.toU32Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_U64:
-            return lp.to_U64Field(field).get_value()
+            return lp.Field.toU64Field(field).get_value()
 
         elif field.get_type() == lp.Field.Type_U8:
-            return lp.to_U8Field(field).get_value()
+            return lp.Field.toU8Field(field).get_value()
 
 
 class message_field_iterator:

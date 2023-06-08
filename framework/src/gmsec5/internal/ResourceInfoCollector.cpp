@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -69,6 +69,13 @@
 #include <sys/statvfs.h>
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
+
+#include <mach/mach_error.h>
+#include <mach/mach_host.h>
+#include <mach/mach_init.h>
+#include <mach/mach_types.h>
+#include <mach/vm_map.h>
+#include <mach/vm_statistics.h>
 #endif
 
 #define CHAR_BUF_LEN 256
@@ -205,6 +212,65 @@ static T getNetworkValue(const std::string& interface, const std::string& metric
 
 
 #if defined(__APPLE__)
+class CPUStats
+{
+public:
+	static CPUStats& instance()
+	{
+		if (s_instance == 0) {
+			s_instance = new CPUStats();
+		}
+		return *s_instance;
+	}
+
+	// Returns 1.0f for "CPU fully pinned", 0.0f for "CPU idle", or somewhere in between
+	// You'll need to call this at regular intervals, since it measures the load between
+	// the previous call and the current one.
+	GMSEC_F32 getCPULoad()
+	{
+		host_cpu_load_info_data_t cpuinfo;
+		mach_msg_type_number_t count = HOST_CPU_LOAD_INFO_COUNT;
+		if (host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, (host_info_t)&cpuinfo, &count) == KERN_SUCCESS)
+		{
+			unsigned long long totalTicks = 0;
+			for(int i = 0; i < m_numCPU; ++i) {
+				totalTicks += cpuinfo.cpu_ticks[i];
+			}
+			return calculateCPULoad(cpuinfo.cpu_ticks[CPU_STATE_IDLE], totalTicks);
+		}
+		return -1.0f;
+	}
+
+	GMSEC_U16 getNumCPU()
+	{
+		return m_numCPU;
+	}
+
+private:
+	CPUStats()
+		: m_numCPU(static_cast<GMSEC_U16>(CPU_STATE_MAX)),
+		  m_previousTotalTicks(0),
+		  m_previousIdleTicks(0)
+	{
+	}
+
+	GMSEC_F32 calculateCPULoad(unsigned long long idleTicks, unsigned long long totalTicks)
+	{
+		unsigned long long totalTicksSinceLastTime = totalTicks - m_previousTotalTicks;
+		unsigned long long idleTicksSinceLastTime  = idleTicks - m_previousIdleTicks;
+		GMSEC_F32 ret = 1.0f - ((totalTicksSinceLastTime > 0) ? static_cast<GMSEC_F32>(idleTicksSinceLastTime) / totalTicksSinceLastTime : 0);
+		m_previousTotalTicks = totalTicks;
+		m_previousIdleTicks  = idleTicks;
+		return ret;
+	}
+
+	static CPUStats*   s_instance;
+	GMSEC_U16          m_numCPU;
+	unsigned long long m_previousTotalTicks;
+	unsigned long long m_previousIdleTicks;
+};
+CPUStats* CPUStats::s_instance = NULL;
+
 
 static void pipeStreamToInputStream(std::istringstream& iss, FILE* pStream)
 {
@@ -382,90 +448,44 @@ void ResourceInfoCollector::addMainMemoryStats(Message& msg, unsigned int specVe
 
 #elif defined(__APPLE__)
 
-	bool haveStats = false;
-	int  tries     = 40;
+	vm_size_t page_size;
+	vm_statistics64_data_t vm_stats;
 
-	while (!haveStats && tries-- > 0)
+	mach_port_t mach_port = mach_host_self();
+	mach_msg_type_number_t count = sizeof(vm_stats) / sizeof(natural_t);
+
+	int64_t free_memory = 0;
+	int64_t used_memory = 0;
+	int64_t virtual_mem = 0;
+
+	if (KERN_SUCCESS == host_page_size(mach_port, &page_size) &&
+	    KERN_SUCCESS == host_statistics64(mach_port, HOST_VM_INFO, (host_info64_t)&vm_stats, &count))
 	{
-		system("/usr/bin/top -l 1 > /tmp/tmpout.top");
-
-		TimeUtil::millisleep(100);
-
-		struct stat top_stats;
-		stat("/tmp/tmpout.top", &top_stats);
-
-		haveStats = (top_stats.st_size > 0);
-	}
-
-	if (!haveStats)
-	{
-		GMSEC_ERROR << "Failed to acquire MEMORY stats";
-		return;
-	}
-
-
-	char              buffer[CHAR_BUF_LEN];
-	bool              phys_done             = false;
-	bool              virt_done             = false;
-	int               num_args              = 0;
-	unsigned long int phys_mem_used         = 0;
-	unsigned long int wired_mem_used        = 0;
-	unsigned long int available_phys_mem    = 0;
-	unsigned long int virtual_mem           = 0;
-	char              units1, units2, units3;
-
-	std::ifstream     ifs("/tmp/tmpout.top", std::ios::in);
-
-	while (ifs.getline(buffer, sizeof(buffer) - 1, '\n') && (!phys_done || !virt_done))
-	{
-		if (StringUtil::stringCompareCount(buffer, "PhysMem:", 8) == 0)
-		{
-			num_args = sscanf(buffer, "PhysMem: %lu%c used (%lu%c wired), %lu%c unused.",
-			                  &phys_mem_used, &units1,
-			                  &wired_mem_used, &units2,
-			                  &available_phys_mem, &units3);
-
-			if (num_args == 6)
-			{
-				if (units1 == 'G')
-				{
-					phys_mem_used *= 1000;
-				}
-				if (units3 == 'G')
-				{
-					available_phys_mem *= 1000;
-				}
-				phys_done = true;
-			}
-		}
-		else if (StringUtil::stringCompareCount(buffer, "VM:", 3) == 0)
-		{
-			num_args = sscanf(buffer, "VM: %lu%c vsize", &virtual_mem, &units1);
-
-			if (num_args == 2)
-			{
-				if (units1 == 'G')
-				{
-					virtual_mem *= 1000;
-				}
-				virt_done = true;
-			}
-		}
-	}
-
-	if (!phys_done || !virt_done)
-	{
-		throw GmsecException(RESOURCE_GENERATOR_ERROR, RESOURCE_INFO_MEMORY_ERROR, "Failed to query memory stats");
+		free_memory = (int64_t)vm_stats.free_count * (int64_t)page_size;
+		used_memory = ((int64_t)vm_stats.active_count + (int64_t)vm_stats.inactive_count + (int64_t)vm_stats.wire_count) *  (int64_t)page_size;
 	}
 	else
 	{
-		unlink("/tmp/tmpout.top");
+		throw GmsecException(RESOURCE_GENERATOR_ERROR, RESOURCE_INFO_MEMORY_ERROR, "Failed to query physical memory stats");
 	}
 
-	GMSEC_I64 total_virtual_memory      = static_cast<GMSEC_I64>(virtual_mem) * 1073741824; // virtual_mem is in GBytes
-	GMSEC_I64 total_physical_memory     = (static_cast<GMSEC_I64>(phys_mem_used) + static_cast<GMSEC_I64>(available_phys_mem)) * 1048576; // phys_mem is in MBytes
-	GMSEC_I64 available_physical_memory = static_cast<GMSEC_I64>(available_phys_mem) * 1048576; // phys mem is in MBytes
-	GMSEC_F32 memory_percent_utilized   = static_cast<GMSEC_F32>(phys_mem_used) / static_cast<GMSEC_F32>((phys_mem_used + available_phys_mem));
+	/* TODO: Figure out how to get virtual memory size (if that even makes sense on MacOS)
+	xsw_usage vmusage = {0};
+	size_t size = sizeof(vmusage);
+	if (sysctlbyname("vm.swapusage", &vmusage, &size, NULL, 0) == 0)
+	{
+		virtual_mem = vmusage.xsu_total;
+	}
+	else
+	{
+		throw GmsecException(RESOURCE_GENERATOR_ERROR, RESOURCE_INFO_MEMORY_ERROR, "Failed to query virtual memory stats");
+	}
+	*/
+
+	GMSEC_I64 total_virtual_memory      = static_cast<GMSEC_I64>(virtual_mem);
+	GMSEC_I64 total_physical_memory     = (static_cast<GMSEC_I64>(free_memory) + static_cast<GMSEC_I64>(used_memory));
+	GMSEC_I64 available_physical_memory = static_cast<GMSEC_I64>(free_memory);
+	GMSEC_F32 memory_percent_utilized   = static_cast<GMSEC_F32>(used_memory) / static_cast<GMSEC_F32>((used_memory + free_memory));
 
 	if (!std::isfinite(memory_percent_utilized))
 	{
@@ -649,12 +669,6 @@ void ResourceInfoCollector::addDiskStats(Message& msg, unsigned int specVersion,
 
 				stats_this_iteration.stats.push_back(stats_for_one_disk);
 			}
-			else
-			{
-				std::ostringstream err_str;
-				err_str << "Failed to query disk stats on " << device_path << " [" << strerror(errno) << "]";
-				GMSEC_WARNING << err_str.str().c_str();
-			}
 		}
 	}
 
@@ -722,12 +736,6 @@ void ResourceInfoCollector::addDiskStats(Message& msg, unsigned int specVersion,
 				stats_for_one_disk.disk_util = static_cast<GMSEC_F32>(disk_util_percentage * 100.0);
 
 				stats_this_iteration.stats.push_back(stats_for_one_disk);
-			}
-			else
-			{
-				std::ostringstream err_str;
-				err_str << "Failed to query disk stats on " << device_path << " [" << strerror(errno) << "]";
-				GMSEC_WARNING << err_str.str().c_str();
 			}
 		}
 	}
@@ -998,76 +1006,10 @@ void ResourceInfoCollector::addCPUStats(Message& msg, unsigned int specVersion, 
 
 #elif defined(__APPLE__)
 
-	char          buffer[CHAR_BUF_LEN];
-	bool          done = false;
-	int           num_args = 0;
-	float         dummy = 0.0;
-	float         user = 0.0;
-	float         sys = 0.0;
-	float         idle = 0.0;
-	int           num_cpus = 0;
-	bool          ready_to_fetch_cpu_loads = false;
-	CPUTickStruct cpu_tick_struct;
+	stats_this_iteration.cpu_total_util = ::CPUStats::instance().getCPULoad() * 100.0f;
+	stats_this_iteration.num_cpus = ::CPUStats::instance().getNumCPU();
 
-	FILE* pipe_output_fp = popen("/usr/bin/top -l 1", "r");
-
-	std::istringstream iss;
-
-	pipeStreamToInputStream(iss, pipe_output_fp);
-
-	pclose(pipe_output_fp);
-
-	while (iss.getline(buffer, sizeof(buffer) - 1, '\n') && !done)
-	{
-		if (StringUtil::stringCompareCount(buffer, "CPU usage:", 10) == 0)
-		{
-			//
-			// Get rid of '%' chars in buffer; sscanf doesn't deal with
-			// them gracefully.
-			//
-			unsigned int index = 0;
-
-			while (buffer[index] != '\0' && index < sizeof(buffer)-1)
-			{
-				if (buffer[index] == '%')
-				{
-					buffer[index] = ' ';
-				}
-
-				++index;
-			}
-
-			num_args = sscanf(buffer, "CPU usage: %f user, %f sys, %f idle", &user, &sys, &idle);
-
-			if (num_args == 3)
-			{
-				GMSEC_F32 cpu_util = ((user + sys) / (user + sys + idle)) * 100.0;
-
-				if (!std::isfinite(cpu_util))
-				{
-					cpu_util = 0.0;  // if user + sys + idle is zero (unlikely), assume no CPU utilization
-				}
-
-				stats_this_iteration.cpu_total_util = cpu_util;
-
-				done = true;
-			}
-			else
-			{
-				throw GmsecException(RESOURCE_GENERATOR_ERROR, RESOURCE_INFO_CPU_ERROR, "Failed to query CPU utilization");
-			}
-		}
-	}
-
-	size_t size = sizeof(num_cpus);
-	if (sysctlbyname("hw.logicalcpu", &num_cpus, &size, NULL, 0) != 0)
-	{
-		throw GmsecException(RESOURCE_GENERATOR_ERROR, RESOURCE_INFO_CPU_ERROR, "Failed to query number of CPUs");
-	}
-
-	stats_this_iteration.num_cpus = static_cast<GMSEC_I16>(num_cpus);
-
-	for (size_t synth_cpu_count = 0; synth_cpu_count < num_cpus; ++synth_cpu_count)
+	for (size_t synth_cpu_count = 0; synth_cpu_count < stats_this_iteration.num_cpus; ++synth_cpu_count)
 	{
 		if (synth_cpu_count == 0)
 		{
@@ -1425,7 +1367,7 @@ void ResourceInfoCollector::addNetworkStats(Message& msg, size_t sampleInterval,
 
 	m_networkStatsQueue.push_back(stats_this_iteration);
 
-	for (int net_port_count = 0; net_port_count < stats_this_iteration.num_net_ports; ++net_port_count)
+	for (GMSEC_U16 net_port_count = 0; net_port_count < stats_this_iteration.num_net_ports; ++net_port_count)
 	{
 		char field_key[CHAR_BUF_LEN];
 
@@ -1445,16 +1387,16 @@ void ResourceInfoCollector::addNetworkStats(Message& msg, size_t sampleInterval,
 		if (stats_this_iteration.stats[net_port_count].bandwidth > 0)
 		{
 			StringUtil::stringFormat(field_key, sizeof(field_key), "NET-PORT.%d.BYTES-RECEIVED", net_port_count+1);
-			msg.setFieldValue(field_key, static_cast<GMSEC_I64>(stats_this_iteration.stats[net_port_count].bytesRX));
+			msg.addField(field_key, stats_this_iteration.stats[net_port_count].bytesRX);
 
 			StringUtil::stringFormat(field_key, sizeof(field_key), "NET-PORT.%d.BYTES-SENT", net_port_count+1);
-			msg.setFieldValue(field_key, static_cast<GMSEC_I64>(stats_this_iteration.stats[net_port_count].bytesTX));
+			msg.addField(field_key, stats_this_iteration.stats[net_port_count].bytesTX);
 
 			StringUtil::stringFormat(field_key, sizeof(field_key), "NET-PORT.%d.ERRORS", net_port_count+1);
-			msg.setFieldValue(field_key, static_cast<GMSEC_I64>(stats_this_iteration.stats[net_port_count].errorsRX + stats_this_iteration.stats[net_port_count].errorsTX));
+			msg.addField(field_key, static_cast<GMSEC_U32>(stats_this_iteration.stats[net_port_count].errorsRX + stats_this_iteration.stats[net_port_count].errorsTX));
 
 			StringUtil::stringFormat(field_key, sizeof(field_key), "NET-PORT.%d.TOTAL-BANDWIDTH", net_port_count+1);
-			msg.setFieldValue(field_key, static_cast<GMSEC_I64>(stats_this_iteration.stats[net_port_count].bandwidth));
+			msg.addField(field_key, stats_this_iteration.stats[net_port_count].bandwidth);
 
 			// Compute utilization (for optimal results, we need at least two sample readings, of which only the last two are examined)
 			// If less than two samples are available, then assume utilization to be 0%.
@@ -1485,7 +1427,7 @@ void ResourceInfoCollector::addNetworkStats(Message& msg, size_t sampleInterval,
 		}
 	}
 
-	msg.setFieldValue("NUM-OF-NET-PORTS", static_cast<GMSEC_I64>(stats_this_iteration.num_net_ports));
+	msg.addField("NUM-OF-NET-PORTS", stats_this_iteration.num_net_ports);
 }
 
 

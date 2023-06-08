@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -100,33 +100,33 @@ class FieldIterationCallback < Libgmsec_ruby::Callback
     def get_field_value(field)
         case field.get_field_type()
         when Libgmsec_ruby::Field::Type_BINARY
-            return Libgmsec_ruby::to_BinaryField(field).get_value()
+            return Libgmsec_ruby::Field::toBinaryField(field).get_value()
         when Libgmsec_ruby::Field::Type_BOOL
-            return Libgmsec_ruby::to_BooleanField(field).get_value()
+            return Libgmsec_ruby::Field::toBooleanField(field).get_value()
         when Libgmsec_ruby::Field::Type_CHAR
-            return Libgmsec_ruby::to_CharField(field).get_value()
+            return Libgmsec_ruby::Field::toCharField(field).get_value()
         when Libgmsec_ruby::Field::Type_I16
-            return Libgmsec_ruby::to_I16Field(field).get_value()
+            return Libgmsec_ruby::Field::toI16Field(field).get_value()
         when Libgmsec_ruby::Field::Type_I32
-            return Libgmsec_ruby::to_I32Field(field).get_value()
+            return Libgmsec_ruby::Field::toI32Field(field).get_value()
         when Libgmsec_ruby::Field::Type_I64
-            return Libgmsec_ruby::to_I64Field(field).get_value()
+            return Libgmsec_ruby::Field::toI64Field(field).get_value()
         when Libgmsec_ruby::Field::Type_I8
-            return Libgmsec_ruby::to_I8Field(field).get_value()
+            return Libgmsec_ruby::Field::toI8Field(field).get_value()
         when Libgmsec_ruby::Field::Type_F32
-            return Libgmsec_ruby::to_F32Field(field).get_value()
+            return Libgmsec_ruby::Field::toF32Field(field).get_value()
         when Libgmsec_ruby::Field::Type_F64
-            return Libgmsec_ruby::to_F64Field(field).get_value()
+            return Libgmsec_ruby::Field::toF64Field(field).get_value()
         when Libgmsec_ruby::Field::Type_STRING
-            return Libgmsec_ruby::to_StringField(field).get_value()
+            return Libgmsec_ruby::Field::toStringField(field).get_value()
         when Libgmsec_ruby::Field::Type_U16
-            return Libgmsec_ruby::to_U16Field(field).get_value()
+            return Libgmsec_ruby::Field::toU16Field(field).get_value()
         when Libgmsec_ruby::Field::Type_U32
-            return Libgmsec_ruby::to_U32Field(field).get_value()
+            return Libgmsec_ruby::Field::toU32Field(field).get_value()
         when Libgmsec_ruby::Field::Type_U64
-            return Libgmsec_ruby::to_U64Field(field).get_value()
+            return Libgmsec_ruby::Field::toU64Field(field).get_value()
         when Libgmsec_ruby::Field::Type_U8
-            return Libgmsec_ruby::to_U8Field(field).get_value()
+            return Libgmsec_ruby::Field::toU8Field(field).get_value()
         end
     end
 end

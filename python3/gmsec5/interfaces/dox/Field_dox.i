@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -128,5 +128,229 @@
     Exceptions
     ----------
     A GmsecError is thrown if the field cannot be successfully converted to a double.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toBinaryField "
+
+    toBinaryField(field: Field) -> BinaryField
+
+    Downcasts the Field object into a BinaryField.
+
+    Parameters
+    ----------
+    field : The field object to downcast to a BinaryField.
+
+    Returns
+    -------
+    A BinaryField object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toBooleanField "
+
+    toBooleanField(field: Field) -> BooleanField
+
+    Downcasts the Field object into a BooleanField.
+
+    Parameters
+    ----------
+    field : The field object to downcast to a BooleanField.
+
+    Returns
+    -------
+    A BooleanField object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toCharField "
+
+    toCharField(field: Field) -> CharField
+
+    Downcasts the Field object into a CharField.
+
+    Parameters
+    ----------
+    field : The field object to downcast to a CharField.
+
+    Returns
+    -------
+    A CharField object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toF32Field "
+
+    toF32Field(field: Field) -> F32Field
+
+    Downcasts the Field object into an F32Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to an F32Field.
+
+    Returns
+    -------
+    An F32Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toF64Field "
+
+    toF64Field(field: Field) -> F64Field
+
+    Downcasts the Field object into an F64Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to an F64Field.
+
+    Returns
+    -------
+    An F64Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toI16Field "
+
+    toI16Field(field: Field) -> I16Field
+
+    Downcasts the Field object into an I16Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to an I16Field.
+
+    Returns
+    -------
+    An I16Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toI32Field "
+
+    toI32Field(field: Field) -> I32Field
+
+    Downcasts the Field object into an I32Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to an I32Field.
+
+    Returns
+    -------
+    An I32Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toI64Field "
+
+    toI64Field(field: Field) -> I64Field
+
+    Downcasts the Field object into an I64Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to an I64Field.
+
+    Returns
+    -------
+    An I64Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toI8Field "
+
+    toI8Field(field: Field) -> I8Field
+
+    Downcasts the Field object into an I8Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to an I8Field.
+
+    Returns
+    -------
+    An I8Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toStringField "
+
+    toStringField(field: Field) -> StringField
+
+    Downcasts the Field object into a StringField.
+
+    Parameters
+    ----------
+    field : The field object to downcast to a StringField.
+
+    Returns
+    -------
+    A StringField object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toU16Field "
+
+    toU16Field(field: Field) -> U16Field
+
+    Downcasts the Field object into a U16Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to a U16Field.
+
+    Returns
+    -------
+    A U16Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toU32Field "
+
+    toU32Field(field: Field) -> U32Field
+
+    Downcasts the Field object into a U32Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to a U32Field.
+
+    Returns
+    -------
+    A U32Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toU64Field "
+
+    toU64Field(field: Field) -> U64Field
+
+    Downcasts the Field object into a U64Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to a U64Field.
+
+    Returns
+    -------
+    A U64Field object, or None if the cast fails.
+";
+
+
+%feature("docstring") gmsec::api5::Field::toU8Field "
+
+    toU8Field(field: Field) -> U8Field
+
+    Downcasts the Field object into a U8Field.
+
+    Parameters
+    ----------
+    field : The field object to downcast to a U8Field.
+
+    Returns
+    -------
+    A U8Field object, or None if the cast fails.
 ";
 

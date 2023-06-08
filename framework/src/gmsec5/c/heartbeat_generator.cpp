@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -132,7 +132,14 @@ GMSEC_BOOL CALL_TYPE heartbeatGeneratorStart(GMSEC_HeartbeatGenerator hbgen, GMS
 	}
 	else
 	{
-		hbgenStatus = (h->start() ? GMSEC_BOOL::GMSEC_TRUE : GMSEC_BOOL::GMSEC_FALSE);
+		try
+		{
+			hbgenStatus = (h->start() ? GMSEC_BOOL::GMSEC_TRUE : GMSEC_BOOL::GMSEC_FALSE);
+		}
+		catch (const GmsecException& e)
+		{
+			result = Status(e);
+		}
 	}
 
 	if (status)

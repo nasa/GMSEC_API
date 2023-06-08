@@ -1,4 +1,8 @@
-MCS         = /usr/bin/mcs
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+MCS = /usr/local/bin/mcs
+else
+MCS = /usr/bin/mcs
+endif
 
 CS_ASSEMBLY = $(GMSEC_API_HOME)/bin/gmsec_csharp.dll
 

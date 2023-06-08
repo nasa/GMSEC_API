@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -143,6 +143,15 @@ bool InternalResourceGenerator::start()
 		return false;
 	}
 
+	if (validateMessage())
+	{
+		Status status = m_rsrcMsg.isCompliant();
+		if (status.hasError())
+		{
+			throw GmsecException(status);
+		}
+	}
+
 	setupService();
 
 	m_startupLatch.reset(new CountDownLatch(1));
@@ -216,36 +225,7 @@ bool InternalResourceGenerator::setField(const Field& field)
 	}
 	else
 	{
-		if (validateMessage())
-		{
-			// Retrieve/stow the field being replaced (if any) before adding the new field;
-			// then validate. If an issue arises, restore the original field (if any).
-			// Then report the error.
-			StdUniquePtr<Field> oldField;
-
-			if (fieldOverwritten)
-			{
-				oldField.reset(InternalField::makeFieldCopy( *m_rsrcMsg.getField(field.getName()) ));
-			}
-
-			m_rsrcMsg.addField(field);
-
-			Status status = m_rsrcMsg.isCompliant();
-
-			if (status.hasError())
-			{
-				if (oldField.get())
-				{
-					MessageBuddy::getInternal(m_rsrcMsg).addField(*oldField.release(), false);
-				}
-
-				throw GmsecException(HEARTBEAT_GENERATOR_ERROR, INVALID_MSG, status.getReason());
-			}
-		}
-		else
-		{
-			m_rsrcMsg.addField(field);
-		}
+		m_rsrcMsg.addField(field);
 	}
 
 	return fieldOverwritten;
@@ -331,8 +311,7 @@ void InternalResourceGenerator::run()
 		else if (sample)
 		{
 			// Collect updated resource info into a temporary message
-			Message tmpMsg;
-			collectResources(tmpMsg, m_sampleInterval, m_averageInterval);
+			collectResources(sampleMsg, m_sampleInterval, m_averageInterval);
 		}
 
 		// Small delay so as to not pound the CPU.

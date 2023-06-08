@@ -1,4 +1,4 @@
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -54,22 +54,10 @@ server   : $(BINDIR)/$(SERVER_TARGET)
 
 $(BINDIR)/$(CLIENT_TARGET) : $(CLIENT_OBJECTS)
 	$(DLINK) $^ $(LDFLAGS) $(LIBS) -o $@ 
-	@ echo
-	@ echo "****"
-	@ echo "**** Done building $(CLIENT_TARGET)"
-	@ echo "****"
-	@ echo
-	@ echo
 
 
 $(BINDIR)/$(SERVER_TARGET) : $(SERVER_OBJECTS)
 	$(LINK) $^ $(LDFLAGS) $(LIBS) -o $@
-	@ echo
-	@ echo "****"
-	@ echo "**** Done building $(SERVER_TARGET)"
-	@ echo "****"
-	@ echo
-	@ echo
 
 
 $(OBJDIR)/%.o: ./src/%.cpp

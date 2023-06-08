@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -16,9 +16,9 @@
 WRAPPED_SRC=./interfaces/libgmsec_perl_wrap.cxx
 
 
-if [[ "$GMSEC_PLATFORM" == "linux"* ]]; then
+if [[ "$GMSEC_PLATFORM" == "linux"* ]] || [[ "$GMSEC_PLATFORM" == "aarch64" ]]; then
 
-	echo "Patching $WRAPPED_SRC for Linux..."
+	echo "Patching $WRAPPED_SRC for $GMSEC_PLATFORM..."
 
         sed -i 's/onMessage(gmsec::api5::Connection &conn, gmsec::api5::Message const &msg) {/onMessage(gmsec::api5::Connection \&conn, gmsec::api5::Message const \&msg) {\n  GMSEC_SWIG_SET_PERL_CONTEXT;/g' $WRAPPED_SRC
         sed -i 's/onEvent(gmsec::api5::Connection &conn, gmsec::api5::Status const &status, gmsec::api5::Connection::Event event) {/onEvent(gmsec::api5::Connection \&conn, gmsec::api5::Status const \&status, gmsec::api5::Connection::Event event) {\n  GMSEC_SWIG_SET_PERL_CONTEXT;/g' $WRAPPED_SRC
@@ -33,7 +33,7 @@ if [[ "$GMSEC_PLATFORM" == "linux"* ]]; then
 
 elif [[ "$GMSEC_PLATFORM" == "macosx"* ]]; then
 
-	echo "Patching $WRAPPED_SRC for OS X..."
+	echo "Patching $WRAPPED_SRC for MacOS..."
 
 	sed -i '' 's/onMessage(gmsec::api5::Connection &conn, gmsec::api5::Message const &msg) {/onMessage(gmsec::api5::Connection \&conn, gmsec::api5::Message const \&msg) {\'$'\n  GMSEC_SWIG_SET_PERL_CONTEXT;/g' $WRAPPED_SRC
 

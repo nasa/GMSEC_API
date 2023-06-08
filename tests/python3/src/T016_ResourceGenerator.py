@@ -20,8 +20,16 @@ class Test_ResourceGenerator(Test):
 
         # Nominal test
         rsrcgen = lp.ResourceGenerator(self.get_config(), 5, 1, 10)
-
         self.check("ResourceGenerator should not be running", rsrcgen.is_running() == False)
+
+        # Off-nominal test(s)
+        try:
+            config = lp.Config(self.get_config())
+            config.add_value("mw-id", "bogus-mw")
+            lp.ResourceGenerator(config, 5, 1, 10)
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Unable to load" in str(e))
 
 
     def test_constructor_2(self):
@@ -32,16 +40,25 @@ class Test_ResourceGenerator(Test):
 
         # Nominal test (empty, populated, and null list of fields)
         rsrcgen1 = lp.ResourceGenerator(self.get_config(), 5, 1, 10, emptyFieldList)
-        rsrcgen2 = lp.ResourceGenerator(self.get_config(), 5, 1, 10, standardFields)
-
         self.check("ResourceGenerator should not be running", rsrcgen1.is_running() == False)
+
+        rsrcgen2 = lp.ResourceGenerator(self.get_config(), 5, 1, 10, standardFields)
         self.check("ResourceGenerator should not be running", rsrcgen2.is_running() == False)
+
+        # Off-nominal test(s)
+        try:
+            config = lp.Config(self.get_config())
+            config.add_value("mw-id", "bogus-mw")
+            lp.ResourceGenerator(config, 5, 1, 10, standardFields)
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Unable to load" in str(e))
 
 
     def test_start(self):
         lp.log_info("Test start()")
 
-        config  = self.get_config()
+        config  = lp.Config(self.get_config())
         pubRate = 1
 
         rsrcgen = lp.ResourceGenerator(config, pubRate, 1, 10, self.get_standard_fields())
@@ -59,6 +76,19 @@ class Test_ResourceGenerator(Test):
 
         # Allow time for the RSRC-gen thread to stop
         lp.TimeUtil.millisleep(2000)
+
+        # Off-nominal tests
+        config.add_value("gmsec-msg-content-validate", "true")
+
+        rsrcgen2 = lp.ResourceGenerator(config, 1, 1, 10, self.get_standard_fields())
+
+        # Add bogus field using a Field
+        try:
+            rsrcgen2.set_field( lp.U16Field("BOGUS-FIELD", 2) )
+            rsrcgen2.start()
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Message Validation Failed" in str(e))
 
 
     def test_stop(self):
@@ -117,18 +147,6 @@ class Test_ResourceGenerator(Test):
 
         # Allow time for the RSRC-gen thread to stop
         lp.TimeUtil.millisleep(2000)
-
-        # Off-nominal tests
-        config.add_value("gmsec-msg-content-validate", "true")
-
-        rsrcgen2 = lp.ResourceGenerator(config, pubRate, 1, 10, standardFields)
-
-        # Add bogus field using a Field
-        try:
-            rsrcgen2.set_field( lp.U16Field("BOGUS-FIELD", 2) )
-            self.check("An exception was expected", False)
-        except Exception as e:
-            self.check(str(e), "Message Validation Failed" in str(e))
 
 
     def test_create_resource_message(self):

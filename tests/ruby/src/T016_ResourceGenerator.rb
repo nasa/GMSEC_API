@@ -19,12 +19,6 @@ class Test_ResourceGenerator < Test
         test_create_2
         test_start
         test_stop
-
-        # These tests were separated (into off-nominal and nominal tests),
-        # and appear in the following order to mitigate an issue on MacOS
-        # where the testing would unexpectedly crash. Ruby issue???
-        #
-        test_set_field_off_nominal
         test_set_field
     end
 
@@ -36,6 +30,16 @@ class Test_ResourceGenerator < Test
         rsrcgen = Libgmsec_ruby::ResourceGenerator::create(get_config(), 5, 1, 10)
         check("ResourceGenerator should not be running", rsrcgen.is_running() == false)
         Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen)
+
+        # Off-nominal test(s)
+        begin
+            config = Libgmsec_ruby::Config::new(get_config())
+            config.add_value("mw-id", "bogus-mw")
+            Libgmsec_ruby::ResourceGenerator::create(config, 5, 1, 10)
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Unable to load"))
+        end
     end
 
 
@@ -46,20 +50,29 @@ class Test_ResourceGenerator < Test
 
         # Nominal test (empty, populated, and null list of fields)
         rsrcgen1 = Libgmsec_ruby::ResourceGenerator::create(get_config(), 5, 1, 10, emptyFieldList)
-        rsrcgen2 = Libgmsec_ruby::ResourceGenerator::create(get_config(), 5, 1, 10, @@stdFields)
-
         check("ResourceGenerator should not be running", rsrcgen1.is_running() == false)
-        check("ResourceGenerator should not be running", rsrcgen2.is_running() == false)
-
         Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen1)
+
+        rsrcgen2 = Libgmsec_ruby::ResourceGenerator::create(get_config(), 5, 1, 10, @@stdFields)
+        check("ResourceGenerator should not be running", rsrcgen2.is_running() == false)
         Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen2)
+
+        # Off-nominal test(s)
+        begin
+            config = Libgmsec_ruby::Config::new(get_config())
+            config.add_value("mw-id", "bogus-mw")
+            Libgmsec_ruby::ResourceGenerator::create(config, 5, 1, 10, @@stdFields)
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Unable to load"))
+        end
     end
 
 
     def test_start()
         Libgmsec_ruby::Log::info("Test start()")
 
-        config = get_config()
+        config = Libgmsec_ruby::Config::new(get_config())
         pubRate = 1
 
         rsrcgen = Libgmsec_ruby::ResourceGenerator::create( config, pubRate, 1, 10, @@stdFields )
@@ -79,6 +92,23 @@ class Test_ResourceGenerator < Test
         Libgmsec_ruby::TimeUtil::millisleep(2000)
 
         Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen)
+
+        # Off-nominal tests
+        Libgmsec_ruby::Log::info("Off-nominal cases...")
+        config.add_value("gmsec-msg-content-validate", "true")
+
+        rsrcgen2 = Libgmsec_ruby::ResourceGenerator::create(config, 1, 1, 10, get_standard_fields)
+
+        # Add bogus field using a Field
+        begin
+            rsrcgen2.set_field( Libgmsec_ruby::U16Field.new("BOGUS-FIELD", 2) )
+            rsrcgen2.start()
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Message Validation Failed"))
+        end
+        Libgmsec_ruby::Log::info("Cleanup...")
+        Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen2)
     end
 
 
@@ -120,29 +150,6 @@ class Test_ResourceGenerator < Test
         conn.disconnect()
 
         Libgmsec_ruby::Connection::destroy(conn)
-        Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen)
-    end
-
-
-    def test_set_field_off_nominal()
-        Libgmsec_ruby::Log::info("Test set_field() -- Off-nominal")
-
-        config = Libgmsec_ruby::Config.new( get_config() )     # make a copy
-        pubRate = 1
-
-        config.add_value("gmsec-msg-content-validate", "true")
-
-        rsrcgen = Libgmsec_ruby::ResourceGenerator::create( config, pubRate, 1, 10, @@stdFields )
-
-        begin
-            # Add bogus field to verify validation fails
-            rsrcgen.set_field( Libgmsec_ruby::U16Field.new("BOGUS-FIELD", 2) )
-            check("An exception was expected", false)
-        rescue GmsecException => e
-            check(e.message, e.message.include?("Message Validation Failed"))
-        end
-
-        Libgmsec_ruby::Log::info("Cleanup...")
         Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen)
     end
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -150,6 +150,7 @@ public class gmsecJNI
 	public final static native void Connection_Disconnect(long jarg1, JNIConnection connection);
 	public final static native String Connection_GetLibraryName(long jarg1, JNIConnection connection);
 	public final static native String Connection_GetLibraryVersion(long jarg1, JNIConnection connection);
+	public final static native long Connection_GetConfig(long jarg1, JNIConnection connection);
 	public final static native long Connection_GetMessageFactory(long jarg1, JNIConnection connection);
 	public final static native void Connection_RegisterEventCallback(long jarg1, JNIConnection connection, int event, long cbPtr);
 	public final static native long Connection_Subscribe(long jarg1, JNIConnection connection, String subject);

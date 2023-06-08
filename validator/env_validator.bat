@@ -1,6 +1,6 @@
 @echo off
 
-rem Copyright 2007-2022 United States Government as represented by the
+rem Copyright 2007-2023 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -605,6 +605,7 @@ REM ##
 REM ## CheckEnvironmentVariables
 REM ##
 REM ##########################################################################
+:CheckEnvironmentVariables
 rem Defining tab-space below; do not erase
 set TAB=	
 set env_file=%~dp0\%1.env
@@ -662,7 +663,7 @@ if !result! == "" (
 ) else (
 	call:Success "Python is installed"
 
-	set min_python_ver=3.8.5
+	set min_python_ver=3.10.7
 
 	python %~dp0\python_ver.py 1>NUl 2>NUL
 

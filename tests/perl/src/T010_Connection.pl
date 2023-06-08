@@ -17,6 +17,7 @@ sub Test_Connection
 	test_disconnect($test);
 	test_getLibraryName($test);
 	test_getLibraryVersion($test);
+	test_getConfig($test);
 	test_getMessageFactory($test);
 	test_registerEventCallback($test);
 	test_subscribe($test);
@@ -213,6 +214,32 @@ sub test_getLibraryVersion
 	{
 		$conn = libgmsec_perl::Connection::create( $test->getConfig() );
 		$test->check("Expected to get a library version", defined $conn->getLibraryVersion());
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), 0);
+	}
+	if (defined $conn)
+	{
+		libgmsec_perl::Connection::destroy($conn);
+		$conn = undef;
+	}
+}
+
+
+sub test_getConfig
+{
+	libgmsec_perl::logInfo("Test getConfig()");
+
+	my ($test) = @_;
+
+	my $conn;
+
+	eval
+	{
+		$conn = libgmsec_perl::Connection::create( $test->getConfig() );
+		$test->check("Expected to get a Config", defined $conn->getConfig());
 	};
 	if (isa($@, 'libgmsec_perl::GmsecException'))
 	{
@@ -792,7 +819,7 @@ sub test_request
 		}
 
 		# Delay to allow sub-process to fully start
-		libgmsec_perl::TimeUtil::millisleep(5000);
+		libgmsec_perl::TimeUtil::millisleep(10000);
 
 		$conn = libgmsec_perl::Connection::create( $config );
 

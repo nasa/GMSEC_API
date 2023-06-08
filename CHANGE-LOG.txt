@@ -6,7 +6,52 @@ For technical support regarding this release, or any previous version, please co
 
 
 ==============================================================================
-= GMSEC API 5.0 release notes (October 2022)
+= GMSEC API 5.1 release notes (May 2023)
+==============================================================================
+o This release provides a NodeJS binding that can be used by server-side clients
+o A distribution supporting Ubuntu 20.04 LTS ARM64/Aarch64 is now provided
+o Distributions for RHEL/CentOS 7 and Ubuntu 18.04 LTS are no longer provided
+
+
+--- Change summary -----------------------------------------------------------
+* API-5911 : Provide NodeJS/JavaScript API binding
+* API-5925 : Fix Ruby build failure on MacOS
+* API-5929 : MSG.CNTL template should allow for any string in CNTL-KEYWORD field
+* API-5931 : Fix compliance validator so missing subject elements are not reported twice
+* API-5940 : Mitigate compiler warnings regarding object backing the pointer will be destroyed at the end of the full-expression
+* API-5954 : Fields cannot be added to HB Generator that is not primed with standard fields
+* API-5955 : Fields cannot be added to RSRC Generator that is not primed with standard fields
+* API-5956 : C binding heartbeatGeneratorStart() function does not catch exceptions
+* API-5957 : C binding resourceGeneratorStart() function does not catch exceptions
+* API-5962 : Do not log message when system disk stats cannot be queried
+* API-5964 : Windows Environment Validator is missing entry point for CheckEnvironmentVariables
+* API-5966 : Improve CPU stats collection for MacOS
+* API-5967 : Improve Memory stats collection for MacOS
+* API-5969 : Linux configuration does not properly determine if C++11 is available with GCC
+* API-5970 : Linux configuration file references old version of Python if PYTHON3_HOME is not defined
+* API-5971 : InternalMessage.cpp is missing include statement for limits header file
+* API-5975 : Fix C++ example programs to free Connection object
+* API-5976 : Apply usage of connectionShutdownAllMiddlewares() in C example programs
+* API-5991 : Script to correct dynamic library loader paths on MacOS needs to be updated
+* API-5995 : Reference the correct Ruby executable in Makefile and Unit Test
+* API-6006 : Improve Memory stats collection for MacOS - Part 2
+* API-6009 : BinaryField module of C# binding is not being patched correctly
+* API-6015 : Incorrect data casts are used in ResourceInfoGenerator
+* API-6016 : Provide C# binding on MacOS using Mono
+* API-6018 : Add support for ARM64/Aarch64 systems
+* API-6028 : Conversion from a negative floating point value to an unsigned integer is undefined
+* API-6024 : Modify C2 NSS Makefile to leverage system provided NSS development package
+* API-6039 : Refactor Ruby binding to extend Field class with down cast methods
+* API-6040 : Refactor Perl binding to extend Field class with down cast methods
+* API-6041 : Refactor Python binding to extend Field class with down cast methods
+* API-6054 : Add getConfig() to the Connection class
+* API-6061 : Relax logged message from the warning level to the debug level
+* API-6064 : Define constant to represent Message Queue delimiter
+* API-6078 : Upon completion, gmlog produces a core dump
+
+
+==============================================================================
+= GMSEC API 5.0 release notes (January 2023)
 ==============================================================================
 o This release contains a different API compared to the previous GMSEC API 4.x releases
 
@@ -16,7 +61,7 @@ o The default message specification is C2MS (was NASA/GMSEC Addendum to C2MS)
 
 o Message validation levels are no longer supported; either a message is valid (ergo, compliant), or it is not
 
-o The Closed-Response request/reply paradigm is no longer offered; all request/reply transactions will use the Open-Response paradigm.
+o The Closed-Response request/reply paradigm is no longer offered; all request/reply transactions will use the Open-Response paradigm
 
 o Message Queue support is offered by the Artemis middleware wrapper
 

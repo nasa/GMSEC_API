@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,6 +22,7 @@ using namespace gmsec::api5;
 
 %extend gmsec::api5::U32Field
 {
+    /* Obsolete as of API 5.1, but leave in place to preserve binary compatibility */
     static U32Field* CALL_TYPE cast_field(Field* field)
     {
         U32Field* casted = dynamic_cast<U32Field*>(field);

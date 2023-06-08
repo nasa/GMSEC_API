@@ -19,6 +19,7 @@ class Test_Connection < Test
         test_disconnect
         test_get_library_name
         test_get_library_version
+        test_get_config
         test_get_message_factory
         test_register_event_callback
         test_subscribe
@@ -165,6 +166,25 @@ class Test_Connection < Test
         begin
             conn = Libgmsec_ruby::Connection::create( get_config() )
             check("Expected to get a library version", conn.get_library_version() != nil)
+        rescue GmsecException => e
+            check(e.message, false)
+        ensure
+            if conn != nil
+                Libgmsec_ruby::Connection::destroy( conn )
+                conn = nil
+            end
+		end
+	end
+
+
+    def test_get_config()
+        Libgmsec_ruby::Log::info("Test get_config()")
+
+        conn = nil
+
+        begin
+            conn = Libgmsec_ruby::Connection::create( get_config() )
+            check("Expected to get a config", conn.get_config() != nil)
         rescue GmsecException => e
             check(e.message, false)
         ensure
@@ -611,16 +631,14 @@ class Test_Connection < Test
 
             # Start the sub-process (i.e. responder)
             ruby_cmd = "ruby"
-            if not OS.windows?
+            if not OS.windows? and not OS.mac?
                 ruby_cmd = "/usr/bin/ruby"
             end
-
             Libgmsec_ruby::Log::info("Spawning... #{ruby_cmd} #{responder} #{args}")
-
             spawn("#{ruby_cmd} #{responder} #{args}")
 
             # Allow time for the responder process to start
-            Libgmsec_ruby::TimeUtil::millisleep(5000)
+            Libgmsec_ruby::TimeUtil::millisleep(10000)
 
             conn = Libgmsec_ruby::Connection::create( get_config() )
 
