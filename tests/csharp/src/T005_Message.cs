@@ -126,7 +126,7 @@ namespace T005
 			}
 			catch (ArgumentNullException e)
 			{
-				Check(e.ToString(), e.ToString().Contains("System.ArgumentNullException: gmsec::api5::Message const & type is null"));
+				Check(e.ToString(), e.ToString().Contains("System.ArgumentNullException: gmsec::api5::Message const & is null"));
 			}
 		}
 

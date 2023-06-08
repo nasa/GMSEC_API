@@ -1,4 +1,4 @@
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -11,7 +11,12 @@ TARGET	        = libgmsec_csharp.so
 
 ASSEMBLY        = gmsec_csharp.dll
 
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+MCS             = /usr/local/bin/mcs
+else
 MCS             = /usr/bin/mcs
+endif
+
 SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_INC        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/csharp -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
@@ -28,6 +33,12 @@ WRAPPED_SRCS    = $(INTERFACE_DIR)/Gmsec_wrap.cxx
 WRAPPED_OBJS    = $(WRAPPED_SRCS:.cxx=.o)
 
 OBJECTS        += $(WRAPPED_OBJS)
+
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+API_CXXFLAGS   += -Wno-uninitialized
+else
+API_CXXFLAGS   += -Wno-maybe-uninitialized
+endif
 
 .PHONY: clean check_mono check_swig message
 
@@ -82,7 +93,7 @@ $(INTERFACE_DIR)/%_wrap.cxx: $(INTERFACE_DIR)/%.i
 
 
 $(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.cxx
-	$(CXX) -c $(API_CXXFLAGS) -Wno-maybe-uninitialized $< -o $@
+	$(CXX) -c $(API_CXXFLAGS) $< -o $@
 
 
 $(BINDIR)/$(TARGET): $(OBJECTS)

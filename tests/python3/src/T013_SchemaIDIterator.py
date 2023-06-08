@@ -15,12 +15,12 @@ class Test_SchemaIDIterator(Test):
         lp.log_info("Test has_next() and next()")
 
         self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_CURRENT, lp.Specification.SchemaLevel_LEVEL_0, 73)
-        self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_CURRENT, lp.Specification.SchemaLevel_LEVEL_1, 104)
-        self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_CURRENT, lp.Specification.SchemaLevel_LEVEL_2, 107)
+        self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_CURRENT, lp.Specification.SchemaLevel_LEVEL_1, 103)
+        self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_CURRENT, lp.Specification.SchemaLevel_LEVEL_2, 106)
 
         self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_2019_00, lp.Specification.SchemaLevel_LEVEL_0, 73)
-        self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_2019_00, lp.Specification.SchemaLevel_LEVEL_1, 104)
-        self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_2019_00, lp.Specification.SchemaLevel_LEVEL_2, 107)
+        self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_2019_00, lp.Specification.SchemaLevel_LEVEL_1, 103)
+        self.test_schema_id_iterator_aux(lp.GMSEC_MSG_SPEC_2019_00, lp.Specification.SchemaLevel_LEVEL_2, 106)
 
 
     def test_reset(self):

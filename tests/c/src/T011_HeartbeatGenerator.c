@@ -32,6 +32,17 @@ void test_heartbeatGeneratorCreate()
 		testRequireBool("Heartbeat Generator handle is NULL", hbgen == NULL);
 	}
 
+	{
+		// Bogus middleware
+		GMSEC_Config config = configCreateCopy(testGetConfig(), NULL);
+		configAddValue(config, "mw-id", "bogus-mw", NULL);
+
+		GMSEC_HeartbeatGenerator hbgen = heartbeatGeneratorCreate(config, (GMSEC_U16) 5, status);
+
+		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
+		testRequireBool("Heartbeat Generator handle is NULL", hbgen == NULL);
+	}
+
 	statusDestroy(&status);
 }
 
@@ -69,6 +80,17 @@ void test_heartbeatGeneratorCreateWithFields()
 	{
 		// NULL config
 		GMSEC_HeartbeatGenerator hbgen = heartbeatGeneratorCreateWithFields(NULL, (GMSEC_U16) 5, fields, sizeof(fields)/sizeof(GMSEC_Field), status);
+
+		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
+		testRequireBool("Heartbeat Generator handle is NULL", hbgen == NULL);
+	}
+
+	{
+		// Bogus middleware
+		GMSEC_Config config = configCreateCopy(testGetConfig(), NULL);
+		configAddValue(config, "mw-id", "bogus-mw", NULL);
+
+		GMSEC_HeartbeatGenerator hbgen = heartbeatGeneratorCreateWithFields(config, (GMSEC_U16) 5, fields, sizeof(fields)/sizeof(GMSEC_Field), status);
 
 		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
 		testRequireBool("Heartbeat Generator handle is NULL", hbgen == NULL);
@@ -159,8 +181,28 @@ void test_heartbeatGeneratorStart()
 	verifyHeartbeatMessage(config, pubRate);
 
 	// Off-nominal
-	heartbeatGeneratorStart(NULL, status);
-	testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
+	{
+		// Missing handle
+		heartbeatGeneratorStart(NULL, status);
+		testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
+	}
+	{
+		// Non-compliant message
+		GMSEC_Config myConfig = configCreateCopy(testGetConfig(), NULL);
+		configAddValue(myConfig, "gmsec-msg-content-validate", "true", NULL);
+
+		GMSEC_HeartbeatGenerator hbgen2 = heartbeatGeneratorCreateWithFields(myConfig, pubRate, fields, sizeof(fields)/sizeof(GMSEC_Field), NULL);
+
+		GMSEC_Field component = stringFieldCreate("BOGUS", "FOOBAR", GMSEC_FALSE, NULL);
+		heartbeatGeneratorSetField(hbgen2, component, NULL);
+		fieldDestroy(&component);
+
+		heartbeatGeneratorStart(hbgen2, status);
+		testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
+
+		configDestroy(&myConfig);
+		heartbeatGeneratorDestroy(&hbgen2);
+	}
 
 	int i;
 	for (i = 0; i < sizeof(fields)/sizeof(GMSEC_Field); ++i)

@@ -29,6 +29,16 @@ class Test_HeartbeatGenerator < Test
         hbgen = Libgmsec_ruby::HeartbeatGenerator::create(get_config(), 5)
         check("HeartbeatGenerator should not be running", hbgen.is_running() == false)
         Libgmsec_ruby::HeartbeatGenerator::destroy(hbgen)
+
+        # Off-nominal test(s)
+        begin
+            config = Libgmsec_ruby::Config::new(get_config())
+            config.add_value("mw-id", "bogus-mw")
+            Libgmsec_ruby::HeartbeatGenerator::create(config, 5)
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Unable to load"))
+        end
     end
 
 
@@ -47,13 +57,23 @@ class Test_HeartbeatGenerator < Test
 
         Libgmsec_ruby::HeartbeatGenerator::destroy(hbgen1)
         Libgmsec_ruby::HeartbeatGenerator::destroy(hbgen2)
+
+        # Off-nominal test(s)
+        begin
+            config = Libgmsec_ruby::Config::new(get_config())
+            config.add_value("mw-id", "bogus-mw")
+            Libgmsec_ruby::HeartbeatGenerator::create(config, 5, standardFields)
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Unable to load"))
+        end
     end
 
 
     def test_start()
         Libgmsec_ruby::Log::info("Test start()")
 
-        config = get_config()
+        config = Libgmsec_ruby::Config::new(get_config())
 
         hbgen = Libgmsec_ruby::HeartbeatGenerator::create(config, 1, get_standard_fields())
 
@@ -72,6 +92,51 @@ class Test_HeartbeatGenerator < Test
         Libgmsec_ruby::TimeUtil::millisleep(2000)
 
         Libgmsec_ruby::HeartbeatGenerator::destroy(hbgen)
+
+        # Off-nominal tests
+        Libgmsec_ruby::Log::info("Off-nominal cases...")
+        config.add_value("gmsec-msg-content-validate", "true")
+
+        hbgen2 = Libgmsec_ruby::HeartbeatGenerator::create(config, 1, get_standard_fields)
+
+        # Add bogus field using a Field
+        begin
+            hbgen2.set_field( Libgmsec_ruby::U16Field.new("BOGUS-FIELD", 2) )
+            hbgen2.start()
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Message Validation Failed"))
+        end
+
+        # Add bogus field using a long value
+        begin
+            hbgen2.set_field("BOGUS-FIELD", 2)
+            hbgen2.start()
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Message Validation Failed"))
+        end
+
+        # Add bogus field using a double value
+        begin
+            hbgen2.set_field("BOGUS-FIELD", 2.0)
+            hbgen2.start()
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Message Validation Failed"))
+        end
+
+        # Add bogus field using a string value
+        begin
+            hbgen2.set_field("BOGUS-FIELD", "2")
+            hbgen2.start()
+            check("An exception was expected", false)
+        rescue GmsecException => e
+            check(e.message, e.message.include?("Message Validation Failed"))
+        end
+
+        Libgmsec_ruby::Log::info("Cleanup...")
+        Libgmsec_ruby::HeartbeatGenerator::destroy(hbgen2)
     end
 
 
@@ -209,47 +274,6 @@ class Test_HeartbeatGenerator < Test
         Libgmsec_ruby::TimeUtil::millisleep(2000)
 
         Libgmsec_ruby::HeartbeatGenerator::destroy(hbgen)
-
-        # Off-nominal tests
-        Libgmsec_ruby::Log::info("Off-nominal cases...")
-        config.add_value("gmsec-msg-content-validate", "true")
-
-        hbgen2 = Libgmsec_ruby::HeartbeatGenerator::create(config, 1, get_standard_fields)
-
-        # Add bogus field using a Field
-        begin
-            hbgen2.set_field( Libgmsec_ruby::U16Field.new("BOGUS-FIELD", 2) )
-            check("An expection was expected", false)
-        rescue GmsecException => e
-            check(e.message, e.message.include?("Message Validation Failed"))
-        end
-
-        # Add bogus field using a long value
-        begin
-            hbgen2.set_field("BOGUS-FIELD", 2)
-            check("An expection was expected", false)
-        rescue GmsecException => e
-            check(e.message, e.message.include?("Message Validation Failed"))
-        end
-
-        # Add bogus field using a double value
-        begin
-            hbgen2.set_field("BOGUS-FIELD", 2.0)
-            check("An expection was expected", false)
-        rescue GmsecException => e
-            check(e.message, e.message.include?("Message Validation Failed"))
-        end
-
-        # Add bogus field using a string value
-        begin
-            hbgen2.set_field("BOGUS-FIELD", "2")
-            check("An expection was expected", false)
-        rescue GmsecException => e
-            check(e.message, e.message.include?("Message Validation Failed"))
-        end
-
-        Libgmsec_ruby::Log::info("Cleanup...")
-        Libgmsec_ruby::HeartbeatGenerator::destroy(hbgen2)
     end
 
 

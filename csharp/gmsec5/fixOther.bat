@@ -1,7 +1,7 @@
 @ECHO OFF
 
 
-rem Copyright 2007-2022 United States Government as represented by the
+rem Copyright 2007-2023 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -12,8 +12,12 @@ set OLD_TEXT=public SWIGTYPE_p_GmsecBinaryData GetValue
 set NEW_TEXT=public byte\[\] GetValue
 perl -pi.bak -e "s/%OLD_TEXT%/%NEW_TEXT%/" %GENERATED_SRC%
 
-set OLD_CTOR=public BinaryField\(string name, byte\[\] blob, int length\) : this\(GmsecPINVOKE.new_BinaryField__SWIG_0\(name, blob, length\), true\) \{
-set NEW_CTOR=public BinaryField\(string name, byte\[\] blob\) : this\(GmsecPINVOKE.new_BinaryField__SWIG_0\(name, blob, blob.Length\), true\) \{
+set OLD_CTOR=public BinaryField\(string name, byte\[\] blob, int length, bool IsHeader\) : this\(GmsecPINVOKE.new_BinaryField__SWIG_0\(name, blob, length, IsHeader\), true\) \{
+set NEW_CTOR=public BinaryField\(string name, byte\[\] blob, bool IsHeader\) : this\(GmsecPINVOKE.new_BinaryField__SWIG_0\(name, blob, blob.Length, IsHeader\), true\) \{
+perl -pi.bak -e "s/%OLD_CTOR%/%NEW_CTOR%/" %GENERATED_SRC%
+
+set OLD_CTOR=public BinaryField\(string name, byte\[\] blob, int length\) : this\(GmsecPINVOKE.new_BinaryField__SWIG_1\(name, blob, length\), true\) \{
+set NEW_CTOR=public BinaryField\(string name, byte\[\] blob\) : this\(GmsecPINVOKE.new_BinaryField__SWIG_1\(name, blob, blob.Length\), true\) \{
 perl -pi.bak -e "s/%OLD_CTOR%/%NEW_CTOR%/" %GENERATED_SRC%
 
 set GENERATED_SRC=interfaces/ConfigFile.cs

@@ -1,4 +1,4 @@
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -77,7 +77,7 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# An XML string.
 		#
-		def to_xml
+		def toxml
 		end
 
 
@@ -87,7 +87,7 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# A JSON string.
 		#
-		def to_json
+		def tojson
 		end
 
 
@@ -141,5 +141,313 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		def get_double_value
 		end
+
+
+        # Downcasts the Field object into a BinaryField.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to a BinaryField.
+		#
+		# ==== Returns
+		#
+        # A BinaryField object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to a BinaryField object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toBinaryField(field)
+        end
+
+
+        # Downcasts the Field object into a BooleanField.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to a BooleanField.
+		#
+		# ==== Returns
+		#
+        # A BooleanField object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to a BooleanField object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toBooleanField(field)
+        end
+
+
+        # Downcasts the Field object into a CharField.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to a CharField.
+		#
+		# ==== Returns
+		#
+        # A CharField object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to a CharField object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toCharField(field)
+        end
+
+
+        # Downcasts the Field object into an F32Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to an F32Field.
+		#
+		# ==== Returns
+		#
+        # An F32Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to an F32Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toF32Field(field)
+        end
+
+
+        # Downcasts the Field object into an F64Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to an F64Field.
+		#
+		# ==== Returns
+		#
+        # An F64Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to an F64Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toF64Field(field)
+        end
+
+
+        # Downcasts the Field object into an I16Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to an I16Field.
+		#
+		# ==== Returns
+		#
+        # An I16Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to an I16Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toI16Field(field)
+        end
+
+
+        # Downcasts the Field object into an I32Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to an I32Field.
+		#
+		# ==== Returns
+		#
+        # An I32Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to an I32Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toI32Field(field)
+        end
+
+
+        # Downcasts the Field object into an I64Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to an I64Field.
+		#
+		# ==== Returns
+		#
+        # An I64Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to an I64Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toI64Field(field)
+        end
+
+
+        # Downcasts the Field object into an I8Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to an I8Field.
+		#
+		# ==== Returns
+		#
+        # An I8Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to an I8Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toI8Field(field)
+        end
+
+
+        # Downcasts the Field object into a StringField.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to a StringField.
+		#
+		# ==== Returns
+		#
+        # A StringField object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to a StringField object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toStringField(field)
+        end
+
+
+        # Downcasts the Field object into a U16Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to a U16Field.
+		#
+		# ==== Returns
+		#
+        # A U16Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to a U16Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toU16Field(field)
+        end
+
+
+        # Downcasts the Field object into a U32Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to a U32Field.
+		#
+		# ==== Returns
+		#
+        # A U32Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to a U32Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toU32Field(field)
+        end
+
+
+        # Downcasts the Field object into a U64Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to a U64Field.
+		#
+		# ==== Returns
+		#
+        # A U64Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to a U64Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toU64Field(field)
+        end
+
+
+        # Downcasts the Field object into a U8Field.
+        #
+        # ==== Attributes
+        #
+        # * +field+ - The field object to downcast to a U8Field.
+		#
+		# ==== Returns
+		#
+        # A U8Field object.
+		#
+		# ==== Raises
+		#
+        # A GmsecException is thrown if the given Field object is null.
+        #
+        # A GmsecException is thrown if the given Field object cannot be converted to a U8Field object.
+        #
+        # A GmsecException is thrown if the given object is not a Field object.
+        #
+        def self.toU8Field(field)
+        end
 	end
 end

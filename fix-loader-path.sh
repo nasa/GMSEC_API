@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -23,7 +23,7 @@ if [[ "$systype" == "Darwin" || "$systype" == "Mac" ]]; then
                libgmsec_activemq395.dylib libgmsec_amqp.dylib libgmsec_artemis.dylib \
                libgmsec_bolt.dylib libgmsec_c2.dylib libgmsec_generic_jms.dylib libgmsec_jni.jnilib libgmsec_mb.dylib \
                MBServer gm_msg_config gmconfig_edit gmhelp gmpub gmreq gmrpl gmsub throughput_pub throughput_sub \
-               libgmsec_perl.dylib libgmsec_ruby.bundle )
+               libgmsec_perl.dylib libgmsec_ruby.bundle gmsec_nodejs.node )
     for product in ${products[@]}; do
         if [ -f ${product} ]; then
             install_name_tool -change "../bin/libgmsec_api.dylib" "@loader_path/libgmsec_api.dylib" ${product}
@@ -37,30 +37,19 @@ if [[ "$systype" == "Darwin" || "$systype" == "Mac" ]]; then
     fi
 
 
-    old_support1="/Users/nightrun/dave"
-    old_support2="/Users/gsfc-580-nightrun/build"
-    new_support="/Users/gsfc-580-nightrun/nightrun/API-5.x/GMSEC_SUPPORT"
-
+    old_support="/Users/gsfc-580-nightrun/tmp"
 
     # libgmsec_activemq395.dylib
     if [ -f libgmsec_activemq395.dylib ]; then
-        install_name_tool -change "${old_support2}/activemq/lib/libactivemq-cpp.19.dylib" "${new_support}/activemq395/lib/libactivemq-cpp.19.dylib" libgmsec_activemq395.dylib
-        install_name_tool -change "${old_support2}/activemq/lib/libapr-1.0.dylib" "${new_support}/activemq395/lib/libapr-1.0.dylib" libgmsec_activemq395.dylib
+        install_name_tool -change "${old_support}/activemq/lib/libactivemq-cpp.19.dylib" "@loader_path/libactivemq-cpp.19.dylib" libgmsec_activemq395.dylib
+        install_name_tool -change "${old_support}/activemq/lib/libapr-1.0.dylib" "@loader_path/libapr-1.0.dylib" libgmsec_activemq395.dylib
     fi
-
-
-    # libgmsec_amqp.dylib
-    if [ -f libgmsec_amqp.dylib ]; then
-        install_name_tool -change "libqpid-proton.2.dylib" "${new_support}/amqp-1.0/lib64/libqpid-proton.2.dylib" libgmsec_amqp.dylib
-    fi
-
 
     # libgmsec_artemis.dylib
     if [ -f libgmsec_artemis.dylib ]; then
-        install_name_tool -change "${old_support2}/activemq/lib/libactivemq-cpp.19.dylib" "${new_support}/activemq395/lib/libactivemq-cpp.19.dylib" libgmsec_artemis.dylib
-        install_name_tool -change "${old_support2}/activemq/lib/libapr-1.0.dylib" "${new_support}/activemq395/lib/libapr-1.0.dylib" libgmsec_artemis.dylib
+        install_name_tool -change "${old_support}/activemq/lib/libactivemq-cpp.19.dylib" "@loader_path/libactivemq-cpp.19.dylib" libgmsec_artemis.dylib
+        install_name_tool -change "${old_support}/activemq/lib/libapr-1.0.dylib" "@loader_path/libapr-1.0.dylib" libgmsec_artemis.dylib
     fi
-
 
     popd > /dev/null
 fi

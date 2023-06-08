@@ -52,8 +52,8 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_BINARY)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_length() == value.length)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"BIN\">00010203</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"BIN\",\"VALUE\":\"00010203\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"BIN\">00010203</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"BIN\",\"VALUE\":\"00010203\"}")
 
         blob     = field1.get_value()
 		blob_len = field1.get_length()
@@ -70,8 +70,8 @@ class Test_Fields < Test
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_length() == field1.get_length())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         blob    = field2.get_value()
 		blo_len = field2.get_length()
@@ -114,16 +114,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_BOOL)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"BOOL\">TRUE</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"BOOL\",\"VALUE\":\"TRUE\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"BOOL\">TRUE</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"BOOL\",\"VALUE\":\"TRUE\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::BooleanField.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -156,16 +156,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_CHAR)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"CHAR\">f</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"CHAR\",\"VALUE\":\"f\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"CHAR\">f</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"CHAR\",\"VALUE\":\"f\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::CharField.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json()== field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson()== field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -198,16 +198,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_STRING)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"STRING\">Test String</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"STRING\",\"VALUE\":\"Test String\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"STRING\">Test String</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"STRING\",\"VALUE\":\"Test String\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::StringField.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -248,16 +248,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_F32)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"F32\" BITS=\"41200000\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"F32\",\"BITS\":\"41200000\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"F32\" BITS=\"41200000\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"F32\",\"BITS\":\"41200000\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::F32Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -290,16 +290,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_F64)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"F64\" BITS=\"4024000000000000\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"F64\",\"BITS\":\"4024000000000000\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"F64\" BITS=\"4024000000000000\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"F64\",\"BITS\":\"4024000000000000\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::F64Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -332,16 +332,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_I8)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"I8\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"I8\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"I8\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"I8\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::I8Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -374,16 +374,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_I16)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"I16\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"I16\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"I16\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"I16\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::I16Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -416,16 +416,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_I32)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"I32\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"I32\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"I32\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"I32\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::I32Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -458,16 +458,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_I64)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"I64\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"I64\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"I64\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"I64\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::I64Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -500,16 +500,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_U8)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"U8\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"U8\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"U8\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"U8\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::U8Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -542,16 +542,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_U16)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"U16\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"U16\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"U16\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"U16\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::U16Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -584,16 +584,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_U32)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"U32\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"U32\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"U32\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"U32\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::U32Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -626,16 +626,16 @@ class Test_Fields < Test
         check("Unexpected field type", field1.get_field_type() == Libgmsec_ruby::Field::Type_U64)
         check("Unexpected field name", field1.get_field_name() == name)
         check("Unexpected field value", field1.get_value() == value)
-        check("Unexpected XML", field1.to_xml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"U64\">10</FIELD>")
-        check("Unexpected JSON", field1.to_json() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"U64\",\"VALUE\":\"10\"}")
+        check("Unexpected XML", field1.toxml() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"U64\">10</FIELD>")
+        check("Unexpected JSON", field1.tojson() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"U64\",\"VALUE\":\"10\"}")
 
         # Copy-constructor
         field2 = Libgmsec_ruby::U64Field.new(field1)
         check("Unexpected field type", field2.get_field_type() == field1.get_field_type())
         check("Unexpected field name", field2.get_field_name() == field1.get_field_name())
         check("Unexpected field value", field2.get_value() == field1.get_value())
-        check("Unexpected XML", field2.to_xml() == field1.to_xml())
-        check("Unexpected JSON", field2.to_json() == field1.to_json())
+        check("Unexpected XML", field2.toxml() == field1.toxml())
+        check("Unexpected JSON", field2.tojson() == field1.tojson())
 
         # Off-Nominal test
 		begin
@@ -728,6 +728,121 @@ class Test_Fields < Test
         rescue GmsecException => e
             check(e.message, e.message.include?("Field cannot be converted to a GMSEC_F64"))
 		end
+
+		# Call on down-cast methods
+        data = []
+        for i in 0..3 do
+            data << (i % 256)
+		end
+
+		value = data.pack('C*').force_encoding('BINARY')
+
+		msg = Libgmsec_ruby::Message.new();
+		msg.add_field(Libgmsec_ruby::BinaryField.new("FIELD-1", value, value.length));
+		msg.add_field(Libgmsec_ruby::BooleanField.new("FIELD-2", true));
+		msg.add_field(Libgmsec_ruby::CharField.new("FIELD-3", 'c'));
+		msg.add_field(Libgmsec_ruby::F32Field.new("FIELD-4", 2));
+		msg.add_field(Libgmsec_ruby::F64Field.new("FIELD-5", 2.1));
+		msg.add_field(Libgmsec_ruby::I16Field.new("FIELD-6", 1));
+		msg.add_field(Libgmsec_ruby::I32Field.new("FIELD-7", 2));
+		msg.add_field(Libgmsec_ruby::I64Field.new("FIELD-8", 3));
+		msg.add_field(Libgmsec_ruby::I8Field.new("FIELD-9", 4));
+		msg.add_field(Libgmsec_ruby::StringField.new("FIELD-10", "Hello World"));
+		msg.add_field(Libgmsec_ruby::U16Field.new("FIELD-11", 1));
+		msg.add_field(Libgmsec_ruby::U32Field.new("FIELD-12", 2));
+		msg.add_field(Libgmsec_ruby::U64Field.new("FIELD-13", 3));
+		msg.add_field(Libgmsec_ruby::U8Field.new("FIELD-14", 4));
+
+		field = Libgmsec_ruby::Field::toBinaryField(msg.get_field("FIELD-1"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_BINARY);
+		check("Unexpected field name", field.get_field_name() == "FIELD-1");
+        blob     = field.get_value()
+		blob_len = field.get_length()
+        for i in 0..(blob_len-1)
+            if blob[i].ord != value[i].ord
+                Libgmsec_ruby::Log::info("BinaryField value at position #{i}" + " is wrong")
+                check("BinaryField value is wrong", false)
+			end
+		end
+
+		field = Libgmsec_ruby::Field::toBooleanField(msg.get_field("FIELD-2"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_BOOL);
+		check("Unexpected field name", field.get_field_name() == "FIELD-2");
+		check("Unexpected field value", field.get_value() == true);
+
+		field = Libgmsec_ruby::Field.toCharField(msg.get_field("FIELD-3"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_CHAR);
+		check("Unexpected field name", field.get_field_name() == "FIELD-3");
+		check("Unexpected field value", field.get_value() == 'c');
+
+		field = Libgmsec_ruby::Field.toF32Field(msg.get_field("FIELD-4"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_F32);
+		check("Unexpected field name", field.get_field_name() == "FIELD-4");
+		check("Unexpected field value", field.get_value() == 2);
+
+		field = Libgmsec_ruby::Field.toF64Field(msg.get_field("FIELD-5"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_F64);
+		check("Unexpected field name", field.get_field_name() == "FIELD-5");
+		check("Unexpected field value", field.get_value() == 2.1);
+
+		field = Libgmsec_ruby::Field.toI16Field(msg.get_field("FIELD-6"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_I16);
+		check("Unexpected field name", field.get_field_name() == "FIELD-6");
+		check("Unexpected field value", field.get_value() == 1);
+
+		field = Libgmsec_ruby::Field.toI32Field(msg.get_field("FIELD-7"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_I32);
+		check("Unexpected field name", field.get_field_name() == "FIELD-7");
+		check("Unexpected field value", field.get_value() == 2);
+
+		field = Libgmsec_ruby::Field.toI64Field(msg.get_field("FIELD-8"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_I64);
+		check("Unexpected field name", field.get_field_name() == "FIELD-8");
+		check("Unexpected field value", field.get_value() == 3);
+
+		field = Libgmsec_ruby::Field.toI8Field(msg.get_field("FIELD-9"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_I8);
+		check("Unexpected field name", field.get_field_name() == "FIELD-9");
+		check("Unexpected field value", field.get_value() == 4);
+
+		field = Libgmsec_ruby::Field.toStringField(msg.get_field("FIELD-10"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_STRING);
+		check("Unexpected field name", field.get_field_name() == "FIELD-10");
+		check("Unexpected field value", field.get_value() == "Hello World");
+
+		field = Libgmsec_ruby::Field.toU16Field(msg.get_field("FIELD-11"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_U16);
+		check("Unexpected field name", field.get_field_name() == "FIELD-11");
+		check("Unexpected field value", field.get_value() == 1);
+
+		field = Libgmsec_ruby::Field.toU32Field(msg.get_field("FIELD-12"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_U32);
+		check("Unexpected field name", field.get_field_name() == "FIELD-12");
+		check("Unexpected field value", field.get_value() == 2);
+
+		field = Libgmsec_ruby::Field.toU64Field(msg.get_field("FIELD-13"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_U64);
+		check("Unexpected field name", field.get_field_name() == "FIELD-13");
+		check("Unexpected field value", field.get_value() == 3);
+
+		field = Libgmsec_ruby::Field.toU8Field(msg.get_field("FIELD-14"));
+		require("Unexpected field reference", field != nil);
+		check("Unexpected field type", field.get_field_type() == Libgmsec_ruby::Field::Type_U8);
+		check("Unexpected field name", field.get_field_name() == "FIELD-14");
+		check("Unexpected field value", field.get_value() == 4);
 	end
 end
 

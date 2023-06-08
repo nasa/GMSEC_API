@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -211,6 +211,29 @@ const char* CALL_TYPE connectionGetLibraryVersion(GMSEC_Connection conn, GMSEC_S
 	}
 
 	return libVersion;
+}
+
+GMSEC_Config CALL_TYPE connectionGetConfig(GMSEC_Connection conn, GMSEC_Status status)
+{
+	GMSEC_Config config = NULL;
+	Status result;
+
+	Connection* c = reinterpret_cast<Connection*>(conn);
+
+	if (!c)
+	{
+		result = Status(CONNECTION_ERROR, UNINITIALIZED_OBJECT, "Connection handle is NULL");
+	}
+	else
+	{
+		config = reinterpret_cast<GMSEC_Config>(&c->getConfig());
+	}
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return config;
 }
 
 

@@ -125,7 +125,7 @@
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(PERL5_HOME)\lib\CORE;..\..\framework\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(PERL5_HOME)\perl\lib\CORE;..\..\framework\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;WIN32IOP_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -141,7 +141,7 @@
     <Link>
       <AdditionalDependencies>gmsec_api.lib;perl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\bin\libgmsec_perl.dll</OutputFile>
-      <AdditionalLibraryDirectories>..\..\objects\$(Configuration);$(PERL5_HOME)\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\objects\$(Configuration);$(PERL5_HOME)\perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs />
       <LinkTimeCodeGeneration />
       <RandomizedBaseAddress>false</RandomizedBaseAddress>

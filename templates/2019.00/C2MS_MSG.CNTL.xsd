@@ -10,13 +10,6 @@
 		</xs:restriction>
 	</xs:simpleType>
 
-	<xs:simpleType name="CNTL-KEYWORD_Type">
-		<xs:restriction base="xs:string">
-			<xs:pattern value="[A-Z0-9\-_]*"/>
-			<xs:enumeration value="CNTL"/>
-		</xs:restriction>
-	</xs:simpleType>
-
 	<xs:element name="MSG.CNTL">
 		<xs:complexType>
 			<xs:all>
@@ -45,7 +38,7 @@
 								</xs:annotation>
 								<xs:complexType>
 									<xs:simpleContent>
-										<xs:extension base="CNTL-KEYWORD_Type">
+										<xs:extension base="HEADER_STRING_Type">
 											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
 										</xs:extension>
 									</xs:simpleContent>

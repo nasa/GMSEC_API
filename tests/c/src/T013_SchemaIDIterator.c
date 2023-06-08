@@ -43,12 +43,12 @@ void test_schemaIDIterator()
 	// Nominal tests
 	{
 		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_CURRENT, GMSEC_SCHEMA_LEVEL_0, 73);
-		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_CURRENT, GMSEC_SCHEMA_LEVEL_1, 104);
-		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_CURRENT, GMSEC_SCHEMA_LEVEL_2, 107);
+		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_CURRENT, GMSEC_SCHEMA_LEVEL_1, 103);
+		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_CURRENT, GMSEC_SCHEMA_LEVEL_2, 106);
 
 		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_2019_00, GMSEC_SCHEMA_LEVEL_0, 73);
-		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_2019_00, GMSEC_SCHEMA_LEVEL_1, 104);
-		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_2019_00, GMSEC_SCHEMA_LEVEL_2, 107);
+		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_2019_00, GMSEC_SCHEMA_LEVEL_1, 103);
+		test_schemaIDIterator_aux(GMSEC_MSG_SPEC_2019_00, GMSEC_SCHEMA_LEVEL_2, 106);
 	}
 
 	// Off-nominal test(s)

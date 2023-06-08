@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -239,6 +239,31 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_
 	JNI_CATCH
 
 	return jVersion;
+}
+
+
+JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetConfig
+(JNIEnv* jenv, jclass jcls, jlong jConnPtr, jobject jConn)
+{
+	jlong jConfigPtr = 0;
+
+	try
+	{
+		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
+		if (conn == NULL)
+		{
+			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
+		}
+		else
+		{
+			Config& config = conn->getConfig();
+			jConfigPtr = JNI_POINTER_TO_JLONG(&config);
+		}
+	}
+	JNI_CATCH
+
+	return jConfigPtr;
 }
 
 

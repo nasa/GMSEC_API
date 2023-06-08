@@ -66,6 +66,20 @@ public class T011_HeartbeatGenerator extends TestCase
 			HeartbeatGenerator.destroy(hbgen2);
 			HeartbeatGenerator.destroy(hbgen3);
 		}
+
+		//o Off-nominal test(s)
+		try
+		{
+			// Bogus middleware
+			Config config = new Config(getConfig());
+			config.addValue("mw-id", "bogus-mw");
+			HeartbeatGenerator.create(config, 5, null);
+			check("Expected an exception", false);
+		}
+		catch (GmsecException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Unable to load"));
+		}
 	}
 
 
@@ -74,7 +88,7 @@ public class T011_HeartbeatGenerator extends TestCase
 	{
 		Log.info("Test start()");
 
-		Config config = getConfig();
+		Config config = new Config(getConfig());
 
 		HeartbeatGenerator hbgen = HeartbeatGenerator.create(config, 1, getStandardFields());
 
@@ -93,6 +107,53 @@ public class T011_HeartbeatGenerator extends TestCase
 		TimeUtil.millisleep(2000);
 
 		HeartbeatGenerator.destroy(hbgen);
+
+		//o Off-nominal tests
+		config.addValue("gmsec-msg-content-validate", "true");
+
+		HeartbeatGenerator hbgen2 = HeartbeatGenerator.create(config, 1, getStandardFields());
+
+		// Add bogus field using a Field
+		try {
+			hbgen2.setField(new U16Field("BOGUS-FIELD", new U16(2)));
+			hbgen2.start();
+			check("An expection was expected", false);
+		}
+		catch (GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
+		}
+
+		// Add bogus field using a long value
+		try {
+			hbgen2.setField("BOGUS-FIELD", (long) 2);
+			hbgen2.start();
+			check("An expection was expected", false);
+		}
+		catch (GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
+		}
+
+		// Add bogus field using a double value
+		try {
+			hbgen2.setField("BOGUS-FIELD", 2.0);
+			hbgen2.start();
+			check("An expection was expected", false);
+		}
+		catch (GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
+		}
+
+		// Add bogus field using a string value
+		try {
+			hbgen2.setField("BOGUS-FIELD", "2");
+			hbgen2.start();
+			check("An expection was expected", false);
+		}
+		catch (GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
+		}
+
+		HeartbeatGenerator.destroy(hbgen2);
 	}
 
 
@@ -257,49 +318,6 @@ public class T011_HeartbeatGenerator extends TestCase
 		TimeUtil.millisleep(2000);
 
 		HeartbeatGenerator.destroy(hbgen);
-
-		//o Off-nominal tests
-		config.addValue("gmsec-msg-content-validate", "true");
-
-		HeartbeatGenerator hbgen2 = HeartbeatGenerator.create(config, 1, getStandardFields());
-
-		// Add bogus field using a Field
-		try {
-			hbgen2.setField(new U16Field("BOGUS-FIELD", new U16(2)));
-			check("An expection was expected", false);
-		}
-		catch (GmsecException e) {
-			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
-		}
-
-		// Add bogus field using a long value
-		try {
-			hbgen2.setField("BOGUS-FIELD", (long) 2);
-			check("An expection was expected", false);
-		}
-		catch (GmsecException e) {
-			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
-		}
-
-		// Add bogus field using a double value
-		try {
-			hbgen2.setField("BOGUS-FIELD", 2.0);
-			check("An expection was expected", false);
-		}
-		catch (GmsecException e) {
-			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
-		}
-
-		// Add bogus field using a string value
-		try {
-			hbgen2.setField("BOGUS-FIELD", "2");
-			check("An expection was expected", false);
-		}
-		catch (GmsecException e) {
-			check(e.getMessage(), e.getMessage().contains("Message Validation Failed"));
-		}
-
-		HeartbeatGenerator.destroy(hbgen2);
 	}
 
 

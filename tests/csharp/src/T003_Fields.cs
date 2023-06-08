@@ -20,6 +20,7 @@ namespace T003
 		{
 			try
 			{
+				Test_BinaryField();
 				Test_BooleanField();
 				Test_CharField();
 				Test_StringField();
@@ -42,6 +43,87 @@ namespace T003
 			catch (GmsecException e)
 			{
 				Require(e.ToString(), false);
+			}
+		}
+
+
+		private void Test_BinaryField()
+		{
+			Log.Info("Test BinaryField");
+
+			// Nominal test
+			string name = "MY-FIELD";
+			byte[] data = new byte[4];
+			for (int i = 0; i < data.Length; ++i) {
+				data[i] = (byte)(i & 0xFF);
+			}
+
+			// Constructor 1
+			BinaryField field1 = new BinaryField(name, data);
+			Check("Unexpected header type", field1.IsHeader() == false);
+			Check("Unexpected field type", field1.GetFieldType() == Field.Type.BINARY);
+			Check("Unexpected field name", field1.GetName() == name);
+			Check("Unexpected data length", field1.GetValue().Length == data.Length);
+
+			byte[] bytes = field1.GetValue();
+			for (int i = 0; i < data.Length; ++i) {
+				Check("Unexpected data at position " + i.ToString(), bytes[i] == data[i]);
+			}
+
+			Check("Unexpected XML", field1.ToXML() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"BIN\">00010203</FIELD>");
+			Check("Unexpected JSON", field1.ToJSON() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"BIN\",\"VALUE\":\"00010203\"}");
+
+			// Constructor 2
+			BinaryField field2 = new BinaryField(name, data, true);
+			Check("Unexpected header type", field2.IsHeader() == true);
+			Check("Unexpected field type", field2.GetFieldType() == Field.Type.BINARY);
+			Check("Unexpected field name", field2.GetName() == name);
+			Check("Unexpected data length", field2.GetValue().Length == data.Length);
+
+			bytes = field2.GetValue();
+			for (int i = 0; i < data.Length; ++i) {
+				Check("Unexpected data at position " + i.ToString(), bytes[i] == data[i]);
+			}
+
+			Check("Unexpected XML", field2.ToXML() == "<FIELD NAME=\"MY-FIELD\" TYPE=\"BIN\">00010203</FIELD>");
+			Check("Unexpected JSON", field2.ToJSON() == "{\"NAME\":\"MY-FIELD\",\"TYPE\":\"BIN\",\"VALUE\":\"00010203\"}");
+
+			// Copy constructor
+			BinaryField field3 = new BinaryField(field2);
+			Check("Unexpected header type", field3.IsHeader() == field2.IsHeader());
+			Check("Unexpected field type", field3.GetFieldType() == field2.GetFieldType());
+			Check("Unexpected field name", field3.GetName() == field2.GetName());
+			Check("Unexpected data length", field3.GetValue().Length == field2.GetValue().Length);
+
+			bytes = field3.GetValue();
+			for (int i = 0; i < data.Length; ++i) {
+				Check("Unexpected data at position " + i.ToString(), bytes[i] == data[i]);
+			}
+
+			Check("Unexpected XML", field3.ToXML() == field2.ToXML());
+			Check("Unexpected JSON", field3.ToJSON() == field2.ToJSON());
+
+			// Off-Nominal test
+			try
+			{
+				// null field name
+				new BinaryField(null, data);
+				Check("IllegalArgumentException was expected", false);
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), e.ToString().Contains("Field name is not compliant"));
+			}
+
+			try
+			{
+				// empty-string field name
+				new BinaryField("", data);
+				Check("IllegalArgumentException was expected", false);
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), e.ToString().Contains("Field name is not compliant"));
 			}
 		}
 

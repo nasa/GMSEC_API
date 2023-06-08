@@ -195,7 +195,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>gmsec_api.lib;x64-vcruntime140-ruby260.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\..\bin\libgmsec_ruby.dll</OutputFile>
+      <OutputFile>..\..\bin\libgmsec_ruby.so</OutputFile>
       <AdditionalLibraryDirectories>..\..\objects\$(Configuration);$(RUBY_HOME)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs />
       <LinkTimeCodeGeneration />

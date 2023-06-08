@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,6 +39,7 @@
 #include <iterator>
 #include <limits>
 #include <sstream>
+#include <cmath>    // for fabs
 #include <cstring>  // for strlen
 #include <cctype>   // for toupper and isalpha
 #include <sstream>  // for ostringstream
@@ -513,10 +514,12 @@ GMSEC_U16 InternalField::getU16Value() const
 			GMSEC_F64 tmp = getF64Value();
 
 			if (tmp < 0) {
-				GMSEC_WARNING << "Converting negative value to unsigned value";
+				GMSEC_WARNING << "Undefined behavior: converting negative GMSEC_F64 value to GMSEC_U16 value";
+				value = static_cast<GMSEC_U16>(std::numeric_limits<GMSEC_U16>::max() - static_cast<GMSEC_U16>(std::fabs(tmp)) + 1);
 			}
-
-			value = static_cast<GMSEC_U16>(tmp);
+			else {
+				value = static_cast<GMSEC_U16>(tmp);
+			}
 		}
 		catch (...)
 		{
@@ -554,10 +557,12 @@ GMSEC_U32 InternalField::getU32Value() const
 			GMSEC_F64 tmp = getF64Value();
 
 			if (tmp < 0) {
-				GMSEC_WARNING << "Converting negative value to unsigned value";
+				GMSEC_WARNING << "Undefined behavior: converting negative GMSEC_F64 value to GMSEC_U32 value";
+				value = static_cast<GMSEC_U32>(std::numeric_limits<GMSEC_U32>::max() - static_cast<GMSEC_U32>(std::fabs(tmp)) + 1);
 			}
-
-			value = static_cast<GMSEC_U32>(tmp);
+			else {
+				value = static_cast<GMSEC_U32>(tmp);
+			}
 		}
 		catch (...)
 		{
@@ -595,10 +600,12 @@ GMSEC_U64 InternalField::getU64Value() const
 			GMSEC_F64 tmp = getF64Value();
 
 			if (tmp < 0) {
-				GMSEC_WARNING << "Converting negative value to unsigned value";
+				GMSEC_WARNING << "Undefined behavior: converting negative GMSEC_F64 value to GMSEC_U64 value";
+				value = static_cast<GMSEC_U64>(std::numeric_limits<GMSEC_U64>::max() - static_cast<GMSEC_U64>(std::fabs(tmp)) + 1);
 			}
-
-			value = static_cast<GMSEC_U64>(tmp);
+			else {
+				value = static_cast<GMSEC_U64>(tmp);
+			}
 		}
 		catch (...)
 		{

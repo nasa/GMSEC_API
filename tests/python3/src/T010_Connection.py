@@ -13,6 +13,7 @@ class Test_Connection(Test):
         self.test_disconnect()
         self.test_get_library_name()
         self.test_get_library_version()
+        self.test_get_config()
         self.test_get_message_factory()
         self.test_register_event_callback()
         self.test_subscribe()
@@ -119,6 +120,16 @@ class Test_Connection(Test):
         try:
             conn = lp.Connection( self.get_config() )
             self.check("Expected to get a library version", conn.get_library_version() != None)
+        except Exception as e:
+            self.check(str(e), False)
+
+
+    def test_get_config(self):
+        lp.log_info("Test get_config()")
+
+        try:
+            conn = lp.Connection( self.get_config() )
+            self.check("Expected to get a lconfig", conn.get_config() != None)
         except Exception as e:
             self.check(str(e), False)
 

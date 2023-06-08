@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -10,9 +10,9 @@ WRAPPED_SRC=./interfaces/libgmsec_python3_wrap.cxx
 PYTHON_SRC=./interfaces/libgmsec_python3.py
 
 
-if [[ "$GMSEC_PLATFORM" == "linux"* ]]; then
+if [[ "$GMSEC_PLATFORM" == "linux"* ]] || [[ "$GMSEC_PLATFORM" == "aarch64" ]]; then
 
-	echo "Patching $WRAPPED_SRC for Linux..."
+	echo "Patching $WRAPPED_SRC for $GMSEC_PLATFORM..."
 
 	# Additional handling for ensuring that the globally-defined XEntry classes (from ConfigFile) are used
 	# Need to include the comma at the end of the replacement string in order to not overwrite the SWIG-generated definition for the (unused) ConfigFile::XEntry classes.
@@ -26,7 +26,7 @@ if [[ "$GMSEC_PLATFORM" == "linux"* ]]; then
 
 elif [[ "$GMSEC_PLATFORM" == "macosx"* ]]; then
 
-	echo "Patching $WRAPPED_SRC for OS X..."
+	echo "Patching $WRAPPED_SRC for MacOS..."
 
 	# Additional handling for ensuring that the globally-defined XEntry classes (from ConfigFile) are used
 	# Need to include the comma at the end of the replacement string in order to not overwrite the SWIG-generated definition for the (unused) ConfigFile::XEntry classes.

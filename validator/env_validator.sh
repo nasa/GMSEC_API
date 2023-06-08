@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -214,7 +214,7 @@ function CheckArchitecture
 
 	case "$sys_type" in
 		Linux)
-			if [ "$sys_arch" == "x86_64" ]; then
+			if [[ "$sys_arch" == "x86_64" ]] || [[ "$sys_arch" == "aarch64" ]]; then
 				pattern="64-bit"
 			else
 				pattern="32-bit"
@@ -443,7 +443,7 @@ function CheckPython
 	if [ $? -eq 0 ]; then
 		Success "Python3 is installed"
 
-		python_ver="3.8.5"	# minimum version of python3 supported by GMSEC
+		python_ver="3.10.7"	# minimum version of python3 supported by GMSEC
 
 		$working_dir/python_ver.py >& /dev/null
 

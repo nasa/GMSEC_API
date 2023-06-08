@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -112,17 +112,19 @@ Status ComplianceValidator::validateMessage(const Message& msg)
 
 			status = compare(intMsg, fieldTemplates, prefix, validFieldNames);
 
-			std::string subjectValResult = Subject::isValid(intMsg.getSubject(), &intMsg);
+			const char* subject = intMsg.getSubject();
+
+			std::string subjectValResult = Subject::isValid(subject, &intMsg);
 
 			if (!status.hasError() && !subjectValResult.empty())
 			{
-				std::string err = msg.getSubject();
+				std::string err = subject;
 				err.append(": Invalid Message Subject: ").append(subjectValResult);
 				status.set(MSG_ERROR, INVALID_SUBJECT_NAME, err.c_str());
 			}
 			else if (status.hasError())
 			{
-				std::string err = msg.getSubject();
+				std::string err = subject;
 				err.append(": Message Validation Failed.");
 				err.append(NEWLINE_INDENT1).append(status.getReason());
 

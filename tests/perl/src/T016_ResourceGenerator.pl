@@ -40,6 +40,19 @@ sub test_create
 	libgmsec_perl::ResourceGenerator::destroy($rsrcgen1);
 	libgmsec_perl::ResourceGenerator::destroy($rsrcgen2);
 	libgmsec_perl::ResourceGenerator::destroy($rsrcgen3);
+
+    # Off-nominal test(s)
+    eval
+    {
+        my $config = libgmsec_perl::Config->new($test->getConfig());
+        $config->addValue("mw-id", "bogus-mw");
+    	my $rsrcgen = libgmsec_perl::ResourceGenerator::create($config, 5, , 1, 10, $emptyFieldArray);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Unable to load") != -1);
+	}
 }
 
 
@@ -49,7 +62,7 @@ sub test_start
 
 	my ($test) = @_;
 
-	my $config  = $test->getConfig();
+	my $config  = libgmsec_perl::Config->new($test->getConfig());
 	my $pubRate = 1;
 
 	my $rsrcgen = libgmsec_perl::ResourceGenerator::create($config, $pubRate, 1, 10, $test->getStandardFields());
@@ -66,6 +79,25 @@ sub test_start
 	$rsrcgen->stop();
 
 	libgmsec_perl::ResourceGenerator::destroy($rsrcgen);
+
+	# Off-nominal tests
+	libgmsec_perl::logInfo("Off-nominal cases...");
+	$config->addValue("gmsec-msg-content-validate", "true");
+
+	my $rsrcgen2 = libgmsec_perl::ResourceGenerator::create($config, 1, 1, 10, $test->getStandardFields());
+
+	# Add bogus field using a Field
+	eval
+	{
+		$rsrcgen2->setField( libgmsec_perl::U16Field->new("BOGUS-FIELD", 2) );
+        $rsrcgen2->start();
+		$test->check("An expection was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
+	}
 }
 
 
@@ -142,27 +174,8 @@ sub test_setField
 
 	$rsrcgen->stop();
 
-	# Off-nominal tests
-	libgmsec_perl::logInfo("Off-nominal cases...");
-	$config->addValue("gmsec-msg-content-validate", "true");
-
-	my $rsrcgen2 = libgmsec_perl::ResourceGenerator::create($config, $pubRate, $samInt, $avgInt, $test->getStandardFields());
-
-	# Add bogus field using a Field
-	eval
-	{
-		$rsrcgen2->setField( libgmsec_perl::U16Field->new("BOGUS-FIELD", 2) );
-		$test->check("An exception was expected", 0);
-	};
-	if (isa($@, 'libgmsec_perl::GmsecException'))
-	{
-		my $error = $@;
-		$test->check($error->what(), index($error->what(), "Message Validation Failed") != -1);
-	}
-
 	libgmsec_perl::logInfo("Cleanup...");
 	libgmsec_perl::ResourceGenerator::destroy($rsrcgen);
-	libgmsec_perl::ResourceGenerator::destroy($rsrcgen2);
 }
 
 

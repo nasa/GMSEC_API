@@ -651,5 +651,114 @@ class Test_Fields(Test):
         except Exception  as e:
             self.check(str(e), "Field cannot be converted to a GMSEC_F64" in str(e))
 
+        # Call on down-cast methods
+        value = bytearray()
+        for i in range(0,4):
+            value.append(i)
+
+        msg = lp.Message()
+        msg.add_field(lp.BinaryField("FIELD-1", value, len(value)))
+        msg.add_field(lp.BooleanField("FIELD-2", True))
+        msg.add_field(lp.CharField("FIELD-3", 'c'))
+        msg.add_field(lp.F32Field("FIELD-4", 2))
+        msg.add_field(lp.F64Field("FIELD-5", 2.1))
+        msg.add_field(lp.I16Field("FIELD-6", 1))
+        msg.add_field(lp.I32Field("FIELD-7", 2))
+        msg.add_field(lp.I64Field("FIELD-8", 3))
+        msg.add_field(lp.I8Field("FIELD-9", 4))
+        msg.add_field(lp.StringField("FIELD-10", "Hello World"))
+        msg.add_field(lp.U16Field("FIELD-11", 1))
+        msg.add_field(lp.U32Field("FIELD-12", 2))
+        msg.add_field(lp.U64Field("FIELD-13", 3))
+        msg.add_field(lp.U8Field("FIELD-14", 4))
+
+        field = lp.Field.toBinaryField(msg.get_field("FIELD-1"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_BINARY)
+        self.check("Unexpected field name", field.get_name() == "FIELD-1")
+        blob = field.get_value()
+        for i in range(0, field.get_length()):
+            if not blob[i] == value[i]:
+                lp.log_info("BinaryField value at position " + str(i) + " is wrong")
+                self.check("BinaryField value is wrong", False)
+
+        field = lp.Field.toBooleanField(msg.get_field("FIELD-2"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_BOOL)
+        self.check("Unexpected field name", field.get_name() == "FIELD-2")
+        self.check("Unexpected field value", field.get_value() == True)
+
+        field = lp.Field.toCharField(msg.get_field("FIELD-3"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_CHAR)
+        self.check("Unexpected field name", field.get_name() == "FIELD-3")
+        self.check("Unexpected field value", field.get_value() == 'c')
+
+        field = lp.Field.toF32Field(msg.get_field("FIELD-4"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_F32)
+        self.check("Unexpected field name", field.get_name() == "FIELD-4")
+        self.check("Unexpected field value", field.get_value() == 2)
+
+        field = lp.Field.toF64Field(msg.get_field("FIELD-5"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_F64)
+        self.check("Unexpected field name", field.get_name() == "FIELD-5")
+        self.check("Unexpected field value", field.get_value() == 2.1)
+
+        field = lp.Field.toI16Field(msg.get_field("FIELD-6"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_I16)
+        self.check("Unexpected field name", field.get_name() == "FIELD-6")
+        self.check("Unexpected field value", field.get_value() == 1)
+
+        field = lp.Field.toI32Field(msg.get_field("FIELD-7"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_I32)
+        self.check("Unexpected field name", field.get_name() == "FIELD-7")
+        self.check("Unexpected field value", field.get_value() == 2)
+
+        field = lp.Field.toI64Field(msg.get_field("FIELD-8"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_I64)
+        self.check("Unexpected field name", field.get_name() == "FIELD-8")
+        self.check("Unexpected field value", field.get_value() == 3)
+
+        field = lp.Field.toI8Field(msg.get_field("FIELD-9"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_I8)
+        self.check("Unexpected field name", field.get_name() == "FIELD-9")
+        self.check("Unexpected field value", field.get_value() == 4)
+
+        field = lp.Field.toStringField(msg.get_field("FIELD-10"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_STRING)
+        self.check("Unexpected field name", field.get_name() == "FIELD-10")
+        self.check("Unexpected field value", field.get_value() == "Hello World")
+
+        field = lp.Field.toU16Field(msg.get_field("FIELD-11"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_U16)
+        self.check("Unexpected field name", field.get_name() == "FIELD-11")
+        self.check("Unexpected field value", field.get_value() == 1)
+
+        field = lp.Field.toU32Field(msg.get_field("FIELD-12"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_U32)
+        self.check("Unexpected field name", field.get_name() == "FIELD-12")
+        self.check("Unexpected field value", field.get_value() == 2)
+
+        field = lp.Field.toU64Field(msg.get_field("FIELD-13"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_U64)
+        self.check("Unexpected field name", field.get_name() == "FIELD-13")
+        self.check("Unexpected field value", field.get_value() == 3)
+
+        field = lp.Field.toU8Field(msg.get_field("FIELD-14"))
+        self.require("Unexpected field reference", field != None)
+        self.check("Unexpected field type", field.get_type() == lp.Field.Type_U8)
+        self.check("Unexpected field name", field.get_name() == "FIELD-14")
+        self.check("Unexpected field value", field.get_value() == 4)
+
 
 Test.run('Test Fields', Test_Fields())

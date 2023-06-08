@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -266,6 +266,21 @@ extern "C"
 	 * @return A string containing the version number of the middleware.
 	 */
 	GMSEC_API const char* connectionGetLibraryVersion(GMSEC_Connection conn, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_Config connectionGetConfig(GMSEC_Connection conn, GMSEC_Status status)
+	 *
+	 * @brief Returns the Config object associated with the Connection.
+	 *
+	 * @note The returned Config object is for reference purposes only. Changing the config object will not affect the Connection
+	 *
+	 * @param[in]  conn   - the handle to the Connection object.
+	 * @param[out] status - out parameter operation result status
+	 *
+	 * @return A handle to the config object associated with the Connection
+	 */
+	GMSEC_API GMSEC_Config connectionGetConfig(GMSEC_Connection conn, GMSEC_Status status);
 
 
 	/**
@@ -582,6 +597,8 @@ extern "C"
 	 * @fn void connectionExcludeSubject(GMSEC_Connection conn, const char* subject, GMSEC_Status status)
 	 *
 	 * @brief Exclude any incoming messages with the specified subject.
+	 * 
+	 * @note The returned Config object is for reference purposes only. Changing the config object will not affect the Connection
 	 *
 	 * @param[in]  conn    - the handle to the Connection object
 	 * @param[in]  subject - the subject pattern to look for in incoming messages
