@@ -23,12 +23,12 @@ sub test_iterator
 	my ($test) = @_;
 
 	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_CURRENT, $libgmsec_perl::Specification::SchemaLevel_LEVEL_0, 73);
-	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_CURRENT, $libgmsec_perl::Specification::SchemaLevel_LEVEL_1, 104);
-	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_CURRENT, $libgmsec_perl::Specification::SchemaLevel_LEVEL_2, 107);
+	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_CURRENT, $libgmsec_perl::Specification::SchemaLevel_LEVEL_1, 103);
+	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_CURRENT, $libgmsec_perl::Specification::SchemaLevel_LEVEL_2, 106);
 
 	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_2019_00, $libgmsec_perl::Specification::SchemaLevel_LEVEL_0, 73);
-	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_2019_00, $libgmsec_perl::Specification::SchemaLevel_LEVEL_1, 104);
-	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_2019_00, $libgmsec_perl::Specification::SchemaLevel_LEVEL_2, 107);
+	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_2019_00, $libgmsec_perl::Specification::SchemaLevel_LEVEL_1, 103);
+	test_schema_id_iterator_aux($test, $libgmsec_perl::GMSEC_MSG_SPEC_2019_00, $libgmsec_perl::Specification::SchemaLevel_LEVEL_2, 106);
 }
 
 

@@ -96,7 +96,7 @@ use libgmsec_perl;
 			while ($iter < 3)
 			{
 				libgmsec_perl::logInfo("Responder is waiting to receive message...");
-				my $reqMsg = $conn->receive(10000);
+				my $reqMsg = $conn->receive(15000);
 
 				if ($reqMsg == undef)
 				{

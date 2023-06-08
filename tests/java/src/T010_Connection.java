@@ -249,6 +249,25 @@ public class T010_Connection extends TestCase
 			check(e.getMessage(), false);
 		}
 	}
+	
+	
+	private void test_get_config()
+		throws Exception
+	{
+		Log.info("Test getConfig()");
+		
+		try
+		{
+			Connection conn = Connection.create( getConfig() );
+			check("Expected to get a library version", null != conn.getConfig());
+			Connection.destroy(conn);
+		}
+		catch (GmsecException e)
+		{
+			check(e.getMessage(), false);
+		}
+	}
+		
 
 
 	private void test_get_message_factory()

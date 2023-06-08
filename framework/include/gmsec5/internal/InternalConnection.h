@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -78,6 +78,13 @@ const char* const GMSEC_REPLY_UNIQUE_ID_FIELD = "__GMSEC-REPLY-UNIQUE-ID__";
 // This definition should not be defined in ConfigOptions.h!
 //
 const char* const GMSEC_SCHEMA_ID_FIELD = "__GMSEC-SCHEMA-ID__";
+
+
+// Special delimiter used by Apache Artemis for separating a subscription
+// topic and a message queue name; for example, C2MS.>::MQ1
+// This definition should not be defined in ConfigOptions.h!
+//
+const char* const ARTEMIS_MQ_TOPIC_DELIMITER = "::";
 
 
 /**

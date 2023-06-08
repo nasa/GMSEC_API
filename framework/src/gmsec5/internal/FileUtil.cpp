@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -68,6 +68,11 @@ bool FileUtil::getCurrentSharedObjectPath(std::string& path)
 	if (GetModuleFileName((HINSTANCE)&__ImageBase, dll_path, MAX_PATH) != 0)
 	{
 		path = dll_path;
+		size_t misc = path.find("\\\\?\\");
+		if (misc != std::string::npos)
+		{
+			path = path.substr(misc+4);
+		}
 		ret_val = true;
 	}
 #endif

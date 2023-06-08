@@ -20,8 +20,16 @@ class Test_HeartbeatGenerator(Test):
 
         # Nominal test
         hbgen = lp.HeartbeatGenerator(self.get_config(), 5)
-
         self.check("HeartbeatGenerator should not be running", hbgen.is_running() == False)
+
+        # Off-nominal test(s)
+        try:
+            config = lp.Config(self.get_config())
+            config.add_value("mw-id", "bogus-mw")
+            lp.HeartbeatGenerator(config, 5)
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Unable to load" in str(e))
 
 
     def test_constructor_2(self):
@@ -32,16 +40,25 @@ class Test_HeartbeatGenerator(Test):
 
         # Nominal test
         hbgen1 = lp.HeartbeatGenerator(self.get_config(), 5, emptyFieldList)
-        hbgen2 = lp.HeartbeatGenerator(self.get_config(), 5, standardFields)
-
         self.check("HeartbeatGenerator should not be running", hbgen1.is_running() == False)
+
+        hbgen2 = lp.HeartbeatGenerator(self.get_config(), 5, standardFields)
         self.check("HeartbeatGenerator should not be running", hbgen2.is_running() == False)
+
+        # Off-nominal test(s)
+        try:
+            config = lp.Config(self.get_config())
+            config.add_value("mw-id", "bogus-mw")
+            lp.HeartbeatGenerator(config, 5, standardFields)
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Unable to load" in str(e))
 
 
     def test_start(self):
         lp.log_info("Test start()")
 
-        config = self.get_config()
+        config = lp.Config(self.get_config())
 
         hbgen = lp.HeartbeatGenerator(config, 1, self.get_standard_fields())
 
@@ -58,6 +75,43 @@ class Test_HeartbeatGenerator(Test):
 
         # Allow time for the HB-gen thread to stop
         lp.TimeUtil.millisleep(2000)
+
+        # Off-nominal tests
+        config.add_value("gmsec-msg-content-validate", "true")
+
+        hbgen2 = lp.HeartbeatGenerator(config, 1, self.get_standard_fields())
+
+        # Add bogus field using a Field
+        try:
+            hbgen2.set_field( lp.U16Field("BOGUS-FIELD", 2) )
+            hbgen2.start()
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Message Validation Failed" in str(e))
+
+        # Add bogus field using a long value
+        try:
+            hbgen2.set_field("BOGUS-FIELD", 2)
+            hbgen2.start()
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Message Validation Failed" in str(e))
+
+        # Add bogus field using a double value
+        try:
+            hbgen2.set_field("BOGUS-FIELD", 2.0)
+            hbgen2.start()
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Message Validation Failed" in str(e))
+
+        # Add bogus field using a string value
+        try:
+            hbgen2.set_field("BOGUS-FIELD", "2")
+            hbgen2.start()
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Message Validation Failed" in str(e))
 
 
     def test_stop(self):
@@ -178,39 +232,6 @@ class Test_HeartbeatGenerator(Test):
 
         # Allow time for the HB-gen thread to stop
         lp.TimeUtil.millisleep(2000)
-
-        # Off-nominal tests
-        config.add_value("gmsec-msg-content-validate", "true")
-
-        hbgen2 = lp.HeartbeatGenerator(config, 1, standardFields)
-
-        # Add bogus field using a Field
-        try:
-            hbgen2.set_field( lp.U16Field("BOGUS-FIELD", 2) )
-            self.check("An expection was expected", False)
-        except Exception as e:
-            self.check(str(e), "Message Validation Failed" in str(e))
-
-        # Add bogus field using a long value
-        try:
-            hbgen2.set_field("BOGUS-FIELD", 2)
-            self.check("An expection was expected", False)
-        except Exception as e:
-            self.check(str(e), "Message Validation Failed" in str(e))
-
-        # Add bogus field using a double value
-        try:
-            hbgen2.set_field("BOGUS-FIELD", 2.0)
-            self.check("An expection was expected", False)
-        except Exception as e:
-            self.check(str(e), "Message Validation Failed" in str(e))
-
-        # Add bogus field using a string value
-        try:
-            hbgen2.set_field("BOGUS-FIELD", "2")
-            self.check("An expection was expected", False)
-        except Exception as e:
-            self.check(str(e), "Message Validation Failed" in str(e))
 
 
     def verify_heartbeat_message(self, config, expectedPubRate):

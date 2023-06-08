@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,35 +41,6 @@
 using namespace gmsec::api5;
 using namespace gmsec::api5::internal;
 using namespace gmsec::api5::util;
-
-
-template<class T>
-static void setFieldAux(Message& msg, const char* fieldName, T fieldValue)
-{
-	// Retrieve/stow the field being replaced (if any) before adding the new field;
-	// then validate. If an issue arises, restore the original field (if any).
-	// Then report the error.
-	StdUniquePtr<Field> oldField;
-
-	if (msg.hasField(fieldName))
-	{
-		oldField.reset(InternalField::makeFieldCopy( *msg.getField(fieldName) ));
-	}
-
-	msg.setFieldValue(fieldName, fieldValue);
-
-	Status status = msg.isCompliant();
-
-	if (status.hasError())
-	{
-		if (oldField.get())
-		{
-			MessageBuddy::getInternal(msg).addField(*oldField.release(), false);
-		}
-
-		throw GmsecException(HEARTBEAT_GENERATOR_ERROR, INVALID_MSG, status.getReason());
-	}
-}
 
 
 InternalHeartbeatGenerator::InternalHeartbeatGenerator(const Config& config, const GMSEC_U16 hbPubRate)
@@ -138,6 +109,15 @@ bool InternalHeartbeatGenerator::start()
 	{
 		GMSEC_WARNING << "The Heartbeat Generator is already running!";
 		return false;
+	}
+
+	if (validateMessage())
+	{
+		Status status = m_hbMsg.isCompliant();
+		if (status.hasError())
+		{
+			throw GmsecException(status);
+		}
 	}
 
 	setupService();
@@ -219,36 +199,7 @@ bool InternalHeartbeatGenerator::setField(const Field& field)
 	}
 	else
 	{
-		if (validateMessage())
-		{
-			// Retrieve/stow the field being replaced (if any) before adding the new field;
-			// then validate. If an issue arises, restore the original field (if any).
-			// Then report the error.
-			StdUniquePtr<Field> oldField;
-
-			if (m_hbMsg.hasField(field.getName()))
-			{
-				oldField.reset(InternalField::makeFieldCopy( *m_hbMsg.getField(field.getName()) ));
-			}
-
-			m_hbMsg.addField(field);
-
-			Status status = m_hbMsg.isCompliant();
-
-			if (status.hasError())
-			{
-				if (oldField.get())
-				{
-					MessageBuddy::getInternal(m_hbMsg).addField(*oldField.release(), false);
-				}
-
-				throw GmsecException(HEARTBEAT_GENERATOR_ERROR, INVALID_MSG, status.getReason());
-			}
-		}
-		else
-		{
-			m_hbMsg.addField(field);
-		}
+		m_hbMsg.addField(field);
 	}
 
 	return fieldOverwritten;
@@ -267,14 +218,7 @@ bool InternalHeartbeatGenerator::setField(const char* fieldName, GMSEC_I64 field
 
 	bool fieldOverwritten = m_hbMsg.hasField(fieldName);
 
-	if (validateMessage())
-	{
-		setFieldAux(m_hbMsg, fieldName, fieldValue);
-	}
-	else
-	{
-		m_hbMsg.setFieldValue(fieldName, fieldValue);
-	}
+	m_hbMsg.setFieldValue(fieldName, fieldValue);
 
 	return fieldOverwritten;
 }
@@ -292,14 +236,7 @@ bool InternalHeartbeatGenerator::setField(const char* fieldName, GMSEC_F64 field
 
 	bool fieldOverwritten = m_hbMsg.hasField(fieldName);
 
-	if (validateMessage())
-	{
-		setFieldAux(m_hbMsg, fieldName, fieldValue);
-	}
-	else
-	{
-		m_hbMsg.setFieldValue(fieldName, fieldValue);
-	}
+	m_hbMsg.setFieldValue(fieldName, fieldValue);
 
 	return fieldOverwritten;
 }
@@ -317,14 +254,7 @@ bool InternalHeartbeatGenerator::setField(const char* fieldName, const char* fie
 
 	bool fieldOverwritten = m_hbMsg.hasField(fieldName);
 
-	if (validateMessage())
-	{
-		setFieldAux(m_hbMsg, fieldName, fieldValue);
-	}
-	else
-	{
-		m_hbMsg.setFieldValue(fieldName, fieldValue);
-	}
+	m_hbMsg.setFieldValue(fieldName, fieldValue);
 
 	return fieldOverwritten;
 }

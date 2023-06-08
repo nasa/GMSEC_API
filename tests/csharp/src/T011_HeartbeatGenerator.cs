@@ -43,6 +43,18 @@ namespace T011
 			{
 				Check("HeartbeatGenerator should not be running", hbgen.IsRunning() == false);
 			}
+
+			//o Off-nominal test(s)
+			try {
+				// Bogus middleware
+				Config config = new Config(GetConfig());
+				config.AddValue("mw-id", "bogus-mw");
+				new HeartbeatGenerator(config, 5);
+				Check("An exception was expected", false);
+			}
+			catch (GmsecException e) {
+				Check(e.ToString(), e.ToString().Contains("Unable to load"));
+			}
 		}
 
 
@@ -62,6 +74,18 @@ namespace T011
 			using (HeartbeatGenerator hbgen = new HeartbeatGenerator(GetConfig(), 5, standardFields))
 			{
 				Check("HeartbeatGenerator should not be running", hbgen.IsRunning() == false);
+			}
+
+			//o Off-nominal test(s)
+			try {
+				// Bogus middleware
+				Config config = new Config(GetConfig());
+				config.AddValue("mw-id", "bogus-mw");
+				new HeartbeatGenerator(config, 5, standardFields);
+				Check("An exception was expected", false);
+			}
+			catch (GmsecException e) {
+				Check(e.ToString(), e.ToString().Contains("Unable to load"));
 			}
 		}
 
@@ -87,6 +111,52 @@ namespace T011
 
 				/* Allow time for the HB-gen thread to stop */
 				TimeUtil.Millisleep(2000);
+			}
+
+			//o Off-nominal tests
+			config.AddValue("gmsec-msg-content-validate", "true");
+
+			using (HeartbeatGenerator hbgen = new HeartbeatGenerator(config, 1, GetStandardFields()))
+			{
+				// Add bogus field using a Field
+				try {
+					hbgen.SetField(new U16Field("BOGUS-FIELD", (ushort) 2));
+					hbgen.Start();
+					Check("An exception was expected", false);
+				}
+				catch (GmsecException e) {
+					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
+				}
+
+				// Add bogus field using a long value
+				try {
+					hbgen.SetField("BOGUS-FIELD", (long) 2);
+					hbgen.Start();
+					Check("An exception was expected", false);
+				}
+				catch (GmsecException e) {
+					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
+				}
+
+				// Add bogus field using a double value
+				try {
+					hbgen.SetField("BOGUS-FIELD", 2.0);
+					hbgen.Start();
+					Check("An exception was expected", false);
+				}
+				catch (GmsecException e) {
+					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
+				}
+
+				// Add bogus field using a string value
+				try {
+					hbgen.SetField("BOGUS-FIELD", "2");
+					hbgen.Start();
+					Check("An exception was expected", false);
+				}
+				catch (GmsecException e) {
+					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
+				}
 			}
 		}
 
@@ -233,48 +303,6 @@ namespace T011
 
 				/* Allow time for the HB-gen thread to stop */
 				TimeUtil.Millisleep(2000);
-			}
-
-			//o Off-nominal tests
-			config.AddValue("gmsec-msg-content-validate", "true");
-
-			using (HeartbeatGenerator hbgen = new HeartbeatGenerator(config, 1, standardFields))
-			{
-				// Add bogus field using a Field
-				try {
-					hbgen.SetField(new U16Field("BOGUS-FIELD", (ushort) 2));
-					Check("An expection was expected", false);
-				}
-				catch (GmsecException e) {
-					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
-				}
-
-				// Add bogus field using a long value
-				try {
-					hbgen.SetField("BOGUS-FIELD", (long) 2);
-					Check("An expection was expected", false);
-				}
-				catch (GmsecException e) {
-					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
-				}
-
-				// Add bogus field using a double value
-				try {
-					hbgen.SetField("BOGUS-FIELD", 2.0);
-					Check("An expection was expected", false);
-				}
-				catch (GmsecException e) {
-					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
-				}
-
-				// Add bogus field using a string value
-				try {
-					hbgen.SetField("BOGUS-FIELD", "2");
-					Check("An expection was expected", false);
-				}
-				catch (GmsecException e) {
-					Check(e.ToString(), e.ToString().Contains("Message Validation Failed"));
-				}
 			}
 		}
 

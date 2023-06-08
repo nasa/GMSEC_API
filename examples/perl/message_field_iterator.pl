@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -59,7 +59,7 @@ use libgmsec_perl;
             # to retrieval of the value contained in the Field. This is useful
             # for ensuring that data types do not lose any level of precision.
             # 
-            # See get_field_value() for an example of how a Field can be converted to a
+            # See getFieldValue() for an example of how a Field can be converted to a
             # specialized Field object.
             #my $value = getFieldValue($field);
 
@@ -95,21 +95,21 @@ use libgmsec_perl;
     {
         my ($field) = @_;
 
-        if    ($field->getType() == $libgmsec_perl::Field::Type_BINARY)   { return libgmsec_perl::to_BinaryField($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_BOOL)     { return libgmsec_perl::to_BooleanField($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_CHAR)     { return libgmsec_perl::to_CharField($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_F32)      { return libgmsec_perl::to_F32Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_F64)      { return libgmsec_perl::to_F64Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_I16)      { return libgmsec_perl::to_I16Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_I32)      { return libgmsec_perl::to_I32Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_I64)      { return libgmsec_perl::to_I64Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_I8)       { return libgmsec_perl::to_I8Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_STRING)   { return libgmsec_perl::to_StringField($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_U16)      { return libgmsec_perl::to_U16Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_U32)      { return libgmsec_perl::to_U32Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_U64)      { return libgmsec_perl::to_U64Field($field)->getValue(); }
-        elsif ($field->getType() == $libgmsec_perl::Field::Type_U8)       { return libgmsec_perl::to_U8Field($field)->getValue() ;}
-        else                                                                   { return "UNKNOWN"; }
+        if    ($field->getType() == $libgmsec_perl::Field::Type_BINARY)   { return libgmsec_perl::Field::toBinaryField($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_BOOL)     { return libgmsec_perl::Field::toBooleanField($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_CHAR)     { return libgmsec_perl::Field::toCharField($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_F32)      { return libgmsec_perl::Field::toF32Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_F64)      { return libgmsec_perl::Field::toF64Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_I16)      { return libgmsec_perl::Field::toI16Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_I32)      { return libgmsec_perl::Field::toI32Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_I64)      { return libgmsec_perl::Field::toI64Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_I8)       { return libgmsec_perl::Field::toI8Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_STRING)   { return libgmsec_perl::Field::toStringField($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_U16)      { return libgmsec_perl::Field::toU16Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_U32)      { return libgmsec_perl::Field::toU32Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_U64)      { return libgmsec_perl::Field::toU64Field($field)->getValue(); }
+        elsif ($field->getType() == $libgmsec_perl::Field::Type_U8)       { return libgmsec_perl::Field::toU8Field($field)->getValue() ;}
+        else                                                              { return "UNKNOWN"; }
     }
 }
 

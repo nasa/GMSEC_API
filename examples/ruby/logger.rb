@@ -1,5 +1,19 @@
 #!/usr/bin/env ruby
 
+# Copyright 2007-2023 United States Government as represented by the
+# Administrator of The National Aeronautics and Space Administration.
+# No copyright is claimed in the United States under Title 17, U.S. Code.
+# All Rights Reserved.
+
+#
+# @file logger.rb
+#
+# @brief This module contains a custom LogHandler for logging output.
+# Once instantiated, the custom LogHandler should be registered using
+# Libgmsec_ruby::Log.register_handler().
+#
+
+
 require 'libgmsec_ruby'
 
 

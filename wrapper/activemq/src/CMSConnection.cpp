@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -929,7 +929,7 @@ gmsec_amqcms::SubscriptionInfo* CMSConnection::makeSubscriptionInfo(const std::s
 		consumer.reset(m_session->createDurableConsumer(dynamic_cast<cms::Topic*>(dest.get()), clientId, msgSelector));
 	}
 #ifdef GMSEC_ARTEMIS
-	else if (in.find("::") != std::string::npos)
+	else if (in.find(ARTEMIS_MQ_TOPIC_DELIMITER) != std::string::npos)
 	{
 		// We have a subscription topic w/ a Fully Qualified Queue Name (FQQN)
 		dest.reset(m_session->createQueue(in));
@@ -965,7 +965,7 @@ void CMSConnection::mwSubscribe(const char *subject0, const Config &config)
 	try
 	{
 #ifdef GMSEC_ARTEMIS
-		size_t p = subject.find("::");
+		size_t p = subject.find(ARTEMIS_MQ_TOPIC_DELIMITER);
 
 		if (p == std::string::npos)
 		{

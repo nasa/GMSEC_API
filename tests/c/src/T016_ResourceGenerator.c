@@ -31,6 +31,16 @@ void test_resourceGeneratorCreate()
 		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
 		testRequireBool("Resource Generator handle is NULL", rsrc_gen == NULL);
 	}
+	{
+		// Bogus middleware
+		GMSEC_Config config = configCreateCopy(testGetConfig(), NULL);
+		configAddValue(config, "mw-id", "bogus-mw", NULL);
+
+		GMSEC_ResourceGenerator rsrc_gen = resourceGeneratorCreate(config, (GMSEC_U16) 5,  (GMSEC_U16) 1, (GMSEC_U16) 10, status);
+
+		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
+		testRequireBool("Resource Generator handle is NULL", rsrc_gen == NULL);
+	}
 
 	statusDestroy(&status);
 }
@@ -81,12 +91,11 @@ void test_resourceGeneratorCreateWithFields()
 	//o Off-nominal test
 	{
 		// NULL config
-		GMSEC_ResourceGenerator rsrc_gen = resourceGeneratorCreateWithFields(NULL, (GMSEC_U16) 5, (GMSEC_U16) 1, (GMSEC_U16) 10, fields, 3, status);
+		GMSEC_ResourceGenerator rsrc_gen = resourceGeneratorCreateWithFields(NULL, (GMSEC_U16) 5, (GMSEC_U16) 1, (GMSEC_U16) 10, fields, sizeof(fields)/sizeof(GMSEC_Field), status);
 
 		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
 		testRequireBool("Resource Generator handle is NULL", rsrc_gen == NULL);
 	}
-
 	{
 		// NULL fields, yet number of fields is 3
 		GMSEC_Config            config   = configCreateCopy(testGetConfig(), NULL);
@@ -97,11 +106,12 @@ void test_resourceGeneratorCreateWithFields()
 
 		configDestroy(&config);
 	}
-
 	{
 		// bogus middleware
-		GMSEC_Config            config   = configCreateUsingData("mw-id=bogus", KEY_VALUE_DATA, NULL);
-		GMSEC_ResourceGenerator rsrc_gen = resourceGeneratorCreateWithFields(config, (GMSEC_U16) 5, (GMSEC_U16) 1, (GMSEC_U16) 10, fields, 3, status);
+		GMSEC_Config config = configCreateCopy(testGetConfig(), NULL);
+		configAddValue(config, "mw-id", "bogus-mw", NULL);
+
+		GMSEC_ResourceGenerator rsrc_gen = resourceGeneratorCreateWithFields(config, (GMSEC_U16) 5, (GMSEC_U16) 1, (GMSEC_U16) 10, fields, sizeof(fields)/sizeof(GMSEC_Field), status);
 
 		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
 		testRequireBool("Resource Generator handle is NULL", rsrc_gen == NULL);
@@ -169,7 +179,7 @@ void test_resourceGeneratorStart()
 	fields[6] = stringFieldCreate("DOMAIN2", "MY-DOMAIN-2", GMSEC_TRUE, NULL);
 	fields[7] = stringFieldCreate("COMPONENT", "T016", GMSEC_TRUE, NULL);
 
-	GMSEC_ResourceGenerator rsrc_gen = resourceGeneratorCreateWithFields(config, (GMSEC_U16) pubRate, (GMSEC_U16) 1, (GMSEC_U16) 10, fields, sizeof(fields)/sizeof(GMSEC_Field), NULL);
+	GMSEC_ResourceGenerator rsrc_gen = resourceGeneratorCreateWithFields(config, pubRate, (GMSEC_U16) 1, (GMSEC_U16) 10, fields, sizeof(fields)/sizeof(GMSEC_Field), NULL);
 
 	/* To ensure this resource message is unique, we set the COMPONENT field */
 	char tmp[OUT_STR_LEN];
@@ -184,19 +194,27 @@ void test_resourceGeneratorStart()
 
 	// Off-nominal
 	{
-		GMSEC_Config            config   = configCreateUsingData("mw-id=bogus", KEY_VALUE_DATA, NULL);
-		GMSEC_ResourceGenerator rsrc_gen = resourceGeneratorCreate(config, (GMSEC_U16) 5, (GMSEC_U16) 1, (GMSEC_U16) 10, status);
-
-		resourceGeneratorStart(rsrc_gen, status);
-
-		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
-		testRequireBool("Resource Generator handle is NULL", rsrc_gen == NULL);
-
-		configDestroy(&config);
+		// NULL ResourceGenerator handle
+		resourceGeneratorStart(NULL, status);
+		testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
 	}
+	{
+		// Non-compliant message
+		GMSEC_Config myConfig = configCreateCopy(testGetConfig(), NULL);
+		configAddValue(myConfig, "gmsec-msg-content-validate", "true", NULL);
 
-	resourceGeneratorStart(NULL, status);
-	testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
+		GMSEC_ResourceGenerator rsrc_gen2 = resourceGeneratorCreateWithFields(myConfig, pubRate, (GMSEC_U16) 1, (GMSEC_U16) 10, fields, sizeof(fields)/sizeof(GMSEC_Field), NULL);
+
+		GMSEC_Field component = stringFieldCreate("BOGUS", "FOOBAR", GMSEC_FALSE, NULL);
+		resourceGeneratorSetField(rsrc_gen2, component, NULL);
+		fieldDestroy(&component);
+
+		resourceGeneratorStart(rsrc_gen2, status);
+		testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
+
+		configDestroy(&myConfig);
+		resourceGeneratorDestroy(&rsrc_gen2);
+	}
 
 	int i;
 	for (i = 0; i < sizeof(fields)/sizeof(GMSEC_Field); ++i)
@@ -485,7 +503,7 @@ void verifyResourceMessage(GMSEC_Config config, GMSEC_U16 expectedPubRate)
 				double delta = t2 - t1;
 				if (delta < expectedPubRate)
 				{
-					delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+					delta = (delta * 10.0 + 0.5) / 10.0;
 				}
 
 				GMSEC_INFO("Expected rate is %u, delta is: %g", expectedPubRate, delta);

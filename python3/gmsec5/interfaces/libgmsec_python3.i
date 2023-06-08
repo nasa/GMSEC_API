@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -69,6 +69,7 @@
 %include field/U32Field.i
 %include field/U64Field.i
 
+/* Obsolete as of API 5.1, but leave in place to preserve binary compatibility */
 %inline %{
         gmsec::api5::BinaryField* to_BinaryField(gmsec::api5::Field* field) {
                 return dynamic_cast<gmsec::api5::BinaryField*>(field);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -220,6 +220,18 @@ public:
 	 * @return Library version as a string.
 	 */
 	const char* CALL_TYPE getLibraryVersion() const;
+
+
+	/**
+	 * @fn Config& getConfig() const
+	 *
+	 * @brief Returns the Config object associated with the Connection.
+	 * 
+	 * @note The returned Config object is for reference purposes only. Changing the config object will not affect the Connection
+	 *
+	 * @return A Config object.
+	 */
+	Config& CALL_TYPE getConfig() const;
 
 
 	/**

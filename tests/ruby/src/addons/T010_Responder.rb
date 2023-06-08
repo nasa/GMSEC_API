@@ -60,7 +60,7 @@ class T010_Responder
 
 			while iter < 3
 				Libgmsec_ruby::Log::info("Responder is waiting to receive message...")
-				reqMsg = conn.receive(10000)
+				reqMsg = conn.receive(15000)
 
 				if reqMsg == nil
 					Libgmsec_ruby::Log::warning("Responder failed to receive message")

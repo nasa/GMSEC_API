@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -42,6 +42,7 @@ eval
 		getOS(\%info);
 		getCxx(\%info);
 		getJava(\%info);
+		getNodeJS(\%info);
 		getPerl(\%info);
 		getPython3(\%info);
 		getRuby(\%info);
@@ -147,6 +148,29 @@ sub getGMSEC
 	$ref->{API_VERSION} = $api_version;
 
 } # getGMSEC
+
+
+##############################################################
+# Get the NodeJS version number
+sub getNodeJS {
+
+	use Config;
+
+	my ($ref) = @_;
+
+	my $path = 'nodejs.ver';
+	open(STDOUT, '>' . $path);
+
+	system("node --version");
+
+	my @in = slurp($path);
+	my $node = $in[0];
+
+	$ref->{NODEJS} = $node;
+
+	unlink($path);
+
+} # getNodeJS
 
 
 ##############################################################
@@ -413,6 +437,7 @@ print FH qq(
 #define GMSEC_OS              "$ref->{OS}"
 #define GMSEC_CXX             "$ref->{CXX}"
 #define GMSEC_JAVA            "$ref->{JAVA}"
+#define GMSEC_NODEJS          "$ref->{NODEJS}"
 #define GMSEC_PERL            "$ref->{PERL}"
 #define GMSEC_PYTHON3         "$ref->{PYTHON3}"
 #define GMSEC_RUBY            "$ref->{RUBY}"

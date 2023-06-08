@@ -1,4 +1,4 @@
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -6,6 +6,7 @@
 DOX_CFG_FILES       = gmsec_c_dox       \
                       gmsec_cpp_dox     \
                       gmsec_java_dox    \
+                      gmsec_nodejs_dox  \
                       gmsec_python3_dox \
                       gmsec_csharp_dox  \
 

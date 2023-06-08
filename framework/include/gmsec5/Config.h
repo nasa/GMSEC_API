@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -179,7 +179,6 @@ public:
 	 * valid boolean interpretion of the value.
 	 *
 	 * @param name - name of value to get
-	 * @param defaultValue - default value to be returned if no value exist for name parameter
 	 * 
 	 * @return value of named item
 	 *
@@ -196,6 +195,7 @@ public:
 	 * a boolean, the default value is returned.
 	 *
 	 * @param name - name of value to get
+	 * @param defaultValue - default value to be returned if no value exist for name parameter
 	 *
 	 * @return Value of named item, or default value if it does not exist
 	 */

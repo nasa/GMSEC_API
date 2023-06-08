@@ -22,12 +22,12 @@ class Test_SchemaIdIterator < Test
         Libgmsec_ruby::Log::info("Test has_next() and next()")
 
         test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_CURRENT, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_0, 73)
-        test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_CURRENT, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_1, 104)
-        test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_CURRENT, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_2, 107)
+        test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_CURRENT, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_1, 103)
+        test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_CURRENT, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_2, 106)
 
         test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_2019_00, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_0, 73)
-        test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_2019_00, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_1, 104)
-        test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_2019_00, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_2, 107)
+        test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_2019_00, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_1, 103)
+        test_schema_id_iterator_aux(Libgmsec_ruby::GMSEC_MSG_SPEC_2019_00, Libgmsec_ruby::Specification::SchemaLevel_LEVEL_2, 106)
 	end
 
 

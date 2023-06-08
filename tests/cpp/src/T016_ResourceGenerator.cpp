@@ -82,9 +82,30 @@ void test_constructor_1(Test& test)
 {
 	GMSEC_INFO << "Test constructor 1...";
 
-	ResourceGenerator rsrc_gen(test.getConfig(), static_cast<GMSEC_U16>(5), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10));
+	Config config(test.getConfig());  // make a copy
+	config.addValue("gmsec-msg-content-validate", "true");
+
+	ResourceGenerator rsrc_gen(config, static_cast<GMSEC_U16>(5), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10));
+
+	rsrc_gen.setField( StringField("MISSION-ID", "MY-MISSION") );
+	rsrc_gen.setField( StringField("SAT-ID-PHYSICAL", "MY-SAT-ID") );
+	rsrc_gen.setField( StringField("COMPONENT", "HB-GEN") );
+	rsrc_gen.setField( StringField("BOGUS", "FOOBAR") );
 
 	test.check("ResourceGenerator should not be running", false == rsrc_gen.isRunning());
+
+	// Off-nominal test(s)
+	try
+	{
+		// Bogus middleware
+		config.addValue("mw-id", "bogus-mw");
+		(void) ResourceGenerator(config, static_cast<GMSEC_U16>(5), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10));
+		test.check("An exception was expected", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Unable to load") != std::string::npos);
+	}
 }
 
 
@@ -92,20 +113,40 @@ void test_constructor_2(Test& test)
 {
 	GMSEC_INFO << "Test constructor 2...";
 
+	Config config(test.getConfig());  // make a copy
+	config.addValue("gmsec-msg-content-validate", "true");
+
 	List<Field*> standardFields;
 	List<Field*> emptyFieldList;
 
 	get_standard_fields(standardFields);
 
 	// Nominal test - no extra fields
-	ResourceGenerator rsrc_gen1(test.getConfig(), static_cast<GMSEC_U16>(5), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), emptyFieldList);
-
+	ResourceGenerator rsrc_gen1(config, static_cast<GMSEC_U16>(5), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), emptyFieldList);
+	rsrc_gen1.setField( StringField("MISSION-ID", "MY-MISSION") );
+	rsrc_gen1.setField( StringField("SAT-ID-PHYSICAL", "MY-SAT-ID") );
+	rsrc_gen1.setField( StringField("COMPONENT", "HB-GEN") );
+	rsrc_gen1.setField( StringField("BOGUS", "FOOBAR") );
 	test.check("ResourceGenerator should not be running", false == rsrc_gen1.isRunning());
 
 	// Nominal test - standard fields provided
-	ResourceGenerator rsrc_gen2(test.getConfig(), static_cast<GMSEC_U16>(5), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), standardFields);
-
+	ResourceGenerator rsrc_gen2(config, static_cast<GMSEC_U16>(5), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), standardFields);
+	rsrc_gen2.setField( StringField("BOGUS", "FOOBAR") );
 	test.check("ResourceGenerator should not be running", false == rsrc_gen2.isRunning());
+
+	// Off-nominal test(s)
+	GMSEC_INFO << "Off-nominal cases...";
+	try
+	{
+		// Bogus middleware
+		config.addValue("mw-id", "bogus-mw");
+		ResourceGenerator(config, static_cast<GMSEC_U16>(5), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), standardFields);
+		test.check("An exception was expected", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Unable to load") != std::string::npos);
+	}
 
 	// Cleanup
 	destroy_standard_fields(standardFields);
@@ -116,19 +157,18 @@ void test_start(Test& test)
 {
 	GMSEC_INFO << "Test start()...";
 
-	Config& config = test.getConfig();
+	Config config = test.getConfig();   // make a copy!
 
 	List<Field*> fields;
 	get_standard_fields(fields);
-
-	fields.push_back( new I16Field("CUSTOM-FIELD", static_cast<GMSEC_I16>(3)) );
 
 	try
 	{
 		ResourceGenerator rsrc_gen(config, static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), fields);
 
         /* To ensure this resource message is unique, we set the COMPONENT field */
-        rsrc_gen.setField( StringField("COMPONENT", test.getUniqueComponent().c_str()) );
+        rsrc_gen.setField( StringField("COMPONENT", test.getUniqueComponent().c_str(), true) );
+		rsrc_gen.setField( I16Field("CUSTOM-FIELD", static_cast<GMSEC_I16>(3)) );
 
 		rsrc_gen.start();
 
@@ -144,6 +184,35 @@ void test_start(Test& test)
 	catch (const GmsecException& e)
 	{
 		test.check(e.what(), false);
+	}
+
+	// Off-nominal test(s)
+	GMSEC_INFO << "Off-nominal cases...";
+	config.addValue("gmsec-msg-content-validate", "true");
+	try
+	{
+		//o Add bogus field using a String value
+		ResourceGenerator rsrc_gen(config, static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), fields);
+		rsrc_gen.setField( StringField("BOGUS-FIELD", "2") );
+		rsrc_gen.start();
+		test.check("Expected an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
+	}
+
+	try
+	{
+		//o Add legit field but with illegal value
+		ResourceGenerator rsrc_gen(config, static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), fields);
+		rsrc_gen.setField( F32Field("CONTENT-VERSION", static_cast<GMSEC_F32>(1776)) );
+		rsrc_gen.start();
+		test.check("Expected an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
 	}
 
 	// Cleanup
@@ -245,38 +314,6 @@ void test_set_field(Test& test)
 
 	// Off-nominal cases
 	GMSEC_INFO << "Off-nominal cases...";
-
-	//o Add bogus field using a U16Field
-	try
-	{
-		config.addValue("gmsec-msg-content-validate", "true");
-
-		ResourceGenerator rsrc_gen(config, static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), standardFields);
-
-		rsrc_gen.setField( U16Field("BOGUS-FIELD", static_cast<GMSEC_U16>(2)) );
-
-		test.check("Expected an exception", false);
-	}
-	catch (const GmsecException& e)
-	{
-		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
-	}
-
-	//o Add legit field but with illegal value
-	try
-	{
-		config.addValue("gmsec-msg-content-validate", "true");
-
-		ResourceGenerator rsrc_gen(config, static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(1), static_cast<GMSEC_U16>(10), standardFields);
-
-		rsrc_gen.setField( F32Field("CONTENT-VERSION", static_cast<GMSEC_F32>(1776)) );
-
-		test.check("Expected an exception", false);
-	}
-	catch (const GmsecException& e)
-	{
-		test.check(e.what(), std::string(e.what()).find("Message Validation Failed") != std::string::npos);
-	}
 
 	GMSEC_INFO << "Cleanup...";
 	destroy_standard_fields(standardFields);

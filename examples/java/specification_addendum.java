@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2022 United States Government as represented by the
+ * Copyright 2007-2023 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -40,7 +40,7 @@ public class specification_addendum
 
 		// Tell the API that there is an additional layer of message schema to
 		// validate (The 'EXAMPLE' message definitions). By default, this value
-		// is set to 2 (only 'GMSEC' specification validation).
+		// is set to 0 (only 'C2MS' specification validation).
 		//
 		// Note: These levels for validation are determined by the "LEVEL-X"
 		// attributes defined in the DIRECTORY.xml file contained in the XML

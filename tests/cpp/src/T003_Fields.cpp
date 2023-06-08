@@ -942,14 +942,14 @@ void test_Field(Test& test)
 		unsigned char blob2[] = { 0x01, 0x02, 0x03, 0x04 };
 		size_t blob2Len = sizeof(blob2)/sizeof(unsigned char);
 
-		I16Field    field1("I16-FIELD", -1234);
+		I16Field    field1("I16-FIELD", -10);
 		U16Field    field2("U16-FIELD", 1234);
 		F32Field    field3("F32-FIELD", 1234.56f);
 		StringField field4("STR-FIELD", "Hello World");
 		BinaryField field5("BIN1-FIELD", blob1, blob1Len);
 		BinaryField field6("BIN2-FIELD", blob2, blob2Len);
 
-		test.check("1: Fail getU16Value", static_cast<GMSEC_U16>(-1234) == field1.getU16Value());
+		test.check("1: Fail getU16Value", static_cast<GMSEC_U16>(65526) == field1.getU16Value());
 		test.check("2: Fail getU16Value", static_cast<GMSEC_U16>(1234) == field2.getU16Value());
 		test.check("3: Fail getU16Value", static_cast<GMSEC_U16>(1234) == field3.getU16Value());
 
@@ -982,16 +982,16 @@ void test_Field(Test& test)
 		unsigned char blob2[] = { 0x01, 0x02, 0x03, 0x04, 0x05 };
 		size_t blob2Len = sizeof(blob2)/sizeof(unsigned char);
 
-		I32Field    field1("I32-FIELD", -1234);
+		I32Field    field1("I32-FIELD", -10);
 		U32Field    field2("U32-FIELD", 1234);
 		F32Field    field3("F32-FIELD", 1234.56f);
 		StringField field4("STR-FIELD", "Hello World");
 		BinaryField field5("BIN1-FIELD", blob1, blob1Len);
 		BinaryField field6("BIN2-FIELD", blob2, blob2Len);
 
-		test.check("1: Fail getU32Value", static_cast<GMSEC_U32>(-1234) == field1.getU32Value());
-		test.check("2: Fail getU32Value", 1234 == field2.getU32Value());
-		test.check("3: Fail getU32Value", 1234 == field3.getU32Value());
+		test.check("1: Fail getU32Value", static_cast<GMSEC_U32>(4294967286) == field1.getU32Value());
+		test.check("2: Fail getU32Value", static_cast<GMSEC_U32>(1234) == field2.getU32Value());
+		test.check("3: Fail getU32Value", static_cast<GMSEC_U32>(1234) == field3.getU32Value());
 
 		try {
 			field4.getU32Value();
@@ -1022,7 +1022,7 @@ void test_Field(Test& test)
 		unsigned char blob2[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 		size_t blob2Len = sizeof(blob2)/sizeof(unsigned char);
 
-		I32Field    field1("I32-FIELD", -1234);
+		I32Field    field1("I32-FIELD", -10);
 		U32Field    field2("U32-FIELD", 1234);
 		F32Field    field3("F32-FIELD", 1234.56f);
 		StringField field4("STR-FIELD", "Hello World");
@@ -1030,9 +1030,9 @@ void test_Field(Test& test)
 		BinaryField field6("BIN1-FIELD", blob1, blob1Len);
 		BinaryField field7("BIN2-FIELD", blob2, blob2Len);
 
-		test.check("1: Fail getU64Value", static_cast<GMSEC_U64>(-1234) == field1.getU64Value());
-		test.check("2: Fail getU64Value", 1234 == field2.getU64Value());
-		test.check("3: Fail getU64Value", 1234 == field3.getU64Value());
+		test.check("1: Fail getU64Value", static_cast<GMSEC_U64>(18446744073709551606UL) == field1.getU64Value());
+		test.check("2: Fail getU64Value", static_cast<GMSEC_U64>(1234) == field2.getU64Value());
+		test.check("3: Fail getU64Value", static_cast<GMSEC_U64>(1234) == field3.getU64Value());
 
 		try {
 			field4.getU64Value();

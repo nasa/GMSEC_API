@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-# Copyright 2007-2022 United States Government as represented by the
+# Copyright 2007-2023 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -46,7 +46,7 @@ dest_dir=../../GMSEC_API_DOCS-5.x
 docs_dir=$dest_dir/docs
 man_dir=$docs_dir/manual
 
-lang_dirs=( c cpp csharp java perl python3 ruby )
+lang_dirs=( c cpp csharp java nodejs perl python3 ruby )
 
 
 if [ ! -d $src_dir ]; then
