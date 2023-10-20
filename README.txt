@@ -1,6 +1,14 @@
 ﻿This README file provides general information regarding the GMSEC API, its
 supported middleware, and example programs.
 
+IMPORTANT NOTE:
+All C2MS-PIPE (formerly known as C2MS-11b) and GMSEC message templates have been
+removed from the open-source distributions of the GMSEC API, including within
+releases posted in the past. If attempting to use releases 4.5 through 4.9.1,
+pass the gmsec-schema-level=0 configuration option when instantiating a
+Connection or ConnectionManager object. This will load C2MS message templates.
+If C2MS-PIPE or GMSEC message templates are required, please send a request to
+gmsec-support@lists.nasa.gov for further guidance on how to acquire these.
 
 1. DISTRIBUTIONS
 
