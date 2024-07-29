@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -35,16 +35,6 @@ namespace internal
 class GMSEC_API Value
 {
 public:
-
-#if 0
-	// Activate this block if Values are to be used outside of ValueMap
-	(for example, by Field)
-	static Value* createString(const char* value);
-	static Value* createBoolean(bool value);
-	static Value* createI32(int value);
-	static Value* createF64(double value);
-#endif
-
 	virtual ~Value ();
 
 	virtual bool isInteger() const { return false; }
@@ -63,7 +53,11 @@ public:
 	virtual Status getString(std::string& value) const = 0;
 
 	virtual Value* clone() const = 0;
+
+protected:
+	Value() {}
 };
+
 
 
 class GMSEC_API ValueMap
@@ -73,7 +67,6 @@ public:
 	~ValueMap();
 
 	bool contains(const char* key) const;
-	bool contains(const std::string& key) const;
 
 	size_t size() const;
 
@@ -98,7 +91,6 @@ public:
 	{
 	public:
 		Iterator();
-		Iterator(MapType &vm);
 		~Iterator();
 
 		const Value *next();
@@ -107,7 +99,6 @@ public:
 		}
 
 	private:
-
 		friend class ValueMap;
 
 		const MapType* pmap;

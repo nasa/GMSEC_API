@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -26,7 +26,7 @@ public class StringField extends Field
 	 *
 	 * @throws SWIG_Exception Thrown if the field name is null.
 	 * @throws SWIG_Exception Thrown if the data string is null.
-	 * @throws GmsecException Thrown if the field name contains an empty string.
+	 * @throws GmsecException Thrown if the field name string is an empty string or is otherwise non-compliant.
 	 */
 	public StringField(name, data);
 
@@ -40,7 +40,7 @@ public class StringField extends Field
 	 *
 	 * @throws SWIG_Exception Thrown if the field name is null.
 	 * @throws SWIG_Exception Thrown if the data string is null.
-	 * @throws GmsecException Thrown if the field name contains an empty string.
+	 * @throws GmsecException Thrown if the field name string is an empty string or is otherwise non-compliant.
 	 */
 	public StringField(name, data, is_header);
 

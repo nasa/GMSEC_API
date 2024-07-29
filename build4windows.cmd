@@ -1,6 +1,6 @@
 @echo OFF
 
-rem Copyright 2007-2023 United States Government as represented by the
+rem Copyright 2007-2024 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -10,7 +10,7 @@ rem This batch file builds everything for Microsoft Windows
 
 rem Build the main part of the API
 
-set BUILD=gmsec_api gmsec_java gmsec_jni generic_jms bolt mb MBServer libgmsec_csharp libgmsec_perl libgmsec_python3 libgmsec_ruby gmsec_nodejs gmhelp
+set BUILD=gmsec_api gmsec_java gmsec_jni generic_jms bolt mb MBServer loopback libgmsec_csharp libgmsec_perl libgmsec_python3 libgmsec_ruby gmsec_nodejs gmhelp
 
 IF DEFINED WRAPPERS (
 	set BUILD=%BUILD% %WRAPPERS%

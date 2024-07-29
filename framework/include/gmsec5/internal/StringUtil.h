@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,33 +41,6 @@ namespace util
 #ifdef __sun
 using std::va_list;
 #endif
-
-
-class GMSEC_API StringConverter
-{
-public:
-	enum Mode
-	{
-		NO_CONVERSION,
-		TO_UPPERCASE,
-		TO_LOWERCASE
-	};
-
-	static StringConverter& CALL_TYPE instance();
-
-	void CALL_TYPE setMode(Mode mode);
-
-	Mode CALL_TYPE getMode() const;
-
-	std::string CALL_TYPE convertString(const std::string& str) const;
-
-	std::string CALL_TYPE convertString(const char* str) const;
-
-private:
-	StringConverter();
-
-	Mode m_mode;
-};
 
 
 class GMSEC_API StringUtil
@@ -399,7 +372,7 @@ public:
 
 					if (iss.str().length() == 1)
 					{
-						result = iss.str()[0];
+						result = static_cast<GMSEC_CHAR>(iss.str()[0]);
 					}
 					else
 					{

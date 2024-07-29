@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,6 +39,9 @@
 
         # Disconnect from middleware server
         conn.disconnect()
+
+        # Destroy the Connection
+        del conn
 
     except GmsecError as e:
         #handle error
@@ -254,6 +257,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown on error establishing subscription.
 
     See Also
@@ -297,6 +301,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown on failure to establish a subscription
 
     See Also
@@ -318,6 +323,13 @@
     Parameters
     ----------
     info : SubscriptionInfo handle from subscription.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
+    A GmsecError is thrown if the given SubscriptionInfo object is null.
+    A GmsecError is thrown if the given SubscriptionInfo object originated from a different Connection object.
+    A GmsecError is thrown if an error occurs at the middleware level.
 
     See Also
     --------
@@ -342,6 +354,10 @@
     Returns
     -------
     True if the auto-dispatcher has been started; False otherwise.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
 ";
 
 
@@ -361,6 +377,10 @@
     -------
     True if the auto-dispatcher was running and has been stopped; False otherwise.
     If the waitForCompletion flag is set to False, then users can expect a return value of False.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
 
     See Also
     --------
@@ -384,6 +404,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown if error occurs while attempting to publish the message
 
     See Also
@@ -412,6 +433,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown if error occurs while attempting to publish the message
 
     See Also
@@ -450,6 +472,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown on error with generating async request, or if ReplyCallback is NULL.
 
     See Also
@@ -488,6 +511,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown on error transmitting request message.
 
     See Also
@@ -513,6 +537,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown on error transmitting message
 ";
 
@@ -530,6 +555,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown on error
 
     See Also
@@ -563,6 +589,7 @@
 
     Exceptions
     ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
     A GmsecError is thrown on error
 
     See Also
@@ -582,6 +609,11 @@
     Parameters
     ----------
     subject: The subject pattern to look for in incoming messages.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
+    A GmsecError is thrown if the subject is null, is an empty string, or is otherwise non-compliant.
 ";
 
 
@@ -595,6 +627,11 @@
     Parameters
     ----------
     subject : The subject pattern to remove.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if not connected to the GMSEC Bus.
+    A GmsecError is thrown if the subject is null, is an empty string, or is otherwise non-compliant.
 ";
 
 

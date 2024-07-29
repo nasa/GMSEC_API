@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -28,10 +28,12 @@ import java.util.Map;
  */
 public class Field
 {
+	//! @cond
 	protected JNIField m_jniField = null;
 
 
 	/**
+	 * @hidden
 	 * This constructor is for internal GMSEC API use only.
 	 * @param field A Field object.
 	 * @return A JNIField object.
@@ -40,6 +42,7 @@ public class Field
 	{
 		return (field == null ? null : field.m_jniField);
 	}
+	//! @endcond
 
 
 	/**
@@ -126,6 +129,7 @@ public class Field
 	}
 
 
+	//! @cond
 	protected Field()
 	{
 	}
@@ -136,6 +140,11 @@ public class Field
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 	}
 
@@ -150,6 +159,7 @@ public class Field
 	{
 		return m_jniField;
 	}
+	//! @endcond
 
 
 	/**
@@ -319,5 +329,16 @@ public class Field
 	public boolean isHeader()
 	{
 		return m_jniField.isHeader();
+	}
+
+
+	/**
+	 * Returns whether the Field is a GMSEC API tracking field.
+	 *
+	 * @return True if a tracking field, false otherwise.
+	 */
+	public boolean isTracking()
+	{
+		return m_jniField.isTracking();
 	}
 }

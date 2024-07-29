@@ -30,6 +30,7 @@ namespace T005
 				Test_SetFieldValue();
 				Test_SetConfig();
 				Test_SetSubject();
+				Test_SetSubjectElement();
 				Test_GetSubject();
 				Test_SetKind();
 				Test_GetKind();
@@ -350,6 +351,65 @@ namespace T005
 			}
 			catch (GmsecException e) {
 				Check(e.ToString(), e.ToString().Contains("Invalid message subject"));
+			}
+		}
+
+
+		private void Test_SetSubjectElement()
+		{
+			Log.Info("Test SetSubjectElement()");
+
+			MessageFactory msgFactory = new MessageFactory();
+
+			SetStandardFields(msgFactory);
+
+			Message msg = msgFactory.CreateMessage("TLMPROC");
+
+			msg.SetSubjectElement("ME4", "FOOEY");
+
+			Check("Message has unexpected subject", msg.GetSubject() == "C2MS.MY-DOMAIN-1.MY-DOMAIN-2.MY-MISSION.MY-CONSTELLATION.MY-SAT-ID.MSG.TLMPROC.MY-COMPONENT.FILL.FILL.FOOEY");
+
+			try
+			{
+				msg.SetSubjectElement("ME9000", "FOOEY");
+				Check("An exception was expected", false);
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), e.ToString().Contains("Message does not have a subject element named ME9000"));
+			}
+
+			try
+			{
+				Message tmp = new Message();
+				tmp.SetSubjectElement(null, "FOOEY");
+				Check("An exception was expected", false);
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), e.ToString().Contains("Subject element name cannot be NULL or empty string"));
+			}
+
+			try
+			{
+				Message tmp = new Message();
+				tmp.SetSubjectElement("", "FOOEY");
+				Check("An exception was expected", false);
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), e.ToString().Contains("Subject element name cannot be NULL or empty string"));
+			}
+
+			try
+			{
+				Message tmp = new Message();
+				tmp.SetSubjectElement("ME4", "FOOEY");
+				Check("An exception was expected", false);
+			}
+			catch (GmsecException e)
+			{
+				Check(e.ToString(), e.ToString().Contains("Message does not have a message template"));
 			}
 		}
 

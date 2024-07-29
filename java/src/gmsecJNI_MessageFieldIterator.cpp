@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,22 +31,9 @@ extern "C" {
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_MessageFieldIterator_1HasNext
   (JNIEnv *jenv, jclass jcls, jlong jMsgIterPtr, jobject jMsgIter)
 {
-	jboolean result = JNI_FALSE;
+	MessageFieldIterator* iter = JNI_JLONG_TO_MSG_FIELD_ITER(jMsgIterPtr);
 
-	try
-	{
-		MessageFieldIterator* iter = JNI_JLONG_TO_MSG_FIELD_ITER(jMsgIterPtr);
-
-		if (iter == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageFieldIterator reference is null");
-		}
-		else
-		{
-			result = (iter->hasNext() ? JNI_TRUE : JNI_FALSE);
-		}
-	}
-	JNI_CATCH
+	jboolean result = (iter->hasNext() ? JNI_TRUE : JNI_FALSE);
 
 	return result;
 }
@@ -55,24 +42,20 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_MessageFie
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_MessageFieldIterator_1Next
   (JNIEnv *jenv, jclass jcls, jlong jMsgIterPtr, jobject jMsgIter)
 {
+	MessageFieldIterator* iter = JNI_JLONG_TO_MSG_FIELD_ITER(jMsgIterPtr);
+
 	jlong result = 0;
 
 	try
 	{
-		MessageFieldIterator* iter = JNI_JLONG_TO_MSG_FIELD_ITER(jMsgIterPtr);
+		const Field& field = iter->next();
 
-		if (iter == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageFieldIterator reference is null");
-		}
-		else
-		{
-			const Field& field = iter->next();
-
-			result = JNI_POINTER_TO_JLONG(&field);
-		}
+		result = JNI_POINTER_TO_JLONG(&field);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -81,20 +64,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_MessageFieldI
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_MessageFieldIterator_1Reset
   (JNIEnv *jenv, jclass jcls, jlong jMsgIterPtr, jobject jMsgIter)
 {
-	try
-	{
-		MessageFieldIterator* iter = JNI_JLONG_TO_MSG_FIELD_ITER(jMsgIterPtr);
+	MessageFieldIterator* iter = JNI_JLONG_TO_MSG_FIELD_ITER(jMsgIterPtr);
 
-		if (iter == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageFieldIterator reference is null");
-		}
-		else
-		{
-			iter->reset();
-		}
-	}
-	JNI_CATCH
+	iter->reset();
 }
 
 

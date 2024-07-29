@@ -73,8 +73,8 @@ public:
 
 		if (m_msgsReceived == 1)
 		{
-			GMSEC_INFO << "Begin burst of messages...";
-			GMSEC_INFO << "Received Message: " << msg.getSubject();
+			GMSEC_VERBOSE << "Begin burst of messages...";
+			GMSEC_VERBOSE << "Received Message: " << msg.getSubject();
 
 			m_timeIndex ^= 1;   // ping-pong index between 0 and 1 using XOR operation
 
@@ -82,23 +82,23 @@ public:
 		}
 		else if (m_msgsReceived == m_numExpectedMsgs)
 		{
-			GMSEC_INFO << "Received Message: " << msg.getSubject();
-			GMSEC_INFO << "End burst of messages...";
+			GMSEC_VERBOSE << "Received Message: " << msg.getSubject();
+			GMSEC_VERBOSE << "End burst of messages...";
 
 			m_msgsReceived = 0;
 			m_allDone = (m_timeIndex == 1);
 		}
 		else
 		{
-			GMSEC_INFO << "Received Message: " << msg.getSubject();
+			GMSEC_VERBOSE << "Received Message: " << msg.getSubject();
 		}
 
 		if (m_allDone)
 		{
-			GMSEC_INFO << "Checking time...";
+			GMSEC_VERBOSE << "Checking time...";
 
 			double delta_raw = m_rcvTime[1] - m_rcvTime[0];
-			int    delta_int = (int) (delta_raw);
+			int    delta_int = static_cast<int>(delta_raw);
 
 			GMSEC_INFO    << "Time delta between receiving bursts of aggregated messages: " << delta_raw << " seconds";
 			GMSEC_VERBOSE << "Time delta between receiving bursts of aggregated messages: " << delta_int << " seconds";
@@ -142,20 +142,20 @@ public:
 
 	virtual void CALL_TYPE onMessage(Connection& conn, const Message& msg)
 	{
-		GMSEC_INFO << "ExpectedMsgCallback::onMessage -- Received:\n" << msg.getSubject();
+		GMSEC_VERBOSE << "ExpectedMsgCallback::onMessage -- Received: " << msg.getSubject();
 
-		GMSEC_F64       now       = TimeUtil::getCurrentTime_s();
-		const F64Field* timeField = dynamic_cast<const F64Field*>(msg.getField("SEND-TIME"));
-		GMSEC_F64       sendTime  = timeField->getValue();
-		GMSEC_F64       delta     = now - sendTime;
+		GMSEC_F64 now      = TimeUtil::getCurrentTime_s();
+		GMSEC_F64 sendTime = msg.getF64Value("SEND-TIME");
+		GMSEC_F64 delta    = now - sendTime;
+		bool      excluded = (m_excludedSubjects.find(msg.getSubject()) != m_excludedSubjects.end());
 
-		if (m_excludedSubjects.find(msg.getSubject()) != m_excludedSubjects.end())
+		if (excluded)
 		{
 			++m_numExcludedMsgs;
 
 			m_test.check("Excluded Message arrived significantly late", delta <= m_rcvTimeThreshold);
 
-			GMSEC_DEBUG << "Excluded -- delta is: " << delta << "; threshold is: " << m_rcvTimeThreshold;
+			GMSEC_VERBOSE << "Excluded -- delta is: " << delta << "; threshold is: " << m_rcvTimeThreshold;
 		}
 		else
 		{
@@ -163,7 +163,7 @@ public:
 
 			m_test.check("Expected Message arrived significantly early", delta > m_rcvTimeThreshold);
 
-			GMSEC_DEBUG << "Expected -- delta is: " << delta << "; threshold is: " << m_rcvTimeThreshold;
+			GMSEC_VERBOSE << "Expected -- delta is: " << delta << "; threshold is: " << m_rcvTimeThreshold;
 		}
 	}
 
@@ -200,12 +200,11 @@ public:
 
 	virtual void CALL_TYPE onMessage(Connection& conn, const Message& msg)
 	{
-		GMSEC_INFO << "ExcludeMsgCallback::onMessage -- Received:\n" << msg.getSubject();
+		GMSEC_VERBOSE << "ExcludeMsgCallback::onMessage -- Received: " << msg.getSubject();
 
-		GMSEC_F64       now       = TimeUtil::getCurrentTime_s();
-		const F64Field* timeField = dynamic_cast<const F64Field*>(msg.getField("SEND-TIME"));
-		GMSEC_F64       sendTime  = timeField->getValue();
-		GMSEC_F64       delta     = now - sendTime;
+		GMSEC_F64 now      = TimeUtil::getCurrentTime_s();
+		GMSEC_F64 sendTime = msg.getF64Value("SEND-TIME");
+		GMSEC_F64 delta    = now - sendTime;
 
 		if (m_excludedSubject == msg.getSubject())
 		{
@@ -213,7 +212,7 @@ public:
 
 			m_test.check("Excluded Message arrived significantly late", delta <= m_rcvTimeThreshold);
 
-			GMSEC_DEBUG << "Excluded -- delta is: " << delta << "; threshold is: " << m_rcvTimeThreshold;
+			GMSEC_VERBOSE << "Excluded -- delta is: " << delta << "; threshold is: " << m_rcvTimeThreshold;
 		}
 		else
 		{
@@ -221,7 +220,7 @@ public:
 
 			m_test.check("Expected Message arrived significantly early", delta > m_rcvTimeThreshold);
 
-			GMSEC_DEBUG << "Expected -- delta is: " << delta << "; threshold is: " << m_rcvTimeThreshold;
+			GMSEC_VERBOSE << "Expected -- delta is: " << delta << "; threshold is: " << m_rcvTimeThreshold;
 		}
 	}
 
@@ -271,11 +270,11 @@ void conductTest(Test& test, const Config& config)
 
 		for (int i = 0; i < 60; ++i)
 		{
-			msg.addField("COUNT", GMSEC_U32(i+1));
+			msg.addField("COUNT", static_cast<GMSEC_U32>(i+1));
 
 			conn->publish(msg);
 
-			GMSEC_INFO << "Published Message: " << msg.getSubject();
+			GMSEC_VERBOSE << "Published Message: " << msg.getSubject();
 
 			// delay for 1 second, and then some;
 			// this assists testing by ensuring that
@@ -304,7 +303,7 @@ void conductTest(Test& test, const Config& config)
 
 void test_CfgMsgBinSize(Test& test)
 {
-	GMSEC_INFO << "Begin - Configurable Message Bin: Using Size";
+	GMSEC_INFO << "Test Configurable Message Bin: Using Size";
 
 	Config config = test.getConfig();
 	config.addValue("gmsec-use-msg-bins",    "true");
@@ -315,14 +314,12 @@ void test_CfgMsgBinSize(Test& test)
 	config.addValue("subject",               test.getSubject("BIN-SIZE").c_str());
 
 	conductTest(test, config);
-
-	GMSEC_INFO << "End - Configurable Message Bin: Using Size";
 }
 
 
 void test_CfgMsgBinTimeout(Test& test)
 {
-	GMSEC_INFO << "Begin - Configurable Message Bin: Using timeout";
+	GMSEC_INFO << "Test Configurable Message Bin: Using timeout";
 
 	std::string subject = test.getSubject();
 
@@ -335,14 +332,12 @@ void test_CfgMsgBinTimeout(Test& test)
 	config.addValue("subject",               test.getSubject("BIN-TIMEOUT").c_str());
 
 	conductTest(test, config);
-
-	GMSEC_INFO << "End - Configurable Message Bin: Using timeout";
 }
 
 
 void test_CfgMsgBinSubjects(Test& test)
 {
-	GMSEC_INFO << "Begin - Configurable Message Bin: Only Specific Messages [JIRA 4699]";
+	GMSEC_INFO << "Test Configurable Message Bin: Only Specific Messages [JIRA 4699]";
 
 	std::vector<std::string> subscribeTo;
 
@@ -406,7 +401,7 @@ void test_CfgMsgBinSubjects(Test& test)
 
 		for (size_t i = 0; i < numMsgsToPublish; ++i)
 		{
-			F64Field sendTime("SEND-TIME", (GMSEC_F64) TimeUtil::getCurrentTime_s());
+			F64Field sendTime("SEND-TIME", static_cast<GMSEC_F64>(TimeUtil::getCurrentTime_s()));
 
 			expected1.addField(sendTime);
 			expected2.addField(sendTime);
@@ -432,14 +427,12 @@ void test_CfgMsgBinSubjects(Test& test)
 	{
 		test.check(e.what(), false);
 	}
-
-	GMSEC_INFO << "End - Configurable Message Bin: Only Specific Messages [JIRA 4699]";
 }
 
 
 void test_CfgMsgBinExcludeSubjects(Test& test)
 {
-	GMSEC_INFO << "Begin - Configurable Message Bin: Exclude Specific Messages [JIRA 4509]";
+	GMSEC_INFO << "Test Configurable Message Bin: Exclude Specific Messages [JIRA 4509]";
 
 	std::vector<std::string> subscribeTo;
 
@@ -456,9 +449,9 @@ void test_CfgMsgBinExcludeSubjects(Test& test)
 		subscribeTo.push_back(test.getSubject("FOOBAR.>"));
 	}
 
-	std::string msgTopic1   = test.getSubject("FOOBAR.EXPECTED1.PUBLISH");
-	std::string msgTopic2   = test.getSubject("FOOBAR.EXPECTED2.PUBLISH");
-	std::string msgTopic3   = test.getSubject("FOOBAR.EXCLUDED.PUBLISH");
+	std::string msgTopic1 = test.getSubject("FOOBAR.EXPECTED1.PUBLISH");
+	std::string msgTopic2 = test.getSubject("FOOBAR.EXPECTED2.PUBLISH");
+	std::string msgTopic3 = test.getSubject("FOOBAR.EXCLUDED.PUBLISH");
 
 	Config config = test.getConfig();
 	config.addValue("gmsec-use-msg-bins",    "true");
@@ -494,7 +487,7 @@ void test_CfgMsgBinExcludeSubjects(Test& test)
 
 		for (size_t i = 0; i < numMsgsToPublish; ++i)
 		{
-			F64Field sendTime("SEND-TIME", (GMSEC_F64) TimeUtil::getCurrentTime_s());
+			F64Field sendTime("SEND-TIME", static_cast<GMSEC_F64>(TimeUtil::getCurrentTime_s()));
 
 			expected1.addField(sendTime);
 			expected2.addField(sendTime);
@@ -502,7 +495,7 @@ void test_CfgMsgBinExcludeSubjects(Test& test)
 
 			conn->publish(expected1);   // message will be binned (verified in callback)
 			conn->publish(expected2);   // message will be binned (verified in callback)
-			conn->publish(excluded1);    // message will NOT be binned (verified in callback)
+			conn->publish(excluded1);   // message will NOT be binned (verified in callback)
 
 			TimeUtil::millisleep(1000);
 		}
@@ -518,14 +511,12 @@ void test_CfgMsgBinExcludeSubjects(Test& test)
 	{
 		test.check(e.what(), false);
 	}
-
-	GMSEC_INFO << "End - Configurable Message Bin: Exclude Specific Messages [JIRA 4509]";
 }
 
 
 void test_CfgMsgBinUsingValidation(Test& test)
 {
-	GMSEC_INFO << "Begin - Configurable Message Bin: Message Validation Enabled";
+	GMSEC_INFO << "Test Configurable Message Bin: Message Validation Enabled";
 
 	Config pubConfig = test.getConfig();  // make a copy!
 	pubConfig.addValue("gmsec-use-msg-bins", "true");
@@ -579,7 +570,7 @@ void test_CfgMsgBinUsingValidation(Test& test)
 					continue;
 				}
 
-				GMSEC_INFO << "COUNTER is: " << rcv->getI32Value("COUNTER");
+				GMSEC_VERBOSE << "COUNTER is: " << rcv->getI32Value("COUNTER");
 
 				test.check("Unexpected COUNTER value", rcv->getI32Value("COUNTER") == (i+1));
 
@@ -598,6 +589,4 @@ void test_CfgMsgBinUsingValidation(Test& test)
 	{
 		test.check(e.what(), false);
 	}
-
-	GMSEC_INFO << "End - Configurable Message Bin: Message Validation Enabled";
 }

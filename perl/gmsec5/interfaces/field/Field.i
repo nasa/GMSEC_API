@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -218,6 +218,18 @@ C<libgmsec_perl::Field-E<gt>isHeader()>
 
 
 
+=head3 isTracking
+
+C<libgmsec_perl::Field-E<gt>isTracking()>
+
+        Returns whether the Field represents a GMSEC API tracking field.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
+
+        Returns 1 (true) if a tracking field, 0 (false) otherwise.
+
+
+
 =head3 toXML 
 
 C<libgmsec_perl::Field-E<gt>toXML()>
@@ -264,7 +276,7 @@ C<libgmsec_perl::Field-E<gt>getBooleanValue()>
 
         Returns the field value as a boolean
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An GmsecException is thrown if the field cannot be successfully converted to a boolean.
 
@@ -280,7 +292,7 @@ C<libgmsec_perl::Field-E<gt>getIntegerValue()>
 
         Returns the field value as an integer.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An GmsecException is thrown if the field cannot be successfully converted into an integer.
 
@@ -296,7 +308,7 @@ C<libgmsec_perl::Field-E<gt>getDoubleValue()>
 
         Returns the field value as a floating point number.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An GmsecException is thrown if the field cannot be successfully converted into a double.
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,22 +27,9 @@ extern "C" {
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SchemaIDIterator_1HasNext
   (JNIEnv *jenv, jclass jcls, jlong jSchemaIDIterPtr, jobject jSchemaIDIter)
 {
-	jboolean result = JNI_FALSE;
+	SchemaIDIterator* iter = JNI_JLONG_TO_SCHEMA_ID_ITER(jSchemaIDIterPtr);
 
-	try
-	{
-		SchemaIDIterator* iter = JNI_JLONG_TO_SCHEMA_ID_ITER(jSchemaIDIterPtr);
-
-		if (iter == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SchemaIDIterator reference is null");
-		}
-		else
-		{
-			result = (iter->hasNext() ? JNI_TRUE : JNI_FALSE);
-		}
-	}
-	JNI_CATCH
+	jboolean result = (iter->hasNext() ? JNI_TRUE : JNI_FALSE);
 
 	return result;
 }
@@ -51,24 +38,20 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SchemaIDIt
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SchemaIDIterator_1Next
   (JNIEnv *jenv, jclass jcls, jlong jSchemaIDIterPtr, jobject jSchemaIDIter)
 {
+	SchemaIDIterator* iter = JNI_JLONG_TO_SCHEMA_ID_ITER(jSchemaIDIterPtr);
+
 	jstring id = 0;
 
 	try
 	{
-		SchemaIDIterator* iter = JNI_JLONG_TO_SCHEMA_ID_ITER(jSchemaIDIterPtr);
-
-		if (iter == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SchemaIDIterator reference is null");
-		}
-		else
-		{
-			const char* tmp = iter->next();
-			id = makeJavaString(jenv, tmp);
-			jvmOk(jenv, "SchemaIDIterator.next");
-		}
+		const char* tmp = iter->next();
+		id = makeJavaString(jenv, tmp);
+		jvmOk(jenv, "SchemaIDIterator.next");
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return id;
 }
@@ -77,20 +60,9 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SchemaIDIte
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SchemaIDIterator_1Reset
   (JNIEnv *jenv, jclass jcls, jlong jSchemaIDIterPtr, jobject jSchemaIDIter)
 {
-	try
-	{
-		SchemaIDIterator* iter = JNI_JLONG_TO_SCHEMA_ID_ITER(jSchemaIDIterPtr);
+	SchemaIDIterator* iter = JNI_JLONG_TO_SCHEMA_ID_ITER(jSchemaIDIterPtr);
 
-		if (iter == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SchemaIDIterator reference is null");
-		}
-		else
-		{
-			iter->reset();
-		}
-	}
-	JNI_CATCH
+	iter->reset();
 }
 
 

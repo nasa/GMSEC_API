@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -123,9 +123,9 @@ C<libgmsec_perl::U16Field-E<gt>new($name, $value, $isHeader)>
         $value - the unsigned 16-bit value to store
         $isHeader - used to indicate if Field is a header field (default is 0)
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
-        An GmsecException is thrown if the name is NULL, or is an empty string.
+        A GmsecException is thrown if the field name is NULL, is an empty string, or otherwise is non-compliant.
 
 C<libgmsec_perl::U16Field-E<gt>new($field)>
 
@@ -167,7 +167,7 @@ C<libgmsec_perl::U16Field-E<gt>castField()>
 
         Field object that represents a U16Field.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An exception is thrown if the field object cannot be converted to a U16Field.
 
@@ -227,7 +227,7 @@ C<libgmsec_perl::Field-E<gt>setName()>
 
         Field name string.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An exception is thrown if the field name is null or is an empty string.
 
@@ -271,7 +271,7 @@ C<libgmsec_perl::Field-E<gt>getIntegerValue()>
 
         Returns the field value as an integer.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An GmsecException is thrown if the field cannot be successfully converted into an integer.
 
@@ -287,7 +287,7 @@ C<libgmsec_perl::Field-E<gt>getUnsignedIntegerValue()>
 
         Returns the field value as an unsigned integer.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An GmsecException is thrown if the field cannot be successfully converted into an unsigned integer.
 
@@ -303,7 +303,7 @@ C<libgmsec_perl::Field-E<gt>getDoubleValue()>
 
         Returns the field value as a floating point number.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An GmsecException is thrown if the field cannot be successfully converted into a double.
 
@@ -319,7 +319,7 @@ C<libgmsec_perl::Field-E<gt>getStringValue()>
 
         Returns the field value as a string.
 
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>GmsecExceptions:</b><br>
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         An GmsecException is thrown if the field cannot be successfully converted to a string.
 

@@ -1,4 +1,4 @@
-rem Copyright 2007-2023 United States Government as represented by the
+rem Copyright 2007-2024 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -29,30 +29,18 @@ echo 4 -- %_InputFile%
 
 setlocal enabledelayedexpansion
 
-if "!_VisualStudioVersion!" == "" goto:buildLegacy
 
-if !_VisualStudioVersion! lss 15 goto:buildLegacy
-
-
-REM For Visual Studio 2017
+REM For Visual Studio 2019
 REM Remove the semicolon from the end of the _VC_InstallDir macro for a valid path to use with SWIG
 set INCLUDE=!_VCIncludeDir!
 if "x!INCLUDE:~-1!"=="x;" (
 	set INCLUDE=!INCLUDE:~0,-1!
 )
 
-echo "%SWIG_HOME%\swig.exe" -DGMSEC_S16IL32LL64=1 -DCHAR_BIT=8 -c++ -csharp -namespace GMSEC.API5 -I..\..\framework\include -I"!_VCInstallDir!include" -I"!INCLUDE!" "!_InputFile!"
-"%SWIG_HOME%\swig.exe" -DGMSEC_S16IL32LL64=1 -DCHAR_BIT=8 -c++ -csharp -namespace GMSEC.API5 -I..\..\framework\include -I"!_VCInstallDir!include" -I"!INCLUDE!" "!_InputFile!"
-goto:patch
+echo "%SWIG_HOME%\swig.exe" -DSWIG_BINDING -DCHAR_BIT=8 -c++ -csharp -namespace GMSEC.API5 -I..\..\framework\include -I"!_VCInstallDir!include" -I"!INCLUDE!" "!_InputFile!"
+"%SWIG_HOME%\swig.exe" -DSWIG_BINDING -DCHAR_BIT=8 -c++ -csharp -namespace GMSEC.API5 -I..\..\framework\include -I"!_VCInstallDir!include" -I"!INCLUDE!" "!_InputFile!"
 
 
-:buildLegacy
-REM For Visual Studio 2008, 2010 or 2013
-echo "%SWIG_HOME%\swig.exe" -DGMSEC_S16IL32LL64=1 -DCHAR_BIT=8 -c++ -csharp -namespace GMSEC.API5 -I..\..\framework\include -I"!_VCInstallDir!include" "!_InputFile!"
-"%SWIG_HOME%\swig.exe" -DGMSEC_S16IL32LL64=1 -DCHAR_BIT=8 -c++ -csharp -namespace GMSEC.API5 -I..\..\framework\include -I"!_VCInstallDir!include" "!_InputFile!"
-
-
-:patch
 echo "Patching swig generated code"
 call patch.bat
 call addWindowsMacros.bat

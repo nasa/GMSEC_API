@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,35 +31,31 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1Create
   (JNIEnv *jenv, jclass jcls, jlong jCfgPtr, jobject jCfg, jint jPubRate, jlongArray jFieldPtrs, jobjectArray jFields, jint jNumFields)
 {
+	Config* cfg = JNI_JLONG_TO_CONFIG(jCfgPtr);
+
 	HeartbeatGenerator* created = 0;
 
 	try
 	{
-		Config* cfg = JNI_JLONG_TO_CONFIG(jCfgPtr);
+		List<Field*> fields;
+		size_t numFields = static_cast<size_t>(jNumFields);
 
-		if (cfg == NULL)
+		if (numFields > 0)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			List<Field*> fields;
-			size_t numFields = (size_t) jNumFields;
+			jlong* fldptrs = jenv->GetLongArrayElements(jFieldPtrs, JNI_FALSE);
 
-			if (numFields > 0)
+			for (size_t i = 0; i < numFields; ++i)
 			{
-				jlong* fldptrs = jenv->GetLongArrayElements(jFieldPtrs, JNI_FALSE);
-
-				for (size_t i = 0; i < numFields; ++i)
-				{
-					fields.push_back(JNI_JLONG_TO_FIELD(fldptrs[i]));
-				}
+				fields.push_back(JNI_JLONG_TO_FIELD(fldptrs[i]));
 			}
-
-			created = new HeartbeatGenerator(*cfg, (GMSEC_U16) jPubRate, fields);
 		}
+
+		created = new HeartbeatGenerator(*cfg, static_cast<GMSEC_U16>(jPubRate), fields);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -68,42 +64,27 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGene
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1Destroy
   (JNIEnv *jenv, jclass jcls, jlong jHbGenPtr, jobject jHbGen)
 {
-	try
-	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jHbGenPtr);
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jHbGenPtr);
 
-		if (hbgen == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
-		}
-		else
-		{
-			delete hbgen;
-		}
-	}
-	JNI_CATCH
+	delete hbgen;
 }
 
 
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1Start
   (JNIEnv *jenv, jclass jcls, jlong jGenPtr, jobject jGen)
 {
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
+
 	jboolean result = JNI_FALSE;
 
 	try
 	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
-
-		if (hbgen == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
-		}
-		else
-		{
-			result = (hbgen->start() ? JNI_TRUE : JNI_FALSE);
-		}
+		result = (hbgen->start() ? JNI_TRUE : JNI_FALSE);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -112,22 +93,9 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatG
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1Stop
   (JNIEnv *jenv, jclass jcls, jlong jGenPtr, jobject jGen)
 {
-	jboolean result = JNI_FALSE;
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
 
-	try
-	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
-
-		if (hbgen == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
-		}
-		else
-		{
-			result = (hbgen->stop() ? JNI_TRUE : JNI_FALSE);
-		}
-	}
-	JNI_CATCH
+	jboolean result = (hbgen->stop() ? JNI_TRUE : JNI_FALSE);
 
 	return result;
 }
@@ -136,22 +104,9 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatG
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1IsRunning
   (JNIEnv *jenv, jclass jcls, jlong jGenPtr, jobject jGen)
 {
-	jboolean result = JNI_FALSE;
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
 
-	try
-	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
-
-		if (hbgen == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
-		}
-		else
-		{
-			result = (hbgen->isRunning() ? JNI_TRUE : JNI_FALSE);
-		}
-	}
-	JNI_CATCH
+	jboolean result = (hbgen->isRunning() ? JNI_TRUE : JNI_FALSE);
 
 	return result;
 }
@@ -160,47 +115,35 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatG
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1ChangePublishRate
   (JNIEnv *jenv, jclass jcls, jlong jGenPtr, jobject jGen, jint jPubRate)
 {
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
+
 	try
 	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
-
-		if (hbgen == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
-		}
-		else
-		{
-			hbgen->changePublishRate((GMSEC_U16) jPubRate);
-		}
+		hbgen->changePublishRate(static_cast<GMSEC_U16>(jPubRate));
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 }
 
 
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1SetField__JLgov_nasa_gsfc_gmsec_api5_jni_JNIHeartbeatGenerator_2JLgov_nasa_gsfc_gmsec_api5_jni_field_JNIField_2
   (JNIEnv *jenv, jclass jcls, jlong jGenPtr, jobject jGen, jlong jFieldPtr, jobject jField)
 {
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
+	Field*              field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jboolean result = JNI_FALSE;
 
 	try
 	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
-		Field*              field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (hbgen == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
-		}
-		else if (field == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = (hbgen->setField(*field) ? JNI_TRUE : JNI_FALSE);
-		}
+		result = (hbgen->setField(*field) ? JNI_TRUE : JNI_FALSE);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -209,27 +152,23 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatG
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1SetField__JLgov_nasa_gsfc_gmsec_api5_jni_JNIHeartbeatGenerator_2Ljava_lang_String_2J
   (JNIEnv *jenv, jclass jcls, jlong jGenPtr, jobject jGen, jstring jFieldName, jlong jFieldValue)
 {
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
+
 	jboolean result = JNI_FALSE;
 
-	try
+	JStringManager fieldName(jenv, jFieldName);
+
+	if (jvmOk(jenv, "HeartbeatGenerator::setField(fieldName, fieldValueLong"))
 	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
-
-		if (hbgen == NULL)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
+			result = (hbgen->setField(fieldName.c_str(), static_cast<GMSEC_I64>(jFieldValue)) ? JNI_TRUE : JNI_FALSE);
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager fieldName(jenv, jFieldName);
-
-			if (jvmOk(jenv, "HeartbeatGenerator::setField(fieldName, fieldValueLong"))
-			{
-				result = (hbgen->setField(fieldName.c_str(), (GMSEC_I64) jFieldValue) ? JNI_TRUE : JNI_FALSE);
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -238,27 +177,23 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatG
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatGenerator_1SetField__JLgov_nasa_gsfc_gmsec_api5_jni_JNIHeartbeatGenerator_2Ljava_lang_String_2D
   (JNIEnv *jenv, jclass jcls, jlong jGenPtr, jobject jGen, jstring jFieldName, jdouble jFieldValue)
 {
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
+
 	jboolean result = JNI_FALSE;
 
-	try
+	JStringManager fieldName(jenv, jFieldName);
+
+	if (jvmOk(jenv, "HeartbeatGenerator::setField(fieldName, fieldValueDouble"))
 	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
-
-		if (hbgen == NULL)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
+			result = (hbgen->setField(fieldName.c_str(), static_cast<GMSEC_F64>(jFieldValue)) ? JNI_TRUE : JNI_FALSE);
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager fieldName(jenv, jFieldName);
-
-			if (jvmOk(jenv, "HeartbeatGenerator::setField(fieldName, fieldValueDouble"))
-			{
-				result = (hbgen->setField(fieldName.c_str(), (GMSEC_F64) jFieldValue) ? JNI_TRUE : JNI_FALSE);
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -269,26 +204,22 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_HeartbeatG
 {
 	jboolean result = JNI_FALSE;
 
-	try
+	HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
+
+	JStringManager fieldName(jenv, jFieldName);
+	JStringManager fieldValue(jenv, jFieldValue);
+
+	if (jvmOk(jenv, "HeartbeatGenerator::setField(fieldName, fieldValueString"))
 	{
-		HeartbeatGenerator* hbgen = JNI_JLONG_TO_HEARTBEAT_GENERATOR(jGenPtr);
-
-		if (hbgen == NULL)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "HeartbeatGenerator reference is null");
+			result = (hbgen->setField(fieldName.c_str(), fieldValue.c_str()) ? JNI_TRUE : JNI_FALSE);
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager fieldName(jenv, jFieldName);
-			JStringManager fieldValue(jenv, jFieldValue);
-
-			if (jvmOk(jenv, "HeartbeatGenerator::setField(fieldName, fieldValueString"))
-			{
-				result = (hbgen->setField(fieldName.c_str(), fieldValue.c_str()) ? JNI_TRUE : JNI_FALSE);
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }

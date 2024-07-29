@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -97,6 +97,9 @@ public class subscribe_async
 	{
 		// Set up connection configuration options from the command line.
 		Config config = new Config(args);
+
+		// Validate incoming messages
+		config.addValue("gmsec-msg-content-validate-recv", "true");
 
 		// Initialize log level for output
 		utility.initializeLogLevel(config);

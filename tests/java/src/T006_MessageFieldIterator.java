@@ -1,3 +1,4 @@
+import gov.nasa.gsfc.gmsec.api5.GmsecException;
 import gov.nasa.gsfc.gmsec.api5.Message;
 import gov.nasa.gsfc.gmsec.api5.MessageFactory;
 import gov.nasa.gsfc.gmsec.api5.MessageFieldIterator;
@@ -235,6 +236,7 @@ class TestMessage
 	private Message            m_msg      = null;
 
 	public static TestMessage instance()
+		throws GmsecException
 	{
 		if (s_instance == null) {
 			s_instance = new TestMessage();
@@ -249,6 +251,7 @@ class TestMessage
 	}
 
 	private TestMessage()
+		throws GmsecException
 	{
 		m_msg = new Message();
 

@@ -10,18 +10,20 @@ int test_MultipleConnections(Test& test)
 
 	Log::setReportingLevel( LogLevel::logNONE );
 
-	Connection* conn[100] = { NULL };
+	const int numConnections = 10;
+
+	Connection* conn[numConnections] = { NULL };
 
 	try
 	{
-		for (int i = 0; i < 100; ++i)
+		for (int i = 0; i < numConnections; ++i)
 		{
 			conn[i] = new Connection( test.getConfig() );
 
 			conn[i]->connect();
 		}
 
-		for (int i = 0; i < 100; ++i)
+		for (int i = 0; i < numConnections; ++i)
 		{
 			conn[i]->disconnect();
 

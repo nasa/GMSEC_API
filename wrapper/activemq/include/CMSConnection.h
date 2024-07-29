@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -8,7 +8,7 @@
 
 /**
  * @file CMSConnection.h
- * Holds the declaration of ActiveMQ subclass of gmsec::api::internal::ConnectionInterface.
+ * The declaration of the ActiveMQ/Artemis implementation of ConnectionInterface.
  */
 
 #ifndef CMS_CONNECTION_H
@@ -23,6 +23,7 @@
 #include <gmsec5/Config.h>
 #include <gmsec5/Message.h>
 
+#include <gmsec5/util/BoundedQueue.h>
 #include <gmsec5/util/StdUniquePtr.h>
 #include <gmsec5/util/StdSharedPtr.h>
 
@@ -36,14 +37,6 @@
 
 #include <activemq/transport/DefaultTransportListener.h>
 #include <decaf/lang/Pointer.h>
-
-#if ACTIVEMQ_CMS_V2
-#include <decaf/util/Queue.h>
-typedef decaf::util::Queue<cms::Message*> MessageQueue;
-#else
-#include <decaf/util/StlQueue.h>
-typedef decaf::util::StlQueue<cms::Message*> MessageQueue;
-#endif
 
 
 namespace gmsec_amqcms
@@ -61,7 +54,7 @@ public:
 	* @brief Constructor- assumes ownership of the consumer,
 	* and the consumer's MessageListener.
 	*/
-	SubscriptionInfo(cms::MessageConsumer *consumer);
+	SubscriptionInfo(cms::MessageConsumer* consumer);
 
 	/**
 	* @brief Destructor- destroys consumer, and consumer's
@@ -69,15 +62,15 @@ public:
 	*/
 	~SubscriptionInfo();
 
-	void setExtra(SubscriptionInfo *info);
+	void setExtra(SubscriptionInfo* info);
 
 private:
 	// not implemented
-	SubscriptionInfo (const SubscriptionInfo &);
-	SubscriptionInfo &operator=(const SubscriptionInfo &);
+	SubscriptionInfo (const SubscriptionInfo&);
+	SubscriptionInfo &operator=(const SubscriptionInfo&);
 
-	cms::MessageConsumer *consumer;
-	SubscriptionInfo *extra;
+	cms::MessageConsumer* consumer;
+	SubscriptionInfo* extra;
 };
 
 
@@ -130,74 +123,10 @@ private:
  */
 class GMSEC_ACTIVEMQ_API CMSConnection : public gmsec::api5::internal::ConnectionInterface
 {
-private:
-	gmsec::api5::util::StdUniquePtr<cms::ConnectionFactory> m_cmsFactory;
-	gmsec::api5::util::StdUniquePtr<cms::Connection>        m_connection;
-	gmsec::api5::util::StdUniquePtr<cms::Session>           m_session;
-	gmsec::api5::util::StdUniquePtr<cms::Destination>       m_requestReplyDestination;
-	gmsec::api5::util::StdUniquePtr<cms::MessageProducer>   m_requestReplyProducer;
-	gmsec::api5::util::StdUniquePtr<cms::MessageConsumer>   m_replyConsumer;
-	std::map<std::string, SubscriptionInfo*>                m_subscriptions;
-	MessageQueue                                            m_queue;
-	gmsec::api5::internal::UniqueFilter                     m_uniqueFilter;
-
-	// configuration
-	std::string m_brokerURI;
-	std::string m_connClientId;
-	std::string m_username;
-	std::string m_password;
-	std::string m_keystore;
-	std::string m_keystorePassword;
-	std::string m_truststore;
-	std::string m_truststorePassword;
-	bool        m_useFilter;
-	bool        m_reportFailoverEvent;
-	int         m_ackMode;
-
-	// Request Specs
-	gmsec::api5::internal::RequestSpecs m_requestSpecs;
-
-	// middleware info
-	std::string m_mwinfo;
-
-	gmsec::api5::util::StdUniquePtr<CMSTransportListener> m_transportListener;
-	gmsec::api5::util::StdUniquePtr<CMSExceptionListener> m_exceptionListener;
-
-
-	/**
-	 * @brief Utility function for releasing resources.
-	 */
-	void cleanup();
-
-
-	/**
-	 * @brief Prepare a CMS Message for a GMSEC Message.
-	 */
-	void prepare(const gmsec::api5::Message& msg, gmsec::api5::util::StdUniquePtr<cms::Message>& cmsMsg);
-
-
-	/**
-	 * @brief Handles the conversion of a CMS message to a GMSEC message, and the delivery of such
-	 */
-	void handleReply(const cms::Message* message);
-
-
-	/**
-	 * @brief Extract a GMSEC Message from a CMS Message.
-	 */
-	void unload(const cms::Message* cmsMsg, gmsec::api5::Message*& gmsecMsg);
-
-
-	/**
-	 * @brief Actual implementation of mwReceive
-	 */
-	void mwReceiveAux(gmsec::api5::Message*& msg, GMSEC_I32 timeout);
-
-
-	SubscriptionInfo* makeSubscriptionInfo(const std::string& in, const gmsec::api5::Config& config);
-
-
 public:
+	typedef gmsec::api5::util::BoundedQueue<gmsec::api5::Message*> MessageQueue;
+
+
 	/**
 	 * @fn CMSConnection(const gmsec::api::Config& config)
 	 * @brief Create a CMS Connection with configuration.
@@ -248,7 +177,7 @@ public:
 	 * @brief Subscribe to @p subject (which possibly contains wildcards)
 	 * using the configuration supplied in the config object.
 	 */
-	virtual void mwSubscribe(const char *subject, const gmsec::api5::Config &config);
+	virtual void mwSubscribe(const char* subject, const gmsec::api5::Config& config);
 
 
 	/**
@@ -266,13 +195,7 @@ public:
 	/**
 	 * @brief Send request message.
 	 */
-	virtual void mwRequest(const gmsec::api5::Message& request, std::string& id);
-
-
-	/**
-	 * @brief Assists in delivering reply messages to the client.
-	 */
-	void handleCmsReply(const cms::Message* cmsReply, bool logStackTrace);
+	virtual void mwRequest(const gmsec::api5::Message& request, const std::string& uniqueID);
 
 
 	/**
@@ -285,8 +208,78 @@ public:
 	 * @brief Acknowledge receipt/processing of underlying CMS message
 	 */
 	virtual void mwAcknowledge(gmsec::api5::util::StdSharedPtr<gmsec::api5::internal::MiddlewareInfo>& info);
+
+
+	/**
+	 * @brief Returns a unique identifier string
+	 */
+	virtual std::string mwGetUniqueID();
+
+
+	/**
+	 * @brief Extract a GMSEC Message from a CMS Message.
+	 */
+	void unload(const cms::Message* cmsMsg, gmsec::api5::Message*& gmsecMsg);
+
+
+private:
+	gmsec::api5::util::StdUniquePtr<cms::ConnectionFactory> m_cmsFactory;
+	gmsec::api5::util::StdUniquePtr<cms::Connection>        m_connection;
+	gmsec::api5::util::StdUniquePtr<cms::Session>           m_session;
+	gmsec::api5::util::StdUniquePtr<cms::Destination>       m_requestReplyDestination;
+	gmsec::api5::util::StdUniquePtr<cms::MessageProducer>   m_requestReplyProducer;
+	gmsec::api5::util::StdUniquePtr<cms::MessageConsumer>   m_replyConsumer;
+	std::map<std::string, SubscriptionInfo*>                m_subscriptions;
+	MessageQueue                                            m_queue;
+	gmsec::api5::internal::UniqueFilter                     m_uniqueFilter;
+
+	// configuration
+	std::string m_brokerURI;
+	std::string m_connClientId;
+	std::string m_username;
+	std::string m_password;
+	std::string m_keystore;
+	std::string m_keystorePassword;
+	std::string m_truststore;
+	std::string m_truststorePassword;
+	bool        m_useFilter;
+	bool        m_reportFailoverEvent;
+	int         m_ackMode;
+
+	// Request Specs
+	gmsec::api5::internal::RequestSpecs m_requestSpecs;
+
+	// middleware info
+	std::string m_mwinfo;
+
+	gmsec::api5::util::StdUniquePtr<CMSTransportListener> m_transportListener;
+	gmsec::api5::util::StdUniquePtr<CMSExceptionListener> m_exceptionListener;
+
+
+	/**
+	 * @brief Utility function for releasing resources.
+	 */
+	void cleanup();
+
+
+	/**
+	 * @brief Prepare a CMS Message from a GMSEC Message.
+	 */
+	void prepare(const gmsec::api5::Message& msg, gmsec::api5::util::StdUniquePtr<cms::Message>& cmsMsg);
+
+
+	/**
+	 * @brief Helper method to support mwReceive
+	 */
+	void mwReceiveAux(gmsec::api5::Message*& msg, GMSEC_I32 timeout);
+
+
+	/**
+	 * @brief Helper method to setup subscription monitoring
+	 */
+	SubscriptionInfo* makeSubscriptionInfo(const std::string& subject, const gmsec::api5::Config& config);
 };
 
 }  // end namespace gmsec_amqcms
 
-#endif  // CMS_CONNECTION_H
+#endif

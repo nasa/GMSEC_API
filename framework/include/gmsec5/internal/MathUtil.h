@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -11,6 +11,8 @@
 
 #include <gmsec5_defs.h>
 
+#include <gmsec5/util/wdllexp.h>
+
 
 namespace gmsec
 {
@@ -19,28 +21,28 @@ namespace api5
 namespace internal
 {
 
-class MathUtil
+class GMSEC_API MathUtil
 {
 public:
-	static bool floatEquals(GMSEC_F32 f1, GMSEC_F32 f2);
+	static bool CALL_TYPE floatEquals(GMSEC_F32 f1, GMSEC_F32 f2);
 
-	static bool doubleEquals(GMSEC_F64 d1, GMSEC_F64 d2);
+	static bool CALL_TYPE doubleEquals(GMSEC_F64 d1, GMSEC_F64 d2);
 
-	static GMSEC_F32 extractF32(const char* hexstr);
+	static GMSEC_F32 CALL_TYPE extractF32(const char* hexstr);
 
-	static GMSEC_F64 extractF64(const char* hexstr);
+	static GMSEC_F64 CALL_TYPE extractF64(const char* hexstr);
 
-	static double getInfinity();
+	static double CALL_TYPE getInfinity();
 
-	static float getInfinityf();
+	static float CALL_TYPE getInfinityf();
 
-	static double getNaN();
+	static double CALL_TYPE getNaN();
 
-	static float getNaNf();
+	static float CALL_TYPE getNaNf();
 
-	static const char* realStringConstant(double x);
+	static const char* CALL_TYPE realStringConstant(double x);
 
-	static float stringRealConstant(const char* p);
+	static float CALL_TYPE stringRealConstant(const char* p);
 };
 
 

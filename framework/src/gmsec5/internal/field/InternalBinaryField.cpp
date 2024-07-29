@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -7,6 +7,10 @@
 
 
 #include <gmsec5/internal/field/InternalBinaryField.h>
+
+#include <gmsec5/internal/Encoder.h>
+
+#include <gmsec5/GmsecException.h>
 
 #include <sstream>
 #include <cstring>   // for memcpy()
@@ -19,13 +23,25 @@ InternalBinaryField::InternalBinaryField(const char* name, const GMSEC_U8* blob,
 	: InternalField(name, Field::Type::BINARY, isHeader),
 	  m_blob(0)
 {
+	if (length > static_cast<size_t>(GMSEC_BIN_LIMIT))
+	{
+		throw GmsecException(FIELD_ERROR, INVALID_FIELD_VALUE, "BinaryField blob is too big");
+	}
+
 	m_length = (!blob ? 0 : length);
 
 	if (m_length > 0)
 	{
-		m_blob = new unsigned char[m_length];
+		try
+		{
+			m_blob = new unsigned char[m_length];
 
-		std::memcpy(m_blob, blob, m_length);
+			std::memcpy(m_blob, blob, m_length);
+		}
+		catch (const std::bad_alloc& e)
+		{
+			throw GmsecException(FIELD_ERROR, INVALID_FIELD_VALUE, e.what());
+		}
 	}
 }
 

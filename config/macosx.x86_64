@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -19,8 +19,9 @@ BINDIR      = $(GMSEC_API_HOME)/bin
 JAVA_BIN    = $(JDK_HOME)/bin
 JAVA_INCS   = -I$(JDK_HOME)/include -I$(JDK_HOME)/include/darwin
 
-ifndef PYTHON_HOME
-PYTHON_HOME = /usr
+
+ifndef NODE_HOME
+NODE_HOME = /usr
 endif
 
 ifndef PYTHON3_HOME

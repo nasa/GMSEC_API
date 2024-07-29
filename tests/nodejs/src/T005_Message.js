@@ -22,6 +22,7 @@ class T005_Message extends TestCase
 		this.testSetFieldValue();
 		this.testSetConfig();
 		this.testSetSubject();
+		this.testSetSubjectElement();
 		this.testGetSubject();
 		this.testSetKind();
 		this.testGetKind();
@@ -318,6 +319,51 @@ class T005_Message extends TestCase
 		}
 		catch (e) {
 			this.check(e.message, e.message.includes("Invalid message subject"));
+		}
+	}
+
+	testSetSubjectElement()
+	{
+		gmsec.Log.info("Test setSubjectElement()");
+
+		try {
+			var msgFactory = new gmsec.MessageFactory();
+			this.setStandardFields(msgFactory);
+
+			var msg = msgFactory.createMessage("TLMPROC");
+			msg.setSubjectElement("ME4", "FOOEY");
+
+			this.check("Message has unexpected subject", msg.getSubject() === "C2MS.MY-DOMAIN-1.MY-DOMAIN-2.MY-MISSION.MY-CNST-ID.MY-SAT-ID.MSG.TLMPROC.JS-TESTCASE.FILL.FILL.FOOEY");
+			try {
+				msg.setSubjectElement("ME9000", "FOOEY");
+				this.check("An exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, e.message.includes("Message does not have a subject element named ME9000"));
+			}
+		}
+		catch (e) {
+			this.require(e.message, false);
+		}
+
+		//o Off-nominal tests
+		
+		try {
+			var tmp = new gmsec.Message();
+			tmp.setSubjectElement("", "FOOEY");
+			this.check("An exception was expected", false);
+		}
+		catch (e) {
+			this.check(e.message, e.message.includes("Subject element name cannot be NULL or empty string"));
+		}
+		
+		try {
+			var tmp = new gmsec.Message();
+			tmp.setSubjectElement("ME4", "FOOEY");
+			this.check("An exception was expected", false);
+		}
+		catch (e) {
+			this.check(e.message, e.message.includes("Message does not have a message template"));
 		}
 	}
 

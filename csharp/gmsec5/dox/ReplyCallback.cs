@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,7 +15,7 @@ namespace GMSEC.API5 {
 /// <summary>
 /// This class defines the abstract base class for receiving replies from asynchronous request
 /// messages. A user created class, derived from this class, can be passed into Request()
-/// to have user code executed asynchronously when a reply is received or when an error
+/// to have user code executed asynchronously when a reply is received or when an event
 /// occurs.
 /// <p>
 /// Note that because users are able to create their own ReplyCallback class, reentrancy is not

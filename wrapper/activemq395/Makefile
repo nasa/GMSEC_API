@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -23,15 +23,27 @@ OBJDIR       = ../activemq/src
 
 SUPDIR       = $(SUPPORT)/activemq$(MAJOR_VER)$(MINOR_VER)$(PATCH_VER)
 
-LOCAL_DEFS   = -DACTIVEMQ_CMS_V3=1 -DACTIVEMQ_USE_MSG_RESET=1 -DGMSEC_LIBROOTNAME=$(LIBROOTNAME)$(MAJOR_VER)$(MINOR_VER)$(PATCH_VER)
+LOCAL_DEFS   = -DGMSEC_LIBROOTNAME=$(LIBROOTNAME)$(MAJOR_VER)$(MINOR_VER)$(PATCH_VER)
 
 LOCAL_INCS   = -I$(SUPDIR)/include \
-               -I$(SUPDIR)/include/apr-1 \
                -I../activemq/include
+
+ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+    # MacOS
+LOCAL_INCS  += -I/usr/local/opt/apr/include/apr-1
+else
+ifeq (,$(wildcard /etc/lsb-release))
+    # RHEL
+LOCAL_INCS  += -I/usr/include/apr-1
+else
+    # Ubuntu
+LOCAL_INCS  += -I/usr/include/apr-1.0
+endif
+endif
 
 CXXFLAGS    += $(LOCAL_DEFS) $(LOCAL_INCS) -Wno-deprecated-declarations
 
-LDFLAGS     += -L$(SUPDIR)/lib -lactivemq-cpp -lapr-1
+LDFLAGS     += -L$(SUPDIR)/lib -lactivemq-cpp
 
 SRCDIR       = ../activemq/src
 

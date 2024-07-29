@@ -1,8 +1,80 @@
-﻿This GMSEC API file contains technical notes and the change summary for the current release and historical releases.
+This GMSEC API file contains technical notes and the change summary for the current release and historical releases.
 
 See the associated Version Description Document (VDD) for further details of each release.
 
 For technical support regarding this release, or any previous version, please contact the API Team at gmsec-support@lists.nasa.gov.
+
+
+==============================================================================
+= GMSEC API 5.2 release notes (TBD 2024)
+==============================================================================
+
+--- Change summary -----------------------------------------------------------
+* API-5738 : Add new interface setSubjectElement() to Message class
+* API-6033 : Build the GMSEC API using OpenJDK 17
+* API-6082 : Fortify - Mitigate 'variable never used' issues in the Java binding
+* API-6083 : Fortify - Remove debug hooks from Bolt
+* API-6084 : Fortify - Remove dead code from Message Bus TCPSocketClientArray
+* API-6085 : Fortify - Remove debug hooks from Message Bus TCPSocketClientReconnector
+* API-6088 : Fortify - Mitigate 'variable never used' issues within JMSConnection
+* API-6089 : Fortify - Remove debug hook from JMSConnection
+* API-6092 : Refactor how the UNIQUE-ID field is acquired in CMSConnection
+* API-6094 : Do not report /dev/loop and /dev/fuse disks in Resource Message
+* API-6102 : Allow Message to use the gmsec-remove-tracking-fields configuration option
+* API-6103 : Unexpected exception is thrown when removing tracking fields from a Heartbeat message
+* API-6106 : Remove usage of std::binary_function
+* API-6108 : Connection setName() does not fulfill what is stated in documentation
+* API-6110 : Add comment to Java binding classes regarding Message destroy()
+* API-6120 : The Java binding should check if a Message object has an underlying JNIMessage before attempting to destroy the object
+* API-6121 : added mutex to InternalMessageFactory::fromData() for thread safety
+* API-6124 : Fortify - JMSCache should be deallocated if it cannot be initialized
+* API-6125 : Fortify -  Ensure only a sane number of configuration options are allowed with GenericJMS
+* API-6126 : Fortify: BinaryField copy constructor in Java binding does not need to catch exceptions
+* API-6135 : MessageFactory fromData() is not thread-safe
+* API-6136 : Fortify - Remove dead-code and unneeded try-catch block from Generic JMS
+* API-6147 : Connection shutdownMiddleware() crashes if NULL is passed as the middleware name
+* API-6154 : StringUtil getTimeFromString() improperly handles negative relative time
+* API-6155 : Rename FieldTemplate::addDependency() to FieldTemplate::initDependency()
+* API-6156 : Rename FieldTemplate::resetDependencies() to FieldTemplate::resetCheckedDependencies()
+* API-6157 : Removed unused function FieldTemplate::setDependencies()
+* API-6159 : Accessing MessageTemplate in a multi-threaded application can lead to a crash
+* API-6162 : Remove usage of the C++ std::unary_function because it is deprecated
+* API-6170 : Internal Message setFieldValue() catches its own exceptions
+* API-6171 : Remove unused/obsolete code from InternalAtomics
+* API-6173 : Change FieldTemplate::applyDependency() from public to private
+* API-6174 : Remove unused function FieldTemplate::getTypeStrings()
+* API-6176 : Field Template accessors should account for overriding modifications from applied dependencies
+* API-6177 : Remove unused function FieldTemplate::hasDependencies()
+* API-6183 : Change FieldTemplate::getValue() from public to private
+* API-6189 : Incorrect Field count is encoded by MessageEncoder
+* API-6193 : Fortify - Limit Asynchronous Queue Depth to a maximum size
+* API-6196 : Build Ruby binding using Ruby 3.2.2 on Windows
+* API-6197 : Fortify - BoundedQueue should not allocate buffer of zero size
+* API-6198 : ZIP field not removed from uncompressed message
+* API-6200 : Fortify - BoundedQueue should enforce the maximum size of its buffer
+* API-6212 : Fortify - Allocated proxy callback object is not freed
+* API-6227 : Patch the SWIG-generated code for the NodeJS binding for converting a U32 value
+* API-6220 : Allow API 5.x to handle request/response messaging with API 4.x
+* API-6237 : Simplify the GMSEC API's data type header file
+* API-6250 : Encoder does not mask encoded field type bits
+* API-6263 : Provide an isTracking() method with the Field class
+* API-6224 : Build the Python binding using system native version of Python3
+* API-6265 : Build the NodeJS binding using system native version of node and node-gyp
+* API-6271 : StringUtil getTimeFromString() does not handle exit from Daylight Savings Time
+* API-6273 : Do not allow a Message with a missing subject element to be sent across the bus
+* API-6279 : Log message when an unhandled exception is thrown by a Callback
+* API-6285 : Add support to MessageFieldIterator for fetching tracking fields
+* API-6289 : Catch GMSEC exception when handling ActiveMQ CMS message
+* API-6290 : Heartbeat message tracking fields are not properly identified
+* API-6293 : NodeJS does not immediately destroy Connection object after falling out of scope
+* API-6295 : NUM-OF-SUBSCRIPTIONS is not a header field
+* API-6297 : Build ActiveMQ CMS using Linux provided packages of APR and OpenSSL
+* API-6305 : Message Template XSDs should identify tracking fields
+* API-6310 : Unsigned integer classes in Java binding do not check range of value passed to set() method
+* API-6323 : Remove obsolete function ComplianceValidator::isApiReservedField
+* API-6325 : Integrate tracking field validation into main validation loop
+* API-6332 : Build Perl binding on Windows using Strawberry Perl 5.38.2.2
+* API-6337 : Fortify: Limit the size of a BinaryField
 
 
 ==============================================================================

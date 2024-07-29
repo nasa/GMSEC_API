@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,6 +27,7 @@ namespace api5
 namespace internal
 {
 	class InternalField;
+	class FieldBuddy;
 }
 
 /**
@@ -97,6 +98,14 @@ public:
 	 * @return Returns true if a header field; false otherwise.
 	 */
 	bool CALL_TYPE isHeader() const;
+
+
+	/**
+	 * @fn bool isTracking() const
+	 * @brief Returns whether the Field represents a GMSEC API tracking field.
+	 * @return Returns true if a tracking field; false otherwise.
+	 */
+	bool CALL_TYPE isTracking() const;
 
 
 	/**
@@ -208,6 +217,7 @@ private:
 	Field(const Field& other);
 
 	friend class gmsec::api5::internal::InternalField;
+	friend class gmsec::api5::internal::FieldBuddy;
 
 	gmsec::api5::internal::InternalField* m_internal;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -29,71 +29,71 @@ using namespace gmsec::api5::internal;
 
 FieldTemplate::FieldTemplate()
 	: m_xml(),
-	  m_name(),
-	  m_modifiedName(),
-	  m_mode(),
-	  m_modifiedMode(),
-	  m_class(),
-	  m_values(),
-	  m_modifiedValues(),
-	  m_pattern(),
-	  m_modifiedPattern(),
-	  m_types(),
-	  m_modifiedTypes(),
-	  m_description(),
-	  m_size(),
-	  m_prefix(),
-	  m_children(),
-	  m_dependencies()
+	m_name(),
+	m_modifiedName(),
+	m_mode(),
+	m_modifiedMode(),
+	m_class(),
+	m_values(),
+	m_modifiedValues(),
+	m_pattern(),
+	m_modifiedPattern(),
+	m_types(),
+	m_modifiedTypes(),
+	m_description(),
+	m_size(),
+	m_prefix(),
+	m_children(),
+	m_dependencies()
 {
 }
 
 
-FieldTemplate::FieldTemplate(const std::string& fieldName, 
-							 const std::string& fieldMode, 
-							 const std::string& fieldClass, 
-							 const std::list<std::string>& fieldValues, 
-							 const std::list<std::string>& fieldTypes, 
-							 const std::string& fieldDescription)
+FieldTemplate::FieldTemplate(const std::string& fieldName,
+	const std::string& fieldMode,
+	const std::string& fieldClass,
+	const std::list<std::string>& fieldValues,
+	const std::list<std::string>& fieldTypes,
+	const std::string& fieldDescription)
 	: m_xml(),
-	  m_name(fieldName),
-	  m_modifiedName(fieldName),
-	  m_mode(fieldMode),
-	  m_modifiedMode(),
-	  m_class(fieldClass),
-	  m_values(fieldValues),
-	  m_modifiedValues(),
-	  m_pattern(),
-	  m_modifiedPattern(),
-	  m_types(fieldTypes),
-	  m_modifiedTypes(),
-	  m_description(fieldDescription),
-	  m_size(),
-	  m_prefix(),
-	  m_children(),
-	  m_dependencies()
+	m_name(fieldName),
+	m_modifiedName(fieldName),
+	m_mode(fieldMode),
+	m_modifiedMode(),
+	m_class(fieldClass),
+	m_values(fieldValues),
+	m_modifiedValues(),
+	m_pattern(),
+	m_modifiedPattern(),
+	m_types(fieldTypes),
+	m_modifiedTypes(),
+	m_description(fieldDescription),
+	m_size(),
+	m_prefix(),
+	m_children(),
+	m_dependencies()
 {
 }
 
 
 FieldTemplate::FieldTemplate(const FieldTemplate& other)
 	: m_xml(other.m_xml),
-	  m_name(other.m_name),
-	  m_modifiedName(other.m_modifiedName),
-	  m_mode(other.m_mode),
-	  m_modifiedMode(other.m_modifiedMode),
-	  m_class(other.m_class),
-	  m_values(other.m_values),
-	  m_modifiedValues(other.m_modifiedValues),
-	  m_pattern(other.m_pattern),
-	  m_modifiedPattern(other.m_modifiedPattern),
-	  m_types(other.m_types),
-	  m_modifiedTypes(other.m_modifiedTypes),
-	  m_description(other.m_description),
-	  m_size(other.m_size),
-	  m_prefix(other.m_prefix),
-	  m_children(),
-	  m_dependencies()
+	m_name(other.m_name),
+	m_modifiedName(other.m_modifiedName),
+	m_mode(other.m_mode),
+	m_modifiedMode(other.m_modifiedMode),
+	m_class(other.m_class),
+	m_values(other.m_values),
+	m_modifiedValues(other.m_modifiedValues),
+	m_pattern(other.m_pattern),
+	m_modifiedPattern(other.m_modifiedPattern),
+	m_types(other.m_types),
+	m_modifiedTypes(other.m_modifiedTypes),
+	m_description(other.m_description),
+	m_size(other.m_size),
+	m_prefix(other.m_prefix),
+	m_children(),
+	m_dependencies()
 {
 	// We need to make a deep-copy of the child FieldTemplate(s)
 	for (FieldTemplateList::const_iterator it = other.m_children.begin(); it != other.m_children.end(); ++it)
@@ -158,11 +158,6 @@ const std::string& FieldTemplate::getPattern() const
 	return (m_modifiedPattern.empty() ? m_pattern : m_modifiedPattern);
 }
 
-
-const std::list<std::string>& FieldTemplate::getTypeStrings() const
-{
-	return (m_modifiedTypes.empty() ? m_types : m_modifiedTypes);
-}
 
 std::list<Field::Type> FieldTemplate::getTypes() const
 {
@@ -263,12 +258,12 @@ const std::string& FieldTemplate::getPrefix() const
 
 std::string FieldTemplate::getType() const
 {
-	return hasExplicitType() ? *m_types.begin() : "";
+	return hasExplicitType() ? (m_modifiedTypes.empty() ? *m_types.begin() : *m_modifiedTypes.begin()) : "";
 }
 
 std::string FieldTemplate::getValue() const
 {
-	return hasExplicitValue() ? *m_values.begin() : "";
+	return hasExplicitValue() ? (m_modifiedValues.empty() ? *m_values.begin() : *m_modifiedValues.begin()) : "";
 }
 
 std::string FieldTemplate::getConcatenatedTypes() const
@@ -334,7 +329,7 @@ void FieldTemplate::getAllChildren(FieldTemplateList& fields, const std::string&
 		if (StringUtil::stringEqualsIgnoreCase(child->getMode().c_str(), "CONTROL") && child->hasChildren())
 		{
 			std::string newPrefix = prefix + m_prefix + ".1.";
-			child->getAllChildren(fields,  newPrefix);
+			child->getAllChildren(fields, newPrefix);
 		}
 		else
 		{
@@ -373,7 +368,7 @@ void FieldTemplate::setValues(const std::list<std::string>& values)
 	m_values = values;
 }
 
-void FieldTemplate::setPattern(const std::string & pattern)
+void FieldTemplate::setPattern(const std::string& pattern)
 {
 	m_pattern = pattern;
 }
@@ -412,6 +407,7 @@ void FieldTemplate::setChildren(const FieldTemplateList& children)
 	{
 		delete *it;
 	}
+	m_children.clear();
 
 	// We need to make a deep-copy of the FieldTemplate(s)
 	for (FieldTemplateList::const_iterator it = children.begin(); it != children.end(); ++it)
@@ -420,46 +416,58 @@ void FieldTemplate::setChildren(const FieldTemplateList& children)
 	}
 }
 
-void FieldTemplate::setDependencies(const FieldTemplateDependencyList& dependencies)
-{
-	for (FieldTemplateDependencyList::const_iterator it = m_dependencies.begin(); it != m_dependencies.end(); ++it)
-	{
-		delete *it;
-	}
-
-	for (FieldTemplateDependencyList::const_iterator it = dependencies.begin(); it != dependencies.end(); ++it)
-	{
-		m_dependencies.push_back(new FieldTemplateDependency(*(*it)));
-	}
-}
-
-void FieldTemplate::addDependency(const char* name, const char* valueEquals, const char* valueGreaterThan, const char* valueLessThan, const char* newMode, const char* newPattern, const std::list<std::string>& newValues, const std::list<std::string>& newTypes)
+void FieldTemplate::initDependency(const char* name, const char* valueEquals, const char* valueGreaterThan, const char* valueLessThan, const char* newMode, const char* newPattern, const std::list<std::string>& newValues, const std::list<std::string>& newTypes)
 {
 	m_dependencies.push_back(new FieldTemplateDependency(name, valueEquals, valueGreaterThan, valueLessThan, newMode, newPattern, newValues, newTypes));
 }
 
 bool FieldTemplate::hasExplicitType() const
 {
-	return m_types.size() == 1 && !(StringUtil::stringEqualsIgnoreCase(m_types.front().c_str(), "VARIABLE")) && !(StringUtil::stringEqualsIgnoreCase(m_types.front().c_str(), "UNSET"));
+	if (m_modifiedTypes.empty())
+		return m_types.size() == 1 && !(StringUtil::stringEqualsIgnoreCase(m_types.front().c_str(), "VARIABLE")) && !(StringUtil::stringEqualsIgnoreCase(m_types.front().c_str(), "UNSET"));
+	else
+		return m_modifiedTypes.size() == 1 && !(StringUtil::stringEqualsIgnoreCase(m_types.front().c_str(), "VARIABLE")) && !(StringUtil::stringEqualsIgnoreCase(m_types.front().c_str(), "UNSET"));
 }
 
 bool FieldTemplate::hasExplicitValue() const
-{//to have an explicitly defined value, there can only be one value present that is not a range and the type must be explicitly defined
-	if (m_values.size() == 1 && hasExplicitType())
+{//if modified values exist, use those instead
+	if (m_modifiedValues.empty())
 	{
-		const std::string& value = *m_values.begin();
-		if (value.find("..") != std::string::npos && !StringUtil::stringEqualsIgnoreCase(getType().c_str(), "STRING"))
+		if (m_values.size() == 1 && hasExplicitType())
 		{
-			return false;
-		}
-		else if ((StringUtil::stringEquals(&value.at(value.length() - 1), "+") ||
-				  StringUtil::stringEquals(&value.at(value.length() - 1), "-")) &&
-				  !StringUtil::stringEqualsIgnoreCase(value.c_str(), "STRING"))
-		{
-			return false;
-		}
+			const std::string& value = m_values.front();
+			if (value.find("..") != std::string::npos && !StringUtil::stringEqualsIgnoreCase(getType().c_str(), "STRING"))
+			{
+				return false;
+			}
+			else if ((StringUtil::stringEquals(&value.at(value.length() - 1), "+") ||
+				StringUtil::stringEquals(&value.at(value.length() - 1), "-")) &&
+				!StringUtil::stringEqualsIgnoreCase(value.c_str(), "STRING"))
+			{
+				return false;
+			}
 
-		return true;
+			return true;
+		}
+	}
+	else
+	{
+		if (m_modifiedValues.size() == 1 && hasExplicitType())
+		{
+			const std::string& value = m_modifiedValues.front();
+			if (value.find("..") != std::string::npos && !StringUtil::stringEqualsIgnoreCase(getType().c_str(), "STRING"))
+			{
+				return false;
+			}
+			else if ((StringUtil::stringEquals(&value.at(value.length() - 1), "+") ||
+				StringUtil::stringEquals(&value.at(value.length() - 1), "-")) &&
+				!StringUtil::stringEqualsIgnoreCase(value.c_str(), "STRING"))
+			{
+				return false;
+			}
+
+			return true;
+		}
 	}
 
 	return false;
@@ -487,11 +495,6 @@ bool FieldTemplate::isHeader() const
 bool FieldTemplate::hasChildren() const
 {
 	return !m_children.empty();
-}
-
-bool FieldTemplate::hasDependencies() const
-{
-	return !m_dependencies.empty();
 }
 
 void FieldTemplate::checkDependencies(const InternalMessage& message)
@@ -526,7 +529,7 @@ void FieldTemplate::checkDependencies(const InternalMessage& message)
 						fieldName = prefix + "." + dependency->getName();
 
 						field = message.getField(fieldName.c_str());
-						
+
 						if (field) break;
 					}
 				}
@@ -611,7 +614,7 @@ void FieldTemplate::applyDependency(const FieldTemplateDependency* dependency)
 
 }
 
-void FieldTemplate::resetDependencies()
+void FieldTemplate::resetCheckedDependencies()
 {
 	m_modifiedMode.clear();
 	m_modifiedTypes.clear();
@@ -629,7 +632,7 @@ const std::string& FieldTemplate::toXML(const std::string& type) const
 
 	std::ostringstream oss;
 
-	oss << "<FIELD TYPE=\"" << (type=="UNSET" || type=="VARIABLE" ? "STRING" : type) << "\" NAME=\"" << m_name << "\"" 
+	oss << "<FIELD TYPE=\"" << (type == "UNSET" || type == "VARIABLE" ? "STRING" : type) << "\" NAME=\"" << m_name << "\""
 		<< (isHeader() ? " HEAD=\"T\"" : "") << ">"
 		<< (hasExplicitType() ? getValue() : "")
 		<< "</FIELD>";
@@ -646,79 +649,79 @@ Field* FieldTemplate::toField(const std::string& type) const
 	switch (fieldType)
 	{
 	case Field::Type::BINARY:
-		{
-			StringUtil::Data blob = StringUtil::binaryString_toBinary(getValue().c_str());
-			return new BinaryField(m_name.c_str(), blob.data(), blob.length(), isHeader());
-		}
-		break;
+	{
+		StringUtil::Data blob = StringUtil::binaryString_toBinary(getValue().c_str());
+		return new BinaryField(m_name.c_str(), blob.data(), blob.length(), isHeader());
+	}
+	break;
 	case Field::Type::BOOL:
-		{
-			return new BooleanField(m_name.c_str(), StringUtil::stringEqualsIgnoreCase(getValue().c_str(), "TRUE"), isHeader());
-		}
-		break;
+	{
+		return new BooleanField(m_name.c_str(), StringUtil::stringEqualsIgnoreCase(getValue().c_str(), "TRUE"), isHeader());
+	}
+	break;
 	case Field::Type::CHAR:
-		{
-			return new CharField(m_name.c_str(), StringUtil::getValue<GMSEC_CHAR>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new CharField(m_name.c_str(), StringUtil::getValue<GMSEC_CHAR>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::F32:
-		{
-			return new F32Field(m_name.c_str(), StringUtil::getValue<GMSEC_F32>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new F32Field(m_name.c_str(), StringUtil::getValue<GMSEC_F32>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::F64:
-		{
-			return new F64Field(m_name.c_str(), StringUtil::getValue<GMSEC_F64>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new F64Field(m_name.c_str(), StringUtil::getValue<GMSEC_F64>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::I8:
-		{
-			return new I8Field(m_name.c_str(), StringUtil::getValue<GMSEC_I8>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new I8Field(m_name.c_str(), StringUtil::getValue<GMSEC_I8>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::I16:
-		{
-			return new I16Field(m_name.c_str(), StringUtil::getValue<GMSEC_I16>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new I16Field(m_name.c_str(), StringUtil::getValue<GMSEC_I16>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::I32:
-		{
-			return new I32Field(m_name.c_str(), StringUtil::getValue<GMSEC_I32>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new I32Field(m_name.c_str(), StringUtil::getValue<GMSEC_I32>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::I64:
-		{
-			return new I64Field(m_name.c_str(), StringUtil::getValue<GMSEC_I64>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new I64Field(m_name.c_str(), StringUtil::getValue<GMSEC_I64>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::U8:
-		{
-			return new U8Field(m_name.c_str(), StringUtil::getValue<GMSEC_U8>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new U8Field(m_name.c_str(), StringUtil::getValue<GMSEC_U8>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::U16:
-		{
-			return new U16Field(m_name.c_str(), StringUtil::getValue<GMSEC_U16>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new U16Field(m_name.c_str(), StringUtil::getValue<GMSEC_U16>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::U32:
-		{
-			return new U32Field(m_name.c_str(), StringUtil::getValue<GMSEC_U32>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new U32Field(m_name.c_str(), StringUtil::getValue<GMSEC_U32>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::U64:
-		{
-			return new U64Field(m_name.c_str(), StringUtil::getValue<GMSEC_U64>(getValue().c_str()), isHeader());
-		}
-		break;
+	{
+		return new U64Field(m_name.c_str(), StringUtil::getValue<GMSEC_U64>(getValue().c_str()), isHeader());
+	}
+	break;
 	case Field::Type::STRING:
-		{
-			return new StringField(m_name.c_str(), getValue().c_str(), isHeader());
-		}
-		break;
+	{
+		return new StringField(m_name.c_str(), getValue().c_str(), isHeader());
+	}
+	break;
 	default:
-		{
-			return NULL;
-		}
+	{
+		return NULL;
+	}
 	}
 }

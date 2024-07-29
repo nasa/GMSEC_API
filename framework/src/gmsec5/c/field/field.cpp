@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -90,6 +90,30 @@ GMSEC_BOOL CALL_TYPE fieldIsHeader(GMSEC_Field field, GMSEC_Status status)
 	}
 
 	return isHeader;
+}
+
+
+GMSEC_BOOL CALL_TYPE fieldIsTracking(GMSEC_Field field, GMSEC_Status status)
+{
+	Field*     fld  = reinterpret_cast<Field*>(field);
+	GMSEC_BOOL isTracking = GMSEC_BOOL::GMSEC_FALSE;
+	Status     result;
+
+	if (fld)
+	{
+		isTracking = (fld->isTracking() ? GMSEC_BOOL::GMSEC_TRUE : GMSEC_BOOL::GMSEC_FALSE);
+	}
+	else
+	{
+		result = Status(FIELD_ERROR, UNINITIALIZED_OBJECT, "Field object is NULL");
+	}
+
+	if (status)
+	{
+		*(reinterpret_cast<Status*>(status)) = result;
+	}
+
+	return isTracking;
 }
 
 

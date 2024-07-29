@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -53,7 +53,9 @@ public abstract class LogHandler
 	private JNILogHandler m_jniLogHandler = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param handler A LogHandler object.
 	 * @return A JNILogHandler object.
@@ -62,6 +64,7 @@ public abstract class LogHandler
 	{
 		return (handler == null ? null : handler.m_jniLogHandler);
 	}
+	//! @endcond
 
 
 	/**

@@ -1,7 +1,9 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
+
+GMSEC_API_HOME=../../..
 
 include $(GMSEC_API_HOME)/config/$(GMSEC_PLATFORM)
 
@@ -28,6 +30,11 @@ TESTS =	\
         T019_StringUtil.exe \
         T020_Atomics.exe \
         T021_CountDownLatch.exe \
+        T022_SubscriptionInfo.exe \
+        T023_ValueMap.exe \
+        T024_MathUtil.exe \
+        T025_Encoder.exe \
+        T026_BoundedQueue.exe \
         T030_StressConnection.exe \
         T031_MultipleConnections.exe \
         T032_MultipleSubscriptions.exe \
@@ -42,6 +49,9 @@ TESTS =	\
         T041_MsgOptimization.exe \
         T042_PerformanceLogger.exe \
         T043_MultiResponse.exe \
+        T044_FieldTemplate.exe \
+        T045_MessageTemplate.exe \
+        T046_Subject.exe \
         T100_C2NSS_Publisher.exe \
         T100_C2NSS_Subscriber.exe \
         T101_LargeMessage.exe \
@@ -54,9 +64,7 @@ TESTS =	\
         T108_ArtemisFQQN.exe \
 
 
-INTERNAL  = -I../../../framework/include -I../../../framework/support/include
-
-CXXFLAGS += -g $(INTERNAL)
+CXXFLAGS += -g
 
 BIN_DIR   = ../bin
 

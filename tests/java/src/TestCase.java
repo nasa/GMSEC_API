@@ -34,13 +34,13 @@ public class TestCase
 		standardFields = new ArrayList<Field>();
 
 		standardFields.add(new StringField("MISSION-ID", "MY-MISSION", true));
-        standardFields.add(new StringField("CONSTELLATION-ID", "MY-CONSTELLATION", true));
-        standardFields.add(new StringField("SAT-ID-PHYSICAL", "MY-SAT-ID", true));
-        standardFields.add(new StringField("SAT-ID-LOGICAL", "MY-SAT-ID", true));
-        standardFields.add(new StringField("FACILITY", "MY-FACILITY", true));
-        standardFields.add(new StringField("DOMAIN1", "MY-DOMAIN-1", true));
-        standardFields.add(new StringField("DOMAIN2", "MY-DOMAIN-2", true));
-        standardFields.add(new StringField("COMPONENT", "MY-COMPONENT", true));
+		standardFields.add(new StringField("CONSTELLATION-ID", "MY-CONSTELLATION", true));
+		standardFields.add(new StringField("SAT-ID-PHYSICAL", "MY-SAT-ID", true));
+		standardFields.add(new StringField("SAT-ID-LOGICAL", "MY-SAT-ID", true));
+		standardFields.add(new StringField("FACILITY", "MY-FACILITY", true));
+		standardFields.add(new StringField("DOMAIN1", "MY-DOMAIN-1", true));
+		standardFields.add(new StringField("DOMAIN2", "MY-DOMAIN-2", true));
+		standardFields.add(new StringField("COMPONENT", "MY-COMPONENT", true));
     }
 
 	Config getConfig()

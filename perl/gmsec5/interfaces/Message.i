@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -308,7 +308,7 @@ C<libgmsec_perl::Message-E<gt>setFieldValue($name, $value)>
         Returns true if the field was replaced; false otherwise.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-        $libgmsec_perl::GmsecException is thrown if the field name is null or contains an empty string.
+        $libgmsec_perl::GmsecException is thrown if the field name is null, is an empty string, or is otherwise non-compliant.
         $libgmsec_perl::GmsecException is thrown if the field value type cannot be converted into the type required by the field, or if the string is too big when converting to a char.
 
 
@@ -347,6 +347,28 @@ C<libgmsec_perl::Message-E<gt>setSubject($subject)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
         $libgmsec_perl::GmsecException is thrown if the subject is NULL or contains an empty-string
+
+
+=head3 setSubjectElement
+
+C<libgmsec_perl::Message-E<gt>setSubjectElement($name, $value)>
+
+        Allows for the setting of individual subject elements. The name of the elements are defined
+		by the corresponding message template. This value will be overridden by automatic subject
+		generation if the subject element is defined by an existing field in the message, or if the 
+		subject was manually defined with setSubject.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
+
+        $name - the name of the subject element
+
+        $value - the value of the subject element. An empty or null value will be seen as FILL in the subject line.
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+        $libgmsec_perl::GmsecException is thrown if the name is NULL, an empty string, or does not match 
+		a subject element name defined the message template, or if the message does not have a corresponding 
+		message template.
 
 
 =head3 getSubject

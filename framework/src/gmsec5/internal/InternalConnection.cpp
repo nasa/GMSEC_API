@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,6 +32,8 @@
 #include <gmsec5/internal/SystemUtil.h>
 #include <gmsec5/internal/TicketMutex.h>
 
+#include <gmsec5/internal/field/InternalField.h>
+
 #include <gmsec5/Config.h>
 #include <gmsec5/Callback.h>
 #include <gmsec5/EventCallback.h>
@@ -40,6 +42,7 @@
 
 #include <gmsec5/util/Log.h>
 
+#include <exception>
 #include <sstream>
 
 
@@ -99,7 +102,8 @@ InternalConnection::InternalConnection(Connection* parent, const Config& config)
 	  m_callbackAdapter(0),
 	  m_connectionEndpoint(),
 	  m_maxConnRetries(DEFAULT_MAX_CONN_RETRIES),
-	  m_connRetryInterval(DEFAULT_CONN_RETRY_INTERVAL)
+	  m_connRetryInterval(DEFAULT_CONN_RETRY_INTERVAL),
+	  m_supportLegacyAPI(false)
 {
 	initMessageFactory();
 	initConnection();
@@ -144,7 +148,8 @@ InternalConnection::InternalConnection(Connection* parent, const Config& config,
 	  m_callbackAdapter(0),
 	  m_connectionEndpoint(),
 	  m_maxConnRetries(DEFAULT_MAX_CONN_RETRIES),
-	  m_connRetryInterval(DEFAULT_CONN_RETRY_INTERVAL)
+	  m_connRetryInterval(DEFAULT_CONN_RETRY_INTERVAL),
+	  m_supportLegacyAPI(false)
 {
 	initMessageFactory();
 	initConnection();
@@ -176,13 +181,6 @@ InternalConnection::~InternalConnection()
 
 		if (connCallback != NULL)
 		{
-			C_CallbackAdapter* ccb = dynamic_cast<C_CallbackAdapter*>(connCallback->getUserCallback());
-
-			if (ccb != NULL)
-			{
-				delete ccb;
-			}
-
 			delete connCallback;
 		}
 
@@ -488,12 +486,12 @@ void InternalConnection::publish(const Message& msg, const Config& mwConfig)
 
 		if (checkMsg)
 		{
-			if (m_removeTrackingFields)
+			if (m_removeTrackingFields || msg.getConfig().getBooleanValue(GMSEC_REMOVE_TRACKING_FIELDS, false))
 			{
 				removeTrackingFields(const_cast<Message&>(msg));
 			}
 
-			MessageBuddy::getInternal(msg).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
+			MessageBuddy::getInternal(msg).getDetails().setBoolean(GMSEC_CHECK_TRACKING_FIELDS, true);
 			Status status = msg.isCompliant();
 
 			if (status.hasError())
@@ -585,12 +583,12 @@ void InternalConnection::request(const Message& request, GMSEC_I32 timeout, Repl
 
 	if (validateOnSend())
 	{
-		if (m_removeTrackingFields)
+		if (m_removeTrackingFields || request.getConfig().getBooleanValue(GMSEC_REMOVE_TRACKING_FIELDS, false))
 		{
 			removeTrackingFields(const_cast<Message&>(request));
 		}
 
-		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
+		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_CHECK_TRACKING_FIELDS, true);
 		Status status = request.isCompliant();
 
 		if (status.hasError())
@@ -649,12 +647,12 @@ Message* InternalConnection::request(const Message& request, GMSEC_I32 timeout, 
 
 	if (validateOnSend())
 	{
-		if (m_removeTrackingFields)
+		if (m_removeTrackingFields || request.getConfig().getBooleanValue(GMSEC_REMOVE_TRACKING_FIELDS, false))
 		{
 			removeTrackingFields(const_cast<Message&>(request));
 		}
 
-		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
+		MessageBuddy::getInternal(request).getDetails().setBoolean(GMSEC_CHECK_TRACKING_FIELDS, true);
 		Status status = request.isCompliant();
 
 		if (status.hasError())
@@ -785,12 +783,12 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 
 	if (validateOnSend())
 	{
-		if (m_removeTrackingFields)
+		if (m_removeTrackingFields || reply.getConfig().getBooleanValue(GMSEC_REMOVE_TRACKING_FIELDS, false))
 		{
 			removeTrackingFields(const_cast<Message&>(reply));
 		}
 
-		MessageBuddy::getInternal(reply).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
+		MessageBuddy::getInternal(reply).getDetails().setBoolean(GMSEC_CHECK_TRACKING_FIELDS, true);
 		Status status = reply.isCompliant();
 
 		if (status.hasError())
@@ -802,9 +800,20 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 	ValueMap& meta = MessageBuddy::getInternal(request).getDetails();
 
 	std::string id;
-	if (!meta.getString(GMSEC_REPLY_UNIQUE_ID_FIELD, id).hasError())
+	if (meta.getString(GMSEC_REPLY_UNIQUE_ID_FIELD, id).hasError())
 	{
-		MessageBuddy::getInternal(reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
+		meta.getString(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD, id);
+	}
+
+	if (id.empty())
+	{
+		GMSEC_WARNING << "Request Message does not contain " << GMSEC_REPLY_UNIQUE_ID_FIELD << " in meta";
+	}
+	else
+	{
+		const char* replyUniqueIdField = (m_supportLegacyAPI ? LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD : GMSEC_REPLY_UNIQUE_ID_FIELD);
+
+		MessageBuddy::getInternal(reply).addField(replyUniqueIdField, id.c_str());
 	}
 
 	insertTrackingFields(const_cast<Message&>(reply));
@@ -824,7 +833,12 @@ void InternalConnection::reply(const Message& request, const Message& reply)
 	}
 
 	removeTrackingFields(const_cast<Message&>(reply));
+
 	MessageBuddy::getInternal(reply).clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+	if (m_supportLegacyAPI)
+	{
+		MessageBuddy::getInternal(reply).clearField(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD);
+	}
 
 	if (result.getErrorClass() != NO_ERROR_CLASS)
 	{
@@ -888,7 +902,7 @@ void InternalConnection::dispatch(const Message& msg)
 
 	if (validateOnSend())
 	{
-		MessageBuddy::getInternal(msg).getDetails().setBoolean(GMSEC_MSG_BEING_SENT, true);
+		MessageBuddy::getInternal(msg).getDetails().setBoolean(GMSEC_CHECK_TRACKING_FIELDS, true);
 		Status status = msg.isCompliant();
 
 		if (status.hasError())
@@ -966,12 +980,10 @@ const char* InternalConnection::getName() const
 
 void InternalConnection::setName(const char* name)
 {
-	if (!name)
+	if (name != NULL)
 	{
-		throw GmsecException(CONNECTION_ERROR, OTHER_ERROR_CODE, "Connection name cannot be NULL");
+		m_connName = name;
 	}
-
-	m_connName = name;
 }
 
 
@@ -1074,7 +1086,20 @@ void InternalConnection::dispatchEvent(Connection::Event event, const Status& st
 
 	if (it != m_eventCallbacks.end() && it->second != NULL)
 	{
-		it->second->onEvent(*m_parent, status, event);
+		try
+		{
+			it->second->onEvent(*m_parent, status, event);
+		}
+		catch (const GmsecException& e)
+		{
+			GMSEC_ERROR   << "An uncaught exception from an EventCallback was handled by the GMSEC API";
+			GMSEC_VERBOSE << "Exception: " << e.what();
+		}
+		catch (const std::exception& e)
+		{
+			GMSEC_ERROR   << "An uncaught exception from an EventCallback was handled by the GMSEC API";
+			GMSEC_VERBOSE << "Exception: " << e.what();
+		}
 	}
 }
 
@@ -1096,6 +1121,10 @@ void InternalConnection::setReplyUniqueID(Message& msg, const std::string& uniqu
 	ValueMap& details = MessageBuddy::getInternal(msg).getDetails();
 
 	details.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID);
+	if (m_supportLegacyAPI)
+	{
+		details.setString(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID);
+	}
 }
 
 
@@ -1107,6 +1136,11 @@ std::string InternalConnection::getReplyUniqueID(const Message& msg)
 
 	details.getString(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID);
 
+	if (m_supportLegacyAPI && uniqueID.empty())
+	{
+		details.getString(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID);
+	}
+
 	return uniqueID;
 }
 
@@ -1114,6 +1148,13 @@ std::string InternalConnection::getReplyUniqueID(const Message& msg)
 bool InternalConnection::onReply(Message* reply)
 {
 	bool replyDelivered = true;
+
+	if (m_supportLegacyAPI && reply->hasField(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD))
+	{
+        MessageBuddy::getInternal(*reply).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, reply->getStringValue(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD));
+
+        MessageBuddy::getInternal(*reply).clearField(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD);
+	}
 
 	StdSharedPtr<RequestShared> tmp(m_requestShared);
 
@@ -1138,7 +1179,20 @@ void InternalConnection::replyEvent(ReplyCallback* rcb, const Status& status, Co
 
 	if (rcb)
 	{
-		rcb->onEvent(*m_parent, status, event);
+		try
+		{
+			rcb->onEvent(*m_parent, status, event);
+		}
+		catch (const GmsecException& e)
+		{
+			GMSEC_ERROR   << "An uncaught exception from an EventCallback was handled by the GMSEC API";
+			GMSEC_VERBOSE << "Exception: " << e.what();
+		}
+		catch (const std::exception& e)
+		{
+			GMSEC_ERROR   << "An uncaught exception from an EventCallback was handled by the GMSEC API";
+			GMSEC_VERBOSE << "Exception: " << e.what();
+		}
 	}
 }
 
@@ -1147,7 +1201,20 @@ void InternalConnection::replyCallback(ReplyCallback* rcb, const Message& reques
 {
 	if (rcb)
 	{
-		rcb->onReply(*m_parent, request, reply);
+		try
+		{
+			rcb->onReply(*m_parent, request, reply);
+		}
+		catch (const GmsecException& e)
+		{
+			GMSEC_ERROR   << "An uncaught exception from a ReplyCallback was handled by the GMSEC API";
+			GMSEC_VERBOSE << "Exception: " << e.what();
+		}
+		catch (const std::exception& e)
+		{
+			GMSEC_ERROR   << "An uncaught exception from a ReplyCallback was handled by the GMSEC API";
+			GMSEC_VERBOSE << "Exception: " << e.what();
+		}
 	}
 }
 
@@ -1162,6 +1229,12 @@ void InternalConnection::issueRequestToMW(const Message& request, std::string& i
 
 	// We do not need to catch m/w exception here since the tracking fields are
 	// added to a copy of the request message, not the original request message.
+	id = m_connIf->mwGetUniqueID();
+
+	const char* replyUniqueIdField = (m_supportLegacyAPI ? LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD : GMSEC_REPLY_UNIQUE_ID_FIELD);
+
+	MessageBuddy::getInternal(requestCopy).addField(replyUniqueIdField, id.c_str());
+
 	m_connIf->mwRequest(requestCopy, id);
 }
 
@@ -1222,7 +1295,6 @@ void InternalConnection::initConnection()
 	// Establish connection ID
 	m_connectionID = ++s_instanceCount;
 
-
 	// Generate Connection ID
 	m_processID = SystemUtil::getProcessID();
 
@@ -1242,7 +1314,13 @@ void InternalConnection::initConnection()
 	}
 	m_hostName = StringUtil::stringToUpper(m_hostName);
 
+	// Set default connection name
 	std::ostringstream oss;
+	oss << "Connection " << m_connectionID;
+	m_connName = oss.str();
+	oss.str("");
+
+	// Set default connection ID
 	oss << "GMSEC_" << m_hostName << "_";
 	{
 		// apply timestamp <seconds:x><subseconds:04x>
@@ -1289,12 +1367,19 @@ void InternalConnection::initConnection()
 	m_asyncQueueDepth       = m_config.getIntegerValue(GMSEC_ASYNC_PUBLISH_QUEUE_DEPTH, DEFAULT_ASYNC_QUEUE_DEPTH);
 	m_asyncTeardownWait     = m_config.getIntegerValue(GMSEC_ASYNC_PUBLISH_TEARDOWN_WAIT, DEFAULT_ASYNC_TEARDOWN_WAIT);
 
-	if (m_asyncQueueDepth <= 0)
+	if (m_asyncQueueDepth < static_cast<int>(BoundedQueue<MessagePublishTask>::MIN_QUEUE_SIZE))
 	{
 		GMSEC_WARNING << "Invalid value for " << GMSEC_ASYNC_PUBLISH_QUEUE_DEPTH
 		              << ", defaulting to " << DEFAULT_ASYNC_QUEUE_DEPTH;
 
 		m_asyncQueueDepth = DEFAULT_ASYNC_QUEUE_DEPTH;
+	}
+	else if (m_asyncQueueDepth > static_cast<int>(BoundedQueue<MessagePublishTask>::MAX_QUEUE_SIZE))
+	{
+		GMSEC_WARNING << "Value for " << GMSEC_ASYNC_PUBLISH_QUEUE_DEPTH
+		              << " exceeds maximum limit, defaulting to " << BoundedQueue<MessagePublishTask>::MAX_QUEUE_SIZE;
+
+		m_asyncQueueDepth = static_cast<int>(BoundedQueue<MessagePublishTask>::MAX_QUEUE_SIZE);
 	}
 
 	if (m_asyncTeardownWait <= 0)
@@ -1353,6 +1438,8 @@ void InternalConnection::initConnection()
 		}
 	}
 
+	// Should we support comm with a legacy API?
+	m_supportLegacyAPI = m_config.getBooleanValue(GMSEC_SUPPORT_LEGACY_API, false);
 
 	// Instantiate C-binding callback adapter factory.
 	m_callbackAdapter = new CallbackAdapter();
@@ -1530,34 +1617,31 @@ void InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
 				}
 			}
 		}
-		else
+		else if (msg != NULL && MessageAggregationToolkit::isAggregatedMsg(msg))
 		{
-			if (msg != NULL && MessageAggregationToolkit::isAggregatedMsg(msg))
+			m_msgAggregationToolkitShared->processAggregatedMsg(msg);
+
+			// If there are messages (and there should be), always return the first one.
+			if (m_msgAggregationToolkitShared->hasNextMsg())
 			{
-				m_msgAggregationToolkitShared->processAggregatedMsg(msg);
+				msg = m_msgAggregationToolkitShared->nextMsg();
 
-				// If there are messages (and there should be), always return the first one.
-				if (m_msgAggregationToolkitShared->hasNextMsg())
+				// Attempt to add a message template to the message
+				try
 				{
-					msg = m_msgAggregationToolkitShared->nextMsg();
-
-					// Attempt to add a message template to the message
-					try
-					{
-						MessageFactoryBuddy::getInternal(getMessageFactory()).addMessageTemplate(*msg);
-					}
-					catch (...)
-					{
-						GMSEC_WARNING << "Cannot apply message template to de-aggregated message";
-					}
+					MessageFactoryBuddy::getInternal(getMessageFactory()).addMessageTemplate(*msg);
+				}
+				catch (...)
+				{
+					GMSEC_WARNING << "Cannot apply message template to de-aggregated message";
 				}
 			}
-
-			done = true;
 		}
+
+		done = true;
 	}
 
-	if (msg && m_usePerfLogger)
+	if (msg != NULL && m_usePerfLogger)
 	{
 		const StringField* pubTime = dynamic_cast<const StringField*>(msg->getField("PUBLISH-TIME"));
 
@@ -1567,13 +1651,30 @@ void InternalConnection::getNextMsg(Message*& msg, GMSEC_I32 timeout)
 		}
 	}
 
-	if (msg && (msg->getKind() == Message::Kind::REQUEST || msg->getKind() == Message::Kind::REPLY))
+	if (msg != NULL)
 	{
-		if (msg->hasField(GMSEC_REPLY_UNIQUE_ID_FIELD))
+		if (msg->getKind() == Message::Kind::REQUEST)
 		{
-			setReplyUniqueID(*msg, msg->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
+			std::string uniqueID;
+
+			if (msg->hasField(GMSEC_REPLY_UNIQUE_ID_FIELD))
+			{
+				uniqueID = msg->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD);
+			}
+			else if (m_supportLegacyAPI && msg->hasField(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD))
+			{
+				uniqueID = msg->getStringValue(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD);
+			}
 
 			msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+			msg->clearField(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD);
+
+			setReplyUniqueID(*msg, uniqueID);
+		}
+		else if (msg->getKind() == Message::Kind::REPLY)
+		{
+			msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
+			msg->clearField(LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD);
 		}
 	}
 }
@@ -1589,9 +1690,15 @@ void InternalConnection::dispatchMsgToCallbacks(const Message& msg, std::list<Ca
 		{
 			callback->onMessage(*m_parent, msg);
 		}
-		catch (...)
+		catch (const GmsecException& e)
 		{
-			// ignore error; continue with next callback (if any)
+			GMSEC_ERROR   << "An uncaught exception from a Callback was handled by the GMSEC API";
+			GMSEC_VERBOSE << "Exception: " << e.what();
+		}
+		catch (const std::exception& e)
+		{
+			GMSEC_ERROR   << "An uncaught exception from a Callback was handled by the GMSEC API";
+			GMSEC_VERBOSE << "Exception: " << e.what();
 		}
 	}
 }
@@ -1674,13 +1781,6 @@ void InternalConnection::unsubscribeAux(SubscriptionInfo*& info)
 
 		if (connCallback != NULL)
 		{
-			C_CallbackAdapter* ccb = dynamic_cast<C_CallbackAdapter*>(connCallback->getUserCallback());
-
-			if (ccb != NULL)
-			{
-				delete ccb;
-			}
-
 			delete connCallback;
 		}
 	}
@@ -1748,22 +1848,25 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	    (connTracking.getNode() != OFF && msgTracking.getNode() != OFF))
 	{
 		Field* field = new StringField("NODE", m_hostName.c_str(), true);
+		FieldBuddy::getInternal(*field).isTracking(true);
 		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	if ((addTracking || connTracking.getProcessId() == ON || msgTracking.getProcessId() == ON) &&
 	    (connTracking.getProcessId() != OFF && msgTracking.getProcessId() != OFF))
 	{
+		Field* field;
+
 		if (getSpecVersion() == GMSEC_MSG_SPEC_2014_00 || getSpecVersion() == GMSEC_MSG_SPEC_2016_00)
 		{
-			Field* field = new I16Field("PROCESS-ID", (GMSEC_I16) m_processID, true);
-			MessageBuddy::getInternal(msg).addField(*field, false);
+			field = new I16Field("PROCESS-ID", (GMSEC_I16) m_processID, true);
 		}
 		else
 		{
-			Field* field = new U32Field("PROCESS-ID", (GMSEC_U32) m_processID, true);
-			MessageBuddy::getInternal(msg).addField(*field, false);
+			field = new U32Field("PROCESS-ID", (GMSEC_U32) m_processID, true);
 		}
+		FieldBuddy::getInternal(*field).isTracking(true);
+		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	if ((addTracking || connTracking.getUserName() == ON || msgTracking.getUserName() == ON) &&
@@ -1772,13 +1875,15 @@ void InternalConnection::insertTrackingFields(Message& msg)
 		const char* userName = (getSpecVersion() < GMSEC_MSG_SPEC_2018_00 ? m_lowercaseUserName.c_str() : m_uppercaseUserName.c_str());
 
 		Field* field = new StringField("USER-NAME", userName, true);
+		FieldBuddy::getInternal(*field).isTracking(true);
 		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
 	if ((addTracking || connTracking.getConnectionId() == ON || msgTracking.getConnectionId() == ON) &&
 	    (connTracking.getConnectionId() != OFF && msgTracking.getConnectionId() != OFF))
 	{
-		Field* field = new U32Field("CONNECTION-ID", (GMSEC_U32) m_connectionID, true);
+		Field* field = new U32Field("CONNECTION-ID", static_cast<GMSEC_U32>(m_connectionID), true);
+		FieldBuddy::getInternal(*field).isTracking(true);
 		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
@@ -1791,6 +1896,7 @@ void InternalConnection::insertTrackingFields(Message& msg)
 		TimeUtil::formatTime(ts, curTime);
 
 		Field* field = new StringField("PUBLISH-TIME", curTime, true);
+		FieldBuddy::getInternal(*field).isTracking(true);
 		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
@@ -1803,6 +1909,7 @@ void InternalConnection::insertTrackingFields(Message& msg)
 		oss << m_connID << "_" << counter;
 
 		Field* field = new StringField("UNIQUE-ID", oss.str().c_str(), true);
+		FieldBuddy::getInternal(*field).isTracking(true);
 		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
@@ -1810,6 +1917,7 @@ void InternalConnection::insertTrackingFields(Message& msg)
 	    (connTracking.getMwInfo() != OFF && msgTracking.getMwInfo() != OFF))
 	{
 		Field* field = new StringField("MW-INFO", getMWInfo(), true);
+		FieldBuddy::getInternal(*field).isTracking(true);
 		MessageBuddy::getInternal(msg).addField(*field, false);
 	}
 
@@ -1836,11 +1944,13 @@ void InternalConnection::insertTrackingFields(Message& msg)
 		if (c2cxSubtype != NULL && StringUtil::stringEqualsIgnoreCase(c2cxSubtype->getStringValue(), "HB"))
 		{
 			if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
-	    	    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
+			    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
 			{
 				std::set<std::string> activeSubs = s_activeSubscriptions.getTopics();
 
-				msg.addField("NUM-OF-SUBSCRIPTIONS", (GMSEC_U16) activeSubs.size());
+				Field* numsubs = new U16Field("NUM-OF-SUBSCRIPTIONS", static_cast<GMSEC_U16>(activeSubs.size()));
+				FieldBuddy::getInternal(*numsubs).isTracking(true);
+				MessageBuddy::getInternal(msg).addField(*numsubs, false);
 
 				if (activeSubs.size() > 0)
 				{
@@ -1850,24 +1960,31 @@ void InternalConnection::insertTrackingFields(Message& msg)
 						std::ostringstream fieldName;
 						fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
 
-						msg.addField(fieldName.str().c_str(), it->c_str());
+						Field* pattern = new StringField(fieldName.str().c_str(), it->c_str());
+						FieldBuddy::getInternal(*pattern).isTracking(true);
+						MessageBuddy::getInternal(msg).addField(*pattern, false);
 					}
 				}
 			}
 
 			if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&
-	    	    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
+			    (connTracking.getConnectionEndpoint() != OFF && msgTracking.getConnectionEndpoint() != OFF))
 			{
 				const char* endpoint = (m_connectionEndpoint.empty() ? "unknown" : m_connectionEndpoint.c_str());
+				const char* fieldName;
 
 				if (getSpecVersion() == GMSEC_MSG_SPEC_2018_00 && getSpecSchemaLevel() == Specification::SchemaLevel::LEVEL_0)
 				{
-					msg.addField("CONNECTION-ENDPOINT", endpoint);     // spelling used within 2018 C2MS-draft
+					fieldName = "CONNECTION-ENDPOINT";     // spelling used within 2018 C2MS-draft
 				}
 				else
 				{
-					msg.addField("MW-CONNECTION-ENDPOINT", endpoint);  // official spelling used within 2019 C2MS
+					fieldName = "MW-CONNECTION-ENDPOINT";  // official spelling used within 2019 C2MS
 				}
+
+				Field* endpnt = new StringField(fieldName, endpoint);
+				FieldBuddy::getInternal(*endpnt).isTracking(true);
+				MessageBuddy::getInternal(msg).addField(*endpnt, false);
 			}
 		}
 	}
@@ -1940,17 +2057,20 @@ void InternalConnection::removeTrackingFields(Message& msg)
 			if ((addTracking || connTracking.getActiveSubscriptions() == ON || msgTracking.getActiveSubscriptions() == ON) &&
 			    (connTracking.getActiveSubscriptions() != OFF && msgTracking.getActiveSubscriptions() != OFF))
 			{
-				GMSEC_I64 numSubscriptions = msg.getI64Value("NUM-OF-SUBSCRIPTIONS");
-
-				for (GMSEC_I64 n = 1; n <= numSubscriptions; ++n)
+				if (msg.hasField("NUM-OF-SUBSCRIPTIONS"))
 				{
-					std::ostringstream fieldName;
-					fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+					GMSEC_I64 numSubscriptions = msg.getI64Value("NUM-OF-SUBSCRIPTIONS");
 
-					msg.clearField(fieldName.str().c_str());
+					for (GMSEC_I64 n = 1; n <= numSubscriptions; ++n)
+					{
+						std::ostringstream fieldName;
+						fieldName << "SUBSCRIPTION." << n << ".SUBJECT-PATTERN";
+
+						msg.clearField(fieldName.str().c_str());
+					}
+
+					msg.clearField("NUM-OF-SUBSCRIPTIONS");
 				}
-
-				msg.clearField("NUM-OF-SUBSCRIPTIONS");
 			}
 
 			if ((addTracking || connTracking.getConnectionEndpoint() == ON || msgTracking.getConnectionEndpoint() == ON) &&

@@ -48,7 +48,6 @@ namespace T015
 			MessageSpecificationList msgSpecs = spec.GetMessageSpecifications();
 
 			foreach (MessageSpecification msgSpec in msgSpecs)
-			using(msgSpec)
 			{
 				FieldSpecificationList fieldSpecs = msgSpec.GetFieldSpecifications();
 

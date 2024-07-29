@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -222,7 +222,7 @@ void GMSEC_Request::request(const std::string& subject,
 	Message request( conn->getMessageFactory().createMessage("REQ.DIR") );
 
 	//o Add fields to message
-	request.addField("DESTINATION-COMPONENT", "GMRPL");
+	request.addField(StringField("DESTINATION-COMPONENT", "GMRPL", true));
 	request.addField("DIRECTIVE-KEYWORD", "QUESTION");
 	request.addField("DIRECTIVE-STRING", "DOES_THE_REQUEST_REPLY_FUNCTIONALITY_STILL_WORK");
 	request.addField("RESPONSE", true);

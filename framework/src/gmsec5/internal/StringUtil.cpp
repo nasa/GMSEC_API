@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,22 +18,22 @@
 
 #include <gmsec5/util/Log.h>
 
-#include <sstream>
 #include <algorithm>
-#include <iomanip>
-#include <cmath>
-#include <ctime>
-#include <cerrno>
-#include <iterator>
 #include <functional> 
-#include <cctype>
-#include <locale>
-#include <cstring>
+#include <iomanip>
 #include <iostream>
+#include <iterator>
+#include <locale>
+#include <regex>
 
-
+#include <cctype>
+#include <cerrno>
+#include <cmath>
 #include <cstdarg>
 #include <cstdio>
+#include <cstring>
+#include <ctime>
+
 
 #if defined(_MSC_VER)
 #define strtoll _strtoi64
@@ -75,62 +75,6 @@ using gmsec::api5::internal::Decoder;
 namespace gmsec {
 namespace api5 {
 namespace util {
-
-
-
-// BEGIN StringConverter
-//
-
-StringConverter& StringConverter::instance()
-{
-	static StringConverter theInstance;
-	return theInstance;
-}
-
-
-StringConverter::StringConverter()
-	: m_mode(NO_CONVERSION)
-{
-}
-
-
-void StringConverter::setMode(Mode mode)
-{
-	m_mode = mode;
-}
-
-
-StringConverter::Mode StringConverter::getMode() const
-{
-	return m_mode;
-}
-
-
-std::string StringConverter::convertString(const std::string& str) const
-{
-	return convertString(str.c_str());
-}
-
-
-std::string StringConverter::convertString(const char* str) const
-{
-	std::string data;
-
-	switch (m_mode)
-	{
-	case NO_CONVERSION:
-		data = str;
-		break;
-	case TO_UPPERCASE:
-		std::transform(str, str + strlen(str), std::back_inserter(data), ::toupper);
-		break;
-	case TO_LOWERCASE:
-		std::transform(str, str + strlen(str), std::back_inserter(data), ::tolower);
-		break;
-	}
-
-	return data;
-}
 
 
 // BEGIN StringUtil
@@ -345,35 +289,14 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 	time_t now = time(NULL);
 	struct tm utc;
 
-	#ifdef WIN32
+#ifdef WIN32
 		gmtime_s(&utc, &now);
-	#else
+#else
 		gmtime_r(&now, &utc);
-	#endif
+#endif
 
 	time_t utcTime = mktime(&utc);
 	struct tm locTime;
-
-	if (dt.m_relative)
-	{
-		if (dt.m_future)
-		{
-			dt.m_year += (utc.tm_year + 1900);
-			dt.m_doy  += (utc.tm_yday + 1);
-			dt.m_hour += (utc.tm_hour - 1);
-			dt.m_min  += utc.tm_min;
-			dt.m_sec  += utc.tm_sec;
-		}
-		else
-		{
-			dt.m_year  -= (utc.tm_year + 1900);
-			dt.m_doy   -= (utc.tm_yday + 1);
-			dt.m_hour  -= (utc.tm_hour -1);
-			dt.m_min   -= utc.tm_min;
-			dt.m_sec   -= utc.tm_sec;
-			dt.m_milli -= static_cast<int>(dt.m_milli_div);
-		}
-	}
 
 #ifdef WIN32
 	localtime_s(&locTime, &now);
@@ -387,7 +310,7 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 	int leapYearIndex = (isLeapYear(dt.m_year) ? 1 : 0);
 	int month = 0;
 	int dayOfMonth = 0;
-	for (int mon = 0; mon < 12; mon++) { //12 months in year
+	for (int mon = 0; mon < 12; mon++) {
 		if (dt.m_doy <= gmsec_mon_yday[leapYearIndex][mon+1]) {
 			month = mon;
 			dayOfMonth = dt.m_doy - gmsec_mon_yday[leapYearIndex][mon];
@@ -397,13 +320,48 @@ double StringUtil::getTimeFromString(const std::string& timeString)
 
 	struct tm newtime;
 	memset(&newtime, 0, sizeof(struct tm));
-	newtime.tm_year = dt.m_year - 1900;
-	newtime.tm_hour = dt.m_hour;
-	newtime.tm_min = dt.m_min;
-	newtime.tm_sec = dt.m_sec;
+
+	if (dt.m_relative)
+	{
+		time_t now = time(NULL);
+		struct tm utc;
+
+#ifdef WIN32
+		gmtime_s(&utc, &now);
+#else
+		gmtime_r(&now, &utc);
+#endif
+
+		if (dt.m_future) {
+			newtime.tm_year = utc.tm_year + dt.m_year;
+			newtime.tm_mon  = utc.tm_mon  + month;
+			newtime.tm_mday = utc.tm_mday + dayOfMonth;
+			newtime.tm_hour = utc.tm_hour + dt.m_hour;
+			newtime.tm_min  = utc.tm_min  + dt.m_min;
+			newtime.tm_sec  = utc.tm_sec  + dt.m_sec;
+		}
+		else {
+			newtime.tm_year = utc.tm_year - dt.m_year;
+			newtime.tm_mon  = utc.tm_mon  - month;
+			newtime.tm_mday = utc.tm_mday - dayOfMonth;
+			newtime.tm_hour = utc.tm_hour - dt.m_hour;
+			newtime.tm_min  = utc.tm_min  - dt.m_min;
+			newtime.tm_sec  = utc.tm_sec  - dt.m_sec;
+
+			dt.m_milli *= -1;   // later this will be added to the offsetted time
+		}
+	}
+	else
+	{
+		newtime.tm_year = dt.m_year - 1900;
+		newtime.tm_mon  = month;
+		newtime.tm_mday = dayOfMonth;
+		newtime.tm_hour = dt.m_hour;
+		newtime.tm_min  = dt.m_min;
+		newtime.tm_sec  = dt.m_sec;
+	}
+
 	newtime.tm_isdst = 0; //This works since publish time is UTC
-	newtime.tm_mon = month;
-	newtime.tm_mday = dayOfMonth;
 
 	time_t reversed = mktime(&newtime);
 	reversed += localTimeOffsetSeconds;
@@ -864,9 +822,8 @@ bool StringUtil::isValidHeaderString(const std::string& fieldValue)
 		return false;
 	}
 
-	char junk;
-	int ret = sscanf(fieldValue.c_str(), "%*[A-Z0-9_-]%c", &junk);
-	return (ret <= 0);  // success if no conversion made or EOF reached
+	std::regex ext(".[A-Z0-9_-]*");
+	return std::regex_match(fieldValue, ext);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -122,13 +122,23 @@ jstring gmsec::api5::jni::makeJavaString(JNIEnv *jenv, const char* cStr)
 	std::string str(cStr);
 	int byteCount = static_cast<int>(str.length());
 	const jbyte* pNativeMessage = reinterpret_cast<const jbyte*>(str.c_str());
-	jbyteArray bytes = jenv->NewByteArray(byteCount);
-	jenv->SetByteArrayRegion(bytes, 0, byteCount, pNativeMessage);
-	jclass stringClass = jenv->FindClass("java/lang/String");
-	jmethodID ctor = jenv->GetMethodID(stringClass, "<init>", "([B)V");
 
-	// Convert the Java binary array into the platform default Charset
-	return reinterpret_cast<jstring>(jenv->NewObject(stringClass, ctor, bytes));
+	jstring jStr = 0;
+
+	jbyteArray bytes = jenv->NewByteArray(byteCount);
+	if (bytes)
+	{
+		jenv->SetByteArrayRegion(bytes, 0, byteCount, pNativeMessage);
+		jclass stringClass = jenv->FindClass("java/lang/String");
+		jmethodID ctor = jenv->GetMethodID(stringClass, "<init>", "([B)V");
+
+		// Convert the Java binary array into the platform default Charset
+		jStr = reinterpret_cast<jstring>(jenv->NewObject(stringClass, ctor, bytes));
+
+		jenv->DeleteLocalRef(bytes);
+	}
+
+	return jStr;
 }
 
 

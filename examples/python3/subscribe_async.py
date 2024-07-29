@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -70,6 +70,9 @@ class subscribe_async:
         # Set up connection configuration options using values from the command line.
         self.config = lp.Config(sys.argv)
 
+        # Validate incoming messages
+        self.config.add_value("gmsec-msg-content-validate-recv", "true")
+
         # Initialize log level for output
         self.initialize_log_level()
 
@@ -127,6 +130,9 @@ class subscribe_async:
 
             # Disconnect from the GMSEC Bus, and terminate subscriptions.
             conn.disconnect()
+
+            # Destroy the Connection
+            del conn
 
         except lp.GmsecError as e:
             # If here, the most likely case is the middleware could not be

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -116,6 +116,13 @@ bool GMSEC_Reply::run()
 		std::string cfgFile        = get("CFG-FILE", "");
 		GMSEC_I32   msg_timeout_ms = get("MSG-TIMEOUT-MS", GMSEC_WAIT_FOREVER);
 		GMSEC_I32   prog_timeout_s = get("PROG-TIMEOUT-S", GMSEC_WAIT_FOREVER);
+		GMSEC_I32   iterations     = get("ITERATIONS", 1);
+
+		if (iterations < -1)
+		{
+			GMSEC_WARNING << "Illegal value for iterations; defaulting to 1";
+			iterations = 1;
+		}
 
 		unsigned int specVersion = conn->getMessageFactory().getSpecification().getVersion();
 		Specification::SchemaLevel schemaLevel = conn->getMessageFactory().getSpecification().getSchemaLevel();
@@ -132,12 +139,13 @@ bool GMSEC_Reply::run()
 			(void) conn->subscribe(subjects[i].c_str(), getConfig());
 		}
 
-		bool   done = false;
 		time_t prevTime;
 		time_t nextTime;
 		double elapsedTime = 0;
 
 		time(&prevTime);
+
+		bool done = false;
 
 		while (!done)
 		{
@@ -211,6 +219,12 @@ bool GMSEC_Reply::run()
 
 				//o Destroy request message */
 				Message::destroy(message);
+
+				if (iterations > 0)
+				{
+					--iterations;
+					done = (iterations == 0);
+				}
 			}
 		}
 	}
@@ -262,7 +276,7 @@ void GMSEC_Reply::genAndSendReply(const Message& request)
 	reply.setFieldValue("FACILITY", (facility ? facility : "FILL"));
 	reply.setFieldValue("COMPONENT", "GMRPL");
 	reply.setFieldValue("REQUEST-ID", (requestID ? requestID : "0"));
-	reply.addField("DESTINATION-COMPONENT", (component ? component : "FILL"));
+	reply.addField(StringField("DESTINATION-COMPONENT", (component ? component : "FILL"), true));
 	reply.addField("RESPONSE-STATUS", responseStatus);
 
 	//o Display XML/JSON representation of reply message

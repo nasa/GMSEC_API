@@ -122,6 +122,30 @@ void MyRequestCallback(GMSEC_Connection conn, GMSEC_Message msg)
 }
 
 
+
+void verifyTrackingFields(GMSEC_Message msg, int expected)
+{
+	if (msg != NULL)
+	{
+		int numTrackingFields = 0;
+
+		GMSEC_MessageFieldIterator iter = messageGetFieldIterator(msg, NULL);
+
+		while (messageFieldIteratorHasNext(iter, NULL) == GMSEC_TRUE)
+		{
+			GMSEC_Field field = messageFieldIteratorNext(iter, NULL);
+
+			if (fieldIsTracking(field, NULL))
+			{
+				++numTrackingFields;
+			}
+		}
+
+		testCheckBool("Unexpected number of tracking fields", numTrackingFields == expected);
+	}
+}
+
+
 void test_connectionCreate()
 {
 	GMSEC_INFO("Test connectionCreate()");
@@ -477,7 +501,7 @@ void test_connectionSubscribe()
 	GMSEC_SubscriptionInfo info2 = connectionSubscribe(conn, testGetSubjectCharPtr("FOO.BAZ", tmp), status);
 	testCheckBool(statusGet(status), statusHasError(status) == GMSEC_FALSE);
 
-	GMSEC_Message msg1 = messageFactoryCreateMessage(connectionGetMessageFactory(conn, NULL), "LOG", NULL);
+	GMSEC_Message msg1 = messageFactoryCreateMessage(connectionGetMessageFactory(conn, NULL), "HB", NULL);
 	GMSEC_Message msg2 = messageFactoryCreateMessage(connectionGetMessageFactory(conn, NULL), "LOG", NULL);
 	GMSEC_Message msg3 = messageFactoryCreateMessage(connectionGetMessageFactory(conn, NULL), "LOG", NULL);
 
@@ -492,6 +516,9 @@ void test_connectionSubscribe()
 		GMSEC_Message msg = connectionReceive(conn, 5000, NULL);
 		testRequireBool("Failed to receive message", msg != NULL);
 		testCheckBool("Unexpected message subject", strcompare(messageGetSubject(msg, NULL), testGetSubjectCharPtr("GIN.BAR", tmp)) == 0);
+
+		verifyTrackingFields(msg, 11);
+
 		messageDestroy(&msg);
 	}
 
@@ -501,6 +528,9 @@ void test_connectionSubscribe()
 		GMSEC_Message msg = connectionReceive(conn, 5000, NULL);
 		testRequireBool("Failed to receive message", msg != NULL);
 		testCheckBool("Unexpected message subject", strcompare(messageGetSubject(msg, NULL), testGetSubjectCharPtr("FOO.BAZ", tmp)) == 0);
+
+		verifyTrackingFields(msg, 7);
+
 		messageDestroy(&msg);
 	}
 
@@ -1379,6 +1409,12 @@ void test_connectionReply()
 		messageDestroy(&repMsg);
 	}
 	{
+		//o Request message is NULL
+		connectionReply(conn, NULL, NULL, status);
+		testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
+		testCheckBool(statusGet(status), strcontains(statusGet(status), "Request Message handle is NULL") == 0);
+	}
+	{
 		//o Reply message is NULL
 		GMSEC_Message reqMsg = messageFactoryCreateMessage(connectionGetMessageFactory(conn, NULL), "REQ.DIR", NULL);
 
@@ -1650,25 +1686,22 @@ void test_connectionGetName()
 	GMSEC_Connection conn   = connectionCreate(config, status);
 	testRequireBool(statusGet(status), statusHasError(status) == GMSEC_FALSE);
 
-	connectionConnect(conn, status);
-	testRequireBool(statusGet(status), statusHasError(status) == GMSEC_FALSE);
 	testCheckBool("Expected a connection name to be non-NULL", connectionGetName(conn, NULL) != NULL);
 
 	connectionSetName(conn, "FOOBAR", status);
 	testRequireBool(statusGet(status), statusHasError(status) == GMSEC_FALSE);
-	testCheckBool("Expected a connection name to be FOOBAR", strcompare(connectionGetName(conn, NULL), "FOOBAR") ==0);
+	testCheckBool("Expected a connection name to be 'FOOBAR'", strcompare(connectionGetName(conn, NULL), "FOOBAR") == 0);
 
 	// Off-nominal tests
+	connectionSetName(conn, NULL, status);
+	testCheckBool(statusGet(status), statusHasError(status) == GMSEC_FALSE);
+	testCheckBool("Expected a connection name to be 'FOOBAR'", strcompare(connectionGetName(conn, NULL), "FOOBAR") == 0);
+
 	connectionGetName(NULL, status);
 	testCheckBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
 
 	connectionSetName(NULL, "FOOBAZ", status);
 	testCheckBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
-
-	connectionSetName(conn, NULL, status);
-	testCheckBool(statusGet(status), statusHasError(status) == GMSEC_TRUE);
-
-	connectionDisconnect(conn, NULL);
 
 	connectionDestroy(&conn);
 	statusDestroy(&status);
@@ -1780,7 +1813,7 @@ void test_connectionGetPublishQueueMessageCount()
 	// Nominal test
 	for (i = 0; i < 5; ++i)
 	{
-		GMSEC_U32 count = connectionGetPublishQueueMessageCount(conn, NULL);
+		GMSEC_U64 count = connectionGetPublishQueueMessageCount(conn, NULL);
 		testCheckBool("Unexpected message count", count <= 1);
 		connectionPublish(conn, msg, NULL);
 		timeUtilMillisleep(500);
@@ -1797,6 +1830,20 @@ void test_connectionGetPublishQueueMessageCount()
 	messageDestroy(&msg);
 	connectionDestroy(&conn);
 	statusDestroy(&status);
+}
+
+
+void test_connectionShutdownMiddleware()
+{
+	GMSEC_INFO("Test connectionShutdownMiddleware()");
+
+	GMSEC_Config config = testGetConfig();
+
+	connectionShutdownMiddleware(configGetValueOrDefault(config, "mw-id", "Unknown Middleware", NULL));
+	testCheckBool("Okay", GMSEC_TRUE);
+
+	connectionShutdownMiddleware(NULL);
+	testCheckBool("Okay", GMSEC_TRUE);
 }
 
 
@@ -1836,6 +1883,7 @@ int test_Connection()
 	test_connectionGetMWInfo();
 	test_connectionGetConnectionEndpoint();
 	test_connectionGetPublishQueueMessageCount();
+	test_connectionShutdownMiddleware();
 
 	return 0;
 }

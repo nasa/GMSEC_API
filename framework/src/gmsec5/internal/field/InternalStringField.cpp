@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,6 +9,8 @@
 #include <gmsec5/internal/field/InternalStringField.h>
 #include <gmsec5/internal/StringUtil.h>
 #include <gmsec5/GmsecException.h>
+
+#include <gmsec5/internal/Encoder.h>
 
 #include <sstream>
 
@@ -24,6 +26,11 @@ InternalStringField::InternalStringField(const char* name, const char* value, bo
 	if (!value)
 	{
         throw GmsecException(FIELD_ERROR, INVALID_FIELD_VALUE, "StringField value cannot be NULL");
+	}
+
+	if (strlen(value) > static_cast<size_t>(GMSEC_STRING_LIMIT))
+	{
+		throw GmsecException(FIELD_ERROR, INVALID_FIELD_VALUE, "StringField value is too big");
 	}
 
 	m_value = value;

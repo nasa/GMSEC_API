@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -114,7 +114,7 @@ public:
 	/**
 	 * @fn getSchemaIDIterator()
 	 * 
-	 * @brief returns a SchemaIDIterator, which can be used to iterated over the IDs
+	 * @brief returns a SchemaIDIterator which can be used to iterate over the IDs
 	 * of the loaded templates.
 	 *
 	 * @note Only one SchemaIDIterator object is associated with a %Specification object; multiple calls to 
@@ -128,7 +128,7 @@ public:
 	/**
 	 * @fn getVersion()
 	 *
-	 * @brief Returns the version of the ISD being used as an unsigned integer.
+	 * @brief Returns the version of the templates that have been loaded.
 	 */
 	unsigned int CALL_TYPE getVersion() const;
 

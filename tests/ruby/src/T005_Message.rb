@@ -23,6 +23,7 @@ class Test_Message < Test
         test_set_field_value
         test_set_config
         test_set_subject
+        test_set_subject_element
         test_get_subject
         test_set_kind
         test_get_kind
@@ -317,6 +318,55 @@ class Test_Message < Test
             check("An exception was expected", false)
         rescue GmsecException => e
             check(e.message, e.message.include?("Invalid message subject"))
+		end
+	end
+
+
+    def test_set_subject_element()
+        Libgmsec_ruby::Log::info("Test set_subject_element()")
+
+        msgFactory = Libgmsec_ruby::MessageFactory::create()
+
+        set_standard_fields(msgFactory)
+
+        msg = msgFactory.create_message("TLMPROC")
+
+        Libgmsec_ruby::MessageFactory::destroy(msgFactory)
+
+        msg.set_subject_element("ME4", "FOOEY")
+
+        check("Message has unexpected subject", msg.get_subject() == "C2MS.MY-DOMAIN-1.MY-DOMAIN-2.MY-MISSION.MY-CONSTELLATION-ID.MY-SAT-ID.MSG.TLMPROC.MY-COMPONENT.FILL.FILL.FOOEY")
+
+        # Off-nominal tests
+		begin
+            msg.set_subject_element("ME9000", "FOOEY")
+            check("An exception was expected", false)
+		rescue GmsecException => e
+            check(e.message, e.message.include?("Message does not have a subject element named ME9000"))
+		end
+		
+		begin
+            tmp = Libgmsec_ruby::Message.new()
+            tmp.set_subject_element(nil, "FOOEY")
+            check("An exception was expected", false)
+		rescue GmsecException => e
+            check(e.message, e.message.include?("Subject element name cannot be NULL or empty string"))
+		end
+		
+		begin
+            tmp = Libgmsec_ruby::Message.new()
+            tmp.set_subject_element("", "FOOEY")
+            check("An exception was expected", false)
+		rescue GmsecException => e
+            check(e.message, e.message.include?("Subject element name cannot be NULL or empty string"))
+		end
+		
+		begin
+            tmp = Libgmsec_ruby::Message.new()
+            tmp.set_subject_element("ME4", "FOOEY")
+            check("An exception was expected", false)
+		rescue GmsecException => e
+            check(e.message, e.message.include?("Message does not have a message template"))
 		end
 	end
 

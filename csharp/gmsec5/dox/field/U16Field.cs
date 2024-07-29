@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,9 +22,9 @@ public class U16Field : Field {
   ///
   /// <param name="name">The name of the field</param>
   /// <param name="value">The value to store in the field</param>
-  /// <param name="isHeader">used to indicate if Field is a header field (default is false)</param>
+  /// <param name="isHeader">Use to indicate if the field is a header field (default is false)</param>
   ///
-  /// <exception cref="GmsecException">If the name is null or contains an empty-string</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or otherwise if the field name is non-compliant.</exception>
   public U16Field(string name, ushort value, bool isHeader = false) {
   }
 

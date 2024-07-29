@@ -49,8 +49,7 @@ Instructions for running Perl example programs
 
       perl <example_name>.pl mw-id=bolt mw-server=localhost
 
-
-   Note: Use Strawberry Perl 5.32.1 or later under Windows.
+      Note: Use Strawberry Perl 5.32.1 or later version under Windows.
 
 
    For other middleware, refer to the GMSEC API User's Guide for additional

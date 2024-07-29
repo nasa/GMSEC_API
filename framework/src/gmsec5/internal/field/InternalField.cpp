@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -55,42 +55,11 @@ using namespace gmsec::api5::util;
 bool InternalField::s_identifyHeaderField = false;
 
 
-static bool isFieldNameCompliant(const char* name)
-{
-	static const int EMPTY = 0x00;
-	static const int HYPHEN = 0x2D;
-	static const int PERIOD = 0x2E;
-	static const int UNDERSCORE = 0x5F;
-
-	if (!name || *name == EMPTY)
-	{
-		return false;
-	}
-
-	const char* s = name;
-	while (*s)
-	{
-		// If NOT one of these, then error
-		if (!( (isalpha(*s) && isupper(*s))
-		        || isdigit(*s)
-		        || *s == HYPHEN
-		        || *s == PERIOD
-		        || *s == UNDERSCORE ))
-		{
-			return false;
-		}
-
-		++s;
-	}
-
-	return true;
-}
-
-
 InternalField::InternalField(const char* name, Field::Type type, bool isHeader)
 	: m_name(),
 	  m_type(type),
-	  m_header(isHeader)
+	  m_header(isHeader),
+	  m_tracking(false)
 {
 	if (!isFieldNameCompliant(name))
 	{
@@ -123,6 +92,18 @@ Field::Type InternalField::getType() const
 bool InternalField::isHeader() const
 {
 	return m_header;
+}
+
+
+bool InternalField::isTracking() const
+{
+	return m_tracking;
+}
+
+
+void InternalField::isTracking(bool tracking)
+{
+	m_tracking = tracking;
 }
 
 
@@ -370,7 +351,7 @@ bool InternalField::getBooleanValue() const
 
 GMSEC_I16 InternalField::getI16Value() const
 {
-	GMSEC_F64 value = 0;
+	GMSEC_F64 value;
 
 	if (this->getType() == Field::Type::I16)
 	{
@@ -410,7 +391,7 @@ GMSEC_I16 InternalField::getI16Value() const
 
 GMSEC_I32 InternalField::getI32Value() const
 {
-	GMSEC_F64 value = 0;
+	GMSEC_F64 value;
 
 	if (this->getType() == Field::Type::I32)
 	{
@@ -450,7 +431,7 @@ GMSEC_I32 InternalField::getI32Value() const
 
 GMSEC_I64 InternalField::getI64Value() const
 {
-	GMSEC_F64 value = 0;
+	GMSEC_F64 value;
 
 	if (this->getType() == Field::Type::I64)
 	{
@@ -490,7 +471,7 @@ GMSEC_I64 InternalField::getI64Value() const
 
 GMSEC_U16 InternalField::getU16Value() const
 {
-	GMSEC_U16 value = 0;
+	GMSEC_U16 value;
 
 	if (this->getType() == Field::Type::U16)
 	{
@@ -533,7 +514,7 @@ GMSEC_U16 InternalField::getU16Value() const
 
 GMSEC_U32 InternalField::getU32Value() const
 {
-	GMSEC_U32 value = 0;
+	GMSEC_U32 value;
 
 	if (this->getType() == Field::Type::U32)
 	{
@@ -576,7 +557,7 @@ GMSEC_U32 InternalField::getU32Value() const
 
 GMSEC_U64 InternalField::getU64Value() const
 {
-	GMSEC_U64 value = 0;
+	GMSEC_U64 value;
 
 	if (this->getType() == Field::Type::U64)
 	{
@@ -619,7 +600,7 @@ GMSEC_U64 InternalField::getU64Value() const
 
 GMSEC_F64 InternalField::getF64Value() const
 {
-	GMSEC_F64 value     = 0;
+	GMSEC_F64 value;
 	bool      converted = true;
 
 	switch (getType())
@@ -922,6 +903,8 @@ Field* InternalField::makeFieldCopy(const Field& other)
 		break;
 	}
 
+	FieldBuddy::getInternal(*copy.get()).isTracking(other.isTracking());
+
 	return copy.release();
 }
 
@@ -1067,4 +1050,37 @@ std::string InternalField::lookupTypeStr(Field::Type type)
 	}
 
 	return ret_string;
+}
+
+
+bool InternalField::isFieldNameCompliant(const char* name)
+{
+	static const int HYPHEN     = 0x2D;
+	static const int PERIOD     = 0x2E;
+	static const int UNDERSCORE = 0x5F;
+
+	if (name == NULL || *name == '\0')
+	{
+		return false;
+	}
+
+	const char* s = name;
+	char        p = '\0';  // previous character
+	while (*s)
+	{
+		if (!( (isalpha(*s) && isupper(*s)) || isdigit(*s) || *s == HYPHEN || *s == PERIOD || *s == UNDERSCORE ))
+		{
+			return false;
+		}
+
+		if (p && (*s == HYPHEN || *s == PERIOD) && *s == p)
+		{
+			return false;
+		}
+		p = *s;
+
+		++s;
+	}
+
+	return true;
 }

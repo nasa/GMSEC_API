@@ -310,7 +310,7 @@ class Test
 		summary = "RESULT=" + result + "\nDESCRIPTION=" + @@description + "\nN_OK=#{@@nOk}" + "\nN_BAD=#{@@nBad}" + "\nPREFIX=#{@@prefix}"
 
 		if @@reason != ""
-			summary += "\n\tEXCUSE=#{@@reason}"
+			summary += "\nEXCUSE=#{@@reason}"
 		end
 
 		Libgmsec_ruby::Log.info("Summary:\n" + summary)

@@ -9,7 +9,7 @@ process.on('message', (cfgXML) => {
 			var config = new gmsec.Config(cfgXML, gmsec.DataType_XML_DATA);
 			//console.log("Responder config is:\n" + config.toXML());
 
-			var conn = new gmsec.Connection(config);
+			var conn = gmsec.Connection.create(config);
 			conn.connect();
 
 			var info = conn.setupSubscription(config.getValue("req-subject"));
@@ -46,6 +46,8 @@ process.on('message', (cfgXML) => {
 			}
 
 			conn.disconnect();
+
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			console.log("Failed to run T010_Responder: " + e.message);

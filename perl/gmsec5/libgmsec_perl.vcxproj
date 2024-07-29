@@ -182,7 +182,7 @@ copy .\interfaces\libgmsec_perl.pm .\..\..\bin\lib\GMSECAPI4\libgmsec_perl.pm
       <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>gmsec_api.lib;libperl532.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>gmsec_api.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\bin\libgmsec_perl.dll</OutputFile>
       <AdditionalLibraryDirectories>..\..\objects\$(Configuration);$(PERL5_HOME)\perl\lib\CORE;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs />
@@ -191,6 +191,7 @@ copy .\interfaces\libgmsec_perl.pm .\..\..\bin\lib\GMSECAPI4\libgmsec_perl.pm
       <DataExecutionPrevention />
       <ImportLibrary>..\..\objects/Release/$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
+      <AdditionalOptions>"$(PERL5_HOME)\perl\lib\CORE\libperl*.a" %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>md ..\..\bin\lib\GMSECAPI5%3b

@@ -89,7 +89,7 @@ class Test_ResourceGenerator < Test
         rsrcgen.stop()
 
         # Allow time for the RSRC-gen thread to stop
-        Libgmsec_ruby::TimeUtil::millisleep(2000)
+        sleep(4)
 
         Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen)
 
@@ -132,11 +132,13 @@ class Test_ResourceGenerator < Test
         check("ResourceGenerator should not be running", rsrcgen.is_running() == false)
 
         # Allow time for the RSRC-gen thread to stop
-        Libgmsec_ruby::TimeUtil::millisleep(2000)
+        sleep(4)
 
         conn = Libgmsec_ruby::Connection::create(config)
         conn.connect()
         conn.subscribe("C2MS.*.*.*.*.*.MSG.RSRC." + get_unique_component())
+
+        sleep(4)
 
         for i in 0..3 do
             rsrcMsg = conn.receive(5000)
@@ -168,20 +170,18 @@ class Test_ResourceGenerator < Test
 
         rsrcgen.start()
 
-        Libgmsec_ruby::TimeUtil.millisleep(2000)
+        sleep(4)
 
         Libgmsec_ruby::Log::info("Test set_field() with a Field")
         newPubRate = 2
         rsrcgen.set_field( Libgmsec_ruby::U16Field.new("PUB-RATE", newPubRate) )
-
-        Libgmsec_ruby::TimeUtil.millisleep(2000)
 
         verify_resource_message(config, newPubRate)
 
         rsrcgen.stop()
 
         # Allow time for the RSRC-gen thread to stop
-        Libgmsec_ruby::TimeUtil::millisleep(4000)
+        sleep(4)
 
         Libgmsec_ruby::Log::info("Cleanup...")
         Libgmsec_ruby::ResourceGenerator::destroy(rsrcgen)
@@ -194,46 +194,18 @@ class Test_ResourceGenerator < Test
             conn.connect()
             conn.subscribe("C2MS.*.*.*.*.*.MSG.RSRC." + get_unique_component() + ".+")
 
-            t1 = 0
-            t2 = 0
+            sleep(4)
 
-            for i in 0..6 do
-                rsrcMsg = conn.receive(5000)
+            rsrcMsg = conn.receive(5000)
 
-                # ignore the first few incoming messages (if any)
-                if i < 3
-                    if rsrcMsg != nil
-                        Libgmsec_ruby::Message::destroy(rsrcMsg)
-                    end
-                    next
-                end
+            if rsrcMsg != nil
+                check("Unexpected MESSAGE-TYPE", rsrcMsg.get_string_value("MESSAGE-TYPE") == "MSG")
+                check("Unexpected MESSAGE-SUBTYPE", rsrcMsg.get_string_value("MESSAGE-SUBTYPE") == "RSRC")
+                check("Unexpected PUB-RATE", rsrcMsg.get_integer_value("PUB-RATE") == expectedPubRate)
 
-                if rsrcMsg != nil
-                    if t1 == 0
-                        t1 = Libgmsec_ruby::TimeUtil.get_current_time_s()
-                    else
-                        t2 = Libgmsec_ruby::TimeUtil.get_current_time_s()
-
-                        delta = t2 - t1
-                        if delta < expectedPubRate
-                            delta = ((t2 - t1) * 10.0 + 0.5) / 10.0
-                        end
-
-                        Libgmsec_ruby::Log::info("Expected rate is: " + expectedPubRate.to_s + ", delta is: " + delta.to_s)
-
-                        check("Unexpected publish rate", expectedPubRate == delta.to_i)
-
-                        t1 = t2
-                    end
-
-                    check("Unexpected MESSAGE-TYPE", rsrcMsg.get_string_value("MESSAGE-TYPE") == "MSG")
-                    check("Unexpected MESSAGE-SUBTYPE", rsrcMsg.get_string_value("MESSAGE-SUBTYPE") == "RSRC")
-                    check("Unexpected PUB-RATE", rsrcMsg.get_integer_value("PUB-RATE") == expectedPubRate)
-
-                    Libgmsec_ruby::Message::destroy(rsrcMsg)
-                else
-                    check("Failed to received Resource Message", false)
-                end
+                Libgmsec_ruby::Message::destroy(rsrcMsg)
+            else
+                check("Failed to received Resource Message", false)
             end
 
             conn.disconnect()

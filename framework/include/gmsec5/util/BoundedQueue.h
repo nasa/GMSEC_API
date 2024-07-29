@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,10 +15,13 @@
 #define GMSEC_API5_UTIL_BOUNDED_QUEUE_H
 
 
+#include <gmsec5/GmsecException.h>
+
 #include <gmsec5/util/Condition.h>
 #include <gmsec5/util/Mutex.h>
 
-#include <stddef.h>  // for size_t
+#include <sstream>
+#include <cstddef>
 
 
 namespace gmsec
@@ -42,10 +45,22 @@ namespace util
  *
  *	bool success = boundedqueue.offer(item);
  */
-template <class elemType>
+template <class T>
 class BoundedQueue
 {
 public:
+	/**
+	 * @brief The minium queue size allowed.
+	 */
+	static const size_t MIN_QUEUE_SIZE = 1;
+
+
+	/**
+	 * @brief The maximum queue size allowed.
+	 */
+	static const size_t MAX_QUEUE_SIZE = 5000;
+
+
 	/** @fn BoundedQueue(size_t size)
 	 *
 	 *	@brief Standard constructor. 
@@ -54,7 +69,7 @@ public:
 	 */
 	BoundedQueue(size_t size)
 		: capacity(size),
-		  data(new elemType[size]),
+		  data(0),
 		  front(0),
 		  rear(0),
 		  count(0),
@@ -62,6 +77,20 @@ public:
 		  lock(),
 		  condition(lock)
 	{
+		if (capacity < MIN_QUEUE_SIZE)
+		{
+			std::ostringstream oss;
+			oss << "BoundedQueue size must be greater than or equal to " << MIN_QUEUE_SIZE;
+			throw GmsecException(OTHER_ERROR, VALUE_OUT_OF_RANGE, oss.str().c_str());
+		}
+		else if (capacity > MAX_QUEUE_SIZE)
+		{
+			std::ostringstream oss;
+			oss << "BoundedQueue size cannot be greater than " << MAX_QUEUE_SIZE;
+			throw GmsecException(OTHER_ERROR, VALUE_OUT_OF_RANGE, oss.str().c_str());
+		}
+
+		data = new T[capacity];
 	}	
 
 
@@ -80,7 +109,7 @@ public:
 	 *	@brief This function retreives the next item in the queue. This call will block indefinitely
 	 *	until another item becomes available.
 	 */
-	elemType  take()
+	T take()
 	{
 		AutoMutex hold(lock);
 
@@ -95,19 +124,20 @@ public:
 	}
 
 
-	/** @fn poll(int milliseconds)
+	/** @fn poll(int milliseconds, T& value)
 	 *
 	 *	@brief This function is similar to take(), however it accepts a timeout.
 	 *
 	 *	@param milliseconds - The number of millseconds to wait for an item.
+	 *	@param value - The value, if any, being returned.
 	 *
 	 *  @return Returns true if an item is being returned; false otherwise.
 	 */
-	bool  poll(int milliseconds, elemType &value)
+	bool poll(int milliseconds, T& value)
 	{
 		AutoMutex hold(lock);
 
-		if (count == 0)
+		while (count == 0)
 		{
 			++someoneWaiting;
 			int signal = condition.wait(milliseconds);
@@ -125,14 +155,14 @@ public:
 	}
 
 
-	/** @fn put(elemType item)
+	/** @fn put(T item)
 	 *
 	 *	@brief Places the item on the queue. If the queue is full, the call will block until
 	 *	space becomes available.
 	 *
 	 *	@param item - The item to be placed upon the queue.
 	 */
-	void  put(elemType item)
+	void put(T item)
 	{
 		AutoMutex hold(lock);
 
@@ -151,7 +181,7 @@ public:
 	}
 	
 
-	/** @fn offer(elemType item)
+	/** @fn offer(T item)
 	 *
 	 *	@brief Attempts to place the item on the queue. If the queue is full, the call
 	 *	will return immediately with the value false. True is returned if the item
@@ -159,7 +189,7 @@ public:
 	 *
 	 * 	@param item - The item to be placed upon the queue.
 	 */
-	bool  offer(elemType item)
+	bool offer(T item)
 	{
 		AutoMutex hold(lock);
 
@@ -174,7 +204,7 @@ public:
 	}
 
 
-	/** @fn offer(elemType item, int milliseconds)
+	/** @fn offer(T item, int milliseconds)
 	 *
 	 *	@brief Attempts to place the item on the queue. If the queue is full, the call
 	 *	will wait for the timeout specified. If there is no space within that time, the
@@ -184,7 +214,7 @@ public:
 	 *	@param item - The item to be placed upon the queue.
 	 *	@param milliseconds - The number of milliseconds to wait.
 	 */
-	bool  offer(elemType item, int milliseconds)
+	bool offer(T item, int milliseconds)
 	{
 		AutoMutex hold(lock);
 
@@ -213,7 +243,7 @@ public:
 	 *	specification, but it practice it is best not to use it because it breaks
 	 *	the atomicity of the BoundedQueue and necessitates the use of an external mutex.
 	 */
-	size_t  remainingCapacity()
+	size_t remainingCapacity()
 	{
 		AutoMutex hold(lock);
 
@@ -225,7 +255,7 @@ public:
 	 *
 	 *	@brief Returns true if the queue is empty, false otherwise
 	 */
-	bool  empty()
+	bool empty()
 	{
 		AutoMutex hold(lock);
 
@@ -237,26 +267,16 @@ public:
 	 *
 	 *	@brief Returns the number of elements held in the queue
 	 */
-	size_t  queuedElements()
+	size_t queuedElements()
 	{
+		AutoMutex hold(lock);
+
 		return count;
 	}
 
 
 private:
-	size_t    capacity;
-	elemType* data;
-
-	size_t    front;
-	size_t    rear;
-	size_t    count;
-
-	int       someoneWaiting;
-	Mutex     lock;
-	Condition condition;
-
-
-	void  offerCommon(elemType item)
+	void offerCommon(T item)
 	{
 		data[rear] = item;
 
@@ -271,9 +291,9 @@ private:
 	}
 
 
-	elemType  pollCommon()
+	T pollCommon()
 	{
-		elemType value = data[front];
+		T value = data[front];
 
 		front = (front + 1) % capacity;
 
@@ -286,6 +306,18 @@ private:
 
 		return value;
 	}
+
+
+	size_t    capacity;
+	T*        data;
+
+	size_t    front;
+	size_t    rear;
+	size_t    count;
+
+	int       someoneWaiting;
+	Mutex     lock;
+	Condition condition;
 };
 
 

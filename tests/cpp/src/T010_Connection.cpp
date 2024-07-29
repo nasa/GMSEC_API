@@ -129,6 +129,100 @@ private:
 };
 
 
+class MyThread
+{
+public:
+	static void runThread(StdSharedPtr<MyThread> mt) {
+		mt->run();
+	}
+
+	MyThread(Test& test, StdSharedPtr<Connection> conn) : test(test), conn(conn) {
+	}
+
+	~MyThread() {
+	}
+
+	void run() {
+		static int NUM_MESSAGES = 500;
+
+		try {
+			for (int i = 0; i < NUM_MESSAGES; ++i) {
+				//o test createMessage()
+				Message msg = conn->getMessageFactory().createMessage( ((i % 2) == 0 ? "HB" : "LOG") );
+
+				if (i % 2 != 0) {
+					msg.addField("SUBCLASS", "SC");
+					msg.addField("OCCURRENCE-TYPE", "OT");
+					msg.addField("SEVERITY", static_cast<GMSEC_I16>(1));
+					msg.addField("EVENT-TIME", "2023-123-00:12:34");
+					msg.addField("MSG-TEXT", "MT");
+				}
+
+				//o test fromData()
+				msg = conn->getMessageFactory().fromData(msg.toXML(), DataType::XML_DATA);
+
+				//o test publish()
+				conn->publish(msg);
+			}
+			test.check("Okay, all done", true);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), false);
+		}
+		catch (const std::exception& e) {
+			test.check(e.what(), false);
+		}
+	}
+
+private:
+	Test& test;
+	StdSharedPtr<Connection> conn;
+};
+
+
+
+void verifyHeaderFields(Test& test, const Message& msg, int expected)
+{
+	int numHeaderFields = 0;
+
+	MessageFieldIterator& iter = msg.getFieldIterator(MessageFieldIterator::Selector::HEADER_FIELDS);
+
+	while (iter.hasNext())
+	{
+		const Field& field = iter.next();
+
+		test.check("Expected a header field", field.isHeader());
+
+		if (field.isHeader()) {
+			++numHeaderFields;
+		}
+	}
+
+	test.check("Unexpected number of header fields", numHeaderFields == expected);
+}
+
+
+void verifyTrackingFields(Test& test, const Message& msg, int expected)
+{
+	int numTrackingFields = 0;
+
+	MessageFieldIterator& iter = msg.getFieldIterator(MessageFieldIterator::Selector::TRACKING_FIELDS);
+
+	while (iter.hasNext())
+	{
+		const Field& field = iter.next();
+
+		test.check("Expected a tracking field", field.isTracking());
+
+		if (field.isTracking()) {
+			++numTrackingFields;
+		}
+	}
+
+	test.check("Unexpected number of tracking fields", numTrackingFields == expected);
+}
+
+
 void test_constructor(Test& test)
 {
 	GMSEC_INFO << "Test constructor";
@@ -381,7 +475,9 @@ void test_subscribe(Test& test)
 		(void) conn.subscribe( topic1.c_str() );
 		(void) conn.subscribe( topic2.c_str() );
 
-		Message msg1 = conn.getMessageFactory().createMessage("LOG");
+		set_standard_fields(conn.getMessageFactory());
+
+		Message msg1 = conn.getMessageFactory().createMessage("HB");
 		Message msg2 = conn.getMessageFactory().createMessage("LOG");
 		Message msg3 = conn.getMessageFactory().createMessage("LOG");
 
@@ -394,6 +490,8 @@ void test_subscribe(Test& test)
 		Message* msg = conn.receive(10000);
 		test.require("1. Failed to receive message", NULL != msg);
 		test.check("1. Unexpected message subject", subject1 == msg->getSubject());
+		verifyHeaderFields(test, *msg, 19);
+		verifyTrackingFields(test, *msg, 11);
 		Message::destroy(msg);
 
 		conn.publish(msg2);
@@ -401,6 +499,8 @@ void test_subscribe(Test& test)
 		msg = conn.receive(10000);
 		test.require("2. Failed to receive message", NULL != msg);
 		test.check("2. Unexpected message subject", subject2 == msg->getSubject());
+		verifyHeaderFields(test, *msg, 19);
+		verifyTrackingFields(test, *msg, 7);
 		Message::destroy(msg);
 
 		conn.publish(msg3);
@@ -1265,11 +1365,12 @@ void test_get_set_name(Test& test)
 	try
 	{
 		Connection conn(test.getConfig());
-		conn.connect();
-		test.check("Expected a connection name to be non-NULL", NULL != conn.getName());
+		test.require("Expected a connection name to be non-NULL", NULL != conn.getName());
 
 		conn.setName("FOOBAR");
+		test.check("Unexpected connection name", std::string("FOOBAR") == conn.getName());
 
+		conn.setName(NULL);
 		test.check("Unexpected connection name", std::string("FOOBAR") == conn.getName());
 	}
 	catch (const GmsecException& e)
@@ -1355,21 +1456,74 @@ void test_get_publish_queue_message_count(Test& test)
 
 		for (int i = 0; i < 10; ++i)
 		{
-			//DMW GMSEC_U64 count = conn.getPublishQueueMessageCount();
-			//DMW test.check("Unexpected message count", count <= static_cast<GMSEC_U64>(1));
 			conn.publish(msg);
 			test.check("Unexpected message count", conn.getPublishQueueMessageCount() >= static_cast<GMSEC_U64>(0));
-			//DMW TimeUtil::millisleep(500);
 		}
-		test.check("Unexpected message count", conn.getPublishQueueMessageCount() >= static_cast<GMSEC_U64>(0));
-		//DMW TimeUtil::millisleep(500);
 		TimeUtil::millisleep(2000);
-		//DMW test.check("Expected message count to be 0 (zero)", static_cast<GMSEC_U64>(0) == conn.getPublishQueueMessageCount());
 		test.check("Expected message count to be 0 (zero)", conn.getPublishQueueMessageCount() == static_cast<GMSEC_U64>(0));
 	}
 	catch (const GmsecException& e)
 	{
 		test.check(e.what(), false);
+	}
+}
+
+
+void test_shutdown_middleware(Test& test)
+{
+	GMSEC_INFO << "Test shutdownMiddleware()";
+
+	Config& config = test.getConfig();
+
+	Connection::shutdownMiddleware(config.getValue("mw-id", "Unknown Middleware"));
+	test.check("Okay", true);
+
+	Connection::shutdownMiddleware("");
+	test.check("Okay", true);
+
+	Connection::shutdownMiddleware(NULL);
+	test.check("Okay", true);
+}
+
+
+void test_thread_safeness(Test& test)
+{
+	GMSEC_INFO << "Test thread-safeness";
+
+	Config config = test.getConfig();  // make a copy
+	config.addValue("gmsec-msg-content-validate-send", "true");
+
+	try
+	{
+		StdSharedPtr<Connection> conn( new Connection(config) );
+
+		set_standard_fields( conn->getMessageFactory() );
+
+		conn->connect();
+
+		StdSharedPtr<MyThread> mt( new MyThread(test, conn) );
+
+		static const size_t NUM_THREADS = 10;
+
+		StdUniquePtr<StdThread> threads[NUM_THREADS];
+
+		for (size_t i = 0; i < NUM_THREADS; ++i) {
+			threads[i].reset( new StdThread(&MyThread::runThread, mt) );
+		}
+
+		for (size_t i = 0; i < NUM_THREADS; ++i) {
+			threads[i]->start();
+		}
+
+		for (size_t i = 0; i < NUM_THREADS; ++i) {
+			threads[i]->join();
+		}
+
+		conn->disconnect();
+	}
+	catch (const GmsecException& e)
+	{
+		GMSEC_ERROR << "Exception: "  << e.what();
 	}
 }
 
@@ -1406,6 +1560,8 @@ int test_Connection(Test& test)
 	test_get_mw_info(test);
 	test_get_connection_endpoint(test);
 	test_get_publish_queue_message_count(test);
+	test_shutdown_middleware(test);
+	test_thread_safeness(test);
 
 	return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -28,8 +28,9 @@
 
 #include <map>
 #include <list>
-#include <vector>
+#include <set>
 #include <string>
+#include <vector>
 
 
 namespace gmsec
@@ -148,29 +149,29 @@ private:
 	FieldTemplateList cloneFieldTemplates(const FieldTemplateList& fields) const;
 
 
-	typedef std::map<std::string, std::string>       SchemaRegistry;       // message subject, schema ID
-	typedef std::map<std::string, MessageTemplate*>  MessageTemplates;     // schema ID, MessageTemplate
-	typedef std::map<std::string, FieldTemplateList> HeaderFieldTemplates; // header ID, FieldTemplateList
+	typedef std::map<std::string, std::string>       SchemaRegistry;         // message subject, schema ID
+	typedef std::map<std::string, MessageTemplate*>  MessageTemplates;       // schema ID, MessageTemplate
+	typedef std::map<std::string, FieldTemplateList> HeaderFieldTemplates;   // header ID, FieldTemplateList
 	typedef util::List<MessageSpecification*>        MessageSpecifications;
 
-	const Config&						m_config;
-	SchemaRegistry						m_registry;	
-	MessageTemplates					m_templates;
-	HeaderFieldTemplates				m_headers;	
-	SchemaTemplateList					m_directory;
-	std::string							m_specVersionStr;   //version as a string
-	unsigned int                        m_specVersion;      //version as a number
-	Specification::SchemaLevel          m_schemaLevel;
-	MessageTemplates::const_iterator	m_schemaIndex;
-	SchemaIDIterator					m_iterator;
-	std::string							m_basePath;
-	std::string							m_lastHeaderName;
-	SubjectElementList					m_subjectHeader;
+	const Config&                    m_config;
+	SchemaRegistry                   m_registry;   //list of registered message subjects and their schema IDs
+	MessageTemplates                 m_templates;
+	HeaderFieldTemplates             m_headers;
+	SchemaTemplateList               m_directory; 
+	std::string                      m_specVersionStr;   //version as a string
+	unsigned int                     m_specVersion;      //version as a number
+	Specification::SchemaLevel       m_schemaLevel;
+	MessageTemplates::const_iterator m_schemaIndex;
+	SchemaIDIterator                 m_iterator;
+	std::string                      m_basePath;
+	std::string                      m_lastHeaderName;
+	SubjectElementList               m_subjectHeader;
 
-	MessageSpecifications               m_msgSpecs;
+	MessageSpecifications            m_msgSpecs;
 
 	//holding string for getTemplateXML, without it the function produces undefined behavior
-	std::string							m_templateXML;
+	std::string                      m_templateXML;
 };
 
 } //end namespace internal

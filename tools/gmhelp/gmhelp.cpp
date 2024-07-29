@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,6 +12,7 @@
 #include "Bolt_help.h"
 #include "IBMMQ_help.h"
 #include "JMS_help.h"
+#include "Loopback_help.h"
 #include "MB_help.h"
 #include "OpenDDS_help.h"
 #include "WS_help.h"
@@ -70,6 +71,17 @@ MiddlewareHelp::MiddlewareHelp()
     ibmmq.client.insert(ibmmq_client_opt6);
     ibmmq.server.insert(ibmmq_server_opt1);
 
+    MiddlewareOptions loopback;
+    loopback.client.insert(loopback_client_opt1);
+    loopback.client.insert(loopback_client_opt2);
+    loopback.client.insert(loopback_client_opt3);
+    loopback.client.insert(loopback_client_opt4);
+    loopback.client.insert(loopback_client_opt5);
+    loopback.client.insert(loopback_client_opt6);
+    loopback.client.insert(loopback_client_opt7);
+    loopback.client.insert(loopback_client_opt8);
+    loopback.client.insert(loopback_client_opt9);
+
     MiddlewareOptions mb;
     mb.client.insert(mb_client_opt1);
     mb.client.insert(mb_client_opt2);
@@ -111,6 +123,7 @@ MiddlewareHelp::MiddlewareHelp()
     m_helpMap["artemis"] = art;
     m_helpMap["bolt"] = bolt;
     m_helpMap["ibmmq"] = ibmmq;
+    m_helpMap["loopback"] = loopback;
     m_helpMap["mb"] = mb;
     m_helpMap["opendds"] = opendds;
     m_helpMap["zeromq"] = zmq;
@@ -212,13 +225,14 @@ MiddlewareHelp::showUsage(const string& progName) const
          << "\n"
          << "    Must be one of the following middlewares:\n"
          << "\n"
-         << "      activemq39\n"
+         << "      activemq\n"
          << "      artemis\n"
          << "      bolt\n"
-         << "      ibmmq90\n"
+         << "      ibmmq\n"
+         << "      loopback\n"
          << "      mb\n"
-         << "      opendds312\n"
-         << "      zeromq413\n"
+         << "      opendds\n"
+         << "      zeromq\n"
          << "      generic_jms\n"
          << "\n"
          << "      Notes:\n"
@@ -228,7 +242,7 @@ MiddlewareHelp::showUsage(const string& progName) const
 
     cerr << " *  [jms-mw]\n"
          << "\n"
-         << "    The type of middleware server being used by the JMS wrapper.  Must be one\n"
+         << "    The type of middleware server being used by the JMS wrapper. Must be one\n"
          << "    of the following:\n"
          << "\n"
          << "      activemq\n"
@@ -240,14 +254,14 @@ MiddlewareHelp::showUsage(const string& progName) const
          << "\n"
          << "    Must be specific parameter option supported by a middleware.\n"
          << "    Specifying a parameter name, if valid, will display detailed\n"
-         << "    information regarding that connection parameter.\n"
+         << "    information regarding the connection configuration parameter.\n"
          << endl;
 
     cerr << "\n"
          << "For details on available middleware options, please re-run this utility with\n"
          << "the appropriate middleware type.\n"
          << "\n"
-         << "If additional assistance is required, please submit your queries to:\n\n"
+         << "If additional assistance is required, please submit queries to:\n\n"
          << "    gmsec-support@lists.nasa.gov\n"
          << endl;
 }

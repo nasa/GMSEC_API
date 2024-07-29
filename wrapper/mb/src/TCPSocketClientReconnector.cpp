@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -23,9 +23,6 @@ using namespace gmsec::api5;
 using namespace gmsec::api5::util;
 
 using namespace gmsec_messagebus;
-
-
-static const int IS_DEBUG = 0;
 
 
 TCPSocketClientReconnector::TCPSocketClientReconnector(unsigned nreconnectors, ConfigData *config_data, Mutex *config_data_mutex)
@@ -135,10 +132,7 @@ void TCPSocketClientReconnector::reconnect()
 
 Status TCPSocketClientReconnector::internalReconnect()
 {
-	if (IS_DEBUG)
-	{
-		GMSEC_DEBUG << "Reconnector:" << this << ":InternalReconnect starting";
-	}
+	GMSEC_DEBUG << "Reconnector:" << this << ":InternalReconnect starting";
 
 	Status result = TCPSocketClient::disconnect();
 	m_isConnected.set(false);
@@ -168,10 +162,7 @@ Status TCPSocketClientReconnector::internalReconnect()
 		}
 	}
 
-	if (IS_DEBUG)
-	{
-		GMSEC_DEBUG << "Reconnector:" << this << ":InternalReconnect returning";
-	}
+	GMSEC_DEBUG << "Reconnector:" << this << ":InternalReconnect returning";
 
 	return result;
 }

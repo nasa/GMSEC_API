@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -86,7 +86,7 @@ public class Message : global::System.IDisposable {
   ///
   /// <returns>Returns true if the field was replaced; false otherwise.</returns>
   ///
-  /// <exception cref="GmsecException">Thrown if the field name is NULL or contains an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the field name is NULL, contains an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the input value's type cannot be converted into the type required by the field, or if the string is too big when converting to char.</exception>
   public bool SetFieldValue(string fieldName, string value) {
   }
@@ -108,7 +108,7 @@ public class Message : global::System.IDisposable {
   ///
   /// <returns>Returns true if the field was replaced; false otherwise.</returns>
   ///
-  /// <exception cref="GmsecException">Thrown if the field name is NULL or contains an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the field name is NULL, contains an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the input value's type cannot be converted into the type required by the field.</exception>
   public bool SetFieldValue(string fieldName, short value) {
   }
@@ -130,7 +130,7 @@ public class Message : global::System.IDisposable {
   ///
   /// <returns>Returns true if the field was replaced; false otherwise.</returns>
   ///
-  /// <exception cref="GmsecException">Thrown if the field name is NULL or contains an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the field name is NULL, contains an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the input value's type cannot be converted into the type required by the field.</exception>
   public bool SetFieldValue(string fieldName, ushort value) {
   }
@@ -152,7 +152,7 @@ public class Message : global::System.IDisposable {
   ///
   /// <returns>Returns true if the field was replaced; false otherwise.</returns>
   ///
-  /// <exception cref="GmsecException">Thrown if the field name is NULL or contains an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the field name is NULL, contains an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the input value's type cannot be converted into the type required by the field.</exception>
   public bool SetFieldValue(string fieldName, int value) {
   }
@@ -174,7 +174,7 @@ public class Message : global::System.IDisposable {
   ///
   /// <returns>Returns true if the field was replaced; false otherwise.</returns>
   ///
-  /// <exception cref="GmsecException">Thrown if the field name is NULL or contains an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the field name is NULL, contains an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the input value's type cannot be converted into the type required by the field.</exception>
   public bool SetFieldValue(string fieldName, uint value) {
   }
@@ -196,7 +196,7 @@ public class Message : global::System.IDisposable {
   ///
   /// <returns>Returns true if the field was replaced; false otherwise.</returns>
   ///
-  /// <exception cref="GmsecException">Thrown if the field name is NULL or contains an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the field name is NULL, contains an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the input value's type cannot be converted into the type required by the field.</exception>
   public bool SetFieldValue(string fieldName, long value) {
   }
@@ -218,7 +218,7 @@ public class Message : global::System.IDisposable {
   ///
   /// <returns>Returns true if the field was replaced; false otherwise.</returns>
   ///
-  /// <exception cref="GmsecException">Thrown if the field name is NULL or contains an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the field name is NULL, contains an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the input value's type cannot be converted into the type required by the field.</exception>
   public bool SetFieldValue(string fieldName, ulong value) {
   }
@@ -240,7 +240,7 @@ public class Message : global::System.IDisposable {
   ///
   /// <returns>Returns true if the field was replaced; false otherwise.</returns>
   ///
-  /// <exception cref="GmsecException">Thrown if the field name is NULL or contains an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the field name is NULL, contains an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the input value's type cannot be converted into the type required by the field.</exception>
   public bool SetFieldValue(string fieldName, double value) {
   }
@@ -268,6 +268,22 @@ public class Message : global::System.IDisposable {
   ///
   /// <exception cref="GmsecException">If the subject is null or contains an empty-string</exception>
   public void SetSubject(string subject) {
+  }
+
+  /// <summary>
+  /// Allows for the setting of individual subject elements. The name of the elements are defined
+  /// by the message's corresponding message template. This value will be overridden by automatic subject
+  /// generation if the subject element is defined by an existing field in the message, or if the subject
+  /// was manually defined with setSubject.
+  /// </summary>
+  ///
+  /// <param name="name">The name of the subject element</param>
+  /// <param name="value">The value of the subject element. An empty or null value will be seen as FILL in the subject line.</param>
+  ///
+  /// <exception cref="GmsecException">if the name is NULL, an empty string, or does not match a subject element
+  /// name defined the message template, or if the message does not have a corresponding message template.
+  /// </exception>
+  public void SetSubjectElement(string name, string value) {
   }
 
   /// <summary>Returns message subject</summary>
@@ -300,7 +316,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="bin">Byte array of data</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the byte arrray is null.</exception>
   public bool AddField(string name, byte[] bin) {
   }
@@ -309,7 +325,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, bool value) {
   }
 
@@ -317,7 +333,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, char value) {
   }
 
@@ -325,7 +341,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, float value) {
   }
 
@@ -333,7 +349,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, double value) {
   }
 
@@ -341,7 +357,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, sbyte value) {
   }
 
@@ -349,7 +365,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, short value) {
   }
 
@@ -357,7 +373,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, int value) {
   }
 
@@ -365,7 +381,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, long value) {
   }
 
@@ -373,7 +389,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   /// <exception cref="GmsecException">Thrown if the value is null.</exception>
   public bool AddField(string name, string value) {
   }
@@ -382,7 +398,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, byte value) {
   }
 
@@ -390,7 +406,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, ushort value) {
   }
 
@@ -398,7 +414,7 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, uint value) {
   }
 
@@ -406,13 +422,13 @@ public class Message : global::System.IDisposable {
   /// <param name="name">The name of the field</param>
   /// <param name="value">Field value</param>
   /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
-  /// <exception cref="GmsecException">Thrown if the name is null or is an empty string.</exception>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is otherwise non-compliant.</exception>
   public bool AddField(string name, ulong value) {
   }
 
   /// <summary>Adds each Field in the given list to the Message.</summary>
   /// <param name="fields">The list of field objects</param>
-  /// <returns>True if the Field is replacing one with the same name; false otherwise.</returns>
+  /// <exception cref="GmsecException">Thrown if the name is null, is an empty string, or is non-compliant.</exception>
   public bool AddFields(FieldList fields) {
   }
 

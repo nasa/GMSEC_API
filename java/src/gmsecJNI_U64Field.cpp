@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,6 +13,8 @@
 #include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 
+#include <gmsec5/internal/field/InternalField.h>
+
 #include <gmsec5/field/U64Field.h>
 
 #include <sstream>
@@ -20,6 +22,7 @@
 
 
 using namespace gmsec::api5;
+using namespace gmsec::api5::internal;
 using namespace gmsec::api5::jni;
 
 
@@ -57,22 +60,11 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1U64Field
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1U64Field_1Copy
   (JNIEnv *jenv, jclass jcls, jlong jU64FieldPtr, jobject jU64Field)
 {
-	U64Field* created = 0;
+	U64Field* field = JNI_JLONG_TO_U64FIELD(jU64FieldPtr);
 
-	try
-	{
-		U64Field* field = JNI_JLONG_TO_U64FIELD(jU64FieldPtr);
+	U64Field* created = new U64Field(*field);
 
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "U64Field reference is null");
-		}
-		else
-		{
-			created = new U64Field(*field);
-		}
-	}
-	JNI_CATCH
+	FieldBuddy::getInternal(*created).isTracking(field->isTracking());
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -81,27 +73,16 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1U64Field
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_U64Field_1GetValue
   (JNIEnv *jenv, jclass jcls, jlong jU64FieldPtr, jobject jU64Field)
 {
-	jstring data;
+	U64Field* field = JNI_JLONG_TO_U64FIELD(jU64FieldPtr);
 
-	try
-	{
-		U64Field* field = JNI_JLONG_TO_U64FIELD(jU64FieldPtr);
+	GMSEC_U64 value = field->getValue();
 
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "U64Field reference is null");
-		}
-		else
-		{
-			GMSEC_U64 value = field->getValue();
+	std::ostringstream oss;
+	oss << value;
 
-			std::ostringstream oss;
-			oss << value;
-
-			data = makeJavaString(jenv, oss.str().c_str());
-		}
-	}
-	JNI_CATCH
+	// Note: makeJavaString() can throw an exception if the given value is NULL.
+	// Since a string is always passed, there's no need for a try-catch block.
+	jstring data = makeJavaString(jenv, oss.str().c_str());
 
 	return data;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,7 +32,9 @@ public class HeartbeatGenerator
 	private JNIHeartbeatGenerator m_jniHeartbeatGenerator = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param hbgen Object to reference for acquiring internal JNIHeartbeatGenerator
 	 * @return Internal JNIHeartbeatGenerator object
@@ -44,6 +46,7 @@ public class HeartbeatGenerator
 
 
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param jhbgen Internal JNIHeartbeatGenerator object
 	 */
@@ -51,6 +54,7 @@ public class HeartbeatGenerator
 	{
 		m_jniHeartbeatGenerator = jhbgen;
 	}
+	//! @endcond
 
 
 	/**
@@ -67,15 +71,15 @@ public class HeartbeatGenerator
 	 * <p>
 	 * Note: If the publish rate is set to 0 (zero), the heartbeat generator will only publish one message.
 	 *
-	 * @param config the Config object to configure the Connection that is used to publish messages
-	 * @param hbPubRate the message publish rate (in seconds)
+	 * @param config the Config object to configure the Connection that is used to publish messages.
+	 * @param hbPubRate the message publish rate (in seconds).
 	 * @param fields a list of fields to be included within the heartbeat message; value can be null.
 	 *
 	 * @return A instance of a HeartbeatGenerator object.
 	 *
-	 * @throws IllegalArgumentException Thrown if the Config object is null 
-	 * @throws IllegalArgumentException Thrown if the publish rate is less than 0 (zero)
-	 * @throws GmsecException Thrown if a Connection object cannot be created
+	 * @throws IllegalArgumentException Thrown if the Config object is null.
+	 * @throws IllegalArgumentException Thrown if the publish rate is less than 0 (zero).
+	 * @throws GmsecException Thrown if a Connection object cannot be created.
 	 *
 	 * @see HeartbeatGenerator#destroy(HeartbeatGenerator)
 	 */
@@ -98,7 +102,7 @@ public class HeartbeatGenerator
 	/**
 	 * This static method is used to destroy the HeartbeatGenerator object.
 	 *
-	 * @param hbGen The HeartbeatGenerator object to destroy
+	 * @param hbGen The HeartbeatGenerator object to destroy.
 	 *
 	 * @throws IllegalArgumentException Thrown if the given HeartbeatGenerator object is null.
 	 */
@@ -122,8 +126,8 @@ public class HeartbeatGenerator
 	 *
 	 * @return True if the heartbeat generator thread has started; false otherwise.
 	 *
-	 * @throws GmsecException Thrown if a connection cannot be established with the GMSEC Bus
-	 * @throws GmsecException Thrown if message validation is enabled and a valid HB message cannot be created
+	 * @throws GmsecException Thrown if a connection cannot be established with the GMSEC Bus.
+	 * @throws GmsecException Thrown if message validation is enabled and a valid HB message cannot be created.
 	 *
 	 * @see stop
 	 */ 
@@ -163,7 +167,7 @@ public class HeartbeatGenerator
 	 * <p>
 	 * Note: If the publish rate is set to 0 (zero), then only one additional heartbeat message will be published.
 	 *
-	 * @param pubRate the new publish rate for the heartbeat message generator
+	 * @param pubRate the new publish rate for the heartbeat message generator.
 	 *
 	 * @throws IllegalArgumentException Thrown if the given publish rate is less than 0 (zero).
 	 */
@@ -185,7 +189,7 @@ public class HeartbeatGenerator
 	 * Note: If the PUB-RATE field is provided, then then publish rate for the heartbeat generator
 	 * will be updated to publish at the (new) rate.
 	 *
-	 * @param field The field to add to the message
+	 * @param field The field to add to the message.
 	 *
 	 * @return True if an existing field was overwritten; false otherwise.
 	 *
@@ -210,8 +214,8 @@ public class HeartbeatGenerator
 	 * Note: If the PUB-RATE field is provided, then then publish rate for the heartbeat generator
 	 * will be updated to publish at the (new) rate.
 	 *
-	 * @param fieldName The name of the field
-	 * @param fieldValue The value of the field
+	 * @param fieldName The name of the field.
+	 * @param fieldValue The value of the field.
 	 *
 	 * @return True if an existing field was overwritten; false otherwise.
 	 *
@@ -236,8 +240,8 @@ public class HeartbeatGenerator
 	 * Note: If the PUB-RATE field is provided, then then publish rate for the heartbeat generator
 	 * will be updated to publish at the (new) rate.
 	 *
-	 * @param fieldName The name of the field
-	 * @param fieldValue The value of the field
+	 * @param fieldName The name of the field.
+	 * @param fieldValue The value of the field.
 	 *
 	 * @return True if an existing field was overwritten; false otherwise.
 	 *
@@ -262,8 +266,8 @@ public class HeartbeatGenerator
 	 * Note: If the PUB-RATE field is provided, then then publish rate for the heartbeat generator
 	 * will be updated to publish at the (new) rate.
 	 *
-	 * @param fieldName The name of the field
-	 * @param fieldValue The value of the field
+	 * @param fieldName The name of the field.
+	 * @param fieldValue The value of the field.
 	 *
 	 * @return True if an existing field was overwritten; false otherwise.
 	 *

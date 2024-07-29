@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,7 +42,9 @@ public class Connection
 	private JNIConnection m_jniConnection = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param conn Object to reference for acquiring internal JNIConnection
 	 * @return Internal JNIConnection object
@@ -54,6 +56,7 @@ public class Connection
 
 
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param conn Connection object
 	 */
@@ -67,6 +70,7 @@ public class Connection
 
 
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param jConn Internal JNIConnection object
 	 * @throws GmsecException Thrown if given JNIConnection object is null.
@@ -80,6 +84,7 @@ public class Connection
 		}
 		m_jniConnection = jConn;
 	}
+	//! @endcond
 
 
 	/**
@@ -549,7 +554,7 @@ public class Connection
 	 * @throws IllegalArgumentException Thrown if the given SubscriptionInfo object is null.
 	 * @throws GmsecException Thrown if the given SubscriptionInfo object originated from a different Connection object.
 	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
-	 * @throws GmsecException Thrown if error occurs at the middleware level.
+	 * @throws GmsecException Thrown if an error occurs at the middleware level.
 	 *
 	 * @see Connection#subscribe(String)
 	 * @see Connection#receive()
@@ -570,11 +575,14 @@ public class Connection
 	/**
 	 * Starts a thread that will dispatch messages asynchronously when they are received.
 	 * If this is used, all subscriptions must be made with callbacks or the messages with be dropped. If
-	 * receive() is called while the auto-dispatcher is used, the behavior will be undesireable and undefined.
+	 * receive() is called while the auto-dispatcher is used, the behavior will be undesirable and undefined.
 	 *
 	 * @return A value of true is returned if the auto-dispatcher has been started; false otherwise.
+	 *
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 */
 	public boolean startAutoDispatch()
+		throws GmsecException
 	{
 		return m_jniConnection.startAutoDispatch();
 	}
@@ -584,8 +592,11 @@ public class Connection
 	 * Stops the auto dispatch thread.
 	 *
 	 * @return A value of true is returned if the auto-dispatcher was running and has been stopped; false otherwise.
+	 *
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 */
 	public boolean stopAutoDispatch()
+		throws GmsecException
 	{
 		return m_jniConnection.stopAutoDispatch(true);
 	}
@@ -598,8 +609,11 @@ public class Connection
 	 * thread has completed running.
 	 *
 	 * @return A value of true is returned if the auto-dispatcher was running and has been stopped; false otherwise.
+	 *
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 */
 	public boolean stopAutoDispatch(boolean waitForCompletion)
+		throws GmsecException
 	{
 		return m_jniConnection.stopAutoDispatch(waitForCompletion);
 	}
@@ -615,12 +629,14 @@ public class Connection
 	 * @param msg Message to be published
 	 *
 	 * @throws IllegalArgumentException Thrown if the given Message object is null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to publish the message.
 	 *
 	 * @see Connection#subscribe(String)
 	 * @see Connection#receive()
 	 */
-	public void publish(Message msg) throws IllegalArgumentException, GmsecException
+	public void publish(Message msg)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (msg == null)
 		{
@@ -643,12 +659,14 @@ public class Connection
 	 * @param mwConfig Config object for providing middleware configuration options
 	 *
 	 * @throws IllegalArgumentException Thrown if either the given Message or Config objects are null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to publish the message.
 	 *
 	 * @see Connection#subscribe(String)
 	 * @see Connection#receive()
 	 */
-	public void publish(Message msg, Config mwConfig) throws IllegalArgumentException, GmsecException
+	public void publish(Message msg, Config mwConfig)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (msg == null)
 		{
@@ -684,9 +702,11 @@ public class Connection
 	 *                     Config object used to create the Connection object.  The minimum republish period allowed is 100ms.
 	 *
 	 * @throws IllegalArgumentException Thrown if either the given Message or ReplyCallback objects are null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to generate an asynchronous request.
 	 */
-	public void request(Message request, int timeout, ReplyCallback cb, int republish_ms) throws IllegalArgumentException, GmsecException
+	public void request(Message request, int timeout, ReplyCallback cb, int republish_ms)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (request == null)
 		{
@@ -720,11 +740,13 @@ public class Connection
 	 * @return Reply Message, or null if no reply received in time
 	 *
 	 * @throws IllegalArgumentException Thrown if the given Message object is null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to generate an synchronous request.
 	 *
 	 * @see Message#destroy(Message)
 	 */
-	public Message request(Message request, int timeout, int republish_ms) throws IllegalArgumentException, GmsecException
+	public Message request(Message request, int timeout, int republish_ms)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (request == null)
 		{
@@ -746,9 +768,11 @@ public class Connection
 	 * @param reply The reply message to be sent.
 	 *
 	 * @throws IllegalArgumentException Thrown if the given Reply Message objects is null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to issue the reply.
 	 */
-	public void reply(Message request, Message reply) throws IllegalArgumentException, GmsecException
+	public void reply(Message request, Message reply)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (reply == null)
 		{
@@ -766,12 +790,14 @@ public class Connection
 	 * @param msg Message to be dispatched
 	 *
 	 * @throws IllegalArgumentException Thrown if the given Messages object is null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to dispatch the message.
 	 *
 	 * @see Connection#subscribe(String, Callback)
 	 * @see Connection#receive()
 	 */
-	public void dispatch(Message msg) throws IllegalArgumentException, GmsecException
+	public void dispatch(Message msg)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (msg == null)
 		{
@@ -791,13 +817,15 @@ public class Connection
 	 *
 	 * @return A handle to the next available Message.
 	 *
-	 * @throws GmsecException Thrown on error
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
+	 * @throws GmsecException Thrown if an error occurs while attempting to receive a message.
 	 *
 	 * @see Connection#subscribe(String)
 	 * @see Connection#dispatch(Message)
 	 * @see Message#destroy(Message)
 	 */
-	public Message receive() throws GmsecException
+	public Message receive()
+		throws GmsecException
 	{
 		return receive(Gmsec.WAIT_FOREVER);
 	}
@@ -814,13 +842,15 @@ public class Connection
 	 *
 	 * @return A handle to the next available Message, or null if a timeout occurs.
 	 *
-	 * @throws GmsecException Thrown on error
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
+	 * @throws GmsecException Thrown if an error occurs while attempting to receive a message.
 	 *
 	 * @see Connection#subscribe(String)
 	 * @see Connection#dispatch(Message)
 	 * @see Message#destroy(Message)
 	 */
-	public Message receive(int timeout) throws GmsecException
+	public Message receive(int timeout)
+		throws GmsecException
 	{
 		return m_jniConnection.receive(timeout);
 	}
@@ -832,8 +862,11 @@ public class Connection
 	 * @param subject The subject pattern to look for in incoming messages.
 	 *
 	 * @throws IllegalArgumentException Thrown if the given Subject string is null or contains an empty string.
+	 * @throws GmsecException Thrown if the given Subject string is non-compliant.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 */
-	public void excludeSubject(String subject) throws IllegalArgumentException
+	public void excludeSubject(String subject)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -851,8 +884,11 @@ public class Connection
 	 * @param subject The subject pattern to remove.
 	 *
 	 * @throws IllegalArgumentException Thrown if the given Subject string is null or contains an empty string.
+	 * @throws GmsecException Thrown if the given Subject string is non-compliant.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 */
-	public void removeExcludedSubject(String subject) throws IllegalArgumentException
+	public void removeExcludedSubject(String subject)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (subject == null || subject.isEmpty())
 		{
@@ -880,16 +916,9 @@ public class Connection
 	 * one will be automatically generated.
 	 *
 	 * @param name Name of this connection
-	 *
-	 * @throws IllegalArgumentException Thrown if the given name string is null or contains an empty string.
 	 */
-	public void setName(String name) throws IllegalArgumentException
+	public void setName(String name)
 	{
-		if (name == null || name.isEmpty())
-		{
-			throw new IllegalArgumentException("Name is null or contains an empty string");
-		}
-
 		m_jniConnection.setName(name);
 	}
 

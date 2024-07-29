@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -66,13 +66,15 @@ void Middleware::shutdownAll()
 
 
 
-void Middleware::shutdown(const char* name)
+void Middleware::shutdown(const char* name0)
 {
+	std::string name((name0 ? name0 : "unknown middleware"));
+
 	std::map<std::string, Middleware*>::iterator i = middlewares.find(name);
 
 	if (i != middlewares.end())
 	{
-		GMSEC_DEBUG << "Attempting shutdown of middleware " << name;
+		GMSEC_DEBUG << "Attempting shutdown of middleware " << name.c_str();
 
 		Middleware* middleware = i->second;
 

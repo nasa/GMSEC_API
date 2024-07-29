@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,10 +19,6 @@
 
 
 namespace bolt {
-
-
-static const int DEBUG_WRITE = 0;
-static const int DEBUG_PUT = 0;
 
 
 static i32 getID()
@@ -248,11 +244,6 @@ Result Shared::write(const ByteBuffer &buffer)
 	while (position < buffer.size() && getState() == STATE_CONNECTED)
 	{
 		int pending = buffer.size() - position;
-if (DEBUG_WRITE)
-{
-	GMSEC_DEBUG << fTag.c_str() << "write size=" << buffer.size()
-			<< " position=" << position << " pending=" << pending;
-}
 
 		int written = write(buffer.raw() + position, pending);
 
@@ -301,12 +292,6 @@ Result Shared::put(const SharedPacket &packet)
 		ByteBuffer buffer;
 		packet->put(buffer);
 		result = write(buffer);
-
-if (DEBUG_PUT)
-{
-	GMSEC_INFO << fTag.c_str() << "put wrote";
-	packet->put(std::cout);
-}
 	}
 	else if (fState == STATE_RECONNECTING)
 	{

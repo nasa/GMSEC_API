@@ -164,7 +164,7 @@ class T016_ResourceGenerator extends TestCase
 
 			// Verify no RSRC messages are being published
 			try {
-				var conn = new gmsec.Connection(this.getConfig());
+				var conn = gmsec.Connection.create(this.getConfig());
 				conn.connect();
 				conn.setupSubscription("C2MS.*.*.*.*.*.MSG.RSRC." + this.getUniqueComponent() + ".+");
 
@@ -177,6 +177,8 @@ class T016_ResourceGenerator extends TestCase
 				}
 
 				conn.disconnect();
+
+				gmsec.Connection.destroy(conn);
 			}
 			catch (e) {
 				this.require(e.message, false);
@@ -250,7 +252,7 @@ class T016_ResourceGenerator extends TestCase
 	verifyResourceMessage(config, pubRate)
 	{
 		try {
-			var conn = new gmsec.Connection(config);
+			var conn = gmsec.Connection.create(config);
 			conn.connect();
 			conn.setupSubscription("C2MS.*.*.*.*.*.MSG.RSRC." + this.getUniqueComponent() + ".+");
 
@@ -288,6 +290,8 @@ class T016_ResourceGenerator extends TestCase
 			}
 
 			conn.disconnect();
+
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);

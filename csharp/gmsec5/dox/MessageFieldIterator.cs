@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,6 +14,8 @@ namespace GMSEC.API5 {
 
 /// <summary>
 /// The MessageFieldIterator class can be used to iterate over the Fields contained within a Message.
+///
+/// Note: MessageFieldIterator is not thread safe.
 ///
 /// <seealso cref="Message"/>
 /// </summary>
@@ -44,7 +46,10 @@ public class MessageFieldIterator : global::System.IDisposable {
     HEADER_FIELDS,
 
     /// <summary>Used for iterating only over non-header Fields.</summary>
-    NON_HEADER_FIELDS
+    NON_HEADER_FIELDS,
+
+    /// <summary>Used for iterating only over tracking Fields.</summary>
+    TRACKING_FIELDS
   }
 
 }

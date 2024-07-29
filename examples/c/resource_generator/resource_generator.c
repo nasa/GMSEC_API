@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -116,7 +116,7 @@ void getStandardFields(GMSEC_Field** standardFields, size_t* numFields)
 	(*standardFields)[4] = stringFieldCreate("FACILITY", "MY-FACILITY", GMSEC_TRUE, NULL);
 	(*standardFields)[5] = stringFieldCreate("DOMAIN1", "MY-DOMAIN-1", GMSEC_TRUE, NULL);
 	(*standardFields)[6] = stringFieldCreate("DOMAIN2", "MY-DOMAIN-2", GMSEC_TRUE, NULL);
-	(*standardFields)[7] = stringFieldCreate("COMPONENT", "HB-GEN", GMSEC_TRUE, NULL);
+	(*standardFields)[7] = stringFieldCreate("COMPONENT", "RSRC-GEN", GMSEC_TRUE, NULL);
 }
 
 

@@ -16,6 +16,8 @@
 #else
 #include <winsock2.h>
 #include <process.h>
+// This is not production level code; allow usage of strcat(), strcpy(), etc.
+#pragma warning ( disable : 4996 )
 #endif
 
 
@@ -88,9 +90,9 @@ int        strcontains(const char* haystack, const char* needle);
 int        strcompare(const char* s1, const char* s2);
 size_t     strlength(const char* str);
 void       strcopy(char* s1, const char* s2);
-char*      strduplicate(const char* str, int length);
-int        strfind(const char* haystack, const char* needle);
-char*      substr(const char* str, int offset, int len, char* dest);
+char*      strduplicate(const char* str, size_t length);
+size_t     strfind(const char* haystack, const char* needle);
+char*      substr(const char* str, size_t offset, size_t len, char* dest);
 GMSEC_BOOL checkForOS(const char* os);
 
 
@@ -511,7 +513,7 @@ const char* testGetDescription()
 
 void stringToUpper(char* destStr, const char* srcStr)
 {
-	int index = 0;
+	size_t index;
 
 	for (index = 0; index < strlength(srcStr); index++)
 	{
@@ -531,7 +533,7 @@ void stringToUpper(char* destStr, const char* srcStr)
 
 void stringToLower(char* destStr, const char* srcStr)
 {
-	int index = 0;
+	size_t index;
 
 	for (index = 0; index < strlength(srcStr); index++)
 	{
@@ -595,7 +597,7 @@ void testSetPrefix(const char* s)
 {
 	GMSEC_BOOL path_divider_found = GMSEC_FALSE;
 	GMSEC_BOOL underscore_found   = GMSEC_FALSE;
-	int  index                    = strlength(s)-1;
+	size_t     index              = strlength(s)-1;
 
 	char hostname_str[OUT_STR_LEN];
 	char unit_test_number_str[OUT_STR_LEN];
@@ -886,7 +888,7 @@ void strcopy(char* s1, const char* s2)
 }
 
 
-char* strduplicate(const char* str, int length)
+char* strduplicate(const char* str, size_t length)
 {
 	char* dup = (char* ) malloc(length + 1);
 	strcopy(dup, str);
@@ -895,16 +897,16 @@ char* strduplicate(const char* str, int length)
 }
 
 
-int strfind(const char* haystack, const char* needle)
+size_t strfind(const char* haystack, const char* needle)
 {
 	char* pos = strstr(haystack, needle);
 	return (pos ? pos - haystack : -1);
 }
 
 
-char* substr(const char* str, int offset, int len, char* dest)
+char* substr(const char* str, size_t offset, size_t len, char* dest)
 {
-	int str_len = strlen(str);
+	size_t str_len = strlen(str);
 
 	if (offset + len > str_len)
 	{
@@ -921,8 +923,8 @@ char* substr(const char* str, int offset, int len, char* dest)
 // Determine if specified Operating System is in use
 GMSEC_BOOL checkForOS(const char* os)
 {
-	char  tmp_str[OUT_STR_LEN];
-	int   index   = 0;
+	char   tmp_str[OUT_STR_LEN];
+	size_t index;
 
 	strcopy(tmp_str, os);
 

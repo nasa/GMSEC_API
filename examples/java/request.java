@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -91,6 +91,9 @@ public class request
 				// GMSEC_REQUEST_REPUBLISH_NEVER, then this block will never be reached.
 				Log.warning("Time out; no Response Directive message received");
 			}
+
+			// Destroy the request message
+			Message.destroy(reqMsg);
 
 			// Disconnect from the GMSEC Bus, and terminate subscriptions.
 			conn.disconnect();

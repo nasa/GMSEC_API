@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -234,21 +234,6 @@ void InternalConfig::addValue(const char* name, const char* value)
 
 		InternalLog::setDefaultStream(out);
 	}
-	else if (uc_name == GMSEC_CONVERT_FIELD_NAMES)
-	{
-		if (StringUtil::stringEqualsIgnoreCase(value, "uppercase"))
-		{
-			StringConverter::instance().setMode(StringConverter::TO_UPPERCASE);
-		}
-		else if (StringUtil::stringEqualsIgnoreCase(value, "lowercase"))
-		{
-			StringConverter::instance().setMode(StringConverter::TO_LOWERCASE);
-		}
-		else
-		{
-			StringConverter::instance().setMode(StringConverter::NO_CONVERSION);
-		}
-	}
 	else if (uc_name == GMSEC_IDENTIFY_HEADER_FIELDS)
 	{
 		if (StringUtil::stringEqualsIgnoreCase(value, "true"))
@@ -263,7 +248,11 @@ void InternalConfig::addValue(const char* name, const char* value)
 		{
 			std::stringstream ss;
 			ss << GMSEC_IDENTIFY_HEADER_FIELDS << " value must be either be true or false.";
-			throw GmsecException(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
+
+			LogLevel level = Log::getReportingLevel();
+			Log::setReportingLevel(LogLevel::logWARNING);
+			GMSEC_WARNING << ss.str().c_str();
+			Log::setReportingLevel(level);
 		}
 	}
 }

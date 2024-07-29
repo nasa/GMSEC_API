@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -139,5 +139,17 @@ public class JNIField
 	public boolean isHeader()
 	{
 		return gmsecJNI.Field_IsHeader(swigCPtr, this);
+	}
+
+
+	public boolean isTracking()
+	{
+		return gmsecJNI.Field_IsTracking(swigCPtr, this);
+	}
+
+
+	public static boolean isFieldNameCompliant(String fieldName)
+	{
+		return gmsecJNI.Field_IsFieldNameCompliant(fieldName);
 	}
 }

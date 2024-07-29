@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,7 +32,9 @@ public class SchemaIDIterator
 	}
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param iter Object to reference for acquiring internal JNISchemaIDIterator.
 	 * @return Internal JNISchemaIDIterator object.
@@ -44,6 +46,7 @@ public class SchemaIDIterator
 
 
 	/**
+	 * @hidden
 	 * This constructor is for internal GMSEC API use only.
 	 * @param jIter Internal JNISchemaIDIterator object.
 	 */
@@ -51,6 +54,7 @@ public class SchemaIDIterator
 	{
 		m_jniSchemaIDIterator = jIter;
 	}
+	//! @endcond
 
 
 	/**

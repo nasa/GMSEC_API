@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -149,7 +149,7 @@ public class Connection : global::System.IDisposable {
 
   /// <summary>Starts a thread that will dispatch messages asynchronously when they are received. If this is used,
   /// all subscriptions must be made with callbacks or the messages with be dropped. If Receive() is called while
-  /// the auto-dispatcher is used, the behavior will be undesireable and undefined.</summary>
+  /// the auto-dispatcher is used, the behavior will be undesirable and undefined.</summary>
   /// <returns>Boolean flag to indicate whether the auto-dispatcher has started.</returns>
   /// <exception cref="GmsecException">Thrown if a connection to the middleware server has not been established.</exception>
   public bool StartAutoDispatch() {
@@ -299,7 +299,6 @@ public class Connection : global::System.IDisposable {
   /// <summary>Sets the logical name of this connection. This can be used for identifying connections withing
   /// a client program. If a name is not given, one will be automatically generated.</summary>
   /// <param name="name">The connection name.</param>
-  /// <exception cref="GmsecException">Thrown if the given name is null or contains an empty string.</exception>
   public void SetName(string name) {
   }
 

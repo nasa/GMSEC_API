@@ -37,14 +37,26 @@ class T010_Connection extends TestCase
 		this.testGetConnectionEndpoint();
 	}
 
+
 	testConstructor()
 	{
 		gmsec.Log.info("Test constructor");
 
 		// Nominal test
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			this.check("Okay", true);
+			gmsec.Connection.destroy(conn);
+		}
+		catch (e) {
+			this.require(e.message, false);
+		}
+
+		try {
+			var factory = new gmsec.MessageFactory(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig(), factory);
+			this.check("Okay", true);
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -53,22 +65,22 @@ class T010_Connection extends TestCase
 		// Off-nominal test
 		try {
 			// missing mw-id
-			var conn = new gmsec.Connection(new gmsec.Config());
+			var conn = gmsec.Connection.create(new gmsec.Config());
 			this.check("Expected an exception", false);
 		}
 		catch (e) {
 			//SWIG BUG this.check(e.message, e.message.includes("mw-id in Config is not specified"));
-			this.check(e.message, e.message.includes("Illegal arguments for construction of _exports_Connection"));
+			this.check(e.message, e.message.includes("Illegal arguments for function create"));
 		}
 
 		try {
 			// bogus middleware
-			var conn = new gmsec.Connection(new gmsec.Config("mw-id=bogus", gmsec.DataType_KEY_VALUE_DATA));
+			var conn = gmsec.Connection.create(new gmsec.Config("mw-id=bogus", gmsec.DataType_KEY_VALUE_DATA));
 			this.check("Expected an exception", false);
 		}
 		catch (e) {
 			//SWIG BUG this.check(e.message, e.message.includes("Unable to load"));
-			this.check(e.message, e.message.includes("Illegal arguments for construction of _exports_Connection"));
+			this.check(e.message, e.message.includes("Illegal arguments for function create"));
 		}
 	}
 
@@ -83,9 +95,11 @@ class T010_Connection extends TestCase
 	{
 		gmsec.Log.info("Test connect()");
 
+		var conn = null;
+
 		// Nominal test
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			this.check("Okay", true);
 			conn.disconnect();
@@ -93,11 +107,14 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.require(e.message, false);
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		// Off-nominal test
 		try {
 			var config = new gmsec.Config("mw-id=bolt server=gs580s-gc764mw1:1234", gmsec.DataType_KEY_VALUE_DATA);
-			var conn = new gmsec.Connection(config);
+			conn = gmsec.Connection.create(config);
 			conn.connect();
 			this.check("Expected error to indicate unable to connect", false);
 		}
@@ -108,6 +125,9 @@ class T010_Connection extends TestCase
 			             (ex.getCustomCode() == 7);
 			this.check(e.message, result);
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 	}
 
 	testDisconnect()
@@ -115,10 +135,11 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test disconnect()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			conn.disconnect();
 			this.check("Okay", true);
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -130,8 +151,9 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test getLibraryName()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			this.check("Unexpected library name", conn.getLibraryName().includes(this.getConfig().getValue("mw-id", "unknown")));
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -143,8 +165,9 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test getLibraryVersion()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			this.check("Unexpected library version", conn.getLibraryVersion() != null);
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -156,8 +179,9 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test getConfig()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			this.check("Unexpected Config", conn.getConfig() != null);
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -169,8 +193,9 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test getMessageFactory()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			this.check("Expected MessageFactory for the CURRENT specification", conn.getMessageFactory().getSpecification().getVersion() == gmsec.GMSEC_MSG_SPEC_CURRENT);
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -181,14 +206,16 @@ class T010_Connection extends TestCase
 	{
 		gmsec.Log.info("Test setupSubscription()");
 
+		var conn = null;
+
 		// Nominal tests
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			conn.setupSubscription(this.getSubject("*.BAR"));
 			conn.setupSubscription(this.getSubject("FOO.BAZ"));
 
-			var msg1 = conn.getMessageFactory().createMessage("LOG");
+			var msg1 = conn.getMessageFactory().createMessage("HB");
 			var msg2 = conn.getMessageFactory().createMessage("LOG");
 			var msg3 = conn.getMessageFactory().createMessage("LOG");
 
@@ -200,11 +227,13 @@ class T010_Connection extends TestCase
 			var msg = conn.receive(5000);
 			this.require("Was expecting to receive a message", msg != null);
 			this.check("Unexpected message subject", msg.getSubject() == msg1.getSubject());
+			this.verifyTrackingFields(msg, 11);
 
 			conn.publish(msg2);
 			msg = conn.receive(5000);
 			this.require("Was expecting to receive a message", msg != null);
 			this.check("Unexpected message subject", msg.getSubject() == msg2.getSubject());
+			this.verifyTrackingFields(msg, 7);
 
 			conn.publish(msg3);
 			msg = conn.receive(5000);
@@ -215,11 +244,14 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.require(e.message, false);
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		// Off-nominal tests
 		try {
 			// duplicate subscription
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			conn.setupSubscription("GMSEC.>");
 			conn.setupSubscription("GMSEC.>");
@@ -228,20 +260,26 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("Duplicate subscription"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		try {
 			// subscribe before connect
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.setupSubscription("GMSEC.>");
 			this.check("An exception was expected", false);
 		}
 		catch (e) {
 			this.check(e.message, e.message.includes("Connection has not been initialized"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		try {
 			// illegal subscription topic
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			conn.setupSubscription("GMSEC.MY MISSION.*.*.>");
 			this.check("An exception was expected", false);
@@ -249,15 +287,20 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("Subject is invalid"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 	}
 
 	testUnsubscribe()
 	{
 		gmsec.Log.info("Test unsubscribe()");
 
+		var conn = null;
+
 		// Nominal test
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			var info = conn.setupSubscription(this.getSubject("FOO.BAR"));
 			conn.unsubscribe(info);
@@ -273,11 +316,17 @@ class T010_Connection extends TestCase
 		catch (e) {
 			test.require(e.message, false);
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		// Off-nominal test
+		var conn1 = null;
+		var conn2 = null;
+
 		try {
-			var conn1 = new gmsec.Connection(this.getConfig());
-			var conn2 = new gmsec.Connection(this.getConfig());
+			conn1 = gmsec.Connection.create(this.getConfig());
+			conn2 = gmsec.Connection.create(this.getConfig());
 
 			conn1.connect();
 			conn2.connect();
@@ -290,15 +339,21 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("SubscriptionInfo object is not associated with this Connection"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn1);
+			gmsec.Connection.destroy(conn2);
+		}
 	}
 
 	testPublish()
 	{
 		gmsec.Log.info("Test publish()");
 
+		var conn = null;
+
 		// Nominal test
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			conn.setupSubscription(this.getSubject(">"));
 
@@ -322,6 +377,9 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.require(e.message, false);
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		// Off-nominal test
 		try {
@@ -329,7 +387,7 @@ class T010_Connection extends TestCase
 			var config = new gmsec.Config(this.getConfig());   // make a copy!
 			config.addValue("gmsec-msg-content-validate", "true");
 
-			var conn = new gmsec.Connection(config);
+			conn = gmsec.Connection.create(config);
 			var msg = conn.getMessageFactory().createMessage("HB");
 
 			conn.connect();
@@ -339,10 +397,13 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("Message Validation Failed"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		try {
 			// Connection has not been initialized
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			var msg = conn.getMessageFactory().createMessage("HB");
 			conn.publish(msg);
 			this.check("Expected an exception", false);
@@ -350,10 +411,13 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("Connection has not been initialized"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		try {
 			// Connection has not been initialized
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			var msg = conn.getMessageFactory().createMessage("REQ.DIR");
 			conn.connect();
 			conn.publish(msg);
@@ -362,6 +426,9 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("Cannot publish message with non-PUBLISH message kind"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 	}
 
 	testPublishWithConfig()
@@ -369,7 +436,7 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test publishWithConfig()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			this.setStandardFields(conn.getMessageFactory());
 
 			var msg = conn.getMessageFactory().createMessage("HB");
@@ -389,6 +456,7 @@ class T010_Connection extends TestCase
 			else {
 				this.check("Received a message", true);
 			}
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -397,6 +465,14 @@ class T010_Connection extends TestCase
 
 	testRequest()
 	{
+		var mw = this.getConfig().getValue("mw-id", "unknown");
+
+		if (mw == "unknown" || mw == "loopback")
+		{
+			// Test is not supported by loopback (or unknown) middleware
+			return;
+		}
+
 		gmsec.Log.info("Test request()");
 
 		// Nominal case
@@ -406,7 +482,7 @@ class T010_Connection extends TestCase
 			var config = new gmsec.Config(this.getConfig());   // make a copy!
 			config.addValue("tracking", "false");
 
-			var conn = new gmsec.Connection(config);
+			var conn = gmsec.Connection.create(config);
 			conn.connect();
 			conn.setupSubscription(responseSubject);
 
@@ -449,6 +525,8 @@ class T010_Connection extends TestCase
 			else {
 				this.check("Okay, no message received", true);
 			}
+
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -461,10 +539,12 @@ class T010_Connection extends TestCase
 
 		// Nominal test for Connection.reply() tested earlier (via addons/T010_Responder.js)
 
+		var conn = null;
+
 		// Off-nominal tests
 		try {
 			// Connection not initialized
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			var reqMsg = conn.getMessageFactory().createMessage("REQ.DIR");
 			var repMsg = conn.getMessageFactory().createMessage("RESP.DIR");
 			conn.reply(reqMsg, repMsg);
@@ -473,10 +553,13 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("Connection has not been initialized"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		try {
 			// Bad request message
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			var reqMsg = conn.getMessageFactory().createMessage("HB");
 			var repMsg = conn.getMessageFactory().createMessage("RESP.DIR");
@@ -486,10 +569,13 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("Cannot issue reply with non-REQUEST kind message"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		try {
 			// Bad reply message
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			var reqMsg = conn.getMessageFactory().createMessage("REQ.DIR");
 			var repMsg = conn.getMessageFactory().createMessage("HB");
@@ -499,6 +585,9 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.check(e.message, e.message.includes("Cannot issue reply with non-REPLY kind message"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 	}
 
 	testReceive()
@@ -507,7 +596,7 @@ class T010_Connection extends TestCase
 
 		// Nominal tests
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 
 			this.setStandardFields(conn.getMessageFactory());
@@ -526,19 +615,34 @@ class T010_Connection extends TestCase
 			rcvd = conn.receive(5000);
 			this.require("Did not receive message", rcvd != null);
 			this.check("Unexpected subject", rcvd.getSubject() == msg.getSubject());
+
+			var iter = rcvd.getFieldIterator( gmsec.MessageFieldIterator.Selector_TRACKING_FIELDS );
+			var numTrackingFields = 0;
+			while (iter.hasNext()) {
+				var field = iter.next();
+				this.check("Expected a tracking field", field.isTracking());
+				numTrackingFields += 1;
+			}
+			this.check("Unexpected number of tracking fields", numTrackingFields == 10);
+
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
 		}
 
 		// Off-nominal test(s)
+		var conn = null;
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.receive(10);
 			this.check("Expected an exception", false);
 		}
 		catch (e) {
 			this.check(e.message, e.message.includes("Connection has not been initialized"));
+		}
+		finally {
+			gmsec.Connection.destroy(conn);
 		}
 	}
 
@@ -546,9 +650,11 @@ class T010_Connection extends TestCase
 	{
 		gmsec.Log.info("Test excludeSubject()");
 
+		var conn = null;
+
 		// Nominal test
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 	
 			this.setStandardFields(conn.getMessageFactory());
@@ -585,25 +691,34 @@ class T010_Connection extends TestCase
 		catch (e) {
 			this.require(e.message, false);
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		// Off-nominal tests
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.excludeSubject("GMSEC.FOO.BAR");
 			this.check("Expected an exception", false);
 		}
 		catch (e) {
 			this.check(e.message, e.message.includes("Connection has not been initialized"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			conn.excludeSubject("GMSEC FOO BAR");
 			this.check("Expected an exception", false);
 		}
 		catch (e) {
 			this.check(e.message, e.message.includes("Subject is invalid"));
+		}
+		finally {
+			gmsec.Connection.destroy(conn);
 		}
 	}
 
@@ -613,24 +728,32 @@ class T010_Connection extends TestCase
 
 		// Nominal test for removeExcludedSubject() was tested in testExcludeSubject()
 
+		var conn = null;
+
 		// Off-nominal tests
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.removeExcludedSubject("GMSEC.FOO.BAR");
 			this.check("Expected an exception", false);
 		}
 		catch (e) {
 			this.check(e.message, e.message.includes("Connection has not been initialized"));
 		}
+		finally {
+			gmsec.Connection.destroy(conn);
+		}
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			conn.removeExcludedSubject("GMSEC FOO BAR");
 			this.check("Expected an exception", false);
 		}
 		catch (e) {
 			this.check(e.message, e.message.includes("Subject is invalid"));
+		}
+		finally {
+			gmsec.Connection.destroy(conn);
 		}
 	}
 
@@ -639,12 +762,18 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test getName() and setName()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
-			conn.connect();
+			var conn = gmsec.Connection.create(this.getConfig());
 			this.check("Expected a connection name", conn.getName() != null);
 
 			conn.setName("FOOBAR");
 			this.check("Expected connection name of FOOBAR", conn.getName() === "FOOBAR");
+
+			/* Binding does not allow null to be passed as an argument
+			conn.setName(null);
+			this.check("Expected connection name of FOOBAR", conn.getName() === "FOOBAR");
+			*/
+
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -656,9 +785,10 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test getID()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			this.check("Expected a connection ID", conn.getID() != null);
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -670,8 +800,9 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test getMWInfo()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			this.check("Expected mwInfo to contain mw-id", conn.getMWInfo().includes(this.getConfig().getValue("mw-id", "")));
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
@@ -683,13 +814,34 @@ class T010_Connection extends TestCase
 		gmsec.Log.info("Test getConnectionEndpoint()");
 
 		try {
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			this.check("Unexpected connectioon endpoint", conn.getConnectionEndpoint() != null);
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);
 		}
+	}
+
+	verifyTrackingFields(msg, expected)
+	{
+		var numTrackingFields = 0;
+
+		var iter = msg.getFieldIterator(gmsec.MessageFieldIterator.Selector_TRACKING_FIELDS);
+
+		while (iter.hasNext())
+		{
+			var field = iter.next();
+
+			this.check("Expected a tracking field", field.isTracking());
+
+			if (field.isTracking()) {
+				numTrackingFields += 1;
+			}
+		}
+
+		this.check("Unexpected number of tracking fields", numTrackingFields == expected);
 	}
 }
 

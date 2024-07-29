@@ -34,8 +34,8 @@ Instructions for running Java example programs
 
 
    IMPORTANT:
-   The GMSEC API's Java binding is built using OpenJDK 11. Use a similar
-   or later version of Java to build and run the example programs. Set the
+   The GMSEC API's Java binding is built using OpenJDK 17, however OpenJDK 8,
+   11, 17 or later version can be used to compile the example programs. Set the
    environment variable JDK_HOME to reference the path where OpenJDK is
    installed.
 

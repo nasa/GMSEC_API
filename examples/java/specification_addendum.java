@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -118,6 +118,9 @@ public class specification_addendum
 			{
 				Log.info("This validation error is expected for the incomplete LOG message:\n" + e.getMessage());
 			}
+
+			// Destroy the Log message
+			Message.destroy(logMsg);
 
 			// Disconnect from the GMSEC Bus.
 			conn.disconnect();

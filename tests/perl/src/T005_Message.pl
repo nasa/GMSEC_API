@@ -21,6 +21,7 @@ sub Test_Message
 	test_setFieldValue($test);
 	test_setConfig($test);
 	test_setSubject($test);
+	test_setSubjectElement($test);
 	test_getSubject($test);
 	test_setKind($test);
 	test_getKind($test);
@@ -361,6 +362,74 @@ sub test_setSubject
 	{
 		my $error = $@;
 		$test->check($error->what(), index($error->what(), "Invalid message subject") != -1);
+	}
+}
+
+
+sub test_setSubjectElement
+{
+	libgmsec_perl::logInfo("Test setSubjectElement()");
+
+	my ($test) = @_;
+
+	my $msgFactory = libgmsec_perl::MessageFactory::create();
+
+	$test->setStandardFields($msgFactory);
+
+	my $msg = $msgFactory->createMessage("TLMPROC");
+
+	libgmsec_perl::MessageFactory::destroy($msgFactory);
+
+	$msg->setSubjectElement("ME4", "FOOEY");
+
+	$test->check("Message has unexpected subject", $msg->getSubject() eq "C2MS.MY-DOMAIN-1.MY-DOMAIN-2.MY-MISSION.MY-CONSTELLATION-ID.MY-SAT-ID.MSG.TLMPROC.MY-COMPONENT.FILL.FILL.FOOEY");
+
+	# Off-nominal tests
+	eval
+	{
+		$msg->setSubjectElement("ME9000", "FOOEY");
+		$test->check("An exception was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Message does not have a subject element named ME9000") != -1);
+	}
+
+	eval
+	{
+		my $tmp = libgmsec_perl::Message->new();
+		$tmp->setSubjectElement(undef, "FOOEY");
+		$test->check("An exception was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Subject element name cannot be NULL or empty string") != -1);
+	}
+
+	eval
+	{
+		my $tmp = libgmsec_perl::Message->new();
+		$tmp->setSubjectElement("", "FOOEY");
+		$test->check("An exception was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Subject element name cannot be NULL or empty string") != -1);
+	}
+
+	eval
+	{
+		my $tmp = libgmsec_perl::Message->new();
+		$tmp->setSubjectElement("ME4", "FOOEY");
+		$test->check("An exception was expected", 0);
+	};
+	if (isa($@, 'libgmsec_perl::GmsecException'))
+	{
+		my $error = $@;
+		$test->check($error->what(), index($error->what(), "Message does not have a message template") != -1);
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -559,7 +559,6 @@ int TCPSocket::write (const char *buffer, int count)
 
 		if (q == 0) // timeout
 		{
-			GMSEC_WARNING << tag.c_str() << "write: select=" << q;
 			tryAgain = true;
 			continue;
 		}

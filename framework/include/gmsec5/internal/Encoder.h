@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -440,7 +440,7 @@ private:
 	MessageEncoder& operator=(const MessageEncoder& encoder);
 
 
-	size_t findLength(const Message& message);
+	size_t findLength(const Message& message, GMSEC_I32& fieldCount);
 	size_t updateLength(const Field& field);
 
 
@@ -492,6 +492,13 @@ public:
 	 **/
 	void decode(Message &message, const gmsec::api5::util::DataBuffer &in);
 
+private:
+	friend gmsec::api5::internal::Decoder;
+
+	// Defined but not implemented
+	MessageDecoder(MessageDecoder &decoder);
+	MessageDecoder& operator=(const MessageDecoder &decoder);
+
 
 	/**
 	 * @fn checkAvailable(GMSEC_U32 count)
@@ -500,10 +507,6 @@ public:
 	 * provided number of bytes
 	 **/
 	bool checkAvailable(GMSEC_U32 count);
-
-private:
-	MessageDecoder(MessageDecoder &decoder);
-	MessageDecoder& operator=(const MessageDecoder &decoder);
 
 
 	Field* decodeField();
@@ -544,6 +547,9 @@ const GMSEC_U32 GMSEC_COMPOUND_BYTES = 4;
 
 /* header fields have this bit applied to their type */
 const GMSEC_U16 GMSEC_FLAG_HEADER_FIELD = 0x8000;
+
+/* mask for encoded field type */
+const GMSEC_U16 GMSEC_FIELD_TYPE_MASK = 0x00FF;
 
 
 } // end namespace internal

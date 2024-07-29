@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -260,15 +260,8 @@ void AMQPConnection::mwPublish(const Message& msg, const Config& config)
 }
 
 
-void AMQPConnection::mwRequest(const Message& request, std::string& id)
+void AMQPConnection::mwRequest(const Message& request, const std::string& unused)
 {
-	{
-		AutoTicket lock(m_mutex);
-		id = generateUniqueId( ++m_requestCounter );
-	}
-
-	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
-
 	// Send request for reply (subscription thread was started on connection)
 	mwPublish(request, getExternal().getConfig());
 }
@@ -370,16 +363,6 @@ void AMQPConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 						// or filtering is turned off on the subscriber, so return the message.
 						done = true;
 					}
-
-					// Check subject mapping and handle accordingly.
-					ValueMap& meta = MessageBuddy::getInternal(*msg).getDetails();
-
-					if (msg->getKind() == Message::Kind::REQUEST && msg->hasField(GMSEC_REPLY_UNIQUE_ID_FIELD))
-					{
-						meta.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, msg->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
-
-						msg->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
-					}
 				}
 				else
 				{
@@ -398,6 +381,13 @@ void AMQPConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 
 		first = false;
 	}
+}
+
+
+std::string AMQPConnection::mwGetUniqueID()
+{
+	AutoTicket lock(m_mutex);
+	return generateUniqueId( ++m_requestCounter );
 }
 
 

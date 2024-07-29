@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -67,13 +67,13 @@ protected:
 
 	bool updateReplyTo(const std::string& in);
 
-	void makePacket(const gmsec::api5::Message& message, bolt::SharedPacket& packet, bolt::PacketType type, std::string* preID = 0);
+	void makePacket(const gmsec::api5::Message& message, bolt::SharedPacket& packet, bolt::PacketType type, const std::string* preID = 0);
 
 	void fromPacket(bolt::SharedPacket& packet, gmsec::api5::Message*& message);
 
 	void mwPublishAux(const gmsec::api5::Message& message, bolt::SharedPacket& packet);
 
-	void mwRequestAux(gmsec::api5::Message& message, bolt::SharedPacket& packet, std::string& uniqueID);
+	void mwRequestAux(gmsec::api5::Message& message, bolt::SharedPacket& packet, const std::string& uniqueID);
 
 
 	bolt::PacketHandler* myDefaultHandler;
@@ -105,9 +105,11 @@ public:
 
 	virtual void mwPublish(const gmsec::api5::Message& message, const gmsec::api5::Config& config);
 
-	virtual void mwRequest(const gmsec::api5::Message& message, std::string& id);
+	virtual void mwRequest(const gmsec::api5::Message& message, const std::string& uniqueID);
 
 	virtual void mwReceive(gmsec::api5::Message*& message, GMSEC_I32 timeout);
+
+	virtual std::string mwGetUniqueID();
 
 private:
 
@@ -140,13 +142,15 @@ public:
 
 	virtual void mwPublish(const gmsec::api5::Message& message, const gmsec::api5::Config& config);
 
-	virtual void mwRequest(const gmsec::api5::Message& message, std::string& id);
+	virtual void mwRequest(const gmsec::api5::Message& message, const std::string& uniqueID);
 
 	virtual void mwReceive(gmsec::api5::Message*& message, GMSEC_I32 timeout);
 
-	virtual void handlePacket(bolt::SharedPacket &packet);
+	virtual std::string mwGetUniqueID();
 
 private:
+
+	virtual void handlePacket(bolt::SharedPacket &packet);
 
 	typedef std::list<bolt::Server>      Servers;
 	typedef std::list<bolt::Connection*> Connections;

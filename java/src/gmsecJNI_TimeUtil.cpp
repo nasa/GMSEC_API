@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,9 +14,11 @@
 #include "gmsecJNI_Jenv.h"
 
 #include <gmsec5_defs.h>
+#include <gmsec5/GmsecException.h>
 #include <gmsec5/util/TimeUtil.h>
 
 
+using namespace gmsec::api5;
 using namespace gmsec::api5::jni;
 using namespace gmsec::api5::util;
 
@@ -65,11 +67,11 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_TimeUtil_1Con
 {
 	jlong jTimeSpec = 0;
 
-	try
-	{
-		JStringManager timeString(jenv, jTimeString);
+	JStringManager timeString(jenv, jTimeString);
 
-		if (jvmOk(jenv, "TimeUtil::convertTimeString"))
+	if (jvmOk(jenv, "TimeUtil::convertTimeString"))
+	{
+		try
 		{
 			GMSEC_TimeSpec  theTime = TimeUtil::convertTimeString(timeString.c_str());
 			GMSEC_TimeSpec* spec    = new GMSEC_TimeSpec();
@@ -79,8 +81,11 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_TimeUtil_1Con
 
 			jTimeSpec = JNI_POINTER_TO_JLONG(spec);
 		}
+		catch (const GmsecException& e)
+		{
+			ThrowGmsecException(jenv, e.what());
+		}
 	}
-	JNI_CATCH
 
 	return jTimeSpec;
 }

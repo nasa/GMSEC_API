@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -13,7 +13,7 @@ distribution. This process requires a myriad of dependencies that include,
 depending on the platform and the desired API bindings, the following:
 
 * Compiler (e.g. GCC or Visual Studio)
-* OpenJDK 11
+* OpenJDK
 * Simplified Wrapper Interface Generator (SWIG)
 * Mono (for Linux)
 * Node
@@ -37,20 +37,20 @@ Below is a detailed list of additional tools/packages for particular
 systems:
 
 * For Windows systems:
-    - Visual Studio 2019 or later
+    - Visual Studio 2017 or 2019
     - The manifest tool (mt.exe) from the Windows SDK
-    - OpenJDK version 1.8 or higher (OpenJDK 11 is preferred)
+    - OpenJDK version 1.8 or higher (OpenJDK 17 is preferred)
     - SWIG 4.1.0 or later
     - Node 18.15.0 (from https://nodejs.org/en/download)
-    - Strawberry Perl 5.32.1.1
+    - Strawberry Perl 5.32.1.1 or later
     - Python 3.10.7 or later (from https://www.python.org/downloads)
-    - Ruby 3.0.2p107
+    - Ruby 3.2.2
 
 
 * For RHEL 8:
     - GCC 8.5.0
     - GNU make 4.2.1
-    - OpenJDK version 1.8 or higher (OpenJDK 11 is preferred)
+    - OpenJDK version 1.8 or higher (OpenJDK 17 is preferred)
     - SWIG 4.1.0 or later
     - Mono JIT Compiler 6.12.0.107 or later
     - Node 18.15.0 (from https://nodejs.org/en/download)
@@ -62,7 +62,7 @@ systems:
 For Ubuntu 20.04 (x86-64 or ARM64):
     - GCC 9.4.0
     - GNU make 4.2.1
-    - OpenJDK version 1.8 or higher (OpenJDK 11 is preferred)
+    - OpenJDK version 1.8 or higher (OpenJDK 17 is preferred)
     - Mono JIT Compiler 6.16.0.182 or later
     - Node 18.15.0 (from https://nodejs.org/en/download)
     - Perl 5.30.0 or later
@@ -73,7 +73,7 @@ For Ubuntu 20.04 (x86-64 or ARM64):
 For MacOS (x86-64):
     - GCC Apple clang version 14.0.0 (clang-1400.0.29.202)
     - GNU make 3.81
-    - OpenJDK version 1.8 or higher (OpenJDK 11 is preferred)
+    - OpenJDK version 1.8 or higher (OpenJDK 17 is preferred)
     - Mono JIT Compiler 6.12.0.108 or later (install using Homebrew)
     - Node 18.15.0 (from https://nodejs.org/en/download)
     - Perl 5.36.0 or later (install using Homebrew)
@@ -130,9 +130,9 @@ refer to standard installation locations on the system.
                            Windows systems
 ==========================================================================
 
-Configuring Strawberry Perl 5.32.1.1:
+Configuring Strawberry Perl:
 -----------------------------------------
-1.  Download Strawberry-5.32.1.1 64-bit ZIP file from here:
+1.  Download the 64-bit ZIP file from here:
     https://strawberryperl.com/releases.html
 
 
@@ -146,6 +146,7 @@ Configuring Strawberry Perl 5.32.1.1:
 
 
 5. Run the script relocation.pl.bat (and the close the command prompt)
+    Note: Not all versions and distributions have this file. If yours doesn't, skip this step.
 
 
 6. Using File Explorer, navigate to C:\Strawberry\perl\lib\CORE
@@ -153,9 +154,11 @@ Configuring Strawberry Perl 5.32.1.1:
 
 7. Using Notepad++ or other editor, open config.h
 
-        a. Comment out line 1039 (PERL_STATIC_INLINE)
+        a. Comment out line 1038 (HAS_STATIC_INLINE)
 
-        b. Comment out line 2312 (HAS_BUILTIN_EXPECT)
+        b. Comment out line 1039 (PERL_STATIC_INLINE)
+
+        c. Comment out line 2312 (HAS_BUILTIN_EXPECT)
 
 
 8. Using File Explorer, navigate to C:\Strawberry\perl\lib\CORE\sys
@@ -188,7 +191,7 @@ For example:
     set NODE_HOME=C:\node-18.15.0
     set PERL5_HOME=C:\Strawberry
     set PYTHON3_HOME=C:\Python310
-    set RUBY_HOME=C:\Ruby-3.02
+    set RUBY_HOME=C:\Ruby-3.2.2
     set SWIG_HOME=C:\swig-4.1.0
 
     set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64
@@ -203,7 +206,7 @@ For example:
 
 Building the C, C++, C#, Java, NodeJS, Perl, Python3, and Ruby bindings:
 ------------------------------------------------------------------------
-Open GMSEC_API\gmsec_api_opensource.sln in Visual Studio 2019.
+Open GMSEC_API\gmsec_api_opensource.sln in Visual Studio.
 
 Choose the "Release" Solution Configuration (located in the toolbar) and select
 the "x64" architecture. Note, the GMSEC API no longer supports "Win32" builds.

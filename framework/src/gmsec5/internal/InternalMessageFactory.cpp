@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,6 +14,7 @@
 
 #include <gmsec5/internal/InternalMessageFactory.h>
 
+#include <gmsec5/internal/ComplianceValidator.h>
 #include <gmsec5/internal/FieldTemplate.h>
 #include <gmsec5/internal/InternalConnection.h>
 #include <gmsec5/internal/MessageAggregationToolkit.h>
@@ -117,6 +118,11 @@ InternalMessageFactory::InternalMessageFactory(const Config& config)
 InternalMessageFactory::~InternalMessageFactory()
 {
 	clearStandardFields();
+
+	for (MessageTemplateCache::iterator it = m_mtCache.begin(); it != m_mtCache.end(); ++it)
+	{
+		delete it->second;
+	}
 	m_mtCache.clear();
 }
 
@@ -197,9 +203,9 @@ Message InternalMessageFactory::createMessage(const char* schemaID)
 		throw GmsecException(MSG_ERROR, UNKNOWN_MSG_TYPE, "SchemaID cannot be NULL, nor be an empty string");
 	}
 
-	Message msg;
-
 	AutoTicket lock(m_mutex);   // ensure the following is thread-safe
+
+	Message msg;
 
 	MessageBuddy::getInternal(msg).setTemplate( createMessageTemplate(schemaID) );
 	MessageBuddy::getInternal(msg).setConfig( m_msgConfig );
@@ -260,7 +266,7 @@ Message InternalMessageFactory::fromData(const char* data, DataType type)
 	// Merge the connection configuration options (supplied to the MessageFactory) into
 	// the message configuration (if any). The connection configuration options will
 	// trump over anything provided by the message.
-	msg.getConfig().merge(m_msgConfig);
+	mergeConfig(msg, m_msgConfig);
 
 	// TODO: Should we force the version? Message may have different version.
 	MessageBuddy::getInternal(msg).setVersion( m_spec->getVersion() );
@@ -319,14 +325,13 @@ void InternalMessageFactory::addMessageTemplate(Message& msg)
 		return;
 	}
 
-	AutoTicket lock(m_mutex);   // ensure the following is thread-safe
-
 	try
 	{
+		AutoTicket lock(m_mutex);   // ensure the following is thread-safe
+
 		std::string schemaID = deduceSchemaID(msg);
 
-		StdSharedPtr<MessageTemplate> msgTemplate(createMessageTemplate(schemaID));
-		MessageBuddy::getInternal(msg).setTemplate(msgTemplate);
+		MessageBuddy::getInternal(msg).setTemplate( createMessageTemplate(schemaID) );
 	}
 	catch (const GmsecException& e)
 	{
@@ -337,6 +342,121 @@ void InternalMessageFactory::addMessageTemplate(Message& msg)
 		{
 			throw e;
 		}
+	}
+}
+
+
+void InternalMessageFactory::identifyTrackingFields(Message& msg)
+{
+	//Accessor for the message template is in the internal interface for Message
+	const MessageTemplate* mt = MessageBuddy::getInternal(msg).getTemplate();
+	if (mt)
+	{
+#if 1
+		MessageFieldIterator& iter = msg.getFieldIterator();
+
+		while (iter.hasNext())
+		{//iterate through each field in the message and check if it is a tracking field
+			Field& field = const_cast<Field&>(iter.next());
+
+			//for field arrays, elements of the field name are delimited by . and an index number (e.g. SUBSCRIPTION.n.NAME-PATTERN)
+			std::vector<std::string> nameElements = StringUtil::split(field.getName(), '.');
+
+			const MessageTemplate::FieldTemplateList& list = mt->getFieldTemplates();
+
+			for (MessageTemplate::FieldTemplateList::const_iterator it = list.begin(); it != list.end(); ++it)
+			{//iterate through the field templates to match a template to our message field
+				FieldTemplate* ft = *it;
+
+				if (ft->getName() == nameElements[0] && ft->getMode() == "TRACKING")
+				{//match found, regular tracking field
+					FieldBuddy::getInternal(field).isTracking(true);
+					break;
+				}
+				else if (ft->getName().find(nameElements[0]) != std::string::npos && ft->getMode() == "CONTROL" && ft->hasChildren())
+				{//match found, tracking field is nested in an array, need to match all elements in the arrayed name to prevent mismatch
+
+					bool matched = false;
+
+					MessageTemplate::FieldTemplateList children;
+					ft->getAllChildren(children);
+
+					for (MessageTemplate::FieldTemplateList::const_iterator it2 = children.begin(); it2 != children.end(); ++it2)
+					{//check each child of the field array for a matching field name
+
+						FieldTemplate* child = *it2;
+
+						std::vector<std::string> templateElements = StringUtil::split(child->getModifiedName(), '.');
+
+						//elements in the msg field name are matched to the respective elements in the field template name
+						for (size_t i = 2; i < nameElements.size(); i+=2)
+						{//indexes are the odd-numbered elements and can be skipped
+							if (i < templateElements.size() && templateElements[i] == nameElements[i])
+							{
+								matched = true;
+							}
+							else
+							{
+								matched = false;
+								break;
+							}
+						}
+
+						if (matched)
+						{//all elements match
+							FieldBuddy::getInternal(field).isTracking(true);
+							break;
+						}
+					}
+
+					if (matched) break;
+				}
+			}
+		}
+#else
+		//get the field templates from the message template, we will iterate through them and mark tracking fields
+		const MessageTemplate::FieldTemplateList& list = mt->getFieldTemplates();
+
+		for (MessageTemplate::FieldTemplateList::const_iterator it = list.begin(); it != list.end(); ++it)
+		{
+			FieldTemplate* ft = *it;
+
+			if (ft->getMode() == "TRACKING" && msg.hasField(ft->getName().c_str()))
+			{//tracking field template matches a field in the message (e.g. NODE), mark it as tracking
+				FieldBuddy::getInternal(*msg.getField(ft->getName().c_str())).isTracking(true);
+			}
+			else if (ft->getMode() == "CONTROL" && ft->hasChildren())
+			{//we've encountered a container field that defines an indexed array of fields (e.g. SUBSCRIPTION.n.NAME-PATTERN)
+			 //check the contained field templates for any tracking fields.
+
+				bool matched = false;
+
+				MessageTemplate::FieldTemplateList children;
+				ft->getAllChildren(children);				
+
+				for (MessageTemplate::FieldTemplateList::const_iterator it2 = children.begin(); it2 != children.end(); ++it2)
+				{
+					FieldTemplate* child = *it2;
+
+					if (child->getMode() == "TRACKING" && msg.hasField(child->getName().c_str()))
+					{//we've found the first field in an indexed array (e.g. SUBSCRIPTION.1.NAME-PATTERN)
+						
+						FieldBuddy::getInternal(*msg.getField(child->getName().c_str())).isTracking(true);
+
+						//we do not necessarily know how many elements are in the array, so we need to ensure we account for them all
+
+						//elements in the array
+						std::vector<std::string> nameElements = StringUtil::split(child->getName(),".1.");
+
+						//TODO MAV:
+						//Any kind of string surgery on the fieldnames to make this part work won't yeld any significant improvement over the original code block
+						//a basic string is not a good enough container to handle a field names with multiple, incrementing index numbers embedded in it.
+					}
+				}
+			}
+
+		}
+#endif
 	}
 }
 
@@ -458,37 +578,43 @@ std::string InternalMessageFactory::deduceSchemaID(const Message& msg)
 }
 
 
-StdSharedPtr<MessageTemplate> InternalMessageFactory::createMessageTemplate(const std::string& schemaID)
+MessageTemplate* InternalMessageFactory::createMessageTemplate(const std::string& schemaID)
 {
-	std::string ID = m_schemaIdMap.getSchemaId(schemaID, m_spec->getVersion());
+	// note: before this method is called, ensure a Mutex is used to prevent concurrent access
 
-	StdSharedPtr<MessageTemplate> sharedTemplate;
+	std::string id = m_schemaIdMap.getSchemaId(schemaID, m_spec->getVersion());
 
-	//check if template for ID already exists in cache
-	MessageTemplateCache::iterator msgIt = m_mtCache.find(ID.c_str());
+	MessageTemplate* newMsgTemp;
+
+	// check if template for ID already exists in the cache
+	MessageTemplateCache::const_iterator msgIt = m_mtCache.find(id);
+
 	if (msgIt != m_mtCache.end())
 	{
-		sharedTemplate = msgIt->second;
+		// return a copy of the message template (because it is not thread-safe)
+		newMsgTemp = new MessageTemplate( *(msgIt->second) );
 	}
 	else
 	{
-		const MessageTemplate& msgTemp = SpecificationBuddy::getInternal(*m_spec.get()).findTemplate(ID.c_str());
+		const MessageTemplate& msgTemp = SpecificationBuddy::getInternal(*m_spec.get()).findTemplate(id.c_str());
 
 		const MessageTemplate::FieldTemplateList& msgFieldTemps = msgTemp.getFieldTemplates();
 
-		MessageTemplate::FieldTemplateList fields = SpecificationBuddy::getInternal(*m_spec.get()).prepHeaders(ID.c_str());
+		MessageTemplate::FieldTemplateList fields = SpecificationBuddy::getInternal(*m_spec.get()).prepHeaders(id.c_str());
 
 		for (MessageTemplate::FieldTemplateList::const_iterator it = msgFieldTemps.begin(); it != msgFieldTemps.end(); ++it)
 		{
 			fields.push_back(new FieldTemplate(*(*it)));
 		}
 
-		sharedTemplate.reset(new MessageTemplate(ID.c_str(), fields, msgTemp.getSchemaLevel()));
-		sharedTemplate->setDefinition(msgTemp.getDefinition());
-		sharedTemplate->setSubject(msgTemp.getSubjectElements());
+		// create message template with prepped field templates
+		newMsgTemp = new MessageTemplate(id.c_str(), fields, msgTemp.getSchemaLevel());
 
-		//m_mtCache.insert({ ID.c_str(), sharedTemplate });
-		m_mtCache[schemaID] = sharedTemplate;
+		newMsgTemp->setDefinition( msgTemp.getDefinition() );
+		newMsgTemp->setSubject( msgTemp.getSubjectElements() );
+
+		// create a copy of the message template and add to the cache
+		m_mtCache[id] = new MessageTemplate( *newMsgTemp );
 
 		for (MessageTemplate::FieldTemplateList::iterator it = fields.begin(); it != fields.end(); ++it)
 		{
@@ -496,7 +622,7 @@ StdSharedPtr<MessageTemplate> InternalMessageFactory::createMessageTemplate(cons
 		}
 	}
 
-	return sharedTemplate;
+	return newMsgTemp;
 }
 
 
@@ -544,4 +670,11 @@ Message::Kind InternalMessageFactory::deduceMessageKind(const char* schemaID, un
 	std::ostringstream err;
 	err << "MessageFactory::deduceMessageKind(): Unable to determine the Message Kind from schema ID '" << schemaID << "'";
 	throw GmsecException(MSG_ERROR, UNKNOWN_MSG_TYPE, err.str().c_str());
+}
+
+void InternalMessageFactory::mergeConfig(Message& msg, const Config& config)
+{
+	AutoTicket lock(m_mutex);
+
+	msg.getConfig().merge(config);
 }

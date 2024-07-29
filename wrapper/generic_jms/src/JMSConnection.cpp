@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -34,7 +34,9 @@
 #include <gmsec5/util/StdUniquePtr.h>
 #include <gmsec5/util/TimeUtil.h>
 
+#include <list>
 #include <sstream>
+#include <vector>
 
 
 #define NONE                "NONE"
@@ -52,8 +54,6 @@ using namespace gmsec::api5::util;
 using namespace gmsec::api5::internal;
 
 using namespace gmsec_generic_jms;
-
-static const int DEBUG_JMS_TYPE = 0;
 
 
 // --- MessagePullState -----------------------------------------------
@@ -122,9 +122,7 @@ void MessagePullState::run()
 		try
 		{
 			//
-			// The checkJVM() calls in the following section can throw a
-			// StatusException, but an easy way to trigger such failures in
-			// a unit test was not found.
+			// The checkJVM() calls in the following section can throw a GmsecException.
 			//
 			if (newConsumer || stopListening)
 			{
@@ -259,22 +257,21 @@ static Mutex& getClassMutex()
 static const JMSCache* getCache(JNIEnv* env)
 {
 	static int initialized = 0;
-	static JMSCache *cache = 0;
+	static JMSCache* cache = 0;
 
 	if (initialized)
 		return cache;
 
-	try
+	JMSCache* tmp = new JMSCache();
+	if (tmp->initialize(env, true))
 	{
-		JMSCache *tmp = new JMSCache();
-		tmp->initialize(env, true);
-
 		cache = tmp;
+		initialized = 1;
 	}
-	JNI_CATCH(env)
-
-	// it has been initialized, though possibly unsuccessfully...
-	initialized = 1;
+	else
+	{
+		delete tmp;
+	}
 
 	return cache;
 }
@@ -309,9 +306,9 @@ JMSConnection::JMSConnection(const Config& config)
 
 	uniquecounter = 0;
 
-	std::string            jvmClasspath;
-	std::list<std::string> jvmArgs;
-	bool                   jvmIgnoreUnrecognized = false;
+	std::string              jvmClasspath;
+	std::vector<std::string> jvmArgs;
+	bool                     jvmIgnoreUnrecognized = false;
 
 	// Try to get the needed values out of the config object.
 	mwConfig(config, "username", username);
@@ -392,19 +389,21 @@ JMSConnection::JMSConnection(const Config& config)
 	}
 	else
 	{
-		jvmArgs.push_front("-Djava.compiler=NONE");
-		jvmArgs.push_front("-Djava.class.path=" + jvmClasspath);
+		jvmArgs.push_back("-Djava.class.path=" + jvmClasspath);
+		jvmArgs.push_back("-Djava.compiler=NONE");
 #if !defined(JNI_VERSION_1_8) && defined(JNI_VERSION_1_6)
-		jvmArgs.push_front("-Xss2m");  // Set JVM stack size; see https://issues.apache.org/jira/browse/DAEMON-363
+		jvmArgs.push_back("-Xss2m");  // Set JVM stack size; see https://issues.apache.org/jira/browse/DAEMON-363
 #endif
 
-		JavaVMOption *options = new JavaVMOption[jvmArgs.size()];
-		int n = 0;
+		// Limit configuration args to no more than 100
+		const size_t argsSize = (jvmArgs.size() > 100 ? 100 : jvmArgs.size());
+
+		JavaVMOption* options = new JavaVMOption[argsSize];
 		GMSEC_VERBOSE << "initializing JVM with arguments:";
-		for (std::list<std::string>::const_iterator i = jvmArgs.begin(); i != jvmArgs.end(); ++i, ++n)
+		for (size_t n = 0; n < argsSize; ++n)
 		{
-			options[n].optionString = (char*) i->c_str();
-			GMSEC_VERBOSE << "\t" << i->c_str();
+			options[n].optionString = const_cast<char*>(jvmArgs[n].c_str());
+			GMSEC_VERBOSE << "\t" << options[n].optionString;
 		}
 
 		JavaVMInitArgs vm_args;
@@ -416,7 +415,7 @@ JMSConnection::JMSConnection(const Config& config)
 		vm_args.version = JNI_VERSION_1_4;
 #endif
 		vm_args.options = &options[0];
-		vm_args.nOptions = n;
+		vm_args.nOptions = static_cast<int>(argsSize);
 		vm_args.ignoreUnrecognized = jvmIgnoreUnrecognized ? JNI_TRUE : JNI_FALSE;
 
 		jint result = JNI_CreateJavaVM(&jvm, (void **) &env, &vm_args);
@@ -440,9 +439,7 @@ JMSConnection::JMSConnection(const Config& config)
 	try
 	{
 		//
-		// checkJVM() calls in the following section can trigger a
-		// StatusException(); the catching of such exceptions is done
-		// in unit test 0051.MiddlewareError.cpp
+		// The checkJVM() calls in the following section can throw a GmsecException.
 		//
 
 		// Retrieve ConnectionFactory
@@ -540,16 +537,7 @@ const char* JMSConnection::getMWInfo()
 {
 	if (mwInfo.empty())
 	{
-		const char* info = getLibraryVersion();
-
-		if (info)
-		{
-			mwInfo = info;
-		}
-		else
-		{
-			mwInfo = "NOT AVAILABLE";
-		}
+		mwInfo = getLibraryVersion();
 	}
 
 	return mwInfo.c_str();
@@ -703,9 +691,7 @@ void JMSConnection::mwPublish(const Message& msg, const Config& config)
 	try
 	{
 		//
-		// The checkJVM() calls in the following block can throw
-		// a StatusException, but an easy method to trigger
-		// errors in a unit test was not found.
+		// The checkJVM() calls in the following block can throw a GmsecException
 		//
 		jobject bytesMsg = envLocal->CallObjectMethod(outputSession, cache->methodCreateBytesMessage);
 		if (bytesMsg == NULL)
@@ -747,14 +733,8 @@ void JMSConnection::mwPublish(const Message& msg, const Config& config)
 }
 
 
-void JMSConnection::mwRequest(const Message& request, std::string& id)
+void JMSConnection::mwRequest(const Message& request, const std::string& unused)
 {
-	++requestCounter;
-
-	id = generateUniqueId(requestCounter);
-
-	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
-
 	mwPublish(request, getExternal().getConfig());
 }
 
@@ -820,6 +800,12 @@ void JMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 }
 
 
+std::string JMSConnection::mwGetUniqueID()
+{
+	return generateUniqueId(++requestCounter);
+}
+
+
 bool JMSConnection::handle(JNIEnv* envPoint, jobject msg)
 {
 	jlong length = envPoint->CallLongMethod(msg, cache->methodGetBodyLength);
@@ -846,11 +832,6 @@ bool JMSConnection::handle(JNIEnv* envPoint, jobject msg)
 		}
 
 		kind = jmsTypeToKind(q);
-
-		if (DEBUG_JMS_TYPE)
-		{
-			GMSEC_VERBOSE << "handle: JMSType='" << q << "'" << " kind=" << static_cast<int>(kind);
-		}
 	}
 	else
 	{
@@ -869,6 +850,7 @@ bool JMSConnection::handle(JNIEnv* envPoint, jobject msg)
 	unloadBytes(buffer, kind, gmsecMsg, inSubject);
 
 	MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).addMessageTemplate(*gmsecMsg);
+	MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).identifyTrackingFields(*gmsecMsg);
 
 	if (kind == Message::Kind::REPLY)
 	{

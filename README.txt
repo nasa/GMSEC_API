@@ -1,14 +1,21 @@
 ﻿This README file provides general information regarding the GMSEC API, its
 supported middleware, and example programs.
 
+
+
 IMPORTANT NOTE:
-All C2MS-PIPE (formerly known as C2MS-11b) and GMSEC message templates have been
-removed from the open-source distributions of the GMSEC API, including within
-releases posted in the past. If attempting to use releases 4.5 through 4.9.1,
-pass the gmsec-schema-level=0 configuration option when instantiating a
-Connection or ConnectionManager object. This will load C2MS message templates.
-If C2MS-PIPE or GMSEC message templates are required, please send a request to
-gmsec-support@lists.nasa.gov for further guidance on how to acquire these.
+   The open-source distribution of the GMSEC API only includes C2MS message
+   templates. All C2MS-PIPE (formerly known as C2MS-11b) and NASA/GMSEC Addendum
+   to C2MS message templates have been removed from the open-source distribution
+   of the GMSEC API, including within releases posted in the past.
+
+   If attempting to use releases 4.5 through 4.9.1, use the connection config-
+   uration option gmsec-schema-level=0 to load the C2MS message templates.
+
+   If C2MS-PIPE or GMSEC message templates are required, please send a request
+   to gmsec-support@lists.nasa.gov for further guidance on how to acquire these.
+
+
 
 1. DISTRIBUTIONS
 
@@ -20,7 +27,7 @@ gmsec-support@lists.nasa.gov for further guidance on how to acquire these.
       * RHEL 8
       * Ubuntu 20.04 LTS
       * Ubuntu 20.04 ARM/Aarch64 LTS
-      * MacOS
+      * MacOS x86-64
 
    Binaries and source code for the Open-Source version is available on NASA
    GitHub. See here for further details: https://github.com/nasa/GMSEC_API
@@ -32,7 +39,7 @@ gmsec-support@lists.nasa.gov for further guidance on how to acquire these.
    As for the Government version, it is only available in binary format (no
    source code), and more importantly it is only available by request from GMSEC
    by those supporting a US Government contract. This version contains the
-   Compat-C2 interface (for NSS message encrption); for users that do not
+   C2-NSS interface (for NSS message encrption); for users that do not
    require this feature, then it is recommended to use the Open-Source
    distribution.
 
@@ -163,21 +170,21 @@ gmsec-support@lists.nasa.gov for further guidance on how to acquire these.
       * C++
       * C#
       * Java
-      * NodeJS
+      * Node.js
       * Perl
-      * Python
+      * Python3
       * Ruby
 
-   Information regarding developing applications using these bindings can be
-   found in the GMSEC API User's Guide.
+   Information with regards to developing applications using these bindings can
+   be found in the respective sections of the GMSEC API User's Guide.
 
    Notes:
 
       1. Mono is required to use C# under Linux and MacOS
-      2. Strawberry Perl 5.32.1 is required use Perl under Windows
-      3. Python 3.10.7 (or later 3.10.x) is required to use Python
-      4. Ruby 3.0.2 is required to use Ruby under Windows
-      5. Node 18.15.0 (or later) is required for NodeJS
+      2. Strawberry Perl 5.32.1 is required for Windows 10 and 11
+      3. Python 3.10.7 (or later 3.10.x) is required for Windows 10 and 11
+      4. Ruby 3.2.2 is required for Windows 10 and 11
+      5. Node.js 18.15.0 (or later) is required for Windows 10 and 11
 
 
 

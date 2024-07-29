@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -19,7 +19,7 @@ JAVA_DOC_FILE   = $(BIN_DIR)\gmsecapi-javadoc.jar
 JAVA_OUTPUT_DIR = classes
 JAVA_CLASS_PATH = $(JAVA_OUTPUT_DIR)
 JAVADOC_DIR     = docs
-JAVA_OPTS       = --release 8
+JAVA_OPTS       = --release 8 -Xlint:deprecation
 
 
 # Java stuff
@@ -75,6 +75,6 @@ clean:
 
 
 gen-doc:
-	-$(JDK_JAVA_DOC) -public -quiet -d $(JAVADOC_DIR) --no-module-directories -sourcepath . $(JAVA_DOCS)
+	-$(JDK_JAVA_DOC) -public -quiet -d $(JAVADOC_DIR) -sourcepath . $(JAVA_DOCS)
 	$(JDK_JAVA_JAR) cf $(JAVA_DOC_FILE) $(JAVADOC_DIR)
 	$(JDK_JAVA_JAR) uf $(JAR_FILE) $(JAVADOC_DIR)

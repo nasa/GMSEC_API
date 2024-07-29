@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -451,13 +451,6 @@ ValueMap::Iterator::Iterator()
 }
 
 
-ValueMap::Iterator::Iterator(ValueMap::MapType& vm)
-	: pmap(&vm),
-	  current(vm.begin())
-{
-}
-
-
 ValueMap::Iterator::~Iterator()
 {
 }
@@ -483,7 +476,7 @@ const Value* ValueMap::Iterator::next()
 
 
 template<typename T_PAIR>
-struct Clone : public std::unary_function<T_PAIR, typename T_PAIR::first_type>
+struct Clone
 {
 	const T_PAIR operator()(const T_PAIR& item) const
 	{
@@ -499,6 +492,7 @@ void ValueMap::cloneValues(const ValueMap& from)
 	{
 		delete i->second;
 	}
+	values.clear();
 
 	// Clone 'from' values into our current map.
 	std::transform(from.values.begin(), from.values.end(), std::inserter(values, values.begin()), Clone<MapType::value_type>());

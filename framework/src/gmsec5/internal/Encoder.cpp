@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -365,7 +365,8 @@ void MessageEncoder::encode(const Message& message, GMSEC_U64& count, char*& dat
 
 void MessageEncoder::encode(const Message &message, DataBuffer &out)
 {
-	size_t length = findLength(message);
+	GMSEC_I32 fieldCount;
+	size_t length = findLength(message, fieldCount);
 
 	if (out.size() < length && !out.resize(length))
 	{
@@ -378,7 +379,7 @@ void MessageEncoder::encode(const Message &message, DataBuffer &out)
 		// accept the passed in buffer
 		buffer.swap(out);
 
-		encode(message, (GMSEC_I32) message.getFieldCount());
+		encode(message, fieldCount);
 
 		// replace- ought to use RAII
 		buffer.swap(out);
@@ -402,31 +403,45 @@ void MessageEncoder::setSelector(FieldSelector s)
 }
 
 
-size_t MessageEncoder::findLength(const Message &message)
+size_t MessageEncoder::findLength(const Message &message, GMSEC_I32& fieldCount)
 {
+	fieldCount = 0;
+
 	size_t length = GMSEC_ENCODING_BYTES;
-
-#ifdef GMSEC_ENCODE_HEADER
-	/* the message type */
-	length += GMSEC_TYPE_BYTES;
-
-	/* the message subject */
-	length += GMSEC_LENGTH_BYTES + StringUtil::stringLength(message.getSubject()) + 1;
-#endif
 
 	length += GMSEC_FIELD_COUNT_BYTES;
 
-	MessageFieldIterator& iter = message.getFieldIterator(selector);
-	while (iter.hasNext())
+	if (altSelector != NULL)
 	{
-		const Field& field = iter.next();
+		MessageFieldIterator& iter = message.getFieldIterator();
+		while (iter.hasNext())
+		{
+			const Field& field = iter.next();
 
-		length += updateLength(field);
+			if (altSelector(field))
+			{
+				length += updateLength(field);
+
+				++fieldCount;
+			}
+		}
 	}
-
-	if (length > static_cast<size_t>(GMSEC_ENCODED_LIMIT))
+	else
 	{
-		setError("MessageEncoder::findLength : Encoded content too large");
+		MessageFieldIterator& iter = message.getFieldIterator(selector);
+		while (iter.hasNext())
+		{
+			const Field& field = iter.next();
+
+			length += updateLength(field);
+
+			++fieldCount;
+		}
+
+		if (length > static_cast<size_t>(GMSEC_ENCODED_LIMIT))
+		{
+			setError("MessageEncoder::findLength : Encoded content too large");
+		}
 	}
 
 	return length;
@@ -439,16 +454,6 @@ void MessageEncoder::encode(const Message &message, GMSEC_I32 fieldCount)
 
 	GMSEC_U16 version = 1;
 	encoder->putU16(&version, current);
-
-#ifdef GMSEC_ENCODE_HEADER
-	/* the message kind */
-	Message::Kind kind = message.getKind();
-	GMSEC_U16 type = static_cast<GMSEC_U16>(kind);
-	encoder->putU16(&type, current);
-
-	/* the message subject */
-	encoder->putString(message.getSubject(), current);
-#endif
 
 	/* the message field count*/
 	encoder->putI32(&fieldCount, current);
@@ -488,7 +493,7 @@ void MessageEncoder::encode(const Field &field)
 {
 	Field::Type type = field.getType();
 
-	GMSEC_U16 tmp = (GMSEC_U16) type;
+	GMSEC_U16 tmp = static_cast<GMSEC_U16>(type) & GMSEC_FIELD_TYPE_MASK;
 
 	if (field.isHeader())
 	{
@@ -1565,7 +1570,7 @@ Field* MessageDecoder::decodeField()
 			isHeader = true;
 			tmp ^= GMSEC_FLAG_HEADER_FIELD;
 		}
-		type = static_cast<Field::Type>(tmp);
+		type = static_cast<Field::Type>(tmp & GMSEC_FIELD_TYPE_MASK);
 	}
 	else
 	{

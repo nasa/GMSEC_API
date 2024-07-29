@@ -61,6 +61,20 @@ void verify_resource_message(Test& test, const Config& config, GMSEC_U16 expecte
 					test.check("Unexpected CUSTOM-FIELD type", rsrc_msg->getField("CUSTOM-FIELD")->getType() == Field::Type::I16);
 				}
 
+				// Verify /dev/loop<N> and /dev/fuse disks do not appear in the message
+				if (rsrc_msg->hasField("NUM-OF-DISKS"))
+				{
+					GMSEC_U16 disks = rsrc_msg->getU16Value("NUM-OF-DISKS");
+					for (GMSEC_U16 n = 0; n < disks; ++n)
+					{
+						std::ostringstream oss;
+						oss << "DISK." << (n+1) << ".NAME";
+						std::string name = rsrc_msg->getStringValue(oss.str().c_str());
+						test.check("Unexpected /dev/loop disk", name.compare(0, 9, "/dev/loop") != 0);
+						test.check("Unexpected /dev/fuse disk", name.compare(0, 9, "/dev/fuse") != 0);
+					}
+				}
+
 				Message::destroy(rsrc_msg);
 			}
 			else

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,7 +31,7 @@ public:
 	bool add(Property *p);
 	Property *get(const string &key) const;
 
-	string getString(const string &key, const char *p) const;
+	string getString(const string &key, const string& defaultValue) const;
 	i32 getI32(const string &key, i32 x) const;
 	bool getFlag(const string &key, bool x) const;
 

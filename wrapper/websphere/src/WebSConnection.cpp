@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -949,12 +949,8 @@ void WebSConnection::mwPublish(const Message& msg, const Config& config)
 }
 
 
-void WebSConnection::mwRequest(const Message& request, std::string& id)
+void WebSConnection::mwRequest(const Message& request, const std::string& id)
 {
-	id = generateUniqueId(++requestCounter);
-
-	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
-
 	mwPublish(request, getExternal().getConfig());
 }
 
@@ -1071,6 +1067,12 @@ void WebSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 }
 
 
+std::string WebSConnection::mwGetUniqueID()
+{
+	return generateUniqueId(++requestCounter);
+}
+
+
 bool WebSConnection::fromMW(const DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg)
 {
 	StdUniquePtr<Message> msg;
@@ -1104,6 +1106,7 @@ bool WebSConnection::fromMW(const DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg)
 	}
 
 	MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).addMessageTemplate(*msg.get());
+	MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).identifyTrackingFields(*msg.get());
 
 	const char* subject = msg->getSubject();
 

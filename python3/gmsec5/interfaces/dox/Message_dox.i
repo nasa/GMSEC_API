@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -156,7 +156,7 @@
 
     Exception
     ---------
-    GmsecError : Thrown if the field name is NULL or contains an empty string.
+    GmsecError : Thrown if the field name is NULL, is an empty string, or is otherwise non-compliant.
     GmsecError : Thrown if the input value's type cannot be converted into the type required by the field, or if the string is too big when converting to char.
 
 
@@ -184,7 +184,7 @@
 
     Exception
     ---------
-    GmsecError : Thrown if the field name is NULL or contains an empty string.
+    GmsecError : Thrown if the field name is NULL, is an empty string, or is otherwise non-compliant.
     GmsecError : Thrown if the input value's type cannot be converted into the type required by the field.
 
 
@@ -212,7 +212,7 @@
 
     Exception
     ---------
-    GmsecError : Thrown if the field name is NULL or contains an empty string.
+    GmsecError : Thrown if the field name is NULL, is an empty string, or is otherwise non-compliant.
     GmsecError : Thrown if the input value's type cannot be converted into the type required by the field.
 ";
 
@@ -257,6 +257,27 @@
     Exceptions
     ----------
     A GmsecError is thrown if the subject is null, an empty-string, or if it is not compliant.
+";
+
+
+%feature("docstring") gmsec::api5::Message::setSubjectElement "
+
+    set_subject_element(self, name: str, value: str)
+
+    Allows for the setting of individual subject elements. The name of the elements are defined
+	by the corresponding message template. This value will be overridden by automatic subject
+	generation if the subject element is defined by an existing field in the message, or if the subject
+	was manually defined with setSubject.
+
+    Parameters
+    ----------
+    name : The name of the subject element
+    value : The value of the subject element. An empty or null value will be seen as FILL in the subject line.
+
+    Exceptions
+    ----------
+    A GmsecError is thrown if the name is NULL, an empty string, or does not match a subject element
+	name defined the message template, or if the message does not have a corresponding message template.
 ";
 
 
@@ -946,7 +967,7 @@
 
     Parameters
     ----------
-    selector : Choices are Selector_ALL_FIELDS, Selector_HEADER_FIELDS, or Selector_NON_HEADER_FIELDS; default is Selector_ALL_FIELDS.
+    selector : Choices are Selector_ALL_FIELDS, Selector_HEADER_FIELDS, Selector_NON_HEADER_FIELDS, or Selector_TRACKING_FIELDS; default is Selector_ALL_FIELDS.
 
     Returns
     ----------

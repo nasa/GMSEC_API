@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -14,7 +14,7 @@ TARGET	        = _libgmsec_python3.so
 SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_SWG        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/python -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
-SWIG_OPTS       = -c++ -python -py3 -threads $(SWIG_SWG) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
+SWIG_OPTS       = -c++ -python -threads $(SWIG_SWG) -DCHAR_BIT=8 -DSWIG_BINDING
 
 FRAMEWORK_DIR   = ../../framework
 
@@ -29,9 +29,8 @@ LDFLAGS        += $(shell $(PYTHON3_HOME)/bin/python3-config --ldflags)
 
 ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
 LDFLAGS        += -L$(PYTHON3_HOME)/lib
-endif
-
 LDFLAGS        += -lpython$(version_major).$(version_minor)
+endif
 
 COREOBJDIR      = $(FRAMEWORK_DIR)/src/gmsec5
 INTERNALOBJDIR  = $(FRAMEWORK_DIR)/src/gmsec5/internal

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -175,6 +175,9 @@ class message_field_iterator:
             # Clean up
             conn.stop_auto_dispatch()
             conn.disconnect()
+
+            # Destroy the Connection
+            del conn
 
         except lp.GmsecError as e:
             lp.log_error(str(e))

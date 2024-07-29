@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -544,12 +544,8 @@ void OpenDDSConnection::mwPublish(const Message& msg, const Config& config)
 }
 
 
-void OpenDDSConnection::mwRequest(const Message& request, std::string& uniqueID)
+void OpenDDSConnection::mwRequest(const Message& request, const std::string& unused)
 {
-	uniqueID = generateUniqueId(++m_requestCounter);
-
-	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
-
 	mwPublish(request, getExternal().getConfig());
 }
 
@@ -592,6 +588,12 @@ void OpenDDSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 			done = true;
 		}
 	}
+}
+
+
+std::string OpenDDSConnection::mwGetUniqueID()
+{
+	return generateUniqueId(++m_requestCounter);
 }
 
 

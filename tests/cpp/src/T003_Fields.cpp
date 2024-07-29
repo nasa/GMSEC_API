@@ -1,8 +1,14 @@
 #include "TestCase.h"
 
+#include <gmsec5/internal/Encoder.h>
+#include <gmsec5/internal/StringUtil.h>
+#include <gmsec5/internal/field/InternalField.h>
+
 #include <limits>
 
 using namespace gmsec::api5;
+using namespace gmsec::api5::internal;
+using namespace gmsec::api5::util;
 
 
 void test_BinaryField(Test& test)
@@ -13,7 +19,8 @@ void test_BinaryField(Test& test)
 	size_t blobLen = sizeof(blob)/sizeof(unsigned char);
 	std::string name = "BINARY-FIELD";
 
-	BinaryField f1(name.c_str(), blob, blobLen);
+	//o Constructor
+	BinaryField f1(name.c_str(), blob, blobLen, true);
 
 	GMSEC_U8 const* f1_blob = f1.getValue();
 	size_t          f1_blobLen = f1.getLength();
@@ -32,12 +39,11 @@ void test_BinaryField(Test& test)
 			test.check(oss.str().c_str(), false);
 		}
 	}
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"BINARY-FIELD\" TYPE=\"BIN\">00020408FF</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"BINARY-FIELD\",\"TYPE\":\"BIN\",\"VALUE\":\"00020408FF\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"BINARY-FIELD\" TYPE=\"BIN\" HEAD=\"T\">00020408FF</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"BINARY-FIELD\",\"TYPE\":\"BIN\",\"HEAD\":\"T\",\"VALUE\":\"00020408FF\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test BinaryField copy-constructor...";
-
+	//o Copy constructor
 	BinaryField f2(f1);
 
 	GMSEC_U8 const* f2_blob = f2.getValue();
@@ -57,12 +63,11 @@ void test_BinaryField(Test& test)
 			test.check(oss.str().c_str(), false);
 		}
 	}
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"BINARY-FIELD\" TYPE=\"BIN\">00020408FF</FIELD>") == f2.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"BINARY-FIELD\",\"TYPE\":\"BIN\",\"VALUE\":\"00020408FF\"}") == f2.toJSON());
+	test.check("Unexpected XML string", StringUtil::stringEquals(f2.toXML(), f1.toXML()));
+	test.check("Unexpected JSON string", StringUtil::stringEquals(f2.toJSON(), f1.toJSON()));
 
 
-	GMSEC_INFO << "Test BinaryField off-nominal cases...";
-
+	//o Off nominal
 	try {
 		BinaryField f3(NULL, blob, blobLen);
 		test.check("Expected BinaryField to disallow NULL field name", false);
@@ -79,6 +84,15 @@ void test_BinaryField(Test& test)
 	catch (...) {
 		test.check("Okay", true);
 	}
+
+
+	try {
+		BinaryField f4(name.c_str(), blob, static_cast<size_t>(GMSEC_BIN_LIMIT+1));
+		test.check("Expected BinaryField to disallow a large blob", false);
+	}
+	catch (...) {
+		test.check("Okay", true);
+	}
 }
 
 
@@ -89,17 +103,17 @@ void test_BooleanField(Test& test)
 	std::string name = "BOOLEAN-FIELD";
 	bool value = true;
 
-	BooleanField f1(name.c_str(), value);
+	//o Constructor
+	BooleanField f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::BOOL == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"BOOLEAN-FIELD\" TYPE=\"BOOL\">TRUE</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"BOOLEAN-FIELD\",\"TYPE\":\"BOOL\",\"VALUE\":\"TRUE\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"BOOLEAN-FIELD\" TYPE=\"BOOL\" HEAD=\"T\">TRUE</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"BOOLEAN-FIELD\",\"TYPE\":\"BOOL\",\"HEAD\":\"T\",\"VALUE\":\"TRUE\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test BooleanField copy-constructor...";
-
+	//o Copy constructor
 	BooleanField f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -109,8 +123,7 @@ void test_BooleanField(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test BooleanField off-nominal cases...";
-
+	//o Off nominal
 	try {
 		BooleanField f3(NULL, value);
 		test.check("Expected BooleanField to disallow NULL field name", false);
@@ -137,17 +150,17 @@ void test_CharField(Test& test)
 	std::string name = "CHAR-FIELD";
 	char value = 'z';
 
-	CharField f1(name.c_str(), value);
+	//o Constructor
+	CharField f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::CHAR == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"CHAR-FIELD\" TYPE=\"CHAR\">z</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"CHAR-FIELD\",\"TYPE\":\"CHAR\",\"VALUE\":\"z\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"CHAR-FIELD\" TYPE=\"CHAR\" HEAD=\"T\">z</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"CHAR-FIELD\",\"TYPE\":\"CHAR\",\"HEAD\":\"T\",\"VALUE\":\"z\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test CharField copy-constructor...";
-
+	//o Copy constructor
 	CharField f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -157,8 +170,7 @@ void test_CharField(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test CharField off-nominal cases...";
-
+	//o Off nominal
 	try {
 		CharField f3(NULL, value);
 		test.check("Expected CharField to disallow NULL field name", false);
@@ -185,17 +197,17 @@ void test_F32Field(Test& test)
 	std::string name = "F32-FIELD";
 	GMSEC_F32 value = 3.14f;
 
-	F32Field f1(name.c_str(), value);
+	//o Constructor
+	F32Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::F32 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"F32-FIELD\" TYPE=\"F32\" BITS=\"4048F5C3\">3.14</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"F32-FIELD\",\"TYPE\":\"F32\",\"BITS\":\"4048F5C3\",\"VALUE\":\"3.14\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"F32-FIELD\" TYPE=\"F32\" HEAD=\"T\" BITS=\"4048F5C3\">3.14</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"F32-FIELD\",\"TYPE\":\"F32\",\"HEAD\":\"T\",\"BITS\":\"4048F5C3\",\"VALUE\":\"3.14\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test F32Field copy-constructor...";
-
+	//o Copy constructor
 	F32Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -205,8 +217,7 @@ void test_F32Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test F32Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		F32Field f3(NULL, value);
 		test.check("Expected F32Field to disallow NULL field name", false);
@@ -233,17 +244,17 @@ void test_F64Field(Test& test)
 	std::string name = "F64-FIELD";
 	GMSEC_F64 value = 3.14;
 
-	F64Field f1(name.c_str(), value);
+	//o Constructor
+	F64Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::F64 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"F64-FIELD\" TYPE=\"F64\" BITS=\"40091EB851EB851F\">3.14</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"F64-FIELD\",\"TYPE\":\"F64\",\"BITS\":\"40091EB851EB851F\",\"VALUE\":\"3.14\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"F64-FIELD\" TYPE=\"F64\" HEAD=\"T\" BITS=\"40091EB851EB851F\">3.14</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"F64-FIELD\",\"TYPE\":\"F64\",\"HEAD\":\"T\",\"BITS\":\"40091EB851EB851F\",\"VALUE\":\"3.14\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test F64Field copy-constructor...";
-
+	//o Copy constructor
 	F64Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -253,8 +264,7 @@ void test_F64Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test F64Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		F64Field f3(NULL, value);
 		test.check("Expected F64Field to disallow NULL field name", false);
@@ -281,17 +291,17 @@ void test_I16Field(Test& test)
 	std::string name = "I16-FIELD";
 	GMSEC_I16 value = -10;
 
-	I16Field f1(name.c_str(), value);
+	//o Constructor
+	I16Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::I16 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"I16-FIELD\" TYPE=\"I16\">-10</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"I16-FIELD\",\"TYPE\":\"I16\",\"VALUE\":\"-10\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"I16-FIELD\" TYPE=\"I16\" HEAD=\"T\">-10</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"I16-FIELD\",\"TYPE\":\"I16\",\"HEAD\":\"T\",\"VALUE\":\"-10\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test I16Field copy-constructor...";
-
+	//o Copy constructor
 	I16Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -301,8 +311,7 @@ void test_I16Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test I16Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		I16Field f3(NULL, value);
 		test.check("Expected I16Field to disallow NULL field name", false);
@@ -329,17 +338,17 @@ void test_I32Field(Test& test)
 	std::string name = "I32-FIELD";
 	GMSEC_I32 value = 5;
 
-	I32Field f1(name.c_str(), value);
+	//o Constructor
+	I32Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::I32 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"I32-FIELD\" TYPE=\"I32\">5</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"I32-FIELD\",\"TYPE\":\"I32\",\"VALUE\":\"5\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"I32-FIELD\" TYPE=\"I32\" HEAD=\"T\">5</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"I32-FIELD\",\"TYPE\":\"I32\",\"HEAD\":\"T\",\"VALUE\":\"5\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test I32Field copy-constructor...";
-
+	//o Copy constructor
 	I32Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -349,8 +358,7 @@ void test_I32Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test I32Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		I32Field f3(NULL, value);
 		test.check("Expected I32Field to disallow NULL field name", false);
@@ -377,17 +385,17 @@ void test_I64Field(Test& test)
 	std::string name = "I64-FIELD";
 	GMSEC_I64 value = -5;
 
-	I64Field f1(name.c_str(), value);
+	//o Constructor
+	I64Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::I64 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"I64-FIELD\" TYPE=\"I64\">-5</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"I64-FIELD\",\"TYPE\":\"I64\",\"VALUE\":\"-5\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"I64-FIELD\" TYPE=\"I64\" HEAD=\"T\">-5</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"I64-FIELD\",\"TYPE\":\"I64\",\"HEAD\":\"T\",\"VALUE\":\"-5\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test I64Field copy-constructor...";
-
+	//o Copy constructor
 	I64Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -397,8 +405,7 @@ void test_I64Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test I64Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		I64Field f3(NULL, value);
 		test.check("Expected I64Field to disallow NULL field name", false);
@@ -425,17 +432,17 @@ void test_I8Field(Test& test)
 	std::string name = "I8-FIELD";
 	GMSEC_I8 value = 5;
 
-	I8Field f1(name.c_str(), value);
+	//o Constructor
+	I8Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::I8 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"I8-FIELD\" TYPE=\"I8\">5</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"I8-FIELD\",\"TYPE\":\"I8\",\"VALUE\":\"5\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"I8-FIELD\" TYPE=\"I8\" HEAD=\"T\">5</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"I8-FIELD\",\"TYPE\":\"I8\",\"HEAD\":\"T\",\"VALUE\":\"5\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test I8Field copy-constructor...";
-
+	//o Copy constructor
 	I8Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -445,8 +452,7 @@ void test_I8Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test I8Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		I8Field f3(NULL, value);
 		test.check("Expected I8Field to disallow NULL field name", false);
@@ -473,17 +479,17 @@ void test_U16Field(Test& test)
 	std::string name = "U16-FIELD";
 	GMSEC_U16 value = 10;
 
-	U16Field f1(name.c_str(), value);
+	//o Constructor
+	U16Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::U16 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"U16-FIELD\" TYPE=\"U16\">10</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"U16-FIELD\",\"TYPE\":\"U16\",\"VALUE\":\"10\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"U16-FIELD\" TYPE=\"U16\" HEAD=\"T\">10</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"U16-FIELD\",\"TYPE\":\"U16\",\"HEAD\":\"T\",\"VALUE\":\"10\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test U16Field copy-constructor...";
-
+	//o Copy constructor
 	U16Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -493,8 +499,7 @@ void test_U16Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test U16Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		U16Field f3(NULL, value);
 		test.check("Expected U16Field to disallow NULL field name", false);
@@ -521,17 +526,17 @@ void test_U32Field(Test& test)
 	std::string name = "U32-FIELD";
 	GMSEC_U32 value = 5;
 
-	U32Field f1(name.c_str(), value);
+	//o Constructor
+	U32Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::U32 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"U32-FIELD\" TYPE=\"U32\">5</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"U32-FIELD\",\"TYPE\":\"U32\",\"VALUE\":\"5\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"U32-FIELD\" TYPE=\"U32\" HEAD=\"T\">5</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"U32-FIELD\",\"TYPE\":\"U32\",\"HEAD\":\"T\",\"VALUE\":\"5\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test U32Field copy-constructor...";
-
+	//o Copy constructor
 	U32Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -541,8 +546,7 @@ void test_U32Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test U32Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		U32Field f3(NULL, value);
 		test.check("Expected U32Field to disallow NULL field name", false);
@@ -569,17 +573,17 @@ void test_U64Field(Test& test)
 	std::string name = "U64-FIELD";
 	GMSEC_U64 value = 50;
 
-	U64Field f1(name.c_str(), value);
+	//o Constructor
+	U64Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::U64 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"U64-FIELD\" TYPE=\"U64\">50</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"U64-FIELD\",\"TYPE\":\"U64\",\"VALUE\":\"50\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"U64-FIELD\" TYPE=\"U64\" HEAD=\"T\">50</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"U64-FIELD\",\"TYPE\":\"U64\",\"HEAD\":\"T\",\"VALUE\":\"50\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test U64Field copy-constructor...";
-
+	//o Copy constructor
 	U64Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -589,8 +593,7 @@ void test_U64Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test U64Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		U64Field f3(NULL, value);
 		test.check("Expected U64Field to disallow NULL field name", false);
@@ -617,17 +620,17 @@ void test_U8Field(Test& test)
 	std::string name = "U8-FIELD";
 	GMSEC_U8 value = 5;
 
-	U8Field f1(name.c_str(), value);
+	//o Constructor
+	U8Field f1(name.c_str(), value, true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::U8 == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"U8-FIELD\" TYPE=\"U8\">5</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"U8-FIELD\",\"TYPE\":\"U8\",\"VALUE\":\"5\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"U8-FIELD\" TYPE=\"U8\" HEAD=\"T\">5</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"U8-FIELD\",\"TYPE\":\"U8\",\"HEAD\":\"T\",\"VALUE\":\"5\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test U8Field copy-constructor...";
-
+	//o Copy constructor
 	U8Field f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -637,8 +640,7 @@ void test_U8Field(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test U8Field off-nominal cases...";
-
+	//o Off nominal
 	try {
 		U8Field f3(NULL, value);
 		test.check("Expected U8Field to disallow NULL field name", false);
@@ -665,17 +667,17 @@ void test_StringField(Test& test)
 	std::string name = "STRING-FIELD";
 	std::string value = "Test String";
 
-	StringField f1(name.c_str(), value.c_str());
+	//o Constructor
+	StringField f1(name.c_str(), value.c_str(), true);
 
 	test.check("Unexpected field name", name == f1.getName());
 	test.check("Unexpected field type", Field::Type::STRING == f1.getType());
 	test.check("Unexpected field value", value == f1.getValue());
-	test.check("Unexpected XML string", std::string("<FIELD NAME=\"STRING-FIELD\" TYPE=\"STRING\">Test String</FIELD>") == f1.toXML());
-	test.check("Unexpected JSON string", std::string("{\"NAME\":\"STRING-FIELD\",\"TYPE\":\"STRING\",\"VALUE\":\"Test String\"}") == f1.toJSON());
+	test.check("Unexpected XML string", std::string("<FIELD NAME=\"STRING-FIELD\" TYPE=\"STRING\" HEAD=\"T\">Test String</FIELD>") == f1.toXML());
+	test.check("Unexpected JSON string", std::string("{\"NAME\":\"STRING-FIELD\",\"TYPE\":\"STRING\",\"HEAD\":\"T\",\"VALUE\":\"Test String\"}") == f1.toJSON());
 
 
-	GMSEC_INFO << "Test StringField copy-constructor...";
-
+	//o Copy constructor
 	StringField f2(f1);
 
 	test.check("Unexpected field name", name == f2.getName());
@@ -685,8 +687,7 @@ void test_StringField(Test& test)
 	test.check("Unexpected JSON string", std::string(f1.toJSON()) == f2.toJSON());
 
 
-	GMSEC_INFO << "Test StringField off-nominal cases...";
-
+	//o Off nominal
 	try {
 		StringField f3(NULL, value.c_str());
 		test.check("Expected StringField to disallow NULL field name", false);
@@ -1120,24 +1121,6 @@ void test_Field(Test& test)
 		StringField field("MY-FIELD", "MY-VALUE", true);
 		test.check("Expected isHeader to report true", field.isHeader());
 	}
-
-	// invalid field name
-	{
-		GMSEC_INFO << "Test Field::isFieldNameCompliant()";
-
-		const char* invalid_name[4] = { NULL, "", "FOO%BAR", "foobar" };
-
-		for (size_t i = 0; i < sizeof(invalid_name)/sizeof(const char*); ++i)
-		{
-			try {
-				StringField(invalid_name[i], "Hello World");
-				test.check("An error was expected", false);
-			}
-			catch (const GmsecException& e) {
-				test.check(e.what(), true);
-			}
-		}
-	}
 }
 
 
@@ -1145,14 +1128,15 @@ void test_IdentifyHeaderFields(Test& test)
 {
 	GMSEC_INFO << "Test Identify Header Fields...";
 
+	//o Note: This unit test enables the identification of header fields
 	{
 		StringField field1("MISSION-ID", "MSSN", true);              // a header field
 		U32Field    field2("PUB-RATE", static_cast<GMSEC_U32>(30));  // not a header field
 
-		test.check("Expected no HEAD", std::string(field1.toXML()).find("HEAD") == std::string::npos);
+		test.check("Expected no HEAD", std::string(field1.toXML()).find("HEAD") != std::string::npos);
 		test.check("Expected no HEAD", std::string(field2.toXML()).find("HEAD") == std::string::npos);
 
-		test.check("Expected no HEAD", std::string(field1.toJSON()).find("HEAD") == std::string::npos);
+		test.check("Expected no HEAD", std::string(field1.toJSON()).find("HEAD") != std::string::npos);
 		test.check("Expected no HEAD", std::string(field2.toJSON()).find("HEAD") == std::string::npos);
 	}
 
@@ -1186,9 +1170,74 @@ void test_IdentifyHeaderFields(Test& test)
 }
 
 
+void test_InternalField(Test& test)
+{
+	GMSEC_INFO << "Test InternalField";
+
+	struct FieldName {
+		const char* name;
+		bool        legal;
+	};
+
+	FieldName names[] = {
+		{ "FOO-BAR", true },
+		{ "FOO.BAR", true },
+		{ "FOO.1.BAR", true },
+		{ "FOO_BAR", true },
+		{ "__GMSEC-UNIQUE-REPLY-ID__", true },
+		{ "FOO..BAR", false },   // cannot have double-periods
+		{ "FOO--BAR", false },   // cannot have double-hyphens
+		{ "foo-bar", false },    // cannot have lowercase
+		{ "FOO%BAR", false },    // cannot have extraneous character
+		{ "FOO$BAR", false }     // cannot have extraneous character
+	};
+
+	for (size_t i = 0; i < sizeof(names)/sizeof(FieldName); ++i) {
+		GMSEC_VERBOSE << "Testing Field Name Compliancy with '" << names[i].name << "'";
+		test.check("Unexpected result", InternalField::isFieldNameCompliant(names[i].name) == names[i].legal);
+	}
+
+	//o Off nominal test of InternalField::fromXML()
+	try {
+		InternalField::fromXML(NULL);
+		test.check("Expected an exception", false);
+	}
+	catch (const GmsecException& e) {
+		test.check(e.what(), std::string(e.what()).find("FIELD element is NULL") != std::string::npos);
+	}
+}
+
+
+void test_dataSizes(Test& test)
+{
+	GMSEC_INFO << "Test data sizes";
+
+	test.check("Unexpected size for GMSEC_CHAR", sizeof(GMSEC_CHAR) == 1);
+	test.check("Unexpected size for GMSEC_BOOL", sizeof(GMSEC_BOOL) == 4);
+
+	test.check("Unexpected size for GMSEC_I8", sizeof(GMSEC_I8) == 1);
+	test.check("Unexpected size for GMSEC_U8", sizeof(GMSEC_U8) == 1);
+
+	test.check("Unexpected size for GMSEC_I16", sizeof(GMSEC_I16) == 2);
+	test.check("Unexpected size for GMSEC_U16", sizeof(GMSEC_U16) == 2);
+
+	test.check("Unexpected size for GMSEC_I32", sizeof(GMSEC_I32) == 4);
+	test.check("Unexpected size for GMSEC_U32", sizeof(GMSEC_U32) == 4);
+
+	test.check("Unexpected size for GMSEC_I64", sizeof(GMSEC_I64) == 8);
+	test.check("Unexpected size for GMSEC_U64", sizeof(GMSEC_U64) == 8);
+
+	test.check("Unexpected size for GMSEC_F32", sizeof(GMSEC_F32) == 4);
+	test.check("Unexpected size for GMSEC_F64", sizeof(GMSEC_F64) == 8);
+}
+
+
 int test_Fields(Test& test)
 {
 	test.setDescription("Test Fields");
+
+	// Make sure header fields are identified when using toXML() and toJSON()
+	InternalField::identifyHeaderField(true);
 
 	test_BinaryField(test);
 	test_BooleanField(test);
@@ -1206,6 +1255,8 @@ int test_Fields(Test& test)
 	test_StringField(test);
 	test_Field(test);
 	test_IdentifyHeaderFields(test);
+	test_InternalField(test);
+	test_dataSizes(test);
 
 	return 0;
 }

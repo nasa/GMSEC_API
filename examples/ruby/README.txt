@@ -17,7 +17,7 @@ Instructions for running Ruby example programs
 
    For Windows:
 
-      set RUBY_HOME=C:\path\to\Ruby-3.0.2
+      set RUBY_HOME=C:\path\to\Ruby-3.2.2
 
       set GMSEC_API_HOME=C:\path\to\GMSEC_API
 
@@ -45,8 +45,7 @@ Instructions for running Ruby example programs
 
       ruby <example_name>.rb mw-id=bolt mw-server=localhost
 
-
-   Note: For Windows, use ruby 3.0.2p107 [x64-mswin64_140] or later.
+      Note: For Windows, use ruby 3.2.2 (2023-03-30 revision e51014f9c0) [x64-mswin64_140].
 
 
    For other middleware, refer to the GMSEC API User's Guide for additional

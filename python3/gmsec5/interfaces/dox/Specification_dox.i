@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,7 +22,7 @@
 
     Specification()
 
-    Initializes the Specification with the default message specification (NASA/GMSEC Addendum).
+    Initializes the Specification with the default message specification.
 
     Exceptions
     ----------
@@ -78,7 +78,7 @@
 
     get_version(self) -> unsigned int
 
-    Returns the version of the ISD being used as an unsigned integer.
+    Returns the version of the message specification that is referenced by the Specification.
 ";
 
 %feature("docstring") gmsec::api5::Specification::getSchemaLevel"

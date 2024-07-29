@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -180,7 +180,7 @@ C<libgmsec_perl::Connection::shutdownMiddleware($name)>
 
 C<libgmsec_perl::Connection-E<gt>connect()>
 
-    This function establishes this connection to the middleware.
+    Establishes this connection to the middleware.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
@@ -191,18 +191,14 @@ C<libgmsec_perl::Connection-E<gt>connect()>
 
 C<libgmsec_perl::Connection-E<gt>disconnect()>
 
-    This function terminates this connection to the middleware.  It is automatically called by the destructor if necessary.
-
-=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
-
-    $libgmsec_perl::GmsecException if an anomaly occurs while disconnecting from the GMSEC Bus.
+    Terminates the connection to the middleware. It is automatically called by the destructor if necessary.
 
 
 =head3 getLibraryName
 
 C<libgmsec_perl::Connection-E<gt>getLibraryName()>
 
-    This function identifies the library name and therefore the connection type that this connection is associated with.
+    Identifies the library name and therefore the connection type that this connection is associated with.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 
@@ -239,7 +235,7 @@ C<libgmsec_perl::Connection-E<gt>getConfig()>
 
 C<libgmsec_perl::Connection-E<gt>subscribe($subject, $callback = NULL)>
 
-    This function subscribes to a particular subject or pattern.
+    Subscribes to a particular subject or pattern.
 
     Example subscription patterns:
 
@@ -279,6 +275,7 @@ C<libgmsec_perl::Connection-E<gt>subscribe($subject, $callback = NULL)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException on error establishing subscription.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br><br>
@@ -305,6 +302,7 @@ C<libgmsec_perl::Connection-E<gt>subscribe($subject, $config, $callback = NULL)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException on error establishing subscription.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br><br>
@@ -326,6 +324,7 @@ C<libgmsec_perl::Connection-E<gt>unsubscribe($subscriptionInfo)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException if SubscriptionInfo object originated from a different ConnectionManager
         $libgmsec_perl::GmsecException if error occurs at the middleware level
 
@@ -352,6 +351,7 @@ C<libgmsec_perl::Connection-E<gt>publish($message)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException if error occurs while attempting to publish the message
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
@@ -375,6 +375,7 @@ C<libgmsec_perl::Connection-E<gt>publish($message, $mwConfig)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException if error occurs while attempting to publish the message
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
@@ -403,6 +404,7 @@ C<libgmsec_perl::Connection-E<gt>request($message, $timeout, $callback, $republi
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException on error with generating async request, or if ReplyCallback is NULL.
 
 
@@ -426,6 +428,7 @@ C<libgmsec_perl::Connection-E<gt>request($message, $timeout, $republish_ms = 0)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException on error transmitting request message
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
@@ -450,6 +453,7 @@ C<libgmsec_perl::Connection-E<gt>reply($request, $reply)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException on error transmitting message
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
@@ -475,6 +479,7 @@ C<libgmsec_perl::Connection-E<gt>receive($timeout = -1)>
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
         $libgmsec_perl::GmsecException on error receiving message
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>See also:</b><br>
@@ -494,6 +499,11 @@ C<libgmsec_perl::Connection-E<gt>excludeSubject($subject)>
 
         $subject - the subject pattern to look for in incoming messages
 
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
+        $libgmsec_perl::GmsecException if the given subject is non-compliant.
+
 
 =head3 removeExcludedSubject
 
@@ -504,6 +514,11 @@ C<libgmsec_perl::Connection-E<gt>removeExcludedSubject($subject)>
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
         $subject - the subject pattern to remove
+
+=for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
+
+        $libgmsec_perl::GmsecException if not connected to the GMSEC Bus.
+        $libgmsec_perl::GmsecException if the given subject is non-compliant.
 
 
 =head3 getName

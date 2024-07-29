@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -614,12 +614,8 @@ std::string ZMQConnection::generateUniqueId(long id)
 }
 
 
-void ZMQConnection::mwRequest(const Message& request, std::string& id)
+void ZMQConnection::mwRequest(const Message& request, const std::string& unused)
 {
-	id = generateUniqueId(++m_requestCounter);
-
-	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
-
 	mwPublish(request, getExternal().getConfig());
 }
 
@@ -746,6 +742,12 @@ void ZMQConnection::mwReceive(Message*& message, GMSEC_I32 timeout)
 	{
 		GMSEC_DEBUG << "[Received published message: " << message->getSubject() << "]";
 	}
+}
+
+
+std::string ZMQConnection::mwGetUniqueID()
+{
+	return generateUniqueId(++m_requestCounter);
 }
 
 
@@ -921,6 +923,7 @@ void ZMQConnection::handleMessage(zmq_msg_t* zmqMessage, int zmqMsgSize, zmq_msg
 	}
 
 	MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).addMessageTemplate(*message.get());
+	MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).identifyTrackingFields(*message.get());
 
 	// Check to see if is type reply and whether or not to enqueue message/result
 	if (message->getKind() == Message::Kind::REPLY)

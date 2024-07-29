@@ -9,11 +9,7 @@ Instructions for running NodeJS example programs
 
       export LD_LIBRARY_PATH=$GMSEC_API_HOME/bin
 
-      export NODEJS_HOME=/path/to/node-18.12.1
-
-      export PATH=$GMSEC_API_HOME/bin:$PATH
-
-      export PATH=$NODEJS_HOME:$PATH
+      export PATH=$PATH:$GMSEC_API_HOME/bin
 
 
    Hint: Place the export statements in ~/.bashrc.
@@ -23,9 +19,9 @@ Instructions for running NodeJS example programs
 
       set GMSEC_API_HOME=C:\path\to\GMSEC_API
 
-      set NODEJS_HOME=C:\path\to\node-18.12.1
+      set NODEJS_HOME=C:\path\to\node-18.15.0
 
-      set PATH=%GMSEC_API_HOME%\bin;%PATH%
+      set PATH=%PATH%;%GMSEC_API_HOME%\bin
 
       set PATH=%NODEJS_HOME%;%PATH%
 
@@ -47,8 +43,7 @@ Instructions for running NodeJS example programs
 
       node <example_name>.js mw-id=bolt mw-server=localhost
 
-
-   Note: Use NodeJS 18.12.1 or later.
+   	  Note: Use NodeJS 18.15.0.
 
 
    For other middleware, refer to the GMSEC API User's Guide for additional

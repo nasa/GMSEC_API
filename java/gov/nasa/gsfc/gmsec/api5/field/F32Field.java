@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -11,6 +11,7 @@
  */
 package gov.nasa.gsfc.gmsec.api5.field;
 
+import gov.nasa.gsfc.gmsec.api5.GmsecException;
 import gov.nasa.gsfc.gmsec.api5.jni.field.JNIF32Field;
 
 
@@ -19,7 +20,9 @@ import gov.nasa.gsfc.gmsec.api5.jni.field.JNIF32Field;
  */
 public class F32Field extends Field
 {
+	//! @cond
 	/**
+	 * @hidden
 	 * This constructor is for internal GMSEC API use only.
 	 * @param field A JNIF32Field object.
 	 */
@@ -27,6 +30,7 @@ public class F32Field extends Field
 	{
 		setInternal(field);
 	}
+	//! @endcond
 
 
 	/**
@@ -35,7 +39,7 @@ public class F32Field extends Field
 	 * @param name Name of the field.
 	 * @param data Data to associate with the field.
 	 *
-	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name string is null, is an empty string, or is not compliant.
 	 */
 	public F32Field(String name, float data) throws IllegalArgumentException
 	{
@@ -50,7 +54,7 @@ public class F32Field extends Field
 	 * @param data Data to associate with the field.
 	 * @param isHeader used to indicate if Field is a header field.
 	 *
-	 * @throws IllegalArgumentException Thrown if the field name is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name string is null, is an empty string, or is not compliant.
 	 */
 	public F32Field(String name, float data, boolean isHeader) throws IllegalArgumentException
 	{

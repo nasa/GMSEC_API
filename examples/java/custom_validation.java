@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -136,6 +136,9 @@ public class custom_validation
 			catch (GmsecException e) {
 				Log.error("Unexpected error: " + e.getMessage());
 			}
+
+			// Destroy the Heartbeat message
+			Message.destroy(hbMsg);
 
 			// Disconnect from the GMSEC Bus
 			conn.disconnect();

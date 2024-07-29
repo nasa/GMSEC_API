@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -185,7 +185,7 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# ==== Raises
 		#
-		# A GmsecException is thrown if the field name is null or contains an empty string.
+		# A GmsecException is thrown if the field name is null, is an empty string, or otherwise is non-compliant.
 		# A GmsecException is thrown if the field value type cannot be converted into the type required by the field, or if the string is too big when converting to a char.
 		#
 		def set_field_value(name, value)
@@ -234,6 +234,26 @@ module Libgmsec_ruby #:nodoc: don't document this
 		# A GmsecException is thrown if the subject is nil or contains an empty string.
 		#
 		def set_subject(subject)
+		end
+
+
+		##
+		# Allows for the setting of individual subject elements. The name of the elements are defined
+		# by the message's corresponding message template. This value will be overridden by automatic subject
+		# generation if the subject element is defined by an existing field in the message, or if the subject
+		# was manually defined with setSubject.
+		#
+		# ==== Attributes
+		#
+		# * +name+ - The name of the subject element.
+		# * +value+ - The value of the subject element. An empty or null value will be seen as FILL in the subject line.
+		#
+		# ==== Raises
+		#
+		# A GmsecException is thrown if the name is NULL, an empty string, or does not match a subject element
+		# name defined the message template, or if the message does not have a corresponding message template.
+		#
+		def set_subject_element(name, value)
 		end
 
 

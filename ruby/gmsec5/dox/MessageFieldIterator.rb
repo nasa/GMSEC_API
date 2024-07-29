@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -10,6 +10,8 @@
 module Libgmsec_ruby #:nodoc: don't document this
 
 	# This class is used to iterate over the Field objects of a Message object.
+	#
+	# Note: MessageFieldIterator is not thread safe.
 	#
 	# ==== Example usage:
 	#
@@ -29,6 +31,9 @@ module Libgmsec_ruby #:nodoc: don't document this
 	#
 	#    # Non-header fields
 	#    iter = msg.get_field_iterator(Libgmsec_ruby::MessageFieldIterator::NON_HEADER_FIELDS)
+	#
+	#    # Tracking fields
+	#    iter = msg.get_field_iterator(Libgmsec_ruby::MessageFieldIterator::TRACKING_FIELDS)
 	#
 	#    ...
 	#
@@ -50,6 +55,7 @@ module Libgmsec_ruby #:nodoc: don't document this
 			# * +Selector_ALL_FIELDS+        - Used for iterating over all available fields (default selector).
 			# * +Selector_HEADER_FIELDS+     - Used for iterating over header fields only.
 			# * +Selector_NON_HEADER_FIELDS+ - Used for iterating over non-header fields only.
+			# * +Selector_TRACKING_FIELDS+   - Used for iterating over tracking fields only.
 			#
 			def Selector_Enum
 			end

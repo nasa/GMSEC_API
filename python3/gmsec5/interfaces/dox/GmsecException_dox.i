@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,8 +15,8 @@
 
     Parameters
     ----------
-    errorClass : Enumerated value indicating source of the error.
-    errorCode  : Enumerated value indicating reason for the error.
+    errorClass : Value indicating source of the error.
+    errorCode  : Value indicating reason for the error.
     errorMsg   : Explanation for the error.
 
 
@@ -27,8 +27,8 @@
 
     Parameters
     ----------
-    errorClass : Enumerated value indicating source of the error.
-    errorCode  : Enumerated value indicating reason for the error.
+    errorClass : Value indicating source of the error.
+    errorCode  : Value indicating reason for the error.
     customCode : Custom error code (typically middleware specific) on the root cause of the error.
     errorMsg   : Explanation for the error.
 

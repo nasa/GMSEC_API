@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -157,7 +157,7 @@ public:
 	 * @fn mwRequest(const gmsec::api5::Message& request)
 	 * @brief Send a request message to the middleware.
 	 */
-	virtual void mwRequest(const gmsec::api5::Message& request, std::string& id);
+	virtual void mwRequest(const gmsec::api5::Message& request, const std::string& uniqueID);
 
 
 	/**
@@ -165,6 +165,13 @@ public:
 	 * @brief pull the next message off the inbound queue
 	 */
 	virtual void mwReceive(gmsec::api5::Message*& msg, GMSEC_I32 timeout);
+
+
+	/**
+	 * @fn mwGetUniqueID()
+	 * @brief Return a unique identifier string for request messages
+	 */
+	virtual std::string mwGetUniqueID();
 
 
 	struct GMSEC_AMQP_API MsgSubscriptionResult

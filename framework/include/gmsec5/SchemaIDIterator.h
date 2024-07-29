@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,7 +9,7 @@
 /**
  * @file SchemaIDIterator.h
  *
- * @brief Defines a class that supports the iteration of Specification's loaded schema.
+ * @brief Defines a class that supports the iteration of a Specification's loaded schema.
  * 
  */
 
@@ -32,7 +32,7 @@ namespace internal
 
 /** @class SchemaIDIterator
  * 
- * @brief Supports the iteration of Specification's loaded schema templates.
+ * @brief Supports the iteration of a Specification's loaded schema templates.
  *
  * @sa Specification::getSchemaIDIterator()
  */
@@ -71,7 +71,7 @@ public:
 	/**
 	 * @fn void reset()
 	 *
-	 * @brief Resets the interator to the beginning of the Schema list that is maintained by Specification.
+	 * @brief Resets the interator to the beginning of the Schema list that is maintained by the Specification.
 	 */
 	void CALL_TYPE reset();
 

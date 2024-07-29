@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -60,33 +60,44 @@ static CharValidater VALIDATE_LENIENT(true);
 
 std::string Subject::isValid(const std::string& subject, bool lenient)
 {
+	if (subject.find("..") != std::string::npos)
+		return " -- Subject has '..' (is it missing an element?)";
 	std::vector<std::string> elements = StringUtil::split(subject, '.');
 	if (elements.size() <= 0)
-		return "Subject cannot be empty.";
+		return " -- Subject cannot be empty";
 	return areValidElements(elements, NULL, false, lenient);
 }
 
 
-std::string Subject::isValid(const std::string &subject, const internal::InternalMessage* msg, bool lenient)
+std::string Subject::isValid(const std::string& subject, const internal::InternalMessage* msg, bool lenient)
 {
+	if (subject.find("..") != std::string::npos)
+		return " -- Subject has '..' (is it missing an element?)";
 	std::vector<std::string> elements = StringUtil::split(subject, '.');
 	if (elements.size() <= 0)
-		return "Subject cannot be empty.";
+		return " -- Subject cannot be empty";
 	return areValidElements(elements, msg, false, lenient);
 }
 
 
 std::string Subject::isValidSubscription(const std::string& subject, bool lenient)
 {
+	if (subject.find("..") != std::string::npos)
+		return " -- Subject has '..' (is it missing an element?)";
+	if (subject.empty())
+		return " -- Subject cannot be empty";
 	std::vector<std::string> elements;
 	if (!getElements(subject, elements))
-		return "Subject cannot be empty.";
+		return " -- Subject cannot be empty";
 	return areValidElements(elements, NULL, true, lenient);
 }
 
 
 bool Subject::getElements(const std::string& subject, std::vector<std::string>& elements)
 {
+	if (subject.empty())
+		return false;
+
 	size_t i = 0;
 
 	while (i != std::string::npos)
@@ -173,13 +184,12 @@ std::string Subject::areValidElements(const std::vector<std::string>& elements, 
 
 	if (!msg)
 	{
-		
 		for (size_t i = 0; i < elements.size(); ++i)
 		{
 			std::string result = isValidElement(elements[i], "", false, subscription, i == (elements.size() - 1), lenient);
 			if (!result.empty())
 			{
-				err.append("\n\tSubject element \"").append("\" is invalid: ").append(result);
+				err.append("\n\tSubject element \"").append(elements[i]).append("\" is invalid: ").append(result);
 			}
 		}
 	}

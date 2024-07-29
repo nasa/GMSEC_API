@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,12 +13,15 @@
 #include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 
+#include <gmsec5/internal/field/InternalField.h>
+
 #include <gmsec5/field/F64Field.h>
 
 #include <iostream>
 
 
 using namespace gmsec::api5;
+using namespace gmsec::api5::internal;
 using namespace gmsec::api5::jni;
 
 
@@ -50,22 +53,11 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1F64Field
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1F64Field_1Copy
   (JNIEnv *jenv, jclass jcls, jlong jF64FieldPtr, jobject jF64Field)
 {
-	F64Field* created = 0;
+	F64Field* field = JNI_JLONG_TO_F64FIELD(jF64FieldPtr);
 
-	try
-	{
-		F64Field* field = JNI_JLONG_TO_F64FIELD(jF64FieldPtr);
+	F64Field* created = new F64Field(*field);
 
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "F64Field reference is null");
-		}
-		else
-		{
-			created = new F64Field(*field);
-		}
-	}
-	JNI_CATCH
+	FieldBuddy::getInternal(*created).isTracking(field->isTracking());
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -74,22 +66,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1F64Field
 JNIEXPORT jdouble JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_F64Field_1GetValue
   (JNIEnv *jenv, jclass jcls, jlong jF64FieldPtr, jobject jF64Field)
 {
-	jdouble result = 0;
+	F64Field* field = JNI_JLONG_TO_F64FIELD(jF64FieldPtr);
 
-	try
-	{
-		F64Field* field = JNI_JLONG_TO_F64FIELD(jF64FieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "F64Field reference is null");
-		}
-		else
-		{
-			result = field->getValue();
-		}
-	}
-	JNI_CATCH
+	jdouble result = field->getValue();
 
 	return result;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,7 +32,9 @@ public class ResourceGenerator
 	private JNIResourceGenerator m_jniResourceGenerator = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param rsrcgen Object to reference for acquiring internal JNIResourceGenerator
 	 * @return Internal JNIResourceGenerator object
@@ -44,6 +46,7 @@ public class ResourceGenerator
 
 
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param jrsrcgen Internal JNIResourceGenerator object
 	 */
@@ -51,6 +54,7 @@ public class ResourceGenerator
 	{
 		m_jniResourceGenerator = jrsrcgen;
 	}
+	//! @endcond
 
 
 	/**
@@ -67,18 +71,18 @@ public class ResourceGenerator
 	 * <p>
 	 * Note: If the publish rate is set to 0 (zero), the resource generator will only publish one message.
 	 *
-	 * @param config          The Config object to configure the Connection that is used to publish messages
-	 * @param pubRate         The message publish rate (in seconds)
-	 * @param sampleInterval  The time distance between sample collection (in seconds)
-	 * @param averageInterval Time window over which to make a moving average of samples (in seconds)
+	 * @param config          The Config object to configure the Connection that is used to publish messages.
+	 * @param pubRate         The message publish rate (in seconds).
+	 * @param sampleInterval  The time distance between sample collection (in seconds).
+	 * @param averageInterval Time window over which to make a moving average of samples (in seconds).
 	 * @param fields          A list of fields to be included within the resource message; value can be null.
 	 *
 	 * @return An instance of a ResourceGenerator object.
 	 *
-	 * @throws IllegalArgumentException Thrown if the Config object is null 
-	 * @throws IllegalArgumentException Thrown if the publish rate is less than 0 (zero)
-	 * @throws IllegalArgumentException Thrown if the sample rate is less than 1 (one), or if averageInterval is less than sampleInterval
-	 * @throws GmsecException Thrown if a Connection object cannot be created
+	 * @throws IllegalArgumentException Thrown if the Config object is null.
+	 * @throws IllegalArgumentException Thrown if the publish rate is less than 0 (zero).
+	 * @throws IllegalArgumentException Thrown if the sample rate is less than 1 (one), or if averageInterval is less than sampleInterval.
+	 * @throws GmsecException Thrown if a Connection object cannot be created.
 	 *
 	 * @see ResourceGenerator#destroy(ResourceGenerator)
 	 */
@@ -109,7 +113,7 @@ public class ResourceGenerator
 	/**
 	 * This static method is used to destroy the ResourceGenerator object.
 	 *
-	 * @param rsrcGen The ResourceGenerator object to destroy
+	 * @param rsrcGen The ResourceGenerator object to destroy.
 	 *
 	 * @throws IllegalArgumentException Thrown if the given ResourceGenerator object is null.
 	 */
@@ -133,8 +137,8 @@ public class ResourceGenerator
 	 *
 	 * @return True if the resource generator thread has started; false otherwise.
 	 *
-	 * @throws GmsecException Thrown if a connection cannot be established with the GMSEC Bus
-	 * @throws GmsecException Thrown if message validation is enabled and a valid RSRC message cannot be created
+	 * @throws GmsecException Thrown if a connection cannot be established with the GMSEC Bus.
+	 * @throws GmsecException Thrown if message validation is enabled and a valid RSRC message cannot be created.
 	 *
 	 * @see stop
 	 */ 
@@ -175,7 +179,7 @@ public class ResourceGenerator
 	 * Note: If the PUB-RATE field is provided, then then publish rate for the resource generator
 	 * will be updated to publish at the (new) rate.
 	 *
-	 * @param field The field to add to the message
+	 * @param field The field to add to the message.
 	 *
 	 * @return True if an existing field was overwritten; false otherwise.
 	 *

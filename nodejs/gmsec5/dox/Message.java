@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -143,7 +143,7 @@ public class Message
 	 * @return Returns true if the field was replaced; false otherwise.
 	 *
 	 * @throws SWIG_Exception Thrown if the field name is null.
-	 * @throws GMSECException Thrown if the field name is an empty string.
+	 * @throws GmsecException Thrown if the field name is an empty string or is otherwise non-compliant.
 	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required by the field.
 	 */
 	public setFieldValue(fieldName, strValue);
@@ -164,7 +164,7 @@ public class Message
 	 * @return Returns true if the field was replaced; false otherwise.
 	 *
 	 * @throws SWIG_Exception Thrown if the field name is null.
-	 * @throws GMSECException Thrown if the field name is an empty string.
+	 * @throws GmsecException Thrown if the field name is an empty string or is otherwise non-compliant.
 	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required by the field.
 	 */
 	public setFieldValue(fieldName, intValue);
@@ -185,7 +185,7 @@ public class Message
 	 * @return Returns true if the field was replaced; false otherwise.
 	 *
 	 * @throws SWIG_Exception Thrown if the field name is null.
-	 * @throws GMSECException Thrown if the field name is an empty string.
+	 * @throws GmsecException Thrown if the field name is an empty string or is otherwise non-compliant.
 	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required by the field.
 	 */
 	public setFieldValue(fieldName, longValue);
@@ -206,7 +206,7 @@ public class Message
 	 * @return Returns true if the field was replaced; false otherwise.
 	 *
 	 * @throws SWIG_Exception Thrown if the field name is null.
-	 * @throws GMSECException Thrown if the field name is an empty string.
+	 * @throws GmsecException Thrown if the field name is an empty string or is otherwise non-compliant.
 	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required by the field.
 	 */
 	public setFieldValue(fieldName, doubleValue);
@@ -251,6 +251,23 @@ public class Message
 	 * @throws GmsecException Thrown if the subject contains illegal content.
 	 */
 	public setSubject(subject);
+
+
+	/**
+	 * Allows for the setting of individual subject elements. The name of the elements are defined
+	 * by the message's corresponding message template. This value will be overridden by automatic subject
+	 * generation if the subject element is defined by an existing field in the message, or if the subject
+	 * was manually defined with setSubject.
+	 *
+	 * @param name - the name of the subject element
+	 * @param value - the value of the subject element. An empty or null value will be seen as FILL in the subject line.
+	 *
+	 * @throws SWIG_Exception Thrown if the name is null or an empty string.
+	 * @throws GmsecException Thrown if the name does not match a subject 
+	 * element name defined the message template, or if the message does not 
+	 * have a corresponding message template.
+	 */
+	public setSubjectElement(name, value);
 
 
 	/**

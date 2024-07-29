@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,13 +42,14 @@ class GMSEC_API BinaryField : public Field
 {
 public:
 	/**
-	 * @fn BinaryField(const char* name, const GMSEC_U8* blob, size_t length)
+	 * @fn BinaryField(const char* name, const GMSEC_U8* blob, size_t length, bool isHeader = false)
 	 * @brief Constructor for creating a specialized Field object containing raw data.
 	 * @param name - the name of the Field
 	 * @param blob - the raw data
 	 * @param length - the length (size) of the raw data
 	 * @param isHeader - used to indicate if Field is a header field (default is false)
-	 * @throw A GmsecException is thrown if the name is NULL, or is an empty string.
+	 * @throw A GmsecException is thrown if the name is NULL, or is an empty string, or the field name is otherwise not compliant.
+	 * @throw A GmsecException is thrown if the size of the blob is greater than 1GB or cannot be copied.
 	 */
 	BinaryField(const char* name, const GMSEC_U8* blob, size_t length, bool isHeader = false);
 
