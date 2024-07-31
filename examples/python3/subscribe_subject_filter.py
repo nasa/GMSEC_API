@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -94,6 +94,9 @@ class subscribe_subject_filter:
 
             # Disconnect from the GMSEC Bus.
             conn.disconnect()
+
+            # Destroy the Connection
+            del conn
 
         except lp.GmsecError as e:
             # If here, the most likely case is the middleware could not be

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -325,13 +325,19 @@ public:
 	/**
 	 * @brief Send request message.
 	 */
-	virtual void mwRequest(const gmsec::api5::Message& request, std::string& id);
+	virtual void mwRequest(const gmsec::api5::Message& request, const std::string& id);
 
 
 	/**
 	 * @brief Wait up to @p timeout milliseconds for next message.
 	 */
 	virtual void mwReceive(gmsec::api5::Message*& msg, GMSEC_I32 timeout);
+
+
+	/**
+	 * @brief Generate a unique identifer string to associate with a request message.
+	 */
+	virtual std::string mwGetUniqueID();
 
 
 	/**

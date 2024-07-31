@@ -129,6 +129,17 @@ public class T003_Fields extends TestCase
 		catch (IllegalArgumentException e) {
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
 		}
+
+		try
+		{
+			// non-compliant field name
+			new BinaryField("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
+		}
 	}
 
 
@@ -179,6 +190,17 @@ public class T003_Fields extends TestCase
 		catch (IllegalArgumentException e)
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
+		}
+
+		try
+		{
+			// non-compliant field name
+			new BooleanField("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
 		}
 	}
 
@@ -231,6 +253,17 @@ public class T003_Fields extends TestCase
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
 		}
+
+		try
+		{
+			// non-compliant field name
+			new CharField("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
+		}
 	}
 
 
@@ -282,6 +315,17 @@ public class T003_Fields extends TestCase
 		catch (IllegalArgumentException e)
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
+		}
+
+		try
+		{
+			// non-compliant field name
+			new StringField("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
 		}
 	}
 
@@ -336,6 +380,17 @@ public class T003_Fields extends TestCase
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
 		}
+
+		try
+		{
+			// non-compliant field name
+			new F32Field("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
+		}
 	}
 
 
@@ -386,6 +441,17 @@ public class T003_Fields extends TestCase
 		catch (IllegalArgumentException e)
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
+		}
+
+		try
+		{
+			// non-compliant field name
+			new F64Field("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
 		}
 	}
 
@@ -438,6 +504,17 @@ public class T003_Fields extends TestCase
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
 		}
+
+		try
+		{
+			// non-compliant field name
+			new I8Field("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
+		}
 	}
 
 
@@ -487,6 +564,17 @@ public class T003_Fields extends TestCase
 		catch (IllegalArgumentException e)
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
+		}
+
+		try
+		{
+			// non-compliant field name
+			new I16Field("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
 		}
 	}
 
@@ -538,6 +626,17 @@ public class T003_Fields extends TestCase
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
 		}
+
+		try
+		{
+			// non-compliant field name
+			new I32Field("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
+		}
 	}
 
 
@@ -587,6 +686,17 @@ public class T003_Fields extends TestCase
 		catch (IllegalArgumentException e)
 		{
 			check(e.getMessage(), e.getMessage().contains("Field name is null or contains an empty string"));
+		}
+
+		try
+		{
+			// non-compliant field name
+			new I64Field("NON%COMPLIANT", value);
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
 		}
 	}
 
@@ -650,6 +760,17 @@ public class T003_Fields extends TestCase
 		{
 			check(e.getMessage(), e.getMessage().contains("U8 object is null"));
 		}
+
+		try
+		{
+			// non-compliant field name
+			new U8Field("NON%COMPLIANT", new U8(value));
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
+		}
 	}
 
 
@@ -710,6 +831,17 @@ public class T003_Fields extends TestCase
 		catch (IllegalArgumentException e)
 		{
 			check(e.getMessage(), e.getMessage().contains("U16 object is null"));
+		}
+
+		try
+		{
+			// non-compliant field name
+			new U16Field("NON%COMPLIANT", new U16(value));
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
 		}
 	}
 
@@ -772,6 +904,17 @@ public class T003_Fields extends TestCase
 		{
 			check(e.getMessage(), e.getMessage().contains("U32 object is null"));
 		}
+
+		try
+		{
+			// non-compliant field name
+			new U32Field("NON%COMPLIANT", new U32(value));
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
+		}
 	}
 
 
@@ -832,6 +975,17 @@ public class T003_Fields extends TestCase
 		catch (IllegalArgumentException e)
 		{
 			check(e.getMessage(), e.getMessage().contains("U64 object is null"));
+		}
+
+		try
+		{
+			// non-compliant field name
+			new U64Field("NON%COMPLIANT", new U64(value));
+			check("Exception was expected", false);
+		}
+		catch (IllegalArgumentException e)
+		{
+			check(e.getMessage(), e.getMessage().contains("Field name is not compliant"));
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -72,8 +72,8 @@ C<libgmsec_perl::GmsecException-E<gt>new($errorClass, $errorCode, $errorMessage)
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
-        $errorClass - enumerated value indicating source of the error
-        $errorCode - enumerated value indicating reason for the error
+        $errorClass - value indicating source of the error
+        $errorCode - value indicating reason for the error
         $errorMessage - explanation for the error
 
 =for html <b>&nbsp;&nbsp;&nbsp;&nbsp;See also:</b><br><br>
@@ -86,8 +86,8 @@ C<libgmsec_perl::GmsecException-E<gt>new($errorClass, $errorCode, $customCode, $
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br>
 
-        $errorClass - enumerated value indicating source of the error
-        $errorCode - enumerated value indicating reason for the error
+        $errorClass - value indicating source of the error
+        $errorCode - value indicating reason for the error
         $customCode - custom error code (typically middleware specific) on the root cause of the error
         $errorMessage - explanation for the error
 
@@ -125,7 +125,7 @@ C<libgmsec_perl::GmsecException-E<gt>getErrorClass()>
 
 =for html <b>&nbsp;&nbsp;&nbsp;&nbsp;Returns:</b>
 
-        A StatusClass enumerated value
+        A numeric value
 
 =for html <b>&nbsp;&nbsp;&nbsp;&nbsp;See also:</b><br><br>
 
@@ -139,7 +139,7 @@ C<libgmsec_perl::GmsecException-E<gt>getErrorCode()>
 
 =for html <b>&nbsp;&nbsp;&nbsp;&nbsp;Returns:</b>
 
-        A StatusCode enumerated value
+        A numeric value
 
 =for html <b>&nbsp;&nbsp;&nbsp;&nbsp;See also:</b><br><br>
 

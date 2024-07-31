@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -17,13 +17,11 @@
 
 #include <gmsec_version.h>
 
+#include <limits.h>
 
-#if (defined WIN32) && (_MSC_VER == 1500)
-#define GMSEC_USING_VS2008 1
-#endif
 
-// Undefine macros defined by the perl libraries which cause problems with the 4.X Perl
-// linking on Windows
+// Undefine macros defined by the Perl libraries which cause problems with the
+// linking the 5.x Perl binding on Windows
 //
 #if (defined WIN32)
 #if (defined connect)
@@ -35,8 +33,6 @@
 #endif
 #endif
 
-
-#include <limits.h>
 
 
 /* Ensure we are on a platform with 8 bit chars */
@@ -51,13 +47,25 @@
 #endif
 
 
+/**
+ * Macros for maintaining binary compatibility with the C# binding of API 5.x
+ */
+#ifdef SWIG_BINDING
+#define GMSEC_USING_SCHAR      1
+#define GMSEC_USING_UCHAR      1
+#define GMSEC_USING_SHORT      1
+#define GMSEC_USING_LONG       1
+#define GMSEC_USING_LONG_LONG  1
+#endif
+
+
 /** @name GMSEC Data Types
  * @{
  */
 
 /**
- *  @typedef GMSEC_BOOL
- *  @brief typedef for GMSEC_BOOL
+ * @typedef GMSEC_BOOL
+ * @brief typedef for GMSEC_BOOL
  */
 #ifdef __cplusplus
 enum class GMSEC_BOOL
@@ -74,279 +82,97 @@ typedef enum
 #endif
 
 
-/** @typedef GMSEC_CHAR
- *  @brief typedef for GMSEC_CHAR
+/**
+ * @typedef GMSEC_CHAR
+ * @brief typedef for GMSEC_CHAR
  */
 typedef char GMSEC_CHAR;
 
 
-/** @typedef GMSEC_I8
- *  @brief typedef for GMSEC_I8
+/**
+ * @typedef GMSEC_I8
+ * @brief typedef for GMSEC_I8
  */
 typedef signed char GMSEC_I8;
-#define GMSEC_USING_SCHAR 1
 
 
-/** @typedef GMSEC_U8
- *  @brief typedef for GMSEC_U8
+/**
+ * @typedef GMSEC_U8
+ * @brief typedef for GMSEC_U8
  */
 typedef unsigned char GMSEC_U8;
-#define GMSEC_USING_UCHAR 1
 
 
-#if GMSEC_S16IL32LL64
-	/** @typedef GMSEC_I16
-	 *  @brief typedef for GMSEC_I16
-	 */
-	typedef signed short   GMSEC_I16;
+/**
+ * @typedef GMSEC_I16
+ * @brief typedef for GMSEC_I16
+ */
+typedef signed short GMSEC_I16;
 
-	/** @typedef GMSEC_U16
-	 *  @brief typedef for GMSEC_U16
-	 */
-	typedef unsigned short GMSEC_U16;
 
-	#define GMSEC_USING_SHORT 1
+/**
+ * @typedef GMSEC_U16
+ * @brief typedef for GMSEC_U16
+ */
+typedef unsigned short GMSEC_U16;
 
-	/** @typedef GMSEC_I32
-	 *  @brief typedef for GMSEC_I32
-	 */
-	typedef signed long    GMSEC_I32;
 
-	/** @typedef GMSEC_U32
-	 *  @brief typedef for GMSEC_U32
-	 */
-	typedef unsigned long  GMSEC_U32;
-
-	#define GMSEC_USING_LONG 1
-
-	/** @typedef GMSEC_I64
-	 *  @brief typedef for GMSEC_I64
-	 */
-	typedef signed long long   GMSEC_I64;
-
-	/** @typedef GMSEC_U64
-	 *  @brief typedef for GMSEC_U64
-	 */
-	typedef unsigned long long GMSEC_U64;
-
-	#define GMSEC_USING_LONG_LONG 1
-
-#elif GMSEC_S16I32L64
-	/** @typedef GMSEC_I16
-	 *  @brief typedef for GMSEC_I16
-	 */
-	typedef signed short   GMSEC_I16;
-
-	/** @typedef GMSEC_U16
-	 *  @brief typedef for GMSEC_U16
-	 */
-	typedef unsigned short GMSEC_U16;
-
-	#define GMSEC_USING_SHORT 1
-
-	/** @typedef GMSEC_I32
-	 *  @brief typedef for GMSEC_I32
-	 */
-	typedef signed int   GMSEC_I32;
-
-	/** @typedef GMSEC_U32
-	 *  @brief typedef for GMSEC_U32
-	 */
-	typedef unsigned int GMSEC_U32;
-
-	#define GMSEC_USING_INT 1
-
-	/** @typedef GMSEC_I64
-	 *  @brief typedef for GMSEC_I64
-	 */
-	typedef signed long   GMSEC_I64;
-
-	/** @typedef GMSEC_U64
-	 *  @brief typedef for GMSEC_U64
-	 */
-	typedef unsigned long GMSEC_U64;
-
-	#define GMSEC_USING_LONG 1
-
-#elif GMSEC_VC6
-	#define GMSEC_USE_ENUM_FOR_CONSTANTS
-
-	/** @typedef GMSEC_I16
-	 *  @brief typedef for GMSEC_I16
-	 */
-	typedef signed short   GMSEC_I16;
-
-	/** @typedef GMSEC_U16
-	 *  @brief typedef for GMSEC_U16
-	 */
-	typedef unsigned short GMSEC_U16;
-
-	#define GMSEC_USING_SHORT 1
-
-	/** @typedef GMSEC_I32
-	 *  @brief typedef for GMSEC_I32
-	 */
-	typedef signed int   GMSEC_I32;
-
-	/** @typedef GMSEC_U32
-	 *  @brief typedef for GMSEC_U32
-	 */
-	typedef unsigned int GMSEC_U32;
-
-	#define GMSEC_USING_INT 1
-
-	/** @typedef GMSEC_I64
-	 *  @brief typedef for GMSEC_I16
-	 */
-	typedef signed __int64   GMSEC_I64;
-
-	/** @typedef GMSEC_U64
-	 *  @brief typedef for GMSEC_U16
-	 */
-	typedef unsigned __int64 GMSEC_U64;
-
-	#define GMSEC_USING_LONG_LONG 1
-
+/**
+ * @typedef GMSEC_I32
+ * @brief typedef for GMSEC_I32
+ */
+#ifdef WIN32
+typedef signed long GMSEC_I32;
 #else
-	/* determine sizes from limits.h macros */
-
-	/* Prefer short for GMSEC_I16 for backward-compatibility, then int */
-	#if (SHRT_MAX >> 14) > 0
-		/** @typedef GMSEC_I16
-		 *  @brief typedef for GMSEC_I16
-		 */
-		typedef signed short   GMSEC_I16;
-
-		/** @typedef GMSEC_U16
-		 *  @brief typedef for GMSEC_U16
-		 */
-		typedef unsigned short GMSEC_U16;
-
-		#define GMSEC_USING_SHORT 1
-
-	#elif (INT_MAX >> 14) > 0
-		/** @typedef GMSEC_I16
-		 *  @brief typedef for GMSEC_I16
-		 */
-		typedef signed int   GMSEC_I16;
-
-		/** @typedef GMSEC_U16
-		 *  @brief typedef for GMSEC_U16
-		 */
-		typedef unsigned int GMSEC_U16;
-
-		#define GMSEC_USING_INT 1
-
-	#else
-		#error Unsupported platform: missing type for GMSEC_I16
-	#endif
+typedef signed int GMSEC_I32;
+#endif
 
 
-	/* Prefer long for GMSEC_x32 if it is 32 bit for backward-compatibility,
-	 * then int if still available */
-	/* Shifts of more than 31 bits are broken up to avoid for HP-UX aCC. */
-
-	#if (LONG_MAX >> 30) > 0
-		#if ((LONG_MAX >> 16) >> 16) == 0
-			/** @typedef GMSEC_I32
-			 *  @brief typedef for GMSEC_I32
-			 */
-			typedef signed long   GMSEC_I32;
-
-			/** @typedef GMSEC_U32
-			 *  @brief typedef for GMSEC_U32
-			 */
-			typedef unsigned long GMSEC_U32;
-
-			#define GMSEC_USING_LONG 1
-
-		#elif !defined(GMSEC_USING_INT) && ((INT_MAX >> 30) > 0)
-			/** @typedef GMSEC_I32
-			 *  @brief typedef for GMSEC_I32
-			 */
-			typedef signed int   GMSEC_I32;
-
-			/** @typedef GMSEC_U32
-			 *  @brief typedef for GMSEC_U32
-			 */
-			typedef unsigned int GMSEC_U32;
-
-			#define GMSEC_USING_INT 1
-
-		#else
-			#error Unsupported platform: missing type for GMSEC_I32
-		#endif /* ((LONG_MAX >> 16) >> 16) == 0 */
-
-	#else
-		#error Unsupported platform: missing type for GMSEC_I32
-	#endif /* (LONG_MAX >> 30) > 0 */
-
-
-	/* Prefer long for GMSEC_x64 if available and 64 bit, then long long */
-	#if !defined(GMSEC_USING_LONG) && ((LONG_MAX >> 30) >> 30) > 0
-		/** @typedef GMSEC_I64
-		 *  @brief typedef for GMSEC_I64
-		 */
-		typedef signed long   GMSEC_I64;
-
-		/** @typedef GMSEC_U64
-		 *  @brief typedef for GMSEC_U64
-		 */
-		typedef unsigned long GMSEC_U64;
-
-		#define GMSEC_USING_LONG 1
-
-	#elif ((LLONG_MAX >> 30) >> 30) > 0
-		/** @typedef GMSEC_I64
-		 *  @brief typedef for GMSEC_I64
-		 */
-		typedef signed long long   GMSEC_I64;
-
-		/** @typedef GMSEC_U64
-		 *  @brief typedef for GMSEC_U64
-		 */
-		typedef unsigned long long GMSEC_U64;
-
-		#define GMSEC_USING_LONG_LONG 1
-
-	#elif !defined(LLONG_MAX)
-		#ifdef GMSEC_WARN_MISSING_LLONG
-			/* in order to avoid a warning for each translation unit, only set and change
-			 * the GMSEC_USING_LONG_LONG macro if GMSEC_WARN_MISSING_LLONG is defined
-			 */
-			#define GMSEC_USING_LONG_LONG warning: limits.h does not define LLONG_MAX
-		#endif
-
-		/** @typedef GMSEC_I64
-		 *  @brief typedef for GMSEC_I64
-		 */
-		typedef signed long long   GMSEC_I64;
-
-		/** @typedef GMSEC_U64
-		 *  @brief typedef for GMSEC_U64
-		 */
-		typedef unsigned long long GMSEC_U64;
-
-		#define GMSEC_USING_LONG_LONG 1
-
-	#else
-		#error Unsupported platform: missing type for GMSEC_I64
-	#endif /* !defined(GMSEC_USING_LONG) && ... */
-
-#endif /* !defined(GMSEC_S16I32L64) */
-
-
-
-/** @typedef GMSEC_F32
- *  @brief typedef for GMSEC_F32
+/**
+ * @typedef GMSEC_U32
+ * @brief typedef for GMSEC_U32
  */
-typedef float     GMSEC_F32;
+#ifdef WIN32
+typedef unsigned long GMSEC_U32;
+#else
+typedef unsigned int GMSEC_U32;
+#endif
 
 
-/** @typedef GMSEC_F64
- *  @brief typedef for GMSEC_F64
+/**
+ * @typedef GMSEC_I64
+ * @brief typedef for GMSEC_I64
  */
-typedef double    GMSEC_F64;
+#if defined(WIN32) || defined(SWIG_BINDING)
+typedef signed long long GMSEC_I64;
+#else
+typedef signed long GMSEC_I64;
+#endif
+
+
+/**
+ * @typedef GMSEC_U64
+ * @brief typedef for GMSEC_U64
+ */
+#if defined(WIN32) || defined(SWIG_BINDING)
+typedef unsigned long long GMSEC_U64;
+#else
+typedef unsigned long GMSEC_U64;
+#endif
+
+
+/**
+ * @typedef GMSEC_F32
+ * @brief typedef for GMSEC_F32
+ */
+typedef float GMSEC_F32;
+
+
+/**
+ * @typedef GMSEC_F64
+ * @brief typedef for GMSEC_F64
+ */
+typedef double GMSEC_F64;
 /**@}*/
 
 
@@ -460,7 +286,7 @@ typedef enum
 /**
  * @typedef GMSEC_Config
  *
- * @brief A handle to a Config object.
+ * @brief A C binding handle to a Config object.
  *
  * @sa configCreate
  * @sa configCreateWithArgs
@@ -473,6 +299,8 @@ typedef void* GMSEC_Config;
 /**
  * @typedef GMSEC_ConfigFile
  *
+ * @brief A C binding handle to a ConfigFile object.
+ *
  * @sa configFileCreate
  * @sa configFileDestroy
  */
@@ -482,6 +310,8 @@ typedef void* GMSEC_ConfigFile;
 /**
  * @typedef GMSEC_ConfigFileIterator
  *
+ * @brief A C binding handle to a ConfigFileIterator object.
+ *
  * @sa configFileGetIterator
  */
 typedef void* GMSEC_ConfigFileIterator;
@@ -490,7 +320,7 @@ typedef void* GMSEC_ConfigFileIterator;
 /**
  * @typedef GMSEC_Connection
  *
- * @brief A handle to a Connection object.
+ * @brief A C binding handle to a Connection object.
  *
  * @sa connectionCreate
  * @sa connectionDestroy
@@ -501,7 +331,7 @@ typedef void* GMSEC_Connection;
 /**
  * @typedef GMSEC_Field
  *
- * @brief A handle to an opaque Field object.
+ * @brief A C binding handle to an opaque Field object.
  *
  * @sa binaryFieldCreate
  * @sa booleanFieldCreate
@@ -525,7 +355,7 @@ typedef void* GMSEC_Field;
 /**
  * @typedef GMSEC_HeartbeatGenerator
  *
- * @brief Typedef for a handle to a Heartbeat Generator object.
+ * @brief A C binding handle to a HeartbeatGenerator object.
  *
  * @sa heartbeatGeneratorCreate
  * @sa heartbeatGeneratorCreateWithFields
@@ -537,7 +367,7 @@ typedef void* GMSEC_HeartbeatGenerator;
 /**
  * @typedef GMSEC_Message
  *
- * @brief Typedef for a handle to a Message object.
+ * @brief A C binding handle to a Message object.
  *
  * @sa messageCreate
  * @sa messageCreateWithConfig
@@ -551,7 +381,7 @@ typedef void* GMSEC_Message;
 /**
  * @typedef GMSEC_MessageFactory
  *
- * @brief Typedef for a handle to a MessageFactory object.
+ * @brief A C binding handle to a MessageFactory object.
  *
  * @sa connectionGetMessageFactory
  */
@@ -561,7 +391,7 @@ typedef void* GMSEC_MessageFactory;
 /**
  * @typedef GMSEC_MessageFieldIterator
  *
- * @brief Typedef for a handle to a MessageFieldIterator object.
+ * @brief A C binding handle to a MessageFieldIterator object.
  *
  * @sa messageGetFieldIterator
  */
@@ -571,7 +401,7 @@ typedef void* GMSEC_MessageFieldIterator;
 /**
  * @typedef GMSEC_ResourceGenerator
  *
- * @brief Typedef for a handle to a Resource Generator object.
+ * @brief A C binding handle to a ResourceGenerator object.
  *
  * @sa resourceGeneratorCreate
  * @sa resourceGeneratorCreateWithFields
@@ -583,7 +413,7 @@ typedef void* GMSEC_ResourceGenerator;
 /**
  * @typedef GMSEC_SchemaIDIterator
  *
- * @brief A handle to a SchemaIDIterator object.
+ * @brief A C binding handle to a SchemaIDIterator object.
  *
  * @sa specificationGetSchemaIDIterator
  */
@@ -593,7 +423,7 @@ typedef void* GMSEC_SchemaIDIterator;
 /**
  * @typedef GMSEC_Specification
  *
- * @brief A handle to a Specification object.
+ * @brief A C binding handle to a Specification object.
  *
  * @sa specificationCreate
  * @sa specificationCreateCopy
@@ -605,7 +435,7 @@ typedef void* GMSEC_Specification;
 /**
  * @typedef GMSEC_Status
  *
- * @brief A handle to a Status object.
+ * @brief A C binding handle to a Status object.
  *
  * @sa statusCreate
  * @sa statusDestroy
@@ -615,7 +445,9 @@ typedef void* GMSEC_Status;
 
 /**
  * @struct GMSEC_SubscriptionEntry
- * @brief A SubscriptionEntry in a Configuration file.
+ *
+ * @brief A C binding handle to a SubscriptionEntry object.
+ *
  * @sa configFileIteratorNextSubscription
  */
 typedef void* GMSEC_SubscriptionEntry;
@@ -624,7 +456,7 @@ typedef void* GMSEC_SubscriptionEntry;
 /**
  * @typedef GMSEC_SubscriptionInfo
  *
- * @brief A handle to a SubscriptionInfo object.
+ * @brief A C binding handle to a SubscriptionInfo object.
  *
  * @sa subscriptionInfoGetSubject
  * @sa subscriptionInfoGetCallback

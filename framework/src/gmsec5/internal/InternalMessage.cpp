@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -74,7 +74,7 @@ InternalMessage::InternalMessage(Message& parent)
 	  m_details(new ValueMap()),
 	  m_valid(false),
 	  m_valueBuffer(),
-	  m_template(0),
+	  m_template(),
 	  m_msgVersion(GMSEC_MSG_SPEC_CURRENT),
 	  m_msgSchemaLevel(Specification::SchemaLevel::LEVEL_0),
 	  m_kind(Message::Kind::PUBLISH),
@@ -85,6 +85,7 @@ InternalMessage::InternalMessage(Message& parent)
 	  m_subjectSet(false),
 	  m_kindSet(false),
 	  m_showMsgConfig(false),
+	  m_subjectElementValues(),
 	  m_mwInfo(0),
 	  m_complianceValidator(new ComplianceValidator(m_config))
 {
@@ -110,6 +111,7 @@ InternalMessage::InternalMessage(Message& parent, const InternalMessage& other)
 	  m_subjectSet(other.m_subjectSet),
 	  m_kindSet(other.m_kindSet),
 	  m_showMsgConfig(other.m_showMsgConfig),
+	  m_subjectElementValues(other.m_subjectElementValues),
 	  m_mwInfo(other.m_mwInfo),
 	  m_complianceValidator(new ComplianceValidator(*(other.m_complianceValidator.get())))
 {
@@ -245,27 +247,28 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 
 	case Field::Type::I16:
 		{
+			GMSEC_I64 numValue;
 			try
 			{
-				GMSEC_I64 numValue = StringUtil::getValue<GMSEC_I64>(value);
-
-				if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I16>::min()) &&
-				    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I16>::max()))
-				{
-					field.reset(new I16Field(fieldName, static_cast<GMSEC_I16>(numValue), isHeader));
-				}
-				else
-				{//int is too big to fit into I16, which can lead to undefined behavior
-					std::ostringstream err;
-					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I16, but value \"" << value << "\" is outside limits";
-					throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-				}
+				numValue = StringUtil::getValue<GMSEC_I64>(value);
 			}
 			catch (...)
 			{
 				std::ostringstream err;
 				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I16, but value \"" << value << "\" cannot be converted";
 				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
+			}
+
+			if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I16>::min()) &&
+			    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I16>::max()))
+			{
+				field.reset(new I16Field(fieldName, static_cast<GMSEC_I16>(numValue), isHeader));
+			}
+			else
+			{//int is too big to fit into I16, which can lead to undefined behavior
+				std::ostringstream err;
+				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I16, but value \"" << value << "\" is outside limits";
+				throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 			}
 		}
 		break;
@@ -280,21 +283,10 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 			}
 
+			GMSEC_I64 numValue;
 			try
 			{
-				GMSEC_I64 numValue = StringUtil::getValue<GMSEC_I64>(value);
-
-				if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U16>::min()) &&
-				    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U16>::max()))
-				{
-					field.reset(new U16Field(fieldName, static_cast<GMSEC_U16>(numValue), isHeader));
-				}
-				else
-				{//int is too big to fit into U16, which can lead to undefined behavior
-					std::ostringstream err;
-					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U16, but value \"" << value << "\" is outside limits";
-					throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-				}
+				numValue = StringUtil::getValue<GMSEC_I64>(value);
 			}
 			catch (...)
 			{
@@ -302,26 +294,27 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U16, but value \"" << value << "\" cannot be converted";
 				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 			}
+
+			if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U16>::min()) &&
+			    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U16>::max()))
+			{
+				field.reset(new U16Field(fieldName, static_cast<GMSEC_U16>(numValue), isHeader));
+			}
+			else
+			{//int is too big to fit into U16, which can lead to undefined behavior
+				std::ostringstream err;
+				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U16, but value \"" << value << "\" is outside limits";
+				throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
+			}
 		}
 		break;
 
 	case Field::Type::I32:
 		{
+			GMSEC_I64 numValue;
 			try
 			{
-				GMSEC_I64 numValue = StringUtil::getValue<GMSEC_I64>(value);
-
-				if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I32>::min()) &&
-				    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I32>::max()))
-				{
-					field.reset(new I32Field(fieldName, static_cast<GMSEC_I32>(numValue), isHeader));
-				}
-				else
-				{//int is too big to fit into I32, which can lead to undefined behavior
-					std::ostringstream err;
-					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I32, but value \"" << value << "\" is outside limits";
-					throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-				}
+				numValue = StringUtil::getValue<GMSEC_I64>(value);
 			}
 			catch (...)
 			{
@@ -329,40 +322,51 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I32, but value \"" << value << "\" cannot be converted";
 				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 			}
+
+			if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I32>::min()) &&
+			    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I32>::max()))
+			{
+				field.reset(new I32Field(fieldName, static_cast<GMSEC_I32>(numValue), isHeader));
+			}
+			else
+			{//int is too big to fit into I32, which can lead to undefined behavior
+				std::ostringstream err;
+				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I32, but value \"" << value << "\" is outside limits";
+				throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
+			}
 		}
 		break;
 
 	case Field::Type::U32:
 		{
+			GMSEC_I64 numValue;
 			try
 			{
-				GMSEC_I64 numValue = StringUtil::getValue<GMSEC_I64>(value);
-
-				if (numValue < 0)
-				{
-					// we disallow negative numbers
-					std::ostringstream err;
-					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U32, but value \"" << value << "\" cannot be converted";
-					throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
-				}
-
-				if (numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U32>::max()))
-				{
-					field.reset(new U32Field(fieldName, static_cast<GMSEC_U32>(numValue), isHeader));
-				}
-				else
-				{
-					//int is too big to fit into U32, which can lead to undefined behavior
-					std::ostringstream err;
-					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U32, but value \"" << value << "\" is outside limits";
-					throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-				}
+				numValue = StringUtil::getValue<GMSEC_I64>(value);
 			}
 			catch (...)
 			{
 				std::ostringstream err;
 				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U32, but value \"" << value << "\" cannot be converted";
 				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
+			}
+
+			if (numValue < 0)
+			{// we disallow negative numbers
+				std::ostringstream err;
+				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U32, but value \"" << value << "\" cannot be converted";
+				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
+			}
+
+			if (numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U32>::max()))
+			{
+				field.reset(new U32Field(fieldName, static_cast<GMSEC_U32>(numValue), isHeader));
+			}
+			else
+			{//int is too big to fit into U32, which can lead to undefined behavior
+				std::ostringstream err;
+				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U32, but value \"" << value << "\" is outside limits";
+				throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 			}
 		}
 		break;
@@ -422,37 +426,38 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 	case Field::Type::BOOL:
 		{
 			//We can accept 4 values here: "true", "false", "0", or "1"
-			try
+			if (StringUtil::stringEqualsIgnoreCase(value, "true"))
 			{
-				if (StringUtil::stringEqualsIgnoreCase(value, "true"))
+				field.reset(new BooleanField(fieldName, true, isHeader));
+			}
+			else if (StringUtil::stringEqualsIgnoreCase(value, "false"))
+			{
+				field.reset(new BooleanField(fieldName, false, isHeader));
+			}
+			else
+			{
+				GMSEC_U32 numValue;
+				try
 				{
-					field.reset(new BooleanField(fieldName, true, isHeader));
+					numValue = StringUtil::getValue<GMSEC_U32>(value);
 				}
-				else if (StringUtil::stringEqualsIgnoreCase(value, "false"))
+				catch (...)
+				{//this value is worthless, we can't do anything with it
+					std::ostringstream err;
+					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_BOOL, but value \"" << value << "\" cannot be converted";
+					throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
+				}
+
+				if (numValue <= 1)
 				{
-					field.reset(new BooleanField(fieldName, false, isHeader));
+					field.reset(new BooleanField(fieldName, numValue == 1, isHeader));
 				}
 				else
-				{
-					GMSEC_U32 numValue = StringUtil::getValue<GMSEC_U32>(value);
-
-					if (numValue <= 1)
-					{
-						field.reset(new BooleanField(fieldName, numValue == 1, isHeader));
-					}
-					else
-					{//it is not 0 or 1
-						std::ostringstream err;
-						err << "Field template \"" << fieldName << "\" calls for field type GMSEC_BOOL, but value \"" << value << "\" cannot be converted";
-						throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
-					}
+				{//it is not 0 or 1
+					std::ostringstream err;
+					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_BOOL, but value \"" << value << "\" cannot be converted";
+					throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 				}
-			}
-			catch (...)
-			{//this value is worthless, we can't do anything with it
-				std::ostringstream err;
-				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_BOOL, but value \"" << value << "\" cannot be converted";
-				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 			}
 		}
 		break;
@@ -476,27 +481,28 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 
 	case Field::Type::I8:
 		{
+			GMSEC_I64 numValue;
 			try
 			{
-				GMSEC_I64 numValue = StringUtil::getValue<GMSEC_I64>(value);
-
-				if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I8>::min()) &&
-				    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I8>::max()))
-				{
-					field.reset(new I8Field(fieldName, static_cast<GMSEC_I8>(numValue), isHeader));
-				}
-				else
-				{//int is too big to fit into I8, which can lead to undefined behavior
-					std::ostringstream err;
-					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I8, but value \"" << value << "\" is outside limits";
-					throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-				}
+				numValue = StringUtil::getValue<GMSEC_I64>(value);
 			}
 			catch (...)
 			{
 				std::ostringstream err;
 				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I8, but value \"" << value << "\" cannot be converted";
 				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
+			}
+
+			if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I8>::min()) &&
+			    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_I8>::max()))
+			{
+				field.reset(new I8Field(fieldName, static_cast<GMSEC_I8>(numValue), isHeader));
+			}
+			else
+			{//int is too big to fit into I8, which can lead to undefined behavior
+				std::ostringstream err;
+				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_I8, but value \"" << value << "\" is outside limits";
+				throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 			}
 		}
 		break;
@@ -510,27 +516,28 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
 			}
 
+			GMSEC_I64 numValue;
 			try
 			{
-				GMSEC_I64 numValue = StringUtil::getValue<GMSEC_I64>(value);
-
-				if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U8>::min()) &&
-				    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U8>::max()))
-				{
-					field.reset(new U8Field(fieldName, static_cast<GMSEC_U8>(numValue), isHeader));
-				}
-				else
-				{//int is too big to fit into U8, which can lead to undefined behavior
-					std::ostringstream err;
-					err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U8, but value \"" << value << "\" is outside limits";
-					throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
-				}
+				numValue = StringUtil::getValue<GMSEC_I64>(value);
 			}
 			catch (...)
 			{
 				std::ostringstream err;
 				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U8, but value \"" << value << "\" cannot be converted";
 				throw GmsecException(MSG_ERROR, INVALID_TYPE_CONVERSION, err.str().c_str());
+			}
+
+			if (numValue >= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U8>::min()) &&
+			    numValue <= static_cast<GMSEC_I64>(std::numeric_limits<GMSEC_U8>::max()))
+			{
+				field.reset(new U8Field(fieldName, static_cast<GMSEC_U8>(numValue), isHeader));
+			}
+			else
+			{//int is too big to fit into U8, which can lead to undefined behavior
+				std::ostringstream err;
+				err << "Field template \"" << fieldName << "\" calls for field type GMSEC_U8, but value \"" << value << "\" is outside limits";
+				throw GmsecException(MSG_ERROR, VALUE_OUT_OF_RANGE, err.str().c_str());
 			}
 		}
 		break;
@@ -1133,6 +1140,51 @@ const char* InternalMessage::getSubject() const
 	}
 
 	return m_subject.c_str();
+}
+
+
+void InternalMessage::setSubjectElement(const char* name, const char* value)
+{
+	if (!name || std::string(name).empty())
+	{
+		throw GmsecException(MSG_ERROR, INVALID_SUBJECT_NAME, "Subject element name cannot be NULL or empty string");
+	}
+
+	std::string newValue;
+
+	if (!value || std::string(value).empty())
+	{
+		newValue = "FILL";
+	}
+	else
+	{
+		newValue = value;
+	}
+
+	if (m_template.get())
+	{
+		bool found = false;
+		const SubjectElementList& elements = m_template->getSubjectElements();
+		for (size_t i = 0; i < elements.size() && !found; i++)
+		{
+			if (StringUtil::stringEquals(name, elements[i].first.c_str()))
+			{
+				found = true;
+				m_subjectElementValues[i] = StringUtil::stringToUpper(newValue);
+			}
+		}
+
+		if (!found)
+		{
+			std::string err;
+			err.append("Message does not have a subject element named ").append(name);
+			throw GmsecException(MSG_ERROR, OTHER_ERROR_CODE, err.c_str());
+		}
+	}
+	else
+	{
+		throw GmsecException(MSG_ERROR, OTHER_ERROR_CODE, "Message does not have a message template");
+	}
 }
 
 
@@ -1954,7 +2006,7 @@ ValueMap& InternalMessage::getDetails() const
 
 void InternalMessage::setTracking(const TrackingDetails& tracking)
 {
-	m_tracking.set(tracking);
+	m_tracking = tracking;
 }
 
 
@@ -2082,6 +2134,19 @@ bool InternalMessage::processConfigValue(const char* name, const char* value)
 			throw GmsecException(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
 		}
 	}
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_REMOVE_TRACKING_FIELDS))
+	{
+		if (StringUtil::stringEqualsIgnoreCase(value, "true") || StringUtil::stringEqualsIgnoreCase(value, "false"))
+		{
+			return true;
+		}
+		else
+		{
+			std::stringstream ss;
+			ss << GMSEC_REMOVE_TRACKING_FIELDS << " value must be either be true or false.";
+			throw GmsecException(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
+		}
+	}
 
 	return false;
 }
@@ -2141,9 +2206,9 @@ Specification::SchemaLevel InternalMessage::getSchemaLevel() const
 }
 
 
-void InternalMessage::setTemplate(StdSharedPtr<MessageTemplate> msgTemplate)
+void InternalMessage::setTemplate(MessageTemplate* msgTemplate)
 {
-	m_template = msgTemplate;
+	m_template.reset(msgTemplate);
 }
 
 
@@ -2172,6 +2237,15 @@ void InternalMessage::init()
 				{
 					addField(*(field.release()), false);
 				}
+			}
+		}
+
+		if (!m_template->getSubjectElements().empty())
+		{
+			const SubjectElementList& elements = m_template->getSubjectElements();
+			for (SubjectElementList::const_iterator it = elements.begin(); it != elements.end(); ++it)
+			{
+				m_subjectElementValues.push_back("FILL");
 			}
 		}
 
@@ -2230,12 +2304,11 @@ void InternalMessage::init()
 std::string InternalMessage::buildSubject(bool forTopic, bool useWildcards) const
 {
 	std::string subject;
-	SubjectElementList elements;
 
 	// If no template is available, or no subject within the template, then we cannot generate/build a subject.
 	if (m_template.get() && !m_template->getSubjectElements().empty())
 	{
-		elements = m_template->getSubjectElements();
+		const SubjectElementList& elements = m_template->getSubjectElements();
 
 		for (size_t i = 0; i < elements.size(); ++i)
 		{
@@ -2252,7 +2325,7 @@ std::string InternalMessage::buildSubject(bool forTopic, bool useWildcards) cons
 				element = element.substr(1);
 			}
 
-			std::string value   = (useWildcards ? (required ? "*" : "!*") : (required ? "FILL" : "!FILL"));
+			std::string value = (useWildcards ? (required ? "*" : "!*") : (required ? m_subjectElementValues[i] : "!" + m_subjectElementValues[i]));
 
 			//element can have multiple associated fields, split into sub elements and look for values
 			std::vector<std::string> subElements = StringUtil::split(element, ",");
@@ -2266,9 +2339,8 @@ std::string InternalMessage::buildSubject(bool forTopic, bool useWildcards) cons
 						value = getStringValue(subElements[j].c_str());
 					break;
 				}
-				else if (subElements[j] == "SPECIFICATION" || subElements[j] == "MESSAGE-TYPE" || subElements[j] == "MESSAGE-SUBTYPE")
+				else if (subElements[j] == "SPECIFICATION" || matchDefinitionElement(subElements[j]))
 				{
-					//TODO MAV: This is C2MS-specific hardcoding, there should be a way to flag subject elements used as identifiers without hardcoding field names
 					value = "FILL";
 					break;
 				}
@@ -2319,8 +2391,19 @@ std::string InternalMessage::buildSubject(bool forTopic, bool useWildcards) cons
 			subject = StringUtil::stringToUpper(subject);
 		}
 	}
-
 	return subject;
+}
+
+bool InternalMessage::matchDefinitionElement(const std::string& element) const
+{
+	std::vector<std::string> definition = StringUtil::split(m_template->getDefinition(), '.');
+
+	for (std::vector<std::string>::const_iterator it = definition.begin(); it != definition.end(); ++it)
+	{
+		if (element == *it) return true;
+	}
+
+	return false;
 }
 
 

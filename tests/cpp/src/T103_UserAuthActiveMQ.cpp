@@ -102,7 +102,7 @@ int test_UserAuthActiveMQ(Test& test)
 		}
 		catch (const GmsecException& e)
 		{
-			test.check("Passed", true);
+			test.check(e.what(), std::string(e.what()).find("User name [notauser] or password is invalid") != std::string::npos);
 		}
 	}
 	catch (const GmsecException& e)
@@ -132,7 +132,7 @@ int test_UserAuthActiveMQ(Test& test)
 		}
 		catch (const GmsecException& e)
 		{
-			test.check("Passed", true);
+			test.check(e.what(), std::string(e.what()).find("User name [nightrun] or password is invalid") != std::string::npos);
 		}
 	}
 	catch (const GmsecException& e)

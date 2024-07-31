@@ -194,7 +194,7 @@ class Test_Connection(Test):
             conn.subscribe( self.get_subject("*.BAR") )
             conn.subscribe( self.get_subject("FOO.BAZ") )
 
-            msg1 = conn.get_message_factory().create_message("LOG")
+            msg1 = conn.get_message_factory().create_message("HB")
             msg2 = conn.get_message_factory().create_message("LOG")
             msg3 = conn.get_message_factory().create_message("LOG")
 
@@ -205,15 +205,17 @@ class Test_Connection(Test):
             conn.publish(msg1)
 
             msg = conn.receive(5000)
-            self.check("Was expecting to receive a message", msg != None)
+            self.require("Was expecting to receive a message", msg != None)
             self.check("Unexpected message subject", msg.get_subject() == self.get_subject("GIN.BAR"))
+            self.verify_tracking_fields(msg, 11)
             lp.Message.destroy(msg)
 
             conn.publish(msg2)
 
             msg = conn.receive(5000)
-            self.check("Was expecting to receive a message", msg != None)
+            self.require("Was expecting to receive a message", msg != None)
             self.check("Unexpected message subject", msg.get_subject() == self.get_subject("FOO.BAZ"))
+            self.verify_tracking_fields(msg, 7)
             lp.Message.destroy(msg)
 
             conn.publish(msg3)
@@ -893,7 +895,16 @@ class Test_Connection(Test):
             conn.publish(msg)
 
             rcvd = conn.receive(5000)
-            self.check("Did not receive expected message", rcvd != None)
+            self.require("Did not receive expected message", rcvd != None)
+
+            iter = rcvd.get_field_iterator( lp.MessageFieldIterator.Selector_TRACKING_FIELDS )
+            numTrackingFields = 0
+            while iter.has_next():
+                field = iter.next()
+                self.check("Expected a tracking field", field.is_tracking())
+                numTrackingFields += 1
+            self.check("Unexpected number of tracking fields", 10 == numTrackingFields)
+
         except Exception as e:
             self.check(str(e), False)
 
@@ -1023,21 +1034,18 @@ class Test_Connection(Test):
     def test_get_set_name(self):
         lp.log_info("Test get_name() and set_name()")
 
-        conn = None
-
         try:
             conn = lp.Connection( self.get_config() )
-            conn.connect()
             self.check("Expected a connection name", conn.get_name() != None)
 
             conn.set_name("FOOBAR")
+            self.check("Expected a connection name of FOOBAR", conn.get_name() == "FOOBAR")
 
+            conn.set_name(None)
             self.check("Expected a connection name of FOOBAR", conn.get_name() == "FOOBAR")
         except Exception as e:
             self.check(str(e), False)
 
-        if conn != None:
-            conn.disconnect()
 
 
     def test_get_id(self):
@@ -1110,6 +1118,22 @@ class Test_Connection(Test):
 
         if conn != None:
             conn.disconnect()
+
+
+    def verify_tracking_fields(self, msg, expected):
+        numTrackingFields = 0
+
+        iter = msg.get_field_iterator(lp.MessageFieldIterator.Selector_TRACKING_FIELDS)
+
+        while iter.has_next():
+            field = iter.next()
+
+            self.check("Expected a tracking field", field.is_tracking())
+
+            if field.is_tracking():
+                numTrackingFields += 1
+
+        self.check("Unexpected number of tracking fields", numTrackingFields == expected)
 
 
 class T010_EventCallback(lp.EventCallback):

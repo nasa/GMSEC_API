@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -7,8 +7,7 @@
 
 /**
  *  @file TrackingDetails.cpp
- *
- *  This file contains the base class for messages.
+ *  @brief This class manages tracking field options.
  */
 
 #include <gmsec5/internal/TrackingDetails.h>
@@ -17,18 +16,8 @@
 
 #include <gmsec5/Config.h>
 #include <gmsec5/ConfigOptions.h>
-#include <gmsec5/Message.h>
-
-#include <gmsec5/util/cxx.h>
-#include <gmsec5/util/Log.h>
-
-#include <gmsec5_defs.h>		// for MESSAGE_TRACKINGFIELDS_* macros
 
 #include <sstream>
-
-#if GMSEC_CXX_11_AVAILABLE == 1
-#include <regex>
-#endif
 
 
 using namespace gmsec::api5;
@@ -256,20 +245,6 @@ TrackingDetails TrackingDetails::initialize(const Config& config)
 	}
 
 	return tracking;
-}
-
-
-void TrackingDetails::set(const TrackingDetails &other)
-{
-	fTrackingFlag            = other.fTrackingFlag;
-	fNodeFlag                = other.fNodeFlag;
-	fProcessIdFlag           = other.fProcessIdFlag;
-	fUserNameFlag            = other.fUserNameFlag;
-	fConnectionIdFlag        = other.fConnectionIdFlag;
-	fPublishTimeFlag         = other.fPublishTimeFlag;
-	fMwInfoFlag              = other.fMwInfoFlag;
-	fActiveSubscriptionsFlag = other.fActiveSubscriptionsFlag;
-	fConnectionEndpointFlag  = other.fConnectionEndpointFlag;
 }
 
 

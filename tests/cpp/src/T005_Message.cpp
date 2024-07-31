@@ -319,6 +319,7 @@ void test_set_field_value(Test& test)
 
 		set_standard_fields(msgFactory);
 
+		// Create a MSG.HB message
 		Message msg = msgFactory.createMessage("HB");
 
 		//o Test with string value
@@ -373,6 +374,7 @@ void test_set_field_value(Test& test)
 
 		// Off-nominal tests
 		try {
+			//o NULL field name
 			msg.setFieldValue(NULL, "1");
 			test.check("Message::setFieldValue() accepted NULL field name", false);
 		}
@@ -381,6 +383,7 @@ void test_set_field_value(Test& test)
 		}
 
 		try {
+			//o NULL field value
 			msg.setFieldValue("FOO-BAR", static_cast<const char*>(NULL));
 			test.check("Message::setFieldValue() accepted NULL field value", false);
 		}
@@ -389,6 +392,7 @@ void test_set_field_value(Test& test)
 		}
 
 		try {
+			//o NULL field name
 			msg.setFieldValue(NULL, static_cast<GMSEC_I64>(1));
 			test.check("Message::setFieldValue() accepted NULL field name", false);
 		}
@@ -397,11 +401,165 @@ void test_set_field_value(Test& test)
 		}
 
 		try {
+			//o NULL field name
 			msg.setFieldValue(NULL, static_cast<GMSEC_F64>(1));
 			test.check("Message::setFieldValue() accepted NULL field name", false);
 		}
 		catch (...) {
 			test.check("Okay", true);
+		}
+
+		try {
+			//o Field value cannot be converted into an I16 value
+			msg.setFieldValue("COMPONENT-INFO", "foobar");
+			test.check("Message::setFieldValue() accepted a value that cannot be converted to I16", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		try {
+			//o Overly small value which cannot fit into an I16 field
+			msg.setFieldValue("COMPONENT-INFO", "-32769");
+			test.check("Message::setFieldValue() accepted overly small value for I16", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == VALUE_OUT_OF_RANGE);
+		}
+
+		try {
+			//o Overly large value which cannot fit into an I16 field
+			msg.setFieldValue("COMPONENT-INFO", "32768");
+			test.check("Message::setFieldValue() accepted overly large value for I16", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == VALUE_OUT_OF_RANGE);
+		}
+
+		try {
+			//o Negative value cannot be converted to a U16
+			msg.setFieldValue("PUB-RATE", "-1");
+			test.check("Message::setFieldValue() negative U16 value", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		try {
+			//o Field value cannot be converted into an U16 value
+			msg.setFieldValue("PUB-RATE", "foobar");
+			test.check("Message::setFieldValue() accepted a value that cannot be converted to U16", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		try {
+			//o Overly large value which cannot fit into an U16 field
+			msg.setFieldValue("PUB-RATE", "65536");
+			test.check("Message::setFieldValue() accepted overly large value for U16", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == VALUE_OUT_OF_RANGE);
+		}
+
+		// Create a RESP.DIR message
+		msg = msgFactory.createMessage("RESP.DIR");
+
+		try {
+			//o Field value cannot be converted into an I32 value
+			msg.setFieldValue("RETURN-VALUE", "foobar");
+			test.check("Message::setFieldValue() accepted a value that cannot be converted to I32", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		try {
+			//o Overly small value which cannot fit into an I32 field
+			msg.setFieldValue("RETURN-VALUE", "-2147483649");
+			test.check("Message::setFieldValue() accepted overly small value for I32", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == VALUE_OUT_OF_RANGE);
+		}
+
+		try {
+			//o Overly large value which cannot fit into an I32 field
+			msg.setFieldValue("RETURN-VALUE", "2147483648");
+			test.check("Message::setFieldValue() accepted overly large value for I32", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == VALUE_OUT_OF_RANGE);
+		}
+
+		// Create a MSG.RSRC message
+		msg = msgFactory.createMessage("MSG.RSRC");
+
+		try {
+			//o Field value cannot be converted into an U32 value
+			msg.setFieldValue("CPU.1.MEM", "foobar");
+			test.check("Message::setFieldValue() accepted a value that cannot be converted to U32", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		try {
+			//o Negative value cannot be used with a U32 field
+			msg.setFieldValue("CPU.1.MEM", "-1");
+			test.check("Message::setFieldValue() accepted negative value for U32", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		try {
+			//o Overly large value cannot be used with a U32 field
+			msg.setFieldValue("CPU.1.MEM", "4294967296");
+			test.check("Message::setFieldValue() accepted negative value for U32", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == VALUE_OUT_OF_RANGE);
+		}
+
+		try {
+			//o Field value cannot be converted into an F32 value
+			msg.setFieldValue("MEM.UTIL", "foobar");
+			test.check("Message::setFieldValue() accepted a value that cannot be converted to F32", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		// Create a RESP.MVAL message
+		msg = msgFactory.createMessage("RESP.MVAL");
+
+		try {
+			//o Field value cannot be converted into an F64 value
+			msg.setFieldValue("MNEMONIC.1.SAMPLE.1.EU-VALUE", "foobar");
+			test.check("Message::setFieldValue() accepted a value that cannot be converted to F64", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		try {
+			//o Field value cannot be converted into a BOOL value
+			msg.setFieldValue("MNEMONIC.1.SAMPLE.1.RED-HIGH", "foobar");
+			test.check("Message::setFieldValue() accepted a value that cannot be converted to F64", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
+		}
+
+		try {
+			//o Field value cannot be converted into a BOOL value
+			msg.setFieldValue("MNEMONIC.1.SAMPLE.1.RED-HIGH", "2");
+			test.check("Message::setFieldValue() accepted a value that cannot be converted to F64", false);
+		}
+		catch (const GmsecException& e) {
+			test.check(e.what(), e.getErrorCode() == INVALID_TYPE_CONVERSION);
 		}
 	}
 	catch (const GmsecException& e)
@@ -501,6 +659,74 @@ void test_set_subject(Test& test)
 	catch (const GmsecException& e)
 	{
 		test.check(e.what(), std::string(e.what()).find("Invalid message subject") != std::string::npos);
+	}
+}
+
+
+void test_set_subject_element(Test& test)
+{
+	GMSEC_INFO << "Test setSubjectElement()";
+
+	// Nominal test
+	try
+	{
+		MessageFactory msgFactory;
+
+		set_standard_fields(msgFactory);
+
+		Message msg = msgFactory.createMessage("TLMPROC");
+
+		msg.setSubjectElement("ME4", "FOOEY");
+
+		test.check("Message has unexpected subject", std::string("C2MS.MY-DOMAIN-1.MY-DOMAIN-2.MY-MISSION.MY-CONSTELLATION.MY-SAT-ID.MSG.TLMPROC.MY-COMPONENT.FILL.FILL.FOOEY") == msg.getSubject());
+
+		//Off-nominal test
+		try
+		{
+			msg.setSubjectElement("ME9000", "FOOEY");
+		}
+		catch (const GmsecException& e)
+		{
+			test.check(e.what(), std::string(e.what()).find("Message does not have a subject element named ME9000") != std::string::npos);
+		}
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), false);
+	}
+
+	// Off-nominal tests
+	try
+	{
+		Message msg;
+		msg.setSubjectElement(NULL, "FOOEY");
+		test.check("Was expecting an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Subject element name cannot be NULL or empty string") != std::string::npos);
+	}
+
+	try
+	{
+		Message msg;
+		msg.setSubjectElement("", "FOOEY");
+		test.check("Was expecting an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Subject element name cannot be NULL or empty string") != std::string::npos);
+	}
+
+	try
+	{
+		Message msg;
+		msg.setSubjectElement("ME4", "FOOEY");
+		test.check("Was expecting an exception", false);
+	}
+	catch (const GmsecException& e)
+	{
+		test.check(e.what(), std::string(e.what()).find("Message does not have a message template") != std::string::npos);
 	}
 }
 
@@ -2094,6 +2320,7 @@ int test_Message(Test& test)
 		test_set_field_value(test);
 		test_set_config(test);
 		test_set_subject(test);
+		test_set_subject_element(test);
 		test_get_subject(test);
 		test_set_kind(test);
 		test_get_kind(test);

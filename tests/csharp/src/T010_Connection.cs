@@ -321,7 +321,7 @@ namespace T010
 					conn.Subscribe( GetSubject("*.BAR") );
 					conn.Subscribe( GetSubject("FOO.BAZ") );
 
-					Message msg1 = conn.GetMessageFactory().CreateMessage("LOG");
+					Message msg1 = conn.GetMessageFactory().CreateMessage("HB");
 					Message msg2 = conn.GetMessageFactory().CreateMessage("LOG");
 					Message msg3 = conn.GetMessageFactory().CreateMessage("LOG");
 
@@ -334,6 +334,7 @@ namespace T010
 					Message msg = conn.Receive(5000);
 					Require("Was expecting to receive a message", msg != null);
 					Check("Unexpected message subject", msg.GetSubject() == GetSubject("GIN.BAR"));
+					VerifyTrackingFields(msg, 11);
 					Message.Destroy(msg);
 
 					conn.Publish(msg2);
@@ -341,6 +342,7 @@ namespace T010
 					msg = conn.Receive(5000);
 					Require("Was expecting to receive a message", msg != null);
 					Check("Unexpected message subject", msg.GetSubject() == GetSubject("FOO.BAZ"));
+					VerifyTrackingFields(msg, 7);
 					Message.Destroy(msg);
 
 					conn.Publish(msg3);
@@ -431,7 +433,7 @@ namespace T010
 
 		private void Test_SubscribeWithCallback()
 		{
-			Log.Info("Test subscribe() with Callback");
+			Log.Info("Test Subscribe() with Callback");
 
 			T010_Callback      mcb = new T010_Callback();
 			T010_EventCallback ecb = new T010_EventCallback();
@@ -479,7 +481,6 @@ namespace T010
 				Message msg = conn2.GetMessageFactory().CreateMessage("HB");
 				msg.SetSubject( GetSubject("HB") );
 
-				conn2.Publish(msg);
 				conn2.Publish(msg);
 
 				TimeUtil.Millisleep(5000);
@@ -1078,7 +1079,16 @@ namespace T010
 				conn1.Publish(msg);
 
 				rcvd = conn1.Receive(5000);
-				Check("Did not receive expected message", rcvd != null);
+				Require("Did not receive expected message", rcvd != null);
+
+				MessageFieldIterator iter = rcvd.GetFieldIterator( MessageFieldIterator.Selector.TRACKING_FIELDS );
+				int numTrackingFields = 0;
+				while (iter.HasNext()) {
+					Field field = iter.Next();
+					Check("Expected a tracking field", field.IsTracking());
+					++numTrackingFields;
+				}
+				Check("Unexpected number of tracking fields", 10 == numTrackingFields);
 
 				Message.Destroy(rcvd);
 
@@ -1229,11 +1239,12 @@ namespace T010
 
 			using (Connection conn = new Connection( GetConfig() ))
 			{
-				conn.Connect();
 				Check("Expected a connection name", conn.GetName() != null);
 
 				conn.SetName("FOOBAR");
+				Check("Expected a connection name of FOOBAR", conn.GetName() == "FOOBAR");
 
+				conn.SetName(null);
 				Check("Expected a connection name of FOOBAR", conn.GetName() == "FOOBAR");
 			}
 		}
@@ -1305,6 +1316,27 @@ namespace T010
 
 				conn.Disconnect();
 			}
+		}
+
+
+		private void VerifyTrackingFields(Message msg, int expected)
+		{
+			int numTrackingFields = 0;
+
+			MessageFieldIterator iter = msg.GetFieldIterator(MessageFieldIterator.Selector.TRACKING_FIELDS);
+
+			while (iter.HasNext())
+			{
+				Field field = iter.Next();
+
+				Check("Expected a tracking field", field.IsTracking());
+
+				if (field.IsTracking()) {
+					++numTrackingFields;
+				}
+			}
+
+			Check("Unexpected number of tracking fields", numTrackingFields == expected);
 		}
 	}
 

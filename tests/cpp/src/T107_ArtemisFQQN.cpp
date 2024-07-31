@@ -134,8 +134,8 @@ public:
 	}
 
 private:
-	const Config& config;
-	std::string   msgSubject;
+	Config      config;
+	std::string msgSubject;
 };
 
 

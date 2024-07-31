@@ -1,6 +1,6 @@
 @echo off
 
-rem Copyright 2007-2023 United States Government as represented by the
+rem Copyright 2007-2024 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -158,6 +158,12 @@ if !errorlevel! == 0 (
 echo %mw_type% | findstr "gmsec_ibmmq" 1>NUL
 if !errorlevel! == 0 (
 	call:CheckWebsphere
+	goto endhere
+)
+
+echo %mw_type% | findstr "gmsec_loopback" 1>NUL
+if !errorlevel! == 0 (
+	call:CheckLoopback
 	goto endhere
 )
 
@@ -825,6 +831,27 @@ if %check_jms% == 1 (
 	echo.
 	call:Header "Checking GMSEC JMS support for GMSEC Bolt..."
 	call:Warning "GMSEC JMS support not available for GMSEC Bolt"
+)
+goto:eof
+
+
+REM ##########################################################################
+REM ##
+REM ## CheckLoopback
+REM ##
+REM ##########################################################################
+:CheckLoopback
+echo.
+call:Header "Checking middleware dependencies for GMSEC Loopback..."
+
+if exist %GMSEC_BIN%\%mw_type%.dll (
+	call:Success "Found %mw_type%.dll"
+	echo.
+	call:Header "Checking dependencies for %mw_type%.dll..."
+	call:CheckDependencies %GMSEC_BIN%\%mw_type%.dll 1
+
+) else (
+	call:Failure "Unable to reference %mw_type%.dll"
 )
 goto:eof
 

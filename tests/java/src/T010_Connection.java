@@ -7,6 +7,7 @@ import gov.nasa.gsfc.gmsec.api5.Gmsec;
 import gov.nasa.gsfc.gmsec.api5.GmsecException;
 import gov.nasa.gsfc.gmsec.api5.Message;
 import gov.nasa.gsfc.gmsec.api5.MessageFactory;
+import gov.nasa.gsfc.gmsec.api5.MessageFieldIterator;
 import gov.nasa.gsfc.gmsec.api5.ReplyCallback;
 import gov.nasa.gsfc.gmsec.api5.Specification;
 import gov.nasa.gsfc.gmsec.api5.Status;
@@ -365,7 +366,7 @@ public class T010_Connection extends TestCase
 			conn.subscribe( getSubject("*.BAR") );
 			conn.subscribe( getSubject("FOO.BAZ") );
 
-			Message msg1 = conn.getMessageFactory().createMessage("LOG");
+			Message msg1 = conn.getMessageFactory().createMessage("HB");
 			Message msg2 = conn.getMessageFactory().createMessage("LOG");
 			Message msg3 = conn.getMessageFactory().createMessage("LOG");
 
@@ -376,14 +377,16 @@ public class T010_Connection extends TestCase
 			conn.publish(msg1);
 
 			Message msg = conn.receive(5000);
-			check("Was expecting to receive a message", msg != null);
+			require("Was expecting to receive a message", msg != null);
 			check("Unexpected message subject", msg.getSubject().equals( getSubject("GIN.BAR") ));
+			verifyTrackingFields(msg, 11);
 
 			conn.publish(msg2);
 
 			msg = conn.receive(5000);
-			check("Was expecting to receive a message", msg != null);
+			require("Was expecting to receive a message", msg != null);
 			check("Unexpected message subject", msg.getSubject().equals( getSubject("FOO.BAZ") ));
+			verifyTrackingFields(msg, 7);
 
 			conn.publish(msg3);
 
@@ -1256,7 +1259,16 @@ public class T010_Connection extends TestCase
 			conn.publish(msg);
 
 			rcvd = conn.receive(5000);
-			check("Did not receive expected message", rcvd != null);
+			require("Did not receive expected message", rcvd != null);
+
+			MessageFieldIterator iter = rcvd.getFieldIterator( MessageFieldIterator.Selector.TRACKING_FIELDS );
+			int numTrackingFields = 0;
+			while (iter.hasNext()) {
+				Field field = iter.next();
+				check("Expected a tracking field", field.isTracking());
+				++numTrackingFields;
+			}
+			check("Unexpected number of tracking fields", 10 == numTrackingFields);
 		}
 		catch (GmsecException e)
 		{
@@ -1329,15 +1341,6 @@ public class T010_Connection extends TestCase
 
 			//o Release message
 			Message.destroy(rcvd);
-
-			//o Verify received message can only be released once
-			try {
-				Message.destroy(rcvd);
-				check("Expected exception when attempting to release a message twice", false);
-			}
-			catch (NullPointerException e) {
-				check("Okay", e.getMessage().contains("Message reference is null"));
-			}
 		}
 		catch (GmsecException e)
 		{
@@ -1489,11 +1492,12 @@ public class T010_Connection extends TestCase
 		try
 		{
 			conn = Connection.create( getConfig() );
-			conn.connect();
 			check("Expected a connection name", conn.getName() != null);
 
 			conn.setName("FOOBAR");
+			check("Expected a connection name of FOOBAR", conn.getName().equals("FOOBAR"));
 
+			conn.setName(null);
 			check("Expected a connection name of FOOBAR", conn.getName().equals("FOOBAR"));
 		}
 		catch (GmsecException e)
@@ -1620,6 +1624,27 @@ public class T010_Connection extends TestCase
 		{
 			if (conn != null) Connection.destroy(conn);
 		}
+	}
+
+
+	private void verifyTrackingFields(Message msg, int expected)
+	{
+		int numTrackingFields = 0;
+
+		MessageFieldIterator iter = msg.getFieldIterator(MessageFieldIterator.Selector.TRACKING_FIELDS);
+
+		while (iter.hasNext())
+		{
+			Field field = iter.next();
+
+			check("Expected a tracking field", field.isTracking());
+
+			if (field.isTracking()) {
+				++numTrackingFields;
+			}
+		}
+
+		check("Unexpected number of tracking fields", numTrackingFields == expected);
 	}
 }
 

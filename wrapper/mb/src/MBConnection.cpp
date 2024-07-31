@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -354,13 +354,8 @@ void MBConnection::mwPublish(const Message& msg, const Config& config)
 }
 
 
-void MBConnection::mwRequest(const Message& request, std::string& id)
+void MBConnection::mwRequest(const Message& request, const std::string& id)
 {
-	id = generateUniqueId();
-
-	// Add an id for identifying the reply
-	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
-
 	mwPublish(request, getExternal().getConfig());
 }
 
@@ -403,7 +398,14 @@ void MBConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 	else
 	{
 		MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).addMessageTemplate(*msg);
+		MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).identifyTrackingFields(*msg);
 	}
+}
+
+
+std::string MBConnection::mwGetUniqueID()
+{
+	return generateUniqueId();
 }
 
 

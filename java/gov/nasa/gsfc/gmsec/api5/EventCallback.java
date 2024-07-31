@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -37,7 +37,9 @@ public abstract class EventCallback
 	private JNIConnection    m_jniConnection = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param cb Object to reference for acquiring internal JNIEventCallback
 	 * @return Internal JNIEventCallback object.
@@ -49,6 +51,7 @@ public abstract class EventCallback
 
 
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @return Returns the internal JNIConnection object.
 	 */
@@ -59,6 +62,7 @@ public abstract class EventCallback
 
 
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param jconn An internal JNIConnection object.
 	 */
@@ -66,6 +70,7 @@ public abstract class EventCallback
 	{
 		m_jniConnection = jconn;
 	}
+	//! @endcond
 
 
 	/**

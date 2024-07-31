@@ -1,22 +1,19 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
  */
 
 
-/** @file TrackingDetails.h
- *  @brief This file contains a class for managing tracking configuration.
+/**
+ *  @file TrackingDetails.h
+ *  @brief This class manages tracking field options.
  */
 
 #ifndef GMSEC_API5_INTERNAL_TRACKING_DETAILS_H
 #define GMSEC_API5_INTERNAL_TRACKING_DETAILS_H
 
-
-#include <gmsec5_defs.h>
-
-#include <gmsec5/Status.h>
 
 #include <gmsec5/util/wdllexp.h>
 
@@ -28,19 +25,22 @@
 #define MESSAGE_TRACKINGFIELDS_UNSET    -1
 
 
-namespace gmsec {
-namespace api5 {
+namespace gmsec
+{
+namespace api5
+{
 	// Forward declaration(s)
 	class Config;
 
-namespace internal {
+namespace internal
+{
 
 
 // Internal meta-detail field for determining if tracking fields should be validated.
 // Should be set to 'true' when a message is being sent.
 // This definition should not be defined in ConfigOptions.h!
 //
-const char* const GMSEC_MSG_BEING_SENT = "GMSEC-MSG-BEING-SENT";
+const char* const GMSEC_CHECK_TRACKING_FIELDS = "GMSEC-CHECK-TRACKING-FIELDS";
 
 
 /** @class TrackingDetails
@@ -124,14 +124,7 @@ public:
 	 */
 	static TrackingDetails initialize(const Config& config);
 
-	void set(const TrackingDetails &other);
-
 	const char* toString() const;
-
-#if 0
-	static bool   isReservedField(const char* fieldName);
-	static Status checkTrackingField(const char* fieldName, const TrackingDetails& configTracking, const TrackingDetails& msgTracking);
-#endif
 };
 
 } //namespace internal

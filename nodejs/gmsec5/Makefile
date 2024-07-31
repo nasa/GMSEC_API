@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -10,12 +10,12 @@ include $(GMSEC_API_HOME)/config/$(GMSEC_PLATFORM)
 TARGET          = gmsec_nodejs.node
 
 NODE            = $(NODE_HOME)/bin/node
-NODE_GYP        = $(NODE_HOME)/lib/node_modules/npm/bin/node-gyp-bin/node-gyp
+NODE_GYP        = $(NODE_HOME)/bin/node-gyp
 
 SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_INC        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/javascript/v8 -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
-SWIG_OPTS       = -c++ -javascript -node $(SWIG_INC) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
+SWIG_OPTS       = -c++ -javascript -node $(SWIG_INC) -DCHAR_BIT=8 -DSWIG_BINDING
 
 FRAMEWORK_DIR   = ../../framework
 
@@ -39,7 +39,7 @@ default: check_nodejs check_swig message $(WRAPPED_SRCS) $(BINDIR)/$(TARGET)
 
 
 check_nodejs:
-	@if [ ! -e $(NODE) ]; then \
+	@if [ ! -e $(NODE) ] || [ ! -e $(NODE_GYP) ]; then \
         echo; \
         echo; \
         echo "###########################################################"; \

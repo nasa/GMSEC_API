@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -154,6 +154,6 @@ $(SRCDIR)/%.o: $(SRCDIR)/%.cpp
 
 
 gen-doc:
-	$(JAVADOC) -public -quiet -d $(JAVADOC_DIR) --no-module-directories -sourcepath . $(JAVA_DOCS)
+	$(JAVADOC) -public -quiet -d $(JAVADOC_DIR) -sourcepath . $(JAVA_DOCS)
 	$(JAR) cf $(JAVA_DOC_FILE) $(JAVADOC_DIR)
 	$(JAR) uf $(JAR_FILE) $(JAVADOC_DIR)

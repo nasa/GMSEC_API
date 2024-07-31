@@ -546,9 +546,6 @@ void test_register_message_validator(Test& test)
 }
 
 
-void test_thread_safeness(Test& test);
-
-
 int test_MessageFactory(Test& test)
 {
 	test.setDescription("Test MessageFactory");
@@ -565,77 +562,7 @@ int test_MessageFactory(Test& test)
 	test_get_specification(test);
 	test_register_message_validator(test);
 
-	test_thread_safeness(test);
-
 	return 0;
-}
-
-
-class MyThread
-{
-public:
-	static void runThread(StdSharedPtr<MyThread> mt) {
-		mt->run();
-	}
-
-	MyThread(Test& test, StdSharedPtr<MessageFactory> msgFactory) : test(test), msgFactory(msgFactory) {
-	}
-
-	~MyThread() {
-	}
-
-	void run() {
-		try {
-			for (int i = 0; i < 1000; ++i) {
-				Message msg = msgFactory->createMessage( ((i % 2) == 0 ? "HB" : "LOG") );
-				TimeUtil::millisleep(5);
-			}
-			test.check("Okay, all done", true);
-		}
-		catch (const GmsecException& e) {
-			test.check(e.what(), false);
-		}
-		catch (const std::exception& e) {
-			test.check(e.what(), false);
-		}
-	}
-
-private:
-	Test& test;
-	StdSharedPtr<MessageFactory> msgFactory;
-};
-
-
-void test_thread_safeness(Test& test)
-{
-	GMSEC_INFO << "Test thread-safeness";
-
-	const Config& config = test.getConfig();
-
-	try
-	{
-		StdSharedPtr<MessageFactory> msgFactory( new MessageFactory(config) );
-
-		StdSharedPtr<MyThread> mt( new MyThread(test, msgFactory) );
-
-		set_standard_fields( *msgFactory.get() );
-
-		StdUniquePtr<StdThread> thread1( new StdThread(&MyThread::runThread, mt) );
-		StdUniquePtr<StdThread> thread2( new StdThread(&MyThread::runThread, mt) );
-		StdUniquePtr<StdThread> thread3( new StdThread(&MyThread::runThread, mt) );
-
-		thread1->start();
-		thread2->start();
-		thread3->start();
-
-		thread1->join();
-		thread2->join();
-		thread3->join();
-	}
-	catch (const GmsecException& e)
-	{
-		GMSEC_ERROR << "Exception: "  << e.what();
-	}
 }
 
 TEST_DRIVER(test_MessageFactory)

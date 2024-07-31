@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -46,7 +46,7 @@ public class Specification : global::System.IDisposable {
   public Specification(Specification other) {
   }
 
-  /// <summary>Returns a SchemaIDIterator, which can be used to iterate over the IDs of the loaded templates.</summary>
+  /// <summary>Returns a SchemaIDIterator which can be used to iterate over the IDs of the loaded templates.</summary>
   ///
   /// <remarks>
   /// Only one SchemaIDIterator object is associated with a %Specification object; multiple calls to 
@@ -58,7 +58,7 @@ public class Specification : global::System.IDisposable {
   public SchemaIDIterator GetSchemaIDIterator() {
   }
 
-  /// <summary>Returns the version of the ISD being used as an unsigned integer.</summary>
+  /// <summary>Returns the version of the message specification that is referenced by the Specification.</summary>
   public uint GetVersion() {
   }
 

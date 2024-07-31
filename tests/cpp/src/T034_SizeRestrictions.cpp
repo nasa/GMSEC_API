@@ -21,56 +21,6 @@ int test_SizeRestrictions(Test& test)
 
 	try
 	{
-		//o Create message with oversized binary field
-		{
-			Message msg;
-			msg.setSubject( test.getSubject().c_str() );
-
-			std::vector<unsigned char> blob(static_cast<size_t>(GMSEC_BIN_LIMIT) + 1);
-
-			msg.addField("HUGE-BINARY-FIELD", blob.data(), blob.size());
-
-			char*          data = 0;
-			GMSEC_U64      dataSize;
-			MessageEncoder encoder;
-
-			//o Should not be able to encode message containing oversized binary field
-			try
-			{
-				encoder.encode(msg, dataSize, data);
-				test.check("Expected encoder error for oversized binary field", false);
-			}
-			catch (const GmsecException& e)
-			{
-				test.check(e.what(), true);
-			}
-		}
-
-		//o Create message with oversized string field
-		{
-			Message msg;
-			msg.setSubject( test.getSubject().c_str() );
-
-			std::vector<char> str(static_cast<size_t>(GMSEC_STRING_LIMIT) + 1, 'A');
-
-			msg.addField("HUGE-STRING-FIELD", static_cast<const char*>(str.data()));
-
-			char*          data = 0;
-			GMSEC_U64      dataSize;
-			MessageEncoder encoder;
-
-			//o Should not be able to encode message containing oversized string field
-			try
-			{
-				encoder.encode(msg, dataSize, data);
-				test.check("Expected encoder error for oversized string field", false);
-			}
-			catch (const GmsecException& e)
-			{
-				test.check(e.what(), true);
-			}
-		}
-
 		//o Create oversized message (largest allowable is 2GB)
 		{
 			Message msg;

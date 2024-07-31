@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,42 +39,18 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1TimeSpec
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_delete_1TimeSpec
   (JNIEnv *jenv, jclass jcls, jlong jTimeSpecPtr, jobject jTimeSpec)
 {
-	try
-	{
-		GMSEC_TimeSpec* spec = JNI_JLONG_TO_TIMESPEC(jTimeSpecPtr);
+	GMSEC_TimeSpec* spec = JNI_JLONG_TO_TIMESPEC(jTimeSpecPtr);
 
-		if (!spec)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TimeSpec reference is null");
-		}
-		else
-		{
-			delete spec;
-		}
-	}
-	JNI_CATCH
+	delete spec;
 }
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_TimeSpec_1GetSeconds
   (JNIEnv *jenv, jclass jcls, jlong jTimeSpecPtr, jobject jTimeSpec)
 {
-	jlong seconds = 0;
+	GMSEC_TimeSpec* spec = JNI_JLONG_TO_TIMESPEC(jTimeSpecPtr);
 
-	try
-	{
-		GMSEC_TimeSpec* spec = JNI_JLONG_TO_TIMESPEC(jTimeSpecPtr);
-
-		if (!spec)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TimeSpec reference is null");
-		}
-		else
-		{
-			seconds = spec->seconds;
-		}
-	}
-	JNI_CATCH
+	jlong seconds = spec->seconds;
 
 	return seconds;
 }
@@ -83,22 +59,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_TimeSpec_1Get
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_TimeSpec_1GetNanoseconds
   (JNIEnv *jenv, jclass jcls, jlong jTimeSpecPtr, jobject jTimeSpec)
 {
-	jlong nanos = 0;
+	GMSEC_TimeSpec* spec = JNI_JLONG_TO_TIMESPEC(jTimeSpecPtr);
 
-	try
-	{
-		GMSEC_TimeSpec* spec = JNI_JLONG_TO_TIMESPEC(jTimeSpecPtr);
-
-		if (!spec)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "TimeSpec reference is null");
-		}
-		else
-		{
-			nanos = spec->nanoseconds;
-		}
-	}
-	JNI_CATCH
+	jlong nanos = spec->nanoseconds;
 
 	return nanos;
 }

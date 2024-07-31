@@ -162,7 +162,7 @@
 								</xs:complexType>
 							</xs:element>
 
-							<xs:element name="RESPONSE-STATUS" minOccurs="0">
+							<xs:element name="RESPONSE-STATUS">
 								<xs:annotation>
 									<xs:documentation>Identifies the status of the Product Message that was processed. Note: Even though a Request is valid, a product may not be able to be successfully generated. In this case the following Product Message would indicate a Failed Completion.</xs:documentation>
 								</xs:annotation>

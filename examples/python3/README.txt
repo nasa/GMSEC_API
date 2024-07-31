@@ -17,7 +17,7 @@ Instructions for running Python3 example programs
 
    For Windows:
 
-      set PYTHON3_HOME=C:\path\to\Python38
+      set PYTHON3_HOME=C:\path\to\Python310
 
       set GMSEC_API_HOME=C:\path\to\GMSEC_API
 
@@ -45,8 +45,7 @@ Instructions for running Python3 example programs
 
       python <example_name>.py mw-id=bolt mw-server=localhost
 
-
-   Note: Use Python 3.8.5 or later.
+      Note: Use Python 3.10.7 or later.
 
 
    For other middleware, refer to the GMSEC API User's Guide for additional

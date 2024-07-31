@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -115,7 +115,7 @@ Field* MessageTemplate::getField(const char* name, const char* type)
 }
 
 
-const FieldTemplate& MessageTemplate::getFieldTemplate(const char* name)
+const FieldTemplate& MessageTemplate::getFieldTemplate(const char* name) const
 {
 	for (FieldTemplateList::const_iterator it = m_fieldTemplates.begin(); it != m_fieldTemplates.end(); ++it)
 	{

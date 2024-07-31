@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -118,6 +118,7 @@ void OpenDDSMessageListener::on_data_available(DDS::DataReader_ptr reader)
 			}
 
 			MessageFactoryBuddy::getInternal(connection->getExternal().getMessageFactory()).addMessageTemplate(*message.get());
+			MessageFactoryBuddy::getInternal(connection->getExternal().getMessageFactory()).identifyTrackingFields(*message.get());
 
 			// Check to see if is type reply and whether or not to enqueue message/result
 			if (message->getKind() == Message::Kind::REPLY)

@@ -280,6 +280,36 @@ class T003_Fields extends TestCase
 		this.check("Unexpected XML", field1.toXML() == field3.toXML());
 		this.check("Unexpected JSON", field1.toJSON() == field3.toJSON());
 		this.check("Unexpected isHeader value", field1.isHeader() == field3.isHeader());
+
+		// Test limits
+		{
+			let min = -128;
+			let max =  127;
+
+			// Minimum
+			let minField = new gmsec.I8Field(name, min);
+			this.check("Unexpected minimum field value", minField.getValue() == min);
+
+			try {
+				let underField = new gmsec.I8Field(name, min-1);
+				this.check("An underflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+
+			// Maximum
+			let maxField = new gmsec.I8Field(name, max);
+			this.check("Unexpected maximum field value", maxField.getValue() == max);
+
+			try {
+				let overField = new gmsec.I8Field(name, max+1);
+				this.check("An overflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+		}
 	}
 
 	testI16Field()
@@ -314,6 +344,36 @@ class T003_Fields extends TestCase
 		this.check("Unexpected XML", field1.toXML() == field3.toXML());
 		this.check("Unexpected JSON", field1.toJSON() == field3.toJSON());
 		this.check("Unexpected isHeader value", field1.isHeader() == field3.isHeader());
+
+		// Test limits
+		{
+			let min = -32768;
+			let max =  32767;
+
+			// Minimum
+			let minField = new gmsec.I16Field(name, min);
+			this.check("Unexpected minimum field value", minField.getValue() == min);
+
+			try {
+				let underField = new gmsec.I16Field(name, min-1);
+				this.check("An underflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+
+			// Maximum
+			let maxField = new gmsec.I16Field(name, max);
+			this.check("Unexpected maximum field value", maxField.getValue() == max);
+
+			try {
+				let overField = new gmsec.I16Field(name, max+1);
+				this.check("An overflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+		}
 	}
 
 	testI32Field()
@@ -348,6 +408,26 @@ class T003_Fields extends TestCase
 		this.check("Unexpected XML", field1.toXML() == field3.toXML());
 		this.check("Unexpected JSON", field1.toJSON() == field3.toJSON());
 		this.check("Unexpected isHeader value", field1.isHeader() == field3.isHeader());
+
+		// Test limits
+		{
+			let min = -2147483648;
+			let max =  2147483647;
+
+			// Minimum
+			let minField = new gmsec.I32Field(name, min);
+			this.check("Unexpected minimum field value", minField.getValue() == min);
+
+			let underField = new gmsec.I32Field(name, min-1);
+			this.check("Unexpected underflow field value", underField.getValue() == max);
+
+			// Maximum
+			let maxField = new gmsec.I32Field(name, max);
+			this.check("Unexpected maximum field value", maxField.getValue() == max);
+
+			let overField = new gmsec.I32Field(name, max+1);
+			this.check("Unexpected overflow field value", overField.getValue() == min);
+		}
 	}
 
 	testI64Field()
@@ -381,6 +461,44 @@ class T003_Fields extends TestCase
 		this.check("Unexpected XML", field1.toXML() == field3.toXML());
 		this.check("Unexpected JSON", field1.toJSON() == field3.toJSON());
 		this.check("Unexpected isHeader value", field1.isHeader() == field3.isHeader());
+
+		// Test limits
+		{
+			let min = -9223372036854775808;
+			let max =  9223372036854775807;
+
+			// Minimum
+			let minField = new gmsec.I64Field(name, min);
+			this.check("Unexpected minimum field value", minField.getValue() == min);
+
+			// TODO: SWIG 4.1.0 generated code does not handle underflow/overflow of I64 values; this bug has been reported.
+			// See here: https://github.com/swig/swig/issues/2679#issuecomment-1741860535
+			/*
+			try {
+				let underField = new gmsec.I64Field(name, min-1);
+				this.check("An underflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+			*/
+
+			// Maximum
+			let maxField = new gmsec.I64Field(name, max);
+			this.check("Unexpected maximum field value", maxField.getValue() == max);
+
+			// TODO: SWIG 4.1.0 generated code does not handle underflow/overflow of I64 values; this bug has been reported.
+			// See here: https://github.com/swig/swig/issues/2679#issuecomment-1741860535
+			/*
+			try {
+				let overField = new gmsec.I64Field(name, max+1);
+				this.check("An overflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+			*/
+		}
 	}
 
 	testU8Field()
@@ -415,6 +533,36 @@ class T003_Fields extends TestCase
 		this.check("Unexpected XML", field1.toXML() == field3.toXML());
 		this.check("Unexpected JSON", field1.toJSON() == field3.toJSON());
 		this.check("Unexpected isHeader value", field1.isHeader() == field3.isHeader());
+
+		// Test limits
+		{
+			let min = 0;
+			let max = 255;
+
+			// Minimum
+			let minField = new gmsec.U8Field(name, min);
+			this.check("Unexpected minimum field value", minField.getValue() == min);
+
+			try {
+				let underField = new gmsec.U8Field(name, min-1);
+				this.check("An underflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+
+			// Maximum
+			let maxField = new gmsec.U8Field(name, max);
+			this.check("Unexpected maximum field value", maxField.getValue() == max);
+
+			try {
+				let overField = new gmsec.U8Field(name, max+1);
+				this.check("An overflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+		}
 	}
 
 	testU16Field()
@@ -449,6 +597,36 @@ class T003_Fields extends TestCase
 		this.check("Unexpected XML", field1.toXML() == field3.toXML());
 		this.check("Unexpected JSON", field1.toJSON() == field3.toJSON());
 		this.check("Unexpected isHeader value", field1.isHeader() == field3.isHeader());
+
+		// Test limits
+		{
+			let min = 0;
+			let max = 65535;
+
+			// Minimum
+			let minField = new gmsec.U16Field(name, min);
+			this.check("Unexpected minimum field value", minField.getValue() == min);
+
+			try {
+				let underField = new gmsec.U16Field(name, min-1);
+				this.check("An underflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+
+			// Maximum
+			let maxField = new gmsec.U16Field(name, max);
+			this.check("Unexpected maximum field value", maxField.getValue() == max);
+
+			try {
+				let overField = new gmsec.U16Field(name, max+1);
+				this.check("An overflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+		}
 	}
 
 	testU32Field()
@@ -483,6 +661,39 @@ class T003_Fields extends TestCase
 		this.check("Unexpected XML", field1.toXML() == field3.toXML());
 		this.check("Unexpected JSON", field1.toJSON() == field3.toJSON());
 		this.check("Unexpected isHeader value", field1.isHeader() == field3.isHeader());
+
+		// Test limits
+		{
+			let min = 0;
+			let max = 4294967295;
+
+			// Minimum
+			let minField = new gmsec.U32Field(name, min);
+			this.check("Unexpected minimum field value", minField.getValue() == min);
+
+			try {
+				let underField = new gmsec.U32Field(name, min-1);
+				this.check("An underflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+
+			// Maximum
+			let maxField = new gmsec.U32Field(name, max);
+			this.check("Unexpected maximum field value", maxField.getValue() == max);
+
+			// TODO: SWIG 4.1.0 generated code does not handle (2^32-1)+1; this bug has been reported.
+			/*
+			try {
+				let overField = new gmsec.U32Field(name, max+1);
+				this.check("An overflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+			*/
+		}
 	}
 
 	testU64Field()
@@ -516,6 +727,40 @@ class T003_Fields extends TestCase
 		this.check("Unexpected XML", field1.toXML() == field3.toXML());
 		this.check("Unexpected JSON", field1.toJSON() == field3.toJSON());
 		this.check("Unexpected isHeader value", field1.isHeader() == field3.isHeader());
+
+		// Test limits
+		{
+			let min = 0;
+			let max = 18446744073709551615;
+
+			// Minimum
+			let minField = new gmsec.U64Field(name, min);
+			this.check("Unexpected minimum field value", minField.getValue() == min);
+
+			try {
+				let underField = new gmsec.U64Field(name, min-1);
+				this.check("An underflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+
+			// Maximum
+			// TODO: SWIG 4.1.0 generated code does not handle 2^64-1; this bug has been reported.
+			// See here: https://github.com/swig/swig/issues/2679#issuecomment-1741860535
+			/*
+			let maxField = new gmsec.U64Field(name, max);
+			this.check("Unexpected maximum field value", maxField.getValue() == max);
+
+			try {
+				let overField = new gmsec.U64Field(name, max+1);
+				this.check("An overflow exception was expected", false);
+			}
+			catch (e) {
+				this.check(e.message, true);
+			}
+			*/
+		}
 	}
 
 	testField()

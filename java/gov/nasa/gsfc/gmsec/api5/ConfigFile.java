@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -71,7 +71,9 @@ public class ConfigFile
 	private JNIConfigFile m_jniConfigFile = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param obj Object to reference for acquiring internal JNIConfigFile
 	 * @return Internal JNIConfigFile object
@@ -80,6 +82,7 @@ public class ConfigFile
 	{
 		return (obj == null ? null : obj.m_jniConfigFile);
 	}
+	//! @endcond
 
 
 	/**
@@ -90,7 +93,9 @@ public class ConfigFile
 	{
 		private JNIConfigEntry m_jniEntry = null;
 
+		//! @cond
 		/**
+		 * @hidden
 		 * This method is for internal GMSEC API use only.
 		 * @param entry Internal JNIConfigEntry object
 		 */
@@ -98,6 +103,7 @@ public class ConfigFile
 		{
 			m_jniEntry = entry;
 		}
+		//! @endcond
 
 		/**
 		 * Returns the name associated with the entry.
@@ -129,7 +135,9 @@ public class ConfigFile
 	{
 		private JNIMessageEntry m_jniEntry = null;
 
+		//! @cond
 		/**
+		 * @hidden
 		 * This method is for internal GMSEC API use only.
 		 * @param entry Internal JNIMessageEntry object
 		 */
@@ -137,6 +145,7 @@ public class ConfigFile
 		{
 			m_jniEntry = entry;
 		}
+		//! @endcond
 
 		/**
 		 * Returns the name associated with the entry.
@@ -168,7 +177,9 @@ public class ConfigFile
 	{
 		private JNISubscriptionEntry m_jniEntry = null;
 
+		//! @cond
 		/**
+		 * @hidden
 		 * This method is for internal GMSEC API use only.
 		 * @param entry Internal JNISubscriptionEntry object
 		 */
@@ -176,6 +187,7 @@ public class ConfigFile
 		{
 			m_jniEntry = entry;
 		}
+		//! @endcond
 
 		/**
 		 * Constructor

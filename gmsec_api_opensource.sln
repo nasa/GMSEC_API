@@ -27,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_python3", "python3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_ruby", "ruby\gmsec5\libgmsec_ruby.vcxproj", "{D661F65B-577C-4102-ABAD-83202B45D85D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loopback", "wrapper\loopback\loopback.vcxproj", "{B7CC8989-CD42-4B95-8207-F15742D7E31B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -129,6 +131,14 @@ Global
 		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release|x64.Build.0 = Release|x64
 		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release|x86.ActiveCfg = Release|Win32
 		{D661F65B-577C-4102-ABAD-83202B45D85D}.Release|x86.Build.0 = Release|Win32
+		{B7CC8989-CD42-4B95-8207-F15742D7E31B}.Debug|x64.ActiveCfg = Debug|x64
+		{B7CC8989-CD42-4B95-8207-F15742D7E31B}.Debug|x64.Build.0 = Debug|x64
+		{B7CC8989-CD42-4B95-8207-F15742D7E31B}.Debug|x86.ActiveCfg = Debug|Win32
+		{B7CC8989-CD42-4B95-8207-F15742D7E31B}.Debug|x86.Build.0 = Debug|Win32
+		{B7CC8989-CD42-4B95-8207-F15742D7E31B}.Release|x64.ActiveCfg = Release|x64
+		{B7CC8989-CD42-4B95-8207-F15742D7E31B}.Release|x64.Build.0 = Release|x64
+		{B7CC8989-CD42-4B95-8207-F15742D7E31B}.Release|x86.ActiveCfg = Release|Win32
+		{B7CC8989-CD42-4B95-8207-F15742D7E31B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

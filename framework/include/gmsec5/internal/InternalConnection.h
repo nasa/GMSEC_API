@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -72,6 +72,7 @@ namespace internal
 // This definition should not be defined in ConfigOptions.h!
 //
 const char* const GMSEC_REPLY_UNIQUE_ID_FIELD = "__GMSEC-REPLY-UNIQUE-ID__";
+const char* const LEGACY_GMSEC_REPLY_UNIQUE_ID_FIELD = "REPLY-UNIQUE-ID";
 
 
 // Internal Message Field for conveying schema id with the sent message
@@ -363,7 +364,7 @@ private:
 	std::string                              m_perfLoggerFilename;
 
 	bool                                     m_useGlobalAsyncPublish;
-	size_t                                   m_asyncQueueDepth;
+	int                                      m_asyncQueueDepth;
 	int                                      m_asyncTeardownWait;
 	AsynchronousQueue*                       m_asyncQueue;
 	AsynchronousThread                       m_asyncPubThread;
@@ -383,6 +384,8 @@ private:
 
 	int                                      m_maxConnRetries;
 	int                                      m_connRetryInterval;
+
+	bool                                     m_supportLegacyAPI;
 
 	static ActiveSubscriptions               s_activeSubscriptions;
 

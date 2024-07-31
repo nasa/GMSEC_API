@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,6 +20,8 @@ import java.util.NoSuchElementException;
 
 /**
  * A class that can be used to iterate over the Fields contained within a Message.
+ *
+ * @note MessageFieldIterator is not thread safe.
  * <p>
  * An example usage is:
  * <pre>{@code
@@ -43,7 +45,9 @@ public class MessageFieldIterator
 	}
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param iter Object to reference for acquiring internal JNIMessageFieldIterator
 	 * @return Internal JNIMessageFieldIterator object
@@ -55,6 +59,7 @@ public class MessageFieldIterator
 
 
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param jIter Internal JNIMessageFieldIterator object
 	 */
@@ -62,6 +67,7 @@ public class MessageFieldIterator
 	{
 		m_jniIter = jIter;
 	}
+	//! @endcond
 
 
 	/**
@@ -82,7 +88,12 @@ public class MessageFieldIterator
 		/**
 		 * Used for iterating only over non-header Fields.
 		 */
-		NON_HEADER_FIELDS
+		NON_HEADER_FIELDS,
+
+		/**
+		 * Used for iterating only over tracking Fields.
+		 */
+		TRACKING_FIELDS
 	}
 
 

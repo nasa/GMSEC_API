@@ -1017,6 +1017,9 @@
     <ClInclude Include="framework\include\gmsec5\internal\MiddlewareInfo.h">
       <Filter>Header Files\internal</Filter>
     </ClInclude>
+    <ClInclude Include="framework\include\gmsec5\internal\FieldTemplate.h">
+      <Filter>Header Files\internal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="buildscript.pl">

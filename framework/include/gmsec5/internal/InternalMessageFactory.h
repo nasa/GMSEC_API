@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -26,9 +26,9 @@
 
 #include <gmsec5/util/List.h>
 #include <gmsec5/util/StdUniquePtr.h>
-#include <gmsec5/util/StdSharedPtr.h>
 #include <gmsec5/util/wdllexp.h>
 
+#include <map>
 #include <string>
 
 
@@ -80,21 +80,25 @@ public:
 
 	void CALL_TYPE addMessageTemplate(Message& msg);
 
+	void CALL_TYPE identifyTrackingFields(Message& msg);
+
 private:
 	// Defined, but not implemented
 	InternalMessageFactory(const InternalMessageFactory& other);
 	InternalMessageFactory& operator=(const InternalMessageFactory& other);
 
-	typedef std::map<std::string, gmsec::api5::util::StdSharedPtr<MessageTemplate> >  MessageTemplateCache;
-
 	// Helper methods
 	std::string deduceSchemaID(const Message& msg);
 
-	gmsec::api5::util::StdSharedPtr<MessageTemplate> createMessageTemplate(const std::string& schemaID);
+	MessageTemplate* createMessageTemplate(const std::string& schemaID);
 
 	Message::Kind deduceMessageKind(const char* schemaID, unsigned int version);
 
+	void mergeConfig(Message& msg, const Config& config);
+
 	// Member data
+	typedef std::map<std::string, MessageTemplate*> MessageTemplateCache;
+
 	Config                                                    m_msgConfig;
 	gmsec::api5::util::StdUniquePtr<Specification>            m_spec;
 	bool                                                      m_validateMsgs;
@@ -103,7 +107,7 @@ private:
 	MessageValidator*                                         m_customMessageValidator;
 	gmsec::api5::util::StdUniquePtr<CustomMessageValidator>   m_ceeMessageValidator;
 
-	MessageTemplateCache									  m_mtCache;
+	MessageTemplateCache                                      m_mtCache;
 
 	mutable gmsec::api5::internal::TicketMutex                m_mutex;
 };

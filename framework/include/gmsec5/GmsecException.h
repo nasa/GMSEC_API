@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -51,8 +51,8 @@ public:
 	/**
 	 * @fn GmsecException(GMSEC_I32 errorClass, GMSEC_I32 errorCode, const char* errorMsg)
 	 * @brief Default Constructor.
-	 * @param errorClass - enumerated value indicating source of the error
-	 * @param errorCode  - enumerated value indicating reason for the error
+	 * @param errorClass - value indicating source of the error
+	 * @param errorCode  - value indicating reason for the error
 	 * @param errorMsg   - explanation for the error
 	 *
 	 * @sa Errors.h
@@ -63,8 +63,8 @@ public:
 	/**
 	 * @fn GmsecException(GMSEC_I32 errorClass, GMSEC_I32 errorCode, GMSEC_I32 customCode, const char* errorMsg)
 	 * @brief Special constructor that can be used to set a custom error code.
-	 * @param errorClass - enumerated value indicating source of the error
-	 * @param errorCode  - enumerated value indicating reason for the error
+	 * @param errorClass - value indicating source of the error
+	 * @param errorCode  - value indicating reason for the error
 	 * @param customCode - custom error code (typically middleware specific) on the root cause of the error.
 	 * @param errorMsg   - explanation for the error
 	 *
@@ -107,7 +107,7 @@ public:
 	/**
 	 * @fn GMSEC_I32 getErrorClass() const
 	 * @brief Returns the error class associated with the exception.
-	 * @return A StatusClass enumerated value.
+	 * @return A GMSEC_I32 value.
 	 *
 	 * @sa Errors.h
 	 */
@@ -117,7 +117,7 @@ public:
 	/**
 	 * @fn GMSEC_I32 getErrorCode() const
 	 * @brief Returns the error code associated with the exception.
-	 * @return A StatusCode enumerated value.
+	 * @return A GMSEC_I32 value.
 	 *
 	 * @sa Errors.h
 	 */
@@ -127,7 +127,7 @@ public:
 	/**
 	 * @fn GMSEC_I32 getCustomCode() const
 	 * @brief An error code originating from a third party library (middleware or otherwise) related to the error that occurred.
-	 * @return A StatusCode enumerated value.
+	 * @return A GMSEC_I32 value.
 	 */
 	GMSEC_I32 CALL_TYPE getCustomCode() const;
 

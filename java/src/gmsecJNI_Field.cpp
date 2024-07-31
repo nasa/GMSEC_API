@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,12 +13,15 @@
 #include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 
+#include <gmsec5/internal/field/InternalField.h>
+
 #include <gmsec5/Fields.h>
 
 #include <sstream>
 
 
 using namespace gmsec::api5;
+using namespace gmsec::api5::internal;
 using namespace gmsec::api5::jni;
 
 
@@ -30,22 +33,9 @@ extern "C" {
 JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetType
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
-	jint result = 0;
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
 
-	try
-	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (field == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = static_cast<jint>( field->getType() );
-		}
-	}
-	JNI_CATCH
+	jint result = static_cast<jint>( field->getType() );
 
 	return result;
 }
@@ -54,24 +44,11 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetType
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetName
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
-	jstring name;
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
 
-	try
-	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (field == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			const char* tmp = field->getName();
-			name = makeJavaString(jenv, tmp);
-			jvmOk(jenv, "Field.getName");
-		}
-	}
-	JNI_CATCH
+	const char* tmp = field->getName();
+	jstring name = makeJavaString(jenv, tmp);
+	jvmOk(jenv, "Field.getName");
 
 	return name;
 }
@@ -80,22 +57,9 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetN
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1ToXML
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
-	jstring result = 0;
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
 
-	try
-	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = makeJavaString(jenv, field->toXML());
-		}
-	}
-	JNI_CATCH
+	jstring result = makeJavaString(jenv, field->toXML());
 
 	return result;
 }
@@ -104,22 +68,9 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1ToXM
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1ToJSON
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
-	jstring result = 0;
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
 
-	try
-	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = makeJavaString(jenv, field->toJSON());
-		}
-	}
-	JNI_CATCH
+	jstring result = makeJavaString(jenv, field->toJSON());
 
 	return result;
 }
@@ -128,22 +79,9 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1ToJS
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetStringValue
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
-	jstring result = 0;
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
 
-	try
-	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = makeJavaString(jenv, field->getStringValue());
-		}
-	}
-	JNI_CATCH
+	jstring result = makeJavaString(jenv, field->getStringValue());
 
 	return result;
 }
@@ -152,22 +90,18 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetS
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetBooleanValue
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jboolean result = 0;
 
 	try
 	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = (field->getBooleanValue() ? JNI_TRUE : JNI_FALSE);
-		}
+		result = (field->getBooleanValue() ? JNI_TRUE : JNI_FALSE);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -176,22 +110,18 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1Get
 JNIEXPORT jshort JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetI16Value
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jshort result = 0;
 
 	try
 	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = field->getI16Value();
-		}
+		result = field->getI16Value();
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -200,22 +130,18 @@ JNIEXPORT jshort JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetI1
 JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetI32Value
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jint result = 0;
 
 	try
 	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = field->getI32Value();
-		}
+		result = field->getI32Value();
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -224,22 +150,18 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetI32V
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetI64Value
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jlong result = 0;
 
 	try
 	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = field->getI64Value();
-		}
+		result = field->getI64Value();
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -248,30 +170,26 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetI64
 JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetU16Value
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jobject result = 0;
 
 	try
 	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+		GMSEC_U16 value = field->getU16Value();
 
-		if (!field)
+		result = jenv->NewObject(Cache::getCache().classU16, Cache::getCache().methodU16Init, static_cast<jint>(value));
+
+		if (!jvmOk(jenv, "Field::getU32Value: new U16") || !result)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			GMSEC_U16 value = field->getU16Value();
-
-			result = jenv->NewObject(Cache::getCache().classU16, Cache::getCache().methodU16Init, static_cast<jint>(value));
-
-			if (!jvmOk(jenv, "Field::getU32Value: new U16") || !result)
-			{
-				GMSEC_WARNING << "Unable to create U16 object";
-				result = 0;
-			}
+			GMSEC_WARNING << "Unable to create U16 object";
+			result = 0;
 		}
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -280,30 +198,26 @@ JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetU
 JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetU32Value
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jobject result = 0;
 
 	try
 	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+		GMSEC_U32 value = field->getU32Value();
 
-		if (!field)
+		result = jenv->NewObject(Cache::getCache().classU32, Cache::getCache().methodU32Init, static_cast<jlong>(value));
+
+		if (!jvmOk(jenv, "Field::getU32Value: new U32") || !result)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			GMSEC_U32 value = field->getU32Value();
-
-			result = jenv->NewObject(Cache::getCache().classU32, Cache::getCache().methodU32Init, static_cast<jlong>(value));
-
-			if (!jvmOk(jenv, "Field::getU32Value: new U32") || !result)
-			{
-				GMSEC_WARNING << "Unable to create U32 object";
-				result = 0;
-			}
+			GMSEC_WARNING << "Unable to create U32 object";
+			result = 0;
 		}
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -312,35 +226,31 @@ JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetU
 JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetU64Value
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jobject result = 0;
 
 	try
 	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+		GMSEC_U64 value = field->getU64Value();
 
-		if (!field)
+		std::ostringstream oss;
+		oss << value;
+
+		jstring valueAsString = makeJavaString(jenv, oss.str().c_str());
+
+		result = jenv->NewObject(Cache::getCache().classU64, Cache::getCache().methodU64Init, valueAsString);
+
+		if (!jvmOk(jenv, "Field::getU64Value: new U64") || !result)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			GMSEC_U64 value = field->getU64Value();
-
-			std::ostringstream oss;
-			oss << value;
-
-			jstring valueAsString = makeJavaString(jenv, oss.str().c_str());
-
-			result = jenv->NewObject(Cache::getCache().classU64, Cache::getCache().methodU64Init, valueAsString);
-
-			if (!jvmOk(jenv, "Field::getU64Value: new U64") || !result)
-			{
-				GMSEC_WARNING << "Unable to create U64 object";
-				result = 0;
-			}
+			GMSEC_WARNING << "Unable to create U64 object";
+			result = 0;
 		}
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
@@ -349,46 +259,56 @@ JNIEXPORT jobject JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetU
 JNIEXPORT jdouble JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1GetF64Value
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
 	jdouble result = 0;
 
 	try
 	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = field->getF64Value();
-		}
+		result = field->getF64Value();
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return result;
 }
 
 
-JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1IsHeader__JLgov_nasa_gsfc_gmsec_api5_jni_field_JNIField_2
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1IsHeader
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
+{
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
+	jboolean result = (field->isHeader() ? JNI_TRUE : JNI_FALSE);
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1IsTracking
+  (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
+{
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+
+	jboolean result = (field->isTracking() ? JNI_TRUE : JNI_FALSE);
+
+	return result;
+}
+
+
+JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1IsFieldNameCompliant
+  (JNIEnv *jenv, jclass jcls, jstring jFieldName)
 {
 	jboolean result = JNI_FALSE;
 
-	try
-	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+	JStringManager fieldName(jenv, jFieldName);
 
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			result = (field->isHeader() ? JNI_TRUE : JNI_FALSE);
-		}
+	if (jvmOk(jenv, "Field.isFieldNameCompliant"))
+	{
+		result = (InternalField::isFieldNameCompliant(fieldName.c_str()) ? JNI_TRUE : JNI_FALSE);
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -397,20 +317,9 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Field_1IsH
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_delete_1Field
   (JNIEnv *jenv, jclass jcls, jlong jFieldPtr, jobject jField)
 {
-	try
-	{
-		Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
+	Field* field = JNI_JLONG_TO_FIELD(jFieldPtr);
 
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Field reference is null");
-		}
-		else
-		{
-			delete field;
-		}
-	}
-	JNI_CATCH
+	delete field;
 }
 
 

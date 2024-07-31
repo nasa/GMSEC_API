@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -19,31 +19,16 @@ using namespace std;
 
 
 static const int DEFAULT_SEPARATOR = '_';
-static const int DEFAULT_DEBUG = 0;
-
 
 
 UniqueFilter::UniqueFilter()
-	: separator(DEFAULT_SEPARATOR),
-	  debug(DEFAULT_DEBUG)
+	: separator(DEFAULT_SEPARATOR)
 {
 }
 
 
 UniqueFilter::~UniqueFilter()
 {
-}
-
-
-void UniqueFilter::setSeparator(char c)
-{
-	separator = c;
-}
-
-
-void UniqueFilter::setDebug(bool flag)
-{
-	debug = flag;
 }
 
 
@@ -83,30 +68,17 @@ bool UniqueFilter::update(const char* id0)
 	}
 	else
 	{
-		int previous = (*probe).second;
-		const char * info = "none";
+		int previous = probe->second;
 
 		if (current < 0 && previous > 0)
 		{
-			/* counter must have rolled over */
+			// counter rolled over
 			unique = true;
-			info = "roll over";
 		}
 		else if (current > previous)
 		{
+			// counter advanced
 			unique = true;
-			info = "increase";
-		}
-		else if (current <= previous)
-		{
-			info = "obsolete";
-		}
-
-		if (debug)
-		{
-			GMSEC_DEBUG << "UniqueFilter.update: current=" << current
-			            << " previous=" << previous
-			            << " => unique=" << unique << " info=" << info;
 		}
 	}
 

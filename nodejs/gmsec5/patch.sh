@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -19,6 +19,9 @@ if [[ "$GMSEC_PLATFORM" == "linux"* ]] || [[ "$GMSEC_PLATFORM" == "aarch64" ]]; 
 	sed -i 's/SWIGTYPE_p_gmsec__api5__ConfigFile__MessageEntry,/SWIGTYPE_p_MessageEntry,/g' $WRAPPED_SRC
 	sed -i 's/SWIGTYPE_p_gmsec__api5__ConfigFile__ConfigEntry,/SWIGTYPE_p_ConfigEntry,/g' $WRAPPED_SRC
 
+	sed -i 's/long longVal = (long) SWIGV8_NUMBER_VALUE(obj);/long long longVal = (long long) SWIGV8_NUMBER_VALUE(obj);/g' $WRAPPED_SRC
+
+
 elif [[ "$GMSEC_PLATFORM" == "macosx"* ]]; then
 
 	echo "Patching $WRAPPED_SRC for MacOS..."
@@ -28,6 +31,8 @@ elif [[ "$GMSEC_PLATFORM" == "macosx"* ]]; then
 	sed -i '' 's/SWIGTYPE_p_gmsec__api5__ConfigFile__SubscriptionEntry,/SWIGTYPE_p_SubscriptionEntry,/g' $WRAPPED_SRC
 	sed -i '' 's/SWIGTYPE_p_gmsec__api5__ConfigFile__MessageEntry,/SWIGTYPE_p_MessageEntry,/g' $WRAPPED_SRC
 	sed -i '' 's/SWIGTYPE_p_gmsec__api5__ConfigFile__ConfigEntry,/SWIGTYPE_p_ConfigEntry,/g' $WRAPPED_SRC
+
+	sed -i '' 's/long longVal = (long) SWIGV8_NUMBER_VALUE(obj);/long long longVal = (long long) SWIGV8_NUMBER_VALUE(obj);/g' $WRAPPED_SRC
 
 else
 

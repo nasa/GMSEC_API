@@ -2,7 +2,7 @@
 
 
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,6 +27,8 @@ class specification_addendum
 {
 	run()
 	{
+		var conn = null;
+
 		try
 		{
 			// Set up connection configuration options provided by the user
@@ -70,7 +72,7 @@ class specification_addendum
 			config.addValue("gmsec-specification-version", "201900");
 
 			// Create a Connection instance
-			const conn = new gmsec.Connection(config);
+			conn = gmsec.Connection.create(config);
 
 			// Establish connection to the GMSEC Bus
 			conn.connect();
@@ -117,6 +119,11 @@ class specification_addendum
 			// deduced, or a failure occurred when attempting to connect to
 			// the GMSEC Bus
 			gmsec.Log.error("Exception: " + e.message);
+		}
+		finally
+		{
+			// Destroy the connection
+			gmsec.Connection.destroy(conn);
 		}
 	}
 

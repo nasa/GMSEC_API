@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -80,7 +80,7 @@ public class Connection
 
 
 	/**
-	 * Constructor for creating a Connection object.
+	 * A static method for creating a Connection object.
 	 *
 	 * @param config The Config object that specifies the type of Connection object to create.
 	 *
@@ -88,14 +88,16 @@ public class Connection
 	 *
 	 * @throws SWIG_Exception Thrown if the given Config object is null.
 	 * @throws GmsecException Thrown if configuration information cannot be used to deduce middleware type.
+	 *
+	 * @see Connection.destroy
 	 */
-	public Connection(config);
+	public static create(config);
 
 
 	/**
-	 * Constructor for creating a Connection object with a MessageFactory object.
-	 * This constructor is meant to be used by an application that intends on creating multiple
-	 * connection objects, where each will use the same MessageFactory objects.
+	 * A static method for creating a Connection object with a MessageFactory object.
+	 * This method is meant to be used by an application that intends on creating multiple
+	 * connection objects, where each will use the same MessageFactory object.
 	 * This will assist in reducing the memory footprint of the application. Do NOT destroy
 	 * the MessageFactory object while the Connection object(s) are in use!
 	 *
@@ -107,8 +109,18 @@ public class Connection
 	 * @throws SWIG_Exception Thrown if the given Config object is null.
 	 * @throws SWIG_Exception Thrown if the given MessageFactory object is null.
 	 * @throws GmsecException Thrown if configuration information cannot be used to deduce middleware type.
+	 *
+	 * @see Connection.destroy
 	 */
-	public Connection(config, factory);
+	public static create(config, factory);
+
+
+	/**
+	 * A static method for destroying a Connection object.
+	 *
+	 * @param conn The Connection object to destroy.
+	 */
+	public static destroy(conn);
 
 
 	/**
@@ -262,6 +274,7 @@ public class Connection
 	 * @param message Message to be published
 	 *
 	 * @throws SWIG_Exception Thrown if the given Message object is null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to publish the message.
 	 *
 	 * @see Connection.setupSubscription()
@@ -282,6 +295,7 @@ public class Connection
 	 * @param mwConfig Config object for providing middleware configuration options
 	 *
 	 * @throws SWIG_Exception Thrown if either the given Message or Config objects are null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to publish the message.
 	 *
 	 * @see Connection.setupSubscription()
@@ -309,6 +323,7 @@ public class Connection
 	 * @return Reply Message, or null if no reply received in time
 	 *
 	 * @throws SWIG_Exception Thrown if the given Message object is null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to generate an synchronous request.
 	 */
 	public request(reqMessage, timeout, republish_ms);
@@ -325,6 +340,7 @@ public class Connection
 	 * @param repMessage The reply message to be sent.
 	 *
 	 * @throws SWIG_Exception Thrown if either the Request or Reply Message objects are null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if an error occurs while attempting to issue the reply.
 	 */
 	public reply(reqMessage, repMessage);
@@ -340,6 +356,7 @@ public class Connection
 	 *
 	 * @return A handle to the next available Message, or null if a timeout occurs.
 	 *
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown on error
 	 *
 	 * @see Connection.setupSubscription()
@@ -353,6 +370,7 @@ public class Connection
 	 * @param subject The subject pattern to look for in incoming messages.
 	 *
 	 * @throws SWIG_Exception Thrown if the given subject string is null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if a malformed subject is provided.
 	 */
 	public excludeSubject(subject);
@@ -365,6 +383,7 @@ public class Connection
 	 * @param subject The subject pattern to remove.
 	 *
 	 * @throws SWIG_Exception Thrown if the given subject string is null.
+	 * @throws GmsecException Thrown if not connected to the GMSEC bus.
 	 * @throws GmsecException Thrown if a malformed subject is provided.
 	 */
 	public removeExcludedSubject(subject);
@@ -384,9 +403,6 @@ public class Connection
 	 * one will be automatically generated.
 	 *
 	 * @param name Name of this connection
-	 *
-	 * @throws SWIG_Exception Thrown if the given name string is null.
-	 * @throws GmsecException Thrown if the name string is an empty string.
 	 */
 	public setName(name);
 

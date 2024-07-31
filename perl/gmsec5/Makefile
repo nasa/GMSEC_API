@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -12,7 +12,7 @@ TARGET	        = libgmsec_perl.$(SHLIB_EXT)
 SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_SWG        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/perl5 -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
-SWIG_OPTS       = -c++ -perl5 $(SWIG_SWG) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
+SWIG_OPTS       = -c++ -perl5 $(SWIG_SWG) -DCHAR_BIT=8 -DSWIG_BINDING
 
 FRAMEWORK_DIR   = ../../framework
 

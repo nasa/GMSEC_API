@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,6 +13,8 @@
 #include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 
+#include <gmsec5/internal/field/InternalField.h>
+
 #include <gmsec5/field/BinaryField.h>
 #include <gmsec5/GmsecException.h>
 #include <gmsec5/Errors.h>
@@ -21,6 +23,7 @@
 
 
 using namespace gmsec::api5;
+using namespace gmsec::api5::internal;
 using namespace gmsec::api5::jni;
 
 
@@ -57,22 +60,11 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1BinaryFi
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1BinaryField_1Copy
   (JNIEnv *jenv, jclass jcls, jlong jBinaryFieldPtr, jobject jBinaryField)
 {
-	BinaryField* created = 0;
+	BinaryField* field = JNI_JLONG_TO_BINARYFIELD(jBinaryFieldPtr);
 
-	try
-	{
-		BinaryField* field = JNI_JLONG_TO_BINARYFIELD(jBinaryFieldPtr);
+	BinaryField* created = new BinaryField(*field);
 
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BinaryField reference is null");
-		}
-		else
-		{
-			created = new BinaryField(*field);
-		}
-	}
-	JNI_CATCH
+	FieldBuddy::getInternal(*created).isTracking(field->isTracking());
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -81,27 +73,17 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1BinaryFi
 JNIEXPORT jbyteArray JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_BinaryField_1GetValue
   (JNIEnv *jenv, jclass jcls, jlong jBinaryFieldPtr, jobject jBinaryField)
 {
-	jbyteArray array = NULL;
+	BinaryField* field = JNI_JLONG_TO_BINARYFIELD(jBinaryFieldPtr);
 
-	try
+	GMSEC_U8 const* value  = field->getValue();
+	size_t          length = field->getLength();
+
+	jbyteArray array = jenv->NewByteArray(static_cast<jsize>(length));
+
+	if (array != NULL)
 	{
-		BinaryField* field = JNI_JLONG_TO_BINARYFIELD(jBinaryFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BinaryField reference is null");
-		}
-		else
-		{
-			GMSEC_U8 const* value  = field->getValue();
-			size_t          length = field->getLength();
-
-			array = jenv->NewByteArray(static_cast<jsize>(length));
-
-			jenv->SetByteArrayRegion(array, 0, static_cast<jsize>(length), reinterpret_cast<jbyte const*>(value));
-		}
+		jenv->SetByteArrayRegion(array, 0, static_cast<jsize>(length), reinterpret_cast<jbyte const*>(value));
 	}
-	JNI_CATCH
 
 	return array;
 }

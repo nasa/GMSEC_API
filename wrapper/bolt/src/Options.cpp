@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -94,15 +94,12 @@ ostream &Options::put(ostream &os, const char *prefix) const
 
 
 
-string Options::getString(const string &key, const char *p) const
+string Options::getString(const string &key, const string& defaultString) const
 {
 	ConstIterator i = properties.find(key);
 	if (i != properties.end())
 		return i->second->asString();
-	if (p)
-		return p;
-	static string empty;
-	return empty;
+	return defaultString;
 }
 
 

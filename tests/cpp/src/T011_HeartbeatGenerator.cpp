@@ -449,6 +449,7 @@ void test_set_field(Test& test)
 int test_HeartbeatGenerator(Test& test)
 {
 	test.setDescription("Test HeartbeatGenerator");
+
 	try
 	{
 		test_constructor_1(test);

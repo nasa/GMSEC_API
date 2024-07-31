@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -332,7 +332,7 @@ public:
 	 *	@param request - This is a reference to the message that is to be published.
 	 *  @param id      - The unique id that is assigned to this request call.
 	 */
-	virtual void mwRequest(const gmsec::api5::Message& request, std::string& id);
+	virtual void mwRequest(const gmsec::api5::Message& request, const std::string& id);
 
 
 	/**	@fn mwReceive(gmsec::api5::Message*& msg, GMSEC_I32 timeout)
@@ -350,6 +350,15 @@ public:
 	 *	@return status - result of the connection operation
 	 */
 	virtual void mwReceive(gmsec::api5::Message*& msg, GMSEC_I32 timeout);
+
+
+	/**
+	 * @fn mwGetUniqueID()
+	 *
+	 * @brief Returns a unique identifier string to be included within a request messages.
+	 */
+	virtual std::string mwGetUniqueID();
+
 
 	bool fromMW(const gmsec::api5::util::DataBuffer& buffer, MQHCONN hcon, MQHMSG hmsg);
 

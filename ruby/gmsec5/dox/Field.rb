@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -68,6 +68,16 @@ module Libgmsec_ruby #:nodoc: don't document this
 		# Returns true if the field represents a header field; false otherwise.
 		#
 		def is_header()
+		end
+
+
+		# Can be used to query if the field is a GMSEC API tracking field.
+		#
+		# ==== Returns
+		#
+		# Returns true if the field represents a tracking field; false otherwise.
+		#
+		def is_tracking()
 		end
 
 

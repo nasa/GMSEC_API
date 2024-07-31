@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,6 +12,7 @@
 
 package gov.nasa.gsfc.gmsec.api5.field;
 
+import gov.nasa.gsfc.gmsec.api5.GmsecException;
 import gov.nasa.gsfc.gmsec.api5.jni.field.JNIBinaryField;
 
 
@@ -21,7 +22,9 @@ import gov.nasa.gsfc.gmsec.api5.jni.field.JNIBinaryField;
  */
 public class BinaryField extends Field
 {
+	//! @cond
 	/**
+	 * @hidden
 	 * This constructor is for internal GMSEC API use only.
 	 * @param field A JNIBinaryField object.
 	 */
@@ -29,6 +32,7 @@ public class BinaryField extends Field
 	{
 		setInternal(field);
 	}
+	//! @endcond
 
 
 	/**
@@ -37,7 +41,7 @@ public class BinaryField extends Field
 	 * @param name Name of the field.
 	 * @param data Raw data to associate with the field.
 	 *
-	 * @throws IllegalArgumentException Thrown if the field name string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name string is null, is an empty string, or is not compliant.
 	 * @throws IllegalArgumentException Thrown if the byte array is null.
 	 */
 	public BinaryField(String name, byte[] data) throws IllegalArgumentException
@@ -53,7 +57,7 @@ public class BinaryField extends Field
 	 * @param data Raw data to associate with the field.
 	 * @param isHeader used to indicate if Field is a header field.
 	 *
-	 * @throws IllegalArgumentException Thrown if the field name string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name string is null, is an empty string, or is not compliant.
 	 * @throws IllegalArgumentException Thrown if the byte array is null.
 	 */
 	public BinaryField(String name, byte[] data, boolean isHeader) throws IllegalArgumentException

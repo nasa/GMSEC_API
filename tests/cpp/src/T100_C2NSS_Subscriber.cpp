@@ -327,6 +327,11 @@ int test_C2NSS_Subscriber(Test& test)
 		test.excuse("Test is being excused because no mw-id was provided");
 		return -1;
 	}
+	else if (mwID == "loopback")
+	{
+		test.excuse("Test is being excused because Loopback is not supported");
+		return -1;
+	}
 	else if (mwID == "mb")
 	{
 		test.excuse("Test is being excused because MessageBus is not supported");

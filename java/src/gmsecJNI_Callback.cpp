@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -87,13 +87,7 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Callback
   (JNIEnv *jenv, jclass jcls, jobject callback)
 {
-	Callback* proxy = 0;
-
-	try
-	{
-		proxy = new CxxCallbackProxy(jenv, callback);
-	}
-	JNI_CATCH
+	Callback* proxy = new CxxCallbackProxy(jenv, callback);
 
 	return JNI_POINTER_TO_JLONG(proxy);
 }

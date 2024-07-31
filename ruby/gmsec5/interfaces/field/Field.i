@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -29,6 +29,7 @@ using namespace gmsec::api5;
 /* ignore methods that will be reimplemented */
 %ignore gmsec::api5::Field::is_header() const;
 %ignore gmsec::api5::Field::is_header(bool);
+%ignore gmsec::api5::Field::is_tracking() const;
 
 /* ignore methods that do not make sense in the Ruby context */
 %ignore gmsec::api5::Field::getI16Value();
@@ -41,6 +42,7 @@ using namespace gmsec::api5;
 %rename("get_field_name") getName;
 %rename("get_field_type") getType;
 %rename("is_header") isHeader;
+%rename("is_tracking") isTracking;
 %rename("toxml") toXML;
 %rename("tojson") toJSON;
 %rename("get_string_value") getStringValue;
@@ -57,6 +59,10 @@ using namespace gmsec::api5;
 {
     bool is_header() {
         return self->isHeader();
+    }
+
+    bool is_tracking() {
+        return self->isTracking();
     }
 
     static gmsec::api5::BinaryField* toBinaryField(gmsec::api5::Field* field) {

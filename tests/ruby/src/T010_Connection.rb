@@ -280,7 +280,7 @@ class Test_Connection < Test
             conn.subscribe( get_subject("*.BAR") )
             conn.subscribe( get_subject("FOO.BAZ") )
 
-            msg1 = conn.get_message_factory().create_message("LOG")
+            msg1 = conn.get_message_factory().create_message("HB")
             msg2 = conn.get_message_factory().create_message("LOG")
             msg3 = conn.get_message_factory().create_message("LOG")
 
@@ -293,6 +293,7 @@ class Test_Connection < Test
             msg = conn.receive(5000)
             require("Was expecting to receive a message", msg != nil)
             check("Unexpected message subject", msg.get_subject() == get_subject("GIN.BAR"))
+            verify_tracking_fields(msg, 11)
             Libgmsec_ruby::Message::destroy(msg)
 
             conn.publish(msg2)
@@ -300,6 +301,7 @@ class Test_Connection < Test
             msg = conn.receive(5000)
             require("Was expecting to receive a message", msg != nil)
             check("Unexpected message subject", msg.get_subject() == get_subject("FOO.BAZ"))
+            verify_tracking_fields(msg, 7)
             Libgmsec_ruby::Message::destroy(msg)
 
             conn.publish(msg3)
@@ -606,6 +608,13 @@ class Test_Connection < Test
 
 
     def test_request()
+        mw = get_config().get_value("mw-id", "unknown")
+
+        if mw == "unknown" or mw == "loopback"
+            # Test is not supported by loopback (or unknown) middleware
+            return
+        end
+
         Libgmsec_ruby::Log::info("Test synchronous request()")
 
         conn = nil
@@ -862,7 +871,17 @@ class Test_Connection < Test
             conn.publish(msg)
 
             rcvd = conn.receive(5000)
-            check("Did not receive expected message", rcvd != nil)
+            require("Did not receive expected message", rcvd != nil)
+
+            iter = rcvd.get_field_iterator( Libgmsec_ruby::MessageFieldIterator::Selector_TRACKING_FIELDS )
+            numTrackingFields = 0
+            while iter.has_next() do
+                field = iter.next()
+                check("Expected a tracking field", field.is_tracking())
+                numTrackingFields += 1
+            end
+            check("Unexpected number of tracking fields", 10 == numTrackingFields)
+
 			Libgmsec_ruby::Message::destroy(rcvd)
         rescue GmsecException => e
             check(e.message, false)
@@ -1021,17 +1040,17 @@ class Test_Connection < Test
 
         begin
             conn = Libgmsec_ruby::Connection::create( get_config() )
-            conn.connect()
             check("Expected a connection name", conn.get_name() != nil)
 
             conn.set_name("FOOBAR")
+            check("Expected a connection name of FOOBAR", conn.get_name() == "FOOBAR")
 
+            conn.set_name(nil)
             check("Expected a connection name of FOOBAR", conn.get_name() == "FOOBAR")
         rescue GmsecException => e
             check(e.message, false)
         ensure
             if conn != nil
-                conn.disconnect()
                 Libgmsec_ruby::Connection::destroy( conn )
                 conn = nil
             end
@@ -1098,6 +1117,25 @@ class Test_Connection < Test
             end
         end
 	end
+
+
+    def verify_tracking_fields(msg, expected)
+        numTrackingFields = 0
+
+        iter = msg.get_field_iterator(Libgmsec_ruby::MessageFieldIterator::Selector_TRACKING_FIELDS)
+
+        while iter.has_next() do
+            field = iter.next()
+
+            check("Expected a tracking field", field.is_tracking())
+
+            if field.is_tracking()
+                numTrackingFields += 1
+            end
+        end
+
+        check("Unexpected number of tracking fields", numTrackingFields == expected)
+    end
 end
 
 

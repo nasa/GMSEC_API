@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -9,7 +9,7 @@
 /**
  * @file CMSConnection.cpp
  *
- * This file contains the implementation for the ActiveMQ Connection.
+ * Contains the implementation for the ActiveMQ/Artemis implementation of ConnectionInterface.
  */
 
 #include "CMSConnection.h"
@@ -21,25 +21,22 @@
 #include <gmsec5/internal/InternalConnection.h>
 #include <gmsec5/internal/InternalMessageFactory.h>
 #include <gmsec5/internal/MessageBuddy.h>
+#include <gmsec5/internal/Middleware.h>
 #include <gmsec5/internal/Rawbuf.h>
 #include <gmsec5/internal/StringUtil.h>
-
-#include <gmsec5/util/Log.h>
 
 #include <gmsec5/Connection.h>
 #include <gmsec5/GmsecException.h>
 
+#include <gmsec5/util/Log.h>
+
 #include <activemq/commands/BrokerInfo.h>
 #include <activemq/core/ActiveMQConnection.h>
+#include <activemq/library/ActiveMQCPP.h>
+
 #include <decaf/lang/System.h>
 #include <decaf/lang/Long.h>
 #include <decaf/util/Random.h>
-
-#ifndef ACTIVEMQ_CMS_V2
-#include <gmsec5/internal/Middleware.h>
-
-#include <activemq/library/ActiveMQCPP.h>
-#endif
 
 #include <sstream>
 #include <string>
@@ -62,9 +59,6 @@
  * The CMS message property used for the GMSEC message subject.
  */
 #define GMSEC_SUBJECT_PROPERTY "GMSEC-SUBJECT"
-
-
-static const bool DEBUG_UNLOAD = false;
 
 
 using namespace gmsec::api5;
@@ -259,37 +253,34 @@ static Message::Kind lookupMessageKind(const char* msgTypeStr)
 class TopicListener : public cms::MessageListener
 {
 public:
-	TopicListener(CMSConnection* connection, MessageQueue &q)
+	TopicListener(CMSConnection* connection, CMSConnection::MessageQueue& q)
 			: connection(connection), queue(q), logStackTrace(false) { }
 
 	~TopicListener() throw () { }
 
-	virtual void onMessage(const cms::Message *message) throw ()
+	virtual void onMessage(const cms::Message* cmsMsg) throw ()
 	{
 		try
 		{
-			std::string   msgType = message->getCMSType();
-			Message::Kind msgKind;
+			Message* tmp;
+			connection->unload(cmsMsg, tmp);
 
-			try
-			{
-				msgKind = lookupMessageKind(msgType.c_str());
-			}
-			catch (const GmsecException& e)
-			{
-				GMSEC_DEBUG << e.what();
-				GMSEC_DEBUG << "Ignoring native ActiveMQ message on " << getInfo(message).c_str();
-				return;
-			}
+			StdUniquePtr<Message> gmsecMsg;
+			gmsecMsg.reset(tmp);
 
-			if (msgKind == Message::Kind::REPLY)
+			if (gmsecMsg.get() != NULL)
 			{
-				(void) connection->handleCmsReply(message, logStackTrace);
-			}
+				if (gmsecMsg->getKind() == Message::Kind::REPLY)
+				{
+					connection->getExternal().onReply(new Message(*gmsecMsg.get()));
+				}
 
-			decaf::util::concurrent::Lock lock(&queue);
-			queue.push(message->clone());
-			queue.notifyAll();
+				queue.put(gmsecMsg.release());
+			}
+		}
+		catch (const GmsecException& e)
+		{
+			GMSEC_WARNING << "ActiveMQ TopicListener: " << e.what();
 		}
 		catch (const cms::CMSException& e)
 		{
@@ -348,39 +339,9 @@ private:
 		return buffer.str();
 	}
 
-	CMSConnection* connection;
-	MessageQueue&  queue;
-	bool           logStackTrace;
-};
-
-
-/**
-* @brief the generic listener for replies.
-*/
-
-class ReplyListener : public cms::MessageListener
-{
-public:
-	ReplyListener(CMSConnection *conn)
-			: connection(conn), logStackTrace(false) { }
-	~ReplyListener() throw () { }
-
-	virtual void onMessage(const cms::Message *message) throw ()
-	{
-		if (connection)
-		{
-			(void) connection->handleCmsReply(message, logStackTrace);
-		}
-	}
-
-	void setStackTrace (bool state)
-	{
-		logStackTrace = state;
-	}
-
-private:
-	CMSConnection *connection;
-	bool logStackTrace;
+	CMSConnection*               connection;
+	CMSConnection::MessageQueue& queue;
+	bool                         logStackTrace;
 };
 
 
@@ -494,8 +455,6 @@ void CMSExceptionListener::onException(const cms::CMSException& e)
 }
 
 
-#ifndef ACTIVEMQ_CMS_V2
-
 class CMSMiddleware : public Middleware
 {
 public:
@@ -517,9 +476,6 @@ public:
 	}
 };
 
-#endif /* ACTIVEMQ_CMS_V2 */
-
-
 
 static Mutex &getClassMutex()
 {
@@ -536,7 +492,7 @@ CMSConnection::CMSConnection(const Config& config)
 	  m_requestReplyProducer(),
 	  m_replyConsumer(),
 	  m_subscriptions(),
-	  m_queue(),
+	  m_queue(MessageQueue::MAX_QUEUE_SIZE),
 	  m_uniqueFilter(),
 	  m_brokerURI(),
 	  m_connClientId(),
@@ -560,7 +516,6 @@ CMSConnection::CMSConnection(const Config& config)
 		AutoMutex hold(getClassMutex());
 		if (!initialized)
 		{
-#if ACTIVEMQ_CMS_V3
 			try
 			{
 				Middleware::addMiddleware(ACTIVEMQVERSIONSTRING, new CMSMiddleware());
@@ -571,10 +526,6 @@ CMSConnection::CMSConnection(const Config& config)
 				GMSEC_ERROR << "Unable to initialize ActiveMQCPP library : " << e.what();
 				throw GmsecException(MIDDLEWARE_ERROR, INVALID_CONNECTION, e.what());
 			}
-#else /* ACTIVEMQ_CMS_V3 */
-			/* ActiveMQ CMS 2 did not require this initialization */
-			initialized = true;
-#endif /* ACTIVEMQ_CMS_V3 */
 		}
 	}
 
@@ -618,8 +569,6 @@ CMSConnection::CMSConnection(const Config& config)
 	std::string filterToggle = config.getValue(AMQ_FILTER_DUPLICATE_MSGS, "");
 	m_useFilter = filterToggle.empty() || StringUtil::stringEqualsIgnoreCase(filterToggle.c_str(), "yes");
 
-#if ACTIVEMQ_CMS_V3
-	// Only available in ActiveMQ CMS 3
 	if (!m_keystore.empty() && !m_keystorePassword.empty())
 	{
 		decaf::lang::System::setProperty("decaf.net.ssl.keyStore", m_keystore);
@@ -634,7 +583,6 @@ CMSConnection::CMSConnection(const Config& config)
 			decaf::lang::System::setProperty("decaf.net.ssl.trustStorePassword", m_truststorePassword);
 		}
 	}
-#endif
 }
 
 
@@ -697,14 +645,10 @@ void CMSConnection::cleanup()
 	}
 
 	// Destroy messages remaining in the queue
+	while (!m_queue.empty())
 	{
-		decaf::util::concurrent::Lock lock(&m_queue);
-
-		cms::Message* cmsMessage;
-		while ((cmsMessage = m_queue.pop()) != 0)
-		{
-			delete cmsMessage;
-		}
+		Message* msg = m_queue.take();
+		delete msg;
 	}
 
 	m_transportListener.release();
@@ -901,16 +845,16 @@ void CMSConnection::mwDisconnect()
 }
 
 
-gmsec_amqcms::SubscriptionInfo* CMSConnection::makeSubscriptionInfo(const std::string& in, const Config& config)
+gmsec_amqcms::SubscriptionInfo* CMSConnection::makeSubscriptionInfo(const std::string& subject, const Config& config)
 {
-	GMSEC_VERBOSE << "makeSubscriptionInfo(" << in.c_str() << ')';
+	GMSEC_VERBOSE << "makeSubscriptionInfo(" << subject.c_str() << ')';
 
 	StdUniquePtr<cms::Destination>     dest;
 	StdUniquePtr<cms::MessageConsumer> consumer;
 
 	if (config.getBooleanValue(AMQ_DURABLE_SUBSCRIBE, false))
 	{
-		dest.reset(m_session->createTopic(in));
+		dest.reset(m_session->createTopic(subject));
 
 		const char* clientId    = config.getValue(AMQ_DURABLE_CLIENT_ID);
 		const char* msgSelector = config.getValue(AMQ_DURABLE_MSG_SELECTOR);
@@ -929,17 +873,17 @@ gmsec_amqcms::SubscriptionInfo* CMSConnection::makeSubscriptionInfo(const std::s
 		consumer.reset(m_session->createDurableConsumer(dynamic_cast<cms::Topic*>(dest.get()), clientId, msgSelector));
 	}
 #ifdef GMSEC_ARTEMIS
-	else if (in.find(ARTEMIS_MQ_TOPIC_DELIMITER) != std::string::npos)
+	else if (subject.find(ARTEMIS_MQ_TOPIC_DELIMITER) != std::string::npos)
 	{
 		// We have a subscription topic w/ a Fully Qualified Queue Name (FQQN)
-		dest.reset(m_session->createQueue(in));
+		dest.reset(m_session->createQueue(subject));
 
 		consumer.reset(m_session->createConsumer(dest.get()));
 	}
 #endif
 	else
 	{
-		dest.reset(m_session->createTopic(in));
+		dest.reset(m_session->createTopic(subject));
 
 		consumer.reset(m_session->createConsumer(dest.get()));
 	}
@@ -1138,13 +1082,9 @@ static std::string generateID()
 }
 
 
-void CMSConnection::mwRequest(const Message& request, std::string& id)
+void CMSConnection::mwRequest(const Message& request, const std::string& uniqueID)
 {
 	std::string subject(request.getSubject());
-
-	id = generateID();
-
-	MessageBuddy::getInternal(request).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, id.c_str());
 
 	StdUniquePtr<cms::Message> cmsRequest;
 
@@ -1153,7 +1093,7 @@ void CMSConnection::mwRequest(const Message& request, std::string& id)
 		prepare(request, cmsRequest);
 
 		cmsRequest->setCMSType(CMS_TYPE_REQUEST);
-		cmsRequest->setCMSCorrelationID(id);
+		cmsRequest->setCMSCorrelationID(uniqueID);
 
 		StdUniquePtr<cms::Destination>     destination(m_session->createTopic(subject));
 		StdUniquePtr<cms::MessageProducer> producer(m_session->createProducer(destination.get()));
@@ -1193,10 +1133,9 @@ void CMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 
 		if (m_useFilter)
 		{
-			try
+			if (msg->hasField("UNIQUE-ID"))
 			{
-				const StringField& idField  = msg->getStringField("UNIQUE-ID");
-				const char*        uniqueID = idField.getValue();
+				const char* uniqueID = msg->getStringValue("UNIQUE-ID");
 
 				if (m_uniqueFilter.update(uniqueID))
 				{
@@ -1204,7 +1143,7 @@ void CMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 					done = true;
 				}
 			}
-			catch (const GmsecException& e)
+			else
 			{
 				// No UNIQUE-ID field (tracking turned off?)
 				done = true;
@@ -1221,58 +1160,15 @@ void CMSConnection::mwReceive(Message*& msg, GMSEC_I32 timeout)
 
 void CMSConnection::mwReceiveAux(Message*& msg, GMSEC_I32 timeout)
 {
-	double start_s;
-
-	// initialize message to NULL
 	msg = NULL;
 
-	if (timeout != GMSEC_WAIT_FOREVER)
+	if (timeout == GMSEC_WAIT_FOREVER)
 	{
-		start_s = TimeUtil::getCurrentTime_s();
+		msg = m_queue.take();
 	}
-
-	bool done = false;
-	while (!done)
+	else
 	{
-		try
-		{
-			decaf::util::concurrent::Lock lock(&m_queue);
-
-			if (!m_queue.empty())
-			{
-				// have a message, don't need to wait
-			}
-			else if (timeout == GMSEC_WAIT_FOREVER)
-			{
-				m_queue.wait();
-			}
-			else
-			{
-				double elapsed_ms = 1000 * (TimeUtil::getCurrentTime_s() - start_s);
-				long cmsTimeout = (long) (timeout - elapsed_ms);
-				if (cmsTimeout > 0)
-				{
-					m_queue.wait(cmsTimeout);
-				}
-				else
-				{
-					// timeout (no error)
-					done = true;
-				}
-			}
-
-			StdUniquePtr<cms::Message> popped(m_queue.pop());
-			if (popped.get())
-			{
-				done = true;
-				unload(popped.get(), msg);
-			}
-		}
-		catch (const decaf::lang::Exception& e)
-		{
-			GMSEC_VERBOSE << e.what();
-			throw GmsecException(MIDDLEWARE_ERROR, INVALID_MSG, e.what());
-		}
+		m_queue.poll(timeout, msg);
 	}
 }
 
@@ -1286,6 +1182,12 @@ void CMSConnection::mwAcknowledge(StdSharedPtr<MiddlewareInfo>& info)
 		mwMsg->acknowledge();
 		delete mwMsg;
 	}
+}
+
+
+std::string CMSConnection::mwGetUniqueID()
+{
+	return generateID();
 }
 
 
@@ -1334,11 +1236,6 @@ static Message* parseProperties(const cms::Message& cmsMessage,
 		{
 			allTypes = cmsMessage.getStringProperty(GMSEC_PROP_TYPES);
 
-			if (DEBUG_UNLOAD)
-			{
-				GMSEC_DEBUG << "parseProperties: allTypes=" << allTypes.c_str();
-			}
-
 			std::vector<std::string> types = StringUtil::split(allTypes, ',');
 
 			for (size_t i = 0; i < types.size(); ++i)
@@ -1365,20 +1262,10 @@ static Message* parseProperties(const cms::Message& cmsMessage,
 
 		std::vector<std::string> properties(cmsMessage.getPropertyNames());
 
-		if (DEBUG_UNLOAD)
-		{
-			GMSEC_DEBUG << "CMS message has " << properties.size() << " properties";
-		}
-
 		for (std::vector<std::string>::iterator i = properties.begin(); i != properties.end(); ++i)
 		{
 			std::string key(*i);
 			std::string value(cmsMessage.getStringProperty(key));
-
-			if (DEBUG_UNLOAD)
-			{
-				GMSEC_DEBUG << "\t" << key.c_str() << " => " << value.c_str();
-			}
 
 			if (key == GMSEC_PROP_TYPES)
 			{
@@ -1497,31 +1384,12 @@ void CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMessag
 		}
 	}
 
-#ifdef ACTIVEMQ_USE_MSG_RESET
-	// For ActiveMQ C++ 3.7.1 (and possibly for newer releases), we have to reset
-	// the incoming bytes-message so we can read it.  Otherwise the message will
-	// be marked as write-only, and any attempt to access attributes from it will
-	// generate an exception.
-	//
-	// This workaround also functions for AMQ C++ 3.4.0, however to be consistent
-	// with previous releases of the API, we are only applying this workaround for
-	// AMQ C++ v3.7.1.
-	//
-	// On the date this note was written (2013-08-29), it was unknown if the need
-	// to reset the message is a functional requirement for AMQ C++ 3.7.1, or a bug.
-	//
 	cms::BytesMessage* bytesMessage = dynamic_cast<cms::BytesMessage*>(const_cast<cms::Message*>(cmsMessage));
 
-	if (bytesMessage)
+	if (bytesMessage != NULL)
 	{
 		bytesMessage->reset();
-	}
-#else
-	const cms::BytesMessage* bytesMessage = dynamic_cast<const cms::BytesMessage*>(cmsMessage);
-#endif
 
-	if (bytesMessage)
-	{
 		int bytes = bytesMessage->getBodyLength();
 		GMSEC_U8* p = (GMSEC_U8 *) bytesMessage->getBodyBytes();
 		DataBuffer buffer(p, bytes, true);
@@ -1549,63 +1417,14 @@ void CMSConnection::unload(const cms::Message* cmsMessage, Message*& gmsecMessag
 		MessageBuddy::getInternal(*gmsecMessage).setMiddlewareInfo(info);
 	}
 
-	if (msgKind == Message::Kind::REQUEST && cmsMessage->getCMSReplyTo() == NULL)
-	{
-		ValueMap& msgMeta = MessageBuddy::getInternal(*gmsecMessage).getDetails();
-
-		const StringField& field    = gmsecMessage->getStringField(GMSEC_REPLY_UNIQUE_ID_FIELD);
-		const char*        uniqueID = field.getValue();
-
-		msgMeta.setString(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID);
-
-		gmsecMessage->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
-	}
-
 #ifdef GMSEC_ARTEMIS
 	// The following field appears courtesy of Apache Artemis; remove it!
 	gmsecMessage->clearField("__AMQ_CID");
 #endif
 
 	MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).addMessageTemplate(*gmsecMessage);
+	MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).identifyTrackingFields(*gmsecMessage);
 }
-
-
-void CMSConnection::handleCmsReply(const cms::Message* cmsReply, bool logStackTrace)
-{
-	try
-	{
-		handleReply(cmsReply);
-	}
-	catch (const cms::CMSException& e)
-	{
-		std::string extra;
-		if (logStackTrace)
-		{
-			extra = "\n" + e.getStackTraceString();
-		}
-		GMSEC_WARNING << "ActiveMQ handleCmsReply: " << e.what() << extra.c_str();
-	}
-	catch (const decaf::lang::Exception& e)
-	{
-		std::string extra;
-		if (logStackTrace)
-		{
-			extra = "\n" + e.getStackTraceString();
-		}
-		GMSEC_WARNING << "ActiveMQ handleCmsReply: " << e.what() << extra.c_str();
-	}
-}
-
-
-void CMSConnection::handleReply(const cms::Message* cmsMessage)
-{
-	Message* gmsecMessage = 0;
-
-	unload(cmsMessage, gmsecMessage);
-
-	getExternal().onReply(gmsecMessage);
-}
-
 
 
 static Status storeProperty(const Value& value, const std::string& name, cms::Message& cmsMessage, std::string& types)

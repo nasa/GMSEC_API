@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -13,12 +13,15 @@
 #include "gmsecJNI_Cache.h"
 #include "gmsecJNI_Jenv.h"
 
+#include <gmsec5/internal/field/InternalField.h>
+
 #include <gmsec5/field/StringField.h>
 
 #include <iostream>
 
 
 using namespace gmsec::api5;
+using namespace gmsec::api5::internal;
 using namespace gmsec::api5::jni;
 
 
@@ -51,22 +54,11 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1StringFi
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1StringField_1Copy
   (JNIEnv *jenv, jclass jcls, jlong jStringFieldPtr, jobject jStringField)
 {
-	StringField* created = 0;
+	StringField* field = JNI_JLONG_TO_STRINGFIELD(jStringFieldPtr);
 
-	try
-	{
-		StringField* field = JNI_JLONG_TO_STRINGFIELD(jStringFieldPtr);
+	StringField* created = new StringField(*field);
 
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "StringField reference is null");
-		}
-		else
-		{
-			created = new StringField(*field);
-		}
-	}
-	JNI_CATCH
+	FieldBuddy::getInternal(*created).isTracking(field->isTracking());
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -75,22 +67,12 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1StringFi
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_StringField_1GetValue
   (JNIEnv *jenv, jclass jcls, jlong jStringFieldPtr, jobject jStringField)
 {
-	jstring result;
+	StringField* field = JNI_JLONG_TO_STRINGFIELD(jStringFieldPtr);
 
-	try
-	{
-		StringField* field = JNI_JLONG_TO_STRINGFIELD(jStringFieldPtr);
-
-		if (!field)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "StringField reference is null");
-		}
-		else
-		{
-			result = makeJavaString(jenv, field->getValue());
-		}
-	}
-	JNI_CATCH
+	// Note: makeJavaString() can throw an exception if the given value is NULL.
+	// Since a StringField cannot contain a NULL field value, there's no need for
+	// a try-catch block below.
+	jstring result = makeJavaString(jenv, field->getValue());
 
 	return result;
 }

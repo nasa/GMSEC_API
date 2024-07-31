@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -177,15 +177,17 @@ public:
 
 
 	/**
-	 * @fn mwRequest(const Message& request, std::string& uniqueID)
+	 * @fn mwRequest(const Message& request, const std::string& uniqueID)
 	 *
 	 * @brief Issues the request message with a unique ID.  The unique ID must be stored
 	 * within the GMSEC_REPLY_UNIQUE_ID field within the sent message and returned.
 	 *
 	 * @param request  - the request message to issue to the middleware
-	 * @param uniqueID - string containing unique ID associated with the sent message.
+	 * @param uniqueID - a unique string identifier for request/reply correlation purposes
+	 *
+	 * @see mwGetUniqueID()
 	 */
-	virtual void CALL_TYPE mwRequest(const Message& request, std::string& uniqueID) = 0;
+	virtual void CALL_TYPE mwRequest(const Message& request, const std::string& uniqueID) = 0;
 
 
 	/**
@@ -214,6 +216,16 @@ public:
 	 * @param info - The MiddlewareInfo object containing data needed to ack a middleware message.
 	 */
 	virtual void CALL_TYPE mwAcknowledge(gmsec::api5::util::StdSharedPtr<MiddlewareInfo>& info) { /* no-op */ }
+
+
+	/**
+	 * @fn std::string getUniqueID()
+	 *
+	 * @brief Returns a unique identifier string to be included within a request messages.
+	 *
+	 * @return A string.
+	 */
+	virtual std::string mwGetUniqueID() = 0;
 
 
 private:

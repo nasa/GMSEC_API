@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -69,7 +69,9 @@ public class Config
 	private JNIConfig m_jniConfig = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param cfg Object to reference for acquiring internal JNIConfig
 	 * @return Internal JNIConfig object
@@ -81,6 +83,7 @@ public class Config
 
 
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param jcfg Internal JNIConfig object
 	 */
@@ -88,6 +91,7 @@ public class Config
 	{
 		m_jniConfig = jcfg;
 	}
+	//! @endcond
 
 
 	/**

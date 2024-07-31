@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
 
-JAVA_11_CLASS_DIR=classes11
+JAVA_CLASS_DIR=classes
 
 JAVA_OPTS="-Xlint:unchecked -Xlint:deprecation --release 8"
 
@@ -15,7 +15,7 @@ error=0
 
 if [[ "$1" == "clean" ]]; then
 
-	rm -rf $JAVA_11_CLASS_DIR
+	rm -rf $JAVA_CLASS_DIR
 
 else
 
@@ -33,9 +33,9 @@ else
 
 	else
 
-		mkdir -p $JAVA_11_CLASS_DIR
+		mkdir -p $JAVA_CLASS_DIR
 
-		$JDK_HOME/bin/javac -cp $GMSEC_API_HOME/bin/gmsecapi.jar -d $JAVA_11_CLASS_DIR $JAVA_OPTS $SOURCE
+		$JDK_HOME/bin/javac -cp $GMSEC_API_HOME/bin/gmsecapi.jar -d $JAVA_CLASS_DIR $JAVA_OPTS $SOURCE
 
 		if [ $? -ne 0 ]; then
 			error=1

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -89,7 +89,7 @@ libgmsec_perl::Specification
 
 C<libgmsec_perl::Specification-E<gt>new()>
 
-        Initializes the Specification with the default message specification (NASA/GMSEC Addendum)
+        Initializes the Specification with the default message specification.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Exceptions:</b><br>
 
@@ -136,7 +136,7 @@ C<libgmsec_perl::Specification-E<gt>getSchemaIDIterator()>
 
 C<libgmsec_perl::Specification-E<gt>getVersion()>
 
-        Gets the version of the message specification being used
+        Returns the version of the message specification that is referenced by the Specification.
 
 =for html &nbsp;&nbsp;&nbsp;&nbsp;<b>Returns:</b><br>
 

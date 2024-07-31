@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -37,12 +37,12 @@ class GMSEC_API U16Field : public Field
 {
 public:
 	/**
-	 * @fn U16Field(const char* name, GMSEC_U16 value)
+	 * @fn U16Field(const char* name, GMSEC_U16 value, bool isHeader = false)
 	 * @brief Constructor for creating a specialized Field object containing an unsigned 16-bit value.
 	 * @param name - the name of the Field
 	 * @param value - the value to store
 	 * @param isHeader - used to indicate if Field is a header field (default is false)
-	 * @throw A GmsecException is thrown if the name is NULL, or is an empty string.
+	 * @throw A GmsecException is thrown if the name is NULL, or is an empty string, or the field name is otherwise not compliant.
 	 */
 	U16Field(const char* name, GMSEC_U16 value, bool isHeader = false);
 

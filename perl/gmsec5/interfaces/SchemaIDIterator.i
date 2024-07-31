@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -22,7 +22,7 @@ using namespace gmsec::api5;
 
 libgmsec_perl::SchemaIDIterator
 
-This class supports the iteration of Specification's loaded schema templates.
+This class supports the iteration of a Specification's loaded schema templates.
 
 A SchemaIDIterator can be retreived from a Specification by invoking Specification::getSchemaIDIterator().
 
@@ -62,7 +62,7 @@ Returns a reference to the next available Schema IDs
 
 C<libgmsec_perl::SchemaIDIterator-E<gt>reset()>
 
-	Resets the iterator to the beginning of the Schema list that is maintained by Specification
+	Resets the iterator to the beginning of the Schema list that is maintained by the Specification
 
 =cut
 %}

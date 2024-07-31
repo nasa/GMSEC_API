@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -41,30 +41,43 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Create
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig, jobject jConnection)
 {
+	Config* cfg = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
 	jlong jConn = 0;
 
 	try
 	{
-		Config* cfg = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (cfg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-
+		// A GmsecException can be thrown if the Connection cannot be created
 		Connection* conn = new Connection(*cfg);
 
 		jConn = JNI_POINTER_TO_JLONG(conn);
 
 		jenv->SetLongField(jConnection, Cache::getCache().fieldConnection_swigCPtr, jConn);
-		jvmOk(jenv, "Connection.create");
 
-		jenv->SetBooleanField(jConnection, Cache::getCache().fieldConnection_swigCMemOwn, JNI_TRUE);
-		jvmOk(jenv, "Connection.create");
+		if (jvmOk(jenv, "Connection.create"))
+		{
+			jenv->SetBooleanField(jConnection, Cache::getCache().fieldConnection_swigCMemOwn, JNI_TRUE);
 
-		Cache::getCache().putConnection(conn, jConnection);
+			if (jvmOk(jenv, "Connection.create"))
+			{
+				Cache::getCache().putConnection(conn, jConnection);
+			}
+			else
+			{
+				delete conn;
+				jConn = 0;
+			}
+		}
+		else
+		{
+			delete conn;
+			jConn = 0;
+		}
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jConn;
 }
@@ -73,35 +86,44 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1C
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1CreateWithFactory
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig, jlong jFactoryPtr, jobject jFactory, jobject jConnection)
 {
+	Config*         cfg     = JNI_JLONG_TO_CONFIG(jConfigPtr);
+	MessageFactory* factory = JNI_JLONG_TO_MESSAGE_FACTORY(jFactoryPtr);
+
 	jlong jConn = 0;
 
 	try
 	{
-		Config*         cfg     = JNI_JLONG_TO_CONFIG(jConfigPtr);
-		MessageFactory* factory = JNI_JLONG_TO_MESSAGE_FACTORY(jFactoryPtr);
-
-		if (cfg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		if (factory == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageFactory reference is null");
-		}
-
+		// A GmsecException can be thrown if the Connection cannot be created
 		Connection* conn = new Connection(*cfg, *factory);
 
 		jConn = JNI_POINTER_TO_JLONG(conn);
 
 		jenv->SetLongField(jConnection, Cache::getCache().fieldConnection_swigCPtr, jConn);
-		jvmOk(jenv, "Connection.create");
 
-		jenv->SetBooleanField(jConnection, Cache::getCache().fieldConnection_swigCMemOwn, JNI_TRUE);
-		jvmOk(jenv, "Connection.create");
+		if (jvmOk(jenv, "Connection.create"))
+		{
+			jenv->SetBooleanField(jConnection, Cache::getCache().fieldConnection_swigCMemOwn, JNI_TRUE);
 
-		Cache::getCache().putConnection(conn, jConnection);
+			if (jvmOk(jenv, "Connection.create"))
+			{
+				Cache::getCache().putConnection(conn, jConnection);
+			}
+			else
+			{
+				delete conn;
+				jConn = 0;
+			}
+		}
+		else
+		{
+			delete conn;
+			jConn = 0;
+		}
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jConn;
 }
@@ -110,37 +132,22 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1C
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Destroy
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
+	Cache::getCache().removeConnection(conn);
 
-		Cache::getCache().removeConnection(conn);
-
-		delete conn;
-	}
-	JNI_CATCH
+	delete conn;
 }
 
 
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetAPIVersion
   (JNIEnv *jenv, jclass jcls)
 {
-	jstring jVersion = NULL;
+	const char* tmp = Connection::getAPIVersion();
 
-	try
-	{
-		const char* tmp = Connection::getAPIVersion();
+	jstring jVersion = makeJavaString(jenv, tmp);
 
-		jVersion = makeJavaString(jenv, tmp);
-
-		jvmOk(jenv, "Connection.getAPIVersion");
-	}
-	JNI_CATCH
+	jvmOk(jenv, "Connection.getAPIVersion");
 
 	return jVersion;
 }
@@ -149,66 +156,39 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Connect
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
 	try
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			conn->connect();
-		}
+		// A GmsecException can be thrown if we fail to connect for any reason
+		conn->connect();
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Disconnect
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			conn->disconnect();
-		}
-	}
-	JNI_CATCH
+	conn->disconnect();
 }
 
 
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetLibraryName
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jstring jName = NULL;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	const char* name = conn->getLibraryName();
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			const char* name = conn->getLibraryName();
+	jstring jName = makeJavaString(jenv, name);
 
-			jName = makeJavaString(jenv, name);
-
-			jvmOk(jenv, "Connection.getLibraryName");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "Connection.getLibraryName");
 
 	return jName;
 }
@@ -217,26 +197,13 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetLibraryVersion
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jstring jVersion = NULL;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	const char* version = conn->getLibraryVersion();
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			const char* version = conn->getLibraryVersion();
+	jstring jVersion = makeJavaString(jenv, version);
 
-			jVersion = makeJavaString(jenv, version);
-
-			jvmOk(jenv, "Connection.getLibraryVersion");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "Connection.getLibraryVersion");
 
 	return jVersion;
 }
@@ -245,107 +212,61 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetConfig
 (JNIEnv* jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jlong jConfigPtr = 0;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Config& config = conn->getConfig();
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			Config& config = conn->getConfig();
-			jConfigPtr = JNI_POINTER_TO_JLONG(&config);
-		}
-	}
-	JNI_CATCH
-
-	return jConfigPtr;
+	return JNI_POINTER_TO_JLONG(&config);
 }
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetMessageFactory
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jlong jMsgFactoryPtr = 0;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	MessageFactory& factory = conn->getMessageFactory();
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			MessageFactory& factory = conn->getMessageFactory();
-
-			jMsgFactoryPtr = JNI_POINTER_TO_JLONG(&factory);
-		}
-	}
-	JNI_CATCH
-
-	return jMsgFactoryPtr;
+	return JNI_POINTER_TO_JLONG(&factory);
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1RegisterEventCallback
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jint jEvent, jlong jEventCallbackPtr)
 {
-	try
-	{
-		Connection*       conn     = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Connection::Event event    = static_cast<Connection::Event>(jEvent);
-		EventCallback*    callback = reinterpret_cast<EventCallback*>(jEventCallbackPtr);
+	Connection*       conn     = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Connection::Event event    = static_cast<Connection::Event>(jEvent);
+	EventCallback*    callback = reinterpret_cast<EventCallback*>(jEventCallbackPtr);
 
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else if (callback == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "EventCallback reference is null");
-		}
-		else
-		{
-			conn->registerEventCallback(event, callback);
-		}
-	}
-	JNI_CATCH
+	conn->registerEventCallback(event, callback);
 }
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Subscribe__JLgov_nasa_gsfc_gmsec_api5_jni_JNIConnection_2Ljava_lang_String_2
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jstring jSubject)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
 	jlong jInfo = 0;
 
-	try
+	JStringManager subject(jenv, jSubject);
+
+	if (jvmOk(jenv, "Connection.subscribe(subject)"))
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-
-		if (conn == NULL)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
+			// A GmsecException can be thrown for any of the following reasons:
+			//   * we are not connected
+			//   * the subject is not compliant
+			SubscriptionInfo* info = conn->subscribe(subject.c_str());
+
+			jInfo = JNI_POINTER_TO_JLONG(info);
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager subject(jenv, jSubject);
-
-			if (jvmOk(jenv, "Connection.subscribe(subject)"))
-			{
-				SubscriptionInfo* info = conn->subscribe(subject.c_str());
-
-				jInfo = JNI_POINTER_TO_JLONG(info);
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return jInfo;
 }
@@ -354,34 +275,29 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1S
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Subscribe__JLgov_nasa_gsfc_gmsec_api5_jni_JNIConnection_2Ljava_lang_String_2J
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jstring jSubject, jlong jCallbackPtr)
 {
+	Connection* conn     = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Callback*   callback = reinterpret_cast<Callback*>(jCallbackPtr);
+
 	jlong jInfo = 0;
 
-	try
+	JStringManager subject(jenv, jSubject);
+
+	if (jvmOk(jenv, "Connection.subscribe(subject, callback)"))
 	{
-		Connection* conn     = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Callback*   callback = reinterpret_cast<Callback*>(jCallbackPtr);
-
-		if (conn == NULL)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
+			// A GmsecException can be thrown for any of the following reasons:
+			//   * we are not connected
+			//   * the subject is not compliant
+			SubscriptionInfo* info = conn->subscribe(subject.c_str(), callback);
+
+			jInfo = JNI_POINTER_TO_JLONG(info);
 		}
-		else if (callback == NULL)
+		catch (const GmsecException& e)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Callback reference is null");
-		}
-		else
-		{
-			JStringManager subject(jenv, jSubject);
-
-			if (jvmOk(jenv, "Connection.subscribe(subject, callback)"))
-			{
-				SubscriptionInfo* info = conn->subscribe(subject.c_str(), callback);
-
-				jInfo = JNI_POINTER_TO_JLONG(info);
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return jInfo;
 }
@@ -390,34 +306,29 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1S
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Subscribe__JLgov_nasa_gsfc_gmsec_api5_jni_JNIConnection_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api5_jni_JNIConfig_2
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jstring jSubject, jlong jConfigPtr, jobject jConfig)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Config*     cfg  = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
 	jlong jInfo = 0;
 
-	try
+	JStringManager subject(jenv, jSubject);
+
+	if (jvmOk(jenv, "Connection.subscribe(subject, callback)"))
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Config*     cfg  = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (conn == NULL)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
+			// A GmsecException can be thrown for any of the following reasons:
+			//   * we are not connected
+			//   * the subject is not compliant
+			SubscriptionInfo* info = conn->subscribe(subject.c_str(), *cfg);
+
+			jInfo = JNI_POINTER_TO_JLONG(info);
 		}
-		else if (cfg == NULL)
+		catch (const GmsecException& e)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			JStringManager subject(jenv, jSubject);
-
-			if (jvmOk(jenv, "Connection.subscribe(subject, callback)"))
-			{
-				SubscriptionInfo* info = conn->subscribe(subject.c_str(), *cfg);
-
-				jInfo = JNI_POINTER_TO_JLONG(info);
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return jInfo;
 }
@@ -426,39 +337,30 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1S
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Subscribe__JLgov_nasa_gsfc_gmsec_api5_jni_JNIConnection_2Ljava_lang_String_2JLgov_nasa_gsfc_gmsec_api5_jni_JNIConfig_2J
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jstring jSubject, jlong jConfigPtr, jobject jConfig, jlong jCallbackPtr)
 {
+	Connection* conn     = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Config*     cfg      = JNI_JLONG_TO_CONFIG(jConfigPtr);
+	Callback*   callback = reinterpret_cast<Callback*>(jCallbackPtr);
+
 	jlong jInfo = 0;
 
-	try
+	JStringManager subject(jenv, jSubject);
+
+	if (jvmOk(jenv, "Connection.subscribe(subject, callback)"))
 	{
-		Connection* conn     = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Config*     cfg      = JNI_JLONG_TO_CONFIG(jConfigPtr);
-		Callback*   callback = reinterpret_cast<Callback*>(jCallbackPtr);
+		try
+		{
+			// A GmsecException can be thrown for any of the following reasons:
+			//   * we are not connected
+			//   * the subject is not compliant
+			SubscriptionInfo* info = conn->subscribe(subject.c_str(), *cfg, callback);
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
+			jInfo = JNI_POINTER_TO_JLONG(info);
 		}
-		else if (cfg == NULL)
+		catch (const GmsecException& e)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else if (callback == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Callback reference is null");
-		}
-		else
-		{
-			JStringManager subject(jenv, jSubject);
-
-			if (jvmOk(jenv, "Connection.subscribe(subject, callback)"))
-			{
-				SubscriptionInfo* info = conn->subscribe(subject.c_str(), *cfg, callback);
-
-				jInfo = JNI_POINTER_TO_JLONG(info);
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return jInfo;
 }
@@ -467,47 +369,39 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1S
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Unsubscribe
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jlong jSubInfoPtr, jobject jSubInfo)
 {
+	Connection*       conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	SubscriptionInfo* info = JNI_JLONG_TO_SUBSCRIPTION_INFO(jSubInfoPtr);
+
 	try
 	{
-		Connection*       conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		SubscriptionInfo* info = JNI_JLONG_TO_SUBSCRIPTION_INFO(jSubInfoPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else if (info == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionInfo reference is null");
-		}
-		else
-		{
-			conn->unsubscribe(info);
-		}
+		// A GmsecException can be thrown for any of the following reasons:
+		//   * we are not connected
+		//   * the SubscriptionInfo object did not originate from the Connection object
+		conn->unsubscribe(info);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 }
 
 
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1StartAutoDispatch
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
 	jboolean jResult = JNI_FALSE;
 
 	try
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			jResult = (conn->startAutoDispatch() ? JNI_TRUE : JNI_FALSE);
-		}
+		// A GmsecException can be thrown if we are not connected
+		jResult = (conn->startAutoDispatch() ? JNI_TRUE : JNI_FALSE);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jResult;
 }
@@ -516,22 +410,19 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1StopAutoDispatch
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jboolean jWaitForCompletion)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
 	jboolean jResult = JNI_FALSE;
 
 	try
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			jResult = (conn->stopAutoDispatch(jWaitForCompletion == JNI_TRUE) ? JNI_TRUE : JNI_FALSE);
-		}
+		// A GmsecException can be thrown if we are not connected
+		jResult = (conn->stopAutoDispatch(jWaitForCompletion == JNI_TRUE) ? JNI_TRUE : JNI_FALSE);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jResult;
 }
@@ -541,117 +432,101 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Publish__JLgov_nasa_gsfc_gmsec_api5_jni_JNIConnection_2JLgov_nasa_gsfc_gmsec_api5_jni_JNIMessage_2
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jlong jMsgPtr, jobject jMsg)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Message*    msg  = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
 	try
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Message*    msg  = JNI_JLONG_TO_MESSAGE(jMsgPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else if (msg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
-		}
-		else
-		{
-			conn->publish(*msg);
-		}
+		// A GmsecException can be thrown for any of the following reasons:
+		//   * we are not connected
+		//   * the message is not a PUBLISH message
+		//   * the message lacks a subject
+		//   * the message is not compliant (when validation is enabled)
+		//   * the middleware can throw an exception
+		conn->publish(*msg);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Publish__JLgov_nasa_gsfc_gmsec_api5_jni_JNIConnection_2JLgov_nasa_gsfc_gmsec_api5_jni_JNIMessage_2JLgov_nasa_gsfc_gmsec_api5_jni_JNIConfig_2
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jlong jMsgPtr, jobject jMsg, jlong jConfigPtr, jobject jConfig)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Message*    msg  = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+	Config*     cfg  = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
 	try
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Message*    msg  = JNI_JLONG_TO_MESSAGE(jMsgPtr);
-		Config*     cfg  = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else if (msg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
-		}
-		else if (cfg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			conn->publish(*msg, *cfg);
-		}
+		// A GmsecException can be thrown for any of the following reasons:
+		//   * we are not connected
+		//   * the message is not a PUBLISH message
+		//   * the message lacks a subject
+		//   * the message is not compliant (when validation is enabled)
+		//   * the middleware can throw an exception
+		conn->publish(*msg, *cfg);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Request__JLgov_nasa_gsfc_gmsec_api5_jni_JNIConnection_2JLgov_nasa_gsfc_gmsec_api5_jni_JNIMessage_2IJI
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jlong jReqMsgPtr, jobject jReqMsg, jint jTimeout, jlong jReplyCallbackPtr, jint jRepublish_ms)
 {
+	Connection*    conn     = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Message*       reqMsg   = JNI_JLONG_TO_MESSAGE(jReqMsgPtr);
+	ReplyCallback* callback = reinterpret_cast<ReplyCallback*>(jReplyCallbackPtr);
+
 	try
 	{
-		Connection*    conn     = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Message*       reqMsg   = JNI_JLONG_TO_MESSAGE(jReqMsgPtr);
-		ReplyCallback* callback = reinterpret_cast<ReplyCallback*>(jReplyCallbackPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else if (reqMsg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Request Message reference is null");
-		}
-		else if (callback == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ReplyCallback reference is null");
-		}
-		else
-		{
-			conn->request(*reqMsg, (int) jTimeout, callback, (int) jRepublish_ms);
-		}
+		// A GmsecException can be thrown for any of the following reasons:
+		//   * we are not connected
+		//   * the request message is not a REQUEST message
+		//   * the request message lacks a subject
+		//   * the request message is not compliant (when validation is enabled)
+		//   * the middleware can throw an exception
+		conn->request(*reqMsg, static_cast<int>(jTimeout), callback, static_cast<int>(jRepublish_ms));
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 }
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Request__JLgov_nasa_gsfc_gmsec_api5_jni_JNIConnection_2JLgov_nasa_gsfc_gmsec_api5_jni_JNIMessage_2II
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jlong jReqMsgPtr, jobject jReqMsg, jint jTimeout, jint jRepublish_ms)
 {
+	Connection* conn   = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Message*    reqMsg = JNI_JLONG_TO_MESSAGE(jReqMsgPtr);
+
 	jlong jRepMsg = 0;
 
 	try
 	{
-		Connection* conn   = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Message*    reqMsg = JNI_JLONG_TO_MESSAGE(jReqMsgPtr);
+		// A GmsecException can be thrown for any of the following reasons:
+		//   * we are not connected
+		//   * the request message is not a REQUEST message
+		//   * the request message lacks a subject
+		//   * the request message is not compliant (when validation is enabled)
+		//   * the middleware can throw an exception
+		Message* repMsg = conn->request(*reqMsg, static_cast<int>(jTimeout), static_cast<int>(jRepublish_ms));
 
-		if (conn == NULL)
+		if (repMsg)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else if (reqMsg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Request Message reference is null");
-		}
-		else
-		{
-			Message* repMsg = conn->request(*reqMsg, (int) jTimeout, (int) jRepublish_ms);
-
-			if (repMsg)
-			{
-				jRepMsg = JNI_POINTER_TO_JLONG(repMsg);
-			}
+			jRepMsg = JNI_POINTER_TO_JLONG(repMsg);
 		}
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jRepMsg;
 }
@@ -660,82 +535,73 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1R
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Reply
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jlong jReqMsgPtr, jobject jReqMsg, jlong jRepMsgPtr, jobject jRepMsg)
 {
+	Connection* conn   = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Message*    reqMsg = JNI_JLONG_TO_MESSAGE(jReqMsgPtr);
+	Message*    repMsg = JNI_JLONG_TO_MESSAGE(jRepMsgPtr);
+
 	try
 	{
-		Connection* conn   = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Message*    reqMsg = JNI_JLONG_TO_MESSAGE(jReqMsgPtr);
-		Message*    repMsg = JNI_JLONG_TO_MESSAGE(jRepMsgPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else if (reqMsg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Request Message reference is null");
-		}
-		else if (repMsg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Reply Message reference is null");
-		}
-		else
-		{
-			conn->reply(*reqMsg, *repMsg);
-		}
+		// A GmsecException can be thrown for any of the following reasons:
+		//   * we are not connected
+		//   * the request message is not a REQUEST message
+		//   * the reply message is not a REPLY message
+		//   * the reply message lacks a subject
+		//   * the reply message is not compliant (when validation is enabled)
+		//   * the middleware can throw an exception
+		conn->reply(*reqMsg, *repMsg);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Dispatch
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jlong jMsgPtr, jobject jMsg)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	Message*    msg  = JNI_JLONG_TO_MESSAGE(jMsgPtr);
+
 	try
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-		Message*    msg  = JNI_JLONG_TO_MESSAGE(jMsgPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else if (msg == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Message reference is null");
-		}
-		else
-		{
-			conn->dispatch(*msg);
-		}
+		// A GmsecException can be thrown for any of the following reasons:
+		//   * we are not connected
+		//   * the auto-dispatcher is running
+		//   * the message lacks a subject
+		//   * the message is not compliant (when validation is enabled)
+		conn->dispatch(*msg);
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 }
 
 
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1Receive
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jint jTimeout)
 {
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
 	jlong jMsg = 0;
 
 	try
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+		// A GmsecException can be thrown for any of the following reasons:
+		//   * we are not connected
+		//   * a middleware issue occurs
+		Message* msg = conn->receive(static_cast<int>(jTimeout));
 
-		if (conn == NULL)
+		if (msg)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			Message* msg = conn->receive((int) jTimeout);
-
-			if (msg)
-			{
-				jMsg = JNI_POINTER_TO_JLONG(msg);
-			}
+			jMsg = JNI_POINTER_TO_JLONG(msg);
 		}
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jMsg;
 }
@@ -744,76 +610,61 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1R
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1ExcludeSubject
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jstring jSubject)
 {
-	try
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
+	JStringManager subject(jenv, jSubject);
+
+	if (jvmOk(jenv, "Connection.excludeSubject()"))
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-
-		if (conn == NULL)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
+			// A GmsecException can be thrown for any of the following reasons:
+			//   * we are not connected
+			//   * the subject is non-compliant
+			conn->excludeSubject(subject.c_str());
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager subject(jenv, jSubject);
-
-			if (jvmOk(jenv, "Connection.excludeSubject()"))
-			{
-				conn->excludeSubject(subject.c_str());
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1RemoveExcludedSubject
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jstring jSubject)
 {
-	try
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
+	JStringManager subject(jenv, jSubject);
+
+	if (jvmOk(jenv, "Connection.removeExcludedSubject()"))
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-
-		if (conn == NULL)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
+			// A GmsecException can be thrown for any of the following reasons:
+			//   * we are not connected
+			//   * the subject is non-compliant
+			conn->removeExcludedSubject(subject.c_str());
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager subject(jenv, jSubject);
-
-			if (jvmOk(jenv, "Connection.removeExcludedSubject()"))
-			{
-				conn->removeExcludedSubject(subject.c_str());
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 }
 
 
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetName
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jstring jName = NULL;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	const char* tmp = conn->getName();
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			const char* tmp = conn->getName();
+	jstring jName = makeJavaString(jenv, tmp);
 
-			jName = makeJavaString(jenv, tmp);
-
-			jvmOk(jenv, "Connection.getName");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "Connection.getName");
 
 	return jName;
 }
@@ -822,51 +673,27 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1SetName
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn, jstring jName)
 {
-	try
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Connection.setName"))
 	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			JStringManager name(jenv, jName);
-
-			if (jvmOk(jenv, "Connection.setName"))
-			{
-				conn->setName(name.c_str());
-			}
-		}
+		conn->setName(name.c_str());
 	}
-	JNI_CATCH
 }
 
 
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetID
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jstring jID = NULL;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	const char* tmp = conn->getID();
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			const char* tmp = conn->getID();
+	jstring jID = makeJavaString(jenv, tmp);
 
-			jID = makeJavaString(jenv, tmp);
-
-			jvmOk(jenv, "Connection.getID");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "Connection.getID");
 
 	return jID;
 }
@@ -875,26 +702,13 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetMWInfo
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jstring jInfo = NULL;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	const char* tmp = conn->getMWInfo();
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			const char* tmp = conn->getMWInfo();
+	jstring jInfo = makeJavaString(jenv, tmp);
 
-			jInfo = makeJavaString(jenv, tmp);
-
-			jvmOk(jenv, "Connection.getMWInfo");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "Connection.getMWInfo");
 
 	return jInfo;
 }
@@ -903,26 +717,13 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetConnectionEndpoint
   (JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jstring jEndpoint = NULL;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
+	const char* endpoint = conn->getConnectionEndpoint();
 
-		if (conn == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			const char* endpoint = conn->getConnectionEndpoint();
+	jstring jEndpoint = makeJavaString(jenv, endpoint);
 
-			jEndpoint = makeJavaString(jenv, endpoint);
-
-			jvmOk(jenv, "Connection.getConnectionEndpoint");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "Connection.getConnectionEndpoint");
 
 	return jEndpoint;
 }
@@ -931,51 +732,28 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1GetPublishQueueMessageCount
 	(JNIEnv *jenv, jclass jcls, jlong jConnPtr, jobject jConn)
 {
-	jlong jCount = 0;
+	Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
 
-	try
-	{
-		Connection* conn = JNI_JLONG_TO_CONNECTION(jConnPtr);
-
-		if (!conn)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Connection reference is null");
-		}
-		else
-		{
-			jCount = (jlong) conn->getPublishQueueMessageCount();
-		}
-	}
-	JNI_CATCH
-
-	return jCount;
+	return static_cast<jlong>(conn->getPublishQueueMessageCount());
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1ShutdownAllMiddlewares
   (JNIEnv *jenv, jclass jcls)
 {
-	try
-	{
-		Connection::shutdownAllMiddlewares();
-	}
-	JNI_CATCH
+	Connection::shutdownAllMiddlewares();
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Connection_1ShutdownMiddleware
   (JNIEnv *jenv, jclass jcls, jstring jName)
 {
-	try
-	{
-		JStringManager name(jenv, jName);
+	JStringManager name(jenv, jName);
 
-		if (jvmOk(jenv, "Connection.shutdownMiddleware"))
-		{
-			Connection::shutdownMiddleware(name.c_str());
-		}
+	if (jvmOk(jenv, "Connection.shutdownMiddleware"))
+	{
+		Connection::shutdownMiddleware(name.c_str());
 	}
-	JNI_CATCH
 }
 
 

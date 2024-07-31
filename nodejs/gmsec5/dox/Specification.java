@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -53,7 +53,7 @@ public class Specification
 
 	/**
 	 * Basic constructor that initializes the %Specification instance with the
-	 * default message specification (NASA/GMSEC Addendum)
+	 * default message specification.
 	 *
 	 * @throws GmsecException Thrown if schemas (templates) cannot be loaded.
 	 */
@@ -92,10 +92,9 @@ public class Specification
 
 
 	/**
-	 * Returns the version of the GMSEC Interface Specification Document (ISD) that is referenced
-	 * by the Specification object.
+	 * Returns the version of the message specification that is referenced by the Specification.
 	 *
-	 * @return The version of the ISD in use.
+	 * @return The version of the templates in use.
 	 */
 	public getVersion();
 

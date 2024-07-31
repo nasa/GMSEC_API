@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -17,6 +17,7 @@ function ShowUsage
 	echo "    artemis"
 	echo "    bolt"
 	echo "    ibmmq90"
+	echo "    loopback"
 	echo "    mb"
 	echo "    websphere80"
 	echo "    zeromq413"
@@ -176,11 +177,14 @@ function CheckDependencies
 								CheckArchitecture $dep_file
 							fi
 						else
-							if [[ $critical == true ]]; then
-								Failure "Unable to locate $dep_file using DYLD_LIBRARY_PATH"
-								result=1
-							else
-								Warning "Unable to locate $dep_file using DYLD_LIBRARY_PATH"
+							#these two libraries are not needed and can be ignored if missing
+							if [[ ( ${dep_file} != "*libc++.1.dylib" ) && ( ${dep_file} != "*libSystem.B.dylib" ) ]]; then
+								if [[ $critical == true ]]; then
+									Failure "Unable to locate $dep_file using DYLD_LIBRARY_PATH"
+									result=1
+								else
+									Warning "Unable to locate $dep_file using DYLD_LIBRARY_PATH"
+								fi
 							fi
 						fi
 						IFS=$'\n'
@@ -596,6 +600,16 @@ function CheckBolt
 	CheckEnvironmentVariables Bolt
 }
 
+function CheckLoopback
+{
+	echo
+	echo "${txtcyn}Checking middleware dependencies for GMSEC Loopback...${txtrst}"
+
+	# Check if all dependencies are satisfied for mw_type
+	#
+	CheckDependencies ${gmsec_api_bin}/lib${mw}.${lib_ext} true
+}
+
 function CheckMessageBus
 {
 	echo
@@ -791,6 +805,7 @@ case $mw_type in
 	*"artemis")     check_mwtype=art     ;;
 	*"bolt")        check_mwtype=bolt    ;;
 	*"ibmmq"*)      check_mwtype=ibmmq   ;;
+	*"loopback"*)   check_mwtype=loopback;;
 	*"mb")          check_mwtype=mb      ;;
 	*"opendds"*)    check_mwtype=opendds ;;
 	*"websphere"*)  check_mwtype=ws      ;;
@@ -871,6 +886,7 @@ case $check_mwtype in
 	"art")		CheckArtemis;;
 	"bolt")		CheckBolt;;
 	"ibmmq")	CheckWebSphere;;
+	"loopback")	CheckLoopback;;
 	"mb")		CheckMessageBus;;
 	"opendds")	CheckOpenDDS;;
 	"ws")		CheckWebSphere;;

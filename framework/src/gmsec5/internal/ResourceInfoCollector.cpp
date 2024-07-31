@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -642,7 +642,10 @@ void ResourceInfoCollector::addDiskStats(Message& msg, unsigned int specVersion,
 		std::string device_path     = tokens[0];
 		std::string mount_directory = tokens[1];
 
-		if (StringUtil::stringCompareCount(device_path.c_str(), "/dev", 4) == 0)
+		// We want /dev disks, but not /dev/loop<N> or /dev/fuse ones
+		if (StringUtil::stringCompareCount(device_path.c_str(), "/dev", 4) == 0      &&
+		    StringUtil::stringCompareCount(device_path.c_str(), "/dev/loop", 9) != 0 &&
+		    StringUtil::stringCompareCount(device_path.c_str(), "/dev/fuse", 9) != 0)
 		{
 			struct statfs stat_buf;
 

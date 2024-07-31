@@ -32,6 +32,7 @@
 						<xs:simpleContent>
 							<xs:extension base="xs:string">
 								<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+								<xs:attribute name="TRACKING"/>
 							</xs:extension>
 						</xs:simpleContent>
 					</xs:complexType>
@@ -177,6 +178,7 @@
 									<xs:simpleContent>
 										<xs:extension base="xs:unsignedShort">
 											<xs:attribute name="TYPE" type="FIELD_Type" fixed="U16"/>
+											<xs:attribute name="TRACKING"/>
 										</xs:extension>
 									</xs:simpleContent>
 								</xs:complexType>
@@ -198,6 +200,7 @@
 									<xs:simpleContent>
 										<xs:extension base="xs:string">
 											<xs:attribute name="TYPE" type="FIELD_Type" fixed="STRING"/>
+											<xs:attribute name="TRACKING"/>
 										</xs:extension>
 									</xs:simpleContent>
 								</xs:complexType>

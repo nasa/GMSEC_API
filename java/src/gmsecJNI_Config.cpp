@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -37,13 +37,7 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Config
   (JNIEnv *jenv, jclass jcls)
 {
-	Config *created = 0;
-
-	try
-	{
-		created = new Config();
-	}
-	JNI_CATCH
+	Config* created = new Config();
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -54,44 +48,40 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Config_1
 {
 	jlong jConfig = 0;
 
-	try
+	jint size = jenv->GetArrayLength(jargs);
+
+	if (size < 1)
 	{
-		jint size = jenv->GetArrayLength(jargs);
+		jConfig = Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Config(jenv, jcls);
+	}
+	else
+	{
+		std::vector<char*> args;
 
-		if (size < 1)
+		for (int i = 0; jvmOk(jenv, "new Config(String[])") && i < size; ++i)
 		{
-			jConfig = Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Config(jenv, jcls);
+			jstring s = (jstring) jenv->GetObjectArrayElement(jargs, i);
+
+			JStringManager manager(jenv, s);
+
+			if (manager.c_str())
+			{
+				args.push_back(StringUtil::stringNew(manager.c_str()));
+			}
 		}
-		else
+
+		if (jvmOk(jenv, "new Config(String[])"))
 		{
-			std::vector<char*> args;
+			Config* created = new Config((int) args.size(), &args[0]);
 
-			for (int i = 0; jvmOk(jenv, "new Config(String[])") && i < size; ++i)
-			{
-				jstring s = (jstring) jenv->GetObjectArrayElement(jargs, i);
+			jConfig = JNI_POINTER_TO_JLONG(created);
+		}
 
-				JStringManager manager(jenv, s);
-
-				if (manager.c_str())
-				{
-					args.push_back(StringUtil::stringNew(manager.c_str()));
-				}
-			}
-
-			if (jvmOk(jenv, "new Config(String[])"))
-			{
-				Config* created = new Config((int) args.size(), &args[0]);
-
-				jConfig = JNI_POINTER_TO_JLONG(created);
-			}
-
-			for (size_t j = 0; j < args.size(); ++j)
-			{
-				StringUtil::stringDestroy(args[j]);
-			}
+		for (size_t j = 0; j < args.size(); ++j)
+		{
+			StringUtil::stringDestroy(args[j]);
 		}
 	}
-	JNI_CATCH
 
 	return jConfig;
 }
@@ -102,18 +92,14 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Config_1
 {
 	jlong jConfig = 0;
 
-	try
+	JStringManager data(jenv, jData);
+
+	if (jvmOk(jenv, "new Config(const char*)") && data.c_str())
 	{
-		JStringManager data(jenv, jData);
+		Config* created = new Config(data.c_str(), static_cast<DataType>(jType));
 
-		if (jvmOk(jenv, "new Config(const char*)") && data.c_str())
-		{
-			Config* created = new Config(data.c_str(), static_cast<DataType>(jType));
-
-			jConfig = JNI_POINTER_TO_JLONG(created);
-		}
+		jConfig = JNI_POINTER_TO_JLONG(created);
 	}
-	JNI_CATCH
 
 	return jConfig;
 }
@@ -122,24 +108,11 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Config_1
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Config_1Copy
   (JNIEnv *jenv, jclass jcls, jlong jOtherPtr, jobject jOther)
 {
-	jlong jConfig = 0;
+	Config* config = JNI_JLONG_TO_CONFIG(jOtherPtr);
 
-	try
-	{
-		Config* config = JNI_JLONG_TO_CONFIG(jOtherPtr);
+	Config* created = new Config(*config);
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			Config* created = new Config(*config);
-
-			jConfig = JNI_POINTER_TO_JLONG(created);
-		}
-	}
-	JNI_CATCH
+	jlong jConfig = JNI_POINTER_TO_JLONG(created);
 
 	return jConfig;
 }
@@ -148,46 +121,24 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Config_1
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_delete_1Config
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig)
 {
-	try
-	{
-		Config *config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+	Config *config = JNI_JLONG_TO_CONFIG(jConfigPtr);
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			delete config;
-		}
-	}
-	JNI_CATCH
+	delete config;
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1AddValue
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig, jstring jName, jstring jValue)
 {
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+	JStringManager value(jenv, jValue, true);
+
+	if (jvmOk(jenv, "Config.AddValue") && name.c_str() && value.c_str())
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			JStringManager name(jenv, jName);
-			JStringManager value(jenv, jValue, true);
-
-			if (jvmOk(jenv, "Config.AddValue") && name.c_str() && value.c_str())
-			{
-				config->addValue(name.c_str(), value.c_str());
-			}
-		}
+		config->addValue(name.c_str(), value.c_str());
 	}
-	JNI_CATCH
 }
 
 
@@ -196,25 +147,14 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Cl
 {
 	jboolean result = JNI_FALSE;
 
-	try
-	{
-		Status status;
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			JStringManager name(jenv, jName);
-			if (jvmOk(jenv, "Config.ClearValue"))
-			{
-				result = (config->clearValue(name.c_str()) ? JNI_TRUE : JNI_FALSE);
-			}
-		}
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Config.ClearValue"))
+	{
+		result = (config->clearValue(name.c_str()) ? JNI_TRUE : JNI_FALSE);
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -223,20 +163,9 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Cl
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Clear
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig)
 {
-	try
-	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			config->clear();
-		}
-	}
-	JNI_CATCH
+	config->clear();
 }
 
 
@@ -245,46 +174,35 @@ JNIEXPORT jobjectArray JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config
 {
 	jobjectArray jKeys = NULL;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	// Get native key set
+	std::vector<std::string> keys;
+	const char*              key = 0;
+	const char*              value = 0;
+
+	bool found = config->getFirst(key, value);
+
+	while (found)
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		keys.push_back(key);
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			// Get native key set
-			std::vector<std::string> keys;
-			const char*              key = 0;
-			const char*              value = 0;
-
-			bool found = config->getFirst(key, value);
-
-			while (found)
-			{
-				keys.push_back(key);
-
-				found = config->getNext(key, value);
-			}
-
-			// Convert native key set to JNI managed set
-			jclass stringClass = jenv->FindClass("java/lang/String");
-			jKeys = jenv->NewObjectArray((jsize) keys.size(), stringClass, 0);
-
-			int i = 0;
-			for (std::vector<std::string>::const_iterator it = keys.begin(); it != keys.end(); ++it)
-			{
-				key = it->c_str();
-
-				jstring jKey = makeJavaString(jenv, key);
-
-				jenv->SetObjectArrayElement(jKeys, i++, jKey);
-			}
-		}
+		found = config->getNext(key, value);
 	}
-	JNI_CATCH
+
+	// Convert native key set to JNI managed set
+	jclass stringClass = jenv->FindClass("java/lang/String");
+	jKeys = jenv->NewObjectArray(static_cast<jsize>(keys.size()), stringClass, 0);
+
+	int i = 0;
+	for (std::vector<std::string>::const_iterator it = keys.begin(); it != keys.end(); ++it)
+	{
+		key = it->c_str();
+
+		jstring jKey = makeJavaString(jenv, key);
+
+		jenv->SetObjectArrayElement(jKeys, i++, jKey);
+	}
 
 	return jKeys;
 }
@@ -295,46 +213,35 @@ JNIEXPORT jobjectArray JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config
 {
 	jobjectArray jValues = NULL;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	// Get native key set
+	std::vector<std::string> values;
+	const char*              key = 0;
+	const char*              value = 0;
+
+	bool found = config->getFirst(key, value);
+
+	while (found)
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		values.push_back(value);
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			// Get native key set
-			std::vector<std::string> values;
-			const char*              key = 0;
-			const char*              value = 0;
-
-			bool found = config->getFirst(key, value);
-
-			while (found)
-			{
-				values.push_back(value);
-
-				found = config->getNext(key, value);
-			}
-
-			// Convert native key set to JNI managed set
-			jclass stringClass = jenv->FindClass("java/lang/String");
-			jValues = jenv->NewObjectArray((jsize) values.size(), stringClass, 0);
-
-			int i = 0;
-			for (std::vector<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
-			{
-				value = it->c_str();
-
-				jstring jValue = makeJavaString(jenv, value);
-
-				jenv->SetObjectArrayElement(jValues, i++, jValue);
-			}
-		}
+		found = config->getNext(key, value);
 	}
-	JNI_CATCH
+
+	// Convert native key set to JNI managed set
+	jclass stringClass = jenv->FindClass("java/lang/String");
+	jValues = jenv->NewObjectArray((jsize) values.size(), stringClass, 0);
+
+	int i = 0;
+	for (std::vector<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
+	{
+		value = it->c_str();
+
+		jstring jValue = makeJavaString(jenv, value);
+
+		jenv->SetObjectArrayElement(jValues, i++, jValue);
+	}
 
 	return jValues;
 }
@@ -345,33 +252,22 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Get
 {
 	jstring result = NULL;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Config.GetValue"))
 	{
-		Status status;
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		const char* value = config->getValue(name.c_str());
 
-		if (!config)
+		if (value)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			JStringManager name(jenv, jName);
+			// Value will always be non-NULL, thus no need to use a try-catch block.
+			result = makeJavaString(jenv, value);
 
-			if (jvmOk(jenv, "Config.GetValue"))
-			{
-				const char* value = config->getValue(name.c_str());
-
-				if (value)
-				{
-					result = makeJavaString(jenv, value);
-
-					jvmOk(jenv, "Config.GetValue");
-				}
-			}
+			jvmOk(jenv, "Config.GetValue");
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -382,34 +278,23 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Get
 {
 	jstring result = NULL;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+	JStringManager defaultValue(jenv, jDefaultValue);
+
+	if (jvmOk(jenv, "Config.GetValue"))
 	{
-		Status status;
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+		const char* value = config->getValue(name.c_str(), defaultValue.c_str());
 
-		if (!config)
+		if (value)
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			JStringManager name(jenv, jName);
-			JStringManager defaultValue(jenv, jDefaultValue);
+			// Value will always be non-NULL, thus no need to use a try-catch block.
+			result = makeJavaString(jenv, value);
 
-			if (jvmOk(jenv, "Config.GetValue"))
-			{
-				const char* value = config->getValue(name.c_str(), defaultValue.c_str());
-
-				if (value)
-				{
-					result = makeJavaString(jenv, value);
-
-					jvmOk(jenv, "Config.GetValue");
-				}
-			}
+			jvmOk(jenv, "Config.GetValue");
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -421,32 +306,21 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Ge
 {
 	jboolean result = JNI_FALSE;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Config.GetBooleanValue"))
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+			result = (config->getBooleanValue(name.c_str()) ? JNI_TRUE : JNI_FALSE);
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager name(jenv, jName);
-
-			if (jvmOk(jenv, "Config.GetBooleanValue"))
-			{
-				try
-				{
-					result = (config->getBooleanValue(name.c_str()) ? JNI_TRUE : JNI_FALSE);
-				}
-				catch (const GmsecException& e)
-				{
-					ThrowGmsecException(jenv, e.what());
-				}
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -457,34 +331,21 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Ge
 {
 	jboolean result = JNI_FALSE;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Config.GetBooleanValue"))
 	{
-		Status status;
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+			result = (config->getBooleanValue(name.c_str(), (jDefaultResult == JNI_TRUE)) ? JNI_TRUE : JNI_FALSE);
 		}
-		else
+		catch (...)
 		{
-			JStringManager name(jenv, jName);
-
-			if (jvmOk(jenv, "Config.GetBooleanValue"))
-			{
-
-				try
-				{
-					result = (config->getBooleanValue(name.c_str(), (jDefaultResult == JNI_TRUE)) ? JNI_TRUE : JNI_FALSE);
-				}
-				catch (...)
-				{
-					result = jDefaultResult; 
-				}
-			}
+			result = jDefaultResult; 
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -495,32 +356,21 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1GetInt
 {
 	jint result = 0;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Config.GetIntegerValue"))
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+			result = config->getIntegerValue(name.c_str());
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager name(jenv, jName);
-
-			if (jvmOk(jenv, "Config.GetIntegerValue"))
-			{
-				try
-				{
-					result = config->getIntegerValue(name.c_str());
-				}
-				catch (const GmsecException& e)
-				{
-					ThrowGmsecException(jenv, e.what());
-				}
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -531,32 +381,21 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1GetInt
 {
 	jint result = 0;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Config.GetIntegerValue"))
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+			result = config->getIntegerValue(name.c_str(), static_cast<int>(jDefaultResult));
 		}
-		else
+		catch (...)
 		{
-			JStringManager name(jenv, jName);
-
-			if (jvmOk(jenv, "Config.GetIntegerValue"))
-			{
-				try
-				{
-					result = config->getIntegerValue(name.c_str(), (int) jDefaultResult);
-				}
-				catch (...)
-				{
-					result = jDefaultResult;
-				}
-			}
+			result = jDefaultResult;
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -567,32 +406,21 @@ JNIEXPORT jdouble JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Get
 {
 	jdouble result = 0;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Config.GetDoubleValue"))
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+			result = config->getDoubleValue(name.c_str());
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager name(jenv, jName);
-
-			if (jvmOk(jenv, "Config.GetDoubleValue"))
-			{
-				try
-				{
-					result = config->getDoubleValue(name.c_str());
-				}
-				catch (const GmsecException& e)
-				{
-					ThrowGmsecException(jenv, e.what());
-				}
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -603,32 +431,21 @@ JNIEXPORT jdouble JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Get
 {
 	jdouble result = 0;
 
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager name(jenv, jName);
+
+	if (jvmOk(jenv, "Config.GetDoubleValue"))
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+			result = config->getDoubleValue(name.c_str(), static_cast<double>(jDefaultResult));
 		}
-		else
+		catch (...)
 		{
-			JStringManager name(jenv, jName);
-
-			if (jvmOk(jenv, "Config.GetDoubleValue"))
-			{
-				try
-				{
-					result = config->getDoubleValue(name.c_str(), (double) jDefaultResult);
-				}
-				catch (...)
-				{
-					result = jDefaultResult;
-				}
-			}
+			result = jDefaultResult;
 		}
 	}
-	JNI_CATCH
 
 	return result;
 }
@@ -637,49 +454,22 @@ JNIEXPORT jdouble JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Get
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1Merge
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig, jlong jOtherConfigPtr, jobject jOtherConfig, jboolean overwriteExisting)
 {
-	try
-	{
-		Config* config      = JNI_JLONG_TO_CONFIG(jConfigPtr);
-		Config* otherConfig = JNI_JLONG_TO_CONFIG(jOtherConfigPtr);
+	Config* config      = JNI_JLONG_TO_CONFIG(jConfigPtr);
+	Config* otherConfig = JNI_JLONG_TO_CONFIG(jOtherConfigPtr);
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else if (!otherConfig)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Other Config reference is null");
-		}
-		else
-		{
-			config->merge(*otherConfig, (overwriteExisting == JNI_TRUE));
-		}
-	}
-	JNI_CATCH
+	config->merge(*otherConfig, (overwriteExisting == JNI_TRUE));
 }
 
 
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1ToXML
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig)
 {
-	jstring result;
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
 
-	try
-	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+	const char* xml = config->toXML();
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			const char* xml = config->toXML();
-
-			result = makeJavaString(jenv, xml);
-		}
-	}
-	JNI_CATCH
+	// XML content will never be NULL, thus no need for a try-catch block.
+	jstring result = makeJavaString(jenv, xml);
 
 	return result;
 }
@@ -688,32 +478,21 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1ToX
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1FromXML
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig, jstring inxml)
 {
-	try
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+
+	JStringManager xml(jenv, inxml);
+
+	if (jvmOk(jenv, "Config.FromXML"))
 	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
-
-		if (!config)
+		try
 		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
+			config->fromXML(xml.c_str());
 		}
-		else
+		catch (const GmsecException& e)
 		{
-			JStringManager xml(jenv, inxml);
-
-			if (jvmOk(jenv, "Config.FromXML"))
-			{
-				try
-				{
-					config->fromXML(xml.c_str());
-				}
-				catch (const GmsecException& e)
-				{
-					ThrowGmsecException(jenv, e.what());
-				}
-			}
+			ThrowGmsecException(jenv, e.what());
 		}
 	}
-	JNI_CATCH
 }
 
 
@@ -722,19 +501,22 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1GetFr
 {
 	jlong jConfig = 0;
 
-	try
-	{
-		JStringManager filename(jenv, jFilename);
-		JStringManager configName(jenv, jConfigName);
+	JStringManager filename(jenv, jFilename);
+	JStringManager configName(jenv, jConfigName);
 
-		if (jvmOk(jenv, "Config.getFromFile"))
+	if (jvmOk(jenv, "Config.getFromFile"))
+	{
+		try
 		{
 			Config config = Config::getFromFile(filename.c_str(), configName.c_str());
 
 			jConfig = JNI_POINTER_TO_JLONG(new Config(config));
 		}
+		catch (const GmsecException& e)
+		{
+			ThrowGmsecException(jenv, e.what());
+		}
 	}
-	JNI_CATCH
 
 	return jConfig;
 }
@@ -743,24 +525,12 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1GetFr
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Config_1ToJSON
   (JNIEnv *jenv, jclass jcls, jlong jConfigPtr, jobject jConfig)
 {
-	jstring result;
+	Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
 
-	try
-	{
-		Config* config = JNI_JLONG_TO_CONFIG(jConfigPtr);
+	const char* json = config->toJSON();
 
-		if (!config)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Config reference is null");
-		}
-		else
-		{
-			const char* json = config->toJSON();
-
-			result = makeJavaString(jenv, json);
-		}
-	}
-	JNI_CATCH
+	// JSON content will never be NULL, thus no need for a try-catch block.
+	jstring result = makeJavaString(jenv, json);
 
 	return result;
 }

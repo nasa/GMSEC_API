@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,6 +14,7 @@ package gov.nasa.gsfc.gmsec.api5;
 
 import gov.nasa.gsfc.gmsec.api5.field.*;
 import gov.nasa.gsfc.gmsec.api5.jni.JNIMessage;
+import gov.nasa.gsfc.gmsec.api5.jni.field.JNIField;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -29,7 +30,9 @@ public class Message
 	private JNIMessage m_jniMessage = null;
 
 
+	//! @cond
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param child A JNIMessage object.
 	 */
@@ -40,6 +43,7 @@ public class Message
 
 
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param msg A Message object.
 	 * @return A JNIMessage object.
@@ -48,6 +52,7 @@ public class Message
 	{
 		return (msg == null ? null : msg.m_jniMessage);
 	}
+	//! @endcond
 
 
 	/**
@@ -157,7 +162,9 @@ public class Message
 
 	/**
 	 * Constructor.
+	 * It is recommend to destroy the %Message object when it is no longer needed.
 	 *
+	 * @see destroy
 	 * @see MessageFactory
 	 */
 	public Message()
@@ -168,10 +175,13 @@ public class Message
 
 	/**
 	 * Copy constructor.
+	 * It is recommend to destroy the %Message object when it is no longer needed.
 	 *
 	 * @param other The other message object to copy.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given Message object is null.
+	 * @throws IllegalArgumentException Thrown if the given %Message object is null.
+	 *
+	 * @see destroy
 	 */
 	public Message(Message other) throws IllegalArgumentException
 	{
@@ -190,6 +200,8 @@ public class Message
      * Some middleware can retain a delivered message in a queue until said time
      * the message has been acknowledged as being processed. Should the message not be
      * acknowledged, the middleware can deliver the message to another subscriber client.
+	 * For middleware that do not support this feature, a call to %acknowledge() will
+	 * perform a no-op.
      */
     public void acknowledge()
 	{
@@ -206,6 +218,8 @@ public class Message
 	 * @see Connection#receive
 	 * @see Connection#receive(int)
 	 * @see Connection#request(Message, int, int)
+	 * @see MessageFactory#createMessage()
+	 * @see MessageFactory#createMessage(String)
 	 */
 	public static void destroy(Message msg)
 	{
@@ -296,7 +310,7 @@ public class Message
 	 *
 	 * @return Returns true if the field was replaced; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required
 	 * by the field, or if the string is too big when converting to char.
 	 */
@@ -308,6 +322,11 @@ public class Message
 			throw new IllegalArgumentException("Field name cannot be null, nor be an empty string");
 		}
 
+		if (!JNIField.isFieldNameCompliant(fieldName))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
+		}
+
 		return m_jniMessage.setFieldValue(fieldName, value);
 	}
 
@@ -326,7 +345,7 @@ public class Message
 	 *
 	 * @return Returns true if the field was replaced; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required by the field.
 	 */
 	public boolean setFieldValue(String fieldName, int value)
@@ -337,33 +356,9 @@ public class Message
 			throw new IllegalArgumentException("Field name cannot be null, nor be an empty string");
 		}
 
-		return m_jniMessage.setFieldValue(fieldName, value);
-	}
-
-
-	/**
-	 * Adds/replaces a field with the given name and value to the message. If
-	 * a field template for the schema in use is available for the named field, then
-	 * the value's type will be coerced to match that which is described in the field
-	 * template.
-	 *
-	 * Note: This method is not very efficient; if the type of the field is known,
-	 * consider calling addField() instead.
-	 * 
-	 * @param fieldName Name of the field to be modified/created
-	 * @param value The value of the field. The value's type is automatically determined based on the message schema.
-	 *
-	 * @return Returns true if the field was replaced; false otherwise.
-	 *
-	 * @throws IllegalArgumentException Thrown if the field name is null or contains an empty string.
-	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required by the field.
-	 */
-	public boolean setFieldValue(String fieldName, long value)
-		throws IllegalArgumentException, GmsecException
-	{
-		if (fieldName == null || fieldName.isEmpty())
+		if (!JNIField.isFieldNameCompliant(fieldName))
 		{
-			throw new IllegalArgumentException("Field name cannot be null, nor be an empty string");
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.setFieldValue(fieldName, value);
@@ -384,7 +379,41 @@ public class Message
 	 *
 	 * @return Returns true if the field was replaced; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
+	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required by the field.
+	 */
+	public boolean setFieldValue(String fieldName, long value)
+		throws IllegalArgumentException, GmsecException
+	{
+		if (fieldName == null || fieldName.isEmpty())
+		{
+			throw new IllegalArgumentException("Field name cannot be null, nor be an empty string");
+		}
+
+		if (!JNIField.isFieldNameCompliant(fieldName))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
+		}
+
+		return m_jniMessage.setFieldValue(fieldName, value);
+	}
+
+
+	/**
+	 * Adds/replaces a field with the given name and value to the message. If
+	 * a field template for the schema in use is available for the named field, then
+	 * the value's type will be coerced to match that which is described in the field
+	 * template.
+	 *
+	 * Note: This method is not very efficient; if the type of the field is known,
+	 * consider calling addField() instead.
+	 * 
+	 * @param fieldName Name of the field to be modified/created
+	 * @param value The value of the field. The value's type is automatically determined based on the message schema.
+	 *
+	 * @return Returns true if the field was replaced; false otherwise.
+	 *
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws GmsecException Thrown if the input value's type cannot be converted into the type required by the field.
 	 */
 	public boolean setFieldValue(String fieldName, double value)
@@ -393,6 +422,11 @@ public class Message
 		if (fieldName == null || fieldName.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name cannot be null, nor be an empty string");
+		}
+
+		if (!JNIField.isFieldNameCompliant(fieldName))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.setFieldValue(fieldName, value);
@@ -464,6 +498,38 @@ public class Message
 
 
 	/**
+	 * Allows for the setting of individual subject elements. The name of the elements are defined
+	 * by the message's corresponding message template. This value will be overridden by automatic subject
+	 * generation if the subject element is defined by an existing field in the message, or if the subject
+	 * was manually defined with setSubject.
+	 *
+	 * @param name - the name of the subject element
+	 * @param value - the value of the subject element. An empty or null value will be seen as FILL in the subject line.
+	 *
+	 * @throws IllegalArgumentException Thrown if the name is NULL, an empty string, or does not match a 
+	 * subject element name defined the message template
+	 * @throws GmsecException Thrown if the message does not have a corresponding message template.
+	 */
+	public void setSubjectElement(String name, String value)
+		throws IllegalArgumentException, GmsecException
+	{
+		if (name == null || name.isEmpty())
+		{
+			throw new IllegalArgumentException("Name is null or contains an empty string");
+		}
+		else if (value == null || name.isEmpty())
+		{
+			m_jniMessage.setSubjectElement(name, "FILL");
+		}
+		else
+		{
+			m_jniMessage.setSubjectElement(name, value);
+		}
+
+	}
+
+
+	/**
 	 * This method sets the message kind. The API can auto-deduce the message kind, but there
 	 * may be cases where this method may be useful. For most common Use Cases, this method
 	 * should not need to be called.
@@ -515,7 +581,7 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws IllegalArgumentException Thrown if the given byte array is null.
 	 */
 	public boolean addField(String name, byte[] data) throws IllegalArgumentException
@@ -523,6 +589,10 @@ public class Message
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 		if (data == null)
 		{
@@ -541,13 +611,17 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 */
 	public boolean addField(String name, boolean data) throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.addField(name, data);
@@ -562,13 +636,17 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 */
 	public boolean addField(String name, char data) throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.addField(name, data);
@@ -583,13 +661,17 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 */
 	public boolean addField(String name, byte data) throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.addField(name, data);
@@ -604,13 +686,17 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 */
 	public boolean addField(String name, short data) throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.addField(name, data);
@@ -625,13 +711,17 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 */
 	public boolean addField(String name, int data) throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.addField(name, data);
@@ -646,13 +736,17 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 */
 	public boolean addField(String name, long data) throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.addField(name, data);
@@ -667,7 +761,7 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws IllegalArgumentException Thrown if the given data object is null.
 	 */
 	public boolean addField(String name, U8 data) throws IllegalArgumentException
@@ -675,6 +769,10 @@ public class Message
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 		if (data == null)
 		{
@@ -693,7 +791,7 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws IllegalArgumentException Thrown if the given data object is null.
 	 */
 	public boolean addField(String name, U16 data) throws IllegalArgumentException
@@ -701,6 +799,10 @@ public class Message
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 		if (data == null)
 		{
@@ -719,7 +821,7 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws IllegalArgumentException Thrown if the given data object is null.
 	 */
 	public boolean addField(String name, U32 data) throws IllegalArgumentException
@@ -727,6 +829,10 @@ public class Message
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 		if (data == null)
 		{
@@ -745,7 +851,7 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws IllegalArgumentException Thrown if the given data object is null.
 	 */
 	public boolean addField(String name, U64 data) throws IllegalArgumentException
@@ -753,6 +859,10 @@ public class Message
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 		if (data == null)
 		{
@@ -771,13 +881,17 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 */
 	public boolean addField(String name, float data) throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.addField(name, data);
@@ -792,13 +906,17 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 */
 	public boolean addField(String name, double data) throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 
 		return m_jniMessage.addField(name, data);
@@ -813,7 +931,7 @@ public class Message
 	 *
 	 * @return Returns true if the field is replacing one with the same name; false otherwise.
 	 *
-	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the field name is null, is an empty string, or is not compliant.
 	 * @throws IllegalArgumentException Thrown if the given data value is null or contains an empty string.
 	 */
 	public boolean addField(String name, String data) throws IllegalArgumentException
@@ -821,6 +939,10 @@ public class Message
 		if (name == null || name.isEmpty())
 		{
 			throw new IllegalArgumentException("Field name is null or contains an empty string");
+		}
+		if (!JNIField.isFieldNameCompliant(name))
+		{
+			throw new IllegalArgumentException("Field name is not compliant");
 		}
 		if (data == null)
 		{
@@ -891,7 +1013,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a string value.
 	 */
-	public String getStringValue(String fieldName) throws IllegalArgumentException, GmsecException
+	public String getStringValue(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -914,7 +1037,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a boolean value.
 	 */
-	public boolean getBooleanValue(String fieldName) throws IllegalArgumentException, GmsecException
+	public boolean getBooleanValue(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -936,7 +1060,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to an integer.
 	 */
-	public short getI16Value(String fieldName) throws IllegalArgumentException, GmsecException
+	public short getI16Value(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -958,7 +1083,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to an integer.
 	 */
-	public int getI32Value(String fieldName) throws IllegalArgumentException, GmsecException
+	public int getI32Value(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -980,7 +1106,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to an integer.
 	 */
-	public long getI64Value(String fieldName) throws IllegalArgumentException, GmsecException
+	public long getI64Value(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -1002,7 +1129,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a U16.
 	 */
-	public U16 getU16Value(String fieldName) throws IllegalArgumentException, GmsecException
+	public U16 getU16Value(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -1024,7 +1152,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a U32.
 	 */
-	public U32 getU32Value(String fieldName) throws IllegalArgumentException, GmsecException
+	public U32 getU32Value(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -1046,7 +1175,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a U64.
 	 */
-	public U64 getU64Value(String fieldName) throws IllegalArgumentException, GmsecException
+	public U64 getU64Value(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -1068,7 +1198,8 @@ public class Message
 	 * @throws GmsecException Thrown if the field cannot be found, or if it cannot successfully
 	 * be converted to a floating-point value.
 	 */
-	public double getF64Value(String fieldName) throws IllegalArgumentException, GmsecException
+	public double getF64Value(String fieldName)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (fieldName == null || fieldName.isEmpty())
 		{
@@ -1102,7 +1233,8 @@ public class Message
 	 *
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 */
-	public Field getField(String name) throws IllegalArgumentException
+	public Field getField(String name)
+		throws IllegalArgumentException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1123,7 +1255,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found.
 	 */
-	public Field.Type getFieldType(String name) throws IllegalArgumentException, GmsecException
+	public Field.Type getFieldType(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1144,7 +1277,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not a BinaryField.
 	 */
-	public BinaryField getBinaryField(String name) throws IllegalArgumentException, GmsecException
+	public BinaryField getBinaryField(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1165,7 +1299,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not a BooleanField.
 	 */
-	public BooleanField getBooleanField(String name) throws IllegalArgumentException, GmsecException
+	public BooleanField getBooleanField(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1186,7 +1321,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not a CharField.
 	 */
-	public CharField getCharField(String name) throws IllegalArgumentException, GmsecException
+	public CharField getCharField(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1207,7 +1343,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not an F32Field.
 	 */
-	public F32Field getF32Field(String name) throws IllegalArgumentException, GmsecException
+	public F32Field getF32Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1228,7 +1365,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not an F32Field.
 	 */
-	public F64Field getF64Field(String name) throws IllegalArgumentException, GmsecException
+	public F64Field getF64Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1249,7 +1387,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not an I8Field.
 	 */
-	public I8Field getI8Field(String name) throws IllegalArgumentException, GmsecException
+	public I8Field getI8Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1270,7 +1409,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not an I16Field.
 	 */
-	public I16Field getI16Field(String name) throws IllegalArgumentException, GmsecException
+	public I16Field getI16Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1291,7 +1431,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not an I32Field.
 	 */
-	public I32Field getI32Field(String name) throws IllegalArgumentException, GmsecException
+	public I32Field getI32Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1312,7 +1453,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not an I64Field.
 	 */
-	public I64Field getI64Field(String name) throws IllegalArgumentException, GmsecException
+	public I64Field getI64Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1333,7 +1475,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not a U8Field.
 	 */
-	public U8Field getU8Field(String name) throws IllegalArgumentException, GmsecException
+	public U8Field getU8Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1354,7 +1497,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not a U16Field.
 	 */
-	public U16Field getU16Field(String name) throws IllegalArgumentException, GmsecException
+	public U16Field getU16Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1396,7 +1540,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not a U16Field.
 	 */
-	public U64Field getU64Field(String name) throws IllegalArgumentException, GmsecException
+	public U64Field getU64Field(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1417,7 +1562,8 @@ public class Message
 	 * @throws IllegalArgumentException Thrown if the given field name is null or contains an empty string.
 	 * @throws GmsecException Thrown if the field cannot be found or is not a StringField.
 	 */
-	public StringField getStringField(String name) throws IllegalArgumentException, GmsecException
+	public StringField getStringField(String name)
+		throws IllegalArgumentException, GmsecException
 	{
 		if (name == null || name.isEmpty())
 		{
@@ -1449,7 +1595,8 @@ public class Message
 	 *
 	 * @throws IllegalArgumentException Thrown if the given Message object is null.
 	 */
-	public void	copyFields(Message toMsg) throws IllegalArgumentException
+	public void copyFields(Message toMsg)
+		throws IllegalArgumentException
 	{
 		if (toMsg == null)
 		{

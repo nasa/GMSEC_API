@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -21,7 +21,7 @@ SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_INC        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/csharp -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
 SWIG_NAMESPACE  = GMSEC.API5
-SWIG_OPTS       = -c++ -csharp -namespace $(SWIG_NAMESPACE) $(SWIG_INC) -DCHAR_BIT=8 -DGMSEC_S16IL32LL64=1
+SWIG_OPTS       = -c++ -csharp -namespace $(SWIG_NAMESPACE) $(SWIG_INC) -DCHAR_BIT=8 -DSWIG_BINDING
 
 FRAMEWORK_DIR   = ../../framework
 

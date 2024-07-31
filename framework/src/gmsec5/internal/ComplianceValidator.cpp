@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -130,6 +130,46 @@ Status ComplianceValidator::validateMessage(const Message& msg)
 
 				status.setReason(err.c_str());
 			}
+			else
+			{
+				// Check if tracking fields need to be validated
+				bool checkTrackingFields = false;
+				intMsg.getDetails().getBoolean(GMSEC_CHECK_TRACKING_FIELDS, checkTrackingFields);
+
+				if (checkTrackingFields)
+				{
+					//The accumulated error messages (if any)
+					std::string errorList;
+
+					const TrackingDetails& msgTracking = MessageBuddy::getInternal(msg).getTracking();
+
+					MessageFieldIterator& iter = msg.getFieldIterator();
+
+					while (iter.hasNext())
+					{
+						const Field& field = iter.next();
+
+						//When message is being sent, disallow tracking fields (these are reserved for use by the API)
+						Status status = checkTrackingField(field.getName(), m_configTracking, msgTracking);
+
+						if (status.hasError())
+						{
+							errorList.append(status.getReason()).append(NEWLINE_INDENT1);
+						}
+					}
+					if (!errorList.empty())
+					{
+						size_t pos = errorList.rfind("\n");
+						errorList = errorList.substr(0, pos);
+
+						std::string err = subject;
+						err.append(": Message Validation Failed.");
+						err.append(NEWLINE_INDENT1).append(errorList);
+
+						status = Status(MSG_ERROR, MESSAGE_FAILED_VALIDATION, err.c_str());
+					}
+				}
+			}
 		}
 	}
 
@@ -209,13 +249,15 @@ Status ComplianceValidator::compare(const InternalMessage& msg, const FieldTempl
 						(*it2)->checkDependencies(msg);
 						if (StringUtil::stringEqualsIgnoreCase((*it2)->getMode().c_str(), "OPTIONAL"))
 						{
-							(*it2)->resetDependencies();
+							(*it2)->resetCheckedDependencies();
 							skipArray = true;
 							break;
 						}
-						(*it2)->resetDependencies();
+						(*it2)->resetCheckedDependencies();
 					}
-					if (StringUtil::stringEqualsIgnoreCase(fieldName.c_str(), arraySizeName.c_str()) && StringUtil::stringEqualsIgnoreCase((*it2)->getMode().c_str(), "OPTIONAL"))
+					if (StringUtil::stringEqualsIgnoreCase(fieldName.c_str(), arraySizeName.c_str()) &&
+						(StringUtil::stringEqualsIgnoreCase((*it2)->getMode().c_str(), "OPTIONAL") ||
+						StringUtil::stringEqualsIgnoreCase((*it2)->getMode().c_str(), "TRACKING")))
 					{
 						//we have determined the array is optional and we will be skipping it
 						skipArray = true;
@@ -264,8 +306,11 @@ Status ComplianceValidator::compare(const InternalMessage& msg, const FieldTempl
 			validFieldNames.append(" ").append(temp->getModifiedName()).append(" ");
 		}
 
+
 		//begin validation process for the field
-		if (temp->getMode() == "REQUIRED")
+		if (temp->getMode() == "REQUIRED" ||
+			temp->getMode() == "OPTIONAL" ||
+			temp->getMode() == "TRACKING")
 		{
 			temp->checkDependencies(msg);
 			Status valStatus = validate(msg, *temp);
@@ -274,18 +319,7 @@ Status ComplianceValidator::compare(const InternalMessage& msg, const FieldTempl
 			{
 				errorList.append(valStatus.getReason()).append(NEWLINE_INDENT1);
 			}
-			temp->resetDependencies();
-		}
-		else if (temp->getMode() == "OPTIONAL")
-		{
-			temp->checkDependencies(msg);
-			Status valStatus = validate(msg, *temp);
-
-			if (valStatus.hasError())
-			{
-				errorList.append(valStatus.getReason()).append(NEWLINE_INDENT1);
-			}
-			temp->resetDependencies();
+			temp->resetCheckedDependencies();
 		}
 
 		// Regardless of validation level, always validate content of the message fields
@@ -296,28 +330,17 @@ Status ComplianceValidator::compare(const InternalMessage& msg, const FieldTempl
 		}
 	}//loop until we're done running through all the field templates
 
-	// Check if tracking fields need to be validated.
-	bool msgBeingSent = false;
-	msg.getDetails().getBoolean(GMSEC_MSG_BEING_SENT, msgBeingSent);
+	bool checkTrackingFields = false;
+	msg.getDetails().getBoolean(GMSEC_CHECK_TRACKING_FIELDS, checkTrackingFields);
 
-	const TrackingDetails& msgTracking = const_cast<InternalMessage&>(msg).getTracking();
+	TrackingDetails& msgTracking = const_cast<InternalMessage&>(msg).getTracking();
+
 	const MessageFieldIterator& iter = const_cast<InternalMessage&>(msg).getFieldIterator();
 
 	//Iterate through all the fields in the message, check for API reserved and, if necessary, extraneous fields
 	while (iter.hasNext())
 	{
 		const Field& field = iter.next();
-
-		//When message is being sent, disallow tracking fields (these are reserved for use by the API).
-		if (msgBeingSent && isApiReservedField(field.getName()))
-		{
-			Status status = checkTrackingField(field.getName(), m_configTracking, msgTracking);
-
-			if (status.hasError())
-			{
-				errorList.append(status.getReason()).append(NEWLINE_INDENT1);
-			}
-		}
 
 		//Disallow extraneous fields
 		std::string fieldName = " ";
@@ -328,6 +351,15 @@ Status ComplianceValidator::compare(const InternalMessage& msg, const FieldTempl
 			err << "Message contains user-defined field " << field.getName();
 			Status error(MSG_ERROR, NON_ALLOWED_FIELD, err.str().c_str());
 			if (errorList.find(err.str()) == std::string::npos) errorList.append(error.getReason()).append(NEWLINE_INDENT1);
+		}
+		else if (checkTrackingFields)
+		{
+			Status status = checkTrackingField(fieldName.c_str(), m_configTracking, msgTracking);
+
+			if (status.hasError())
+			{
+				errorList.append(status.getReason()).append(NEWLINE_INDENT1);
+			}
 		}
 	}
 
@@ -719,7 +751,7 @@ Status ComplianceValidator::validateContent(const InternalMessage& msg, const Fi
 
 	const Field* msgField = msg.getField(ftmp.getModifiedName().c_str());
 
-	if (msgField != NULL && !isApiReservedField(msgField->getName()))
+	if (msgField != NULL && ftmp.getMode() != "TRACKING")
 	{
 		if ((ftmp.getPattern() == "HEADER_STRING_Type") && !StringUtil::isValidHeaderString(msgField->getStringValue()))
 		{
@@ -754,69 +786,6 @@ Status ComplianceValidator::validateContent(const InternalMessage& msg, const Fi
 	}
 
 	return status;
-}
-
-bool ComplianceValidator::isApiReservedField(const char* fieldName)
-{
-	bool reserved = false;
-
-#if defined(WIN32) || defined(__APPLE__) || (GCC_VERSION >= 40900)
-
-	static const char* reservedFields[] =
-	{
-		"CONNECTION-ID",
-		"MW-INFO",
-		"NODE",
-		"PROCESS-ID",
-		"PUBLISH-TIME",
-		"UNIQUE-ID",
-		"USER-NAME",
-		"NUM-OF-SUBSCRIPTIONS",
-		"SUBSCRIPTION.(.*).SUBJECT-PATTERN",
-		"CONNECTION-ENDPOINT",
-		"MW-CONNECTION-ENDPOINT",
-		NULL
-	};
-
-	for (size_t i = 0; !reserved && reservedFields[i]; ++i)
-	{
-		reserved = std::regex_match(fieldName, std::regex(reservedFields[i]));
-	}
-
-#else
-
-	//TODO: Remove once support for RHEL/CentOS 7 is dropped
-	static const char* reservedFields[] =
-	{
-		"CONNECTION-ID",
-		"MW-INFO",
-		"NODE",
-		"PROCESS-ID",
-		"PUBLISH-TIME",
-		"UNIQUE-ID",
-		"USER-NAME",
-		"NUM-OF-SUBSCRIPTIONS",
-		"SUBSCRIPTION.%d.SUBJECT-PATTERN",
-		"CONNECTION-ENDPOINT",
-		"MW-CONNECTION-ENDPOINT",
-		NULL
-	};
-
-	for (size_t i = 0; !reserved && reservedFields[i]; ++i)
-	{
-		if ((std::string(fieldName).find("SUBSCRIPTION") != std::string::npos) && (std::string(fieldName).find("SUBJECT-PATTERN") != std::string::npos))
-		{
-			reserved = true;
-		}
-		else
-		{
-			reserved = (std::string(fieldName) == reservedFields[i]);
-		}
-	}
-
-#endif
-
-	return reserved;
 }
 
 

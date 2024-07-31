@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -40,7 +40,7 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# ==== Raises
 		#
-		# A GmsecException is thrown if the name is nil, or is an empty string.
+		# A GmsecException is thrown if the name is nil, is an empty string, or is otherwise non-compliant.
 		#
 		def initialize(name, data, data_length, is_header)
 		end

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -59,10 +59,13 @@ ConnectionInterface* ConnectionFactory::create(const Config& config)
 	}
 	else
 	{
-		value = config.getValue("ConnectionType");
+		value = config.getValue(GMSEC_CONN_TYPE);
 
 		if (value)
 		{
+			GMSEC_WARNING << "The " << GMSEC_CONN_TYPE << " configuration option is deprecated; use "
+			              << GMSEC_MIDDLEWARE_ID << " instead, sans the 'gmsec_'";
+
 			libname = value;
 		}
 		else

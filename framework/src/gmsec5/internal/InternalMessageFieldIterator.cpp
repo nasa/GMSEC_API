@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -79,6 +79,9 @@ void InternalMessageFieldIterator::setSelector(MessageFieldIterator::Selector se
 	case MessageFieldIterator::Selector::NON_HEADER_FIELDS:
 		m_selector = selectNonHeaderFields;
 		break;
+	case MessageFieldIterator::Selector::TRACKING_FIELDS:
+		m_selector = selectTrackingFields;
+		break;
 	}
 }
 
@@ -126,4 +129,10 @@ bool InternalMessageFieldIterator::selectHeaderFields(const Field& field)
 bool InternalMessageFieldIterator::selectNonHeaderFields(const Field& field)
 {
 	return !field.isHeader();
+}
+
+
+bool InternalMessageFieldIterator::selectTrackingFields(const Field& field)
+{
+	return field.isTracking();
 }

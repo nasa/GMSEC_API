@@ -584,6 +584,58 @@ void test_messageSetSubject()
 }
 
 
+void test_messageSetSubjectElement()
+{
+	GMSEC_INFO("Test messageSetSubjectElement()");
+
+	GMSEC_Status         status = statusCreate();
+	GMSEC_MessageFactory factory = messageFactoryCreate(status);
+
+	setStandardFields(factory);
+
+	GMSEC_Message msg = messageFactoryCreateMessage(factory, "TLMPROC", NULL);
+
+	//o Nominal test
+	{
+		messageSetSubjectElement(msg, "ME4", "FOOEY", status);
+		testCheckBool("Unexpected error setting subject", statusHasError(status) == GMSEC_FALSE);
+		testCheckBool("Message has unexpected subject", strcompare(messageGetSubject(msg, NULL), "C2MS.MY-DOMAIN-1.MY-DOMAIN-2.MY-MISSION.MY-CONSTELLATION.MY-SAT-ID.MSG.TLMPROC.MY-COMPONENT.FILL.FILL.FOOEY") == 0);
+	}
+	
+	//o Off-nominal tests
+	{
+		// Message is NULL
+		messageSetSubjectElement(NULL, "ME4", "FOOEY", status);
+		testCheckBool("Expected an error", statusHasError(status) == GMSEC_TRUE);
+	}
+
+	{
+		// Name is NULL
+		messageSetSubjectElement(msg, NULL, "FOOEY", status);
+		testCheckBool("Expected an error setting name subject to NULL", statusHasError(status) == GMSEC_TRUE);
+		testCheckBool(statusGetReason(status), strcontains(statusGetReason(status), "Subject element name cannot be NULL or empty string") == 0);
+	}
+
+	{
+		// name is empty string
+		messageSetSubjectElement(msg, "", "FOOEY", status);
+		testCheckBool("Expected an error setting name to empty string", statusHasError(status) == GMSEC_TRUE);
+		testCheckBool(statusGetReason(status), strcontains(statusGetReason(status), "Subject element name cannot be NULL or empty string") == 0);
+	}
+
+	{
+		// name is invalid
+		messageSetSubjectElement(msg, "ME9000", "FOOEY", status);
+		testCheckBool("Expected an error using invalid name", statusHasError(status) == GMSEC_TRUE);
+		testCheckBool(statusGetReason(status), strcontains(statusGetReason(status), "Message does not have a subject element named ME9000") == 0);
+	}
+	
+	messageDestroy(&msg);
+	messageFactoryDestroy(&factory);
+	statusDestroy(&status);
+}
+
+
 void test_messageGetSubject()
 {
 	GMSEC_INFO("Test messageGetSubject()");
@@ -683,7 +735,7 @@ void test_messageGetKind()
 		GMSEC_Message msg2 = messageFactoryCreateMessage(factory, "REQ.DIR", NULL);
 		GMSEC_Message msg3 = messageFactoryCreateMessage(factory, "RESP.DIR", NULL);
 		GMSEC_Message msg4 = messageFactoryCreateSimpleMessage(factory, NULL);
-		GMSEC_Message msg5 = messageCreate(NULL);
+		GMSEC_Message msg5 = messageCreate();
 
 		testCheckBool("Message 1 has unexpected kind", messageGetKind(msg1, NULL) == GMSEC_PUBLISH);
 		testCheckBool("Message 2 has unexpected kind", messageGetKind(msg2, NULL) == GMSEC_REQUEST);
@@ -715,7 +767,7 @@ void test_messageAddField()
 	GMSEC_INFO("Test messageAddField()");
 
 	GMSEC_Status  status = statusCreate();
-	GMSEC_Message msg    = messageCreate(NULL);
+	GMSEC_Message msg    = messageCreate();
 	GMSEC_Field   field1 = stringFieldCreate("MY-FIELD", "MY-VALUE", GMSEC_FALSE, NULL);
 	GMSEC_Field   field2 = i32FieldCreate("MY-FIELD", 10, GMSEC_FALSE, NULL);
 
@@ -757,7 +809,7 @@ void test_messageAddXXXField()
 	GMSEC_INFO("Test messageAddXXXField()");
 
 	GMSEC_Status  status = statusCreate();
-	GMSEC_Message msg    = messageCreate(NULL);
+	GMSEC_Message msg    = messageCreate();
 
 	// Nominal tests
 	{
@@ -914,7 +966,7 @@ void test_messageAddFields()
 	GMSEC_INFO("Test messageAddFields()");
 
 	GMSEC_Status  status = statusCreate();
-	GMSEC_Message msg    = messageCreate(NULL);
+	GMSEC_Message msg    = messageCreate();
 
 	GMSEC_Field fields[3];
 	fields[0] = stringFieldCreate("ONE", "uno", GMSEC_FALSE, NULL);
@@ -1210,7 +1262,7 @@ void test_messageGetBooleanValue()
 	GMSEC_INFO("Test messageGetBooleanValue()");
 
 	GMSEC_Status  status = statusCreate();
-	GMSEC_Message msg    = messageCreate(NULL);
+	GMSEC_Message msg    = messageCreate();
 
 	messageAddI32Field(msg, "FIELD-1", 0, NULL);
 	messageAddI32Field(msg, "FIELD-2", 1, NULL);
@@ -2313,6 +2365,7 @@ int test_Message()
 	test_messageSetFieldValue();    // also tests other variances of the function (e.g. I32, U32, etc.)
 	test_messageSetConfig();        // also tests messageGetConfig()
 	test_messageSetSubject();
+	test_messageSetSubjectElement();
 	test_messageGetSubject();
 	test_messageSetKind();
 	test_messageGetKind();

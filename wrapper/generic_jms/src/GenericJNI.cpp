@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -27,9 +27,6 @@ namespace gmsec_generic_jms
 
 using namespace gmsec::api5;
 using namespace gmsec::api5::util;
-
-
-static const int DEBUG_CLASSLOADER = 1;
 
 
 JNILookup::JNILookup(JNIEnv *e, bool global)
@@ -75,7 +72,7 @@ jmethodID JNILookup::getMethod(jclass klazz, const char *name, const char *signa
 {
 	jmethodID mid = jenv->GetMethodID(klazz, name, signature);
 	if (!mid)
-		throw JNIException("JNILookup.getMethod: invalid method " + std::string(name) + " / " + signature);
+		throw JNIException(std::string("JNILookup.getMethod: invalid method ") + name + " / " + signature);
 	return mid;
 }
 
@@ -228,51 +225,23 @@ void updateClassLoader(JNIEnv *env)
 	JNILookup lookup(env, false);
 
 	jclass class_ClassLoader = lookup.getClass("java/lang/ClassLoader");
-if (DEBUG_CLASSLOADER)
-{
-	GMSEC_VERBOSE << "Classloader class: " << class_ClassLoader;
-}
 
 	jmethodID method_getSystemClassLoader = lookup.getStaticMethod(class_ClassLoader,
 			"getSystemClassLoader", "()Ljava/lang/ClassLoader;");
-if (DEBUG_CLASSLOADER)
-{
-	GMSEC_VERBOSE << "method_getSystemClassLoader: " << method_getSystemClassLoader;
-}
 
 	jobject cobj = env->CallStaticObjectMethod(class_ClassLoader,
 			method_getSystemClassLoader);
-if (DEBUG_CLASSLOADER)
-{
-	GMSEC_VERBOSE << "updateClassLoader: getSystemClassLoader=" << cobj;
-}
 
 	jclass class_Thread = lookup.getClass("java/lang/Thread");
-if (DEBUG_CLASSLOADER)
-{
-	GMSEC_VERBOSE << "class_Thread: " << class_Thread;
-}
 
 	jmethodID method_currentThread = lookup.getStaticMethod(class_Thread,
 			"currentThread", "()Ljava/lang/Thread;");
-if (DEBUG_CLASSLOADER)
-{
-	GMSEC_VERBOSE << "method_currentThread: " << method_currentThread;
-}
 
 	jobject tobj = env->CallStaticObjectMethod(class_Thread,
 		method_currentThread);
-if (DEBUG_CLASSLOADER)
-{
-	GMSEC_VERBOSE << "currentThread=" << tobj;
-}
 
 	jmethodID method_setContextClassLoader = lookup.getMethod(class_Thread,
 			"setContextClassLoader", "(Ljava/lang/ClassLoader;)V");
-if (DEBUG_CLASSLOADER)
-{
-	GMSEC_VERBOSE << "method_setContextClassLoader: " << method_setContextClassLoader;
-}
 	env->CallVoidMethod(tobj, method_setContextClassLoader, cobj);
 
 	checkJVM(env, "setContextClassLoader");

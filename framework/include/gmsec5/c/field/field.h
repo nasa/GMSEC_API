@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -119,6 +119,22 @@ extern "C"
 	 * @return Returns GMSEC_TRUE if a header field; GMSEC_FALSE otherwise.
 	 */
 	GMSEC_API GMSEC_BOOL fieldIsHeader(GMSEC_Field field, GMSEC_Status status);
+
+
+	/**
+	 * @fn GMSEC_BOOL fieldIsTracking(GMSEC_Field field, GMSEC_Status status)
+	 *
+	 * @brief Returns whether the Field represents a GMSEC API tracking field.
+	 *
+	 * @note A status object MUST BE CREATED with statusCreate() and
+	 * passed in as the status parameter in order to receive any resulting status.
+	 *
+	 * @param[in]  field  - handle to the field.
+	 * @param[out] status - operation result status
+	 *
+	 * @return Returns GMSEC_TRUE if a tracking field; GMSEC_FALSE otherwise.
+	 */
+	GMSEC_API GMSEC_BOOL fieldIsTracking(GMSEC_Field field, GMSEC_Status status);
 
 
 	/**

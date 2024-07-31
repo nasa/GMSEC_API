@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -42,13 +42,6 @@ using std::list;
 namespace gmsec_bolt {
 
 
-static const int DEBUG_PREPARE = 0;
-static const int DEBUG_UNLOAD = 0;
-static const int DEBUG_REPLY = 0;
-static const int DEBUG_MULTI = 0;
-static const int DEBUG_PARSE = 0;
-
-
 class MyPacketHandler : public PacketHandler
 {
 public:
@@ -60,12 +53,6 @@ public:
 
 	virtual void onPacket(SharedPacket packet)
 	{
-		if (DEBUG_REPLY)
-		{
-			GMSEC_DEBUG << "MyPacketHandler.onPacket() reply=" << reply;
-			packet->put(std::cout);
-		}
-
 		if (reply)
 		{
 			connection.handleReply(packet);
@@ -289,19 +276,19 @@ static void storeProperties(const ValueMap &header, Meta &meta)
 		}
 		else if (v->isBoolean())
 		{
-			bool value = false;
+			bool value;
 			v->getBoolean(value);
 			meta.add(Property::createFlag(id, value));
 		}
 		else if (v->isInteger())
 		{
-			i32 value = 0;
+			i32 value;
 			v->getI32(value);
 			meta.add(Property::createInteger(id, value));
 		}
 		else if (v->isReal())
 		{
-			f64 value = 0;
+			f64 value;
 			v->getF64(value);
 			meta.add(Property::createReal(id, value));
 		}
@@ -309,7 +296,7 @@ static void storeProperties(const ValueMap &header, Meta &meta)
 }
 
 
-void BoltConnection::makePacket(const Message& message, SharedPacket& packet, PacketType type, std::string* useID)
+void BoltConnection::makePacket(const Message& message, SharedPacket& packet, PacketType type, const std::string* useID)
 {
 	DataBuffer data;
 	ValueMap header;
@@ -336,12 +323,6 @@ void BoltConnection::makePacket(const Message& message, SharedPacket& packet, Pa
 	// ick, can ByteBuffer be changed to DataBuffer?
 	ByteBuffer content((bolt::u8 *) data.get(), static_cast<bolt::i32>(data.size()), false);
 	packet->setBody(content);
-
-	if (DEBUG_PREPARE)
-	{
-		GMSEC_DEBUG << "BoltConnection.makePacket:";
-		packet->put(std::cout);
-	}
 }
 
 
@@ -414,11 +395,6 @@ void parseProperties(const Meta& meta, Message::Kind kind, Message*& message)
 		{
 			MessageBuddy::getInternal(*message).addField(*(field.release()), false);
 		}
-
-		if (DEBUG_PARSE)
-		{
-			GMSEC_INFO << "parseProperties: " << id << " => " << svalue.c_str();
-		}
 	}
 
 	if (message)
@@ -440,12 +416,6 @@ void parseProperties(const Meta& meta, Message::Kind kind, Message*& message)
 
 void BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
 {
-	if (DEBUG_UNLOAD)
-	{
-		GMSEC_INFO << "BoltConnection.fromPacket:";
-		packet->put(std::cout);
-	}
-
 	Message::Kind kind = mapTypeToKind(packet->getHeader()->getType());
 
 	const ByteBuffer* body = packet->getBody();
@@ -480,13 +450,7 @@ void BoltConnection::fromPacket(SharedPacket& packet, Message*& message)
 		}
 
 		MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).addMessageTemplate(*message);
-
-		if (kind == Message::Kind::REQUEST && message->hasField(GMSEC_REPLY_UNIQUE_ID_FIELD))
-		{
-			getExternal().setReplyUniqueID(*message, message->getStringValue(GMSEC_REPLY_UNIQUE_ID_FIELD));
-
-			message->clearField(GMSEC_REPLY_UNIQUE_ID_FIELD);
-		}
+		MessageFactoryBuddy::getInternal(getExternal().getMessageFactory()).identifyTrackingFields(*message);
 	}
 }
 
@@ -520,31 +484,27 @@ void BoltConnection::mwPublishAux(const Message& message, SharedPacket& packet)
 {
 	Message::Kind kind = message.getKind();
 
-	if (kind == Message::Kind::REPLY)
-	{
-		makePacket(message, packet, PACKET_REPLY);
-	}
-	else if (kind == Message::Kind::REQUEST)
-	{
-		std::string uniqueID = generateID();
+	PacketType type;
 
-		const_cast<Message&>(message).addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
-
-		makePacket(message, packet, PACKET_REQUEST);
-	}
-	else
+	switch (kind)
 	{
-		makePacket(message, packet, PACKET_PUBLISH);
+	case Message::Kind::PUBLISH:
+		type = PACKET_PUBLISH;
+		break;
+	case Message::Kind::REPLY:
+		type = PACKET_REPLY;
+		break;
+	default:
+		GMSEC_WARNING << "This method should not be used to publish a request message";
+		return;
 	}
+
+	makePacket(message, packet, type);
 }
 
 
-void BoltConnection::mwRequestAux(Message& message, SharedPacket& packet, std::string& uniqueID)
+void BoltConnection::mwRequestAux(Message& message, SharedPacket& packet, const std::string& uniqueID)
 {
-	uniqueID = generateID();
-
-	message.addField(GMSEC_REPLY_UNIQUE_ID_FIELD, uniqueID.c_str());
-
 	makePacket(message, packet, PACKET_REQUEST, &uniqueID);
 
 	Meta *meta = packet->getMeta();
@@ -692,11 +652,11 @@ void SingleConnection::mwPublish(const Message& message, const Config& config)
 }
 
 
-void SingleConnection::mwRequest(const Message& message, std::string& id)
+void SingleConnection::mwRequest(const Message& message, const std::string& uniqueID)
 {
 	SharedPacket packet;
 
-	mwRequestAux(const_cast<Message&>(message), packet, id);
+	mwRequestAux(const_cast<Message&>(message), packet, uniqueID);
 
 	Result result = connection->put(packet);
 
@@ -732,6 +692,12 @@ void SingleConnection::mwReceive(Message*& message, GMSEC_I32 timeout_ms)
 }
 
 
+std::string SingleConnection::mwGetUniqueID()
+{
+	return generateID();
+}
+
+
 const char* SingleConnection::getMWInfo()
 {
 	if (mwInfo.empty())
@@ -748,7 +714,6 @@ const char* SingleConnection::getMWInfo()
 MultipleConnection::MultipleConnection(const Config& config)
 	: BoltConnection(config)
 {
-	filter.setDebug(config.getBooleanValue(BOLT_LOG_FILTER, false));
 }
 
 
@@ -956,11 +921,11 @@ void MultipleConnection::mwPublish(const Message& message, const Config& config)
 }
 
 
-void MultipleConnection::mwRequest(const Message& message, std::string& id)
+void MultipleConnection::mwRequest(const Message& message, const std::string& uniqueID)
 {
 	SharedPacket packet;
 
-	mwRequestAux(const_cast<Message&>(message), packet, id);
+	mwRequestAux(const_cast<Message&>(message), packet, uniqueID);
 
 	MultiStatus multi("put/request");
 
@@ -977,6 +942,12 @@ void MultipleConnection::mwRequest(const Message& message, std::string& id)
 	{
 		throw GmsecException(status);
 	}
+}
+
+
+std::string MultipleConnection::mwGetUniqueID()
+{
+	return generateID();
 }
 
 
@@ -1044,12 +1015,6 @@ void MultipleConnection::handlePacket(SharedPacket &packet)
 {
 	AutoMutex hold(condvar.getMutex());
 
-	if (DEBUG_MULTI)
-	{
-		GMSEC_INFO << "MultipleConnection.handlePacket";
-		packet->put(std::cout);
-	}
-
 	const Meta *meta = packet->getMeta();
 	if (!meta)
 	{
@@ -1060,10 +1025,6 @@ void MultipleConnection::handlePacket(SharedPacket &packet)
 	std::string id = meta->getID();
 
 	bool isUnique = filter.update(id.c_str());
-	if (DEBUG_MULTI)
-	{
-		GMSEC_DEBUG << "\tisUnique(" << id.c_str() << ") => " << (isUnique ? "true" : "false");
-	}
 
 	if (!isUnique)
 	{

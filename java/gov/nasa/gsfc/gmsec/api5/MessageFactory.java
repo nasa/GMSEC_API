@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,7 +32,9 @@ public class MessageFactory
 	private JNIMessageFactory m_jniMessageFactory = null;
 
 
+	//! @cond
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param msgFactory A MessageFactory object.
 	 * @return A JNIMessageFactory object.
@@ -44,6 +46,7 @@ public class MessageFactory
 
 
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param factory MessageFactory object.
 	 */
@@ -57,6 +60,7 @@ public class MessageFactory
 
 
 	/**
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param jFactory A JNIMessageFactory object.
 	 */
@@ -64,6 +68,7 @@ public class MessageFactory
 	{
 		m_jniMessageFactory = jFactory;
 	}
+	//! @endcond
 
 
 	/**
@@ -192,13 +197,15 @@ public class MessageFactory
 	/**
 	 * Creates and returns a %Message object. The %Message will include any user-supplied
 	 * message attributes (such as a message configuration, standard fields, and 
-	 * custom message validator).
+	 * custom message validator). It is recommended to destroy the %Message object when it
+	 * is no longer needed.
 	 *
 	 * @return A Message object is returned.
 	 *
 	 * @see setMessageConfig
 	 * @see setStandardFields
 	 * @see registerMessageValidator
+	 * @see Message#destroy
 	 */
 	public Message createMessage()
 	{
@@ -207,22 +214,23 @@ public class MessageFactory
 
 
 	/**
-	 * Creates and returns a Message object that is populated with fields derived
+	 * Creates and returns a %Message object that is populated with fields derived
 	 * from the working message specification and schema ID. In addition, the
 	 * %Message object will include any user-supplied message attributes (such as a
-	 * message configuration, standard fields, and custom message validator).
+	 * message configuration, standard fields, and custom message validator). It is
+	 * recommended to destroy the %Message object when it is no longer needed.
 	 *
 	 * @param schemaID The string identifying which message to create (e.g. HB).
 	 *
 	 * @return A Message object is returned.
 	 *
-	 * @throws IllegalArgumentException Thrown if the schemaID is null or contains an empty string.
-	 * @throws GmsecException Thrown if the schemaID string is null, contains an empty
-	 * string, or references an unknown/illegal schema ID.
+	 * @throws IllegalArgumentException Thrown if the schemaID is null or is an empty string.
+	 * @throws GmsecException Thrown if the schemaID references an unknown/illegal schema ID.
 	 *
 	 * @see setMessageConfig
 	 * @see setStandardFields
 	 * @see registerMessageValidator
+	 * @see Message#destroy
 	 */
 	public Message createMessage(String schemaID)
 		throws IllegalArgumentException, GmsecException
@@ -244,7 +252,8 @@ public class MessageFactory
 	 *
 	 * @return A Message object that is populated using the given data is returned.
 	 *
-	 * @throws IllegalArgumentException Thrown if the data string is null, or contains an empty string.
+	 * @throws IllegalArgumentException Thrown if the data string is null, or is an empty string.
+	 * @throws IllegalArgumentException Thrown if the given data type is not XML_DATA or JSON_DATA.
 	 * @throws GmsecException Thrown if the given data string is not parsable as a GMSEC-style message in either XML or JSON format.
 	 */
 	public Message fromData(String data, Gmsec.DataType type)
@@ -253,6 +262,10 @@ public class MessageFactory
 		if (data == null || data.isEmpty())
 		{
 			throw new IllegalArgumentException("Message data is null or contains an empty string");
+		}
+		if (type == Gmsec.DataType.KEY_VALUE_DATA)
+		{
+			throw new IllegalArgumentException("DataType " + type + " is not supported");
 		}
 
 		return m_jniMessageFactory.fromData(data, type);

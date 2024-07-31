@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,7 +39,9 @@ public class Specification
 	private JNISpecification m_jniSpecification = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param spec Object to reference for acquiring internal JNISpecification.
 	 * @return Internal JNISpecification object.
@@ -51,6 +53,7 @@ public class Specification
 
 
 	/**
+	 * @hidden
 	 * This constructor is for internal GMSEC API use only.
 	 * @param jSpec Internal JNISpecification object.
 	 */
@@ -58,6 +61,7 @@ public class Specification
 	{
 		m_jniSpecification = jSpec;
 	}
+	//! @endcond
 
 
 	/**
@@ -108,7 +112,7 @@ public class Specification
 		}
 
 		/**
-		 * Converts an interger value into a SchemaLevel enumerated type.
+		 * Converts an integer value into a SchemaLevel enumerated type.
 		 * @param level An integer value representing a SchemaLevel enumerated type.
 		 * @return A SchemaLevel, or null if the integer value cannot be converted.
 		 */
@@ -120,7 +124,7 @@ public class Specification
 
 	/**
 	 * Basic constructor that initializes the %Specification instance with the
-	 * default message specification (NASA/GMSEC Addendum)
+	 * default message specification.
 	 *
 	 * @throws GmsecException Thrown if schemas (templates) cannot be loaded.
 	 */
@@ -183,10 +187,9 @@ public class Specification
 
 
 	/**
-	 * Returns the version of the GMSEC Interface Specification Document (ISD) that is referenced
-	 * by the Specification object.
+	 * Returns the version of the message specification that is referenced by the Specification.
 	 *
-	 * @return The version of the ISD in use.
+	 * @return A version number.
 	 */
 	public int getVersion()
 	{

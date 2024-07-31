@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -99,24 +99,34 @@ CallbackAdapter::~CallbackAdapter()
 	for (Callbacks::iterator it = m_callbacks.begin(); it != m_callbacks.end(); ++it)
 	{
 		delete it->second;
-		it->second = NULL;
 	}
+	m_callbacks.clear();
+
 	for (EventCallbacks::iterator it = m_eventCallbacks.begin(); it != m_eventCallbacks.end(); ++it)
 	{
 		delete it->second;
-		it->second = NULL;
 	}
+	m_eventCallbacks.clear();
+
 	for (ReplyCallbacks::iterator it = m_replyCallbacks.begin(); it != m_replyCallbacks.end(); ++it)
 	{
 		delete it->second;
-		it->second = NULL;
 	}
+	m_replyCallbacks.clear();
 }
 
 
 Callback* CallbackAdapter::createCallback(GMSEC_Callback* cb)
 {
-	return new C_CallbackAdapter(cb);
+	C_CallbackAdapter* callback = dynamic_cast<C_CallbackAdapter*>(lookupCallback(cb));
+
+	if (!callback)
+	{
+		callback = new C_CallbackAdapter(cb);
+		m_callbacks[cb] = callback;
+	}
+
+	return callback;
 }
 
 

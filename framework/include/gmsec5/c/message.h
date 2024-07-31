@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -454,6 +454,26 @@ extern "C"
 	 * @param[out] status  - status of the operation
 	 */
 	GMSEC_API void messageSetSubject(GMSEC_Message msg, const char* subject, GMSEC_Status status);
+
+	/**
+	* @fn void setSubjectElement(GMSEC_Message msg, const char* name, const char* value, GMSEC_Status status)
+	*
+	* @brief Allows for the setting of individual subject elements. The name of the elements are defined
+	* by the message's corresponding message template. This value will be overridden by automatic subject
+	* generation if the subject element is defined by an existing field in the message, or if the subject
+	* was manually defined with setSubject.
+	*
+	* @param[in]  msg     - handle to the Message
+	* @param[in] name - the name of the subject element
+	* @param[in] value - the value of the subject element. An empty or null value will be seen as FILL in the subject line.
+	* @param[out] status  - status of the operation
+	*
+	* @throw A GmsecException is thrown if the name is NULL, an empty string, or does not match a subject element
+	* name defined the message template, or if the message does not have a corresponding message template.
+	*
+	*
+	*/
+	GMSEC_API void messageSetSubjectElement(GMSEC_Message msg, const char* name, const char* value, GMSEC_Status status);
 
 
 	/**

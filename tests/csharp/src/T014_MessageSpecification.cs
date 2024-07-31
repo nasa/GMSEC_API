@@ -50,7 +50,6 @@ namespace T014
 			Check("Expected at least 1 (one) message specification", msgSpecs.Count > 0);
 
 			foreach (MessageSpecification msgSpec in msgSpecs)
-			using (msgSpec)
 			{
 				Check("Schema ID is NULL", msgSpec.GetSchemaID() != null);
 				Check("Subject Template is NULL", msgSpec.GetSubjectTemplate() != null);

@@ -162,7 +162,7 @@ class T011_HeartbeatGenerator extends TestCase
 
 			// Verify no HB messages are being published
 			try {
-				var conn = new gmsec.Connection(this.getConfig());
+				var conn = gmsec.Connection.create(this.getConfig());
 				conn.connect();
 				conn.setupSubscription("C2MS.*.*.*.*.*.MSG.HB." + this.getUniqueComponent() + ".+");
 
@@ -175,6 +175,8 @@ class T011_HeartbeatGenerator extends TestCase
 				}
 
 				conn.disconnect();
+
+				gmsec.Connection.destroy(conn);
 			}
 			catch (e) {
 				this.require(e.message, false);
@@ -205,7 +207,7 @@ class T011_HeartbeatGenerator extends TestCase
 
 			this.verifyHeartbeatMessage(this.getConfig(), 2);
 
-			var conn = new gmsec.Connection(this.getConfig());
+			var conn = gmsec.Connection.create(this.getConfig());
 			conn.connect();
 			conn.setupSubscription("C2MS.*.*.*.*.*.MSG.HB." + this.getUniqueComponent() + ".+");
 
@@ -229,6 +231,8 @@ class T011_HeartbeatGenerator extends TestCase
 			this.check("Failed to receive HB message with PUB-RATE of 0", lastMessage);
 
 			conn.disconnect();
+
+			gmsec.Connection.destroy(conn);
 
 			hbgen.stop();
 		}
@@ -322,7 +326,7 @@ class T011_HeartbeatGenerator extends TestCase
 	verifyHeartbeatMessage(config, pubRate)
 	{
 		try {
-			var conn = new gmsec.Connection(config);
+			var conn = gmsec.Connection.create(config);
 			conn.connect();
 			conn.setupSubscription("C2MS.*.*.*.*.*.MSG.HB." + this.getUniqueComponent() + ".+");
 
@@ -360,6 +364,8 @@ class T011_HeartbeatGenerator extends TestCase
 			}
 
 			conn.disconnect();
+
+			gmsec.Connection.destroy(conn);
 		}
 		catch (e) {
 			this.require(e.message, false);

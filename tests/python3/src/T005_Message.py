@@ -17,6 +17,7 @@ class Test_Message(Test):
         self.test_set_field_value()
         self.test_set_config()
         self.test_set_subject()
+        self.test_set_subject_element()
         self.test_get_subject()
         self.test_set_kind()
         self.test_get_kind()
@@ -278,6 +279,49 @@ class Test_Message(Test):
             self.check("An exception was expected", False)
         except Exception as e:
             self.check(str(e), "Invalid message subject" in str(e))
+
+
+    def test_set_subject_element(self):
+        lp.log_info("Test set_subject_element()")
+
+        msgFactory = lp.MessageFactory()
+
+        self.set_standard_fields(msgFactory)
+
+        msg = msgFactory.create_message("TLMPROC")
+
+        msg.set_subject_element("ME4", "FOOEY")
+
+        self.check("Message has unexpected subject", msg.get_subject() == "C2MS.MY-DOMAIN-1.MY-DOMAIN-2.MY-MISSION.MY-CONSTELLATION.MY-SAT-ID.MSG.TLMPROC.MY-COMPONENT.FILL.FILL.FOOEY")
+
+        # Off-nominal tests
+        try:
+            msg.set_subject_element("ME9000", "FOOEY")
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Message does not have a subject element named ME9000" in str(e))
+            
+        try:
+            tmp = lp.Message()
+            tmp.set_subject_element(None, "FOOEY")
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Subject element name cannot be NULL or empty string" in str(e))
+            
+        try:
+            tmp = lp.Message()
+            tmp.set_subject_element("", "FOOEY")
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Subject element name cannot be NULL or empty string" in str(e))
+            
+        try:
+            tmp = lp.Message()
+            tmp.set_subject_element("ME4", "FOOEY")
+            self.check("An exception was expected", False)
+        except Exception as e:
+            self.check(str(e), "Message does not have a message template" in str(e))
+
 
 
     def test_get_subject(self):

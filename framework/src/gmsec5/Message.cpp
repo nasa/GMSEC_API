@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -179,6 +179,12 @@ void Message::setSubject(const char* subject)
 const char* Message::getSubject() const
 {
 	return m_internal->getSubject();
+}
+
+
+void Message::setSubjectElement(const char* name, const char* value)
+{
+	m_internal->setSubjectElement(name, value);
 }
 
 

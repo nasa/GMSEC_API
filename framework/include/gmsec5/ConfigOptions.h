@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -68,13 +68,14 @@ const char* const GMSEC_ASYNC_PUBLISH_TEARDOWN_WAIT	= "GMSEC-ASYNC-PUBLISH-TEARD
 const char* const GMSEC_USE_MSG_BINS           		= "GMSEC-USE-MSG-BINS";
 const char* const GMSEC_MSG_BIN_SIZE           		= "GMSEC-MSG-BIN-SIZE";
 const char* const GMSEC_MSG_BIN_TIMEOUT        		= "GMSEC-MSG-BIN-TIMEOUT";
-
 const char* const GMSEC_MSG_FLD_STORAGE_TYPE		= "GMSEC-MSGFLD-STORE-TYPE";
 const char* const GMSEC_MSG_FLD_STORAGE_SIZE		= "GMSEC-MSGFLD-STORE-SIZE";
 const char* const GMSEC_SORT_MSG_FIELDS			= "GMSEC-SORT-MSG-FIELDS";
-const char* const GMSEC_CONVERT_FIELD_NAMES		= "GMSEC-CONVERT-FIELD-NAMES";
+
 const char* const GMSEC_SHOW_MSG_CONFIG			= "GMSEC-SHOW-MSG-CONFIG";
 const char* const GMSEC_IDENTIFY_HEADER_FIELDS		= "GMSEC-IDENTIFY-HEADER-FIELDS";
+
+const char* const GMSEC_SUPPORT_LEGACY_API		= "GMSEC-SUPPORT-LEGACY-API";
 
 
 namespace secure
@@ -183,7 +184,6 @@ const char* const ZEROMQ_SUB_ENDPOINT 			= "MW-SUBSCRIBE-ENDPOINT";
 
 //BoltConnection
 const char* const BOLT_HIDE_MWGET			= "MW-HIDE-MWGET";
-const char* const BOLT_LOG_FILTER			= "MW-LOG-FILTER";
 
 
 //Generic JMS

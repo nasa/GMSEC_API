@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -234,6 +234,7 @@ public class gmsecJNI
 	public final static native void Message_SetConfig(long jarg1, JNIMessage msg, long cfgPtr, JNIConfig config);
 	public final static native long Message_GetConfig(long jarg1, JNIMessage msg);
 	public final static native void Message_SetSubject(long jarg1, JNIMessage msg, String subject);
+	public final static native void Message_SetSubjectElement(long jarg1, JNIMessage msg, String name, String value);
 	public final static native String Message_GetSubject(long jarg1, JNIMessage msg);
 	public final static native void Message_SetKind(long jarg1, JNIMessage msg, int jKind);
 	public final static native int Message_GetKind(long jarg1, JNIMessage msg);
@@ -385,6 +386,8 @@ public class gmsecJNI
 	public final static native U64 Field_GetU64Value(long fieldPtr, JNIField field);
 	public final static native double Field_GetF64Value(long fieldPtr, JNIField field);
 	public final static native boolean Field_IsHeader(long fieldPtr, JNIField field);
+	public final static native boolean Field_IsTracking(long fieldPtr, JNIField field);
+	public final static native boolean Field_IsFieldNameCompliant(String fieldName);
 	public final static native void delete_Field(long fieldPtr, JNIField field);
 
 

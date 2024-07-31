@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -38,9 +38,6 @@ public:
 	*/
 	bool update(const char* id);
 
-	void setSeparator(char sep);
-	void setDebug(bool flag);
-
 private:
 	// Declared, but not implemented.
 	UniqueFilter(const UniqueFilter&);
@@ -48,7 +45,6 @@ private:
 
 	char separator;
 	std::map<std::string, int> state;
-	bool debug;
 };
 
 } // namespace internal

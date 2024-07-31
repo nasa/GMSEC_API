@@ -2,7 +2,7 @@
 
 
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -32,17 +32,7 @@ const gmsec = require(gmsec_api_home + "/bin/gmsec_nodejs.node");
  */
 function createConfig(argv, needMwId = true)
 {
-	let cfgArgs = new gmsec.StringArray();
-
-	if (argv != null && argv.length > 2) {
-		for (let i = 0; i < argv.length; i++) {
-			if (argv[i].includes("=")) {
-				cfgArgs.add(argv[i]);
-			}
-		}
-	}
-
-	const config = (cfgArgs.size() > 0 ? new gmsec.Config(cfgArgs) : new gmsec.Config());
+	const config = (argv != null && argv.length > 2 ? new gmsec.Config(JSON.stringify(argv)) : new gmsec.Config());
 
 	if (needMwId && config.getValue("mw-id") == null) {
 		throw new Error("Missing mw-id configuration option!");

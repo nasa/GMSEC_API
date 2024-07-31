@@ -39,6 +39,7 @@ public class T005_Message extends TestCase
 		{
 			test_constructor();
 			test_copy_constructor();
+			test_destroy();
 			test_get_schema_id();
 			test_get_version();
 			test_get_schema_level();
@@ -47,6 +48,7 @@ public class T005_Message extends TestCase
 			test_set_field_value();
 			test_set_config();
 			test_set_subject();
+			test_set_subject_element();
 			test_get_subject();
 			test_set_kind();
 			test_get_kind();
@@ -149,6 +151,21 @@ public class T005_Message extends TestCase
 		{
 			check(e.getMessage(), e.getMessage().contains("Message is null"));
 		}
+	}
+
+
+	private void test_destroy()
+		throws Exception
+	{
+		Log.info("Test destroy()");
+
+		Message msg = new Message();
+
+		Message.destroy(msg);
+		check("First time will be okay", true);
+
+		Message.destroy(msg);
+		check("Second time will be okay", true);
 	}
 
 
@@ -393,6 +410,60 @@ public class T005_Message extends TestCase
 		}
 		catch (IllegalArgumentException | GmsecException e) {
 			check(e.getMessage(), e.getMessage().contains("Invalid message subject"));
+		}
+	}
+
+
+	private void test_set_subject_element()
+		throws Exception
+	{
+		Log.info("Test setSubjectElement()");
+
+		MessageFactory msgFactory = MessageFactory.create();
+
+		setStandardFields(msgFactory);
+
+		Message msg = msgFactory.createMessage("TLMPROC");
+
+		msg.setSubjectElement("ME4", "FOOEY");
+
+		check("Message has unexpected subject", msg.getSubject().equals("C2MS.MY-DOMAIN-1.MY-DOMAIN-2.MY-MISSION.MY-CONSTELLATION.MY-SAT-ID.MSG.TLMPROC.MY-COMPONENT.FILL.FILL.FOOEY"));
+		try {
+			msg.setSubjectElement("ME9000", "FOOEY");
+			check("An exception was expected", false);
+		}
+		catch (IllegalArgumentException | GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Message does not have a subject element named ME9000"));
+		}
+
+		MessageFactory.destroy(msgFactory);
+
+		//o Off-nominal tests
+		try {
+			Message tmp = new Message();
+			tmp.setSubjectElement(null, "FOOEY");
+			check("An exception was expected", false);
+		}
+		catch (IllegalArgumentException | GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Name is null or contains an empty string"));
+		}
+
+		try {
+			Message tmp = new Message();
+			tmp.setSubjectElement("", "FOOEY");
+			check("An exception was expected", false);
+		}
+		catch (IllegalArgumentException | GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Name is null or contains an empty string"));
+		}
+
+		try {
+			Message tmp = new Message();
+			tmp.setSubjectElement("ME4", "FOOEY");
+			check("An exception was expected", false);
+		}
+		catch (IllegalArgumentException | GmsecException e) {
+			check(e.getMessage(), e.getMessage().contains("Message does not have a message template"));
 		}
 	}
 

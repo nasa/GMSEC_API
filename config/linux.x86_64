@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -17,6 +17,14 @@ ifdef JDK_HOME
 BASE_WRAPPERS += generic_jms
 
 JAVA_INCS = -I$(JDK_HOME)/include -I$(JDK_HOME)/include/linux
+endif
+
+
+##
+# NodeJS stuff
+#
+ifndef NODE_HOME
+NODE_HOME = /usr
 endif
 
 
@@ -47,8 +55,9 @@ endif
 # Python3 stuff
 #
 ifndef PYTHON3_HOME
-PYTHON3_HOME = $(SUPPORT)/python-3.10.7
+PYTHON3_HOME = /usr
 endif
+
 
 ifndef CXX
 CXX	= g++

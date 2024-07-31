@@ -1,6 +1,13 @@
 #include "TestCase.h"
 
+#include <gmsec5/internal/StringUtil.h>
+#include <gmsec5/internal/TrackingDetails.h>
+
+#include <string>
+#include <vector>
+
 using namespace gmsec::api5;
+using namespace gmsec::api5::internal;
 using namespace gmsec::api5::util;
 
 
@@ -25,6 +32,8 @@ static const char* trackingOptions[] =
 
 void runTest(Test& test, unsigned int version)
 {
+	GMSEC_INFO << "Test Verify Tracking Fields for Specification " << version;
+
 	std::ostringstream oss;
 	oss << version;
 
@@ -253,6 +262,61 @@ void test_remove_tracking_fields(Test& test)
 }
 
 
+void verifyToString(Test& test, int m)
+{
+	std::string setting ;
+	if (m == MESSAGE_TRACKINGFIELDS_ON) {
+		setting = "ON";
+	}
+	else if (m == MESSAGE_TRACKINGFIELDS_OFF) {
+		setting = "OFF";
+	}
+	else {
+		setting = "UNSET";
+	}
+
+	TrackingDetails td;
+
+	td.set(m);
+	td.setNode(m);
+	td.setProcessId(m);
+	td.setUserName(m);
+	td.setConnectionId(m);
+	td.setPublishTime(m);
+	td.setUniqueId(m);
+	td.setMwInfo(m);
+	td.setActiveSubscriptions(m);
+	td.setConnectionEndpoint(m);
+
+	std::string str = td.toString();
+	std::vector<std::string> lines = StringUtil::split(str, "\n");
+
+	test.check("Unexpected toString", lines.size() == 10);
+
+	for (size_t i = 0; trackingOptions[i] != NULL; ++i) {
+		std::string option = trackingOptions[i];
+		if (option.find("TRACKING-") != std::string::npos) {
+			option = option.substr(9);
+		}
+		for (size_t j = 0; j < lines.size(); ++j) {
+			if (lines[j].find(option) != std::string::npos) {
+				test.check("Unexpected result", lines[j].find(setting) != std::string::npos);
+			}
+		}
+	}
+}
+
+
+void test_to_string(Test& test)
+{
+	GMSEC_INFO << "Test TrackingDetails::toString()";
+
+	verifyToString(test, MESSAGE_TRACKINGFIELDS_UNSET);
+	verifyToString(test, MESSAGE_TRACKINGFIELDS_ON);
+	verifyToString(test, MESSAGE_TRACKINGFIELDS_OFF);
+}
+
+
 int test_TrackingFields(Test& test)
 {
 	test.setDescription("Tracking Fields");
@@ -261,6 +325,7 @@ int test_TrackingFields(Test& test)
     runTest(test, GMSEC_MSG_SPEC_CURRENT);
 
 	test_remove_tracking_fields(test);
+	test_to_string(test);
 
     return 0;
 }

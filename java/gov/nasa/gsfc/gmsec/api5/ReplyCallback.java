@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -20,7 +20,7 @@ import gov.nasa.gsfc.gmsec.api5.jni.JNIReplyCallback;
  * This is the abstract base class for receiving reply messages from asynchronous requests. 
  * A user created class, derived from this class, can be passed to 
  * {@link Connection#request(Message, int, ReplyCallback, int)}
- * to have user code executed asynchronously when a message is received or an error occurs.
+ * to have user code executed asynchronously when a message is received or an event occurs.
  * <p>
  * Note that because users are able to create their own ReplyCallback class, reentrancy is not
  * guaranteed unless if they implement their own reentrancy rules.
@@ -68,7 +68,9 @@ public abstract class ReplyCallback extends EventCallback
 	private JNIConnection    m_jniConnection = null;
 
 
+	//! @cond
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param cb Object to reference for acquiring internal JNIReplyCallback
 	 * @return Internal JNIReplyCallback object.
@@ -80,6 +82,7 @@ public abstract class ReplyCallback extends EventCallback
 
 
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @return Returns the internal JNIConnection object.
 	 */
@@ -90,6 +93,7 @@ public abstract class ReplyCallback extends EventCallback
 
 
 	/** 
+	 * @hidden
 	 * This method is for internal GMSEC API use only.
 	 * @param jconn The internal JNIConnection object.
 	 */
@@ -98,6 +102,7 @@ public abstract class ReplyCallback extends EventCallback
 		super.setConnection(jconn);
 		m_jniConnection = jconn;
 	}
+	//! @endcond
 
 
 	/**

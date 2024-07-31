@@ -362,7 +362,7 @@ sub test_subscribe
 		$conn->subscribe( $test->getSubject("*.BAR") );
 		$conn->subscribe( $test->getSubject("FOO.BAZ") );
 
-		my $msg1 = $conn->getMessageFactory()->createMessage("LOG");
+		my $msg1 = $conn->getMessageFactory()->createMessage("HB");
 		my $msg2 = $conn->getMessageFactory()->createMessage("LOG");
 		my $msg3 = $conn->getMessageFactory()->createMessage("LOG");
 
@@ -375,6 +375,7 @@ sub test_subscribe
 		my $msg = $conn->receive(5000);
 		$test->check("Was expecting to receive a message", defined $msg);
 		$test->check("Unexpected message subject", $msg->getSubject() eq $test->getSubject("GIN.BAR"));
+		verifyTrackingFields($test, $msg, 11);
 		libgmsec_perl::Message::destroy($msg);
 
 		$conn->publish($msg2);
@@ -382,6 +383,7 @@ sub test_subscribe
 		$msg = $conn->receive(5000);
 		$test->check("Was expecting to receive a message", defined $msg);
 		$test->check("Unexpected message subject", $msg->getSubject() eq $test->getSubject("FOO.BAZ"));
+		verifyTrackingFields($test, $msg, 7);
 		libgmsec_perl::Message::destroy($msg);
 
 		$conn->publish($msg3);
@@ -751,9 +753,17 @@ sub test_publish_with_mwconfig
 
 sub test_request
 {
-	libgmsec_perl::logInfo("Test synchronous request()");
-
 	my ($test) = @_;
+
+	my $mw = $test->getConfig()->getValue("mw-id", "unknown");
+
+	if ($mw eq "unknown" or $mw eq "loopback")
+	{
+		# Test is not supported by loopback (or unknown) middleware
+		return;
+	}
+
+	libgmsec_perl::logInfo("Test synchronous request()");
 
 	my $conn;
 
@@ -1085,7 +1095,17 @@ sub test_receive
 		$conn->publish($msg);
 
 		$rcvd = $conn->receive(5000);
-		$test->check("Did not receive expected message", defined $rcvd);
+		$test->require("Did not receive expected message", defined $rcvd);
+
+		my $iter = $rcvd->getFieldIterator( $libgmsec_perl::MessageFieldIterator::Selector_TRACKING_FIELDS );
+		my $numTrackingFields = 0;
+		while ($iter->hasNext()) {
+			my $field = $iter->next();
+			$test->check("Expected a tracking field", $field->isTracking());
+			$numTrackingFields += 1;
+		}
+		$test->check("Unexpected number of tracking fields", 10 == $numTrackingFields);
+
 		libgmsec_perl::Message::destroy($rcvd);
 	};
 	if (isa($@, 'libgmsec_perl::GmsecException'))
@@ -1281,12 +1301,13 @@ sub test_getName_setName
 	eval
 	{
 		$conn = libgmsec_perl::Connection::create( $test->getConfig() );
-		$conn->connect();
 
 		$test->check("Expected a connection name", defined $conn->getName());
 
 		$conn->setName("FOOBAR");
+		$test->check("Expected a connection name of FOOBAR", $conn->getName() eq "FOOBAR");
 
+		$conn->setName(undef);
 		$test->check("Expected a connection name of FOOBAR", $conn->getName() eq "FOOBAR");
 	};
 	if (isa($@, 'libgmsec_perl::GmsecException'))
@@ -1296,7 +1317,6 @@ sub test_getName_setName
 	}
 	if (defined $conn)
 	{
-		$conn->disconnect();
 		libgmsec_perl::Connection::destroy($conn);
 		$conn = undef;
 	}
@@ -1432,6 +1452,29 @@ sub test_getPublishQueueMessageCount
 		libgmsec_perl::Connection::destroy($conn);
 		$conn = undef;
 	}
+}
+
+
+sub verifyTrackingFields
+{
+	my ($test,$msg,$expected) = @_;
+
+	my $numTrackingFields = 0;
+
+	my $iter = $msg->getFieldIterator($libgmsec_perl::MessageFieldIterator::Selector_TRACKING_FIELDS);
+
+	while ($iter->hasNext())
+	{
+		my $field = $iter->next();
+
+        $test->check("Expected a tracking field", $field->isTracking());
+
+		if ($field->isTracking()) {
+			$numTrackingFields++;
+		}
+	}
+
+	$test->check("Unexpected number of tracking fields", $numTrackingFields == $expected);
 }
 
 

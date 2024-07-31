@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -15,7 +15,6 @@
 #define GMSEC_API5_INTERNAL_CI_LESS_H
 
 #include <string>
-#include <map>
 
 
 namespace gmsec {
@@ -30,9 +29,9 @@ namespace internal {
  *
  * @return Returns true if s1 < s2
  */
-struct ci_less : std::binary_function<std::string, std::string, bool>
+struct ci_less
 {
-	struct nocase_compare : public std::binary_function<unsigned char,unsigned char,bool>
+	struct nocase_compare
 	{
 		bool operator()(const unsigned char& c1, const unsigned char& c2) const
 		{

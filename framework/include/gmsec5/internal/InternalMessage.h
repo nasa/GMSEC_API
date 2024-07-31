@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -97,6 +97,8 @@ public:
 
 	void CALL_TYPE setSubject(const char* subject);
 	const char* CALL_TYPE getSubject() const;
+
+	void CALL_TYPE setSubjectElement(const char* name, const char* value);
 
 	const char* CALL_TYPE getResponseTopic(bool useWildcards = false) const;
 
@@ -207,8 +209,8 @@ public:
 	void CALL_TYPE setSchemaLevel(Specification::SchemaLevel level);
 	Specification::SchemaLevel CALL_TYPE getSchemaLevel() const;
 
-	void CALL_TYPE setTemplate(gmsec::api5::util::StdSharedPtr<MessageTemplate> msgTemplate);
-	const gmsec::api5::internal::MessageTemplate* CALL_TYPE getTemplate() const;
+	void CALL_TYPE setTemplate(MessageTemplate* msgTemplate);
+	const MessageTemplate* CALL_TYPE getTemplate() const;
 
 	void CALL_TYPE init();
 
@@ -226,12 +228,15 @@ private:
 
 	void validateFieldName(const char* name) const;
 
+	//helper function, return true if element given matches element in schema ID definition
+	bool matchDefinitionElement(const std::string& element) const;
+
 	const gmsec::api5::internal::FieldTemplate& findFieldTemplate(const char* fieldName);
 
 
 	typedef gmsec::api5::util::StdUniquePtr<ValueMap>            SafeDetails;
-	typedef gmsec::api5::util::StdSharedPtr<MessageTemplate>     SafeMessageTemplate;
 	typedef gmsec::api5::util::StdUniquePtr<ComplianceValidator> SafeComplianceValidator;
+	typedef gmsec::api5::util::StdUniquePtr<MessageTemplate>     SafeMessageTemplate;
 
 	Message&                     m_parent;
 	Config                       m_config;
@@ -254,6 +259,8 @@ private:
 	bool                         m_subjectSet;
 	bool                         m_kindSet;
 	bool                         m_showMsgConfig;
+
+	std::vector<std::string>     m_subjectElementValues;
 
 	MWInfo                       m_mwInfo;
 

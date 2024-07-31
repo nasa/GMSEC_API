@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -453,7 +453,7 @@ std::string InternalSpecification::loadXSD(const char* path, const char* fileNam
 			}
 		}
 	}
-	
+
 	xsd.Clear();
 
 	for (std::list<tinyxml2::XMLDocument*>::iterator docIt = included.begin();
@@ -895,6 +895,16 @@ FieldTemplate* InternalSpecification::parseField(const tinyxml2::XMLElement* sch
 			}
 		}
 
+		//tracking fields will have another attribute tag
+		attribute = extension->LastChildElement("xs:attribute");
+		if (attribute)
+		{
+			if (attribute->Attribute("name", "TRACKING") != NULL)
+			{
+				field->setMode("TRACKING");
+			}
+		}
+
 		//find values using base tag
 		if (extension->Attribute("base"))
 		{
@@ -1001,7 +1011,7 @@ FieldTemplate* InternalSpecification::parseField(const tinyxml2::XMLElement* sch
 				}
 
 				//add dependency to field template
-				field->addDependency(dependency->Attribute("name"), dependency->Attribute("valueEquals"), dependency->Attribute("valueGreaterThan"), dependency->Attribute("valueLessThan"), dependency->Attribute("use"), pattern.c_str(), values, types);
+				field->initDependency(dependency->Attribute("name"), dependency->Attribute("valueEquals"), dependency->Attribute("valueGreaterThan"), dependency->Attribute("valueLessThan"), dependency->Attribute("use"), pattern.c_str(), values, types);
 			}
 		}
 	}

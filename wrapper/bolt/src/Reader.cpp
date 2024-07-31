@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -14,8 +14,6 @@
 #include <gmsec5/util/StdUniquePtr.h>
 #include <gmsec5/util/TimeUtil.h>
 
-
-static int DEBUG_READER = 0;
 
 namespace bolt {
 
@@ -74,10 +72,6 @@ void runReader(counted_ptr<Shared> shared)
 		{
 			i32 want = buffer.size() - position;
 			int read = shared->read(buffer.raw() + position, want);
-if (DEBUG_READER)
-{
-	GMSEC_DEBUG << tag.c_str() << "isHeader=" << isHeader << " want=" << want << " read=" << read;
-}
 			if (read > 0)
 			{
 				if (read == want)
@@ -121,10 +115,6 @@ if (DEBUG_READER)
 				else
 				{
 					position += read;
-if (DEBUG_READER)
-{
-	GMSEC_DEBUG << tag.c_str() << "partial read of " << read << "- wanted " << want;
-}
 				}
 			}
 			else if (read < 0)

@@ -1,4 +1,4 @@
-# Copyright 2007-2023 United States Government as represented by the
+# Copyright 2007-2024 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -136,10 +136,6 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# Note: This method is automatically called if the Connection object is destroyed.
 		#
-		# ==== Raises
-		#
-		# A GmsecException is thrown an anomaly occurs while attempting to disconnect.
-		#
 		def disconnect
 		end
 
@@ -225,6 +221,8 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# ==== Raises
 		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
+		#
 		# A GmsecException is thrown if the topic is nil or does not represent a well-formed subscription topic.
 		#
 		# A GmsecException is thrown if a redundant subscription is set up.
@@ -255,6 +253,8 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# ==== Raises
 		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
+		#
 		# A GmsecException is thrown if the given SubscriptionInfo object originated from a different Connection object.
 		#
 		# A GmsecException is thrown if an error occurs at the middleware level.
@@ -282,6 +282,8 @@ module Libgmsec_ruby #:nodoc: don't document this
 		# * +config+ - Option Config object for configuring middleware-level options.
 		#
 		# ==== Raises
+		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
 		#
 		# A GmsecException is thrown if an error occurs while attempting to publish the message.
 		# 
@@ -315,6 +317,8 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# ==== Raises
 		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
+		#
 		# A GmsecException is thrown if an error occurs while attempting to send the message.
 		# 
 		# ==== See also
@@ -338,6 +342,8 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# ==== Raises
 		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
+		#
 		# A GmsecException is thrown if an error occurs while attempting to send the message.
 		#
 		# ==== See also
@@ -356,6 +362,12 @@ module Libgmsec_ruby #:nodoc: don't document this
 		# ==== Attributes
 		#
 		# * +msg+ - The Message to dispatch to Callback objects.
+		#
+		# ==== Raises
+		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
+		#
+		# A GmsecException is thrown if the message object is nil.
 		#
 		def dispatch(msg)
 		end
@@ -376,6 +388,8 @@ module Libgmsec_ruby #:nodoc: don't document this
 		# A Message object is returned, or nil if a timeout occurs.
 		#
 		# ==== Raises
+		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
 		#
 		# A GmsecException is thrown if an error occurs while attempting to receive a message.
 		#
@@ -400,6 +414,8 @@ module Libgmsec_ruby #:nodoc: don't document this
 		#
 		# ==== Raises
 		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
+		#
 		# A GmsecException is thrown if the subject pattern is nil or contains a malformed subject topic pattern.
 		#
 		def exclude_subject(subject_pattern)
@@ -414,6 +430,8 @@ module Libgmsec_ruby #:nodoc: don't document this
 		# * +subject_pattern+ - The subject pattern to remove from filtering incoming messages.
 		#
 		# ==== Raises
+		#
+		# A GmsecException is thrown if there is no connection to the GMSEC Bus.
 		#
 		# A GmsecException is thrown if the subject pattern is nil or contains a malformed subject topic pattern.
 		#
@@ -443,10 +461,6 @@ module Libgmsec_ruby #:nodoc: don't document this
 		# ==== Attributes
 		#
 		# * +name+ - The name to assign to the Connection object.
-		#
-		# ==== Raises
-		#
-		# A GmsecException is thrown if the name is nil.
 		#
 		# ==== See also
 		#

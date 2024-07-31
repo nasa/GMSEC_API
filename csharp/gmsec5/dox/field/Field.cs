@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -31,6 +31,11 @@ public class Field : global::System.IDisposable {
   /// <summary>Returns whether the field object is considered a header field</summary>
   /// <returns>True if a header field; false otherwise</returns>
   public bool IsHeader() {
+  }
+
+  /// <summary>Returns whether the field object is considered a GMSEC API tracking field</summary>
+  /// <returns>True if a tracking field; false otherwise</returns>
+  public bool IsTracking() {
   }
 
   /// <summary>Converts the field object into an XML string representation</summary>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -30,22 +30,9 @@ extern "C" {
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIterator_1HasNextConfig
   (JNIEnv *jenv, jclass jcls, jlong jCfgFileIterPtr, jobject jCfgFileIter)
 {
-	jboolean result = JNI_FALSE;
+	ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
 
-	try
-	{
-		ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
-
-		if (!iter)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigFileIterator reference is null");
-		}
-		else
-		{
-			result = (iter->hasNextConfig() ? JNI_TRUE : JNI_FALSE);
-		}
-	}
-	JNI_CATCH
+	jboolean result = (iter->hasNextConfig() ? JNI_TRUE : JNI_FALSE);
 
 	return result;
 }
@@ -54,22 +41,9 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFile
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIterator_1HasNextMessage
   (JNIEnv *jenv, jclass jcls, jlong jCfgFileIterPtr, jobject jCfgFileIter)
 {
-	jboolean result = JNI_FALSE;
+	ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
 
-	try
-	{
-		ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
-
-		if (!iter)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigFileIterator reference is null");
-		}
-		else
-		{
-			result = (iter->hasNextMessage() ? JNI_TRUE : JNI_FALSE);
-		}
-	}
-	JNI_CATCH
+	jboolean result = (iter->hasNextMessage() ? JNI_TRUE : JNI_FALSE);
 
 	return result;
 }
@@ -78,22 +52,9 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFile
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIterator_1HasNextSubscription
   (JNIEnv *jenv, jclass jcls, jlong jCfgFileIterPtr, jobject jCfgFileIter)
 {
-	jboolean result = JNI_FALSE;
+	ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
 
-	try
-	{
-		ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
-
-		if (!iter)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigFileIterator reference is null");
-		}
-		else
-		{
-			result = (iter->hasNextSubscription() ? JNI_TRUE : JNI_FALSE);
-		}
-	}
-	JNI_CATCH
+	jboolean result = (iter->hasNextSubscription() ? JNI_TRUE : JNI_FALSE);
 
 	return result;
 }
@@ -102,31 +63,20 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFile
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIterator_1NextConfig
   (JNIEnv *jenv, jclass jcls, jlong jCfgFileIterPtr, jobject jCfgFileIter)
 {
+	ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
+
 	jlong jEntry = 0;
 
 	try
 	{
-		ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
+		const ConfigFile::ConfigEntry& entry = iter->nextConfig();
 
-		if (!iter)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigFileIterator reference is null");
-		}
-		else
-		{
-			try
-			{
-				const ConfigFile::ConfigEntry& entry = iter->nextConfig();
-
-				jEntry = JNI_POINTER_TO_JLONG(new ConfigFile::ConfigEntry(entry));
-			}
-			catch (const GmsecException& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
-		}
+		jEntry = JNI_POINTER_TO_JLONG(new ConfigFile::ConfigEntry(entry));
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jEntry;
 }
@@ -135,31 +85,20 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIte
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIterator_1NextMessage
   (JNIEnv *jenv, jclass jcls, jlong jCfgFileIterPtr, jobject jCfgFileIter)
 {
+	ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
+
 	jlong jEntry = 0;
 
 	try
 	{
-		ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
+		const ConfigFile::MessageEntry& entry = iter->nextMessage();
 
-		if (!iter)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigFileIterator reference is null");
-		}
-		else
-		{
-			try
-			{
-				const ConfigFile::MessageEntry& entry = iter->nextMessage();
-
-				jEntry = JNI_POINTER_TO_JLONG(new ConfigFile::MessageEntry(entry));
-			}
-			catch (const GmsecException& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
-		}
+		jEntry = JNI_POINTER_TO_JLONG(new ConfigFile::MessageEntry(entry));
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jEntry;
 }
@@ -168,31 +107,20 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIte
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIterator_1NextSubscription
   (JNIEnv *jenv, jclass jcls, jlong jCfgFileIterPtr, jobject jCfgFileIter)
 {
+	ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
+
 	jlong jEntry = 0;
 
 	try
 	{
-		ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
+		const ConfigFile::SubscriptionEntry& entry = iter->nextSubscription();
 
-		if (!iter)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigFileIterator reference is null");
-		}
-		else
-		{
-			try
-			{
-				const ConfigFile::SubscriptionEntry& entry = iter->nextSubscription();
-
-				jEntry = JNI_POINTER_TO_JLONG(new ConfigFile::SubscriptionEntry(entry));
-			}
-			catch (const GmsecException& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
-		}
+		jEntry = JNI_POINTER_TO_JLONG(new ConfigFile::SubscriptionEntry(entry));
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jEntry;
 }
@@ -201,66 +129,31 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIte
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigFileIterator_1Reset
   (JNIEnv *jenv, jclass jcls, jlong jCfgFileIterPtr, jobject jCfgFileIter)
 {
-	try
-	{
-		ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
+	ConfigFileIterator* iter = JNI_JLONG_TO_CONFIG_FILE_ITER(jCfgFileIterPtr);
 
-		if (!iter)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigFileIterator reference is null");
-		}
-		else
-		{
-			iter->reset();
-		}
-	}
-	JNI_CATCH
+	iter->reset();
 }
 
 
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_delete_1ConfigEntry
   (JNIEnv *jenv, jclass jcls, jlong jCfgEntryPtr, jobject jCfgEntry)
 {
-	try
-	{
-		ConfigFile::ConfigEntry* entry = JNI_JLONG_TO_CONFIG_ENTRY(jCfgEntryPtr);
+	ConfigFile::ConfigEntry* entry = JNI_JLONG_TO_CONFIG_ENTRY(jCfgEntryPtr);
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigEntry reference is null");
-		}
-		else
-		{
-			delete entry;
-		}
-	}
-	JNI_CATCH
+	delete entry;
 }
 
 
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigEntry_1GetName
   (JNIEnv *jenv, jclass jcls, jlong jCfgEntryPtr, jobject jCfgEntry)
 {
-	jstring jName = 0;
+	ConfigFile::ConfigEntry* entry = JNI_JLONG_TO_CONFIG_ENTRY(jCfgEntryPtr);
 
-	try
-	{
-		ConfigFile::ConfigEntry* entry = JNI_JLONG_TO_CONFIG_ENTRY(jCfgEntryPtr);
+	const char* name = entry->getName();
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigEntry reference is null");
-		}
-		else
-		{
-			const char* name = entry->getName();
+	jstring jName = makeJavaString(jenv, name);
 
-			jName = makeJavaString(jenv, name);
-
-			jvmOk(jenv, "ConfigEntry::getName");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "ConfigEntry::getName");
 
 	return jName;
 }
@@ -269,24 +162,11 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigEntry
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigEntry_1GetConfig
   (JNIEnv *jenv, jclass jcls, jlong jCfgEntryPtr, jobject jCfgEntry)
 {
-	jlong jConfig = 0;
+	ConfigFile::ConfigEntry* entry = JNI_JLONG_TO_CONFIG_ENTRY(jCfgEntryPtr);
 
-	try
-	{
-		ConfigFile::ConfigEntry* entry = JNI_JLONG_TO_CONFIG_ENTRY(jCfgEntryPtr);
+	const Config& cfg = entry->getConfig();
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "ConfigEntry reference is null");
-		}
-		else
-		{
-			const Config& cfg = entry->getConfig();
-
-			jConfig = JNI_POINTER_TO_JLONG(&cfg);
-		}
-	}
-	JNI_CATCH
+	jlong jConfig = JNI_POINTER_TO_JLONG(&cfg);
 
 	return jConfig;
 }
@@ -295,46 +175,22 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_ConfigEntry_1
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_delete_1MessageEntry
   (JNIEnv *jenv, jclass jcls, jlong jMsgEntryPtr, jobject jMsgEntry)
 {
-	try
-	{
-		ConfigFile::MessageEntry* entry = JNI_JLONG_TO_MESSAGE_ENTRY(jMsgEntryPtr);
+	ConfigFile::MessageEntry* entry = JNI_JLONG_TO_MESSAGE_ENTRY(jMsgEntryPtr);
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageEntry reference is null");
-		}
-		else
-		{
-			delete entry;
-		}
-	}
-	JNI_CATCH
+	delete entry;
 }
 
 
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_MessageEntry_1GetName
   (JNIEnv *jenv, jclass jcls, jlong jMsgEntryPtr, jobject jMsgEntry)
 {
-	jstring jName = 0;
+	ConfigFile::MessageEntry* entry = JNI_JLONG_TO_MESSAGE_ENTRY(jMsgEntryPtr);
 
-	try
-	{
-		ConfigFile::MessageEntry* entry = JNI_JLONG_TO_MESSAGE_ENTRY(jMsgEntryPtr);
+	const char* name = entry->getName();
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageEntry reference is null");
-		}
-		else
-		{
-			const char* name = entry->getName();
+	jstring jName = makeJavaString(jenv, name);
 
-			jName = makeJavaString(jenv, name);
-
-			jvmOk(jenv, "MessageEntry::getName");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "MessageEntry::getName");
 
 	return jName;
 }
@@ -343,24 +199,11 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_MessageEntr
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_MessageEntry_1GetMessage
   (JNIEnv *jenv, jclass jcls, jlong jMsgEntryPtr, jobject jMsgEntry)
 {
-	jlong jMessage = 0;
+	ConfigFile::MessageEntry* entry = JNI_JLONG_TO_MESSAGE_ENTRY(jMsgEntryPtr);
 
-	try
-	{
-		ConfigFile::MessageEntry* entry = JNI_JLONG_TO_MESSAGE_ENTRY(jMsgEntryPtr);
+	const Message& msg = entry->getMessage();
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "MessageEntry reference is null");
-		}
-		else
-		{
-			const Message& msg = entry->getMessage();
-
-			jMessage = JNI_POINTER_TO_JLONG(&msg);
-		}
-	}
-	JNI_CATCH
+	jlong jMessage = JNI_POINTER_TO_JLONG(&msg);
 
 	return jMessage;
 }
@@ -371,17 +214,13 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Subscrip
 {
 	jlong jEntry = 0;
 
-	try
-	{
-		JStringManager name(jenv, jName);
-		JStringManager pattern(jenv, jPattern);
+	JStringManager name(jenv, jName);
+	JStringManager pattern(jenv, jPattern);
 
-		if (jvmOk(jenv, "ConfigFile.lookupSubscription"))
-		{
-			jEntry = JNI_POINTER_TO_JLONG(new ConfigFile::SubscriptionEntry(name.c_str(), pattern.c_str()));
-		}
+	if (jvmOk(jenv, "ConfigFile.lookupSubscription"))
+	{
+		jEntry = JNI_POINTER_TO_JLONG(new ConfigFile::SubscriptionEntry(name.c_str(), pattern.c_str()));
 	}
-	JNI_CATCH
 
 	return jEntry;
 }
@@ -390,46 +229,22 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Subscrip
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_delete_1SubscriptionEntry
   (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
 {
-	try
-	{
-		ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
+	ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionEntry reference is null");
-		}
-		else
-		{
-			delete entry;
-		}
-	}
-	JNI_CATCH
+	delete entry;
 }
 
 
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SubscriptionEntry_1GetName
   (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
 {
-	jstring jName = 0;
+	ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
 
-	try
-	{
-		ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
+	const char* name = entry->getName();
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionEntry reference is null");
-		}
-		else
-		{
-			const char* name = entry->getName();
+	jstring jName = makeJavaString(jenv, name);
 
-			jName = makeJavaString(jenv, name);
-
-			jvmOk(jenv, "SubscriptionEntry::getName");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "SubscriptionEntry::getName");
 
 	return jName;
 }
@@ -445,26 +260,13 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Subscriptio
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SubscriptionEntry_1GetPattern
   (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
 {
-	jstring jPattern = 0;
+	ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
 
-	try
-	{
-		ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
+	const char* pattern = entry->getPattern();
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionEntry reference is null");
-		}
-		else
-		{
-			const char* pattern = entry->getPattern();
+	jstring jPattern = makeJavaString(jenv, pattern);
 
-			jPattern = makeJavaString(jenv, pattern);
-
-			jvmOk(jenv, "SubscriptionEntry::getPattern");
-		}
-	}
-	JNI_CATCH
+	jvmOk(jenv, "SubscriptionEntry::getPattern");
 
 	return jPattern;
 }
@@ -473,47 +275,23 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Subscriptio
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SubscriptionEntry_1AddExcludedPattern
   (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry, jstring jPattern)
 {
-	try
+	ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
+
+	JStringManager pattern(jenv, jPattern);
+
+	if (jvmOk(jenv, "SubscriptionEntry.addExcludedPattern"))
 	{
-		ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
-
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionEntry reference is null");
-		}
-		else
-		{
-			JStringManager pattern(jenv, jPattern);
-
-			if (jvmOk(jenv, "SubscriptionEntry.addExcludedPattern"))
-			{
-				entry->addExcludedPattern(pattern.c_str());
-			}
-		}
+		entry->addExcludedPattern(pattern.c_str());
 	}
-	JNI_CATCH
 }
 
 
 JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SubscriptionEntry_1HasNextExcludedPattern
   (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
 {
-	jboolean result = JNI_FALSE;
+	ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
 
-	try
-	{
-		ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
-
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionEntry reference is null");
-		}
-		else
-		{
-			result = (entry->hasNextExcludedPattern() ? JNI_TRUE : JNI_FALSE);
-		}
-	}
-	JNI_CATCH
+	jboolean result = (entry->hasNextExcludedPattern() ? JNI_TRUE : JNI_FALSE);
 
 	return result;
 }
@@ -521,33 +299,22 @@ JNIEXPORT jboolean JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Subscripti
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_SubscriptionEntry_1NextExcludedPattern
   (JNIEnv *jenv, jclass jcls, jlong jSubEntryPtr, jobject jSubEntry)
 {
+	ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
+
 	jstring jPattern = 0;
 
 	try
 	{
-		ConfigFile::SubscriptionEntry* entry = JNI_JLONG_TO_SUBSCRIPTION_ENTRY(jSubEntryPtr);
+		const char* pattern = entry->nextExcludedPattern();
 
-		if (!entry)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "SubscriptionEntry reference is null");
-		}
-		else
-		{
-			try
-			{
-				const char* pattern = entry->nextExcludedPattern();
+		jPattern = makeJavaString(jenv, pattern);
 
-				jPattern = makeJavaString(jenv, pattern);
-
-				jvmOk(jenv, "SubscriptionEntry::nextExcludedPattern");
-			}
-			catch (const GmsecException& e)
-			{
-				ThrowGmsecException(jenv, e.what());
-			}
-		}
+		jvmOk(jenv, "SubscriptionEntry::nextExcludedPattern");
 	}
-	JNI_CATCH
+	catch (const GmsecException& e)
+	{
+		ThrowGmsecException(jenv, e.what());
+	}
 
 	return jPattern;
 }

@@ -1,4 +1,4 @@
-rem Copyright 2007-2023 United States Government as represented by the
+rem Copyright 2007-2024 United States Government as represented by the
 rem Administrator of The National Aeronautics and Space Administration.
 rem No copyright is claimed in the United States under Title 17, U.S. Code.
 rem All Rights Reserved.
@@ -36,8 +36,8 @@ if "x!INCLUDE:~-1!"=="x;" (
 	set INCLUDE=!INCLUDE:~0,-1!
 )
 
-echo "%SWIG_HOME%\swig.exe" -DGMSEC_S16IL32LL64=1 -DCHAR_BIT=8 -c++ -javascript -node -I../../framework/include -I"!_VCInstallDir!include" -I"!INCLUDE!" "!_InputFile!"
-"%SWIG_HOME%\swig.exe" -DGMSEC_S16IL32LL64=1 -DCHAR_BIT=8 -c++ -javascript -node -I../../framework/include -I"!_VCInstallDir!include" -I"!INCLUDE!" "!_InputFile!"
+echo "%SWIG_HOME%\swig.exe" -DSWIG_BINDING -DCHAR_BIT=8 -c++ -javascript -node -I../../framework/include -I"!_VCInstallDir!include" -I"!INCLUDE!" "!_InputFile!"
+"%SWIG_HOME%\swig.exe" -DSWIG_BINDING -DCHAR_BIT=8 -c++ -javascript -node -I../../framework/include -I"!_VCInstallDir!include" -I"!INCLUDE!" "!_InputFile!"
 
 
 echo "Patching swig generated code"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2023 United States Government as represented by the
+ * Copyright 2007-2024 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -33,13 +33,7 @@ extern "C" {
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Status
   (JNIEnv *jenv, jclass jcls)
 {
-	Status *created = 0;
-
-	try
-	{
-		created = new Status();
-	}
-	JNI_CATCH
+	Status* created = new Status();
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -55,16 +49,12 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Status_1
 {
 	Status* created = 0;
 
-	try
-	{
-		JStringManager tmp(jenv, jemsg);
+	JStringManager tmp(jenv, jemsg);
 
-		if (jvmOk(jenv, "Status.Set"))
-		{
-			created = new Status((StatusClass) jeclass, (StatusCode) jecode, tmp.c_str());
-		}
+	if (jvmOk(jenv, "Status.Set"))
+	{
+		created = new Status((StatusClass) jeclass, (StatusCode) jecode, tmp.c_str());
 	}
-	JNI_CATCH
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -80,16 +70,12 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Status_1
 {
 	Status* created = 0;
 
-	try
-	{
-		JStringManager tmp(jenv, jemsg);
+	JStringManager tmp(jenv, jemsg);
 
-		if (jvmOk(jenv, "Status.Set"))
-		{
-			created = new Status((StatusClass) jeclass, (StatusCode) jecode, tmp.c_str(), (int) jecustom);
-		}
+	if (jvmOk(jenv, "Status.Set"))
+	{
+		created = new Status((StatusClass) jeclass, (StatusCode) jecode, tmp.c_str(), (int) jecustom);
 	}
-	JNI_CATCH
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -103,22 +89,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Status_1
 JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Status_1Copy
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	Status* created = 0;
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			created = new Status(*status);
-		}
-	}
-	JNI_CATCH
+	Status* created = new Status(*status);
 
 	return JNI_POINTER_TO_JLONG(created);
 }
@@ -132,20 +105,9 @@ JNIEXPORT jlong JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_new_1Status_1
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_delete_1Status
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			delete status;
-		}
-	}
-	JNI_CATCH
+	delete status;
 }
 
 
@@ -157,22 +119,9 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_delete_1Status
 JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1HasError
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	jint error = 0;
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			error = status->hasError();
-		}
-	}
-	JNI_CATCH
+	jint error = status->hasError();
 
 	return error;
 }
@@ -186,25 +135,11 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1HasErr
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1Get
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	jstring s = 0;
+	Status *status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-	try
-	{
-		const char *tmp = "";
-		Status *status = JNI_JLONG_TO_STATUS(jStatusPtr);
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			tmp = status->get();
-			s = makeJavaString(jenv, tmp);
-			jvmOk(jenv, "Status GetString");
-		}
-	}
-	JNI_CATCH
+	const char* tmp = status->get();
+	jstring s = makeJavaString(jenv, tmp);
+	jvmOk(jenv, "Status GetString");
 
 	return s;
 }
@@ -218,22 +153,9 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1Get
 JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1GetClassification
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	jint result = 0;
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			result = status->getClass();
-		}
-	}
-	JNI_CATCH
+	jint result = static_cast<jint>(status->getClass());
 
 	return result;
 }
@@ -247,20 +169,9 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1GetCla
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1SetClassification
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus, jint jeclass)
 {
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			status->setClass((StatusClass) jeclass);
-		}
-	}
-	JNI_CATCH
+	status->setClass(static_cast<StatusClass>(jeclass));
 }
 
 
@@ -272,22 +183,9 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1SetCla
 JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1GetCode
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	jint result = 0;
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			result = status->getCode();
-		}
-	}
-	JNI_CATCH
+	jint result = static_cast<jint>(status->getCode());
 
 	return result;
 }
@@ -301,20 +199,9 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1GetCod
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1SetCode
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus, jint jecode)
 {
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			status->setCode((StatusCode) jecode);
-		}
-	}
-	JNI_CATCH
+	status->setCode(static_cast<StatusCode>(jecode));
 }
 
 
@@ -326,25 +213,11 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1SetCod
 JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1GetReason
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	jstring s = 0;
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
-		const char* tmp = "";
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			tmp = status->getReason();
-			s = makeJavaString(jenv, tmp);
-			jvmOk(jenv, "Status GetErorReason");
-		}
-	}
-	JNI_CATCH
+	const char* tmp = status->getReason();
+	jstring s = makeJavaString(jenv, tmp);
+	jvmOk(jenv, "Status GetErorReason");
 
 	return s;
 }
@@ -358,24 +231,13 @@ JNIEXPORT jstring JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1Get
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1SetErrorReason
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus, jstring jemsg)
 {
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			JStringManager text(jenv, jemsg);
-			if (text.c_str())
-			{
-				status->setReason(text.c_str());
-			}
-		}
+	JStringManager text(jenv, jemsg);
+	if (text.c_str())
+	{
+		status->setReason(text.c_str());
 	}
-	JNI_CATCH
 }
 
 
@@ -387,22 +249,9 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1SetErr
 JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1GetCustomCode
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	jint result = 0;
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			result = status->getCustomCode();
-		}
-	}
-	JNI_CATCH
+	jint result = static_cast<jint>(status->getCustomCode());
 
 	return result;
 }
@@ -416,20 +265,9 @@ JNIEXPORT jint JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1GetCus
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1SetCustomCode
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus, jint jcustom)
 {
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			status->setCustomCode((int) jcustom);
-		}
-	}
-	JNI_CATCH
+	status->setCustomCode(static_cast<int>(jcustom));
 }
 
 
@@ -441,25 +279,14 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1SetCus
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1Set__JLgov_nasa_gsfc_gmsec_api5_jni_JNIStatus_2IILjava_lang_String_2
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus, jint jeclass, jint jecode, jstring jemsg)
 {
-	try
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
+
+	JStringManager tmp(jenv, jemsg);
+
+	if (jvmOk(jenv, "Status.Set"))
 	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			JStringManager tmp(jenv, jemsg);
-
-			if (jvmOk(jenv, "Status.Set"))
-			{
-				status->set((StatusClass) jeclass, (StatusCode) jecode, tmp.c_str());
-			}
-		}
+		status->set(static_cast<StatusClass>(jeclass), static_cast<StatusCode>(jecode), tmp.c_str());
 	}
-	JNI_CATCH
 }
 
 
@@ -471,25 +298,14 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1Set__J
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1Set__JLgov_nasa_gsfc_gmsec_api5_jni_JNIStatus_2IILjava_lang_String_2I
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus, jint jeclass, jint jecode, jstring jemsg, jint jcustom)
 {
-	try
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
+
+	JStringManager tmp(jenv, jemsg);
+
+	if (jvmOk(jenv, "Status.Set"))
 	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
-
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			JStringManager tmp(jenv, jemsg);
-
-			if (jvmOk(jenv, "Status.Set"))
-			{
-				status->set((StatusClass) jeclass, (StatusCode) jecode, tmp.c_str(), (int) jcustom);
-			}
-		}
+		status->set(static_cast<StatusClass>(jeclass), static_cast<StatusCode>(jecode), tmp.c_str(), static_cast<int>(jcustom));
 	}
-	JNI_CATCH
 }
 
 
@@ -501,20 +317,9 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1Set__J
 JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Status_1Reset
   (JNIEnv *jenv, jclass jcls, jlong jStatusPtr, jobject jStatus)
 {
-	try
-	{
-		Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
+	Status* status = JNI_JLONG_TO_STATUS(jStatusPtr);
 
-		if (status == NULL)
-		{
-			SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "Status reference is null");
-		}
-		else
-		{
-			status->reset();
-		}
-	}
-	JNI_CATCH
+	status->reset();
 }
 
 
