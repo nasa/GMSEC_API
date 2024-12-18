@@ -246,7 +246,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <PrecompiledHeaderOutputFile>.\..\objects\Release/gmsec_jni.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderOutputFile>.\..\objects\Release/gmsec5_jni.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>.\..\objects\Release/</AssemblerListingLocation>
       <ObjectFileName>.\..\objects\Release/</ObjectFileName>
       <ProgramDataBaseFileName>.\..\objects\Release/</ProgramDataBaseFileName>
@@ -260,13 +260,13 @@
     </ResourceCompile>
     <Link>
       <AdditionalDependencies>$(JDK_HOME)\lib\jvm.lib;.\..\objects\Release\gmsec_api.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\bin\gmsec_jni.dll</OutputFile>
+      <OutputFile>..\bin\gmsec5_jni.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\objects\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>.\object\Release\gmsec_jni.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>.\object\Release\gmsec5_jni.pdb</ProgramDatabaseFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
-      <ImportLibrary>.\..\objects\Release/gmsec_jni.lib</ImportLibrary>
+      <ImportLibrary>.\..\objects\Release/gmsec5_jni.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
       <CLRImageType>Default</CLRImageType>
     </Link>

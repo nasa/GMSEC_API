@@ -6,7 +6,17 @@ For technical support regarding this release, or any previous version, please co
 
 
 ==============================================================================
-= GMSEC API 5.2 release notes (TBD 2024)
+= GMSEC API 5.2 release notes (November 2024)
+==============================================================================
+
+--- Change summary -----------------------------------------------------------
+* API-6360: Unnecessary usage of throw
+* API-6369: Incorrect generation of Javadocs
+* API-6375: JVM unable to dual load API 4.x and API 5.x interface
+
+
+==============================================================================
+= GMSEC API 5.2 release notes (July 2024)
 ==============================================================================
 
 --- Change summary -----------------------------------------------------------
