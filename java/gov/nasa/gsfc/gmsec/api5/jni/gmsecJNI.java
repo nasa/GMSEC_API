@@ -44,16 +44,17 @@ public class gmsecJNI
 	// This loads the jni library
 	static
 	{
-		final String GMSEC_JNI_KEY = "gmsec.jni.library";
+		final String GMSEC_JNI_KEY = "gmsec5.jni.library";
 
 		String libpath = System.getProperty(GMSEC_JNI_KEY);
 		if (libpath != null)
 		{
+			System.load(libpath.replace("gmsec5_jni.dll", "gmsec_api.dll"));
 			System.load(libpath);
 		}
 		else
 		{
-			System.loadLibrary("gmsec_jni");
+			System.loadLibrary("gmsec5_jni");
 		}
 
 		initialize();

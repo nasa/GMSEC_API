@@ -9,7 +9,7 @@ GMSEC_API_HOME = ..
 include $(GMSEC_API_HOME)/config/$(GMSEC_PLATFORM)
 
 
-TARGET    = libgmsec_jni.$(JSHLIB_EXT)
+TARGET    = libgmsec5_jni.$(JSHLIB_EXT)
 
 CXXFLAGS += $(JAVA_INCS)
 LDFLAGS  += $(STL_PORT) $(JAVA_LIBS)

@@ -2448,14 +2448,18 @@ void InternalMessage::processData(const char* data, DataType type)
 				throw GmsecException(MSG_ERROR, JSON_PARSE_ERROR, "Invalid JSON message format -- invalid JSON string data");
 			}
 
-			try
-			{
+			// Resolve ticket API-6360:
+			// Function fromJSON() handles exception. Therefore, it does not need to catch and make a new exception here.
+			// Note: the error messages generated in the function fromJSON() is not the same as 
+			// "Invalid JSON message format -- invalid JSON string data"
+			//try
+			//{
 				fromJSON(root);
-			}
-			catch (...)
-			{
-				throw GmsecException(MSG_ERROR, JSON_PARSE_ERROR, "Invalid JSON message format -- invalid JSON string data");
-			}
+			//}
+			//catch (...)
+			//{
+			//	throw GmsecException(MSG_ERROR, JSON_PARSE_ERROR, "Invalid JSON message format -- invalid JSON string data");
+			//}
 		}
 		break;
 

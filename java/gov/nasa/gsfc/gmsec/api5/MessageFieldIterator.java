@@ -21,7 +21,9 @@ import java.util.NoSuchElementException;
 /**
  * A class that can be used to iterate over the Fields contained within a Message.
  *
- * @note MessageFieldIterator is not thread safe.
+ * <p>
+ * Note: MessageFieldIterator is not thread safe.
+ * </p>
  * <p>
  * An example usage is:
  * <pre>{@code
