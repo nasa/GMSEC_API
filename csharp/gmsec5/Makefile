@@ -1,4 +1,4 @@
-# Copyright 2007-2024 United States Government as represented by the
+# Copyright 2007-2025 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -11,10 +11,14 @@ TARGET	        = libgmsec_csharp.so
 
 ASSEMBLY        = gmsec_csharp.dll
 
-ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+ifeq ($(findstring macosx.x86_64,$(GMSEC_PLATFORM)), macosx.x86_64)
 MCS             = /usr/local/bin/mcs
 else
+ifeq ($(findstring macosx.aarch64,$(GMSEC_PLATFORM)), macosx.aarch64)
+MCS             = /opt/homebrew/bin/mcs
+else
 MCS             = /usr/bin/mcs
+endif
 endif
 
 SWIG            = $(SWIG_HOME)/bin/swig
@@ -50,7 +54,7 @@ check_mono:
 	@if [ ! -e $(MCS) ]; then \
 		echo; \
 		echo; \
-		echo "###########################################################"; \
+		echo "###########################################################AAAAAAAAAAAAAAAAAAAAA"; \
 		echo "#"; \
 		echo "# Mono development tools are not installed"; \
 		echo "#"; \

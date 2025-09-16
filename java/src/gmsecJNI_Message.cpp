@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -244,7 +244,18 @@ JNIEXPORT void JNICALL Java_gov_nasa_gsfc_gmsec_api5_jni_gmsecJNI_Message_1SetCo
 	Message* msg = JNI_JLONG_TO_MESSAGE(jMsgPtr);
 	Config*  cfg = JNI_JLONG_TO_CONFIG(jCfgPtr);
 
-	msg->setConfig(*cfg);
+	if (jvmOk(jenv, "Message.setConfig"))
+	{
+		try
+		{
+			msg->setConfig(*cfg);
+		}
+		catch (const GmsecException& e)
+		{
+			ThrowGmsecException(jenv, e.what());
+		}
+	}
+
 }
 
 

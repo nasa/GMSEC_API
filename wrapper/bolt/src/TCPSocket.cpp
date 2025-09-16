@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -80,8 +80,12 @@ TCPSocket::~TCPSocket ()
 Result TCPSocket::setOptions(const Options &options)
 {
 	Result result;
-
+#ifdef WIN32                                                                    // made change by TUAN NGUYEN
+	connect_timeout_ms = options.getI32(opt::CONNECT_TIMEOUT_ms, 1);            // made change by TUAN NGUYEN
+#else                                                                           // made change by TUAN NGUYEN
 	connect_timeout_ms = options.getI32(opt::CONNECT_TIMEOUT_ms, 5000);
+#endif                                                                          // made change by TUAN NGUYEN
+
 	m_nagle            = options.getFlag(opt::NAGLE, false);
 	m_tcpBufferSize    = options.getI32(opt::TCP_BUF_SIZE, 0);
 
@@ -393,7 +397,13 @@ Result TCPSocket::open(int family)
 	}
 
 	handle_t tmp = socket(family, SOCK_STREAM, 0);
-	if (tmp < 0)
+	// In Windows OS, handle_t has a type of unsigned int. Therefore it uses INVALID_SOCKET instead of -1.  // made change by TUAN NGUYEN
+	// if (tmp < 0)                                   // made change by TUAN NGUYEN
+#ifdef WIN32                                          // made change by TUAN NGUYEN
+	if (tmp == INVALID_SOCKET)                        // made change by TUAN NGUYEN
+#else                                                 // made change by TUAN NGUYEN
+	if (tmp == -1)                                    // made change by TUAN NGUYEN
+#endif                                                // made change by TUAN NGUYEN
 	{
 		return setError(result);
 	}

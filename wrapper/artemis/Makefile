@@ -1,4 +1,4 @@
-# Copyright 2007-2024 United States Government as represented by the
+# Copyright 2007-2025 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -30,9 +30,13 @@ LOCAL_DEFS   = -DGMSEC_LIBROOTNAME=$(LIBROOTNAME) -DGMSEC_ARTEMIS
 LOCAL_INCS   = -I$(SUPDIR)/include \
                -I../activemq/include
 
-ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+ifeq ($(findstring macosx.x86_64,$(GMSEC_PLATFORM)), macosx.x86_64)
     # MacOS
 LOCAL_INCS  += -I/usr/local/opt/apr/include/apr-1
+else
+ifeq ($(findstring macosx.aarch64,$(GMSEC_PLATFORM)), macosx.aarch64)
+    # MacOS
+LOCAL_INCS  += -I/opt/homebrew/opt/apr/include/apr-1
 else
 ifeq (,$(wildcard /etc/lsb-release))
     # RHEL
@@ -40,6 +44,7 @@ LOCAL_INCS  += -I/usr/include/apr-1
 else
     # Ubuntu
 LOCAL_INCS  += -I/usr/include/apr-1.0
+endif
 endif
 endif
 

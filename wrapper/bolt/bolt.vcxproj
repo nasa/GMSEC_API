@@ -37,6 +37,7 @@
     <ClInclude Include="include\bolt\Packet.h" />
     <ClInclude Include="include\bolt\Property.h" />
     <ClInclude Include="include\bolt\Result.h" />
+    <ClInclude Include="include\bolt\SafeList.h" />
     <ClInclude Include="include\bolt\Shared.h" />
     <ClInclude Include="include\bolt\TCPSocket.h" />
     <ClInclude Include="include\bolt\Test.h" />

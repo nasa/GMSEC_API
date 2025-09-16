@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -134,7 +134,7 @@ public class request_async
 			reqMsg.addField("REQUEST-ID", new U16(0));
 
 			// Timeout and republish periods have been arbitrarily chosen to be 5 seconds.
-			// The republish period could also be set to GMSEC_REQUEST_REPUBLISH_NEVER to
+			// The republish period could also be set to Gmsec.REQUEST_REPUBLISH_NEVER to
 			// prevent re-sending request message should a timeout occur.
 			int timeout   = 5000;
 			int republish = 5000;

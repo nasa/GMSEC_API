@@ -175,7 +175,13 @@ class Test_ResourceGenerator(Test):
         t2 = 0
 
         for i in range(0,7):
+            # Start time t1 is at the time start to receive data
+            t1 = lp.TimeUtil.get_current_time_s()
             rsrcMsg = conn.receive(5000)
+
+            # The end time t2 has to be measured immediately right after 
+            # it completes receiving data.
+            t2 = lp.TimeUtil.get_current_time_s()
 
             # ignore the first few incoming messages (if any)
             if i < 3:
@@ -184,20 +190,23 @@ class Test_ResourceGenerator(Test):
                 continue
 
             if rsrcMsg != None:
-                if t1 == 0:
-                    t1 = lp.TimeUtil.get_current_time_s()
-                else:
-                    t2 = lp.TimeUtil.get_current_time_s()
+                # if t1 == 0:
+                #    t1 = lp.TimeUtil.get_current_time_s()
+                # else:
+                #    t2 = lp.TimeUtil.get_current_time_s()
 
-                    delta = t2 - t1
-                    if delta < expectedPubRate:
-                        delta = ((t2 - t1) * 10.0 + 0.5) / 10.0
+                delta = t2 - t1
+                roundUpPubRateToSecond = int(delta)
+                if delta < expectedPubRate:
+                    #delta = ((t2 - t1) * 10.0 + 0.5) / 10.0
+                    roundUpPubRateToSecond = int(delta + 0.5)
 
-                    lp.log_info("Expected rate is: " + str(expectedPubRate) + ", delta is: " + str(delta))
+                lp.log_info("Expected rate is: " + str(expectedPubRate) + ", delta is: " + str(delta))
 
-                    self.check("Unexpected publish rate", int(expectedPubRate) == int(delta))
+                #self.check("Unexpected publish rate", int(expectedPubRate) == int(delta))
+                self.check("Unexpected publish rate", int(expectedPubRate) == roundUpPubRateToSecond)
 
-                    t1 = t2
+                #    t1 = t2
 
                 self.check("Unexpected MESSAGE-TYPE", rsrcMsg.get_string_value("MESSAGE-TYPE") == "MSG")
                 self.check("Unexpected MESSAGE-SUBTYPE", rsrcMsg.get_string_value("MESSAGE-SUBTYPE") == "RSRC")

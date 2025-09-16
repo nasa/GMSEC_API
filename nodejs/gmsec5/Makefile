@@ -1,4 +1,4 @@
-# Copyright 2007-2024 United States Government as represented by the
+# Copyright 2007-2025 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -9,8 +9,16 @@ include $(GMSEC_API_HOME)/config/$(GMSEC_PLATFORM)
 
 TARGET          = gmsec_nodejs.node
 
-NODE            = $(NODE_HOME)/bin/node
-NODE_GYP        = $(NODE_HOME)/bin/node-gyp
+NODE		= $(NODE_HOME)/bin/node
+
+# If NODE_HOME is in GMSEC_SUPPORT folder, we get node-gyp from there, otherwise 
+# get node from operating system bin folders 
+theString	=GMSEC_SUPPORT
+ifeq ($(findstring $(theString),$(NODE_HOME)), $(theString))
+NODE_GYP	= $(NODE_HOME)/lib/node_modules/npm/bin/node-gyp-bin/node-gyp
+else
+NODE_GYP	= $(NODE_HOME)/bin/node-gyp
+endif
 
 SWIG            = $(SWIG_HOME)/bin/swig
 SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)

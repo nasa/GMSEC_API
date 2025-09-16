@@ -88,6 +88,7 @@ public class T005_Message extends TestCase
 			test_to_json();
 			test_get_size();
 			test_get_field_iterator();
+			test_ticket_API_6403();			// This test case is added for ticket API-6403
 		}
 		catch (Exception e)
 		{
@@ -1887,6 +1888,40 @@ public class T005_Message extends TestCase
 
 		MessageFieldIterator iter = msg.getFieldIterator();
 		check("Got the field iterator", true);
+	}
+
+
+	// This test for ticket API-6403
+	private void test_ticket_API_6403()
+		throws Exception
+	{
+		Log.info("Test ticket API-6403");
+		MessageFactory msgFactory = MessageFactory.create();
+		Message message = msgFactory.createMessage("HB");
+		MessageFactory.destroy(msgFactory);
+
+		// Create a 6-bytes array {0,1,2,3,4,5}
+		final byte[] arr = new byte[6];
+		for (int i = 0; i < 6; i++) 
+		{
+    		arr[i] = (byte) i;
+		}
+		// At this point, arr = {0,1,2,3,4,5}
+
+		final String name = "SPECIAL-INFO";
+		message.addField(name, arr);
+
+		String xmlMsg1 = message.getField(name).toXML();         // Expect the field type to be BINARY and its value to be <000102030405> 
+		System.out.println("binary to xml: " + xmlMsg1);
+
+		final String asString = message.getStringValue(name);    // Expect the value of asString is '000102030405'
+		message.setFieldValue(name, asString);
+
+		String xmlMsg2 = message.getField(name).toXML();
+		System.out.println("xml after string conversion: " + xmlMsg2);
+		//assertArrayEquals(arr, message.getBinaryField(name).getValue()); 
+
+		check("Messages 1 and 2 do not have same XML content", xmlMsg1.equals(xmlMsg2));
 	}
 }
 

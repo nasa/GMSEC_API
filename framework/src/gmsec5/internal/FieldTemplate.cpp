@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -18,6 +18,7 @@
 
 #include <gmsec5/util/Log.h>
 
+#include <iomanip>
 #include <sstream>
 #include <tinyxml2.h>
 
@@ -632,7 +633,7 @@ const std::string& FieldTemplate::toXML(const std::string& type) const
 
 	std::ostringstream oss;
 
-	oss << "<FIELD TYPE=\"" << (type == "UNSET" || type == "VARIABLE" ? "STRING" : type) << "\" NAME=\"" << m_name << "\""
+	oss << std::setprecision(16) << "<FIELD TYPE=\"" << (type == "UNSET" || type == "VARIABLE" ? "STRING" : type) << "\" NAME=\"" << m_name << "\""
 		<< (isHeader() ? " HEAD=\"T\"" : "") << ">"
 		<< (hasExplicitType() ? getValue() : "")
 		<< "</FIELD>";

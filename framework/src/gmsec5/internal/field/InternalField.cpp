@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include <iomanip>
 #include <sstream>
 #include <cmath>    // for fabs
 #include <cstring>  // for strlen
@@ -295,11 +296,11 @@ const char* InternalField::getStringValue() const
 			break;
 
 		case Field::Type::F32:
-			oss << dynamic_cast<const InternalF32Field*>(this)->getValue();
+			oss << std::setprecision(7) << dynamic_cast<const InternalF32Field*>(this)->getValue();
 			break;
 
 		case Field::Type::F64:
-			oss << dynamic_cast<const InternalF64Field*>(this)->getValue();
+			oss << std::setprecision(16) << dynamic_cast<const InternalF64Field*>(this)->getValue();
 			break;
 
 		case Field::Type::STRING:
@@ -600,7 +601,7 @@ GMSEC_U64 InternalField::getU64Value() const
 
 GMSEC_F64 InternalField::getF64Value() const
 {
-	GMSEC_F64 value;
+	GMSEC_F64 value = 0.0;
 	bool      converted = true;
 
 	switch (getType())

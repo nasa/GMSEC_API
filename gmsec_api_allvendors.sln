@@ -6,42 +6,99 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmsec_api", "gmsec_api.vcxproj", "{3FC0A670-E49C-4B59-B286-99137DF463BB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "activemq395", "wrapper\activemq395\activemq395.vcxproj", "{29BE00D5-DDB4-44D3-BEC0-A9904FDB4435}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "artemis", "wrapper\artemis\artemis.vcxproj", "{26567CD7-E3C6-4A6C-82EA-A981391D3E6E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bolt", "wrapper\bolt\bolt.vcxproj", "{2F5DD35F-4C53-4182-8D2C-712E982AC2BB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "c2", "wrapper\c2\c2.vcxproj", "{64DD67C4-9DCA-4CE2-A6BE-20BF2F6590A4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "c2_nss", "wrapper\c2_nss\c2_nss.vcxproj", "{29E18110-A7CE-4490-B47C-9CD8ADFB59A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generic_jms", "wrapper\generic_jms\generic_jms.vcxproj", "{E4A92DEA-C683-4F45-B78A-AF4D7560AE59}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ibmmq90", "wrapper\ibmmq90\ibmmq90.vcxproj", "{99A8F807-7FA5-4CC6-9ECD-BDDE8CA9B142}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mb", "wrapper\mb\mb.vcxproj", "{B1876789-0E12-4974-9755-376F6E4BE078}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MBServer", "wrapper\mb\MBServer\MBServer.vcxproj", "{407B8EB8-D2A9-4F00-89FF-6202433CFEF5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmhelp", "tools\gmhelp\gmhelp.vcxproj", "{D4A09817-D688-4F3B-AA00-C77A2ACC1676}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmsec_java", "java\gmsec_java.vcxproj", "{1207C278-BBEE-466B-A69C-43C6840AEF5F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmsec_jni", "java\gmsec_jni.vcxproj", "{7117D781-7094-4FD5-ACB8-76F5F4C0EB29}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_csharp", "csharp\gmsec5\libgmsec_csharp.vcxproj", "{00ED94E9-3301-4AD0-81C3-8745C620A2F6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_python3", "python3\gmsec5\libgmsec_python3.vcxproj", "{56908689-E380-45F4-9DEA-FD4F8279A812}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_ruby", "ruby\gmsec5\libgmsec_ruby.vcxproj", "{D661F65B-577C-4102-ABAD-83202B45D85D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libgmsec_perl", "perl\gmsec5\libgmsec_perl.vcxproj", "{8D4F2C8C-A403-4242-9C02-58DC93306D38}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opendds317", "wrapper\opendds317\opendds317.vcxproj", "{29FF554C-1AF8-4C19-A99E-91A42A625E4A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gmsec_nodejs", "nodejs\gmsec5\gmsec_nodejs.vcxproj", "{AFE92376-3FD8-4EB4-8893-639CDA785F2E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "loopback", "wrapper\loopback\loopback.vcxproj", "{B7CC8989-CD42-4B95-8207-F15742D7E31B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC0A670-E49C-4B59-B286-99137DF463BB} = {3FC0A670-E49C-4B59-B286-99137DF463BB}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

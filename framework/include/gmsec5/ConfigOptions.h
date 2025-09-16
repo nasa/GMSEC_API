@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -74,6 +74,8 @@ const char* const GMSEC_SORT_MSG_FIELDS			= "GMSEC-SORT-MSG-FIELDS";
 
 const char* const GMSEC_SHOW_MSG_CONFIG			= "GMSEC-SHOW-MSG-CONFIG";
 const char* const GMSEC_IDENTIFY_HEADER_FIELDS		= "GMSEC-IDENTIFY-HEADER-FIELDS";
+
+const char* const GMSEC_REPLY_SUBJECT = "GMSEC-REPLY-SUBJECT";
 
 const char* const GMSEC_SUPPORT_LEGACY_API		= "GMSEC-SUPPORT-LEGACY-API";
 

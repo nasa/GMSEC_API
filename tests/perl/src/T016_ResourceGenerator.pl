@@ -213,7 +213,13 @@ sub verifyResourceMessage
 
 	for (my $i = 0; $i < 7; $i++)
 	{
+		# Start time t1 is at the time start to receive data
+		$t1 = libgmsec_perl::TimeUtil::getCurrentTime_s();
 		my $rsrcMsg = $conn->receive(5000);
+
+		# The end time t2 has to be measured immediately right after 
+        # it completes receiving data.
+		$t2 = libgmsec_perl::TimeUtil::getCurrentTime_s();
 
 		# ignore the first few incoming messages (if any)
 		if ($i < 3)
@@ -231,26 +237,29 @@ sub verifyResourceMessage
 		}
 		else
 		{
-			if ($t1 == 0)
+			# if ($t1 == 0)
+			# {
+			#	$t1 = libgmsec_perl::TimeUtil::getCurrentTime_s();
+			#}
+			#else
+			#{
+			#	$t2 = libgmsec_perl::TimeUtil::getCurrentTime_s();
+
+            my $delta = $t2 - $t1;
+			my $roundUpPubRateToSecond = int($delta);
+            if ($delta < $expectedPubRate)
 			{
-				$t1 = libgmsec_perl::TimeUtil::getCurrentTime_s();
+				#$delta = (($t2 - $t1) * 10.0 + 0.5) / 10.0;
+				$roundUpPubRateToSecond = int($delta + 0.5);
 			}
-			else
-			{
-				$t2 = libgmsec_perl::TimeUtil::getCurrentTime_s();
 
-                my $delta = $t2 - $t1;
-                if ($delta < $expectedPubRate)
-				{
-					$delta = (($t2 - $t1) * 10.0 + 0.5) / 10.0;
-				}
+			libgmsec_perl::logInfo("Expected rate is: $expectedPubRate, delta is: $delta");
 
-				libgmsec_perl::logInfo("Expected rate is: $expectedPubRate, delta is: $delta");
-
-				$test->check("Unexpected publish rate", int($expectedPubRate) <= int($delta));
-
-				$t1 = $t2;
-			}
+			#	$test->check("Unexpected publish rate", int($expectedPubRate) <= int($delta));
+			$test->check("Unexpected publish rate", $expectedPubRate <= $roundUpPubRateToSecond);
+				
+			#	$t1 = $t2;
+			#}
 
             $test->check("Unexpected MESSAGE-TYPE", $rsrcMsg->getStringValue("MESSAGE-TYPE") eq "MSG");
             $test->check("Unexpected MESSAGE-SUBTYPE", $rsrcMsg->getStringValue("MESSAGE-SUBTYPE") eq "RSRC");

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="AMQ_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Artemis_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bolt_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gmhelp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IBMMQ_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JMS_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MB_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenDDS_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WS_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ZeroMQ_help.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{985967ed-cc02-4b84-9d2d-54a884a006d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{59a16f8b-2a45-41a2-8765-06370912d04d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="gmhelp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

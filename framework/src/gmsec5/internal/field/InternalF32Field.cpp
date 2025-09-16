@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -12,6 +12,7 @@
 
 #include <gmsec5/internal/MathUtil.h>
 
+#include <iomanip>
 #include <sstream>
 
 
@@ -42,7 +43,7 @@ const char* InternalF32Field::toXML() const
 	{
 		std::ostringstream oss;
 
-		oss << "<FIELD NAME=\"" << getName()
+		oss << std::setprecision(7) << "<FIELD NAME=\"" << getName()
 		    << "\" TYPE=\"F32\"";
 
 		if (identifyHeaderField())
@@ -93,7 +94,7 @@ const char* InternalF32Field::toJSON() const
 	{
 		std::ostringstream oss;
 
-		oss << "{\"NAME\":\"" << getName() << "\","
+		oss << std::setprecision(7) << "{\"NAME\":\"" << getName() << "\","
 			<< "\"TYPE\":\"F32\",";
 
 		if (identifyHeaderField())
