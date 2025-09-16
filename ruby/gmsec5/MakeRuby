@@ -1,4 +1,4 @@
-# Copyright 2007-2024 United States Government as represented by the
+# Copyright 2007-2025 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -15,10 +15,14 @@ SWIG_VERSION    = $(shell $(SWIG) -version | grep Version | cut -d' ' -f3)
 SWIG_SWG        = -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)/ruby -I$(SWIG_HOME)/share/swig/$(SWIG_VERSION)
 SWIG_OPTS       = -c++ -ruby $(SWIG_SWG) -DCHAR_BIT=8 -DSWIG_BINDING
 
-ifeq ($(findstring macosx,$(GMSEC_PLATFORM)), macosx)
+ifeq ($(findstring macosx.x86_64,$(GMSEC_PLATFORM)), macosx.x86_64)
 RUBY            = /usr/local/opt/ruby/bin/ruby
 else
+ifeq ($(findstring macosx.aarch64,$(GMSEC_PLATFORM)), macosx.aarch64)
+RUBY            = /opt/homebrew/opt/ruby/bin/ruby
+else
 RUBY            = /usr/bin/ruby
+endif
 endif
 
 FRAMEWORK_DIR   = ../../framework

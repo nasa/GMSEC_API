@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -1041,6 +1041,19 @@ StringUtil::Data StringUtil::padWithLeadingZeros(const Data& data, size_t numZer
 }
 
 
+//------------------------------------------------------------------------------------
+// StringUtil::Data StringUtil::string_toBinary(const char* value)
+//------------------------------------------------------------------------------------
+/**
+* This function return a bytes array/stack containing ASCII values of the input string.
+* 
+* For example, the input string := "012345", ASCII values of that string is a six bytes
+* array/stack with values {0x30, 0x31, 0x32, 0x33, 0x34}.
+* 
+* Note that: ASCII of '0', '1', '2', '3', '4', and '5' is 0x30, 0x31, 0x32, 0x33, 0x34, 
+* and 0x35 respectively.
+*/
+//------------------------------------------------------------------------------------
 StringUtil::Data StringUtil::string_toBinary(const char* value)
 {
 	if (value == NULL)
@@ -1052,16 +1065,50 @@ StringUtil::Data StringUtil::string_toBinary(const char* value)
 }
 
 
+//------------------------------------------------------------------------------------
+// StringUtil::Data StringUtil::binaryString_toBinary(const char* value)
+//------------------------------------------------------------------------------------
+/**
+* This function return a hex number as it is presented in the input string.
+*
+* For example, if the input binary string has value := "1F5", the hex number 
+* presenting by that string is 0x1F5. Therefore, this function return 2-bytes 
+* array/stack {0x00, 0xF5}.
+*
+* Note that: the input string is not an empty string and has to contain number with 
+* base 16 (hex). Other kind of content is not allowed. That means all character in the
+* input string has to be in range ['0'-'9'] or ['a'-'f'] or ['A'-'F'].
+*/
+//------------------------------------------------------------------------------------
 StringUtil::Data StringUtil::binaryString_toBinary(const char* value)
 {
 	StringUtil::Data blob;
 
 	size_t blob_len = std::string(value).length();
 
-	for (size_t i = 0; i < blob_len; i += 2)
+	// for (size_t i = 0; i < blob_len; i += 2)			//Fix bug API-6403 
+	size_t i = 0;										//Fix bug API-6403
+	while (i < blob_len)								//Fix bug API-6403
 	{
 		unsigned int ch;
-		char hex[3] = { value[i], value[i+1], 0 };
+		//char hex[3] = { value[i], value[i+1], 0 };	//Fix bug API-6403
+		char hex[3];									//Fix bug API-6403
+		if (((blob_len % 2) != 0) && (i == 0))			//Fix bug API-6403
+		{												//Fix bug API-6403
+			// for case: value = "1F5"					//Fix bug API-6403
+			hex[0] = '0';								//Fix bug API-6403
+			hex[1] = value[i];							//Fix bug API-6403
+			hex[2] = 0;									//Fix bug API-6403
+			++i;										//Fix bug API-6403
+		}												//Fix bug API-6403
+		else											//Fix bug API-6403
+		{												//Fix bug API-6403
+			// for case: value = "01F5"					//Fix bug API-6403
+			hex[0] = value[i];							//Fix bug API-6403
+			hex[1] = value[i+1];						//Fix bug API-6403
+			hex[2] = 0;									//Fix bug API-6403
+			i += 2;										//Fix bug API-6403
+		}												//Fix bug API-6403
 #ifndef WIN32
 		std::sscanf(hex, "%02X", &ch);
 #else

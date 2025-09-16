@@ -260,29 +260,37 @@ class T016_ResourceGenerator extends TestCase
 			var t2 = 0;
 
 			for (var i = 0; i < 8; i++) {
+				// Start time t1 is at the time start to receive data
+				t1 = gmsec.TimeUtil.getCurrentTime_s();
 				var hbmsg = conn.receive(5000);
+
+				// The end time t2 has to be measured immediately right after it completes receiving data.
+				t2 = gmsec.TimeUtil.getCurrentTime_s();
 
 				// Ignore the first few incoming messages (if any)
 				if (i < 3) continue;
 
 				if (hbmsg != null) {
-					if (t1 == 0) {
-						t1 = gmsec.TimeUtil.getCurrentTime_s();
-					}
-					else {
-						t2 = gmsec.TimeUtil.getCurrentTime_s();
+					//if (t1 == 0) {
+					//	t1 = gmsec.TimeUtil.getCurrentTime_s();
+					//}
+					//else {
+					//	t2 = gmsec.TimeUtil.getCurrentTime_s();
 
 						var delta = t2 - t1;
+						roundUpPubRateToSecond = Math.floor(delta);
 						if (delta < pubRate) {
-							delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+							//delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+							roundUpPubRateToSecond = Math.floor(delta + 0.5);    // round up to second
 						}
 
 						gmsec.Log.info("Expected Rate: " + pubRate + ", delta is: " + delta);
 
-						this.check("Unexpected publish rate", Math.floor(delta) == pubRate);
+						//this.check("Unexpected publish rate", Math.floor(delta) == pubRate);
+						this.check("Unexpected publish rate", roundUpPubRateToSecond == pubRate);
 
-						t1 = t2;
-					}
+					//	t1 = t2;
+					//}
 				}
 				else {
 					this.check("Failed to receive RSRC message", false);

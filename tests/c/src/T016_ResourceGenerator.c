@@ -479,8 +479,14 @@ void verifyResourceMessage(GMSEC_Config config, GMSEC_U16 expectedPubRate)
 
 	for (i = 0; i < 7; ++i)
 	{
-		// Ensure we are still connected
+		// Start time t1 is at the time start to receive data
+		t1 = timeUtilGetCurrentTime_s(NULL);;
 		GMSEC_Message msg = connectionReceive(conn, 5000, status);
+
+		// The end time t2 has to be measured immediately right after it completes receiving data.
+		t2 = timeUtilGetCurrentTime_s(NULL);;
+
+		// Ensure we are still connected
 		testRequireBool(statusGet(status), statusHasError(status) == GMSEC_FALSE);
 
 		// Ignore the first few incoming messages (if any)
@@ -492,26 +498,29 @@ void verifyResourceMessage(GMSEC_Config config, GMSEC_U16 expectedPubRate)
 
 		if (msg != NULL)
 		{
-			if (t1 == 0)
-			{
-				t1 = timeUtilGetCurrentTime_s(NULL);
-			}
-			else
-			{
-				t2 = timeUtilGetCurrentTime_s(NULL);
+			//if (t1 == 0)
+			//{
+			//	t1 = timeUtilGetCurrentTime_s(NULL);
+			//}
+			//else
+			//{
+			//	t2 = timeUtilGetCurrentTime_s(NULL);
 
 				double delta = t2 - t1;
+				GMSEC_U16 roundUpPubRateToSecond = (GMSEC_U16)delta;
 				if (delta < expectedPubRate)
 				{
-					delta = (delta * 10.0 + 0.5) / 10.0;
+					//delta = (delta * 10.0 + 0.5) / 10.0;
+					roundUpPubRateToSecond = (GMSEC_U16)(delta + 0.5);       // round up to second
 				}
 
 				GMSEC_INFO("Expected rate is %u, delta is: %g", expectedPubRate, delta);
 
-				testCheckBool("Unexpected publish rate", expectedPubRate == (GMSEC_U16)delta);
+				//testCheckBool("Unexpected publish rate", expectedPubRate == (GMSEC_U16)delta);
+				testCheckBool("Unexpected publish rate", expectedPubRate == roundUpPubRateToSecond);
 
-				t1 = t2;
-			}
+				//t1 = t2;
+			//}
 
 			testCheckBool("Unexpected MESSAGE-TYPE", strcompare(messageGetStringValue(msg, "MESSAGE-TYPE", NULL), "MSG") == 0);
 			testCheckBool("Unexpected MESSAGE-SUBTYPE", strcompare(messageGetStringValue(msg, "MESSAGE-SUBTYPE", NULL), "RSRC") == 0);

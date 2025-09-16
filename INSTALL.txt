@@ -1,4 +1,4 @@
-# Copyright 2007-2024 United States Government as represented by the
+# Copyright 2007-2025 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -41,9 +41,9 @@ systems:
     - The manifest tool (mt.exe) from the Windows SDK
     - OpenJDK version 1.8 or higher (OpenJDK 17 is preferred)
     - SWIG 4.1.0 or later
-    - Node 18.15.0 (from https://nodejs.org/en/download)
-    - Strawberry Perl 5.32.1.1 or later
-    - Python 3.10.7 or later (from https://www.python.org/downloads)
+    - Node 22.14.0 (from https://nodejs.org/en/download)
+    - Strawberry Perl 5.38.2 or later
+    - Python 3.11 (from https://www.python.org/downloads)
     - Ruby 3.2.2
 
 
@@ -53,9 +53,9 @@ systems:
     - OpenJDK version 1.8 or higher (OpenJDK 17 is preferred)
     - SWIG 4.1.0 or later
     - Mono JIT Compiler 6.12.0.107 or later
-    - Node 18.15.0 (from https://nodejs.org/en/download)
+    - Node 22.14.0 (from https://nodejs.org/en/download)
     - Perl 5.26.3 or later
-    - Python 3.10.7 or later (from https://www.python.org/downloads)
+    - Python 3.11 (from https://www.python.org/downloads)
     - Ruby 2.5.9p229
 
 
@@ -64,20 +64,20 @@ For Ubuntu 20.04 (x86-64 or ARM64):
     - GNU make 4.2.1
     - OpenJDK version 1.8 or higher (OpenJDK 17 is preferred)
     - Mono JIT Compiler 6.16.0.182 or later
-    - Node 18.15.0 (from https://nodejs.org/en/download)
+    - Node 22.14.0(from https://nodejs.org/en/download)
     - Perl 5.30.0 or later
     - Python 3.10.7 or later (from https://www.python.org/downloads)
     - Ruby 2.7.0p0
 
 
-For MacOS (x86-64):
-    - GCC Apple clang version 14.0.0 (clang-1400.0.29.202)
+For MacOS (ARM64):
+    - GCC Apple clang version 17.0.0 (clang-1400.0.29.202)
     - GNU make 3.81
     - OpenJDK version 1.8 or higher (OpenJDK 17 is preferred)
     - Mono JIT Compiler 6.12.0.108 or later (install using Homebrew)
-    - Node 18.15.0 (from https://nodejs.org/en/download)
+    - Node 22.18.0 (install using node version manager)
     - Perl 5.36.0 or later (install using Homebrew)
-    - Python 3.10.5 or later (install using Homebrew)
+    - Python 3.13 or later (install using Homebrew)
     - Ruby 3.2.2 (install using Homebrew)
 
 
@@ -188,9 +188,9 @@ be restarted if environment variables have been added or modified.
 For example:
     set JDK_HOME="C:\Program Files\AdoptOpenJDK"
     set JAVA_HOME=%JDK_HOME%
-    set NODE_HOME=C:\node-18.15.0
+    set NODE_HOME=C:\node-22.14.0
     set PERL5_HOME=C:\Strawberry
-    set PYTHON3_HOME=C:\Python310
+    set PYTHON3_HOME=C:\Python311
     set RUBY_HOME=C:\Ruby-3.2.2
     set SWIG_HOME=C:\swig-4.1.0
 
@@ -283,9 +283,9 @@ the following files:
 
 
 For example:
-    export JDK_HOME=~/tools/jdk-11.0.17+8
+    export JDK_HOME=~/tools/jdk-17.0.7+7
     export JAVA_HOME=%JDK_HOME%
-    export NODE_HOME=~/tools/node-18.15.0
+    export NODE_HOME=~/tools/node-22.14.0
     export SWIG_HOME=~/tools/swig-4.1.0
 
     export PATH=$JDK_HOME/bin:$PATH       # we prefer our install of OpenJDK vs. the system's
@@ -301,7 +301,8 @@ Depending on the OS, export GMSEC_PLATFORM according to the choices below:
     ---------        -------
     Linux x86-64     linux.x86_64
     Linux ARM64      aarch64
-    MacOS x86-64     macosx.x86_64
+	MacOS x86-64     macosx.x86_64
+    MacOS ARM64     macosx.aarch64
 
 For example:
 

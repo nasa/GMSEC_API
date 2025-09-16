@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -241,6 +241,33 @@ public:
 	 * by the field, or if the string is too big when converting to char.
 	 */
 	bool CALL_TYPE setFieldValue(const char* fieldName, const char* value);
+
+
+	/** * @fn bool setFieldValue(const char* fieldName, const char* value, bool convert) 
+	* 
+	* @brief Adds/replaces a field with the given name and value to the message. If 
+	* a field template for the schema in use is available for the named field, then 
+	* the value's type will be coerced to match that which is described in the field 
+	* template. 
+	* 
+	* @note This method is not very efficient; if the type of the field is known, 
+	* consider calling addField() instead. 
+	* 
+	* @param fieldName - name of the field to be modified/created 
+	* @param value - the value of the field * @param convert - <usage>
+	* @param convert - the boolean value to indicate wheather or not to covert a string
+	*                  containing a hex number to a binary value. 
+	*                  For case convert = true, the valid value of parameter 'value'  is
+	*                  that all of its charaters to be in the range  of ['0'-'9'], 
+    *                  ['a'-'f'], or ['A'-'F'].
+	* 
+	* @returns Returns true if the field was replaced; false otherwise. 
+	* 
+	* @throw A GmsecException is thrown if the field name is NULL or contains an empty string. 
+	* @throw A GmsecException is thrown if the input value's type cannot be converted into the type required 
+	* by the field, or if the string is too big when converting to char. 
+	*/
+	bool CALL_TYPE setFieldValue(const char* fieldName, const char* value, bool convert);
 
 
 	/**

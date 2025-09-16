@@ -5,8 +5,31 @@ See the associated Version Description Document (VDD) for further details of eac
 For technical support regarding this release, or any previous version, please contact the API Team at gmsec-support@lists.nasa.gov.
 
 
+= GMSEC API 5.3 release notes (September 2025)
 ==============================================================================
-= GMSEC API 5.2 release notes (November 2024)
+o A distribution supporting RHEL 9 is now provided
+o A distribution supporting MacOSX ARM64/Aarch64 (Apple Silicon) is now provided
+o A distribution supporting MacOSX x86_64 (Intel) is no longer provided
+o Python binding is now built with Python 3.11
+o NodeJS binding is now built with Node 22.14
+o Configurable Message Behavior: New message config option GMSEC-REPLY-SUBJECT can be added to request messages.  
+    When used, the Connection's Request call will automatically subscribe to the configured subject for a response if one is expected.
+	
+--- Change summary -----------------------------------------------------------
+* API-6362: mw-conn-retry-interval parameter is not working right on Windows
+* API-6372: build NodeJS binding with Node 22.x
+* API-6391: Built API on RHEL9
+* API-6394: gmsec_api project filters do not reflect directory structure
+* API-6395: java examples give wrong static variable name
+* API-6398: add Python3.11 to GMSEC_SUPPORT
+* API-6399: build python binding with Python 3.11
+* API-6400: Add message config GMSEC-REPLY-SUBJECT
+* API-6401: getStringValue does not print full precision for F64 or F32 fields
+* API-6403: Binary setFieldValue does not parse the string representation of the field
+* API-6490: Build API on MacOSX Aarch64
+
+==============================================================================
+= GMSEC API 5.2.1 release notes (November 2024)
 ==============================================================================
 
 --- Change summary -----------------------------------------------------------

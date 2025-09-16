@@ -25,9 +25,10 @@ IMPORTANT NOTE:
       * Windows 10
       * Windows 11
       * RHEL 8
+      * RHEL 9
       * Ubuntu 20.04 LTS
       * Ubuntu 20.04 ARM/Aarch64 LTS
-      * MacOS x86-64
+      * MacOS ARM/Aarch64
 
    Binaries and source code for the Open-Source version is available on NASA
    GitHub. See here for further details: https://github.com/nasa/GMSEC_API
@@ -181,10 +182,11 @@ IMPORTANT NOTE:
    Notes:
 
       1. Mono is required to use C# under Linux and MacOS
-      2. Strawberry Perl 5.32.1 is required for Windows 10 and 11
-      3. Python 3.10.7 (or later 3.10.x) is required for Windows 10 and 11
+      2. Strawberry Perl 5.38.2 is required for Windows 10 and 11
+      3. Python 3.11 is required for Windows 10 and 11
+      3. Python 3.13 is required for MacOS
       4. Ruby 3.2.2 is required for Windows 10 and 11
-      5. Node.js 18.15.0 (or later) is required for Windows 10 and 11
+      5. Node.js 22.14.0 (or later) is required for Windows 10 and 11
 
 
 

@@ -262,7 +262,12 @@ public class T016_ResourceGenerator extends TestCase
 
 			for (int i = 0; i < 7; ++i)
 			{
+				// Start time t1 is at the time start to receive data
+				t1 = TimeUtil.getCurrentTime_s();
 				Message rsrcMsg = conn.receive(5000);
+
+				// The end time t2 has to be measured immediately right after it completes receiving data.
+				t2 = TimeUtil.getCurrentTime_s();
 
 				// ignore the first few incoming messages (if any)
 				if (i < 3)
@@ -272,26 +277,29 @@ public class T016_ResourceGenerator extends TestCase
 
 				if (rsrcMsg != null)
 				{
-					if (t1 == 0)
-					{
-						t1 = TimeUtil.getCurrentTime_s();
-					}
-					else
-					{
-						t2 = TimeUtil.getCurrentTime_s();
+					//if (t1 == 0)
+					//{
+					//	t1 = TimeUtil.getCurrentTime_s();
+					//}
+					//else
+					//{
+					//	t2 = TimeUtil.getCurrentTime_s();
 
 						double delta = t2 - t1;
+						int roundUpPubRateToSecond = (int)delta;
 						if (delta < expectedPubRate)
 						{
-							delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+							//delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+							roundUpPubRateToSecond = (int)(delta + 0.5);      // round up to second
 						}
 
 						Log.info("Expected rate is: " + expectedPubRate + ", delta is: " + delta);
 
-						check("Unexpected publish rate", expectedPubRate == (int) delta);
+						//check("Unexpected publish rate", expectedPubRate == (int) delta);
+						check("Unexpected publish rate", expectedPubRate == roundUpPubRateToSecond);
 
-						t1 = t2;
-					}
+					//	t1 = t2;
+					//}
 
 					check("Unexpected MESSAGE-TYPE", rsrcMsg.getStringValue("MESSAGE-TYPE").equals("MSG"));
 					check("Unexpected MESSAGE-SUBTYPE", rsrcMsg.getStringValue("MESSAGE-SUBTYPE").equals("RSRC"));

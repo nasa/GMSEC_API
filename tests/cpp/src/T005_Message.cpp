@@ -365,6 +365,12 @@ void test_set_field_value(Test& test)
 		test.check("MISSION-ID has unexpected field type", Field::Type::STRING == msg.getField("MISSION-ID")->getType());
 		test.check("MISSION-ID has unexpected field value", static_cast<GMSEC_I32>(1234) == msg.getI32Value("MISSION-ID"));
 
+		//o off-nominal: setting F64 value to string field and retrieving as F64 should not be truncating value
+		msg.setFieldValue("MISSION-ID", static_cast<GMSEC_F64>(3.141592653589793));
+		test.check("MISSION-ID has unexpected field type", Field::Type::STRING == msg.getField("MISSION-ID")->getType());
+		test.check("MISSION-ID has unexpected field value", static_cast<GMSEC_F64>(3.141592653589793) == msg.getF64Value("MISSION-ID"));
+
+
 		//o Verify result returned is 'true' when replacing a field
 		test.check("Expected return value of true", msg.setFieldValue("PUB-RATE", static_cast<GMSEC_I32>(10)) == true);
 
@@ -1043,6 +1049,10 @@ void test_get_string_value(Test& test)
 
 		test.check("MESSAGE-TYPE has unexpected value", std::string("MSG") == msg.getStringValue("MESSAGE-TYPE"));
 		test.check("PUB-RATE has unexpected value", std::string("30")  == msg.getStringValue("PUB-RATE"));
+
+		//o off-nominal: setting F64 field and retrieving value as string should not truncate
+		msg.addField("TEST", (GMSEC_F64)3.141592653589793);
+		test.check("getStringValue() truncated floating point precision", std::string("3.141592653589793") == msg.getStringValue("TEST"));
 	}
 	catch (const GmsecException& e)
 	{
@@ -2303,6 +2313,38 @@ void test_get_field_iterator(Test& test)
 }
 
 
+void test_ticket_API_6403(Test& test)
+{
+	GMSEC_INFO << "Test for bug API-6403";
+
+	MessageFactory msgFactory;
+
+	Message message = msgFactory.createMessage("HB");
+
+	// Create a byte array contain numbers {0,1,2,3,4,5}
+	unsigned char* arr = new unsigned char[6];                           // Note that: unsiged char type is byte type
+	for (int i = 0; i < 6; i++)
+	{
+		arr[i] = (unsigned char)i;
+	}
+	
+	std::string name = "SPECIAL-INFO";
+	message.addField(name.c_str(), arr, 6);	                             // the value of this field is a 6-bytes array {0,1,2,3,4,5}
+
+	std::string xmlMessage1(message.getField(name.c_str())->toXML());    // expected value after running toXML() is '000102030405'
+	//GMSEC_INFO << "binary to xml: " << xmlMessage1.c_str() << "\n";
+
+	std::string asString = message.getStringValue(name.c_str());         // expected getStringValue() is '000102030405'
+	//GMSEC_INFO << "message.getStringValue(" << name.c_str() << ") = \'" << asString.c_str() << "\'\n";
+
+	message.setFieldValue(name.c_str(), asString.c_str());               // expected the value of this field after nunning setFieldValue() is '000102030405'
+
+	std::string xmlMessage2(message.getField(name.c_str())->toXML());
+	//GMSEC_INFO << "xml after string conversion: " << xmlMessage2.c_str() << "\n";
+	
+	test.check("Messages 1 and 2 do not have same XML content", xmlMessage1 == xmlMessage2);
+}
+
 int test_Message(Test& test)
 {
 	test.setDescription("Test Message");
@@ -2360,6 +2402,7 @@ int test_Message(Test& test)
 		test_to_json(test);
 		test_get_size(test);
 		test_get_field_iterator(test);
+		test_ticket_API_6403(test);
 	}
 	catch (GmsecException& e)
 	{

@@ -1,0 +1,286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="gov\nasa\gsfc\gmsec\api5\ApiVersion.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\ArrayListConverter.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\BinaryField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\BooleanField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\Callback.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\CharField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\Config.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\ConfigFile.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\ConfigFileIterator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\Connection.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\EventCallback.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\F32Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\F64Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\FieldSpecification.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\Gmsec.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\GmsecException.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\gmsecJNI.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\HeartbeatGenerator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\I8Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\I16Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\I32Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\I64Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIBinaryField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIBooleanField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNICallback.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNICharField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConfig.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConfigEntry.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConfigFile.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConfigFileIterator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIConnection.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIEventCallback.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIF32Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIF64Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIFieldConverter.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIHeartbeatGenerator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNII8Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNII16Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNII32Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNII64Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\util\JNILog.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\util\JNILogHandler.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessage.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessageEntry.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessageFactory.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessageFieldIterator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIMessageValidator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIReplyCallback.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIResourceGenerator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNISchemaIDIterator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNISpecification.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNIStatus.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIStringField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNISubscriptionEntry.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\JNISubscriptionInfo.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\util\JNITimeSpec.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\util\JNITimeUtil.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIU8Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIU16Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIU32Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\jni\field\JNIU64Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\Log.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\LogEntry.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\LogHandler.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\LogLevel.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\Message.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\MessageFactory.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\MessageFieldIterator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\MessageSpecification.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\MessageValidator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\ReplyCallback.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\ResourceGenerator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\SchemaIDIterator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\Specification.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\Status.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\StatusClassification.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\StatusCode.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\StringField.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\SubscriptionInfo.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\SystemValidator.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\TimeSpec.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\util\TimeUtil.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\U8.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\U8Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\U16.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\U16Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\U32.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\U32Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\U64.java">
+      <Filter>Java scripts</Filter>
+    </None>
+    <None Include="gov\nasa\gsfc\gmsec\api5\field\U64Field.java">
+      <Filter>Java scripts</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Java scripts">
+      <UniqueIdentifier>{8b73796a-fc49-400b-919e-291d82dca850}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

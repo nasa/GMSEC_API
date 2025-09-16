@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -1812,11 +1812,13 @@ void InternalConnection::initializeRequest()
 void InternalConnection::setupSubscriptionForResponse(const Message& request)
 {
 	// Attempt to set up a subscription so that a response, if requested, can be delivered
+
 	if (request.hasField("RESPONSE") && request.getBooleanValue("RESPONSE"))
 	{
-		const char* topic = MessageBuddy::getInternal(request).getResponseTopic();
+		// determine if user configured a reply subject string
+		const char* topic = request.getConfig().getValue(GMSEC_REPLY_SUBJECT);
 
-		if (topic && !std::string(topic).empty())
+		if (topic)
 		{
 			if (checkSubscription(topic, NULL) == IS_NEW)
 			{
@@ -1826,8 +1828,23 @@ void InternalConnection::setupSubscriptionForResponse(const Message& request)
 		}
 		else
 		{
-			GMSEC_WARNING << "Cannot deduce response topic; unable to subscribe to receive response message(s)";
+			// attempt to deduce reply subject string
+			const char* topic = MessageBuddy::getInternal(request).getResponseTopic();
+
+			if (topic && !std::string(topic).empty())
+			{
+				if (checkSubscription(topic, NULL) == IS_NEW)
+				{
+					GMSEC_VERBOSE << "Subscribing for response message using topic: " << topic;
+					subscribe(topic, Config(), reinterpret_cast<Callback*>(NULL));
+				}
+			}
+			else
+			{
+				GMSEC_WARNING << "Cannot deduce response topic; unable to subscribe to receive response message(s)";
+			}
 		}
+
 	}
 }
 

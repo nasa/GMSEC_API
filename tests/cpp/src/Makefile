@@ -1,4 +1,4 @@
-# Copyright 2007-2024 United States Government as represented by the
+# Copyright 2007-2025 United States Government as represented by the
 # Administrator of The National Aeronautics and Space Administration.
 # No copyright is claimed in the United States under Title 17, U.S. Code.
 # All Rights Reserved.
@@ -52,6 +52,7 @@ TESTS =	\
         T044_FieldTemplate.exe \
         T045_MessageTemplate.exe \
         T046_Subject.exe \
+        T047_ConfigurableMessageBehavior.exe \
         T100_C2NSS_Publisher.exe \
         T100_C2NSS_Subscriber.exe \
         T101_LargeMessage.exe \

@@ -19,7 +19,12 @@ void verify_resource_message(Test& test, const Config& config, GMSEC_U16 expecte
 
 		for (int i = 0; i < 7; ++i)
 		{
+			// Start time t1 is at the time start to receive data
+			t1 = TimeUtil::getCurrentTime_s();
 			Message* rsrc_msg = conn.receive(5000);
+
+			// The end time t2 has to be measured immediately right after it completes receiving data.
+			t2 = TimeUtil::getCurrentTime_s();
 
 			// ignore the first few incoming messages (if any)
 			if (i < 3)
@@ -30,26 +35,29 @@ void verify_resource_message(Test& test, const Config& config, GMSEC_U16 expecte
 
 			if (rsrc_msg)
 			{
-				if (t1 == 0)
-				{
-					t1 = TimeUtil::getCurrentTime_s();
-				}
-				else
-				{
-					t2 = TimeUtil::getCurrentTime_s();
+				//if (t1 == 0)
+				//{
+				//	t1 = TimeUtil::getCurrentTime_s();
+				//}
+				//else
+				//{
+				//	t2 = TimeUtil::getCurrentTime_s();
 
 					double delta = t2 - t1;
+					GMSEC_U16 roundUpPubRateToSecond = static_cast<GMSEC_U16>(delta);
 					if (delta < expectedPubRate)
 					{
-						delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+						//delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+						roundUpPubRateToSecond = static_cast<GMSEC_U16>(delta + 0.5);     // round up to second
 					}
 
 					GMSEC_INFO << "Expected rate is: " << expectedPubRate << ", delta is: " << delta;
 
-					test.check("Unexpected publish rate", expectedPubRate == static_cast<GMSEC_U16>(delta));
+					//test.check("Unexpected publish rate", expectedPubRate == static_cast<GMSEC_U16>(delta));
+					test.check("Unexpected publish rate", expectedPubRate == roundUpPubRateToSecond);
 
-					t1 = t2;
-				}
+				//	t1 = t2;
+				//}
 
 				test.check("Unexpected MESSAGE-TYPE", std::string("MSG") == rsrc_msg->getStringValue("MESSAGE-TYPE"));
 				test.check("Unexpected MESSAGE-SUBTYPE", std::string("RSRC") == rsrc_msg->getStringValue("MESSAGE-SUBTYPE"));

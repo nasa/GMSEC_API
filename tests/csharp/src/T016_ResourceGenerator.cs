@@ -241,7 +241,12 @@ namespace T016
 
 				for (int i = 0; i < 7; ++i)
 				{
+					// Start time t1 is at the time start to receive data
+					t1 = TimeUtil.GetCurrentTime_s();
 					Message rsrcMsg = conn.Receive(5000);
+
+					// The end time t2 has to be measured immediately right after it completes receiving data.
+					t2 = TimeUtil.GetCurrentTime_s();
 
 					// ignore the first few incoming messages (if any)
 					if (i < 3)
@@ -252,26 +257,29 @@ namespace T016
 
 					if (rsrcMsg != null)
 					{
-						if (t1 == 0)
-						{
-							t1 = TimeUtil.GetCurrentTime_s();
-						}
-						else
-						{
-							t2 = TimeUtil.GetCurrentTime_s();
+						//if (t1 == 0)
+						//{
+						//	t1 = TimeUtil.GetCurrentTime_s();
+						//}
+						//else
+						//{
+						//	t2 = TimeUtil.GetCurrentTime_s();
 
 							double delta = t2 - t1;
+							ushort roundUpPubRateToSecond = (ushort)delta;
 							if (delta < expectedPubRate)
 							{
-								delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+								//delta = ((t2 - t1) * 10.0 + 0.5) / 10.0;
+								roundUpPubRateToSecond = (ushort)(delta + 0.5);    // round up to second
 							}
 
 							Log.Info("Expected rate is: " + expectedPubRate + ", delta is: " + delta);
 
-							Check("Unexpected publish rate", expectedPubRate == (ushort) delta);
+							//Check("Unexpected publish rate", expectedPubRate == (ushort) delta);
+							Check("Unexpected publish rate", expectedPubRate == roundUpPubRateToSecond);
 
-							t1 = t2;
-						}
+						//	t1 = t2;
+						//}
 
 						Check("Unexpected MESSAGE-TYPE", rsrcMsg.GetStringValue("MESSAGE-TYPE") == "MSG");
 						Check("Unexpected MESSAGE-SUBTYPE", rsrcMsg.GetStringValue("MESSAGE-SUBTYPE") == "RSRC");

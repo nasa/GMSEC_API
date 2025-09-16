@@ -194,24 +194,49 @@ class Test_ResourceGenerator < Test
             conn.connect()
             conn.subscribe("C2MS.*.*.*.*.*.MSG.RSRC." + get_unique_component() + ".+")
 
-            sleep(4)
+            #sleep(4)
 
-            rsrcMsg = conn.receive(5000)
+            #rsrcMsg = conn.receive(5000)
 
-            if rsrcMsg != nil
-                check("Unexpected MESSAGE-TYPE", rsrcMsg.get_string_value("MESSAGE-TYPE") == "MSG")
-                check("Unexpected MESSAGE-SUBTYPE", rsrcMsg.get_string_value("MESSAGE-SUBTYPE") == "RSRC")
-                check("Unexpected PUB-RATE", rsrcMsg.get_integer_value("PUB-RATE") == expectedPubRate)
+            t1 = 0
+            t2 = 0
+            for i in 0..7 do
+                t1 = Libgmsec_ruby::TimeUtil.get_current_time_s()
+                rsrcMsg = conn.receive(5000)
+                t2 = Libgmsec_ruby::TimeUtil.get_current_time_s()
 
-                Libgmsec_ruby::Message::destroy(rsrcMsg)
-            else
-                check("Failed to received Resource Message", false)
+                # ignore the first few incoming messages (if any)
+                if i < 3
+                    if rsrcMsg != nil
+                        Libgmsec_ruby::Message::destroy(rsrcMsg)
+                    end
+                    next
+                end
+
+                if rsrcMsg != nil
+                    delta = t2 - t1
+                    roundupPubRate = delta.to_i;
+                    if delta < expectedPubRate
+                        roundupPubRate = ((t2 - t1) + 0.5).to_i
+                    end
+
+                    Libgmsec_ruby::Log::info("Expected rate is: " + expectedPubRate.to_s + ", delta is: " + delta.to_s)
+
+                    check("Unexpected publish rate", expectedPubRate == roundupPubRate)
+
+                    check("Unexpected MESSAGE-TYPE", rsrcMsg.get_string_value("MESSAGE-TYPE") == "MSG")
+                    check("Unexpected MESSAGE-SUBTYPE", rsrcMsg.get_string_value("MESSAGE-SUBTYPE") == "RSRC")
+                    check("Unexpected PUB-RATE", rsrcMsg.get_integer_value("PUB-RATE") == expectedPubRate)
+
+                    Libgmsec_ruby::Message::destroy(rsrcMsg)
+                else
+                    check("Failed to received Resource Message", false)
+                end
             end
-
             conn.disconnect()
             Libgmsec_ruby::Connection::destroy(conn)
-        rescue GmsecException => e
-            require("verify_resource_message: " + e.message, false);
+            rescue GmsecException => e
+                require("verify_resource_message: " + e.message, false);
         end
     end
 end

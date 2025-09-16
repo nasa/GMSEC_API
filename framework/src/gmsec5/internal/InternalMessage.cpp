@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2024 United States Government as represented by the
+ * Copyright 2007-2025 United States Government as represented by the
  * Administrator of The National Aeronautics and Space Administration.
  * No copyright is claimed in the United States under Title 17, U.S. Code.
  * All Rights Reserved.
@@ -39,6 +39,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <iomanip>
 #include <limits>
 #include <map>
 #include <sstream>
@@ -223,17 +224,38 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 	Field::Type type;
 	bool isHeader = false;
 
-	if (!fieldTemp || fieldTemp->getType().empty() || fieldTemp->getType() == "UNSET" || fieldTemp->getType() == "VARIABLE")
+	//Fix bug API-6403
+	if (!fieldTemp)
 	{
-		// if the template was not found, or has no discernable type, default to STRING
-		type = Field::Type::STRING;
+		// For case: it has no field template
+		const Field* field = NULL;
+		// get field associated with a given field name
+		field = m_fields.getField(fieldName);
+
+		// get type of that field if the field is not nil, otherwsie default to STRING
+		if (field)
+			type = field->getType();
+		else
+			type = Field::Type::STRING;
 	}
 	else
 	{
-		// use the type associated with the field template
-		type = InternalField::lookupType( fieldTemp->getType().c_str() );
-		isHeader = fieldTemp->isHeader();
+		// For case: it has field template
+		if (fieldTemp->getType().empty() ||
+			fieldTemp->getType() == "UNSET" ||
+			fieldTemp->getType() == "VARIABLE")
+		{
+			// if the template has no discernable type, default to STRING
+			type = Field::Type::STRING;
+		}
+		else
+		{
+			// use the type associated with the field template
+			type = InternalField::lookupType( fieldTemp->getType().c_str() );
+			isHeader = fieldTemp->isHeader();
+		}
 	}
+	// GMSEC_INFO << "SetFieldValue:  field <" << fieldName << "> has type of <" << (int)type << ">\n";
 
 	StdUniquePtr<Field> field;
 
@@ -465,16 +487,20 @@ bool InternalMessage::setFieldValue(const char* fieldName, const char* value, bo
 	case Field::Type::BINARY:
 		{
 			StringUtil::Data blob;
+			// GMSEC_INFO << "Set value <" << value << "> to binary field with convert = " << (convert?"true":"false") << "\n";
 
 			if (convert)
 			{
-				blob = StringUtil::string_toBinary(value);
+				//blob = StringUtil::string_toBinary(value);            // Fix bug for ticket API-6403
+				blob = StringUtil::binaryString_toBinary(value);		// Fix bug for ticket API-6403
 			}
 			else
 			{
-				blob = StringUtil::binaryString_toBinary(value);
+				//blob = StringUtil::binaryString_toBinary(value);      // Fix bug for ticket API-6403
+				blob = StringUtil::string_toBinary(value);				// Fix bug for ticket API-6403
 			}
 
+			// GMSEC_INFO << "blob = <" << blob.data() << ">   blob.length() = " << blob.length() << ",    isHeader = " << (isHeader ? "true" : "false") << "\n";
 			field.reset(new BinaryField(fieldName, const_cast<GMSEC_U8*>(blob.data()), blob.length(), isHeader));
 		}
 		break;
@@ -889,7 +915,7 @@ bool InternalMessage::setFieldValue(const char* fieldName, GMSEC_F64 value, Fiel
 	case Field::Type::STRING:
 		{
 			std::ostringstream oss;
-			oss << value;
+			oss << std::setprecision(16) << value;
 			field.reset(new StringField(fieldName, oss.str().c_str(), isHeader));
 		}
 		break;
@@ -2147,6 +2173,22 @@ bool InternalMessage::processConfigValue(const char* name, const char* value)
 			throw GmsecException(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
 		}
 	}
+	else if (StringUtil::stringEqualsIgnoreCase(name, GMSEC_REPLY_SUBJECT))
+	{
+		std::string result = Subject::isValidSubscription(value);
+
+		if (result.empty())
+		{
+			return true;
+		}
+		else
+		{
+			std::stringstream ss;
+			ss << GMSEC_REPLY_SUBJECT << " value must be a valid subscription subject.";
+			GMSEC_INFO << ss.str().c_str();
+			throw GmsecException(MSG_ERROR, UNUSED_CONFIG_ITEM, ss.str().c_str());
+		}
+	}
 
 	return false;
 }
@@ -2304,6 +2346,8 @@ void InternalMessage::init()
 std::string InternalMessage::buildSubject(bool forTopic, bool useWildcards) const
 {
 	std::string subject;
+
+	//MAV TODO: check message for SUBJECT config and use that if present
 
 	// If no template is available, or no subject within the template, then we cannot generate/build a subject.
 	if (m_template.get() && !m_template->getSubjectElements().empty())
